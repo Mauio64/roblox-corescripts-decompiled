@@ -1,5 +1,7 @@
 > [!CAUTION]  
-> This repo is currently out of date as I can't be bothered to pay for an Oracle API key. This notice will be removed once I get another decompiler working.
+> Updates run on a gifted Oracle API key (thanks @fgdfg!) that expires **2026-08-07** (30 days from 2026-07-08). After that, decompilation will break and this repo will stop updating until a new decompiler is set up.
+>
+> If you see this and the repo is still broken past that date, harass me to figure out another decompiler.
 
 ---
 
