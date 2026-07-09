@@ -1,0 +1,4 @@
+return {
+	Newest = "Newest",
+	RecentlyWorn = "RecentlyWorn"
+}

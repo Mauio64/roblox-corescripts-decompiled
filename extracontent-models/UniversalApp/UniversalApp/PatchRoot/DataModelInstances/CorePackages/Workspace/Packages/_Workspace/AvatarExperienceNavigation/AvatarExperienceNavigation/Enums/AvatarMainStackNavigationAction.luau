@@ -1,0 +1,3 @@
+return {
+	ClearScreens = "ClearScreens"
+}

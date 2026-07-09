@@ -1,0 +1,3 @@
+return {
+	NudgeForInviterSquad = "NudgeForInviterSquad"
+}

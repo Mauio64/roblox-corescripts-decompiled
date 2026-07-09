@@ -1,0 +1,3 @@
+return {
+	SocialUpsellType = require(script.SocialUpsellType)
+}

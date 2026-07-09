@@ -1,0 +1,4 @@
+return {
+	InContent = "InContent",
+	Modal = "Modal"
+}

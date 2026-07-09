@@ -1,0 +1,16 @@
+local EventNames = require(script.Parent.Enums.EventNames)
+
+return {
+	[EventNames.DiscoverabilityModalLoad] = {
+		name = game:DefineFastString("DiscoverabilityModalLoadCounter", "DiscoverabilityModalLoad")
+	},
+	[EventNames.DiscoverabilityModalContinue] = {
+		name = game:DefineFastString("DiscoverabilityModalContinueCounter", "DiscoverabilityModalContinue")
+	},
+	[EventNames.DiscoverabilityModalClose] = {
+		name = game:DefineFastString("DiscoverabilityModalCloseCounter", "DiscoverabilityModalClose")
+	},
+	[EventNames.DiscoverabilityModalRadioButtonClick] = {
+		name = game:DefineFastString("DiscoverabilityModalRadioButtonClickCounter", "DiscoverabilityModalRadioButtonClick")
+	}
+}

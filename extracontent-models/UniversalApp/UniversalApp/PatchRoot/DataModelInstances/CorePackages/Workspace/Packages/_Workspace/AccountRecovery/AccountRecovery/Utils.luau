@@ -1,0 +1,3 @@
+return {
+	IdentifierUtils = require(script.IdentifierUtils)
+}

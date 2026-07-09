@@ -1,0 +1,3 @@
+return {
+	InExpChatRewrite = "InExpChatRewrite"
+}

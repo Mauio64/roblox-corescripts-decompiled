@@ -1,0 +1,4 @@
+return {
+	Login = "Login",
+	AddAuthMethodPage = "AddAuthMethodPage"
+}

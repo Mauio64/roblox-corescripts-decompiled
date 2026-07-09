@@ -1,0 +1,4 @@
+return {
+	SDK_VERSION = "1.0.0",
+	SENTRY_VERSION = "7"
+}

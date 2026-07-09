@@ -1,0 +1,5 @@
+local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagPurchasePromptPriceShouldUseProductInfoPrice = require(script.Parent.FFlagPurchasePromptPriceShouldUseProductInfoPrice)
+
+return SharedFlags.FFlagPurchasePromptFetchCartPricing and (SharedFlags.FFlagEnableUnifiedProductPurchaseFlow and FFlagPurchasePromptPriceShouldUseProductInfoPrice)

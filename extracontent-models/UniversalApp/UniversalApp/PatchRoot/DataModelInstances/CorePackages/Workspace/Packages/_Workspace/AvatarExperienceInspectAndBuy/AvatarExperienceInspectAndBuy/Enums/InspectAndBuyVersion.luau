@@ -1,0 +1,4 @@
+return {
+	Version1 = 1,
+	Version2 = 2
+}

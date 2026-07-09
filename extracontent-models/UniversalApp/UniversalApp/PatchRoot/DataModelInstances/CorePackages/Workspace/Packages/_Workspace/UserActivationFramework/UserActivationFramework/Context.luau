@@ -1,0 +1,7 @@
+local FullPageActivationFrameworkContext = require(script.FullPageActivationFrameworkContext)
+local FullPageActivationFrameworkContextProvider = require(script.FullPageActivationFrameworkContextProvider)
+
+return {
+	FullPageActivationFrameworkContext = FullPageActivationFrameworkContext,
+	FullPageActivationFrameworkContextProvider = FullPageActivationFrameworkContextProvider
+}

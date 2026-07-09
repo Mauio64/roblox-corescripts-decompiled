@@ -1,0 +1,5 @@
+return {
+	Default = "Default",
+	Auto = "Auto",
+	Uniform = "Uniform"
+}

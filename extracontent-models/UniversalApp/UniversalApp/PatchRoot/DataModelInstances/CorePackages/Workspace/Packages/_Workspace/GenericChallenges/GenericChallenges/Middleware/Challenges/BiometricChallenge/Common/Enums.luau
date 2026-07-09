@@ -1,0 +1,5 @@
+return {
+	BiometricTypeEnum = {
+		PersonaLiveness = "personaliveness"
+	}
+}

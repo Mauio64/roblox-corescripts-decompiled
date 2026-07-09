@@ -1,0 +1,3 @@
+return {
+	useMappedSignal = require(script.useMappedSignal)
+}

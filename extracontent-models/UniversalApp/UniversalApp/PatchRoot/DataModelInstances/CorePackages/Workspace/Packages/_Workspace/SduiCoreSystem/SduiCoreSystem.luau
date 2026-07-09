@@ -1,0 +1,85 @@
+local SduiActionType = require(script.SduiActionType)
+local SduiImpressionEventType = require(script.SduiImpressionEventType)
+local SduiBuilderTypes = require(script.SduiBuilderTypes)
+local SduiComponentType = require(script.SduiComponentType)
+local SduiConfigTypes = require(script.SduiConfigTypes)
+local SduiContentTypes = require(script.SduiContentTypes)
+
+require(script.SduiDataStoreTypes)
+require(script.SduiFocusNavigationTypes)
+require(script.ClientBinding.SduiPoolStoreTypes)
+
+local SduiErrors = require(script.SduiErrors)
+local FFlagSduiActionTelemetryHandler = require(script.Parent.SharedFlags).FFlagSduiActionTelemetryHandler
+
+return {
+	["jest.config"] = script["jest.config"],
+	executeAction = require(script.executeAction),
+	findAnalyticsField = require(script.findAnalyticsField),
+	findAnalyticsFieldInAncestors = require(script.findAnalyticsFieldInAncestors),
+	getActionTelemetryFieldValue = require(script.getActionTelemetryFieldValue),
+	getSduiComponentWrapper = require(script.getSduiComponentWrapper),
+	reportUnifiedLoggingAction = require(script.Analytics.reportUnifiedLoggingAction),
+	reportUnifiedLoggingImpressions = require(script.Analytics.reportUnifiedLoggingImpressions),
+	parseProps = require(script.parseProps),
+	SduiActionParams = require(script.SduiActionParams),
+	SduiActionType = SduiActionType,
+	SduiImpressionEventType = SduiImpressionEventType,
+	SduiBuilder = require(script.SduiBuilder),
+	SduiBuilderTypes = SduiBuilderTypes,
+	SduiCollectionAnalyticsBuilder = require(script.Analytics.SduiCollectionAnalyticsBuilder),
+	SduiComponent = require(script.SduiComponent),
+	SduiComponentType = SduiComponentType,
+	SduiConfigTypes = SduiConfigTypes,
+	SduiContentTypes = SduiContentTypes,
+	SduiErrors = SduiErrors,
+	SduiInstrumentation = require(script.SduiInstrumentation),
+	SduiLogger = require(script.SduiLogger),
+	SduiMockUtils = require(script.ClientBinding.SduiMockUtils),
+	SduiParseHelpers = require(script.SduiParseHelpers),
+	SduiPoolStore = require(script.ClientBinding.SduiPoolStore),
+	SduiParsers = require(script.SduiParsers),
+	SduiResponsiveHelpers = require(script.SduiResponsiveHelpers),
+	SduiTemplateRegistry = require(script.SduiTemplateRegistry),
+	SduiUsageRecorder = require(script.Analytics.SduiUsageRecorder),
+	recordTemplateUsage = require(script.Analytics.recordTemplateUsage),
+	recordV1ComponentUsage = require(script.Analytics.recordV1ComponentUsage),
+	recordV1RegisteredTemplates = require(script.Analytics.recordV1RegisteredTemplates),
+	useUidRefString = require(script.useUidRefString),
+	validateInterface = require(script.validateInterface),
+	validateSduiComponentConfig = require(script.validateSduiComponentConfig),
+	getSduiClientBindingBuilder = function() -- line: 103
+		return require(script.ClientBinding.SduiClientBindingBuilder)
+	end,
+	getSduiDataBinder = function() -- line: 106
+		return require(script.ClientBinding.SduiDataBinder)
+	end,
+	getProtoVariableMapper = function() -- line: 109
+		return require(script.ClientBinding.ProtoVariableMapper)
+	end,
+	createBuilderConfig = function(p1) -- line: 112
+		return require(script.ClientBinding.createBuilderConfig)(p1)
+	end,
+	getSduiActionHandlerRegistry = function() -- line: 116
+		return require(script.getSduiActionHandlerRegistry)()
+	end,
+	getSduiImpressionHandlerRegistry = function() -- line: 119
+		return require(script.getSduiImpressionHandlerRegistry)()
+	end,
+	getSduiTelemetryHandlerNameRegistry = if not FFlagSduiActionTelemetryHandler then nil else function() -- line: 123
+		return require(script.getSduiTelemetryHandlerNameRegistry)()
+	end,
+	getSduiServiceDependenciesStore = function() -- line: 127
+		return require(script.ClientBinding.getSduiServiceDependenciesStore)()
+	end,
+	getSduiTokensStore = function() -- line: 130
+		return require(script.ClientBinding.getSduiTokensStore)()
+	end,
+	getSduiPolicyStore = function() -- line: 133
+		return require(script.ClientBinding.getSduiPolicyStore)()
+	end,
+	getSduiComponentRegistry = require(script.getSduiComponentRegistry),
+	getSduiClientPageScope = require(script.ClientBinding.getSduiClientPageScope),
+	usePageScopeRef = require(script.ClientBinding.usePageScopeRef),
+	SduiCapabilities = require(script.ClientBinding.SduiCapabilities)
+}

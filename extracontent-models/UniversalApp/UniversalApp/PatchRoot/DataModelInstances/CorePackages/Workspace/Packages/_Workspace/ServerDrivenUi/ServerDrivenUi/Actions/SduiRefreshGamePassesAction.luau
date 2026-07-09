@@ -1,0 +1,27 @@
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local DataHydration = require(Parent.DataHydration)
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
+local SduiActionType = SduiCoreSystem.SduiActionType
+
+local function SduiRefreshGamePassesAction(p1, _, p3) -- line: 14
+	-- upvalues: SduiErrorType (copy), SduiActionType (copy), DataHydration (copy)
+	local v10 = p1 and p1.actionParams or nil
+
+	if v10 == nil then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			message = "Missing actionParams",
+			name = SduiActionType.RefreshGamePasses
+		}, p3.appPage)
+
+		return
+	end
+
+	local universeId = v10.universeId
+
+	if universeId then
+		DataHydration.Game.getGamePassStore(false).fetchPassesForUniverse(universeId)
+	end
+end
+
+return SduiRefreshGamePassesAction

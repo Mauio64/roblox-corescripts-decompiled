@@ -1,0 +1,40 @@
+local MessageBusService = game:GetService("MessageBusService")
+local MessageId = MessageBusService:GetMessageId("Call", "initCall")
+local MessageId2 = MessageBusService:GetMessageId("Call", "answerCall")
+local MessageId3 = MessageBusService:GetMessageId("Call", "answerSuccessCall")
+local MessageId4 = MessageBusService:GetMessageId("Call", "rejectCall")
+local MessageId5 = MessageBusService:GetMessageId("Call", "cancelCall")
+local MessageId6 = MessageBusService:GetMessageId("Call", "teleportSuccessCall")
+local MessageId7 = MessageBusService:GetMessageId("Call", "finishCall")
+local MessageId8 = MessageBusService:GetMessageId("Call", "updateMicAndCamState")
+local MessageId9 = MessageBusService:GetMessageId("Call", "handleInitCall")
+local MessageId10 = MessageBusService:GetMessageId("Call", "handleConnectingCall")
+local MessageId11 = MessageBusService:GetMessageId("Call", "handleTeleportingCall")
+local MessageId12 = MessageBusService:GetMessageId("Call", "handleActiveCall")
+local MessageId13 = MessageBusService:GetMessageId("Call", "handleEndCall")
+local MessageId14 = MessageBusService:GetMessageId("Call", "handleCallMessage")
+local MessageId15 = MessageBusService:GetMessageId("Call", "handleMicAndCamChanged")
+local MessageId16 = MessageBusService:GetMessageId("Call", "handleTransferCallTeleportLeave")
+local MessageId17 = MessageBusService:GetMessageId("Call", "handleTransferCallTeleportJoin")
+
+return {
+	NAME = "Call",
+	METHOD_GET_CALL_STATE = "getCallState",
+	MESSAGE_INIT_CALL = MessageId,
+	MESSAGE_ANSWER_CALL = MessageId2,
+	MESSAGE_ANSWER_SUCCESS_CALL = MessageId3,
+	MESSAGE_REJECT_CALL = MessageId4,
+	MESSAGE_CANCEL_CALL = MessageId5,
+	MESSAGE_TELEPORT_SUCCESS_CALL = MessageId6,
+	MESSAGE_FINISH_CALL = MessageId7,
+	MESSAGE_UDPATE_MIC_AND_CAM_STATE = MessageId8,
+	MESSAGE_HANDLE_INIT_CALL = MessageId9,
+	MESSAGE_HANDLE_CONNECTING_CALL = MessageId10,
+	MESSAGE_HANDLE_TELEPORTING_CALL = MessageId11,
+	MESSAGE_HANDLE_ACTIVE_CALL = MessageId12,
+	MESSAGE_HANDLE_END_CALL = MessageId13,
+	MESSAGE_HANDLE_CALL_MESSAGE = MessageId14,
+	MESSAGE_HANDLE_MIC_AND_CAM_CHANGED = MessageId15,
+	MESSAGE_HANDLE_TRANSFER_CALL_TELEPORT_LEAVE = MessageId16,
+	MESSAGE_HANDLE_TRANSFER_CALL_TELEPORT_JOIN = MessageId17
+}

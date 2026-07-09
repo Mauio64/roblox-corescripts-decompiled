@@ -1,0 +1,4 @@
+return {
+	Undefined = "",
+	Shown = "Shown"
+}

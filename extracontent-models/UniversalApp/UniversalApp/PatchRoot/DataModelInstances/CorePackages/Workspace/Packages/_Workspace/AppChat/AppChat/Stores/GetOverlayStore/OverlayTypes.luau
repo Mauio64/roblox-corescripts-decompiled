@@ -1,0 +1,3 @@
+return {
+	GroupOSADialog = "GroupOSADialog"
+}

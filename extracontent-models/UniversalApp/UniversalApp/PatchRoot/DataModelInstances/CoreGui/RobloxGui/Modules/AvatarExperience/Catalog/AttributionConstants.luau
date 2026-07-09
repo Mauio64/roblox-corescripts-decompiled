@@ -1,0 +1,45 @@
+local t1 = {
+	UnplayableOtherReason = true,
+	Playable = true,
+	GuestProhibited = true,
+	GameUnapproved = false,
+	IncorrectConfiguration = false,
+	UniverseRootPlaceIsPrivate = false,
+	InsufficientPermissionFriendsOnly = true,
+	InsufficientPermissionGroupOnly = true,
+	DeviceRestricted = true,
+	UnderReview = true,
+	PurchaseRequired = true,
+	AccountRestricted = true,
+	TemporarilyUnavailable = true,
+	ComplianceBlocked = true,
+	ContextualPlayabilityAgeRecommendationParentalControls = true,
+	ContextualPlayabilityRegionalAvailability = true,
+	ContextualPlayabilityRegionalCompliance = true,
+	ContextualPlayabilityUnverifiedSeventeenPlusUser = true
+}
+local t2 = {
+	UnplayableOtherReason = false,
+	Playable = true,
+	GuestProhibited = false,
+	GameUnapproved = false,
+	IncorrectConfiguration = false,
+	UniverseRootPlaceIsPrivate = false,
+	InsufficientPermissionFriendsOnly = false,
+	InsufficientPermissionGroupOnly = false,
+	DeviceRestricted = false,
+	UnderReview = false,
+	PurchaseRequired = true,
+	AccountRestricted = false,
+	TemporarilyUnavailable = false,
+	ComplianceBlocked = false,
+	ContextualPlayabilityAgeRecommendationParentalControls = false,
+	ContextualPlayabilityRegionalAvailability = false,
+	ContextualPlayabilityRegionalCompliance = false,
+	ContextualPlayabilityUnverifiedSeventeenPlusUser = true
+}
+
+return {
+	ShowPlayableAttributionMapper = t1,
+	ShowTraversalAlertMapper = t2
+}

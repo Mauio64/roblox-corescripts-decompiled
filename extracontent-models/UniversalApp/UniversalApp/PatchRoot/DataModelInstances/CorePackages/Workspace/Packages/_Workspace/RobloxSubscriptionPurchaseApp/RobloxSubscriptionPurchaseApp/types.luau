@@ -1,0 +1,8 @@
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+
+require(RobloxSubscriptionPurchaseApp.Enums.RobloxSubscriptionFlowCompleteReason)
+require(RobloxSubscriptionPurchaseApp.Enums.SurfaceContext)
+require(RobloxSubscriptionPurchaseApp.Enums.SurfaceName)
+require(RobloxSubscriptionPurchaseApp.Enums.PurchaseClientSessionIdType)
+
+return {}

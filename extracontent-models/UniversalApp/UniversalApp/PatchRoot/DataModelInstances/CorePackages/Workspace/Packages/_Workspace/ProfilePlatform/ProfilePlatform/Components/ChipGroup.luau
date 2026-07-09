@@ -1,0 +1,3 @@
+return {
+	ChipGroup = require(script.ChipGroup)
+}

@@ -1,0 +1,4 @@
+return {
+	DEBUG = "DEBUG",
+	ERROR = "ERROR"
+}

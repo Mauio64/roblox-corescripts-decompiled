@@ -1,0 +1,14 @@
+return {
+	FFlagExpChatAddUserAsyncNilCheck = require(script.FFlagExpChatAddUserAsyncNilCheck),
+	FFlagExpChatDisableUniverseBubbleChat = require(script.FFlagExpChatDisableUniverseBubbleChat),
+	FFlagExpChatPresetChatEnabled = require(script.FFlagExpChatPresetChatEnabled),
+	FFlagExpChatPresetChatLoadTestEnabled = require(script.FFlagExpChatPresetChatLoadTestEnabled),
+	FFlagExpChatPresetChatSendEnabled = require(script.FFlagExpChatPresetChatSendEnabled),
+	FFlagExpChatUseUnifiedTooltipStore = require(script.FFlagExpChatUseUnifiedTooltipStore),
+	GetFFlagExpChatSyntheticSystemMessageRichText = require(script.GetFFlagExpChatSyntheticSystemMessageRichText),
+	GetFFlagEnableExpChatUniverseChatTabNames = require(script.GetFFlagEnableExpChatUniverseChatTabNames),
+	GetFFlagExpChatSuppressWelcomeMessageTabUnread = require(script.GetFFlagExpChatSuppressWelcomeMessageTabUnread),
+	GetFFlagTextChatEnableUniverseChatTabs = require(script.GetFFlagTextChatEnableUniverseChatTabs),
+	getFFlagUseCharacterStore = require(script.getFFlagUseCharacterStore),
+	FIntPresetChatCooldownLuaMs = require(script.FIntPresetChatCooldownLuaMs)
+}
