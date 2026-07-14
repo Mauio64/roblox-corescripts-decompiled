@@ -4,7 +4,7 @@ local React = require(Parent.React)
 local ChatComposer = require(script.Parent.ChatComposer)
 local View = Foundation.View
 
-local function ChatActions(t1: {[any]: any}) -- line: 28
+local function ChatActions(t1: {[any]: any}) -- line: 29
 	-- upvalues: React (copy), View (copy), ChatComposer (copy)
 	return React.createElement(View, {
 		tag = "col gap-small size-full-0 auto-y",
@@ -18,6 +18,7 @@ local function ChatActions(t1: {[any]: any}) -- line: 28
 			placeholder = t1.placeholder,
 			textBoxRef = t1.textBoxRef,
 			isAssistantResponding = t1.isAssistantResponding,
+			canStopAssistantResponse = t1.canStopAssistantResponse,
 			onSend = t1.onSend,
 			onStop = t1.onStop,
 			maxLines = t1.maxLines,

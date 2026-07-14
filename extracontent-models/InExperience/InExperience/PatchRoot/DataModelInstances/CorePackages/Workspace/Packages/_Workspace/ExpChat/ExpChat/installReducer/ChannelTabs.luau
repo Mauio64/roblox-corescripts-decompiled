@@ -439,46 +439,33 @@ return Rodux.createReducer(t1, {
 
 		v7:trace("FriendsChatChannelSelected dispatched: {}", p11.channelName)
 
-		local v115 = t26.allChannelTabs[p11.channelName]
-
-		if v115 == nil then
-			return Dictionary.join(t26, {
-				selectedTabName = p11.channelName
-			})
-		end
-
 		return Dictionary.join(t26, {
-			allChannelTabs = Dictionary.join(t26.allChannelTabs, {
-				[p11.channelName] = Dictionary.join(v115, {
-					HasUnreadMessages = false
-				})
-			}),
 			selectedTabName = p11.channelName
 		})
 	end,
-	[SetChannelUnreadStatus.name] = function(t27: {[any]: any}, p12) -- line: 511
+	[SetChannelUnreadStatus.name] = function(t27: {[any]: any}, p12) -- line: 504
 		-- upvalues: Dictionary (copy)
-		local v118 = t27.allChannelTabs[p12.channelName]
+		local v117 = t27.allChannelTabs[p12.channelName]
 
-		if v118 == nil then
+		if v117 == nil then
 			return t27
 		end
 
 		return Dictionary.join(t27, {
 			allChannelTabs = Dictionary.join(t27.allChannelTabs, {
-				[p12.channelName] = Dictionary.join(v118, {
+				[p12.channelName] = Dictionary.join(v117, {
 					HasUnreadMessages = p12.hasUnreadMessages
 				})
 			})
 		})
 	end,
-	[UniverseChatChannelSelected.name] = function(t28: {[any]: any}, p13) -- line: 526
+	[UniverseChatChannelSelected.name] = function(t28: {[any]: any}, p13) -- line: 519
 		-- upvalues: v7 (copy), Dictionary (copy)
 		v7:trace("UniverseChatChannelSelected dispatched: {}", p13.channelName)
 
-		local v121 = t28.allChannelTabs[p13.channelName]
+		local v120 = t28.allChannelTabs[p13.channelName]
 
-		if v121 == nil then
+		if v120 == nil then
 			return Dictionary.join(t28, {
 				selectedTabName = p13.channelName
 			})
@@ -486,7 +473,7 @@ return Rodux.createReducer(t1, {
 
 		return Dictionary.join(t28, {
 			allChannelTabs = Dictionary.join(t28.allChannelTabs, {
-				[p13.channelName] = Dictionary.join(v121, {
+				[p13.channelName] = Dictionary.join(v120, {
 					HasUnreadMessages = false
 				})
 			}),

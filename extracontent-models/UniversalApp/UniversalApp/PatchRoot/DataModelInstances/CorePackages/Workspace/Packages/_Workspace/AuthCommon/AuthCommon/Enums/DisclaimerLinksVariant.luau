@@ -1,4 +1,0 @@
-return {
-	Default = "Default",
-	Link = "Link"
-}

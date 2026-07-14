@@ -98,6 +98,7 @@ local FFlagLuaAppUsePrevalidatedVideoGamePlayability = require(GameTileParent.Sh
 local v98 = game:DefineFastFlag("LuaAppStabilizeVideoTileReactRoot", false)
 local FFlagLuaAppHomeReduceRenders = require(GameTileParent.SharedFlags).FFlagLuaAppHomeReduceRenders
 local FFlagLuaAppGenreRatingFooter = require(GameTileParent.SharedFlags).FFlagLuaAppGenreRatingFooter
+local FFlagLuaAppGameTileSelectionVideoPlayback = require(GameTileParent.SharedFlags).FFlagLuaAppGameTileSelectionVideoPlayback
 local VideoPlaybackCoordinator = require(GameTileParent.VideoUtils).VideoPlaybackCoordinator
 local GameTileOverflowMenu = require(GameTile.GameTileOverflowMenu)
 local getAvailableGameTileOverflowMenuItems = require(GameTile.getAvailableGameTileOverflowMenuItems)
@@ -105,13 +106,13 @@ local t1 = {}
 
 game:DefineFastInt("LuaAppGameTileHoverDelayMs", 130)
 
-local function getHoverDelay() -- line: 135
+local function getHoverDelay() -- line: 137
 	return game:GetFastInt("LuaAppGameTileHoverDelayMs") / 1000
 end
 
-local v106 = Roact.PureComponent:extend("AppGameTile")
+local v107 = Roact.PureComponent:extend("AppGameTile")
 
-v106.validateProps = t.strictInterface({
+v107.validateProps = t.strictInterface({
 	entry = t.table,
 	reportGameDetailOpened = t.callback,
 	reportExperienceLaunched = t.optional(t.callback),
@@ -131,8 +132,8 @@ v106.validateProps = t.strictInterface({
 	onGuiStateChanged = if not FFlagLuaAppGameTileInteractionFeedback then nil else t.optional(t.callback),
 	isDisabled = t.optional(t.boolean),
 	onActivated = if not FFlagLuaAppGameTileInteractionFeedback then nil else t.optional(t.callback),
-	onSelectionGained = t.optional(t.callback),
-	onSelectionLost = t.optional(t.callback),
+	onSelectionGained = if not FFlagLuaAppGameTileSelectionVideoPlayback then t.optional(t.callback) else t.callback,
+	onSelectionLost = if not FFlagLuaAppGameTileSelectionVideoPlayback then t.optional(t.callback) else t.callback,
 	friendFooterEnabled = t.optional(t.boolean),
 	index = t.optional(t.number),
 	layoutOrder = t.optional(t.number),
@@ -192,6 +193,7 @@ v106.validateProps = t.strictInterface({
 	hoverRef = t.table,
 	isHoverSupported = t.optional(t.boolean),
 	isHovered = t.optional(t.boolean),
+	isSelected = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else t.boolean,
 	isVideoPlaying = t.boolean,
 	tileBadges = t.optional(t.table),
 	users = t.optional(t.table),
@@ -210,7 +212,7 @@ v106.validateProps = t.strictInterface({
 
 local Narrow = GameTileTypes.GameTileLayoutType.Narrow
 
-v106.defaultProps = {
+v107.defaultProps = {
 	useHoverTile = false,
 	hasBackground = false,
 	useExperienceTileMetadata = false,
@@ -221,8 +223,8 @@ v106.defaultProps = {
 	contentTextLineCount = GameTileConstants.TileTextLines[Narrow].titleTextLines
 }
 
-function v106.init(p1) -- line: 263
-	-- upvalues: DiscoveryAppLaunchTracker (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), gameTileOverflowMenuAction (copy), FFlagLuaAppFixTwoByOneOverflowMenuTelemetry (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), getOverflowMenuSignalStore (copy), FFlagLuaAppGameDetailsAttributionFix (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), VideoPlaybackCoordinator (copy), Roact (copy), AppExperienceActionRow (copy), FFlagLuaAppUnifyPlayButtonTile (copy), sponsoredGamesRecordClick (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy), Responsive (copy), ContentProvider (copy), FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), memoize (copy), sortFriendsByPresenceAndRecencyFactory (copy)
+function v107.init(p1) -- line: 266
+	-- upvalues: DiscoveryAppLaunchTracker (copy), FFlagLuaAppGameTileSelectionVideoPlayback (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), gameTileOverflowMenuAction (copy), FFlagLuaAppFixTwoByOneOverflowMenuTelemetry (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), getOverflowMenuSignalStore (copy), FFlagLuaAppGameDetailsAttributionFix (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), VideoPlaybackCoordinator (copy), Roact (copy), AppExperienceActionRow (copy), FFlagLuaAppUnifyPlayButtonTile (copy), sponsoredGamesRecordClick (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy), Responsive (copy), ContentProvider (copy), FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), memoize (copy), sortFriendsByPresenceAndRecencyFactory (copy)
 	if DiscoveryAppLaunchTracker.isEnabled() and DiscoveryAppLaunchTracker.default then
 		DiscoveryAppLaunchTracker.default:trackTileInit()
 	end
@@ -230,9 +232,9 @@ function v106.init(p1) -- line: 263
 	p1.state = {
 		isHovered = false,
 		canDisplayFriendFooter = false,
-		isSelected = false
+		isSelected = not not FFlagLuaAppGameTileSelectionVideoPlayback and nil
 	}
-	p1.onMenuOpenChanged = if not FFlagLuaAppGameTileOverflowMenuTelemetry then nil else function(b1: boolean, s1: string?) -- line: 275
+	p1.onMenuOpenChanged = if not FFlagLuaAppGameTileOverflowMenuTelemetry then nil else function(b1: boolean, s1: string?) -- line: 278
 		-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), p1 (copy), gameTileOverflowMenuAction (copy), FFlagLuaAppFixTwoByOneOverflowMenuTelemetry (copy)
 		local t2 = {
 			ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then p1.props.appPage else nil,
@@ -245,16 +247,16 @@ function v106.init(p1) -- line: 263
 		gameTileOverflowMenuAction(t2, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else p1.props.appPage or if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else "Unknown")
 	end
 
-	function p1.onTouchLongPress() -- line: 295
+	function p1.onTouchLongPress() -- line: 298
 		-- upvalues: p1 (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), FFlagLuaAppFixTwoByOneOverflowMenuTelemetry (copy), getOverflowMenuSignalStore (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy)
 		if next(p1.props.availableMenuItems) ~= nil then
 			if p1.props.triggerFeedback and not p1.props.overflowMenuOpen then
-				local v222 = if not FFlagLuaAppHapticTriggeredTelemetry then nil else {
+				local v228 = if not FFlagLuaAppHapticTriggeredTelemetry then nil else {
 					universeId = p1.props.universeId,
 					sortId = p1.props.topicId
 				}
 
-				p1.props.triggerFeedback("TileLongPress", "Press", if not FFlagLuaAppHapticTriggeredTelemetry then nil else p1.props.appPage or if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else "Unknown", if not FFlagLuaAppHapticTriggeredTelemetry then nil else v222)
+				p1.props.triggerFeedback("TileLongPress", "Press", if not FFlagLuaAppHapticTriggeredTelemetry then nil else p1.props.appPage or if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else "Unknown", if not FFlagLuaAppHapticTriggeredTelemetry then nil else v228)
 			end
 
 			getOverflowMenuSignalStore().openMenu(p1.props.hoverKey)
@@ -262,15 +264,15 @@ function v106.init(p1) -- line: 263
 			if FFlagLuaAppGameTileOverflowMenuTelemetry then
 				local t3 = {}
 
-				for v224, _ in p1.props.availableMenuItems do
-					table.insert(t3, v224)
+				for v230, _ in p1.props.availableMenuItems do
+					table.insert(t3, v230)
 				end
 
 				p1.onMenuOpenChanged(false, table.concat(t3, ","))
 			end
 		end
 	end
-	function p1.reportExperienceLaunchedFromActionBar(...) -- line: 329
+	function p1.reportExperienceLaunchedFromActionBar(...) -- line: 332
 		-- upvalues: FFlagLuaAppGameDetailsAttributionFix (copy), p1 (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), VideoPlaybackCoordinator (copy)
 		if FFlagLuaAppGameDetailsAttributionFix then
 			p1.props.recordSponsoredGameClick()
@@ -294,14 +296,14 @@ function v106.init(p1) -- line: 263
 
 		VideoPlaybackCoordinator.default:reset(VideoEndReason.ExperienceLaunched, nil, p1.props.navigationUniverseId, nil)
 	end
-	function p1.renderAppExperienceActionRow(_) -- line: 366
+	function p1.renderAppExperienceActionRow(_) -- line: 369
 		-- upvalues: Roact (copy), AppExperienceActionRow (copy), p1 (copy), FFlagLuaAppGameDetailsAttributionFix (copy), FFlagLuaAppUnifyPlayButtonTile (copy)
 		return Roact.createElement(AppExperienceActionRow, {
 			launchSource = "ExperienceTile",
 			universeId = p1.props.navigationUniverseId,
 			referralSource = p1.props.referralSource,
 			reportExperienceLaunched = p1.reportExperienceLaunchedFromActionBar,
-			openGameDetails = if not FFlagLuaAppGameDetailsAttributionFix then p1.onActivated else function() -- line: 373
+			openGameDetails = if not FFlagLuaAppGameDetailsAttributionFix then p1.onActivated else function() -- line: 376
 				-- upvalues: p1 (copy)
 				p1.props.onGameTileActivated(p1.isMounted)
 			end,
@@ -314,7 +316,7 @@ function v106.init(p1) -- line: 263
 			launchDataOverride = p1.props.entry.launchDataOverride
 		})
 	end
-	function p1.onHoverChanged(p3) -- line: 387
+	function p1.onHoverChanged(p3) -- line: 390
 		-- upvalues: p1 (copy)
 		if p3 and p1.props.triggerFeedback then
 			p1.props.triggerFeedback("Default", "Hover")
@@ -327,7 +329,7 @@ function v106.init(p1) -- line: 263
 
 	p1.gameTileRef = Roact.createRef()
 
-	function p1.getTilePosition() -- line: 399
+	function p1.getTilePosition() -- line: 402
 		-- upvalues: p1 (copy)
 		if p1.gameTileRef.current then
 			return p1.gameTileRef.current.AbsolutePosition
@@ -335,7 +337,7 @@ function v106.init(p1) -- line: 263
 
 		return nil
 	end
-	function p1.getTileSize() -- line: 407
+	function p1.getTileSize() -- line: 410
 		-- upvalues: p1 (copy)
 		if p1.gameTileRef.current then
 			return p1.gameTileRef.current.AbsoluteSize
@@ -344,7 +346,7 @@ function v106.init(p1) -- line: 263
 		return nil
 	end
 
-	p1.recordSponsoredGameClick = not FFlagLuaAppGameDetailsAttributionFix and function() -- line: 417
+	p1.recordSponsoredGameClick = not FFlagLuaAppGameDetailsAttributionFix and function() -- line: 420
 		-- upvalues: p1 (copy), sponsoredGamesRecordClick (copy)
 		local networking = p1.props.networking
 		local entry = p1.props.entry
@@ -353,7 +355,7 @@ function v106.init(p1) -- line: 263
 			sponsoredGamesRecordClick(networking, entry.adId)
 		end
 	end or nil
-	p1.onActivated = not FFlagLuaAppGameDetailsAttributionFix and function() -- line: 428
+	p1.onActivated = not FFlagLuaAppGameDetailsAttributionFix and function() -- line: 431
 		-- upvalues: p1 (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), VideoPlaybackCoordinator (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy)
 		if p1.props.isHovered then
 			HoverTileCoordinator.default:reset()
@@ -397,33 +399,33 @@ function v106.init(p1) -- line: 263
 		end
 	end or nil
 
-	function p1.onFriendFooterActivated() -- line: 489
+	function p1.onFriendFooterActivated() -- line: 492
 		-- upvalues: p1 (copy)
 		if p1.isMounted then
 			local game2 = p1.props.game
-			local v234 = p1.getTileSize()
+			local v240 = p1.getTileSize()
 
-			p1.props.openContextualMenu(game2, v234, p1.getTilePosition())
+			p1.props.openContextualMenu(game2, v240, p1.getTilePosition())
 		end
 	end
-	function p1.onActivateSponsoredTooltip() -- line: 497
+	function p1.onActivateSponsoredTooltip() -- line: 500
 		-- upvalues: p1 (copy), Responsive (copy)
 		if p1.isMounted then
 			p1.props.openSponsoredTooltip(Responsive.GetInputModeStore(false).getLastInputType(false))
 		end
 	end
-	function p1.loadWideThumbnail() -- line: 505
+	function p1.loadWideThumbnail() -- line: 508
 		-- upvalues: p1 (copy), ContentProvider (copy)
 		local wideThumbnail = p1.props.wideThumbnail
 
 		if wideThumbnail ~= nil then
-			task.spawn(function() -- line: 508
+			task.spawn(function() -- line: 511
 				-- upvalues: ContentProvider (copy), wideThumbnail (copy)
 				ContentProvider:PreloadAsync({ wideThumbnail })
 			end)
 		end
 	end
-	function p1.getVisitedFriends() -- line: 514
+	function p1.getVisitedFriends() -- line: 517
 		-- upvalues: p1 (copy), FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy)
 		local t5 = {}
 		local friendVisits = p1.props.friendVisits
@@ -434,11 +436,11 @@ function v106.init(p1) -- line: 263
 			if FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then
 				table.insert(t5, str)
 			elseif p1.props.users and p1.props.users[str] then
-				local v240 = p1.props.users[str]
+				local v246 = p1.props.users[str]
 
 				table.insert(t5, {
 					userId = str,
-					displayName = v240.displayName
+					displayName = v246.displayName
 				})
 			end
 		end
@@ -446,7 +448,7 @@ function v106.init(p1) -- line: 263
 		return t5
 	end
 
-	p1.getSortedFriends = memoize(function(p4, p5) -- line: 542
+	p1.getSortedFriends = memoize(function(p4, p5) -- line: 545
 		-- upvalues: sortFriendsByPresenceAndRecencyFactory (copy)
 		if not p4 or not p5 then
 			return {}
@@ -455,46 +457,50 @@ function v106.init(p1) -- line: 263
 		local t6 = {}
 
 		for _, v in pairs(p5) do
-			local v246 = p4[v]
+			local v252 = p4[v]
 
-			if v246 and v246.isFriend then
+			if v252 and v252.isFriend then
 				table.insert(t6, {
-					userId = v246.id,
-					displayName = v246.displayName
+					userId = v252.id,
+					displayName = v252.displayName
 				})
 			end
 		end
 
-		local v247 = sortFriendsByPresenceAndRecencyFactory("displayName")
+		local v253 = sortFriendsByPresenceAndRecencyFactory("displayName")
 
-		table.sort(t6, v247)
+		table.sort(t6, v253)
 
 		return t6
 	end)
 
-	function p1.onSelectionGained() -- line: 564
-		-- upvalues: p1 (copy)
-		p1:setState({
-			isSelected = true
-		})
+	function p1.onSelectionGained() -- line: 567
+		-- upvalues: FFlagLuaAppGameTileSelectionVideoPlayback (copy), p1 (copy)
+		if not FFlagLuaAppGameTileSelectionVideoPlayback then
+			p1:setState({
+				isSelected = true
+			})
+		end
 
-		if p1.props.onSelectionGained then
+		if p1.props.onSelectionGained or FFlagLuaAppGameTileSelectionVideoPlayback then
 			p1.props.onSelectionGained(p1.props.entry, p1.props.index, p1.props.navigationUniverseId)
 		end
 	end
-	function p1.onSelectionLost() -- line: 572
-		-- upvalues: p1 (copy)
-		p1:setState({
-			isSelected = false
-		})
+	function p1.onSelectionLost() -- line: 577
+		-- upvalues: FFlagLuaAppGameTileSelectionVideoPlayback (copy), p1 (copy)
+		if not FFlagLuaAppGameTileSelectionVideoPlayback then
+			p1:setState({
+				isSelected = false
+			})
+		end
 
-		if p1.props.onSelectionLost then
+		if p1.props.onSelectionLost or FFlagLuaAppGameTileSelectionVideoPlayback then
 			p1.props.onSelectionLost()
 		end
 	end
 end
 
-local function getTextLiteralForTextFooter(p6) -- line: 584
+local function getTextLiteralForTextFooter(p6) -- line: 591
 	if p6 == nil then
 		return nil
 	end
@@ -512,10 +518,10 @@ local function getTextLiteralForTextFooter(p6) -- line: 584
 	return text.textLiteral
 end
 
-local u109 = nil
+local u110 = nil
 
 if FFlagLuaAppGenreRatingFooter then
-	function u109(p7) -- line: 600
+	function u110(p7) -- line: 607
 		if p7 == nil then
 			return nil
 		end
@@ -534,58 +540,58 @@ if FFlagLuaAppGenreRatingFooter then
 	end
 end
 
-function v106.renderGridTilesFooter(p8) -- line: 615
-	-- upvalues: FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), FFlagLuaAppGenreRatingFooter (copy), u109 (ref), FFlagLuaAppMigrateGameTileFixConsoleMetadataText (copy), GameTileTypes (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy), Roact (copy), GameStats (copy), GameTileConstants (copy), FFlagLuaAppNarrowTileHideRating (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), React (copy), GridTileSponsoredFooter (copy), GridTileTextFooter (copy), RatingWithGenreFooter (copy), GridTileFriendFooter (copy), GridTileIconTextFooter (copy), Images (copy)
-	local v118 = p8.props.useHoverTile or p8.props.useExperienceTileMetadata
+function v107.renderGridTilesFooter(p8) -- line: 622
+	-- upvalues: FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), FFlagLuaAppGenreRatingFooter (copy), u110 (ref), FFlagLuaAppGameTileSelectionVideoPlayback (copy), FFlagLuaAppMigrateGameTileFixConsoleMetadataText (copy), GameTileTypes (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy), Roact (copy), GameStats (copy), GameTileConstants (copy), FFlagLuaAppNarrowTileHideRating (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), React (copy), GridTileSponsoredFooter (copy), GridTileTextFooter (copy), RatingWithGenreFooter (copy), GridTileFriendFooter (copy), GridTileIconTextFooter (copy), Images (copy)
+	local v119 = p8.props.useHoverTile or p8.props.useExperienceTileMetadata
 	local friendFooterEnabled = p8.props.friendFooterEnabled
 	local hasInGameFriends = p8.props.hasInGameFriends
-	local v121 = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then nil else p8.props.inGameUserIds
+	local v122 = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then nil else p8.props.inGameUserIds
 	local users = p8.props.users
 	local inGameUsersByGame = p8.props.inGameUsersByGame
-	local v124 = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then p8.getSortedFriends(users, inGameUsersByGame) else nil
-	local v125 = friendFooterEnabled and if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then hasInGameFriends else v121 and #v121 > 0
-	local v126 = p8.props.friendVisits and #p8.props.friendVisits > 0
+	local v125 = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then p8.getSortedFriends(users, inGameUsersByGame) else nil
+	local v126 = friendFooterEnabled and if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then hasInGameFriends else v122 and #v122 > 0
+	local v127 = p8.props.friendVisits and #p8.props.friendVisits > 0
 	local footerLayoutData = p8.props.footerLayoutData
-	local v128
+	local v129
 
 	if footerLayoutData == nil then
-		v128 = nil
+		v129 = nil
 	elseif footerLayoutData.type ~= "TextLabel" then
-		v128 = nil
+		v129 = nil
 	else
 		local text = footerLayoutData.text
 
-		v128 = if text ~= nil then text.textLiteral else nil
+		v129 = if text ~= nil then text.textLiteral else nil
 	end
 
-	local v130 = nil
+	local v131 = nil
 
 	if FFlagLuaAppGenreRatingFooter then
-		v130 = u109(p8.props.footerLayoutData)
+		v131 = u110(p8.props.footerLayoutData)
 	end
 
-	local v131 = false
+	local v132 = false
 
-	if (p8.props.isHovered or p8.state.isSelected) and p8.props.ageRatingText and not p8.props.hidePlayButton then
-		v128 = p8.props.ageRatingText
-		v131 = true
+	if (p8.props.isHovered or (if not FFlagLuaAppGameTileSelectionVideoPlayback then p8.state.isSelected else p8.props.isSelected)) and p8.props.ageRatingText and not p8.props.hidePlayButton then
+		v129 = p8.props.ageRatingText
+		v132 = true
 	end
 
-	local v132 = v128 ~= nil
-	local v133 = nil
+	local v133 = v129 ~= nil
+	local v134 = nil
 
 	if FFlagLuaAppGenreRatingFooter then
-		v133 = v130 ~= nil
+		v134 = v131 ~= nil
 	end
 
 	local entry = p8.props.entry
-	local v135 = entry.isSponsored and (entry.isShowSponsoredLabel or (p8.props.isSponsoredFooterAllowed or p8.props.isSponsoredRatingFooterAllowed))
+	local v136 = entry.isSponsored and (entry.isShowSponsoredLabel or (p8.props.isSponsoredFooterAllowed or p8.props.isSponsoredRatingFooterAllowed))
 
-	if FFlagLuaAppMigrateGameTileFixConsoleMetadataText and p8.props.gameTileLayoutType == GameTileTypes.GameTileLayoutType.Narrow and p8.props.useExperienceTileMetadata and (v135 or v132 or FFlagLuaAppGenreRatingFooter and v133) or FFlagLuaAppNarrowTileSmallerFooterFont and p8.props.compactMetadataFormat then
-		v118 = false
+	if FFlagLuaAppMigrateGameTileFixConsoleMetadataText and p8.props.gameTileLayoutType == GameTileTypes.GameTileLayoutType.Narrow and p8.props.useExperienceTileMetadata and (v136 or v133 or FFlagLuaAppGenreRatingFooter and v134) or FFlagLuaAppNarrowTileSmallerFooterFont and p8.props.compactMetadataFormat then
+		v119 = false
 	end
 
-	local v136 = Roact.createElement(GameStats, {
+	local v137 = Roact.createElement(GameStats, {
 		isUnifiedGameTile = true,
 		stats = {
 			totalUpVotes = p8.props.totalUpVotes,
@@ -594,7 +600,7 @@ function v106.renderGridTilesFooter(p8) -- line: 615
 		},
 		isGridTile = p8.props.useGridTile,
 		hideGameStats = p8.props.hideGameStats,
-		useLargerFont = v118,
+		useLargerFont = v119,
 		gameTileLayoutType = p8.props.gameTileLayoutType,
 		compactMetadataFormat = if not FFlagLuaAppNarrowTileSmallerFooterFont then nil else p8.props.compactMetadataFormat,
 		hideRating = if not FFlagLuaAppNarrowTileHideRating then nil else p8.props.hideRating,
@@ -603,24 +609,24 @@ function v106.renderGridTilesFooter(p8) -- line: 615
 
 	if p8.props.hideMetadata then
 		if p8.props.isHovered then
-			if v135 then
+			if v136 then
 				return React.createElement(GridTileSponsoredFooter, {
 					isUnifiedGameTile = true,
-					useLargerFont = v118,
+					useLargerFont = v119,
 					onActivateSponsoredTooltip = p8.onActivateSponsoredTooltip,
 					gameTileLayoutType = p8.props.gameTileLayoutType,
 					isNarrowScreenXSmall = p8.props.isNarrowScreenXSmall,
 					enableSponsoredFeedback = p8.props.enableSponsoredFeedback,
 					isSponsoredRatingFooterAllowed = p8.props.isSponsoredRatingFooterAllowed,
-					gameStatsElement = v136
+					gameStatsElement = v137
 				})
 			end
 
-			if v131 then
+			if v132 then
 				return React.createElement(GridTileTextFooter, {
 					isUnifiedGameTile = true,
-					text = v128,
-					useLargerFont = v118
+					text = v129,
+					useLargerFont = v119
 				})
 			end
 		end
@@ -628,60 +634,34 @@ function v106.renderGridTilesFooter(p8) -- line: 615
 		return nil
 	end
 
-	if v135 then
+	if v136 then
 		return (React.createElement(GridTileSponsoredFooter, {
 			isUnifiedGameTile = true,
-			useLargerFont = v118,
+			useLargerFont = v119,
 			onActivateSponsoredTooltip = p8.onActivateSponsoredTooltip,
 			gameTileLayoutType = p8.props.gameTileLayoutType,
 			isNarrowScreenXSmall = p8.props.isNarrowScreenXSmall,
 			enableSponsoredFeedback = p8.props.enableSponsoredFeedback,
 			isSponsoredRatingFooterAllowed = p8.props.isSponsoredRatingFooterAllowed,
-			gameStatsElement = v136
+			gameStatsElement = v137
 		}))
 	end
 
-	if FFlagLuaAppGenreRatingFooter and v133 and not v131 then
+	if FFlagLuaAppGenreRatingFooter and v134 and not v132 then
 		return (React.createElement(RatingWithGenreFooter, {
 			isUnifiedGameTile = true,
-			useLargerFont = v118,
+			useLargerFont = v119,
 			totalUpVotes = p8.props.totalUpVotes,
 			totalDownVotes = p8.props.totalDownVotes,
-			genreText = v130
+			genreText = v131
 		}))
 	end
 
-	if v132 then
+	if v133 then
 		return (React.createElement(GridTileTextFooter, {
 			isUnifiedGameTile = true,
-			text = v128,
-			useLargerFont = v118
-		}))
-	end
-
-	if v125 then
-		if FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then
-			return (Roact.createElement(GridTileFriendFooter, {
-				showOnlineBorder = false,
-				useLargerFont = v118,
-				friendUserIds = v121,
-				onFriendFooterActivated = p8.onFriendFooterActivated
-			}))
-		end
-
-		return (Roact.createElement(GridTileFriendFooter, {
-			showOnlineBorder = false,
-			friends = v124,
-			useLargerFont = v118
-		}))
-	end
-
-	if p8.props.friendVisitedString then
-		return (Roact.createElement(GridTileIconTextFooter, {
-			icon = Images["icons/menu/recent"],
-			text = p8.props.friendVisitedString,
-			iconSize = not v118 and 24 or 32,
-			useLargerFont = v118
+			text = v129,
+			useLargerFont = v119
 		}))
 	end
 
@@ -689,37 +669,63 @@ function v106.renderGridTilesFooter(p8) -- line: 615
 		if FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then
 			return (Roact.createElement(GridTileFriendFooter, {
 				showOnlineBorder = false,
+				useLargerFont = v119,
+				friendUserIds = v122,
+				onFriendFooterActivated = p8.onFriendFooterActivated
+			}))
+		end
+
+		return (Roact.createElement(GridTileFriendFooter, {
+			showOnlineBorder = false,
+			friends = v125,
+			useLargerFont = v119
+		}))
+	end
+
+	if p8.props.friendVisitedString then
+		return (Roact.createElement(GridTileIconTextFooter, {
+			icon = Images["icons/menu/recent"],
+			text = p8.props.friendVisitedString,
+			iconSize = not v119 and 24 or 32,
+			useLargerFont = v119
+		}))
+	end
+
+	if v127 then
+		if FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then
+			return (Roact.createElement(GridTileFriendFooter, {
+				showOnlineBorder = false,
 				friendUserIds = p8.getVisitedFriends(),
-				useLargerFont = v118
+				useLargerFont = v119
 			}))
 		end
 
 		return (Roact.createElement(GridTileFriendFooter, {
 			showOnlineBorder = false,
 			friends = p8.getVisitedFriends(),
-			useLargerFont = v118
+			useLargerFont = v119
 		}))
 	end
 
-	return v136
+	return v137
 end
-function v106.renderContent(p9, p10, p11, _) -- line: 794
-	-- upvalues: GameTileConstants (copy), GameTileViewConfig (copy), React (copy), GameStats (copy), HiddenTileContent (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), GameTileVideoThumbnail (copy), FFlagRenameDeprecatedUIBloxTokens (copy), FFlagLuaAppVideoTileDisableActivation (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), FFlagLuaAppGameDetailsAttributionFix (copy), FFlagLuaAppHomeTouchAutoplay (copy), Roact (copy), GameTileThumbnailBadges (copy), GameTileOverflowMenu (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableSponsoredReportAd (copy), GameTileView (copy), FFlagLuaAppMigrateGameTileHoverFixes (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), FFlagLuaAppGameTileInteractionFeedback (copy), AppExperienceActionRow (copy), FFlagLuaAppUnifyPlayButtonTile (copy), v98 (copy)
-	local v141 = p9.props.Size or UDim2.fromScale(1, 1)
+function v107.renderContent(p9, p10, p11, _) -- line: 804
+	-- upvalues: GameTileConstants (copy), GameTileViewConfig (copy), React (copy), GameStats (copy), HiddenTileContent (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), GameTileVideoThumbnail (copy), FFlagRenameDeprecatedUIBloxTokens (copy), FFlagLuaAppVideoTileDisableActivation (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), FFlagLuaAppGameDetailsAttributionFix (copy), FFlagLuaAppHomeTouchAutoplay (copy), Roact (copy), GameTileThumbnailBadges (copy), FFlagLuaAppGameTileSelectionVideoPlayback (copy), GameTileOverflowMenu (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableSponsoredReportAd (copy), GameTileView (copy), FFlagLuaAppMigrateGameTileHoverFixes (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), FFlagLuaAppGameTileInteractionFeedback (copy), AppExperienceActionRow (copy), FFlagLuaAppUnifyPlayButtonTile (copy), v98 (copy)
+	local v142 = p9.props.Size or UDim2.fromScale(1, 1)
 	local imageThumbnail = p9.props.imageThumbnail
 	local onGameTileActivated = p9.props.onGameTileActivated
-	local v144 = p9.props.playerCountStyle == GameTileConstants.PlayerCountStyleValues.Always or p9.props.isHovered and p9.props.playerCountStyle == GameTileConstants.PlayerCountStyleValues.Hover
-	local v145 = GameTileViewConfig.getImageAspectRatio(p9.props.gameTileLayoutType)
-	local v146 = p9:renderGridTilesFooter()
-	local v147 = if not p9.props.hideTitle then p9.props.name else nil
-	local v148 = if not v144 then nil else React.createElement(GameStats, {
+	local v145 = p9.props.playerCountStyle == GameTileConstants.PlayerCountStyleValues.Always or p9.props.isHovered and p9.props.playerCountStyle == GameTileConstants.PlayerCountStyleValues.Hover
+	local v146 = GameTileViewConfig.getImageAspectRatio(p9.props.gameTileLayoutType)
+	local v147 = p9:renderGridTilesFooter()
+	local v148 = if not p9.props.hideTitle then p9.props.name else nil
+	local v149 = if not v145 then nil else React.createElement(GameStats, {
 		stats = {
 			displayConcurrentUsersPill = true,
 			playerCount = p9.props.entry.playerCount
 		}
 	})
 	local playButtonHeight = GameTileViewConfig.getElementSizes(p11.Tokens, p9.props.textSizeOffset, p9.props.contentTextLineCount, p9.props.foundationTokens, true).playButtonHeight
-	local v150 = if not p9.props.isHidden then if not p9.props.videoThumbnail then nil else React.createElement(GameTileVideoThumbnail, {
+	local v151 = if not p9.props.isHidden then if not p9.props.videoThumbnail then nil else React.createElement(GameTileVideoThumbnail, {
 		looped = true,
 		ZIndex = -2,
 		video = p9.props.videoThumbnail,
@@ -728,7 +734,7 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 		Size = UDim2.fromScale(1, 1),
 		isTileContained = p9.props.isContained,
 		cornerRadius = if not FFlagRenameDeprecatedUIBloxTokens then p11.Tokens.Global.Space_100 else p11.Tokens.Size.Size_200,
-		onActivated = if not FFlagLuaAppVideoTileDisableActivation then if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else if not FFlagLuaAppGameDetailsAttributionFix then p9.onActivated else function() -- line: 845
+		onActivated = if not FFlagLuaAppVideoTileDisableActivation then if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else if not FFlagLuaAppGameDetailsAttributionFix then p9.onActivated else function() -- line: 855
 			-- upvalues: onGameTileActivated (copy), p9 (copy)
 			onGameTileActivated(p9.isMounted)
 		end else nil,
@@ -744,11 +750,11 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 		parentRef = p9.props.hoverRef,
 		isSponsored = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else p9.props.entry.isSponsored
 	})
-	local v151 = nil
+	local v152 = nil
 
 	if not p9.props.isVideoPlaying then
-		v151 = if not p9.props.tileBadges then v148 else Roact.createFragment({
-			SocialFeaturePill = v148,
+		v152 = if not p9.props.tileBadges then v149 else Roact.createFragment({
+			SocialFeaturePill = v149,
 			Badge = React.createElement(GameTileThumbnailBadges, {
 				tileBadgesByPosition = p9.props.tileBadges
 			})
@@ -756,9 +762,9 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 	end
 
 	local isHidden = p9.props.isHidden
-	local v153 = if next(p9.props.availableMenuItems) == nil or (not p9.props.isHovered and (not p9.props.overflowMenuOpen and not p9.state.isSelected) or isHidden) then nil else React.createElement(GameTileOverflowMenu, {
+	local v154 = if next(p9.props.availableMenuItems) == nil or (not p9.props.isHovered and (not p9.props.overflowMenuOpen and not (if not FFlagLuaAppGameTileSelectionVideoPlayback then p9.state.isSelected else p9.props.isSelected)) or isHidden) then nil else React.createElement(GameTileOverflowMenu, {
 		isHovered = p9.props.isHovered,
-		isSelected = p9.state.isSelected,
+		isSelected = if not FFlagLuaAppGameTileSelectionVideoPlayback then p9.state.isSelected else p9.props.isSelected,
 		universeId = p9.props.universeId,
 		collectionId = p9.props.topicId,
 		appPage = p9.props.appPage,
@@ -776,7 +782,7 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
-		Size = v141,
+		Size = v142,
 		ZIndex = p9.props.ZIndex,
 		LayoutOrder = p9.props.layoutOrder,
 		ref = p9.gameTileRef
@@ -788,16 +794,16 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 			hoverPadding = if FFlagLuaAppMigrateGameTileHoverFixes or p9.props.useGridTile then nil else if not FFlagRenameDeprecatedUIBloxTokens then p11.Tokens.Global.Space_100 else p11.Tokens.Size.Size_200,
 			numLinesForTitle = p9.props.contentTextLineCount,
 			numLinesForMetadata = p9.props.metadataTextLineCount,
-			imageAspectRatio = v145,
+			imageAspectRatio = v146,
 			isContained = p9.props.isContained,
 			containmentSidePadding = GameTileViewConfig.getContainmentSidePadding(p11.Tokens, p9.props.gameTileLayoutType, p9.props.foundationTokens),
 			Size = UDim2.fromScale(1, 1),
 			image = imageThumbnail,
 			onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else p9.props.onTileImageLoaded,
-			thumbnailComponent = v150,
-			title = if not isHidden then v147 else nil,
+			thumbnailComponent = v151,
+			title = if not isHidden then v148 else nil,
 			isDisabled = not not isHidden or p9.props.isDisabled,
-			onActivated = if not FFlagLuaAppGameDetailsAttributionFix or isHidden then p9.onActivated else function() -- line: 931
+			onActivated = if not FFlagLuaAppGameDetailsAttributionFix or isHidden then p9.onActivated else function() -- line: 945
 				-- upvalues: onGameTileActivated (copy), p9 (copy)
 				onGameTileActivated(p9.isMounted)
 			end,
@@ -816,7 +822,7 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 				universeId = p9.props.navigationUniverseId,
 				referralSource = p9.props.referralSource,
 				reportExperienceLaunched = p9.reportExperienceLaunchedFromActionBar,
-				openGameDetails = if not FFlagLuaAppGameDetailsAttributionFix then p9.onActivated else function() -- line: 950
+				openGameDetails = if not FFlagLuaAppGameDetailsAttributionFix then p9.onActivated else function() -- line: 964
 					-- upvalues: onGameTileActivated (copy), p9 (copy)
 					onGameTileActivated(p9.isMounted)
 				end,
@@ -825,21 +831,21 @@ function v106.renderContent(p9, p10, p11, _) -- line: 794
 				fetchDelayInSeconds = game:GetFastInt("LuaAppGameTileHoverDelayMs") / 1000,
 				index = p9.props.index,
 				height = playButtonHeight,
-				showButtonText = v145 > 1,
+				showButtonText = v146 > 1,
 				isUnifiedGameTileEnabled = not not FFlagLuaAppUnifyPlayButtonTile or nil,
 				placeIdOverride = p9.props.entry.placeIdOverride,
 				launchDataOverride = p9.props.entry.launchDataOverride
 			}),
-			thumbnailOverlay = if not isHidden then v151 else nil,
-			overflowMenu = v153,
-			footerMetadata = if not isHidden then v146 else nil,
+			thumbnailOverlay = if not isHidden then v152 else nil,
+			overflowMenu = v154,
+			footerMetadata = if not isHidden then v147 else nil,
 			textSizeOffset = p9.props.textSizeOffset,
 			hideMetadata = p9.props.hideMetadata
 		}),
 		VideoPlaybackDetector = if not v98 then nil else p9.props.videoPlaybackDetector
 	})
 end
-function v106.render(p13) -- line: 980
+function v107.render(p13) -- line: 994
 	-- upvalues: DiscoveryAppLaunchTracker (copy), withStyle (copy)
 	if DiscoveryAppLaunchTracker.isEnabled() and DiscoveryAppLaunchTracker.default then
 		DiscoveryAppLaunchTracker.default:trackTileRender()
@@ -849,14 +855,14 @@ function v106.render(p13) -- line: 980
 		return nil
 	end
 
-	return withStyle(function(p14) -- line: 990
+	return withStyle(function(p14) -- line: 1004
 		-- upvalues: p13 (copy)
 		local ReducedMotion = p14.Settings.ReducedMotion
 
 		return p13:renderContent(ReducedMotion, p14, p13.props.foundationTokens)
 	end)
 end
-function v106.didMount(p15) -- line: 996
+function v107.didMount(p15) -- line: 1010
 	-- upvalues: ImpressionsTagUtility (copy)
 	p15.isMounted = true
 	ImpressionsTagUtility.AddTag(p15.gameTileRef, p15.props.impressionsTag, p15.props.index)
@@ -871,12 +877,12 @@ function v106.didMount(p15) -- line: 996
 		p15.loadWideThumbnail()
 	end
 end
-function v106.willUnmount(p16) -- line: 1011
+function v107.willUnmount(p16) -- line: 1025
 	-- upvalues: ImpressionsTagUtility (copy)
 	p16.isMounted = false
 	ImpressionsTagUtility.RemoveTag(p16.gameTileRef, p16.props.impressionsTag, p16.props.index)
 end
-function v106.didUpdate(p17, p18) -- line: 1016
+function v107.didUpdate(p17, p18) -- line: 1030
 	-- upvalues: ImpressionsTagUtility (copy)
 	if p18.impressionsTag ~= p17.props.impressionsTag or p18.index ~= p17.props.index then
 		ImpressionsTagUtility.RemoveTag(p17.gameTileRef, p18.impressionsTag, p18.index)
@@ -894,7 +900,7 @@ function v106.didUpdate(p17, p18) -- line: 1016
 	end
 end
 
-local function formatRating(n1: number, n2: number) -- line: 1041
+local function formatRating(n1: number, n2: number) -- line: 1055
 	if n1 + n2 == 0 then
 		return "--"
 	end
@@ -902,163 +908,190 @@ local function formatRating(n1: number, n2: number) -- line: 1041
 	return tostring((math.floor(n1 / (n1 + n2) * 100 + 0.5))) .. "%"
 end
 
-local u111 = RoactRodux.connect(function(p19, p20) -- line: 1049
+local u112 = RoactRodux.connect(function(p19, p20) -- line: 1063
 	-- upvalues: FFlagLuaAppGameDetailsAttributionFix (copy), GameInfosReducer (copy), GameTileConstants (copy), getGameTileLayoutData (copy), ItemLayoutDataParsingUtils (copy), formatExperienceThumbnail (copy), GameIconReducer (copy), formatExperienceIcon (copy), v77 (copy), formatExperienceRating (copy), FFlagLuaAppHomeReduceRenders (copy), t1 (copy)
 	local universeId = p20.entry.universeId
-	local v164 = nil
+	local v165 = nil
 
 	if not FFlagLuaAppGameDetailsAttributionFix then
-		v164 = if not p20.entry.navigationUniverseId or (p20.entry.navigationUniverseId == "" or p20.entry.navigationUniverseId == "0") then p20.entry.universeId else p20.entry.navigationUniverseId
+		v165 = if not p20.entry.navigationUniverseId or (p20.entry.navigationUniverseId == "" or p20.entry.navigationUniverseId == "0") then p20.entry.universeId else p20.entry.navigationUniverseId
 	end
 
-	local v165 = p19.Personalization[GameInfosReducer.key][universeId]
-	local v166 = v165 and v165.totalUpVotes or 0
-	local v167 = v165 and v165.totalDownVotes or 0
-	local v168 = v165 and v165.friendActivityTitle or nil
-	local v169 = nil
-	local v170 = v165 and v165.minimumAge or 0
-	local v171 = v165 and v165.ageRecommendationDisplayName or ""
-	local v172 = if p20.gameTileLayoutType ~= "Event" then p20.gameTileLayoutType == "Wide" and p20.playButtonStyle == GameTileConstants.PlayButtonStyleValues.Disabled else p20.playButtonStyle ~= GameTileConstants.PlayButtonStyleValues.Enabled
-	local v173
+	local v166 = p19.Personalization[GameInfosReducer.key][universeId]
+	local v167 = v166 and v166.totalUpVotes or 0
+	local v168 = v166 and v166.totalDownVotes or 0
+	local v169 = v166 and v166.friendActivityTitle or nil
+	local v170 = nil
+	local v171 = v166 and v166.minimumAge or 0
+	local v172 = v166 and v166.ageRecommendationDisplayName or ""
+	local v173 = if p20.gameTileLayoutType ~= "Event" then p20.gameTileLayoutType == "Wide" and p20.playButtonStyle == GameTileConstants.PlayButtonStyleValues.Disabled else p20.playButtonStyle ~= GameTileConstants.PlayButtonStyleValues.Enabled
+	local v174
 
-	if v172 or p20.forceHideAgeRatings then
-		v173 = false
-	elseif v170 ~= 0 and v171 ~= "" then
-		v173 = true
-		v169 = v171
+	if v173 or p20.forceHideAgeRatings then
+		v174 = false
+	elseif v171 ~= 0 and v172 ~= "" then
+		v174 = true
+		v170 = v172
 	else
-		v173 = false
+		v174 = false
 	end
 
-	local v174 = getGameTileLayoutData(v165, p20.topicId)
-	local v175 = ((if not p20.entry.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v174) else p20.entry.primaryWideImageAssetId)) or (v165 and v165.primaryWideAssetId or nil)
-	local v176 = formatExperienceThumbnail(v175, p20.entry.placeId)
-	local v177 = if not p20.entry.primaryWideVideoAssetId then v174 and (v174.primaryMediaAsset and v174.primaryMediaAsset.wideVideoAssetId) else p20.entry.primaryWideVideoAssetId
-	local v178 = if not v177 then nil else `rbxassetid://{ v177 }`
-	local v179 = p19[GameIconReducer.key][universeId] and p19[GameIconReducer.key][universeId].url or nil
-	local v180 = if not p20.useGridTile then formatExperienceIcon(v179, universeId) else v176
-	local v181 = if not p20.useHoverTile and not p20.useExperienceTileMetadata then nil else if not v77 then if v166 + v167 ~= 0 then tostring((math.floor(v166 / (v166 + v167) * 100 + 0.5))) .. "%" else "--" else formatExperienceRating(v166, v167, nil, true)
-	local v182 = v165 and v165.friendVisits or if not FFlagLuaAppHomeReduceRenders then {} else t1
-	local v183 = if not v165 or v165.friendVisitedString == "" then nil else v165.friendVisitedString
-	local v184 = v174 and v174.footer or nil
-	local v185 = v174 and v174.title or (v165 and v165.name or "")
+	local v175 = getGameTileLayoutData(v166, p20.topicId)
+	local v176 = ((if not p20.entry.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v175) else p20.entry.primaryWideImageAssetId)) or (v166 and v166.primaryWideAssetId or nil)
+	local v177 = formatExperienceThumbnail(v176, p20.entry.placeId)
+	local v178 = if not p20.entry.primaryWideVideoAssetId then v175 and (v175.primaryMediaAsset and v175.primaryMediaAsset.wideVideoAssetId) else p20.entry.primaryWideVideoAssetId
+	local v179 = if not v178 then nil else `rbxassetid://{ v178 }`
+	local v180 = p19[GameIconReducer.key][universeId] and p19[GameIconReducer.key][universeId].url or nil
+	local v181 = if not p20.useGridTile then formatExperienceIcon(v180, universeId) else v177
+	local v182 = if not p20.useHoverTile and not p20.useExperienceTileMetadata then nil else if not v77 then if v167 + v168 ~= 0 then tostring((math.floor(v167 / (v167 + v168) * 100 + 0.5))) .. "%" else "--" else formatExperienceRating(v167, v168, nil, true)
+	local v183 = v166 and v166.friendVisits or if not FFlagLuaAppHomeReduceRenders then {} else t1
+	local v184 = if not v166 or v166.friendVisitedString == "" then nil else v166.friendVisitedString
+	local v185 = v175 and v175.footer or nil
+	local v186 = v175 and v175.title or (v166 and v166.name or "")
 
 	return {
-		game = v165,
+		game = v166,
 		universeId = universeId,
-		navigationUniverseId = if FFlagLuaAppGameDetailsAttributionFix then nil else v164,
-		name = v185,
-		totalUpVotes = v166,
-		totalDownVotes = v167,
-		imageThumbnail = v180,
-		wideThumbnail = v176,
-		videoThumbnail = v178,
-		friendActivityTitle = v168,
-		rating = v181,
-		showAgeRating = v173,
-		ageRatingText = v169,
-		friendVisits = v182,
-		friendVisitedString = v183,
-		hidePlayButton = v172,
-		footerLayoutData = v184
+		navigationUniverseId = if FFlagLuaAppGameDetailsAttributionFix then nil else v165,
+		name = v186,
+		totalUpVotes = v167,
+		totalDownVotes = v168,
+		imageThumbnail = v181,
+		wideThumbnail = v177,
+		videoThumbnail = v179,
+		friendActivityTitle = v169,
+		rating = v182,
+		showAgeRating = v174,
+		ageRatingText = v170,
+		friendVisits = v183,
+		friendVisitedString = v184,
+		hidePlayButton = v173,
+		footerLayoutData = v185
 	}
-end, function(p21) -- line: 1152
+end, function(p21) -- line: 1166
 	-- upvalues: OpenCentralOverlayForPlacesList (copy), OpenSponsoredTooltip (copy)
 	return {
-		openContextualMenu = function(p22, p23, p24) -- line: 1154
+		openContextualMenu = function(p22, p23, p24) -- line: 1168
 			-- upvalues: p21 (copy), OpenCentralOverlayForPlacesList (copy)
 			p21(OpenCentralOverlayForPlacesList(p22, p23, p24))
 		end,
-		openSponsoredTooltip = function(p25) -- line: 1157
+		openSponsoredTooltip = function(p25) -- line: 1171
 			-- upvalues: p21 (copy), OpenSponsoredTooltip (copy)
 			return p21(OpenSponsoredTooltip(p25))
 		end
 	}
-end)(v106)
+end)(v107)
 
 if not FFlagLuaAppGameDetailsAttributionFix then
-	u111 = RoactServices.connect({
+	u112 = RoactServices.connect({
 		networking = RoactNetworking
-	})(u111)
+	})(u112)
 end
 
-return function(p26) -- line: 1169
-	-- upvalues: React (copy), useTokens (copy), useIsHoveredTile (copy), useUiModeInfo (copy), UiMode (copy), useValidTileBadges (copy), useSelector (copy), FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), useHasInGameFriends (copy), useInGameUserIds (copy), FFlagLuaAppFixHiddenTileVideoCleanup (copy), FFlagLuaAppGameDetailsAttributionFix (copy), useRoactService (copy), RoactNetworking (copy), sponsoredGamesRecordClick (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), VideoPlaybackCoordinator (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy), useOverflowMenuOpen (copy), useTriggerFeedback (copy), getAvailableGameTileOverflowMenuItems (copy), FFlagLuaAppEnableSponsoredReportAd (copy), v98 (copy), useHasVideoThumbnailSelector (copy), useTagAsViewportAutoplayCandidate (copy), FFlagLuaAppTileVideoCandidateOnly (copy), FFlagLuaAppEdpMediaGalleryVideoPreview (copy), usePreferredInput (copy), GameVideoPlaybackDetector (copy), Responsive (copy), FIntLuaAppGameTileVideoDwellTimeInSec (copy), FIntLuaAppGameTileVideoVisiblePercent (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), FFlagLuaAppTileVideoDeviceMemoryBlocking (copy), u111 (ref), Cryo (copy)
-	local v188 = React.useRef(nil)
-	local v189 = useTokens()
+return function(p26) -- line: 1183
+	-- upvalues: React (copy), useTokens (copy), useIsHoveredTile (copy), useUiModeInfo (copy), UiMode (copy), useValidTileBadges (copy), useSelector (copy), FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), useHasInGameFriends (copy), useInGameUserIds (copy), FFlagLuaAppGameTileSelectionVideoPlayback (copy), FFlagLuaAppFixHiddenTileVideoCleanup (copy), FFlagLuaAppGameDetailsAttributionFix (copy), useRoactService (copy), RoactNetworking (copy), sponsoredGamesRecordClick (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), VideoPlaybackCoordinator (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy), useOverflowMenuOpen (copy), useTriggerFeedback (copy), getAvailableGameTileOverflowMenuItems (copy), FFlagLuaAppEnableSponsoredReportAd (copy), v98 (copy), useHasVideoThumbnailSelector (copy), useTagAsViewportAutoplayCandidate (copy), FFlagLuaAppTileVideoCandidateOnly (copy), FFlagLuaAppEdpMediaGalleryVideoPreview (copy), usePreferredInput (copy), GameVideoPlaybackDetector (copy), Responsive (copy), FIntLuaAppGameTileVideoDwellTimeInSec (copy), FIntLuaAppGameTileVideoVisiblePercent (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), FFlagLuaAppTileVideoDeviceMemoryBlocking (copy), u112 (ref), Cryo (copy)
+	local v189 = React.useRef(nil)
+	local v190 = useTokens()
 	local useHoverTile = p26.useHoverTile
-	local v191 = `{ p26.impressionsTag or "" }_{ p26.index or "0" }_{ p26.gameTileLayoutType or "Narrow" }`
+	local v192 = `{ p26.impressionsTag or "" }_{ p26.index or "0" }_{ p26.gameTileLayoutType or "Narrow" }`
 
 	if p26.impressionsTag == nil or p26.index == nil then
 		useHoverTile = false
 	end
 
-	local v192 = useIsHoveredTile(v188, v191, useHoverTile)
-	local v193 = useUiModeInfo().uiMode == UiMode.TenFoot
-	local v194 = not not v193 or p26.useHoverTile
-	local v195 = if p26.useExperienceTileMetadata == nil then v193 else p26.useExperienceTileMetadata
-	local v196 = useValidTileBadges(p26.entry.universeId, p26.topicId, p26.badgeOverride)
-	local v197 = useSelector(function(p27) -- line: 1192
+	local v193 = useIsHoveredTile(v189, v192, useHoverTile)
+	local v194 = useUiModeInfo().uiMode == UiMode.TenFoot
+	local v195 = not not v194 or p26.useHoverTile
+	local v196 = if p26.useExperienceTileMetadata == nil then v194 else p26.useExperienceTileMetadata
+	local v197 = useValidTileBadges(p26.entry.universeId, p26.topicId, p26.badgeOverride)
+	local v198 = useSelector(function(p27) -- line: 1206
 		return p27.LocalUserId
 	end)
-	local v198 = nil
+	local v199 = nil
 
 	if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then
-		v198 = useSelector(function(p28) -- line: 1198
+		v199 = useSelector(function(p28) -- line: 1212
 			return p28.Users
 		end)
 	end
 
-	local v199 = useSelector(function(p29) -- line: 1203
+	local v200 = useSelector(function(p29) -- line: 1217
 		-- upvalues: p26 (copy)
 		return p29.InGameUsersByGame[p26.entry.universeId]
 	end)
-	local v200 = useHasInGameFriends(v197, v198, v199)
-	local v201 = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then nil else useInGameUserIds(v197, v199)
-	local v202, v203 = React.useState(false)
+	local v201 = useHasInGameFriends(v198, v199, v200)
+	local v202 = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then nil else useInGameUserIds(v198, v200)
+	local v203, v204 = React.useState(false)
+	local v205 = nil
+	local u206 = nil
+	local v207 = nil
+	local v208 = nil
+
+	if FFlagLuaAppGameTileSelectionVideoPlayback then
+		local v209
+
+		v205, v209 = React.useState(false)
+		u206 = v209
+		v207 = React.useCallback(function(p30, p31, p32) -- line: 1234
+			-- upvalues: u206 (ref), p26 (copy)
+			u206(true)
+
+			if p26.onSelectionGained then
+				p26.onSelectionGained(p30, p31, p32)
+			end
+		end, { p26.onSelectionGained })
+		v208 = React.useCallback(function() -- line: 1242
+			-- upvalues: u206 (ref), p26 (copy)
+			u206(false)
+
+			if p26.onSelectionLost then
+				p26.onSelectionLost()
+			end
+		end, { p26.onSelectionLost })
+	end
 
 	if FFlagLuaAppFixHiddenTileVideoCleanup then
-		React.useEffect(function() -- line: 1215
-			-- upvalues: p26 (copy), v203 (copy)
+		React.useEffect(function() -- line: 1252
+			-- upvalues: p26 (copy), v204 (copy)
 			if p26.isHidden then
-				v203(false)
+				v204(false)
 			end
 		end, { p26.isHidden })
 	end
 
-	local u204 = nil
-	local u205 = nil
-	local v206 = nil
-	local u207 = nil
+	local u210 = nil
+	local u211 = nil
+	local v212 = nil
+	local u213 = nil
 
 	if FFlagLuaAppGameDetailsAttributionFix then
-		u204 = useRoactService(RoactNetworking)
-		u205 = if not p26.entry.navigationUniverseId or (p26.entry.navigationUniverseId == "" or p26.entry.navigationUniverseId == "0") then p26.entry.universeId else p26.entry.navigationUniverseId
-		u207 = React.useCallback(function() -- line: 1236
-			-- upvalues: p26 (copy), sponsoredGamesRecordClick (copy), u204 (ref)
+		u210 = useRoactService(RoactNetworking)
+		u211 = if not p26.entry.navigationUniverseId or (p26.entry.navigationUniverseId == "" or p26.entry.navigationUniverseId == "0") then p26.entry.universeId else p26.entry.navigationUniverseId
+		u213 = React.useCallback(function() -- line: 1273
+			-- upvalues: p26 (copy), sponsoredGamesRecordClick (copy), u210 (ref)
 			local entry = p26.entry
 
 			if entry.isSponsored then
-				sponsoredGamesRecordClick(u204, entry.adId)
+				sponsoredGamesRecordClick(u210, entry.adId)
 			end
 		end, {
-			u204,
+			u210,
 			p26.entry.isSponsored,
 			p26.entry.adId
 		})
-		v206 = React.useCallback(function(p30) -- line: 1245
-			-- upvalues: p26 (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), u205 (ref), VideoPlaybackCoordinator (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy), u207 (ref)
+		v212 = React.useCallback(function(p33) -- line: 1282
+			-- upvalues: p26 (copy), HoverTileCoordinator (copy), FFlagLuaAppHomeTouchAutoplay (copy), VideoEndReason (copy), u211 (ref), VideoPlaybackCoordinator (copy), FFlagLuaAppGameTileInteractionFeedback (copy), GameCollectionItemTypes (copy), GetFFlagEnableNavigationPerformanceIntervals (copy), IntervalPerformanceTracker (copy), u213 (ref)
 			if p26.isHovered then
 				HoverTileCoordinator.default:reset()
 			end
 
 			if FFlagLuaAppHomeTouchAutoplay and p26.videoPlaybackContext and p26.videoPlaybackContext.videoPlaybackCoordinator then
-				p26.videoPlaybackContext.videoPlaybackCoordinator:reset(VideoEndReason.TileClicked, nil, u205, nil)
+				p26.videoPlaybackContext.videoPlaybackCoordinator:reset(VideoEndReason.TileClicked, nil, u211, nil)
 			else
-				VideoPlaybackCoordinator.default:reset(VideoEndReason.TileClicked, nil, u205, nil)
+				VideoPlaybackCoordinator.default:reset(VideoEndReason.TileClicked, nil, u211, nil)
 			end
 
-			if p30 then
+			if p33 then
 				if FFlagLuaAppGameTileInteractionFeedback and p26.onActivated then
 					p26.onActivated()
 				end
@@ -1080,9 +1113,9 @@ return function(p26) -- line: 1169
 					IntervalPerformanceTracker:startTracking("AppGameTile_to_GameDetail", 2)
 				end
 
-				p26.navigateToGameDetails(u205, t7)
-				p26.reportGameDetailOpened(p26.index, u205)
-				u207()
+				p26.navigateToGameDetails(u211, t7)
+				p26.reportGameDetailOpened(p26.index, u211)
+				u213()
 			end
 		end, {
 			p26.isHovered,
@@ -1094,17 +1127,17 @@ return function(p26) -- line: 1169
 			p26.onPeekViewClosed,
 			p26.navigateToGameDetails,
 			p26.reportGameDetailOpened,
-			u205,
-			u207,
+			u211,
+			u213,
 			p26.entry.placeIdOverride,
 			p26.entry.launchDataOverride,
 			if not FFlagLuaAppHomeTouchAutoplay or not p26.videoPlaybackContext then nil else p26.videoPlaybackContext.videoPlaybackCoordinator
 		})
 	end
 
-	local v208 = useOverflowMenuOpen(v191)
-	local v209 = useTriggerFeedback()
-	local v210 = React.useMemo(function() -- line: 1320
+	local v214 = useOverflowMenuOpen(v192)
+	local v215 = useTriggerFeedback()
+	local v216 = React.useMemo(function() -- line: 1357
 		-- upvalues: getAvailableGameTileOverflowMenuItems (copy), p26 (copy), FFlagLuaAppEnableSponsoredReportAd (copy)
 		return getAvailableGameTileOverflowMenuItems({
 			isSponsored = p26.entry.isSponsored,
@@ -1118,27 +1151,32 @@ return function(p26) -- line: 1169
 		p26.enableSponsoredFeedback,
 		if not FFlagLuaAppEnableSponsoredReportAd then nil else p26.enableReportAd
 	})
-	local v211 = nil
+	local v217 = nil
 
 	if v98 then
-		local v212 = useHasVideoThumbnailSelector(p26.entry.universeId, p26.topicId)
-		local v213 = p26.entry.primaryWideVideoAssetId ~= nil or v212
+		local v218 = useHasVideoThumbnailSelector(p26.entry.universeId, p26.topicId)
+		local v219 = p26.entry.primaryWideVideoAssetId ~= nil or v218
 
 		if FFlagLuaAppHomeTouchAutoplay then
-			useTagAsViewportAutoplayCandidate(v188, p26.videoPlaybackContext, if not FFlagLuaAppTileVideoCandidateOnly then nil else v213, if not FFlagLuaAppFixHiddenTileVideoCleanup then nil else p26.isHidden)
+			useTagAsViewportAutoplayCandidate(v189, p26.videoPlaybackContext, if not FFlagLuaAppTileVideoCandidateOnly then nil else v219, if not FFlagLuaAppFixHiddenTileVideoCleanup then nil else p26.isHidden)
 		end
 
-		local v214 = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else usePreferredInput()
+		local v220 = nil
 
-		v211 = if not v213 or not (not FFlagLuaAppHomeTouchAutoplay or not p26.isHidden) then nil else React.createElement(GameVideoPlaybackDetector, {
-			videoKey = v191,
+		if not FFlagLuaAppGameTileSelectionVideoPlayback then
+			v220 = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else usePreferredInput()
+		end
+
+		v217 = if not v219 or not (not FFlagLuaAppHomeTouchAutoplay or not p26.isHidden) then nil else React.createElement(GameVideoPlaybackDetector, {
+			videoKey = v192,
 			itemIndex = p26.index,
 			universeId = p26.entry.universeId,
-			tileRef = v188,
+			tileRef = v189,
 			isHoverSupported = useHoverTile,
-			isHovered = v192,
-			autoplay = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else v214 == Responsive.Input.Touch,
-			onPlaybackChange = v203,
+			isHovered = v193,
+			isSelected = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else v205,
+			autoplay = if not FFlagLuaAppGameTileSelectionVideoPlayback then if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else v220 == Responsive.Input.Touch else nil,
+			onPlaybackChange = v204,
 			videoAnalytics = p26.videoAnalytics,
 			videoDwellTimeInSec = FIntLuaAppGameTileVideoDwellTimeInSec,
 			videoVisiblePercent = FIntLuaAppGameTileVideoVisiblePercent,
@@ -1148,55 +1186,63 @@ return function(p26) -- line: 1169
 		})
 	end
 
-	local v215 = React.createElement(u111, Cryo.Dictionary.join(p26, {
-		useExperienceTileMetadata = v195,
-		hasBackground = v194,
-		hoverRef = v188,
+	local v221 = React.createElement(u112, Cryo.Dictionary.join(p26, {
+		useExperienceTileMetadata = v196,
+		hasBackground = v195,
+		hoverRef = v189,
 		isHoverSupported = useHoverTile,
-		isHovered = v192,
-		isVideoPlaying = v202,
-		tileBadges = v196,
-		foundationTokens = v189,
-		users = v198,
-		inGameUsersByGame = v199,
-		hasInGameFriends = v200,
-		inGameUserIds = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then nil else v201,
-		networking = if not FFlagLuaAppGameDetailsAttributionFix then nil else u204,
-		navigationUniverseId = if not FFlagLuaAppGameDetailsAttributionFix then nil else u205,
-		onGameTileActivated = if not FFlagLuaAppGameDetailsAttributionFix then nil else v206,
-		recordSponsoredGameClick = if not FFlagLuaAppGameDetailsAttributionFix then nil else u207,
-		overflowMenuOpen = v208,
-		hoverKey = v191,
-		triggerFeedback = v209,
-		availableMenuItems = v210,
-		videoPlaybackDetector = if not v98 then nil else v211
+		isHovered = v193,
+		isSelected = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else v205,
+		isVideoPlaying = v203,
+		tileBadges = v197,
+		foundationTokens = v190,
+		users = v199,
+		inGameUsersByGame = v200,
+		hasInGameFriends = v201,
+		inGameUserIds = if not FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then nil else v202,
+		networking = if not FFlagLuaAppGameDetailsAttributionFix then nil else u210,
+		navigationUniverseId = if not FFlagLuaAppGameDetailsAttributionFix then nil else u211,
+		onGameTileActivated = if not FFlagLuaAppGameDetailsAttributionFix then nil else v212,
+		recordSponsoredGameClick = if not FFlagLuaAppGameDetailsAttributionFix then nil else u213,
+		overflowMenuOpen = v214,
+		hoverKey = v192,
+		triggerFeedback = v215,
+		availableMenuItems = v216,
+		onSelectionGained = if not FFlagLuaAppGameTileSelectionVideoPlayback then p26.onSelectionGained else v207,
+		onSelectionLost = if not FFlagLuaAppGameTileSelectionVideoPlayback then p26.onSelectionLost else v208,
+		videoPlaybackDetector = if not v98 then nil else v217
 	}))
 
 	if v98 then
-		return v215
+		return v221
 	end
 
-	local v216 = useHasVideoThumbnailSelector(p26.entry.universeId, p26.topicId)
-	local v217 = p26.entry.primaryWideVideoAssetId ~= nil or v216
+	local v222 = useHasVideoThumbnailSelector(p26.entry.universeId, p26.topicId)
+	local v223 = p26.entry.primaryWideVideoAssetId ~= nil or v222
 
 	if FFlagLuaAppHomeTouchAutoplay then
-		useTagAsViewportAutoplayCandidate(v188, p26.videoPlaybackContext, if not FFlagLuaAppTileVideoCandidateOnly then nil else v217, if not FFlagLuaAppFixHiddenTileVideoCleanup then nil else p26.isHidden)
+		useTagAsViewportAutoplayCandidate(v189, p26.videoPlaybackContext, if not FFlagLuaAppTileVideoCandidateOnly then nil else v223, if not FFlagLuaAppFixHiddenTileVideoCleanup then nil else p26.isHidden)
 	end
 
-	local v218 = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else usePreferredInput()
+	local v224 = nil
 
-	if v217 and (not FFlagLuaAppHomeTouchAutoplay or not p26.isHidden) then
+	if not FFlagLuaAppGameTileSelectionVideoPlayback then
+		v224 = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else usePreferredInput()
+	end
+
+	if v223 and (not FFlagLuaAppHomeTouchAutoplay or not p26.isHidden) then
 		return React.createElement(React.Fragment, {}, {
-			GameTile = v215,
+			GameTile = v221,
 			VideoPlaybackDetector = React.createElement(GameVideoPlaybackDetector, {
-				videoKey = v191,
+				videoKey = v192,
 				itemIndex = p26.index,
 				universeId = p26.entry.universeId,
-				tileRef = v188,
+				tileRef = v189,
 				isHoverSupported = useHoverTile,
-				isHovered = v192,
-				autoplay = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else v218 == Responsive.Input.Touch,
-				onPlaybackChange = v203,
+				isHovered = v193,
+				isSelected = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else v205,
+				autoplay = if not FFlagLuaAppGameTileSelectionVideoPlayback then if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else v224 == Responsive.Input.Touch else nil,
+				onPlaybackChange = v204,
 				videoAnalytics = p26.videoAnalytics,
 				videoDwellTimeInSec = FIntLuaAppGameTileVideoDwellTimeInSec,
 				videoVisiblePercent = FIntLuaAppGameTileVideoVisiblePercent,
@@ -1207,5 +1253,5 @@ return function(p26) -- line: 1169
 		})
 	end
 
-	return v215
+	return v221
 end

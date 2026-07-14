@@ -1,3 +1,0 @@
-return {
-	mockCaptures = require(script.mockCaptures)
-}

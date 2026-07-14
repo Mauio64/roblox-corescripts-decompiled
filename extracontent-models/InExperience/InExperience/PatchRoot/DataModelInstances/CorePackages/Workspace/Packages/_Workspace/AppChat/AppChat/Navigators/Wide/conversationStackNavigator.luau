@@ -8,20 +8,21 @@ local SquadAddFriendsIconButton = require(AppChat.Components.Squads.SquadAddFrie
 local EnumScreens = require(AppChat.EnumScreens)
 local ChatConversationScreen = require(AppChat.Components.ChatConversation.ChatConversationScreen)
 local ChatDetailsScreen = require(AppChat.Components.ChatDetails.ChatDetailsScreen)
+local ChatDetailsNavigationOptions = require(AppChat.Components.ChatDetails.ChatDetailsNavigationOptions)
 local SquadInviteFriendsScreen = require(AppChat.Components.Squads.SquadInviteFriendsScreen)
 local SquadLobbyScreen = require(AppChat.Components.Squads.SquadLobbyScreen)
 local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
 local FFlagEnablePartyQuickStartButton = require(AppChatParent.SharedFlags).FFlagEnablePartyQuickStartButton
 local FFlagAppChatDisableAbsorbInputSelectable = require(AppChat.Flags.FFlagAppChatDisableAbsorbInputSelectable)
-local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
-local DomLocators = require(AppChat.Utils.DomLocators)
 local TopBarProvider = require(AppChat.TopBarProvider)
 local createSystemMenuButton = require(AppChat.Components.SelectChatMembers.createSystemMenuButton)
 local withLocalization = require(AppChatParent.Localization).withLocalization
 local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
+local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
+local DomLocators = require(AppChat.Utils.DomLocators)
 local NavProps = require(AppChat.Constants).NavProps
 
-local function instantTransitionConfig() -- line: 31
+local function instantTransitionConfig() -- line: 32
 	return {
 		transitionSpec = {
 			frequency = 1000000,
@@ -30,24 +31,21 @@ local function instantTransitionConfig() -- line: 31
 	}
 end
 
-return function(p1, b1: boolean?) -- line: 40
-	-- upvalues: FFlagAppChatTopBarConfigDriven (copy), Cryo (copy), GetFFlagIsSquadEnabled (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), React (copy), SquadAddFriendsIconButton (copy), NavProps (copy), FFlagEnablePartyQuickStartButton (copy), TopBarProvider (copy), EnumScreens (copy), withLocalization (copy), createSystemMenuButton (copy), ChatConversationScreen (copy), autoFocusNavigation (copy), ChatDetailsScreen (copy), SquadLobbyScreen (copy), SquadInviteFriendsScreen (copy), FFlagAppChatDisableAbsorbInputSelectable (copy), RoactNavigation (copy), instantTransitionConfig (copy)
-	local function getChatDetailsNavigationOptions(_) -- line: 41
-		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p1 (copy), Cryo (copy), GetFFlagIsSquadEnabled (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy)
+return function(p1, b1: boolean?) -- line: 41
+	-- upvalues: FFlagAppChatTopBarConfigDriven (copy), Cryo (copy), ChatDetailsNavigationOptions (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), React (copy), SquadAddFriendsIconButton (copy), NavProps (copy), FFlagEnablePartyQuickStartButton (copy), TopBarProvider (copy), EnumScreens (copy), withLocalization (copy), createSystemMenuButton (copy), ChatConversationScreen (copy), autoFocusNavigation (copy), ChatDetailsScreen (copy), GetFFlagIsSquadEnabled (copy), SquadLobbyScreen (copy), SquadInviteFriendsScreen (copy), FFlagAppChatDisableAbsorbInputSelectable (copy), RoactNavigation (copy), instantTransitionConfig (copy)
+	local function getChatDetailsNavigationOptions(_) -- line: 42
+		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p1 (copy), Cryo (copy), ChatDetailsNavigationOptions (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy)
 		if FFlagAppChatTopBarConfigDriven() then
 			return p1 or {}
 		end
 
 		return Cryo.Dictionary.join({
 			backButtonEnabled = true,
-			headerText = {
-				shouldLocalize = true,
-				raw = not GetFFlagIsSquadEnabled() and "Feature.Chat.Label.ChatDetails" or "Feature.Chat.Label.Details"
-			},
+			headerText = ChatDetailsNavigationOptions.getHeaderText(),
 			backButtonTestId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatDetailsTopBarActionButton("back")
 		}, p1 or {})
 	end
-	local function getSquadLobbyNavigationOptions(p3) -- line: 59
+	local function getSquadLobbyNavigationOptions(p3) -- line: 55
 		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p1 (copy), Cryo (copy), React (copy), SquadAddFriendsIconButton (copy)
 		if FFlagAppChatTopBarConfigDriven() then
 			return p1 or {}
@@ -57,7 +55,7 @@ return function(p1, b1: boolean?) -- line: 40
 
 		return Cryo.Dictionary.join({
 			backButtonEnabled = true,
-			renderRight = function() -- line: 66
+			renderRight = function() -- line: 62
 				-- upvalues: React (copy), SquadAddFriendsIconButton (copy), navigation (copy)
 				return React.createElement(SquadAddFriendsIconButton, {
 					navigation = navigation
@@ -65,13 +63,13 @@ return function(p1, b1: boolean?) -- line: 40
 			end
 		}, p1 or {})
 	end
-	local function getSquadInviteFriendsNavigationOptions(p4) -- line: 74
+	local function getSquadInviteFriendsNavigationOptions(p4) -- line: 70
 		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p1 (copy), NavProps (copy), FFlagEnablePartyQuickStartButton (copy), React (copy), TopBarProvider (copy), EnumScreens (copy), withLocalization (copy), createSystemMenuButton (copy), Cryo (copy)
 		if FFlagAppChatTopBarConfigDriven() then
 			return p1 or {}
 		end
 
-		local v35 = p4.navigation and (p4.navigation.getScreenProps and p4.navigation.getScreenProps(NavProps.WIDE_MODE, false))
+		local v36 = p4.navigation and (p4.navigation.getScreenProps and p4.navigation.getScreenProps(NavProps.WIDE_MODE, false))
 		local t1 = {
 			backButtonEnabled = true,
 			headerText = if not FFlagEnablePartyQuickStartButton then nil else {
@@ -80,23 +78,23 @@ return function(p1, b1: boolean?) -- line: 40
 			}
 		}
 
-		if v35 then
-			function t1.renderRight() -- line: 94
+		if v36 then
+			function t1.renderRight() -- line: 90
 				-- upvalues: React (copy), TopBarProvider (copy), EnumScreens (copy), withLocalization (copy), createSystemMenuButton (copy)
 				return React.createElement(TopBarProvider, {
 					screenName = EnumScreens.SquadInviteFriends,
-					render = function(p5) -- line: 97
+					render = function(p5) -- line: 93
 						-- upvalues: EnumScreens (copy), withLocalization (copy), createSystemMenuButton (copy)
-						local v38 = p5.getScreenTopBar(EnumScreens.SquadInviteFriends)
+						local v39 = p5.getScreenTopBar(EnumScreens.SquadInviteFriends)
 
 						return withLocalization({
 							systemButtonText = "Feature.Squads.Action.Add"
-						})(function(p6) -- line: 102
-							-- upvalues: createSystemMenuButton (copy), v38 (copy)
+						})(function(p6) -- line: 98
+							-- upvalues: createSystemMenuButton (copy), v39 (copy)
 							return createSystemMenuButton({
 								localizedStrings = p6,
-								isDisabled = not v38.systemButtonEnabled,
-								onActivated = v38.systemButtonActivated
+								isDisabled = not v39.systemButtonEnabled,
+								onActivated = v39.systemButtonActivated
 							})
 						end)
 					end

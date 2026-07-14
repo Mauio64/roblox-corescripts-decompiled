@@ -1,4 +1,0 @@
-local FFlagMarketplaceOffersRoot = require(script.Parent.FFlagMarketplaceOffersRoot)
-local FFlagPurchasePromptFetchCartPricing = require(script.Parent.FFlagPurchasePromptFetchCartPricing)
-
-return game:DefineFastFlag("PurchasePromptFetchCartPricingForLooks2", false) and (FFlagMarketplaceOffersRoot and FFlagPurchasePromptFetchCartPricing)

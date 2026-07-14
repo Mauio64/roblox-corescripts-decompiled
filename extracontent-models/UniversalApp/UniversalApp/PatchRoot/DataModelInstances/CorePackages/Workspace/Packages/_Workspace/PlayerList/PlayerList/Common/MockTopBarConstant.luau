@@ -1,3 +1,0 @@
-return {
-	TopBarHeight = 64
-}

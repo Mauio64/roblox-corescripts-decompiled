@@ -4,7 +4,7 @@ local Otter = InGameMenuDependencies.Otter
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local UIBlox = InGameMenuDependencies.UIBlox
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
@@ -47,25 +47,50 @@ function v20.init(p1, p2) -- line: 45
 	})
 end
 function v20.renderWithSelectionCursor(p5, p6) -- line: 72
-	-- upvalues: withLocalization (copy), withStyle (copy), Roact (copy), CursorKind (copy), ImageSetLabel (copy), divideTransparency (copy), ThemedTextLabel (copy)
+	-- upvalues: withLocalization (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), CursorKind (copy), ImageSetLabel (copy), divideTransparency (copy), ThemedTextLabel (copy)
 	local props = p5.props
 
 	return withLocalization({
 		text = props.text
 	})(function(p7) -- line: 77
-		-- upvalues: withStyle (copy), p5 (copy), props (copy), Roact (copy), p6 (copy), CursorKind (copy), ImageSetLabel (copy), divideTransparency (copy), ThemedTextLabel (copy)
-		return withStyle(function(p8) -- line: 78
+		-- upvalues: withFoundationOrUIBloxStyle (copy), p5 (copy), props (copy), Roact (copy), p6 (copy), CursorKind (copy), ImageSetLabel (copy), divideTransparency (copy), ThemedTextLabel (copy)
+		return withFoundationOrUIBloxStyle(function(p8) -- line: 78
+			return {
+				Theme = {
+					BackgroundOnPress = {
+						Color = p8.Color.State.Press.Color3,
+						Transparency = p8.Color.State.Press.Transparency
+					},
+					BackgroundOnHover = {
+						Color = p8.Color.State.Hover.Color3,
+						Transparency = p8.Color.State.Hover.Transparency
+					},
+					IconEmphasis = {
+						Color = p8.Color.Content.Emphasis.Color3,
+						Transparency = p8.Color.Content.Emphasis.Transparency
+					},
+					TextEmphasis = {
+						Color = p8.Color.Content.Emphasis.Color3,
+						Transparency = p8.Color.Content.Emphasis.Transparency
+					},
+					BackgroundMuted = {
+						Color = p8.Color.Surface.Surface_200.Color3,
+						Transparency = p8.Color.Surface.Surface_200.Transparency
+					}
+				}
+			}
+		end, function(p9) -- line: 88
 			-- upvalues: p5 (copy), props (copy), Roact (copy), p6 (copy), CursorKind (copy), ImageSetLabel (copy), divideTransparency (copy), ThemedTextLabel (copy), p7 (copy)
-			local v49 = p5.state.pressing and not props.selected
+			local v50 = p5.state.pressing and not props.selected
 			local t1 = {
 				Transparency = 1,
 				Color = Color3.new(1, 1, 1)
 			}
 
 			if p5.state.pressing then
-				t1 = p8.Theme.BackgroundOnPress
+				t1 = p9.Theme.BackgroundOnPress
 			elseif p5.state.hovering then
-				t1 = p8.Theme.BackgroundOnHover
+				t1 = p9.Theme.BackgroundOnHover
 			end
 
 			return Roact.createElement("TextButton", {
@@ -79,30 +104,30 @@ function v20.renderWithSelectionCursor(p5, p6) -- line: 72
 				SelectionImageObject = p6(CursorKind.Square),
 				[Roact.Event.Activated] = props.onActivated,
 				[Roact.Ref] = props.LayoutOrder == 1 and props.mainPageFirstButtonRef or nil,
-				[Roact.Event.MouseEnter] = function() -- line: 102
+				[Roact.Event.MouseEnter] = function() -- line: 112
 					-- upvalues: p5 (copy)
 					p5:setState({
 						hovering = true
 					})
 				end,
-				[Roact.Event.MouseLeave] = function() -- line: 107
+				[Roact.Event.MouseLeave] = function() -- line: 117
 					-- upvalues: p5 (copy)
 					p5:setState({
 						hovering = false,
 						pressing = false
 					})
 				end,
-				[Roact.Event.InputBegan] = function(_, p10) -- line: 113
+				[Roact.Event.InputBegan] = function(_, p11) -- line: 123
 					-- upvalues: p5 (copy)
-					if p10.UserInputType == Enum.UserInputType.MouseButton1 or p10.UserInputType == Enum.UserInputType.Touch then
+					if p11.UserInputType == Enum.UserInputType.MouseButton1 or p11.UserInputType == Enum.UserInputType.Touch then
 						p5:setState({
 							pressing = true
 						})
 					end
 				end,
-				[Roact.Event.InputEnded] = function(_, p12) -- line: 123
+				[Roact.Event.InputEnded] = function(_, p13) -- line: 133
 					-- upvalues: p5 (copy)
-					if p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch then
+					if p13.UserInputType == Enum.UserInputType.MouseButton1 or p13.UserInputType == Enum.UserInputType.Touch then
 						p5:setState({
 							pressing = false
 						})
@@ -121,8 +146,8 @@ function v20.renderWithSelectionCursor(p5, p6) -- line: 72
 						ZIndex = 3,
 						AnchorPoint = Vector2.new(0, 0.5),
 						Image = props.image,
-						ImageColor3 = p8.Theme.IconEmphasis.Color,
-						ImageTransparency = divideTransparency(p8.Theme.IconEmphasis.Transparency, not v49 and 1 or 2),
+						ImageColor3 = p9.Theme.IconEmphasis.Color,
+						ImageTransparency = divideTransparency(p9.Theme.IconEmphasis.Transparency, not v50 and 1 or 2),
 						Position = UDim2.new(0, 28, 0.5, 0),
 						Size = UDim2.new(0, 36, 0, 36)
 					}),
@@ -134,7 +159,7 @@ function v20.renderWithSelectionCursor(p5, p6) -- line: 72
 						Position = UDim2.new(0, 80, 0.5, 0),
 						Size = UDim2.new(1, -104, 1, 0),
 						Text = p7.text,
-						TextTransparency = divideTransparency(p8.Theme.TextEmphasis.Transparency, not v49 and 1 or 2),
+						TextTransparency = divideTransparency(p9.Theme.TextEmphasis.Transparency, not v50 and 1 or 2),
 						TextXAlignment = Enum.TextXAlignment.Left
 					})
 				}),
@@ -142,32 +167,32 @@ function v20.renderWithSelectionCursor(p5, p6) -- line: 72
 					BorderSizePixel = 0,
 					ZIndex = 2,
 					Size = p5.fillSize,
-					BackgroundColor3 = p8.Theme.BackgroundMuted.Color
+					BackgroundColor3 = p9.Theme.BackgroundMuted.Color
 				})
 			})
 		end)
 	end)
 end
-function v20.render(p13) -- line: 181
+function v20.render(p14) -- line: 191
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p14) -- line: 182
-		-- upvalues: p13 (copy)
-		return p13:renderWithSelectionCursor(p14)
+	return withSelectionCursorProvider(function(p15) -- line: 192
+		-- upvalues: p14 (copy)
+		return p14:renderWithSelectionCursor(p15)
 	end)
 end
-function v20.didUpdate(p15) -- line: 187
+function v20.didUpdate(p16) -- line: 197
 	-- upvalues: Otter (copy)
-	p15.motor:setGoal({
-		fillProgress = Otter.spring(not p15.props.selected and 0 or 1, {
+	p16.motor:setGoal({
+		fillProgress = Otter.spring(not p16.props.selected and 0 or 1, {
 			frequency = 2.5
 		}),
-		hoverTransparency = Otter.spring(not p15.state.hovering and 0 or 1, {
+		hoverTransparency = Otter.spring(not p16.state.hovering and 0 or 1, {
 			frequency = 5
 		})
 	})
 end
 
-local function PageNavigation(p16) -- line: 198
+local function PageNavigation(p17) -- line: 208
 	-- upvalues: Roact (copy), Pages (copy), Constants (copy), v20 (copy), Divider (copy)
 	local t2 = {
 		Layout = Roact.createElement("UIListLayout", {
@@ -183,13 +208,13 @@ local function PageNavigation(p16) -- line: 198
 			t2["Page" .. v.key] = Roact.createElement(v20, {
 				image = v.icon,
 				LayoutOrder = n1,
-				selected = p16.currentPage == v.key,
+				selected = p17.currentPage == v.key,
 				text = v.title,
-				onActivated = function() -- line: 216
-					-- upvalues: p16 (copy), v (copy)
-					p16.setCurrentPage(v.key)
+				onActivated = function() -- line: 226
+					-- upvalues: p17 (copy), v (copy)
+					p17.setCurrentPage(v.key)
 				end,
-				mainPageFirstButtonRef = n1 == 1 and p16.mainPageFirstButtonRef or nil
+				mainPageFirstButtonRef = n1 == 1 and p17.mainPageFirstButtonRef or nil
 			})
 			n1 += 1
 
@@ -205,22 +230,22 @@ local function PageNavigation(p16) -- line: 198
 
 	return Roact.createElement("Frame", {
 		BackgroundTransparency = 1,
-		Position = p16.Position,
+		Position = p17.Position,
 		Size = UDim2.new(1, -Constants.Zone.ContentOffset, 0, v36 * 70 + (v36 - 1))
 	}, t2)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p17, _) -- line: 243
+return RoactRodux.UNSTABLE_connect2(function(p18, _) -- line: 253
 	return {
-		currentPage = p17.menuPage
+		currentPage = p18.menuPage
 	}
-end, function(p19) -- line: 247
+end, function(p20) -- line: 257
 	-- upvalues: SetCurrentPage (copy), SendAnalytics (copy), Constants (copy)
 	return {
-		setCurrentPage = function(p20) -- line: 249
-			-- upvalues: p19 (copy), SetCurrentPage (copy), SendAnalytics (copy), Constants (copy)
-			p19(SetCurrentPage(p20))
-			SendAnalytics("open_" .. p20 .. "_tab", Constants.AnalyticsMenuActionName, {})
+		setCurrentPage = function(p21) -- line: 259
+			-- upvalues: p20 (copy), SetCurrentPage (copy), SendAnalytics (copy), Constants (copy)
+			p20(SetCurrentPage(p21))
+			SendAnalytics("open_" .. p21 .. "_tab", Constants.AnalyticsMenuActionName, {})
 		end
 	}
 end)(PageNavigation)

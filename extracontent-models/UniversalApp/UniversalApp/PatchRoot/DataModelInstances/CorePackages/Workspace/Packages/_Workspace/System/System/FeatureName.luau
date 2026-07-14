@@ -1,3 +1,0 @@
-return {
-	Backpack = "Backpack"
-}

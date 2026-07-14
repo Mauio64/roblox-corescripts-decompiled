@@ -105,7 +105,7 @@ end)
 local IChatSettings = require(RobloxGui.Modules.InGameChat.BubbleChat.Types).IChatSettings
 local v33 = if not getFFlagExpChatAlwaysRunTCS() then TextChatService.ChatVersion == Enum.ChatVersion.TextChatService and TextChatService.CreateDefaultTextChannels else TextChatService.CreateDefaultTextChannels
 
-if game:GetEngineFeature("TextChatServiceProtectedChatEnabled") and game:DefineFastFlag("DebugExpChatTextChannelWindow", false) then
+if game:GetEngineFeature("TextChatServiceProtectedChatEnabled") and game:DefineFastFlag("ExpChatTextChannelWindow", false) and TextChatService:IsProtectedChatEnabled() then
 	require(CorePackages.Workspace.Packages.TextChannelWindow).start()
 end
 

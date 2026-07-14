@@ -52,7 +52,7 @@ local function computeSize(t4: {[any]: any}) -- line: 73
 	return (UDim2.new(t4.width or UDim.new(), v23))
 end
 local function BaseMenu(p1, p2) -- line: 83
-	-- upvalues: React (copy), t1 (copy), withDefaults (copy), useBindable (copy), useScaledValue (copy), useSubmenuHover (copy), DeclarativeBaseMenuContent (copy), t2 (copy), computeAutomaticSize (copy), ScrollView (copy), withCommonProps (copy), Flags (copy), computeSize (copy), View (copy), BaseMenuContext (copy)
+	-- upvalues: React (copy), t1 (copy), withDefaults (copy), useBindable (copy), useScaledValue (copy), useSubmenuHover (copy), Flags (copy), DeclarativeBaseMenuContent (copy), t2 (copy), computeAutomaticSize (copy), ScrollView (copy), withCommonProps (copy), computeSize (copy), View (copy), BaseMenuContext (copy)
 	local v26, v27 = React.useBinding(false)
 	local v28 = table.clone(t1)
 
@@ -80,11 +80,15 @@ local function BaseMenu(p1, p2) -- line: 83
 		v35(true)
 	end, {})
 	local v40 = React.useMemo(function() -- line: 107
-		-- upvalues: v30 (copy), v32 (copy)
+		-- upvalues: v30 (copy), Flags (copy), v32 (copy)
 		return v30:map(function(uDim: UDim?) -- line: 108
-			-- upvalues: v32 (copy)
+			-- upvalues: Flags (copy), v32 (copy)
 			if uDim then
 				return uDim.Offset
+			end
+
+			if Flags.FoundationBaseMenuContentSizing then
+				return 0
 			end
 
 			return v32
@@ -93,57 +97,66 @@ local function BaseMenu(p1, p2) -- line: 83
 		v30,
 		v32
 	})
-	local v41 = React.useMemo(function() -- line: 114
-		-- upvalues: v30 (copy), v29 (copy), v33 (copy)
-		return v30:map(function(uDim: UDim?) -- line: 115
-			-- upvalues: v29 (copy), v33 (copy)
-			return not uDim or v29.couldGrow and uDim.Offset < v33
+	local v41 = React.useMemo(function() -- line: 116
+		-- upvalues: v30 (copy), Flags (copy), v29 (copy), v33 (copy)
+		return v30:map(function(uDim: UDim?) -- line: 117
+			-- upvalues: Flags (copy), v29 (copy), v33 (copy)
+			if Flags.FoundationBaseMenuContentSizing then
+				return not uDim or v29.couldGrow == true
+			end
+
+			return not uDim or v29.couldGrow == true and uDim.Offset < v33
 		end)
 	end, {
 		v30,
 		v33,
 		v29.couldGrow
 	})
-	local v42 = React.useMemo(function() -- line: 120
-		-- upvalues: React (copy), v41 (copy), v40 (copy), v33 (copy)
+	local v42 = React.useMemo(function() -- line: 125
+		-- upvalues: React (copy), v41 (copy), v40 (copy), Flags (copy), v33 (copy)
 		return {
 			MinSize = React.joinBindings({
 				v41,
 				v40
-			}):map(function(p3) -- line: 122
+			}):map(function(p3) -- line: 127
+				-- upvalues: Flags (copy)
 				local v56 = p3[1]
 				local v57 = p3[2]
 
-				if v56 then
-					return (Vector2.new(v57, 0))
+				if not v56 then
+					return nil
 				end
 
-				return nil
+				if Flags.FoundationBaseMenuContentSizing and v57 == 0 then
+					return nil
+				end
+
+				return (Vector2.new(v57, 0))
 			end),
-			MaxSize = v41:map(function(p4) -- line: 127
+			MaxSize = if not Flags.FoundationBaseMenuContentSizing then v41:map(function(p4) -- line: 139
 				-- upvalues: v33 (copy)
 				if p4 then
 					return (Vector2.new(v33, 1e999))
 				end
 
 				return nil
-			end)
+			end) else nil
 		}
 	end, {
 		v41,
 		v40,
 		v33
 	})
-	local v43 = React.useMemo(function() -- line: 133
+	local v43 = React.useMemo(function() -- line: 145
 		-- upvalues: React (copy), v36 (copy), v31 (copy)
 		return React.joinBindings({
 			canvasSize = v36,
 			maxHeight = v31
-		}):map(function(t5: {[any]: any}) -- line: 135
+		}):map(function(t5: {[any]: any}) -- line: 147
 			return t5.maxHeight ~= nil and t5.canvasSize.Y.Offset > t5.maxHeight
 		end)
 	end, { v31 })
-	local v44 = React.useCallback(function(p5) -- line: 140
+	local v44 = React.useCallback(function(p5) -- line: 152
 		-- upvalues: v37 (copy)
 		return v37(UDim2.fromOffset(p5.AbsoluteSize.X, p5.AbsoluteSize.Y))
 	end, { v37 })
@@ -197,7 +210,7 @@ local function BaseMenu(p1, p2) -- line: 83
 
 	return React.createElement(View, withCommonProps(v29, {
 		tag = `col stroke-standard stroke-default { v46 }`,
-		AutomaticSize = v41:map(function(p6) -- line: 210
+		AutomaticSize = v41:map(function(p6) -- line: 222
 			if p6 then
 				return Enum.AutomaticSize.XY
 			end
@@ -207,7 +220,7 @@ local function BaseMenu(p1, p2) -- line: 83
 		Size = React.joinBindings({
 			v41,
 			v30
-		}):map(function(p7) -- line: 213
+		}):map(function(p7) -- line: 225
 			local v51 = p7[1]
 			local v52 = p7[2]
 

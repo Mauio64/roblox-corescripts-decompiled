@@ -1,4 +1,0 @@
-return {
-	Default = "Default",
-	Regroup = "Regroup"
-}

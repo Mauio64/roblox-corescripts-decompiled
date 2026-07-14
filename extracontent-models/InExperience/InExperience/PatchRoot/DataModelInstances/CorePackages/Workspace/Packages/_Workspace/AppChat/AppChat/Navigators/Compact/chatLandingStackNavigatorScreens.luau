@@ -5,6 +5,7 @@ local EnumScreens = require(AppChat.EnumScreens)
 local ChatLandingScreen = require(AppChat.Components.ChatLanding.ChatLandingScreen)
 local ChatConversationScreen = require(AppChat.Components.ChatConversation.ChatConversationScreen)
 local ChatDetailsScreen = require(AppChat.Components.ChatDetails.ChatDetailsScreen)
+local ChatDetailsNavigationOptions = require(AppChat.Components.ChatDetails.ChatDetailsNavigationOptions)
 local CreateNewChatScreen = require(AppChat.Components.CreateNewChat.CreateNewChatScreen)
 local EditChatMembersScreen = require(AppChat.Components.EditChatMembers.EditChatMembersScreen)
 local SquadInviteFriendsScreen = require(AppChat.Components.Squads.SquadInviteFriendsScreen)
@@ -13,6 +14,15 @@ local QuickStartSquadInviteFriendsScreen = require(AppChat.Components.Squads.Qui
 local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
 local getFFlagAppChatRemoveDynamicRequires = require(AppChat.Flags.getFFlagAppChatRemoveDynamicRequires)
 local FFlagEnablePartyQuickStartButton = require(AppChatParent.SharedFlags).FFlagEnablePartyQuickStartButton
+local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
+
+local function getChatDetailsNavigationOptions(p1) -- line: 23
+	-- upvalues: ChatDetailsNavigationOptions (copy)
+	return ChatDetailsNavigationOptions.getNavigationOptions(p1, {
+		tabBarVisible = false
+	})
+end
+
 local t1 = {
 	{
 		[EnumScreens.ChatLanding] = {
@@ -21,7 +31,7 @@ local t1 = {
 				isRoot = true,
 				backButtonEnabled = false,
 				tabBarVisible = true
-			} else function() -- line: 26
+			} else function() -- line: 34
 				return {
 					isRoot = true,
 					backButtonEnabled = false,
@@ -44,10 +54,10 @@ local t1 = {
 	{
 		[EnumScreens.ChatDetails] = {
 			screen = ChatDetailsScreen,
-			navigationOptions = {
+			navigationOptions = if not getFFlagAppChatEnableRootedNavigation() then {
 				backButtonEnabled = true,
 				tabBarVisible = false
-			}
+			} else getChatDetailsNavigationOptions
 		}
 	},
 	{

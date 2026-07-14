@@ -1,0 +1,31 @@
+local v1 = game:DefineFastFlag("DebugMyStatsExperienceAgentSpec", false)
+
+require(script.Parent.Types.acpSession)
+
+local u2 = nil
+
+return {
+	isEnabled = function() -- line: 13
+		-- upvalues: v1 (copy)
+		return v1
+	end,
+	get = function() -- line: 16
+		-- upvalues: u2 (ref)
+		return u2
+	end,
+	set = function(s1: string?) -- line: 19
+		-- upvalues: u2 (ref)
+		u2 = if s1 ~= nil and (s1 ~= "" and s1 ~= "latest") then s1 else nil
+	end,
+	getExperiment = function() -- line: 23
+		-- upvalues: v1 (copy), u2 (ref)
+		if not v1 or u2 == nil then
+			return nil
+		end
+
+		return {
+			ignoreClientTools = false,
+			specVersion = u2
+		}
+	end
+}

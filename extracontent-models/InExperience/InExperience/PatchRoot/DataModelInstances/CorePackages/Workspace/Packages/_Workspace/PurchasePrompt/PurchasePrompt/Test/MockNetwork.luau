@@ -1,14 +1,13 @@
 local ParentParent = script.Parent.Parent
 local Promise = require(ParentParent.Promise)
 local PurchaseWarning = require(ParentParent.Enums.PurchaseWarning)
-local GetFFlagUseCatalogItemDetailsToResolveBundlePurchase = require(ParentParent.Flags.GetFFlagUseCatalogItemDetailsToResolveBundlePurchase)
 local FFlagRefreshPriceOnRetryAfterUpsell = require(ParentParent.Flags.FFlagRefreshPriceOnRetryAfterUpsell)
 
-local function getABTestGroup() -- line: 15
+local function getABTestGroup() -- line: 13
 	-- upvalues: Promise (copy)
 	return Promise.resolve(false)
 end
-local function getProductInfo(_, _) -- line: 19
+local function getProductInfo(_, _) -- line: 17
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		AssetId = 1,
@@ -33,11 +32,11 @@ local function getProductInfo(_, _) -- line: 19
 		}
 	})
 end
-local function getPlayerOwns(_, _, _) -- line: 44
+local function getPlayerOwns(_, _, _) -- line: 42
 	-- upvalues: Promise (copy)
 	return Promise.resolve(false)
 end
-local function performPurchase(_, _, _, _) -- line: 48
+local function performPurchase(_, _, _, _) -- line: 46
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		success = true,
@@ -45,23 +44,23 @@ local function performPurchase(_, _, _, _) -- line: 48
 		receipt = "fake-receipt-hash"
 	})
 end
-local function loadAssetForEquip(_) -- line: 56
+local function loadAssetForEquip(_) -- line: 54
 	-- upvalues: Promise (copy)
 	return Promise.resolve(Instance.new("Tool"))
 end
-local function getAccountInfo() -- line: 60
+local function getAccountInfo() -- line: 58
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		isPremium = false
 	})
 end
-local function getBalanceInfo() -- line: 66
+local function getBalanceInfo() -- line: 64
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		robux = 2147483647
 	})
 end
-local function getBundleDetails(_) -- line: 72
+local function getBundleDetails(_) -- line: 70
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		id = 1,
@@ -86,7 +85,7 @@ local function getBundleDetails(_) -- line: 72
 		}
 	})
 end
-local function getProductPurchasableDetails(_) -- line: 97
+local function getProductPurchasableDetails(_) -- line: 95
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		purchasable = false,
@@ -94,7 +93,7 @@ local function getProductPurchasableDetails(_) -- line: 97
 		price = 100
 	})
 end
-local function getCatalogItemDetails(_: number, _: string) -- line: 105
+local function getCatalogItemDetails(_: number, _: string) -- line: 103
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		bundleType = 1,
@@ -180,14 +179,14 @@ local function getCatalogItemDetails(_: number, _: string) -- line: 105
 		itemStatus = {}
 	})
 end
-local function getResellers(_: string, _: number?) -- line: 191
+local function getResellers(_: string, _: number?) -- line: 189
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		nextPageCursor = nil,
 		data = {}
 	})
 end
-local function getRobuxUpsellProductWithUniverseItemInfo(_, _, _, _, _, _) -- line: 198
+local function getRobuxUpsellProductWithUniverseItemInfo(_, _, _, _, _, _) -- line: 196
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		roblox_product_id = 50,
@@ -196,39 +195,39 @@ local function getRobuxUpsellProductWithUniverseItemInfo(_, _, _, _, _, _) -- li
 		robux_amount = 500
 	})
 end
-local function postPremiumImpression() -- line: 214
+local function postPremiumImpression() -- line: 212
 	-- upvalues: Promise (copy)
 	return Promise.resolve()
 end
-local function getPremiumUpsellPrecheck() -- line: 218
+local function getPremiumUpsellPrecheck() -- line: 216
 	-- upvalues: Promise (copy)
 	return Promise.resolve(true)
 end
-local function getPurchaseWarning(_) -- line: 222
+local function getPurchaseWarning(_) -- line: 220
 	-- upvalues: Promise (copy), PurchaseWarning (copy)
 	return Promise.resolve({
 		action = PurchaseWarning.NoAction
 	})
 end
-local function postPurchaseWarningAcknowledge() -- line: 228
+local function postPurchaseWarningAcknowledge() -- line: 226
 	-- upvalues: Promise (copy)
 	return Promise.resolve()
 end
-local function checkUserPurchaseSettings() -- line: 232
+local function checkUserPurchaseSettings() -- line: 230
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		isEligible = false,
 		failureReason = "PurchaseNotEnabled"
 	})
 end
-local function getUnifiedPurchaseFlowUserEligibility() -- line: 239
+local function getUnifiedPurchaseFlowUserEligibility() -- line: 237
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		isUserEligibleForUnifiedPurchaseFlow = true,
 		expiresInSeconds = 120
 	})
 end
-local function getSubscriptionProductInfo(_) -- line: 246
+local function getSubscriptionProductInfo(_) -- line: 244
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		Name = "Mock Subscription",
@@ -242,7 +241,7 @@ local function getSubscriptionProductInfo(_) -- line: 246
 		PriceInRobux = 0
 	})
 end
-local function GetLookDetailsV2ProductInfo(_) -- line: 260
+local function GetLookDetailsV2ProductInfo(_) -- line: 258
 	-- upvalues: Promise (copy)
 	return Promise.resolve({
 		look = {
@@ -259,12 +258,12 @@ local t1 = {}
 
 t1.__index = t1
 
-function t1.new(p22, p23) -- line: 277
-	-- upvalues: Promise (copy), GetFFlagUseCatalogItemDetailsToResolveBundlePurchase (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), getABTestGroup (copy), getProductInfo (copy), getPlayerOwns (copy), performPurchase (copy), loadAssetForEquip (copy), getAccountInfo (copy), getBalanceInfo (copy), getBundleDetails (copy), getProductPurchasableDetails (copy), getCatalogItemDetails (copy), getResellers (copy), getRobuxUpsellProductWithUniverseItemInfo (copy), postPremiumImpression (copy), getPremiumUpsellPrecheck (copy), getPurchaseWarning (copy), postPurchaseWarningAcknowledge (copy), checkUserPurchaseSettings (copy), getUnifiedPurchaseFlowUserEligibility (copy), getSubscriptionProductInfo (copy), GetLookDetailsV2ProductInfo (copy)
+function t1.new(p22, p23) -- line: 275
+	-- upvalues: Promise (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), getABTestGroup (copy), getProductInfo (copy), getPlayerOwns (copy), performPurchase (copy), loadAssetForEquip (copy), getAccountInfo (copy), getBalanceInfo (copy), getBundleDetails (copy), getProductPurchasableDetails (copy), getCatalogItemDetails (copy), getResellers (copy), getRobuxUpsellProductWithUniverseItemInfo (copy), postPremiumImpression (copy), getPremiumUpsellPrecheck (copy), getPurchaseWarning (copy), postPurchaseWarningAcknowledge (copy), checkUserPurchaseSettings (copy), getUnifiedPurchaseFlowUserEligibility (copy), getSubscriptionProductInfo (copy), GetLookDetailsV2ProductInfo (copy)
 	local t2
 
 	if p23 or p22 then
-		local function v54() -- line: 281
+		local function v53() -- line: 279
 			-- upvalues: p22 (copy), Promise (copy), p23 (copy)
 			if p22 then
 				return Promise.resolve(p22)
@@ -274,25 +273,25 @@ function t1.new(p22, p23) -- line: 277
 		end
 
 		t2 = {
-			getABTestGroup = v54,
-			getProductInfo = v54,
-			getPlayerOwns = v54,
-			performPurchase = v54,
-			loadAssetForEquip = v54,
-			getAccountInfo = v54,
-			getBalanceInfo = v54,
-			getBundleDetails = v54,
-			getProductPurchasableDetails = v54,
-			getCatalogItemDetails = if not GetFFlagUseCatalogItemDetailsToResolveBundlePurchase() and not FFlagRefreshPriceOnRetryAfterUpsell then nil else v54,
-			getResellers = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else v54,
-			getRobuxUpsellProductWithUniverseItemInfo = v54,
-			postPremiumImpression = v54,
-			getPremiumUpsellPrecheck = v54,
-			getPurchaseWarning = v54,
-			postPurchaseWarningAcknowledge = v54,
-			checkUserPurchaseSettings = v54,
-			getUnifiedPurchaseFlowUserEligibility = v54,
-			getSubscriptionProductInfo = v54
+			getABTestGroup = v53,
+			getProductInfo = v53,
+			getPlayerOwns = v53,
+			performPurchase = v53,
+			loadAssetForEquip = v53,
+			getAccountInfo = v53,
+			getBalanceInfo = v53,
+			getBundleDetails = v53,
+			getProductPurchasableDetails = v53,
+			getCatalogItemDetails = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else v53,
+			getResellers = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else v53,
+			getRobuxUpsellProductWithUniverseItemInfo = v53,
+			postPremiumImpression = v53,
+			getPremiumUpsellPrecheck = v53,
+			getPurchaseWarning = v53,
+			postPurchaseWarningAcknowledge = v53,
+			checkUserPurchaseSettings = v53,
+			getUnifiedPurchaseFlowUserEligibility = v53,
+			getSubscriptionProductInfo = v53
 		}
 	else
 		t2 = {
@@ -305,7 +304,7 @@ function t1.new(p22, p23) -- line: 277
 			getBalanceInfo = getBalanceInfo,
 			getBundleDetails = getBundleDetails,
 			getProductPurchasableDetails = getProductPurchasableDetails,
-			getCatalogItemDetails = if not GetFFlagUseCatalogItemDetailsToResolveBundlePurchase() and not FFlagRefreshPriceOnRetryAfterUpsell then nil else getCatalogItemDetails,
+			getCatalogItemDetails = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else getCatalogItemDetails,
 			getResellers = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else getResellers,
 			getRobuxUpsellProductWithUniverseItemInfo = getRobuxUpsellProductWithUniverseItemInfo,
 			postPremiumImpression = postPremiumImpression,
@@ -320,7 +319,7 @@ function t1.new(p22, p23) -- line: 277
 	end
 
 	setmetatable(t2, {
-		__tostring = function() -- line: 341
+		__tostring = function() -- line: 333
 			return "MockService(Network)"
 		end
 	})

@@ -1,3 +1,0 @@
-return {
-	Contact = "Contact"
-}

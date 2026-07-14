@@ -4,9 +4,9 @@ local Signals = require(Parent.Signals)
 
 local function useMessagesMap(p1, p2: ((...any) -> ...any)?) -- line: 28
 	-- upvalues: React (copy), Signals (copy)
-	return React.useMemo(function() -- line: 33
+	return React.useMemo(function() -- line: 32
 		-- upvalues: Signals (copy), p1 (copy), p2 (copy)
-		return Signals.createComputed(function(p3) -- line: 34
+		return Signals.createComputed(function(p3) -- line: 33
 			-- upvalues: p1 (copy), p2 (copy)
 			local t1 = {}
 
@@ -16,7 +16,10 @@ local function useMessagesMap(p1, p2: ((...any) -> ...any)?) -- line: 28
 
 			return t1
 		end)
-	end, {})
+	end, {
+		p1,
+		p2
+	})
 end
 
 return useMessagesMap

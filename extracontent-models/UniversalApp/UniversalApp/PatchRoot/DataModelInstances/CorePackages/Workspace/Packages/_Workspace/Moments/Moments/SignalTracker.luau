@@ -1,3 +1,0 @@
-return {
-	createSignalTracker = require(script.SignalTracker)
-}

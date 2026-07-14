@@ -33,44 +33,54 @@ local t1 = {
 local function MessageLayoutContainer(t2: {[any]: any}) -- line: 56
 	-- upvalues: v13 (copy), React (copy), Signals (copy), useMessagesMap (copy), BubbleEntry (copy), TextLineEntry (copy), useMessagePool (copy), SignalsReact (copy), Foundation (copy), BottomLockedScrollView (copy), t1 (copy)
 	local v19 = t2.messagesSignal or v13
-	local v20 = React.useMemo(function() -- line: 61
+	local v20 = React.useMemo(function() -- line: 60
 		-- upvalues: Signals (copy), v19 (copy)
-		return Signals.createComputed(function(p4) -- line: 62
+		return Signals.createComputed(function(p4) -- line: 61
 			-- upvalues: v19 (copy)
 			local t3 = {}
 
-			for _, v32 in (v19(p4)) do
-				t3[#t3 + 1] = v32.messageId
+			for _, v34 in (v19(p4)) do
+				t3[#t3 + 1] = v34.messageId
 			end
 
 			return t3
 		end)
-	end, {})
+	end, { v19 })
 	local v21 = useMessagesMap(v19)
 	local v22 = if t2.layoutStyle ~= "bubble" then TextLineEntry else BubbleEntry
-	local v23 = useMessagePool({
-		messageIdsSignal = v20,
-		createSlotElement = function(p5) -- line: 33
-			-- upvalues: React (copy), v22 (copy), v21 (copy)
-			return React.createElement(v22, {
+	local v23 = React.useMemo(function() -- line: 79
+		-- upvalues: v22 (copy), v21 (copy), React (copy)
+		local v28 = v22
+		local v29 = v21
+
+		return function(p5) -- line: 33
+			-- upvalues: React (copy), v28 (copy), v29 (copy)
+			return React.createElement(v28, {
 				getMessageId = p5.getMessageId,
 				getLayoutOrder = p5.getLayoutOrder,
-				getMessagesMap = v21
+				getMessagesMap = v29
 			})
 		end
+	end, {
+		v22,
+		v21
 	})
-	local v24 = SignalsReact.useSignalState(v23)
-	local v25 = React.useMemo(function() -- line: 89
-		-- upvalues: v24 (copy), React (copy)
-		local v28 = table.clone(v24)
+	local v24 = useMessagePool({
+		messageIdsSignal = v20,
+		createSlotElement = v23
+	})
+	local v25 = SignalsReact.useSignalState(v24)
+	local v26 = React.useMemo(function() -- line: 94
+		-- upvalues: v25 (copy), React (copy)
+		local v30 = table.clone(v25)
 
-		v28["$layout"] = React.createElement("UIListLayout", {
+		v30["$layout"] = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 2)
 		})
 
-		return v28
-	end, { v24 })
+		return v30
+	end, { v25 })
 
 	return React.createElement(Foundation.View, {
 		tag = "fill padding-y-xsmall",
@@ -79,7 +89,7 @@ local function MessageLayoutContainer(t2: {[any]: any}) -- line: 56
 		scrollView = React.createElement(BottomLockedScrollView, {
 			Size = UDim2.fromScale(1, 1),
 			contentPadding = t2.contentPadding or t1,
-			children = v25
+			children = v26
 		})
 	})
 end

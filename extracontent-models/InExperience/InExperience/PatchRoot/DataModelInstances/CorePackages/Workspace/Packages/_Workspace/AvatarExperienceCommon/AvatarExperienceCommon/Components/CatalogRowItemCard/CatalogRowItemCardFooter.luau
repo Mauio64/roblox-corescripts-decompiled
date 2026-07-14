@@ -21,8 +21,8 @@ local FFlagAXDurables2Option = AvatarExperienceFlags.FFlagAXDurables2Option
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 
-local function CatalogRowItemCardFooter(t1: {[any]: any}) -- line: 72
-	-- upvalues: useTokens (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy), React (copy), Cryo (copy), FFlagAXMISWithOffers (copy), IconSize (copy), Foundation (copy), FFlagAXDurables2Option (copy), ItemCardPriceLine (copy), FFlagAXMISSmallUIChanges (copy), ItemCardTitle (copy), FoundationText (copy), Icon (copy), VerifiedBadges (copy)
+local function CatalogRowItemCardFooter(t1: {[any]: any}) -- line: 76
+	-- upvalues: useTokens (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy), React (copy), Cryo (copy), FFlagAXMISWithOffers (copy), IconSize (copy), Foundation (copy), ItemCardPriceLine (copy), FFlagAXMISSmallUIChanges (copy), FFlagAXDurables2Option (copy), ItemCardTitle (copy), FoundationText (copy), Icon (copy), VerifiedBadges (copy)
 	local v22 = useTokens()
 	local selectedTimedOptionPrice = nil
 	local setSelectedTimedOptionPrice = nil
@@ -32,62 +32,62 @@ local function CatalogRowItemCardFooter(t1: {[any]: any}) -- line: 72
 		setSelectedTimedOptionPrice = t1.setSelectedTimedOptionPrice
 	end
 
-	local v25 = React.useMemo(function() -- line: 83
-		-- upvalues: t1 (copy), Cryo (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy), selectedTimedOptionPrice (ref), FFlagAXMISWithOffers (copy), v22 (copy), IconSize (copy), React (copy), Foundation (copy), FFlagAXDurables2Option (copy), ItemCardPriceLine (copy), FFlagAXMISSmallUIChanges (copy)
+	local v25 = React.useMemo(function() -- line: 87
+		-- upvalues: t1 (copy), Cryo (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy), selectedTimedOptionPrice (ref), FFlagAXMISWithOffers (copy), v22 (copy), IconSize (copy), React (copy), Foundation (copy), ItemCardPriceLine (copy), FFlagAXMISSmallUIChanges (copy)
 		local t2 = {}
 
 		if t1.priceLineContent and #t1.priceLineContent > 0 then
-			for v30, v31 in t1.priceLineContent do
-				local v32 = Cryo.Dictionary.omit(v31, { "strikethrough" })
+			for v28, v29 in t1.priceLineContent do
+				local v30 = Cryo.Dictionary.omit(v29, { "strikethrough" })
 
-				if (FFlagAXDurablesForMIS or FFlagAXEnableTimedOptionsForCatalogRowCard) and selectedTimedOptionPrice and v31.type == "price" then
-					if v31.isOriginalPrice and t1.timedOptions then
-						local v33 = selectedTimedOptionPrice
+				if (FFlagAXDurablesForMIS or FFlagAXEnableTimedOptionsForCatalogRowCard) and selectedTimedOptionPrice and v29.type == "price" then
+					if v29.isOriginalPrice and t1.timedOptions then
+						local v31 = selectedTimedOptionPrice
 
-						for _, v35 in t1.timedOptions do
-							if v35.price == selectedTimedOptionPrice and v35.discountInformation then
-								v33 = v35.discountInformation.originalPrice
+						for _, v33 in t1.timedOptions do
+							if v33.price == selectedTimedOptionPrice and v33.discountInformation then
+								v31 = v33.discountInformation.originalPrice
 
 								break
 							end
 						end
 
-						v32 = Cryo.Dictionary.join(v32, {
-							price = v33
+						v30 = Cryo.Dictionary.join(v30, {
+							price = v31
 						})
 
-						if v33 == selectedTimedOptionPrice and (not FFlagAXMISWithOffers or FFlagAXMISWithOffers and not v31.shouldShowOriginalPrice) then
+						if v31 == selectedTimedOptionPrice and (not FFlagAXMISWithOffers or FFlagAXMISWithOffers and not v29.shouldShowOriginalPrice) then
 							continue
 						end
 					else
-						v32 = Cryo.Dictionary.join(v32, {
+						v30 = Cryo.Dictionary.join(v30, {
 							price = selectedTimedOptionPrice
 						})
 					end
 				end
 
-				if FFlagAXMISWithOffers and v31.priceInRobuxDiscountedByOffers then
-					v32 = Cryo.Dictionary.join(v32, {
-						price = v31.priceInRobuxDiscountedByOffers
+				if FFlagAXMISWithOffers and v29.priceInRobuxDiscountedByOffers then
+					v30 = Cryo.Dictionary.join(v30, {
+						price = v29.priceInRobuxDiscountedByOffers
 					})
 				end
 
-				if (FFlagAXDurablesForMIS or FFlagAXEnableTimedOptionsForCatalogRowCard) and v31.strikethrough then
-					v32 = Cryo.Dictionary.join(v32, {
+				if (FFlagAXDurablesForMIS or FFlagAXEnableTimedOptionsForCatalogRowCard) and v29.strikethrough then
+					v30 = Cryo.Dictionary.join(v30, {
 						colorStyle = v22.Color.Content.Muted,
 						iconSize = IconSize.XSmall,
 						fontStyle = v22.Typography.BodySmall
 					})
 				end
 
-				t2[`PriceLine{ v30 }`] = React.createElement(Foundation.View, {
-					tag = not FFlagAXDurables2Option and "auto-xy" or "auto-xy padding-top-xsmall",
-					LayoutOrder = v30
+				t2[`PriceLine{ v28 }`] = React.createElement(Foundation.View, {
+					tag = "auto-xy",
+					LayoutOrder = v28
 				}, {
 					ItemCardPriceLine = React.createElement(ItemCardPriceLine, {
-						content = v32
+						content = v30
 					}),
-					Strikethrough = if not v31.strikethrough then nil else React.createElement(Foundation.View, {
+					Strikethrough = if not v29.strikethrough then nil else React.createElement(Foundation.View, {
 						tag = "bg-system-neutral anchor-center-center position-center-center size-full-50",
 						Size = if not FFlagAXMISSmallUIChanges then nil else UDim2.new(1, 0, 0, 1)
 					})
@@ -108,69 +108,13 @@ local function CatalogRowItemCardFooter(t1: {[any]: any}) -- line: 72
 		v26 = t1.priceLineContent and #t1.priceLineContent > 0 or t1.timedOptions
 	end
 
-	local v27 = nil
-
-	if FFlagAXDurables2Option then
-		local v28 = React.useMemo(function() -- line: 179
-			-- upvalues: t1 (copy), React (copy), Foundation (copy), setSelectedTimedOptionPrice (ref)
-			local t3 = {}
-
-			if t1.timedOptions then
-				for v37, v38 in t1.timedOptions do
-					if v38.days == 3 or v38.days == 0 then
-						t3[`Option{ v37 }`] = React.createElement(Foundation.View, {
-							tag = "auto-xy padding-top-small",
-							LayoutOrder = #t1.timedOptions - v37 + 1
-						}, {
-							Button = if not t1.wearTimeOptionButton then nil else React.createElement(t1.wearTimeOptionButton, {
-								option = {
-									days = v38.days,
-									price = v38.price,
-									selected = if not t1.selectedTimedOptionIndexInReducer then v38.selected else v37 == t1.selectedTimedOptionIndexInReducer
-								},
-								onActivated = function() -- line: 197
-									-- upvalues: t1 (copy), v37 (copy), setSelectedTimedOptionPrice (ref)
-									local v42 = t1.timedOptions[v37]
-
-									if v42 then
-										if setSelectedTimedOptionPrice then
-											setSelectedTimedOptionPrice(v42.price)
-										end
-
-										if t1.onTimedOptionPriceChanged then
-											local v43 = if v42.days ~= 0 then v42.days else nil
-
-											t1.onTimedOptionPriceChanged(v42.price, v43)
-										end
-									end
-								end
-							})
-						})
-					end
-				end
-			end
-
-			return t3
-		end, {
-			t1.timedOptions,
-			t1.onTimedOptionPriceChanged,
-			t1.selectedTimedOptionIndexInReducer,
-			t1.wearTimeOptionButton,
-			setSelectedTimedOptionPrice
-		})
-
-		v27 = React.createElement(Foundation.View, {
-			tag = "row gap-medium align-y-center auto-xy"
-		}, v28)
-	end
-
 	return React.createElement(Foundation.View, {
 		tag = "fill self-stretch",
 		Size = t1.Size,
 		AutomaticSize = t1.AutomaticSize,
 		LayoutOrder = t1.LayoutOrder
 	}, {
-		TopSection = if not FFlagAXDurables2Option then React.createElement("Frame", {
+		TopSection = if not FFlagAXDurables2Option or not t1.onRemove then React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			AutomaticSize = Enum.AutomaticSize.XY
@@ -326,34 +270,66 @@ local function CatalogRowItemCardFooter(t1: {[any]: any}) -- line: 72
 			tag = "auto-xy row gap-xsmall position-bottom-left anchor-bottom-left"
 		}, v25),
 		BottomContent = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard or not v26 then nil else React.createElement(Foundation.View, {
-			tag = "auto-xy row gap-xsmall align-y-center position-bottom-left anchor-bottom-left",
-			Position = if not FFlagAXDurables2Option or (not t1.timedOptions or not not t1.isOwned and not t1.expirationTime) then nil else UDim2.new(0, 0, 1, v22.Gap.XSmall)
-		}, Cryo.Dictionary.join(v25, {
-			WearTimeOptions = if not t1.timedOptions or not not t1.isOwned and not t1.expirationTime then nil else React.createElement(Foundation.View, {
+			tag = (not FFlagAXDurables2Option or not t1.hideTimedOptionSelections) and "auto-xy row gap-xsmall align-y-center position-bottom-left anchor-bottom-left" or "auto-x row gap-xsmall align-y-center position-bottom-left anchor-bottom-left",
+			Size = if not FFlagAXDurables2Option or not t1.hideTimedOptionSelections then nil else UDim2.fromOffset(0, v22.Size.Size_1200)
+		}, Cryo.Dictionary.join(if not FFlagAXDurables2Option or (not t1.hideTimedOptionSelections or (not t1.timedOptions or (t1.isOwned and not t1.expirationTime or t1.itemStatusInCheckout ~= nil))) then v25 else {}, {
+			WearTimeOptions = if FFlagAXDurables2Option and t1.hideTimedOptionSelections or (not t1.timedOptions or not not t1.isOwned and not t1.expirationTime) then nil else React.createElement(Foundation.View, {
 				tag = "auto-xy padding-left-small",
 				LayoutOrder = 100
 			}, {
-				WearTimeSelectedOptionInList = if FFlagAXDurables2Option or not t1.wearTimeSelectedOptionInList then nil else React.createElement(t1.wearTimeSelectedOptionInList, {
+				WearTimeSelectedOptionInList = if not t1.wearTimeSelectedOptionInList then nil else React.createElement(t1.wearTimeSelectedOptionInList, {
 					options = t1.timedOptions,
 					selectedTimedOptionIndexInReducer = if not FFlagAXDurablesForMIS then nil else t1.selectedTimedOptionIndexInReducer,
-					onOptionActivated = function(p1) -- line: 459
+					onOptionActivated = function(p1) -- line: 415
 						-- upvalues: t1 (copy), setSelectedTimedOptionPrice (ref)
-						local v40 = t1.timedOptions[p1]
+						local v35 = t1.timedOptions[p1]
 
-						if v40 then
+						if v35 then
 							if setSelectedTimedOptionPrice then
-								setSelectedTimedOptionPrice(v40.price)
+								setSelectedTimedOptionPrice(v35.price)
 							end
 
 							if t1.onTimedOptionPriceChanged then
-								local v41 = if v40.days ~= 0 then v40.days else nil
+								local v36 = if v35.days ~= 0 then v35.days else nil
 
-								t1.onTimedOptionPriceChanged(v40.price, v41)
+								t1.onTimedOptionPriceChanged(v35.price, v36)
 							end
 						end
 					end
+				})
+			}),
+			Badge = if not FFlagAXDurables2Option or not t1.offerApplied then nil else React.createElement(Foundation.Popover.Root, {
+				isOpen = t1.showOfferPillTooltip or false
+			}, {
+				Anchor = React.createElement(Foundation.Popover.Anchor, {
+					LayoutOrder = 101
+				}, {
+					Badge = React.createElement(Foundation.Badge, {
+						icon = {
+							name = Foundation.Enums.IconName.TagSparkle,
+							position = Foundation.Enums.IconPosition.Left
+						},
+						text = t1.offersLocalized and t1.offersLocalized.OfferApplied,
+						variant = Foundation.Enums.BadgeVariant.Neutral,
+						shape = Foundation.Enums.BadgeShape.Pill,
+						size = Foundation.Enums.BadgeSize.XSmall
+					})
 				}),
-				OptionsButtonsView = if not FFlagAXDurables2Option then nil else v27
+				Content = React.createElement(Foundation.Popover.Content, {
+					align = Foundation.Enums.PopoverAlign.Center,
+					side = Foundation.Enums.PopoverSide.Top,
+					radius = Foundation.Enums.Radius.Medium,
+					backgroundStyle = v22.Color.System.Contrast
+				}, {
+					TooltipContent = React.createElement(Foundation.View, {
+						tag = "col gap-xsmall auto-xy padding-x-medium padding-y-small"
+					}, {
+						TooltipText = React.createElement(FoundationText, {
+							tag = "auto-xy text-title-medium text-truncate-end content-inverse-emphasis",
+							Text = t1.offersLocalized and t1.offersLocalized.OfferAppliedTooltip
+						})
+					})
+				})
 			})
 		}))
 	})

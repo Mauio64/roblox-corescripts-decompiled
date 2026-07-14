@@ -1,3 +1,0 @@
-return {
-	keyFields = { "targetUserId" }
-}

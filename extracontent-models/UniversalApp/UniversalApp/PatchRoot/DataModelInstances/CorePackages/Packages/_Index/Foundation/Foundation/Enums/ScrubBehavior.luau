@@ -1,0 +1,4 @@
+return {
+	On = "On",
+	Off = "Off"
+}

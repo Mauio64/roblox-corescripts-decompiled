@@ -12,11 +12,12 @@ local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnab
 local v12 = game:DefineFastFlag("ExpChatFocusablePlaceholderText", false)
 local FFlagExpChatInputBarV2CustomSendButton = require(ExpChat.Flags.FFlagExpChatInputBarV2CustomSendButton)
 local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
+local FFlagExpChatFixBackspaceNilTargetChannel = ExpChatShared.Flags.FFlagExpChatFixBackspaceNilTargetChannel
 local FFlagExpChatPresetChatGamepadEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatGamepadEnabled)
 
-local function renderCustomSendButton(t1: {[any]: any}, p1, b1: boolean?, p2: ((...any) -> ...any)) -- line: 77
+local function renderCustomSendButton(t1: {[any]: any}, p1, b1: boolean?, p2: ((...any) -> ...any)) -- line: 79
 	-- upvalues: React (copy), FFlagExpChatPresetChatGamepadEnabled (copy), FFlagExpChatEnableFocusNavigation (copy), Foundation (copy)
-	local v22 = if not b1 then p1.Color.ActionEmphasis else p1.Color.ActionStandard
+	local v23 = if not b1 then p1.Color.ActionEmphasis else p1.Color.ActionStandard
 	local Size_800 = p1.Size.Size_800
 
 	return React.createElement("CanvasGroup", {
@@ -32,8 +33,8 @@ local function renderCustomSendButton(t1: {[any]: any}, p1, b1: boolean?, p2: ((
 		}),
 		SendButton = React.createElement("TextButton", {
 			AutoButtonColor = false,
-			BackgroundColor3 = v22.Background.Color3,
-			BackgroundTransparency = v22.Background.Transparency,
+			BackgroundColor3 = v23.Background.Color3,
+			BackgroundTransparency = v23.Background.Transparency,
 			BorderSizePixel = 0,
 			Selectable = not b1 and if not FFlagExpChatPresetChatGamepadEnabled then not FFlagExpChatEnableFocusNavigation and nil else nil,
 			Size = UDim2.fromOffset(Size_800, Size_800),
@@ -50,14 +51,14 @@ local function renderCustomSendButton(t1: {[any]: any}, p1, b1: boolean?, p2: ((
 			Icon = React.createElement(Foundation.Icon, {
 				name = Foundation.Enums.IconName.ArrowMediumUp,
 				size = Foundation.Enums.IconSize.Small,
-				style = v22.Foreground
+				style = v23.Foreground
 			})
 		})
 	})
 end
-local function ChatInputBarV2(t2: {[any]: any}) -- line: 134
-	-- upvalues: Foundation (copy), React (copy), FFlagEnableConsoleExpControls (copy), FFlagExpChatEnableFocusNavigation (copy), ChannelChip (copy), FFlagExpChatUseMessagesStore (copy), Config (copy), v12 (copy), FFlagExpChatPresetChatEnabled (copy), FFlagExpChatInputBarV2CustomSendButton (copy), renderCustomSendButton (copy), FFlagExpChatPresetChatGamepadEnabled (copy)
-	local v25 = Foundation.Hooks.useTokens()
+local function ChatInputBarV2(t2: {[any]: any}) -- line: 136
+	-- upvalues: Foundation (copy), React (copy), FFlagEnableConsoleExpControls (copy), FFlagExpChatEnableFocusNavigation (copy), ChannelChip (copy), FFlagExpChatFixBackspaceNilTargetChannel (copy), FFlagExpChatUseMessagesStore (copy), Config (copy), v12 (copy), FFlagExpChatPresetChatEnabled (copy), FFlagExpChatInputBarV2CustomSendButton (copy), renderCustomSendButton (copy), FFlagExpChatPresetChatGamepadEnabled (copy)
+	local v26 = Foundation.Hooks.useTokens()
 	local setTransparency = t2.setTransparency
 	local chatInputBarSettings = t2.chatInputBarSettings
 	local chatInputBarBackgroundTransparency = t2.chatInputBarBackgroundTransparency
@@ -100,8 +101,8 @@ local function ChatInputBarV2(t2: {[any]: any}) -- line: 134
 				}),
 				UIStroke = React.createElement("UIStroke", {
 					ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-					Color = v25.Color.Stroke.Default.Color3,
-					Transparency = setTransparency(v25.Color.Stroke.Default.Transparency, t2.transparencyValue)
+					Color = v26.Color.Stroke.Default.Color3,
+					Transparency = setTransparency(v26.Color.Stroke.Default.Transparency, t2.transparencyValue)
 				}),
 				UIPadding = React.createElement("UIPadding", {
 					PaddingRight = UDim.new(0, 2)
@@ -120,7 +121,10 @@ local function ChatInputBarV2(t2: {[any]: any}) -- line: 134
 					TargetChannelChip = React.createElement(ChannelChip, {
 						transparency = setTransparency(0, t2.transparencyValue),
 						onAbsoluteSizeChanged = onAbsoluteSizeChanged,
-						onChannelChipActivated = t2.resetTargetChannel,
+						onChannelChipActivated = if not FFlagExpChatFixBackspaceNilTargetChannel then t2.resetTargetChannel else function() -- line: 216
+							-- upvalues: t2 (copy)
+							t2.resetTargetChannel(t2.isGlobalChatTabActive)
+						end,
 						targetTextChannelDisplayName = t2.targetTextChannelDisplayName or "",
 						isChannelBarVisible = t2.isChannelBarVisible,
 						developerChannelTabsEnabled = t2.developerChannelTabsEnabled
@@ -132,7 +136,7 @@ local function ChatInputBarV2(t2: {[any]: any}) -- line: 134
 						Font = Config.ChatInputBarFont,
 						Text = t2.disabledChatPlaceholderText,
 						Position = UDim2.fromScale(1, 0),
-						Size = targetChannelWidth:map(function(n1: number) -- line: 227
+						Size = targetChannelWidth:map(function(n1: number) -- line: 233
 							return UDim2.new(1, -(n1 + 8), 0, 0)
 						end),
 						TextColor3 = showPlaceholderText and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3,
@@ -151,7 +155,7 @@ local function ChatInputBarV2(t2: {[any]: any}) -- line: 134
 						AnchorPoint = Vector2.new(1, 0),
 						AutomaticSize = Enum.AutomaticSize.Y,
 						Position = UDim2.fromScale(1, 0),
-						Size = targetChannelWidth:map(function(n2: number) -- line: 262
+						Size = targetChannelWidth:map(function(n2: number) -- line: 268
 							return UDim2.new(1, -(n2 + 8), 0, 0)
 						end)
 					}, {
@@ -211,7 +215,7 @@ local function ChatInputBarV2(t2: {[any]: any}) -- line: 134
 						Selectable = if not FFlagExpChatPresetChatGamepadEnabled then not FFlagExpChatEnableFocusNavigation and nil else nil,
 						onActivated = onSendActivated
 					})
-				}) else renderCustomSendButton(t2, v25, hasEmptyInputText, onSendActivated)
+				}) else renderCustomSendButton(t2, v26, hasEmptyInputText, onSendActivated)
 			})
 		})
 	})

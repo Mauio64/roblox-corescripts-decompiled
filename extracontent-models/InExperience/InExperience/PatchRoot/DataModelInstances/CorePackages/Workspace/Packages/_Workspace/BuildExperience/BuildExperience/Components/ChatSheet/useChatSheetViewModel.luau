@@ -84,6 +84,7 @@ local function useChatSheetViewModel(t1: {[any]: any}) -- line: 33
 		onComposerChanged = v21.setComposerText,
 		textBoxRef = v21.textBoxRef,
 		isAssistantResponding = v21.isAssistantResponding,
+		canStopAssistantResponse = v21.canStopAssistantResponse,
 		onSend = v21.sendMessage,
 		onStop = v21.stopAssistantResponse,
 		topBarPillMenuTarget = t1.topBarPillMenuTarget

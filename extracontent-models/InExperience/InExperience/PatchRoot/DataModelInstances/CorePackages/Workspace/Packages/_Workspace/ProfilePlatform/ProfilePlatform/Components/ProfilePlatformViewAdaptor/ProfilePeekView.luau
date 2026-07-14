@@ -9,16 +9,17 @@ local View = require(ProfilePlatformParent.Foundation).View
 local useStyle = require(ProfilePlatformParent.UIBlox).Core.Style.useStyle
 local Enums = require(ProfilePlatform.Common.Enums)
 local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
+local FFlagProfilePlatformPeekDraggerContrast = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformPeekDraggerContrast
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local v13 = not FFlagProfilePlatformNewProfileHeader and 25 or 0
+local v14 = not FFlagProfilePlatformNewProfileHeader and 25 or 0
 
-local function ProfilePeekView(t1: {[any]: any}) -- line: 39
-	-- upvalues: useSelector (copy), FFlagProfilePlatformNewProfileHeader (copy), useStyle (copy), React (copy), PeekViewState (copy), v13 (copy), View (copy), PeekView2 (copy), Enums (copy)
-	local v16 = t1.statusBarHeight or useSelector(function(p1) -- line: 41
+local function ProfilePeekView(t1: {[any]: any}) -- line: 40
+	-- upvalues: useSelector (copy), FFlagProfilePlatformNewProfileHeader (copy), useStyle (copy), React (copy), PeekViewState (copy), v14 (copy), FFlagProfilePlatformPeekDraggerContrast (copy), Enums (copy), View (copy), PeekView2 (copy)
+	local v17 = t1.statusBarHeight or useSelector(function(p1) -- line: 42
 		return p1.TopBar.statusBarHeight
 	end)
-	local v17 = if not FFlagProfilePlatformNewProfileHeader then nil else useStyle()
-	local v18 = React.useCallback(function(p2, p3, p4) -- line: 46
+	local v18 = if not FFlagProfilePlatformNewProfileHeader then nil else useStyle()
+	local v19 = React.useCallback(function(p2, p3, p4) -- line: 47
 		-- upvalues: PeekViewState (copy), t1 (copy)
 		if p2 == PeekViewState.Closed and t1.onClosed then
 			t1.onClosed()
@@ -31,9 +32,10 @@ local function ProfilePeekView(t1: {[any]: any}) -- line: 39
 		t1.onClosed,
 		t1.onViewStateChanged
 	})
-	local v19, v20 = React.useBinding(0)
-	local v21 = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(1, 0, 1, -v16 + v13) else UDim2.new(1, 0, 1, -v16)
-	local v22 = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(0, 0, 0, v16 - v13) else UDim2.new(0, 0, 0, v16)
+	local v20, v21 = React.useBinding(0)
+	local v22 = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(1, 0, 1, -v17 + v14) else UDim2.new(1, 0, 1, -v17)
+	local v23 = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(0, 0, 0, v17 - v14) else UDim2.new(0, 0, 0, v17)
+	local v24 = if not (FFlagProfilePlatformNewProfileHeader and (FFlagProfilePlatformPeekDraggerContrast and t1.profileType == Enums.ProfileTypes.User)) then nil else v18.Tokens.Color.System.Contrast
 
 	return React.createElement(View, {
 		tag = "position-top-left",
@@ -43,11 +45,11 @@ local function ProfilePeekView(t1: {[any]: any}) -- line: 39
 			tag = "position-top-left bg-surface-0",
 			BorderSizePixel = 0,
 			ZIndex = 999,
-			Size = UDim2.new(1, 0, 0, v16)
+			Size = UDim2.new(1, 0, 0, v17)
 		}) else nil,
 		ProfileContent = React.createElement(View, {
-			Size = v21,
-			Position = v22
+			Size = v22,
+			Position = v23
 		}, {
 			PeekView = React.createElement(PeekView2, {
 				hasScrim = true,
@@ -59,16 +61,17 @@ local function ProfilePeekView(t1: {[any]: any}) -- line: 39
 				},
 				mountAsFullView = t1.mountAsFullView,
 				mountAnimation = t1.mountAnimation,
-				viewStateChanged = v18,
-				briefToFullTransitionPercent = function(p5) -- line: 59
-					-- upvalues: v20 (copy), t1 (copy)
-					v20(p5)
+				viewStateChanged = v19,
+				briefToFullTransitionPercent = function(p5) -- line: 60
+					-- upvalues: v21 (copy), t1 (copy)
+					v21(p5)
 
 					if t1.transitionPercentCallback then
 						t1.transitionPercentCallback(p5)
 					end
 				end,
-				hasSolidDragger = (not FFlagProfilePlatformNewProfileHeader or t1.profileType ~= Enums.ProfileTypes.User) and nil
+				hasSolidDragger = (not FFlagProfilePlatformNewProfileHeader or t1.profileType ~= Enums.ProfileTypes.User) and nil,
+				draggerImageStyle = v24
 			}, {
 				UIListLayout = React.createElement("UIListLayout", {
 					Padding = UDim.new(0, 0),
@@ -84,8 +87,8 @@ local function ProfilePeekView(t1: {[any]: any}) -- line: 39
 			BorderSizePixel = 0,
 			ZIndex = 1000,
 			Position = UDim2.new(0, 0, 0, 0),
-			Size = UDim2.new(1, 0, 0, v16 + 56),
-			GroupTransparency = v19:map(function(p6) -- line: 124
+			Size = UDim2.new(1, 0, 0, v17 + 56),
+			GroupTransparency = v20:map(function(p6) -- line: 131
 				return 1 - p6
 			end)
 		}, {
@@ -93,13 +96,13 @@ local function ProfilePeekView(t1: {[any]: any}) -- line: 39
 				BackgroundTransparency = 0,
 				BorderSizePixel = 0,
 				Position = UDim2.new(0, 0, 0, 0),
-				Size = UDim2.new(1, 0, 0, v16),
-				BackgroundColor3 = v17.Theme.BackgroundDefault.Color
+				Size = UDim2.new(1, 0, 0, v17),
+				BackgroundColor3 = v18.Theme.BackgroundDefault.Color
 			}),
 			TopBarSlotContainer = React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				Position = UDim2.new(0, 0, 0, v16),
+				Position = UDim2.new(0, 0, 0, v17),
 				Size = UDim2.new(1, 0, 0, 56)
 			}, {
 				TopBar = t1.topBarSlot
@@ -109,8 +112,8 @@ local function ProfilePeekView(t1: {[any]: any}) -- line: 39
 			BackgroundTransparency = 1,
 			ZIndex = 1000,
 			Size = UDim2.new(1, 0, 0, 56),
-			Position = UDim2.new(0, 0, 0, v16),
-			GroupTransparency = v19:map(function(p7) -- line: 153
+			Position = UDim2.new(0, 0, 0, v17),
+			GroupTransparency = v20:map(function(p7) -- line: 160
 				return 1 - p7
 			end)
 		}, {

@@ -4,8 +4,10 @@ local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTrac
 require(TimeToInteractiveTracker.Stores.types)
 require(TimeToInteractiveTracker.Milestones.types)
 
+local FFlagTTITrackerMemoryTracking = require(script.Parent.FFlagTTITrackerMemoryTracking)
+
 return {
-	findLastMilestoneIndex = function(t1: {[any]: any}, p1) -- line: 31
+	findLastMilestoneIndex = function(t1: {[any]: any}, p1) -- line: 33
 		for i = #t1, 1, -1 do
 			if p1 == t1[i].name then
 				return i
@@ -14,40 +16,40 @@ return {
 
 		return nil
 	end,
-	deepCloneMilestones = function(t2: {[any]: any}) -- line: 40
-		local v7 = table.clone(t2)
+	deepCloneMilestones = function(t2: {[any]: any}) -- line: 42
+		local v8 = table.clone(t2)
 
-		for v8, v9 in v7 do
-			local v10 = table.clone(v9)
+		for v9, v10 in v8 do
+			local v11 = table.clone(v10)
 
-			if v10.subphases then
-				local v11 = table.clone(v10.subphases)
+			if v11.subphases then
+				local v12 = table.clone(v11.subphases)
 
-				for v12, v13 in v11 do
-					v11[v12] = table.clone(v13)
+				for v13, v14 in v12 do
+					v12[v13] = table.clone(v14)
 				end
 
-				v10.subphases = v11
+				v11.subphases = v12
 			end
 
-			if v10.requests then
-				local v14 = table.clone(v10.requests)
+			if v11.requests then
+				local v15 = table.clone(v11.requests)
 
-				for v15, v16 in v14 do
-					v14[v15] = table.clone(v16)
+				for v16, v17 in v15 do
+					v15[v16] = table.clone(v17)
 				end
 
-				v10.requests = v14
+				v11.requests = v15
 			end
 
-			v7[v8] = v10
+			v8[v9] = v11
 		end
 
-		return v7
+		return v8
 	end,
-	encodeMilestonesJSON = function(t3: {[any]: any}) -- line: 63
+	encodeMilestonesJSON = function(t3: {[any]: any}) -- line: 65
 		-- upvalues: HttpService (copy)
-		local ok, result = pcall(function() -- line: 64
+		local ok, result = pcall(function() -- line: 66
 			-- upvalues: HttpService (copy), t3 (copy)
 			return HttpService:JSONEncode(t3)
 		end)
@@ -58,44 +60,44 @@ return {
 
 		return nil
 	end,
-	milestonesToProto = function(t4: {[any]: any}) -- line: 79
+	milestonesToProto = function(t4: {[any]: any}) -- line: 81
 		local t5 = {}
 
-		for _, v23 in t4 do
+		for _, v24 in t4 do
 			local t6 = {
-				name = v23.name,
-				timestamp_seconds = v23.timestamp,
-				delta_ms = v23.deltaMs,
-				total_memory_mb = v23.totalMemoryMB,
-				lua_heap_mb = v23.luaHeapMB
+				name = v24.name,
+				timestamp_seconds = v24.timestamp,
+				delta_ms = v24.deltaMs,
+				total_memory_mb = v24.totalMemoryMB,
+				lua_heap_mb = v24.luaHeapMB
 			}
 
-			if v23.id then
-				t6.id = v23.id
+			if v24.id then
+				t6.id = v24.id
 			end
 
-			if v23.subphases then
+			if v24.subphases then
 				local t7 = {}
 
-				for _, v27 in v23.subphases do
+				for _, v28 in v24.subphases do
 					table.insert(t7, {
-						name = v27.name,
-						timestamp_seconds = v27.timestamp,
-						delta_ms = v27.deltaMs or 0
+						name = v28.name,
+						timestamp_seconds = v28.timestamp,
+						delta_ms = v28.deltaMs or 0
 					})
 				end
 
 				t6.subphases = t7
 			end
 
-			if v23.requests then
+			if v24.requests then
 				local t8 = {}
 
-				for _, v30 in v23.requests do
+				for _, v31 in v24.requests do
 					table.insert(t8, {
-						name = v30.name,
-						timestamp_seconds = v30.timestamp,
-						delta_ms = v30.deltaMs or 0
+						name = v31.name,
+						timestamp_seconds = v31.timestamp,
+						delta_ms = v31.deltaMs or 0
 					})
 				end
 
@@ -107,31 +109,38 @@ return {
 
 		return t5
 	end,
-	generateMilestoneStats = function(s1: string, t9: {[any]: any}) -- line: 145
+	generateMilestoneStats = function(s1: string, t9: {[any]: any}) -- line: 150
+		-- upvalues: FFlagTTITrackerMemoryTracking (copy)
 		local t10 = {}
 
-		for _, v35 in t9 do
-			local v36 = s1 .. "_" .. if not v35.id then v35.name else v35.name .. "__" .. v35.id
+		for _, v36 in t9 do
+			local v37 = s1 .. "_" .. if not v36.id then v36.name else v36.name .. "__" .. v36.id
+			local t11 = {
+				eventName = v37,
+				deltaMs = v36.deltaMs
+			}
 
-			table.insert(t10, {
-				eventName = v36,
-				deltaMs = v35.deltaMs
-			})
+			if FFlagTTITrackerMemoryTracking then
+				t11.totalMemoryMB = v36.totalMemoryMB
+				t11.luaHeapMB = v36.luaHeapMB
+			end
 
-			if v35.subphases then
-				for _, v38 in v35.subphases do
+			table.insert(t10, t11)
+
+			if v36.subphases then
+				for _, v40 in v36.subphases do
 					table.insert(t10, {
-						eventName = v36 .. "_sp_" .. v38.name,
-						deltaMs = v38.deltaMs or 0
+						eventName = v37 .. "_sp_" .. v40.name,
+						deltaMs = v40.deltaMs or 0
 					})
 				end
 			end
 
-			if v35.requests then
-				for _, v40 in v35.requests do
+			if v36.requests then
+				for _, v42 in v36.requests do
 					table.insert(t10, {
-						eventName = v36 .. "_rq_" .. v40.name,
-						deltaMs = v40.deltaMs or 0
+						eventName = v37 .. "_rq_" .. v42.name,
+						deltaMs = v42.deltaMs or 0
 					})
 				end
 			end

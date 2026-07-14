@@ -9,9 +9,9 @@ local getConversationTitle = require(Parent.AppChat.getConversationTitle)
 local GetConversationStore = require(Parent.AppChat.GetConversationStore)
 local logger = AppChat.Components.ChatConversation.logger
 
-local function getMessageTimestamp(p1) -- line: 70
+local function getMessageTimestamp(p1) -- line: 76
 	if type(p1.created_at) == "string" then
-		local ok, result = pcall(function() -- line: 72
+		local ok, result = pcall(function() -- line: 78
 			-- upvalues: p1 (copy)
 			return DateTime.fromIsoDate(p1.created_at)
 		end)
@@ -23,7 +23,7 @@ local function getMessageTimestamp(p1) -- line: 70
 
 	return nil
 end
-local function getUnixTime(p2) -- line: 83
+local function getUnixTime(p2) -- line: 89
 	if p2 == nil then
 		return nil
 	end
@@ -38,25 +38,25 @@ local function getUnixTime(p2) -- line: 83
 
 	return nil
 end
-local function getPreviewContent(p3) -- line: 96
+local function getPreviewContent(p3) -- line: 102
 	return p3.preview_content or p3.content
 end
-local function getMessageUnixTime(p4) -- line: 100
-	local g35 = nil
+local function getMessageUnixTime(p4) -- line: 106
+	local g36 = nil
 	local ok = nil
 	local result = nil
 
 	repeat
-		if g35 or type(p4.created_at) == "string" then
-			if not g35 then
-				ok, result = pcall(function() -- line: 72
+		if g36 or type(p4.created_at) == "string" then
+			if not g36 then
+				ok, result = pcall(function() -- line: 78
 					-- upvalues: p4 (copy)
 					return DateTime.fromIsoDate(p4.created_at)
 				end)
 			end
 
-			if g35 or ok then
-				g35 = false
+			if g36 or ok then
+				g36 = false
 
 				if result ~= nil then
 					return result.UnixTimestamp
@@ -67,112 +67,133 @@ local function getMessageUnixTime(p4) -- line: 100
 		end
 
 		result = nil
-		g35 = true
-	until not g35
+		g36 = true
+	until not g36
 end
-local function isPreviewableMessage(p5) -- line: 105
+local function isPreviewableMessage(p5) -- line: 111
 	return p5 ~= nil and (p5.id ~= nil and (p5.is_previewable == true and (p5.preview_content or p5.content) ~= nil))
 end
-local function getNewestPreviewableMessage(t1: {[any]: any}) -- line: 114
-	local v40 = nil
+local function getNewestPreviewableMessage(t1: {[any]: any}) -- line: 120
 	local v41 = nil
-	local g44 = nil
+	local v42 = nil
+	local g45 = nil
 
-	for _, v43 in t1 do
-		if v43 == nil or (v43.id == nil or (v43.is_previewable ~= true or (v43.preview_content or v43.content) == nil)) then
+	for _, v44 in t1 do
+		if v44 == nil or (v44.id == nil or (v44.is_previewable ~= true or (v44.preview_content or v44.content) == nil)) then
 			continue
 		end
 
 		local result
 
 		repeat
-			if not g44 and type(v43.created_at) == "string" then
+			if not g45 and type(v44.created_at) == "string" then
 				local ok
 
-				ok, result = pcall(function() -- line: 72
-					-- upvalues: v43 (copy)
-					return DateTime.fromIsoDate(v43.created_at)
+				ok, result = pcall(function() -- line: 78
+					-- upvalues: v44 (copy)
+					return DateTime.fromIsoDate(v44.created_at)
 				end)
 
 				if not ok then
-					g44 = true
+					g45 = true
 				end
 			else
-				g44 = false
+				g45 = false
 				result = nil
 			end
-		until not g44
+		until not g45
 
-		local v47 = if result == nil then nil else result.UnixTimestamp
+		local v48 = if result == nil then nil else result.UnixTimestamp
 
-		if v40 == nil then
-			v40 = v43
-			v41 = v47
-		elseif v47 ~= nil and (v41 == nil or v41 < v47) then
-			v40 = v43
-			v41 = v47
+		if v41 == nil then
+			v41 = v44
+			v42 = v48
+		elseif v48 ~= nil and (v42 == nil or v42 < v48) then
+			v41 = v44
+			v42 = v48
 		end
 	end
 
-	return v40
+	return v41
 end
-local function shouldUpdatePreview(p6, p7) -- line: 133
+local function shouldUpdatePreview(p6, p7) -- line: 139
 	if p7 == nil then
 		return true
 	end
 
 	local lastUpdated = p6.lastUpdated
-	local v51 = if lastUpdated ~= nil then if typeof(lastUpdated) ~= "DateTime" then if type(lastUpdated) ~= "table" or lastUpdated.GetUnixTimestamp == nil then nil else lastUpdated:GetUnixTimestamp() else lastUpdated.UnixTimestamp else nil
+	local v52 = if lastUpdated ~= nil then if typeof(lastUpdated) ~= "DateTime" then if type(lastUpdated) ~= "table" or lastUpdated.GetUnixTimestamp == nil then nil else lastUpdated:GetUnixTimestamp() else lastUpdated.UnixTimestamp else nil
 
-	if v51 == nil then
+	if v52 == nil then
 		return true
 	end
 
-	return v51 <= p7.UnixTimestamp
+	return v52 <= p7.UnixTimestamp
 end
-local function hasNewerUnreadMessage(t2: {[any]: any}, p8, t3: {[any]: any}?) -- line: 153
-	if t3 == nil or t3.hasUnreadMessages ~= true then
+local function isUnreadCandidateMessage(p8, t2: {[any]: any}?) -- line: 152
+	if p8 == nil or p8.is_badgeable ~= true then
 		return false
 	end
 
-	local lastUpdated = p8.lastUpdated
-	local v56 = ((if lastUpdated ~= nil then (if typeof(lastUpdated) ~= "DateTime" then (if type(lastUpdated) ~= "table" or lastUpdated.GetUnixTimestamp == nil then nil else lastUpdated:GetUnixTimestamp()) else lastUpdated.UnixTimestamp) else nil)) or 0
-	local g60 = nil
+	local sender_user_id = p8.sender_user_id
 
-	for _, v58 in t2 do
-		if v58 == nil or v58.is_badgeable ~= true then
+	if sender_user_id == nil then
+		return false
+	end
+
+	if t2 ~= nil and t2.localUserId ~= nil and tostring(sender_user_id) == tostring(t2.localUserId) then
+		return false
+	end
+
+	return true
+end
+local function hasNewerUnreadMessage(t3: {[any]: any}, t4: {[any]: any}?) -- line: 173
+	if t4 == nil or t4.hasUnreadMessages ~= true then
+		return false
+	end
+
+	local unreadFreshnessLastUpdated = t4.unreadFreshnessLastUpdated
+	local v59 = ((if unreadFreshnessLastUpdated ~= nil then (if typeof(unreadFreshnessLastUpdated) ~= "DateTime" then (if type(unreadFreshnessLastUpdated) ~= "table" or unreadFreshnessLastUpdated.GetUnixTimestamp == nil then nil else unreadFreshnessLastUpdated:GetUnixTimestamp()) else unreadFreshnessLastUpdated.UnixTimestamp) else nil)) or 0
+	local g64 = nil
+
+	for _, v61 in t3 do
+		local v62
+
+		if v61 == nil or v61.is_badgeable ~= true then
+			v62 = false
+		else
+			local sender_user_id = v61.sender_user_id
+
+			v62 = sender_user_id ~= nil and (t4 == nil or (t4.localUserId == nil or tostring(sender_user_id) ~= tostring(t4.localUserId)))
+		end
+
+		if not v62 then
 			continue
 		end
 
-		local sender_user_id = v58.sender_user_id
+		local result
 
-		if sender_user_id ~= nil and (t3.localUserId == nil or tostring(sender_user_id) ~= tostring(t3.localUserId)) then
-			local result
+		repeat
+			if not g64 and type(v61.created_at) == "string" then
+				local ok
 
-			repeat
-				if not g60 and type(v58.created_at) == "string" then
-					local ok
+				ok, result = pcall(function() -- line: 78
+					-- upvalues: v61 (copy)
+					return DateTime.fromIsoDate(v61.created_at)
+				end)
 
-					ok, result = pcall(function() -- line: 72
-						-- upvalues: v58 (copy)
-						return DateTime.fromIsoDate(v58.created_at)
-					end)
-
-					if not ok then
-						g60 = true
-					end
-				else
-					g60 = false
-					result = nil
+				if not ok then
+					g64 = true
 				end
-			until not g60
-
-			local v63 = if result == nil then nil else result.UnixTimestamp
-
-			if v63 == nil or not (v56 < v63) then
-				continue
+			else
+				g64 = false
+				result = nil
 			end
+		until not g64
 
+		local v67 = if result == nil then nil else result.UnixTimestamp
+
+		if v67 ~= nil and v59 < v67 then
 			return true
 		end
 	end
@@ -185,136 +206,136 @@ return {
 	createConversationFromFriendPlaceholder = createConversationFromFriendPlaceholder,
 	fetchConversationDetailsToSignals = fetchConversationDetailsToSignals,
 	fetchConversationListPageToSignals = fetchConversationListPageToSignals,
-	getConversationStore = function() -- line: 27
+	getConversationStore = function() -- line: 33
 		-- upvalues: GetConversationStore (copy)
 		return GetConversationStore(false)
 	end,
 	getConversationTitle = getConversationTitle,
-	isFriendsConversation = function(s1: string?, p9) -- line: 31
+	isFriendsConversation = function(s1: string?, p9) -- line: 37
 		-- upvalues: GetConversationStore (copy), ConversationChannels (copy)
 		if s1 == nil or s1 == "" then
 			return false
 		end
 
-		local v21 = GetConversationStore(false).getConversation(s1, p9 or false)
+		local v22 = GetConversationStore(false).getConversation(s1, p9 or false)
 
-		return v21 ~= nil and v21.source == ConversationChannels.Source.Friends
+		return v22 ~= nil and v22.source == ConversationChannels.Source.Friends
 	end,
-	markConversationRead = function(s2: string, b1: boolean?) -- line: 39
+	markConversationRead = function(s2: string, b1: boolean?) -- line: 45
 		-- upvalues: GetConversationStore (copy), AppChatNetworking (copy), logger (copy)
-		local v24 = GetConversationStore(false)
-		local v25 = v24.getConversation(s2, false)
-		local v26 = b1 == true
+		local v25 = GetConversationStore(false)
+		local v26 = v25.getConversation(s2, false)
+		local v27 = b1 == true
 
-		if v25 == nil then
-			if not v26 then
+		if v26 == nil then
+			if not v27 then
 				return
 			end
-		elseif v25.hasUnreadMessages == true then
-			local v27 = table.clone(v25)
+		elseif v26.hasUnreadMessages == true then
+			local v28 = table.clone(v26)
 
-			v27.hasUnreadMessages = false
-			v24.upsertConversation(v27, false)
-			v26 = true
+			v28.hasUnreadMessages = false
+			v25.upsertConversation(v28, false)
+			v27 = true
 		end
 
-		if not v26 then
+		if not v27 then
 			return
 		end
 
-		return AppChatNetworking.http.MarkConversationRead(nil, s2):catch(function(p10) -- line: 58
+		return AppChatNetworking.http.MarkConversationRead(nil, s2):catch(function(p10) -- line: 64
 			-- upvalues: logger (copy), s2 (copy)
 			logger:warning(`Failed to mark conversation read for { s2 }: { tostring(p10) }`)
 		end)
 	end,
-	removeConversation = function(s3: string) -- line: 66
+	removeConversation = function(s3: string) -- line: 72
 		-- upvalues: GetConversationStore (copy)
 		GetConversationStore(false).removeConversation(s3)
 	end,
-	updateConversationPreviewFromMessages = function(s4: string, t4: {[any]: any}, t5: {[any]: any}?) -- line: 183
-		-- upvalues: GetConversationStore (copy), fetchConversationListPageToSignals (copy), logger (copy), getNewestPreviewableMessage (copy), hasNewerUnreadMessage (copy)
-		local v67 = GetConversationStore(false)
-		local v68 = v67.getConversation(s4, false)
+	updateConversationPreviewFromMessages = function(s4: string, t5: {[any]: any}, t6: {[any]: any}?) -- line: 198
+		-- upvalues: GetConversationStore (copy), fetchConversationListPageToSignals (copy), logger (copy), hasNewerUnreadMessage (copy), getNewestPreviewableMessage (copy)
+		local v71 = GetConversationStore(false)
+		local v72 = v71.getConversation(s4, false)
 
-		if v68 == nil then
-			if t5 ~= nil and t5.refreshListOnMissingConversation == true then
-				fetchConversationListPageToSignals():catch(function(p11) -- line: 192
+		if v72 == nil then
+			if t6 ~= nil and t6.refreshListOnMissingConversation == true then
+				fetchConversationListPageToSignals():catch(function(p11) -- line: 207
 					-- upvalues: logger (copy)
 					logger:warning(`Failed to refresh conversation list after realtime update: { tostring(p11) }`)
 				end)
 			end
 
-			return false, false
+			return false, (hasNewerUnreadMessage(t5, t6))
 		end
 
-		local v69 = nil
-		local v70 = getNewestPreviewableMessage(t4)
-		local g71 = nil
-		local g73 = nil
+		local v73 = nil
+		local v74 = getNewestPreviewableMessage(t5)
+		local g75 = nil
+		local g77 = nil
 		local ok = nil
 		local result = nil
 
 		repeat
-			if g71 or v70 == nil then
-				g71 = false
+			if g75 or v74 == nil then
+				g75 = false
 
-				local v72 = hasNewerUnreadMessage(t4, v68, t5)
+				local v76 = hasNewerUnreadMessage(t5, t6)
 
-				if v68.hasUnreadMessages ~= true and v72 then
-					v69 = v69 or table.clone(v68)
-					v69.hasUnreadMessages = true
+				if v72.hasUnreadMessages ~= true and v76 then
+					v73 = v73 or table.clone(v72)
+					v73.hasUnreadMessages = true
 				end
 
-				if v69 == nil then
-					return false, false
+				if v73 == nil then
+					return false, v76
 				end
 
-				v67.upsertConversation(v69, false)
+				v71.upsertConversation(v73, false)
 
-				return true, v72
+				return true, v76
 			end
 
 			repeat
-				if g73 or type(v70.created_at) == "string" then
-					if not g73 then
-						ok, result = pcall(function() -- line: 72
-							-- upvalues: v70 (copy)
-							return DateTime.fromIsoDate(v70.created_at)
+				if g77 or type(v74.created_at) == "string" then
+					if not g77 then
+						ok, result = pcall(function() -- line: 78
+							-- upvalues: v74 (copy)
+							return DateTime.fromIsoDate(v74.created_at)
 						end)
 					end
 
-					if g73 or ok then
-						g73 = false
+					if g77 or ok then
+						g77 = false
 
-						local v76
+						local v80
 
 						if result == nil then
-							v76 = true
+							v80 = true
 						else
-							local lastUpdated = v68.lastUpdated
-							local v78 = if lastUpdated ~= nil then if typeof(lastUpdated) ~= "DateTime" then if type(lastUpdated) ~= "table" or lastUpdated.GetUnixTimestamp == nil then nil else lastUpdated:GetUnixTimestamp() else lastUpdated.UnixTimestamp else nil
+							local lastUpdated = v72.lastUpdated
+							local v82 = if lastUpdated ~= nil then if typeof(lastUpdated) ~= "DateTime" then if type(lastUpdated) ~= "table" or lastUpdated.GetUnixTimestamp == nil then nil else lastUpdated:GetUnixTimestamp() else lastUpdated.UnixTimestamp else nil
 
-							v76 = v78 == nil or v78 <= result.UnixTimestamp
+							v80 = v82 == nil or v82 <= result.UnixTimestamp
 						end
 
-						if v76 then
-							v69 = table.clone(v68)
-							v69.previewMessageId = tostring(v70.id)
-							v69.previewContent = v70.preview_content or v70.content
-							v69.lastUpdated = result or DateTime.now()
+						if v80 then
+							v73 = table.clone(v72)
+							v73.previewMessageId = tostring(v74.id)
+							v73.previewContent = v74.preview_content or v74.content
+							v73.lastUpdated = result or DateTime.now()
 						end
 
-						g71 = true
+						g75 = true
 					end
 				end
 
-				if g71 then
+				if g75 then
 					break
 				end
 
 				result = nil
-				g73 = true
-			until not g73
-		until not g71
+				g77 = true
+			until not g77
+		until not g75
 	end
 }

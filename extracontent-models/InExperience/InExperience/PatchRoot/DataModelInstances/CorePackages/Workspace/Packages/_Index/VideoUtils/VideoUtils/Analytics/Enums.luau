@@ -8,6 +8,7 @@ local t1 = {
 	TileClicked = "tileClicked",
 	Unhovered = "unhovered",
 	Unmounted = "unmounted",
+	Unselected = "unselected",
 	ViewportResized = "viewportResized"
 }
 local t2 = {

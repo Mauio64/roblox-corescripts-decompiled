@@ -199,13 +199,11 @@ return {
 			errorCode = p8.errorCode,
 			stopReason = p8.stopReason,
 			assistantTextLength = if typeof(p8.assistantText) ~= "string" then nil else #p8.assistantText,
-			thoughtTextLength = if typeof(p8.thoughtText) ~= "string" then nil else #p8.thoughtText,
-			thoughtContiguousChunks = if typeof(p8.thoughtChunks) ~= "table" then nil else #p8.thoughtChunks,
 			toolCallCount = p8.toolCallCount,
 			sessionId = p8.sessionId
 		}
 	end,
-	rpcFailureMessage = function(s4: string, p9) -- line: 184
+	rpcFailureMessage = function(s4: string, p9) -- line: 182
 		-- upvalues: formatRequestState (copy)
 		local v53 = formatRequestState(p9)
 		local status = v53.status

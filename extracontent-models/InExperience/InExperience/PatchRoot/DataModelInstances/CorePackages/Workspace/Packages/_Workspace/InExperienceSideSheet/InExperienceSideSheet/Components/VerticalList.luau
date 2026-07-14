@@ -11,18 +11,24 @@ require(InExperienceSideSheetParent.Signals)
 local SignalsReact = require(InExperienceSideSheetParent.SignalsReact)
 local View = Foundation.View
 local VerticalItem = require(InExperienceSideSheet.Components.VerticalItem)
+local FFlagSideSheetFocusNav = require(InExperienceSideSheetParent.SharedFlags).FFlagSideSheetFocusNav
 
-local function VerticalList(t1: {[any]: any}) -- line: 21
-	-- upvalues: SignalsReact (copy), React (copy), VerticalItem (copy), View (copy)
+local function VerticalList(t1: {[any]: any}) -- line: 25
+	-- upvalues: SignalsReact (copy), React (copy), VerticalItem (copy), FFlagSideSheetFocusNav (copy), View (copy)
 	local integrationsGetter = t1.integrationsGetter
 	local t2 = {}
 
-	for v12, v13 in (SignalsReact.useSignalState(integrationsGetter)) do
-		t2[v13.id] = React.createElement(VerticalItem, {
-			label = v13.integration.label,
-			layoutOrder = v12,
-			onActivated = v13.activated,
-			icon = v13.component
+	for v13, v14 in (SignalsReact.useSignalState(integrationsGetter)) do
+		t2[v14.id] = React.createElement(VerticalItem, {
+			label = v14.integration.label,
+			layoutOrder = v13,
+			onActivated = v14.activated,
+			icon = v14.component,
+			disableGamepadDirections = if not FFlagSideSheetFocusNav then nil else {
+				right = true,
+				left = true
+			},
+			firstIntegrationToFocusCallback = if not FFlagSideSheetFocusNav or v13 ~= 1 then nil else t1.firstIntegrationToFocusCallback
 		})
 	end
 

@@ -1,3 +1,0 @@
-return {
-	LocalUserIdStore = require(script.LocalUserIdStore)
-}

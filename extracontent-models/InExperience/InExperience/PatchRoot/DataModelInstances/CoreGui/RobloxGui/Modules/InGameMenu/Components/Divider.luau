@@ -1,13 +1,12 @@
 local CorePackages = game:GetService("CorePackages")
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
-local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
 local t = InGameMenuDependencies.t
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent
 local GlobalConfig = require(ParentParent.GlobalConfig)
-local v10 = t.strictInterface({
+local v9 = t.strictInterface({
 	Size = t.optional(t.UDim2),
 	Position = t.optional(t.UDim2),
 	AnchorPoint = t.optional(t.Vector2),
@@ -15,20 +14,29 @@ local v10 = t.strictInterface({
 	Visible = t.optional(t.boolean)
 })
 
-local function Divider(p1) -- line: 23
-	-- upvalues: GlobalConfig (copy), v10 (copy), withStyle (copy), Roact (copy), Cryo (copy)
+local function Divider(p1) -- line: 22
+	-- upvalues: GlobalConfig (copy), v9 (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), Cryo (copy)
 	if GlobalConfig.propValidation then
-		assert(v10(p1))
+		assert(v9(p1))
 	end
 
-	return withStyle(function(p2) -- line: 28
+	return withFoundationOrUIBloxStyle(function(p2) -- line: 27
+		return {
+			Theme = {
+				Divider = {
+					Color = p2.Color.Stroke.Emphasis.Color3,
+					Transparency = p2.Color.Stroke.Emphasis.Transparency
+				}
+			}
+		}
+	end, function(p3) -- line: 33
 		-- upvalues: Roact (copy), Cryo (copy), p1 (copy)
 		return Roact.createElement("Frame", Cryo.Dictionary.join({
 			Size = UDim2.new(1, 0, 0, 1)
 		}, p1, {
 			BorderSizePixel = 0,
-			BackgroundColor3 = p2.Theme.Divider.Color,
-			BackgroundTransparency = p2.Theme.Divider.Transparency
+			BackgroundColor3 = p3.Theme.Divider.Color,
+			BackgroundTransparency = p3.Theme.Divider.Transparency
 		}))
 	end)
 end

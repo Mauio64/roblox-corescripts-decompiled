@@ -4,7 +4,7 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
 local ParentParent = script.Parent.Parent
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local Images = UIBlox.App.ImageSet.Images
 local AssetImage = require(ParentParent.Components.AssetImage)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
@@ -21,7 +21,7 @@ v12.validateProps = t.strictInterface({
 })
 
 function v12.render(p1) -- line: 33
-	-- upvalues: getGameIconRequestSize (copy), withStyle (copy), Roact (copy), AssetImage (copy), ImageSetLabel (copy), Images (copy)
+	-- upvalues: getGameIconRequestSize (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), AssetImage (copy), ImageSetLabel (copy), Images (copy)
 	local iconSize = p1.props.iconSize
 	local v15 = getGameIconRequestSize(iconSize)
 	local gameId = p1.props.gameId
@@ -35,13 +35,26 @@ function v12.render(p1) -- line: 33
 			n1 = iconSize
 		end
 
-		return withStyle(function(p2) -- line: 49
+		return withFoundationOrUIBloxStyle(function(p2) -- line: 49
+			return {
+				Theme = {
+					PlaceHolder = {
+						Color = p2.Color.Common.Shimmer.Color3,
+						Transparency = p2.Color.Common.Shimmer.Transparency
+					},
+					UIDefault = {
+						Color = p2.Color.Shift.Shift_200.Color3,
+						Transparency = p2.Color.Shift.Shift_200.Transparency
+					}
+				}
+			}
+		end, function(p3) -- line: 56
 			-- upvalues: Roact (copy), AssetImage (copy), iconSize (copy), p1 (copy), ImageSetLabel (copy), n1 (ref), Images (copy), cornerRadius (copy)
 			return Roact.createElement(AssetImage.Label, {
 				imageKey = "RoundedRect",
 				Size = UDim2.fromOffset(iconSize, iconSize),
-				ImageColor3 = p2.Theme.PlaceHolder.Color,
-				ImageTransparency = p2.Theme.PlaceHolder.Transparency,
+				ImageColor3 = p3.Theme.PlaceHolder.Color,
+				ImageTransparency = p3.Theme.PlaceHolder.Transparency,
 				LayoutOrder = p1.props.layoutOrder,
 				Position = p1.props.Position,
 				AnchorPoint = p1.props.AnchorPoint
@@ -51,8 +64,8 @@ function v12.render(p1) -- line: 33
 					Size = UDim2.fromOffset(n1, n1),
 					Position = UDim2.fromScale(0.5, 0.5),
 					Image = Images["icons/imageUnavailable"],
-					ImageColor3 = p2.Theme.UIDefault.Color,
-					ImageTransparency = p2.Theme.UIDefault.Transparency,
+					ImageColor3 = p3.Theme.UIDefault.Color,
+					ImageTransparency = p3.Theme.UIDefault.Transparency,
 					AnchorPoint = Vector2.new(0.5, 0.5)
 				}, {
 					UICorner = cornerRadius and (cornerRadius ~= UDim.new(0, 0) and Roact.createElement("UICorner", {

@@ -6,14 +6,12 @@ require(script.Parent.Parent.types)
 local t1 = {
 	agent_message = true,
 	agent_message_chunk = true,
-	agent_thought = true,
-	agent_thought_chunk = true,
 	tool_call_update = true,
 	tool_call_content_chunk = true,
 	state_change = true
 }
 
-local function getHistorySequenceId(p1) -- line: 21
+local function getHistorySequenceId(p1) -- line: 19
 	local sequenceId = p1.sequenceId
 
 	if typeof(sequenceId) == "number" then
@@ -22,13 +20,13 @@ local function getHistorySequenceId(p1) -- line: 21
 
 	return nil
 end
-local function isAssistantSessionUpdate(p2) -- line: 26
+local function isAssistantSessionUpdate(p2) -- line: 24
 	-- upvalues: t1 (copy)
 	local sessionUpdate = p2.sessionUpdate
 
 	return typeof(sessionUpdate) == "string" and t1[sessionUpdate] == true
 end
-local function orderHistoryItems(t2: {[any]: any}) -- line: 37
+local function orderHistoryItems(t2: {[any]: any}) -- line: 35
 	local t3 = {}
 
 	for v12, v13 in t2 do
@@ -42,7 +40,7 @@ local function orderHistoryItems(t2: {[any]: any}) -- line: 37
 		table.insert(t3, t4)
 	end
 
-	table.sort(t3, function(p3, p4) -- line: 47
+	table.sort(t3, function(p3, p4) -- line: 45
 		if p3.sequenceId ~= nil and p4.sequenceId ~= nil then
 			return p3.sequenceId < p4.sequenceId
 		end
@@ -54,7 +52,7 @@ local function orderHistoryItems(t2: {[any]: any}) -- line: 37
 end
 
 return {
-	ingestSessionHistory = function(t5: {[any]: any}, s1: string, t6: {[any]: any}, n1: number?) -- line: 62
+	ingestSessionHistory = function(t5: {[any]: any}, s1: string, t6: {[any]: any}, n1: number?) -- line: 60
 		-- upvalues: orderHistoryItems (copy), t1 (copy), AcpProtocol (copy)
 		assert(typeof(s1) == "string" and s1 ~= "", "sessionId is required")
 

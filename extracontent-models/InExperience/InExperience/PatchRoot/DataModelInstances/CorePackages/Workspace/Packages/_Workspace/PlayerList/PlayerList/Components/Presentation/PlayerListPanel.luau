@@ -11,6 +11,7 @@ local View = Foundation.View
 local ScrollView = Foundation.ScrollView
 local useLeaderboardStore = require(ParentParent.Hooks.useLeaderboardStore)
 local usePanelLayout = require(ParentParent.Hooks.usePanelLayout)
+local usePlatformLeaderboard = require(ParentParent.Hooks.usePlatformLeaderboard)
 local computeStatColumns = require(ParentParent.Common.computeStatColumns)
 local PlayerListVisibilityStore = require(ParentParent.Common.PlayerListVisibilityStore)
 local PlayerContextualMenuStore = require(ParentParent.Common.PlayerContextualMenuStore)
@@ -18,60 +19,67 @@ local openContextMenu = PlayerContextualMenuStore.openContextMenu
 local PanelHeader = require(ParentParent.Components.Presentation.PanelHeader)
 local ColumnHeaderRow = require(ParentParent.Components.Presentation.ColumnHeaderRow)
 local TeamListView = require(ParentParent.Components.Presentation.TeamListView)
-local v18 = createSignalMap()
-local v19 = createSignalMap()
+local TabbedLeaderboardBody = require(ParentParent.Components.Presentation.TabbedLeaderboardBody)
+local FFlagPlayerListTwoTabs = require(ParentParent.Flags.FFlagPlayerListTwoTabs)
+local FallbackSignals = require(ParentParent.Common.FallbackSignals)
+local v22 = createSignalMap()
+local v23 = createSignalMap()
 
-local function PlayerListPanel(t1: {[any]: any}) -- line: 38
-	-- upvalues: useLeaderboardStore (copy), v18 (copy), v19 (copy), SignalsReact (copy), usePanelLayout (copy), PlayerListVisibilityStore (copy), React (copy), PlayerContextualMenuStore (copy), computeStatColumns (copy), TeamListView (copy), openContextMenu (copy), View (copy), PanelHeader (copy), Foundation (copy), ColumnHeaderRow (copy), ScrollView (copy)
-	local v22 = t1.isSmallTouchDevice == true
+local function PlayerListPanel(t1: {[any]: any}) -- line: 53
+	-- upvalues: useLeaderboardStore (copy), v22 (copy), v23 (copy), SignalsReact (copy), FFlagPlayerListTwoTabs (copy), usePlatformLeaderboard (copy), FallbackSignals (copy), usePanelLayout (copy), PlayerListVisibilityStore (copy), React (copy), PlayerContextualMenuStore (copy), computeStatColumns (copy), TeamListView (copy), openContextMenu (copy), ColumnHeaderRow (copy), ScrollView (copy), PanelHeader (copy), Foundation (copy), View (copy), TabbedLeaderboardBody (copy)
+	local v26 = t1.isSmallTouchDevice == true
 	local title = t1.title
-	local v24 = useLeaderboardStore()
+	local platformLeaderboardOverride = t1.platformLeaderboardOverride
+	local v29 = useLeaderboardStore()
 	local LocalPlayer = game:GetService("Players").LocalPlayer
-	local v26 = if not v24 then v18 else v24.getTeamList()
-	local v27 = if not v24 then v19 else v24.getGameStatsList()
-	local v28 = SignalsReact.useSignalState(v26.getAllData)
-	local v29 = SignalsReact.useSignalState(v27.getAllData)
-	local v30 = v27.getCount(false)
-	local v31 = usePanelLayout(v22, v30)
-	local v32 = SignalsReact.useSignalBinding(PlayerListVisibilityStore.getEffectiveVisible)
-	local v33 = React.useCallback(function() -- line: 63
+	local v31 = if not v29 then v22 else v29.getTeamList()
+	local v32 = if not v29 then v23 else v29.getGameStatsList()
+	local v33 = SignalsReact.useSignalState(v31.getAllData)
+	local v34 = SignalsReact.useSignalState(v32.getAllData)
+	local v35 = v32.getCount(false)
+	local v36 = if not FFlagPlayerListTwoTabs then nil else platformLeaderboardOverride or usePlatformLeaderboard()
+	local v37 = if not v36 then FallbackSignals.getHasActiveLeaderboard else v36.getHasActiveLeaderboard
+	local v38 = not not FFlagPlayerListTwoTabs and SignalsReact.useSignalState(v37)
+	local v39 = usePanelLayout(v26, v35, v38)
+	local v40 = SignalsReact.useSignalBinding(PlayerListVisibilityStore.getEffectiveVisible)
+	local v41 = React.useCallback(function() -- line: 90
 		-- upvalues: PlayerContextualMenuStore (copy), PlayerListVisibilityStore (copy)
 		PlayerContextualMenuStore.closeContextMenu()
 		PlayerListVisibilityStore.setVisible(false)
 	end, {})
-	local maxStatColumns = v31.maxStatColumns
-	local v35 = React.useMemo(function() -- line: 75
-		-- upvalues: computeStatColumns (copy), v27 (copy), maxStatColumns (copy)
-		return computeStatColumns(v27, maxStatColumns)
+	local maxStatColumns = v39.maxStatColumns
+	local v43 = React.useMemo(function() -- line: 102
+		-- upvalues: computeStatColumns (copy), v32 (copy), maxStatColumns (copy)
+		return computeStatColumns(v32, maxStatColumns)
 	end, {
-		v29,
-		v27,
+		v34,
+		v32,
 		maxStatColumns
 	})
 	local t2 = {}
 
-	if v24 then
-		local v37 = false
+	if v29 then
+		local v45 = false
 
-		for k, v in pairs(v28) do
+		for k, v in pairs(v33) do
 			if v and k ~= "Neutral" then
-				v37 = true
+				v45 = true
 
 				break
 			end
 		end
 
-		for k, v in pairs(v28) do
+		for k, v in pairs(v33) do
 			if v then
 				t2[`Team_{ tostring(k) }`] = React.createElement(TeamListView, {
 					teamEntry = v,
 					isNeutral = k == "Neutral",
-					hasNonNeutralTeams = v37,
-					leaderboardStore = v24,
-					statColumns = v35,
-					statWidth = v31.statWidth,
-					rowHeight = v31.rowHeight,
-					columnHeaderHeight = v31.columnHeaderHeight,
+					hasNonNeutralTeams = v45,
+					leaderboardStore = v29,
+					statColumns = v43,
+					statWidth = v39.statWidth,
+					rowHeight = v39.rowHeight,
+					columnHeaderHeight = v39.columnHeaderHeight,
 					onActivated = openContextMenu,
 					localPlayer = LocalPlayer
 				})
@@ -79,49 +87,68 @@ local function PlayerListPanel(t1: {[any]: any}) -- line: 38
 		end
 	end
 
-	return React.createElement(View, {
-		tag = "col radius-medium bg-over-media-200",
-		Size = UDim2.fromOffset(v31.panelWidth, v31.panelHeight),
-		Visible = v32
-	}, {
-		Header = React.createElement(PanelHeader, {
+	local t3 = {
+		ColumnHeaders = React.createElement(ColumnHeaderRow, {
 			layoutOrder = 1,
-			onClose = v33,
-			height = v31.headerHeight,
-			title = title
+			statColumns = v43,
+			statWidth = v39.statWidth,
+			headerHeight = v39.columnHeaderHeight
 		}),
-		HeaderDivider = React.createElement(Foundation.Divider, {
-			LayoutOrder = 2
-		}),
+		PlayerRows = React.createElement(ScrollView, {
+			LayoutOrder = 2,
+			tag = "fill size-full-0",
+			layout = {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			},
+			scroll = {
+				AutomaticCanvasSize = Enum.AutomaticSize.Y,
+				ScrollingDirection = Enum.ScrollingDirection.Y
+			},
+			selectionGroup = {
+				SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+				SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+				SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+				SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+			}
+		}, t2)
+	}
+	local t4 = {
+		tag = "col radius-medium bg-over-media-200",
+		Size = UDim2.fromOffset(v39.panelWidth, v39.panelHeight),
+		Visible = v40
+	}
+	local v52 = React.createElement(PanelHeader, {
+		layoutOrder = 1,
+		onClose = v41,
+		height = v39.headerHeight,
+		title = title
+	})
+	local v53 = React.createElement(Foundation.Divider, {
+		LayoutOrder = 2
+	})
+
+	if FFlagPlayerListTwoTabs then
+		local v54 = React.createElement(View, {
+			LayoutOrder = 4,
+			tag = "col fill size-full-0"
+		}, t3)
+
+		return React.createElement(TabbedLeaderboardBody, {
+			serverBody = v54,
+			panelHeader = v52,
+			panelDivider = v53,
+			panelProps = t4
+		})
+	end
+
+	return React.createElement(View, t4, {
+		Header = v52,
+		HeaderDivider = v53,
 		LeaderboardBody = React.createElement(View, {
 			LayoutOrder = 3,
 			tag = "col fill size-full-0"
-		}, {
-			ColumnHeaders = React.createElement(ColumnHeaderRow, {
-				layoutOrder = 1,
-				statColumns = v35,
-				statWidth = v31.statWidth,
-				headerHeight = v31.columnHeaderHeight
-			}),
-			PlayerRows = React.createElement(ScrollView, {
-				LayoutOrder = 2,
-				tag = "fill size-full-0",
-				layout = {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left
-				},
-				scroll = {
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					ScrollingDirection = Enum.ScrollingDirection.Y
-				},
-				selectionGroup = {
-					SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
-					SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
-					SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
-					SelectionBehaviorRight = Enum.SelectionBehavior.Stop
-				}
-			}, t2)
-		})
+		}, t3)
 	})
 end
 

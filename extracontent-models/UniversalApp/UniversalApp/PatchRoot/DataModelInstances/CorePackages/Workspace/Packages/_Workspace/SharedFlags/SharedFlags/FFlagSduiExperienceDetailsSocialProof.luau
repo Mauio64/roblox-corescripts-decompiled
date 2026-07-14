@@ -1,5 +1,0 @@
-local FFlagLuaAppDataHydrationConnectionsPlayedStore = require(script.Parent.FFlagLuaAppDataHydrationConnectionsPlayedStore)
-local FFlagEnableSocialProofVerticalUserListSheet = require(script.Parent.FFlagEnableSocialProofVerticalUserListSheet)
-local FFlagSduiChipAccessoryProps = require(script.Parent.FFlagSduiChipAccessoryProps)
-
-return FFlagLuaAppDataHydrationConnectionsPlayedStore and (FFlagEnableSocialProofVerticalUserListSheet and (FFlagSduiChipAccessoryProps and game:DefineFastFlag("SduiExperienceDetailsSocialProof_3", false)))

@@ -6,28 +6,32 @@ local SignalsReact = require(InExperienceSideSheetParent.SignalsReact)
 local View = Foundation.View
 local GetIntegrationsStore = require(InExperienceSideSheet.Stores.GetIntegrationsStore)
 local UnibarItem = require(InExperienceSideSheet.Components.UnibarItem)
+local FFlagSideSheetFocusNav = require(InExperienceSideSheetParent.SharedFlags).FFlagSideSheetFocusNav
 
-local function getIntegrations(p1) -- line: 18
+local function getIntegrations(p1) -- line: 21
 	-- upvalues: GetIntegrationsStore (copy)
 	return GetIntegrationsStore(p1).getUnibarIntegrations(p1)
 end
-local function UnibarList(t1: {[any]: any}) -- line: 23
-	-- upvalues: SignalsReact (copy), getIntegrations (copy), React (copy), UnibarItem (copy), View (copy)
-	local v13 = SignalsReact.useSignalState(getIntegrations)
+local function UnibarList(t1: {[any]: any}) -- line: 26
+	-- upvalues: SignalsReact (copy), getIntegrations (copy), React (copy), UnibarItem (copy), FFlagSideSheetFocusNav (copy), View (copy)
+	local v14 = SignalsReact.useSignalState(getIntegrations)
 
-	if #v13 == 0 then
+	if #v14 == 0 then
 		return nil
 	end
 
 	local t2 = {}
 
-	for v15, v16 in v13 do
-		t2[v16.id] = React.createElement(UnibarItem, {
-			label = v16.integration.label,
-			layoutOrder = v15,
-			onActivated = v16.activated,
-			icon = v16.component,
-			notification = v16.integration.notification
+	for v16, v17 in v14 do
+		t2[v17.id] = React.createElement(UnibarItem, {
+			label = v17.integration.label,
+			layoutOrder = v16,
+			onActivated = v17.activated,
+			icon = v17.component,
+			notification = v17.integration.notification,
+			disableGamepadDirections = if not FFlagSideSheetFocusNav or v16 ~= 1 then nil else {
+				left = true
+			}
 		})
 	end
 

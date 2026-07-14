@@ -7,42 +7,42 @@ local Constants = require(ParentParent.Common.Constants)
 local computeMobilePanelSize = require(ParentParent.Common.computeMobilePanelSize)
 local useViewportSize = require(ParentParent.Hooks.useViewportSize)
 
-local function usePanelLayout(b1: boolean, n1: number) -- line: 22
+local function usePanelLayout(b1: boolean, n1: number, b2: boolean?) -- line: 24
 	-- upvalues: useViewportSize (copy), useTokens (copy), Constants (copy), useScaledValue (copy), computeMobilePanelSize (copy)
-	local v12 = useViewportSize()
-	local v13 = useTokens()
-	local UIScale = v13.Config.UI.Scale
-	local v15 = Constants.HEADER_HEIGHT * UIScale
-	local v16 = Constants.COLUMN_HEADER_HEIGHT * UIScale
-	local v17 = Constants.ROW_HEIGHT * UIScale
-	local v18 = Constants.ROW_PITCH * UIScale
-	local v19 = Constants.STAT_COLUMN_WIDTH * UIScale
-	local v20 = Constants.PEOPLE_MIN_WIDTH * UIScale
-	local Size_200 = v13.Size.Size_200
-	local v22 = useScaledValue(Constants.PANEL_SIZE_MIN_CAP)
-	local v23 = useScaledValue(Constants.PANEL_SIZE_MAX_CAP)
-	local v24 = if not b1 then Constants.DESKTOP_MAX_STAT_COLUMNS else Constants.MOBILE_MAX_STAT_COLUMNS
-	local v25 = math.min(n1, v24)
+	local v13 = useViewportSize()
+	local v14 = useTokens()
+	local UIScale = v14.Config.UI.Scale
+	local v16 = Constants.HEADER_HEIGHT * UIScale
+	local v17 = Constants.COLUMN_HEADER_HEIGHT * UIScale
+	local v18 = Constants.ROW_HEIGHT * UIScale
+	local v19 = Constants.ROW_PITCH * UIScale
+	local v20 = Constants.STAT_COLUMN_WIDTH * UIScale
+	local v21 = Constants.PEOPLE_MIN_WIDTH * UIScale
+	local Size_200 = v14.Size.Size_200
+	local v23 = useScaledValue(Constants.PANEL_SIZE_MIN_CAP)
+	local v24 = useScaledValue(Constants.PANEL_SIZE_MAX_CAP)
+	local v25 = if not b1 then Constants.DESKTOP_MAX_STAT_COLUMNS else Constants.MOBILE_MAX_STAT_COLUMNS
+	local v26 = v21 + math.min(n1, v25) * v20
 	local X, Y
 
 	if b1 then
-		local v26 = computeMobilePanelSize(v12, v22, v23)
+		local v27 = computeMobilePanelSize(v13, v23, v24)
 
-		X = v26.X
-		Y = v26.Y
+		X = v27.X
+		Y = v27.Y
 	else
-		X = 2 * Size_200 + v20 + v25 * v19
-		Y = math.max(v12.Y * 0.5, v15 + v16 + 2 * v18)
+		X = if not b2 then 2 * Size_200 + v26 else 320 * UIScale
+		Y = math.max(v13.Y * 0.5, v16 + v17 + 2 * v19)
 	end
 
 	return {
 		panelWidth = X,
 		panelHeight = Y,
-		headerHeight = v15,
-		columnHeaderHeight = v16,
-		rowHeight = v17,
-		statWidth = v19,
-		maxStatColumns = v24
+		headerHeight = v16,
+		columnHeaderHeight = v17,
+		rowHeight = v18,
+		statWidth = v20,
+		maxStatColumns = v25
 	}
 end
 

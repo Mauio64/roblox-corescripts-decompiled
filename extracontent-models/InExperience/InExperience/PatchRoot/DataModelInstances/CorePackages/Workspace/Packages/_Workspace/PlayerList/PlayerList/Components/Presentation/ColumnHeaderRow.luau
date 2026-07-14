@@ -1,47 +1,42 @@
 local ParentParent = script.Parent.Parent.Parent
 local ParentParentParent = ParentParent.Parent
 local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
-local View = Foundation.View
-local FoundationText = Foundation.Text
-local Constants = require(ParentParent.Common.Constants)
+local LeaderboardRowShell = require(ParentParent.Components.Presentation.LeaderboardRowShell)
+local PeopleCell = require(ParentParent.Components.Presentation.PeopleCell)
+local LeaderboardTextCell = require(ParentParent.Components.Presentation.LeaderboardTextCell)
 
 require(ParentParent.Common.computeStatColumns)
 
-local ROW_FLEX_TAG = Constants.ROW_FLEX_TAG
+local GameTextTranslatorContext = require(ParentParent.Common.GameTextTranslatorContext)
+local getPeopleHeaderLabel = require(ParentParent.Common.getPeopleHeaderLabel)
+local FFlagPlayerListLocalizeGameText = require(ParentParent.Flags.FFlagPlayerListLocalizeGameText)
 
-local function ColumnHeaderRow(t1: {[any]: any}) -- line: 15
-	-- upvalues: React (copy), View (copy), FoundationText (copy), ROW_FLEX_TAG (copy)
-	local v11 = t1.statColumns or {}
+local function ColumnHeaderRow(t1: {[any]: any}) -- line: 18
+	-- upvalues: FFlagPlayerListLocalizeGameText (copy), React (copy), GameTextTranslatorContext (copy), getPeopleHeaderLabel (copy), PeopleCell (copy), LeaderboardTextCell (copy), LeaderboardRowShell (copy)
+	local v12 = if not FFlagPlayerListLocalizeGameText then nil else React.useContext(GameTextTranslatorContext)
+	local v13 = not FFlagPlayerListLocalizeGameText and "People" or getPeopleHeaderLabel()
+	local v14 = t1.statColumns or {}
 	local t2 = {
-		PeopleHeader = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "fill size-0-full clip"
-		}, {
-			Label = React.createElement(FoundationText, {
-				Text = "People",
-				tag = "size-full text-caption-small text-align-x-left content-emphasis"
-			})
+		PeopleHeader = React.createElement(PeopleCell, {
+			layoutOrder = 1,
+			textTag = "size-full text-caption-small text-align-x-left content-emphasis",
+			displayName = v13
 		})
 	}
 
-	for i, v in ipairs(v11) do
-		t2[`StatHeader_{ v.name }`] = React.createElement(View, {
-			tag = "clip",
-			Size = UDim2.fromOffset(t1.statWidth, t1.headerHeight),
-			LayoutOrder = i + 1
-		}, {
-			Label = React.createElement(FoundationText, {
-				tag = "size-full text-caption-small text-align-x-left content-emphasis",
-				Text = v.name
-			})
+	for i, v in ipairs(v14) do
+		t2[`StatHeader_{ v.name }`] = React.createElement(LeaderboardTextCell, {
+			textTag = "size-full text-caption-small text-align-x-left content-emphasis",
+			text = if not v12 then v.name else v12(v.name),
+			width = t1.statWidth,
+			rowHeight = t1.headerHeight,
+			layoutOrder = i + 1
 		})
 	end
 
-	return React.createElement(View, {
-		Size = UDim2.new(1, 0, 0, t1.headerHeight),
-		LayoutOrder = t1.layoutOrder,
-		tag = ROW_FLEX_TAG
+	return React.createElement(LeaderboardRowShell, {
+		rowHeight = t1.headerHeight,
+		layoutOrder = t1.layoutOrder
 	}, t2)
 end
 

@@ -199,6 +199,10 @@ return {
 		Default = "Default",
 		MeTab = "MeTab"
 	},
+	ProfileAvatarLayoutVariant = {
+		Default = "Default",
+		MeTabMobile = "MeTabMobile"
+	},
 	LoadingState = {
 		Failed = "Failed",
 		Finished = "Finished",

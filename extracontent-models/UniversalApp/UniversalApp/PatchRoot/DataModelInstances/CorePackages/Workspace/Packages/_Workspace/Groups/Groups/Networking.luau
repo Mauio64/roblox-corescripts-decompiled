@@ -1,3 +1,0 @@
-return {
-	GroupsWebApi = require(script.GroupsWebApi)
-}

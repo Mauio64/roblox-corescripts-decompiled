@@ -9,9 +9,9 @@ local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
 local Otter = InGameMenuDependencies.Otter
 local FocusHandler = require(script.Parent.Connection.FocusHandler)
-local withStyle = UIBlox.Core.Style.withStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent
 local divideTransparency = require(ParentParent.Utility.divideTransparency)
 local AssetImage = require(script.Parent.AssetImage)
@@ -163,7 +163,7 @@ function v23.renderFocusHandler(p7) -- line: 173
 	}) or nil
 end
 function v23.renderWithSelectionCursor(p10, p11) -- line: 209
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetButton (copy), AssetImage (copy), divideTransparency (copy), CursorKind (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), ImageSetButton (copy), AssetImage (copy), divideTransparency (copy), CursorKind (copy)
 	local min = p10.props.min
 	local v36 = p10.props.max - min
 	local v37 = (p10.props.value - min) / v36
@@ -171,7 +171,20 @@ function v23.renderWithSelectionCursor(p10, p11) -- line: 209
 	local v39 = v37 / 2
 	local v40 = p10.state.entryMode and p10.props.canCaptureFocus
 
-	return withStyle(function(p12) -- line: 220
+	return withFoundationOrUIBloxStyle(function(p12) -- line: 220
+		return {
+			Theme = {
+				UIMuted = {
+					Color = p12.Color.Shift.Shift_100.Color3,
+					Transparency = p12.Color.Shift.Shift_100.Transparency
+				},
+				ContextualPrimaryDefault = {
+					Color = p12.Color.ActionEmphasis.Background.Color3,
+					Transparency = p12.Color.ActionEmphasis.Background.Transparency
+				}
+			}
+		}
+	end, function(p13) -- line: 227
 		-- upvalues: Roact (copy), ImageSetButton (copy), p10 (copy), AssetImage (copy), divideTransparency (copy), v39 (copy), v38 (copy), v37 (copy), p11 (copy), v40 (copy), CursorKind (copy)
 		return Roact.createElement(ImageSetButton, {
 			AnchorPoint = p10.props.AnchorPoint,
@@ -189,8 +202,8 @@ function v23.renderWithSelectionCursor(p10, p11) -- line: 209
 				BackgroundTransparency = 1,
 				imageKey = "SliderCircle",
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				ImageColor3 = p12.Theme.UIMuted.Color,
-				ImageTransparency = p12.Theme.UIMuted.Transparency,
+				ImageColor3 = p13.Theme.UIMuted.Color,
+				ImageTransparency = p13.Theme.UIMuted.Transparency,
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(1, 0, 0, 4)
 			}, {
@@ -198,8 +211,8 @@ function v23.renderWithSelectionCursor(p10, p11) -- line: 209
 					BackgroundTransparency = 1,
 					imageKey = "SliderCircle",
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					ImageColor3 = p12.Theme.ContextualPrimaryDefault.Color,
-					ImageTransparency = divideTransparency(p12.Theme.ContextualPrimaryDefault.Transparency, not p10.props.disabled and 1 or 2),
+					ImageColor3 = p13.Theme.ContextualPrimaryDefault.Color,
+					ImageTransparency = divideTransparency(p13.Theme.ContextualPrimaryDefault.Transparency, not p10.props.disabled and 1 or 2),
 					Position = UDim2.new(v39, 0, 0.5, 0),
 					Size = UDim2.new(v38, 0, 1, 0)
 				})
@@ -221,21 +234,21 @@ function v23.renderWithSelectionCursor(p10, p11) -- line: 209
 					ImageTransparency = not p10.props.disabled and 0 or 0.5,
 					ZIndex = 2,
 					SelectionImageObject = p11(v40 and CursorKind.SelectedKnob or CursorKind.UnselectedKnob),
-					[Roact.Event.Activated] = function(_, p14) -- line: 274
+					[Roact.Event.Activated] = function(_, p15) -- line: 281
 						-- upvalues: p10 (copy)
-						if p14.KeyCode == Enum.KeyCode.ButtonA then
+						if p15.KeyCode == Enum.KeyCode.ButtonA then
 							p10:setState({
 								entryMode = not p10.state.entryMode
 							})
 						end
 					end,
-					[Roact.Event.InputBegan] = function(p15, p16) -- line: 281
+					[Roact.Event.InputBegan] = function(p16, p17) -- line: 288
 						-- upvalues: p10 (copy)
 						if p10.props.disabled then
 							return
 						end
 
-						if p16.UserInputType == Enum.UserInputType.MouseMovement then
+						if p17.UserInputType == Enum.UserInputType.MouseMovement then
 							p10:setState({
 								hovering = true
 							})
@@ -243,15 +256,15 @@ function v23.renderWithSelectionCursor(p10, p11) -- line: 209
 							return
 						end
 
-						p10.onInputBegan(p15, p16)
+						p10.onInputBegan(p16, p17)
 					end,
-					[Roact.Event.InputEnded] = function(_, p18) -- line: 294
+					[Roact.Event.InputEnded] = function(_, p19) -- line: 301
 						-- upvalues: p10 (copy)
 						if p10.props.disabled then
 							return
 						end
 
-						if p18.UserInputType == Enum.UserInputType.MouseMovement then
+						if p19.UserInputType == Enum.UserInputType.MouseMovement then
 							p10:setState({
 								hovering = false
 							})
@@ -274,62 +287,62 @@ function v23.renderWithSelectionCursor(p10, p11) -- line: 209
 		})
 	end)
 end
-function v23.render(p19) -- line: 323
+function v23.render(p20) -- line: 330
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p20) -- line: 324
-		-- upvalues: p19 (copy)
-		return p19:renderWithSelectionCursor(p20)
+	return withSelectionCursorProvider(function(p21) -- line: 331
+		-- upvalues: p20 (copy)
+		return p20:renderWithSelectionCursor(p21)
 	end)
 end
-function v23.didMount(p21) -- line: 329
-	local current = p21.rootButtonRef.current
+function v23.didMount(p22) -- line: 336
+	local current = p22.rootButtonRef.current
 	local connection = nil
 
-	connection = current.AncestryChanged:Connect(function() -- line: 337
-		-- upvalues: current (copy), connection (ref), p21 (copy)
+	connection = current.AncestryChanged:Connect(function() -- line: 344
+		-- upvalues: current (copy), connection (ref), p22 (copy)
 		if not current:IsDescendantOf(game) then
 			return
 		end
 
 		connection:Disconnect()
-		p21.canUseUserInputService = current:FindFirstAncestorWhichIsA("PluginGui") == nil
+		p22.canUseUserInputService = current:FindFirstAncestorWhichIsA("PluginGui") == nil
 	end)
-	p21.hoverMotor:start()
+	p22.hoverMotor:start()
 end
-function v23.didUpdate(p22) -- line: 352
+function v23.didUpdate(p23) -- line: 359
 	-- upvalues: Otter (copy), t1 (copy)
-	if p22.props.disabled then
-		p22:stopListeningForDrag()
+	if p23.props.disabled then
+		p23:stopListeningForDrag()
 	end
 
 	local n1 = 0
 
-	if not p22.props.disabled and (p22.state.dragging or p22.state.hovering) then
+	if not p23.props.disabled and (p23.state.dragging or p23.state.hovering) then
 		n1 = 42
 	end
 
-	p22.hoverMotor:setGoal(Otter.spring(n1, t1))
+	p23.hoverMotor:setGoal(Otter.spring(n1, t1))
 end
-function v23.willUnmount(p23) -- line: 365
-	p23.hoverMotor:stop()
-	p23:disconnectDragEvents()
+function v23.willUnmount(p24) -- line: 372
+	p24.hoverMotor:stop()
+	p24:disconnectDragEvents()
 end
-function v23.startListeningForDrag(p24) -- line: 370
+function v23.startListeningForDrag(p25) -- line: 377
 	-- upvalues: UserInputService (copy)
-	local current = p24.rootButtonRef.current
+	local current = p25.rootButtonRef.current
 
 	if current == nil then
 		return
 	end
 
-	if p24.state.dragging then
+	if p25.state.dragging then
 		return
 	end
 
-	if p24.canUseUserInputService then
-		p24.moveConnection = UserInputService.InputChanged:Connect(function(input) -- line: 383
-			-- upvalues: p24 (copy)
-			if not p24.state.dragging then
+	if p25.canUseUserInputService then
+		p25.moveConnection = UserInputService.InputChanged:Connect(function(input) -- line: 390
+			-- upvalues: p25 (copy)
+			if not p25.state.dragging then
 				return
 			end
 
@@ -343,22 +356,22 @@ function v23.startListeningForDrag(p24) -- line: 370
 				return
 			end
 
-			p24:processDrag(input.Position.X)
+			p25:processDrag(input.Position.X)
 		end)
-		p24.releaseConnection = UserInputService.InputEnded:Connect(function(input) -- line: 405
-			-- upvalues: p24 (copy)
+		p25.releaseConnection = UserInputService.InputEnded:Connect(function(input) -- line: 412
+			-- upvalues: p25 (copy)
 			local UserInputType = input.UserInputType
 
 			if UserInputType ~= Enum.UserInputType.MouseButton1 and UserInputType ~= Enum.UserInputType.Touch then
 				return
 			end
 
-			p24:stopListeningForDrag()
-			p24:processDrag(input.Position.X)
+			p25:stopListeningForDrag()
+			p25:processDrag(input.Position.X)
 		end)
-		p24.focusLostConnection = UserInputService.WindowFocusReleased:Connect(function() -- line: 420
-			-- upvalues: p24 (copy)
-			p24:stopListeningForDrag()
+		p25.focusLostConnection = UserInputService.WindowFocusReleased:Connect(function() -- line: 427
+			-- upvalues: p25 (copy)
+			p25:stopListeningForDrag()
 		end)
 	else
 		local PluginGui = current:FindFirstAncestorWhichIsA("PluginGui")
@@ -369,90 +382,90 @@ function v23.startListeningForDrag(p24) -- line: 370
 		ImageButton.Name = "SliderPluginGuiInputCapturer"
 		ImageButton.Size = UDim2.new(1, 0, 1, 0)
 		ImageButton.ZIndex = 100000
-		p24.moveConnection = ImageButton.MouseMoved:Connect(function(p25) -- line: 440
-			-- upvalues: p24 (copy)
-			p24:processDrag(p25)
+		p25.moveConnection = ImageButton.MouseMoved:Connect(function(p26) -- line: 447
+			-- upvalues: p25 (copy)
+			p25:processDrag(p26)
 		end)
-		p24.releaseConnection = ImageButton.MouseButton1Up:Connect(function(p26) -- line: 444
-			-- upvalues: p24 (copy)
-			p24:stopListeningForDrag()
-			p24:processDrag(p26)
+		p25.releaseConnection = ImageButton.MouseButton1Up:Connect(function(p27) -- line: 451
+			-- upvalues: p25 (copy)
+			p25:stopListeningForDrag()
+			p25:processDrag(p27)
 		end)
-		p24.focusLostConnection = ImageButton.MouseLeave:Connect(function(x) -- line: 449
-			-- upvalues: p24 (copy)
-			p24:stopListeningForDrag()
-			p24:processDrag(x)
+		p25.focusLostConnection = ImageButton.MouseLeave:Connect(function(x) -- line: 456
+			-- upvalues: p25 (copy)
+			p25:stopListeningForDrag()
+			p25:processDrag(x)
 		end)
 		ImageButton.Parent = PluginGui
-		p24.inputCapturerButton = ImageButton
+		p25.inputCapturerButton = ImageButton
 	end
 
-	p24:setState({
+	p25:setState({
 		dragging = true
 	})
 end
-function v23.processDrag(p27, p28) -- line: 463
-	local current = p27.rootButtonRef.current
+function v23.processDrag(p28, p29) -- line: 470
+	local current = p28.rootButtonRef.current
 
 	if current == nil then
 		return
 	end
 
-	local min = p27.props.min
-	local max = p27.props.max
-	local stepInterval = p27.props.stepInterval
+	local min = p28.props.min
+	local max = p28.props.max
+	local stepInterval = p28.props.stepInterval
 	local AbsoluteSizeX = current.AbsoluteSize.X
-	local v59 = math.floor((math.clamp(p28 - current.AbsolutePosition.X, 0, AbsoluteSizeX) / AbsoluteSizeX * (max - min) + min) / stepInterval + 0.5) * stepInterval
+	local v59 = math.floor((math.clamp(p29 - current.AbsolutePosition.X, 0, AbsoluteSizeX) / AbsoluteSizeX * (max - min) + min) / stepInterval + 0.5) * stepInterval
 
-	if v59 ~= p27.props.value then
-		p27.props.valueChanged(v59)
+	if v59 ~= p28.props.value then
+		p28.props.valueChanged(v59)
 	end
 end
-function v23.disconnectDragEvents(p29) -- line: 486
-	if p29.moveConnection ~= nil then
-		p29.moveConnection:Disconnect()
-		p29.moveConnection = nil
+function v23.disconnectDragEvents(p30) -- line: 493
+	if p30.moveConnection ~= nil then
+		p30.moveConnection:Disconnect()
+		p30.moveConnection = nil
 	end
 
-	if p29.releaseConnection ~= nil then
-		p29.releaseConnection:Disconnect()
-		p29.releaseConnection = nil
+	if p30.releaseConnection ~= nil then
+		p30.releaseConnection:Disconnect()
+		p30.releaseConnection = nil
 	end
 
-	if p29.focusLostConnection ~= nil then
-		p29.focusLostConnection:Disconnect()
-		p29.focusLostConnection = nil
+	if p30.focusLostConnection ~= nil then
+		p30.focusLostConnection:Disconnect()
+		p30.focusLostConnection = nil
 	end
 
-	if p29.inputCapturerButton ~= nil then
-		p29.inputCapturerButton:Destroy()
-		p29.inputCapturerButton = nil
+	if p30.inputCapturerButton ~= nil then
+		p30.inputCapturerButton:Destroy()
+		p30.inputCapturerButton = nil
 	end
 end
-function v23.stopListeningForDrag(p30) -- line: 508
-	if not p30.state.dragging then
+function v23.stopListeningForDrag(p31) -- line: 515
+	if not p31.state.dragging then
 		return
 	end
 
-	p30:disconnectDragEvents()
-	p30:setState({
+	p31:disconnectDragEvents()
+	p31:setState({
 		dragging = false
 	})
 end
-function v23.processGamepadInput(p31, p32, p33) -- line: 520
-	local v65 = p31.props.stepInterval * p32
-	local v66 = math.max(math.min(p31.props.value + v65 * p33, p31.props.max), p31.props.min)
+function v23.processGamepadInput(p32, p33, p34) -- line: 527
+	local v65 = p32.props.stepInterval * p33
+	local v66 = math.max(math.min(p32.props.value + v65 * p34, p32.props.max), p32.props.min)
 
-	if v66 ~= p31.props.value then
-		p31.props.valueChanged(v66)
+	if v66 ~= p32.props.value then
+		p32.props.valueChanged(v66)
 	end
 end
-function v23.onMoveStep(p34, p35, p36) -- line: 531
-	local Position = p36[Enum.KeyCode.Thumbstick1].Position
+function v23.onMoveStep(p35, p36, p37) -- line: 538
+	local Position = p37[Enum.KeyCode.Thumbstick1].Position
 	local v71 = Position.Magnitude > 0.2
 	local n2 = 0
 
-	p34.totalMoveTime = p34.totalMoveTime + p35
+	p35.totalMoveTime = p35.totalMoveTime + p36
 
 	local v73, n3, n4
 
@@ -461,37 +474,37 @@ function v23.onMoveStep(p34, p35, p36) -- line: 531
 		n3 = 0.2
 		n4 = 12
 	else
-		v73 = (p36[Enum.KeyCode.DPadLeft].UserInputState ~= Enum.UserInputState.Begin and 0 or -1) + (p36[Enum.KeyCode.DPadRight].UserInputState ~= Enum.UserInputState.Begin and 0 or 1)
+		v73 = (p37[Enum.KeyCode.DPadLeft].UserInputState ~= Enum.UserInputState.Begin and 0 or -1) + (p37[Enum.KeyCode.DPadRight].UserInputState ~= Enum.UserInputState.Begin and 0 or 1)
 		n3 = 0.5
 		n4 = 8
 	end
 
 	if v73 ~= 0 then
-		if p34.isFirstMove then
-			p34.isFirstMove = false
-			p34.totalMoveTime = 0
-			p34.unhandledTime = 0
+		if p35.isFirstMove then
+			p35.isFirstMove = false
+			p35.totalMoveTime = 0
+			p35.unhandledTime = 0
 			n2 = 1
-		elseif n3 < p34.totalMoveTime then
-			local v76 = p35 - math.max(n3 - p34.totalMoveTime - p35, 0) + p34.unhandledTime
+		elseif n3 < p35.totalMoveTime then
+			local v76 = p36 - math.max(n3 - p35.totalMoveTime - p36, 0) + p35.unhandledTime
 
 			n2 = math.floor(n4 * v76)
-			p34.unhandledTime = v76 - n2 / n4
+			p35.unhandledTime = v76 - n2 / n4
 		else
 			n2 = 0
-			p34.unhandledTime = 0
+			p35.unhandledTime = 0
 		end
 	else
-		p34.totalMoveTime = 0
-		p34.isFirstMove = true
+		p35.totalMoveTime = 0
+		p35.isFirstMove = true
 	end
 
 	if n2 > 0 then
-		p34:processGamepadInput(v73, n2)
+		p35:processGamepadInput(v73, n2)
 	end
 end
-function v23.getDerivedStateFromProps(p37) -- line: 581
-	if not p37.isMenuOpen then
+function v23.getDerivedStateFromProps(p38) -- line: 588
+	if not p38.isMenuOpen then
 		return {
 			entryMode = false
 		}

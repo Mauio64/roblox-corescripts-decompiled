@@ -7,41 +7,39 @@ local FFlagSignalsNavP3hMisc = SharedFlags.FFlagSignalsNavP3hMisc
 local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
 local useSignalState = require(Parent.SignalsReact).useSignalState
 local v9 = if not FFlagSignalsNavP3hMisc then nil else require(Parent.NavigationRodux).GetLegacyNavigationStore
+local v10 = if not FFlagSignalsNavP3hMisc then nil else require(Parent.RobloxAppNavigation).isNavigationAvailable
 
-return function() -- line: 20
-	-- upvalues: FFlagSignalsNavP3hMisc (copy), useSelector (copy), v9 (copy), useSignalState (copy), AppPage (copy), FFlagUseNavigationSelectors (copy), Selectors (copy)
+return function() -- line: 25
+	-- upvalues: FFlagSignalsNavP3hMisc (copy), v9 (copy), useSignalState (copy), v10 (copy), AppPage (copy), useSelector (copy), FFlagUseNavigationSelectors (copy), Selectors (copy)
 	if FFlagSignalsNavP3hMisc then
-		local v10 = useSelector(function(p1) -- line: 22
-			return p1.Navigation ~= nil
-		end)
 		local v11 = v9(false)
 		local v12 = useSignalState(v11.getCurrentPage)
 
-		if not v10 then
+		if not v10() then
 			return true
 		end
 
 		return v12 ~= nil and v12.name == AppPage.Chat
 	end
 
-	return useSelector(function(p2) -- line: 33
+	return useSelector(function(p1) -- line: 35
 		-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy), AppPage (copy)
-		if not p2.Navigation then
+		if not p1.Navigation then
 			return true
 		end
 
 		if FFlagUseNavigationSelectors then
-			return Selectors.selectCurrentPageName(p2) == AppPage.Chat
+			return Selectors.selectCurrentPageName(p1) == AppPage.Chat
 		end
 
-		local history = p2.Navigation.history
+		local history = p1.Navigation.history
 
 		if not history then
 			return false
 		end
 
-		local v16 = history[#history]
+		local v15 = history[#history]
 
-		return (v16[#v16] and v16[#v16].name) == AppPage.Chat
+		return (v15[#v15] and v15[#v15].name) == AppPage.Chat
 	end)
 end

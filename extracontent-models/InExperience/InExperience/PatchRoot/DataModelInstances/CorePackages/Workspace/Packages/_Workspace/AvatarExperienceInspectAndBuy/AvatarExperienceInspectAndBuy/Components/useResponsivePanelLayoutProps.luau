@@ -31,16 +31,15 @@ local getItemThumbnailUrl = require(AvatarExperienceInspectAndBuy.Utils.getItemT
 local usePurchaseButtonProps = require(AvatarExperienceInspectAndBuy.Components.usePurchaseButtonProps)
 local useInspectPlayer = require(AvatarExperienceInspectAndBuy.Hooks.useInspectPlayer)
 local useTokens = require(AvatarExperienceInspectAndBuyParent.Foundation).Hooks.useTokens
-local FFlagAXFixBulkPurchaseFreeItems = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXFixBulkPurchaseFreeItems
 local formatNumber = require(AvatarExperienceInspectAndBuy.Utils.formatNumber)
 
-local function selectView(p1) -- line: 55
+local function selectView(p1) -- line: 54
 	return p1.view
 end
-local function selectInspectPreviewDetails(p2) -- line: 59
+local function selectInspectPreviewDetails(p2) -- line: 58
 	return p2.avatarPreviewDetails
 end
-local function shouldRenderSecondPanel(p3, p4) -- line: 70
+local function shouldRenderSecondPanel(p3, p4) -- line: 69
 	-- upvalues: ViewType (copy)
 	if p3 == ViewType.WideLandscape then
 		return true
@@ -92,32 +91,32 @@ local t1 = {
 	}
 }
 
-return function(t2: {[any]: any}) -- line: 132
-	-- upvalues: useSelector (copy), selectView (copy), tutils (copy), ViewType (copy), React (copy), selectInspectPreviewDetails (copy), useRemoteBulkPurchaseEvent (copy), useInspectPlayer (copy), formatNumber (copy), useTokens (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), useItemSelectionStore (copy), useLocalization (copy), VerifiedBadges (copy), usePurchaseButtonProps (copy), FFlagAXFixBulkPurchaseFreeItems (copy), useEventConnection (copy), MarketplaceService (copy), ItemDetailsLayout (copy), AvatarItemsViewLayout (copy), ViewportLayout (copy), getItemThumbnailUrl (copy), t1 (copy)
-	local v33 = useSelector(selectView, tutils.deepEqual)
-	local v34 = v33 == ViewType.WideLandscape
-	local v35, v36 = React.useState(nil)
-	local v37, v38 = React.useState({
+return function(t2: {[any]: any}) -- line: 131
+	-- upvalues: useSelector (copy), selectView (copy), tutils (copy), ViewType (copy), React (copy), selectInspectPreviewDetails (copy), useRemoteBulkPurchaseEvent (copy), useInspectPlayer (copy), formatNumber (copy), useTokens (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), useItemSelectionStore (copy), useLocalization (copy), VerifiedBadges (copy), usePurchaseButtonProps (copy), useEventConnection (copy), MarketplaceService (copy), ItemDetailsLayout (copy), AvatarItemsViewLayout (copy), ViewportLayout (copy), getItemThumbnailUrl (copy), t1 (copy)
+	local v32 = useSelector(selectView, tutils.deepEqual)
+	local v33 = v32 == ViewType.WideLandscape
+	local v34, v35 = React.useState(nil)
+	local v36, v37 = React.useState({
 		isTryOnEnabled = false,
 		tryOnItem = {}
 	})
 	local items = useSelector(selectInspectPreviewDetails, tutils.deepEqual).items
-	local v40, v41, v42 = useRemoteBulkPurchaseEvent(items, t2.analytics)
-	local v43 = useInspectPlayer()
-	local v44 = formatNumber(v42)
-	local v45 = useTokens()
-	local v46 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useItemSelectionStore()
-	local v47 = React.useRef(nil)
-	local v48 = React.useRef(0)
-	local v49 = useLocalization({
+	local v39, v40, v41 = useRemoteBulkPurchaseEvent(items, t2.analytics)
+	local v42 = useInspectPlayer()
+	local v43 = formatNumber(v41)
+	local v44 = useTokens()
+	local v45 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useItemSelectionStore()
+	local v46 = React.useRef(nil)
+	local v47 = React.useRef(0)
+	local v48 = useLocalization({
 		bulkPurchaseButtonText = "Feature.Catalog.Label.BuyItems",
 		total = "Feature.Catalog.Label.TotalUnformatted",
-		headerText = if not v43.hasVerifiedBadge then {
+		headerText = if not v42.hasVerifiedBadge then {
 			"InGame.InspectMenu.Label.Avatar",
-			PLAYER_NAME = v43.playerName
+			PLAYER_NAME = v42.playerName
 		} else {
 			"InGame.InspectMenu.Label.VerifiedAvatar",
-			PLAYER_NAME = v43.playerName,
+			PLAYER_NAME = v42.playerName,
 			VERIFIED_BADGE = VerifiedBadges.emoji.verified
 		},
 		totalItems = if not items then nil else {
@@ -125,143 +124,143 @@ return function(t2: {[any]: any}) -- line: 132
 			itemCount = #items
 		}
 	})
-	local v50 = React.useCallback(function(p5) -- line: 178
-		-- upvalues: v38 (copy), t2 (copy)
-		v38(function(p6) -- line: 179
+	local v49 = React.useCallback(function(p5) -- line: 177
+		-- upvalues: v37 (copy), t2 (copy)
+		v37(function(p6) -- line: 178
 			-- upvalues: p5 (copy), t2 (copy)
-			local v55 = p5
-			local v56 = not p6.isTryOnEnabled
+			local v54 = p5
+			local v55 = not p6.isTryOnEnabled
 
-			if v56 then
+			if v55 then
 				t2.analytics.reportTryOnButtonClicked(p5.itemType, p5.itemId)
 			end
 
-			if not v56 then
-				v55 = {}
+			if not v55 then
+				v54 = {}
 			end
 
 			return {
-				isTryOnEnabled = v56,
-				tryOnItem = v55
+				isTryOnEnabled = v55,
+				tryOnItem = v54
 			}
 		end)
 	end, { t2.analytics })
-	local v51 = usePurchaseButtonProps({
-		purchaseButtonText = v49.bulkPurchaseButtonText,
-		onBulkPurchase = v40,
-		isDisabled = if not FFlagAXFixBulkPurchaseFreeItems then items == nil or (v42 == 0 or not v41) else not v41,
-		selectedItem = v35,
-		localizedStrings = v49,
-		formattedTotalPrice = v44,
+	local v50 = usePurchaseButtonProps({
+		purchaseButtonText = v48.bulkPurchaseButtonText,
+		onBulkPurchase = v39,
+		isDisabled = not v40,
+		selectedItem = v34,
+		localizedStrings = v48,
+		formattedTotalPrice = v43,
 		onPromptPurchase = t2.onPromptPurchase
 	})
 
 	useEventConnection(MarketplaceService.PromptBulkPurchaseFinished, t2.onBulkPurchaseFinished)
-	React.useEffect(function() -- line: 220
-		-- upvalues: v47 (copy), v48 (copy)
-		if v47.current then
-			v47.current.CanvasPosition = Vector2.new(0, v48.current)
+	React.useEffect(function() -- line: 217
+		-- upvalues: v46 (copy), v47 (copy)
+		if v46.current then
+			v46.current.CanvasPosition = Vector2.new(0, v47.current)
 		end
-	end, { v35 })
-	React.useEffect(function() -- line: 227
-		-- upvalues: v35 (copy), t2 (copy)
-		if v35 then
-			t2.onItemDetailsOpened(v35)
+	end, { v34 })
+	React.useEffect(function() -- line: 224
+		-- upvalues: v34 (copy), t2 (copy)
+		if v34 then
+			t2.onItemDetailsOpened(v34)
 		end
 	end, {
-		v35,
+		v34,
 		t2.onItemDetailsOpened
 	})
 
-	local v52 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else React.useCallback(function() -- line: 234
-		-- upvalues: v46 (copy), t2 (copy)
-		v46.clearAll()
+	local v51 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else React.useCallback(function() -- line: 231
+		-- upvalues: v45 (copy), t2 (copy)
+		v45.clearAll()
 		t2.onInspectMenuClosed()
 	end, {
-		v46,
+		v45,
 		t2.onInspectMenuClosed
 	})
 
 	return {
-		view = v33,
-		renderFirstPanel = function() -- line: 241
-			-- upvalues: v35 (copy), React (copy), ItemDetailsLayout (copy), v33 (copy), v36 (copy), v38 (copy), t2 (copy), ViewType (copy), v51 (copy), v50 (copy), v37 (copy), formatNumber (copy), AvatarItemsViewLayout (copy), items (copy), v49 (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v52 (copy), v47 (copy), v48 (copy), v44 (copy)
-			if v35 then
+		view = v32,
+		renderFirstPanel = function() -- line: 238
+			-- upvalues: v34 (copy), React (copy), ItemDetailsLayout (copy), v32 (copy), v35 (copy), v37 (copy), t2 (copy), ViewType (copy), v50 (copy), v49 (copy), v36 (copy), formatNumber (copy), AvatarItemsViewLayout (copy), items (copy), v48 (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v51 (copy), v46 (copy), v47 (copy), v43 (copy)
+			if v34 then
 				return (React.createElement(ItemDetailsLayout, {
 					itemDetailsViewProps = {
-						view = v33,
-						item = v35,
-						onItemDetailsClosed = function() -- line: 247
-							-- upvalues: v36 (copy), v38 (copy)
-							v36(nil)
-							v38({
+						view = v32,
+						item = v34,
+						onItemDetailsClosed = function() -- line: 244
+							-- upvalues: v35 (copy), v37 (copy)
+							v35(nil)
+							v37({
 								isTryOnEnabled = false,
 								tryOnItem = {}
 							})
 						end,
 						onToggleFavorite = t2.onToggleFavorite,
 						openAttributionOverlay = t2.openAttributionOverlay,
-						purchaseButtonProps = if v33 ~= ViewType.Wide then nil else v51.purchaseButtonProps,
-						onToggleTryOn = v50,
+						purchaseButtonProps = if v32 ~= ViewType.Wide then nil else v50.purchaseButtonProps,
+						onToggleTryOn = v49,
 						renderTryOnViewport = t2.renderTryOnViewport,
-						tryOnState = v37,
+						tryOnState = v36,
 						localPlayerModel = t2.localPlayerModel,
 						formatNumber = formatNumber
 					},
-					buyActionBarProps = v51,
-					view = v33
+					buyActionBarProps = v50,
+					view = v32
 				}))
 			end
 
 			return (React.createElement(AvatarItemsViewLayout, {
-				view = v33,
+				view = v32,
 				items = items,
-				headerText = v49.headerText,
-				onInspectMenuClosed = if not FFlagAXEnableIaBTimedOptionsBulkPurchase or not v52 then t2.onInspectMenuClosed else v52,
-				onItemCardActivated = function(p7) -- line: 275
-					-- upvalues: v47 (copy), v48 (copy), v36 (copy)
-					if v47.current then
-						v48.current = v47.current.CanvasPosition.Y
+				headerText = v48.headerText,
+				onInspectMenuClosed = if not FFlagAXEnableIaBTimedOptionsBulkPurchase or not v51 then t2.onInspectMenuClosed else v51,
+				onItemCardActivated = function(p7) -- line: 272
+					-- upvalues: v46 (copy), v47 (copy), v35 (copy)
+					if v46.current then
+						v47.current = v46.current.CanvasPosition.Y
 					end
 
-					v36(p7)
+					v35(p7)
 				end,
 				subheaderText = {
-					leftSlotLabel = v49.totalItems or "",
-					rightSlotPrice = v44
+					leftSlotLabel = v48.totalItems or "",
+					rightSlotPrice = v43
 				},
-				buyActionBarProps = v51,
-				ref = v47
+				buyActionBarProps = v50,
+				ref = v46
 			}))
 		end,
-		renderSecondPanel = if not (v33 == ViewType.WideLandscape or (v33 == ViewType.Wide or v33 == ViewType.Compact) and not v35) then nil else function() -- line: 291
-			-- upvalues: React (copy), ViewportLayout (copy), v33 (copy), v35 (copy), getItemThumbnailUrl (copy), v43 (copy), v36 (copy), t2 (copy), v34 (copy), v51 (copy), v37 (copy), v45 (copy)
+		renderSecondPanel = if not (v32 == ViewType.WideLandscape or (v32 == ViewType.Wide or v32 == ViewType.Compact) and not v34) then nil else function() -- line: 288
+			-- upvalues: React (copy), ViewportLayout (copy), v32 (copy), v34 (copy), getItemThumbnailUrl (copy), v42 (copy), v35 (copy), t2 (copy), v33 (copy), v50 (copy), v36 (copy), v44 (copy)
 			return React.createElement(ViewportLayout, {
-				view = v33,
-				thumbnailUrl = if not v35 then "rbxthumb://type=Avatar&id=" .. tostring(v43.playerId) .. "&w=420&h=420" else getItemThumbnailUrl(v35) or "",
+				view = v32,
+				thumbnailUrl = if not v34 then "rbxthumb://type=Avatar&id=" .. tostring(v42.playerId) .. "&w=420&h=420" else getItemThumbnailUrl(v34) or "",
 				backButtonProps = {
-					onBackButtonClick = if not v35 then t2.onInspectMenuClosed else function() -- line: 299
-						-- upvalues: v36 (copy)
-						v36(nil)
+					onBackButtonClick = if not v34 then t2.onInspectMenuClosed else function() -- line: 296
+						-- upvalues: v35 (copy)
+						v35(nil)
 					end
 				},
 				viewportProps = {
 					AspectRatio = 1,
 					ScaleType = Enum.ScaleType.Crop,
-					Size = if not v34 then UDim2.new(1, 0, 1, 0) else UDim2.new(1, 0, 0, 0)
+					Size = if not v33 then UDim2.new(1, 0, 1, 0) else UDim2.new(1, 0, 0, 0)
 				},
-				buyActionBarProps = v51,
+				buyActionBarProps = v50,
 				Size = UDim2.new(1, 0, 1, 0),
 				renderTryOnViewport = t2.renderTryOnViewport,
-				tryOnState = v37,
-				thumbnailPadding = if not v35 then nil else {
-					left = UDim.new(0, v45.Padding.XXLarge),
-					right = UDim.new(0, v45.Padding.XXLarge),
-					top = UDim.new(0, v45.Padding.XXLarge),
-					bottom = UDim.new(0, v45.Padding.XXLarge)
+				tryOnState = v36,
+				thumbnailPadding = if not v34 then nil else {
+					left = UDim.new(0, v44.Padding.XXLarge),
+					right = UDim.new(0, v44.Padding.XXLarge),
+					top = UDim.new(0, v44.Padding.XXLarge),
+					bottom = UDim.new(0, v44.Padding.XXLarge)
 				}
 			})
 		end,
-		panelConfig = t1[v33] or t1[ViewType.Wide]
+		panelConfig = t1[v32] or t1[ViewType.Wide]
 	}
 end

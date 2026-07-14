@@ -5,6 +5,7 @@ local Foundation = require(GameTileParent.Foundation)
 local Responsive = require(GameTileParent.Responsive)
 local IconButton = Foundation.IconButton
 local FoundationImage = Foundation.Image
+local View = Foundation.View
 local ButtonSize = Foundation.Enums.ButtonSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
@@ -13,54 +14,76 @@ local useTokens = Foundation.Hooks.useTokens
 local PlayButton = require(GameTileParent.GamePlayButton).PlayButton
 local useLocalization = require(GameTileParent.Localization).Hooks.useLocalization
 local OmniRecommendationsContentType = require(GameTileParent.DiscoveryTypes).OmniRecommendationsContentType
+local useNavigation = require(GameTileParent.Navigation).useNavigation
+local AppPage = require(GameTileParent.RobloxAppEnums).AppPage
+
+require(GameTileParent.VideoUtils)
+
 local useIsHoveredTile = require(GameTile.useIsHoveredTile)
 local useValidTileBadges = require(GameTile.Overlays.useValidTileBadges)
 local GameTileThumbnailBadges = require(GameTile.Overlays.GameTileThumbnailBadges)
 
 require(GameTile.GameTileTypes)
 
-local v19 = game:DefineFastInt("LuaAppOneByTwoTileLogoWidthPercentLandscape", 40)
-local v20 = game:DefineFastInt("LuaAppOneByTwoTileLogoWidthPercentSquare", 25)
-local v21 = v19 / 100
-local v22 = v20 / 100
+local FFlagLuaAppHomeTouchAutoplay = require(GameTileParent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
+local v23 = game:DefineFastInt("LuaAppOneByTwoTileLogoWidthPercentLandscape", 40)
+local v24 = game:DefineFastInt("LuaAppOneByTwoTileLogoWidthPercentSquare", 25)
+local v25 = v23 / 100
+local v26 = v24 / 100
 
-local function noop() -- line: 50
+local function noop() -- line: 60
 end
-local function OneByTwoTile(t1: {[any]: any}) -- line: 52
-	-- upvalues: useTokens (copy), Responsive (copy), React (copy), useIsHoveredTile (copy), useValidTileBadges (copy), useLocalization (copy), OmniRecommendationsContentType (copy), v21 (copy), v22 (copy), ButtonSize (copy), FoundationImage (copy), GameTileThumbnailBadges (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), noop (copy), PlayButton (copy)
-	local v26 = useTokens()
-	local v27 = Responsive.useResponsive({ Responsive.BreakpointConfig.sizes.Small }) == Responsive.Keys.Small
-	local v28 = React.useRef(nil)
-	local v29 = `OneByTwoTile_{ t1.layoutOrder or 0 }`
-	local v30 = useIsHoveredTile(v28, v29, true)
-	local v31 = useValidTileBadges(t1.universeId or "", t1.topicId, t1.badgeOverride)
-	local v32 = useLocalization({
+local function OneByTwoTile(t1: {[any]: any}) -- line: 62
+	-- upvalues: useTokens (copy), Responsive (copy), React (copy), useIsHoveredTile (copy), useNavigation (copy), AppPage (copy), FFlagLuaAppHomeTouchAutoplay (copy), useValidTileBadges (copy), useLocalization (copy), OmniRecommendationsContentType (copy), v25 (copy), v26 (copy), ButtonSize (copy), FoundationImage (copy), GameTileThumbnailBadges (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), noop (copy), PlayButton (copy)
+	local v30 = useTokens()
+	local v31 = Responsive.useResponsive({ Responsive.BreakpointConfig.sizes.Small }) == Responsive.Keys.Small
+	local v32 = React.useRef(nil)
+	local v33 = `OneByTwoTile_{ t1.layoutOrder or 0 }`
+	local v34 = useIsHoveredTile(v32, v33, true)
+	local v35 = useNavigation()
+	local v36 = React.useCallback(function() -- line: 75
+		-- upvalues: v35 (copy), AppPage (copy), t1 (copy), FFlagLuaAppHomeTouchAutoplay (copy)
+		v35.navigate(AppPage.FeatureTileAdPlayer, {
+			extraProps = {
+				videoAssetId = t1.primaryVideoAssetId,
+				imageAssetId = t1.primaryImageAssetId,
+				videoPlaybackContext = if not FFlagLuaAppHomeTouchAutoplay then nil else t1.videoPlaybackContext
+			}
+		})
+	end, {
+		v35,
+		t1.primaryVideoAssetId,
+		t1.primaryImageAssetId,
+		if not FFlagLuaAppHomeTouchAutoplay then nil else t1.videoPlaybackContext
+	})
+	local v37 = useValidTileBadges(t1.universeId or "", t1.topicId, t1.badgeOverride)
+	local v38 = useLocalization({
 		joinButtonText = "Common.VisitGame.Label.Play",
 		learnButtonText = "CommonUI.Features.Label.Learn"
 	})
-	local v33 = t1.contentType == OmniRecommendationsContentType.AdLink
-	local v34 = if not v33 then v32.joinButtonText else v32.learnButtonText
+	local v39 = t1.contentType == OmniRecommendationsContentType.AdLink
+	local v40 = if not v39 then v38.joinButtonText else v38.learnButtonText
 	local num = tonumber(t1.logoAspectRatio)
-	local v36 = (not num or not (num > 0)) and 1 or num
-	local v37 = if v36 ~= 3 then v22 else v21
+	local v42 = (not num or not (num > 0)) and 1 or num
+	local v43 = if v42 ~= 3 then v26 else v25
 	local Medium, TitleLarge, BodySmall, XXSmall, Small, Size_800, TitleSmall
 
-	if v27 then
-		Medium = v26.Padding.Medium
-		TitleLarge = v26.Typography.TitleLarge
-		BodySmall = v26.Typography.BodySmall
-		XXSmall = v26.Gap.XXSmall
+	if v31 then
+		Medium = v30.Padding.Medium
+		TitleLarge = v30.Typography.TitleLarge
+		BodySmall = v30.Typography.BodySmall
+		XXSmall = v30.Gap.XXSmall
 		Small = ButtonSize.Small
-		Size_800 = v26.Size.Size_800
-		TitleSmall = v26.Typography.TitleSmall
+		Size_800 = v30.Size.Size_800
+		TitleSmall = v30.Typography.TitleSmall
 	else
-		Medium = v26.Padding.Large
-		TitleLarge = v26.Typography.HeadingMedium
-		BodySmall = v26.Typography.BodyMedium
-		XXSmall = v26.Gap.XSmall
+		Medium = v30.Padding.Large
+		TitleLarge = v30.Typography.HeadingMedium
+		BodySmall = v30.Typography.BodyMedium
+		XXSmall = v30.Gap.XSmall
 		Small = ButtonSize.Medium
-		Size_800 = v26.Size.Size_1000
-		TitleSmall = v26.Typography.TitleMedium
+		Size_800 = v30.Size.Size_1000
+		TitleSmall = v30.Typography.TitleMedium
 	end
 
 	return React.createElement("Frame", {
@@ -69,48 +92,56 @@ local function OneByTwoTile(t1: {[any]: any}) -- line: 52
 		LayoutOrder = t1.layoutOrder,
 		ZIndex = t1.zIndex
 	}, {
-		Container = React.createElement("Frame", {
+		Container = React.createElement("TextButton", {
+			ref = v32,
+			Size = t1.size or UDim2.fromScale(1, 1),
+			BackgroundColor3 = v30.Color.Surface.Surface_100.Color3,
 			BorderSizePixel = 0,
 			ClipsDescendants = true,
-			ref = v28,
-			Size = t1.size or UDim2.fromScale(1, 1),
-			BackgroundColor3 = v26.Color.Surface.Surface_100.Color3
+			Text = "",
+			AutoButtonColor = false,
+			[React.Event.Activated] = v36
 		}, {
 			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v26.Radius.Medium)
+				CornerRadius = UDim.new(0, v30.Radius.Medium)
 			}),
-			Thumbnail = if not t1.primaryImageAssetId then nil else React.createElement(FoundationImage, {
+			Thumbnail = React.createElement(FoundationImage, {
 				ZIndex = 1,
 				Image = `rbxassetid://{ t1.primaryImageAssetId }`,
 				Size = UDim2.fromScale(1, 1),
-				ScaleType = Enum.ScaleType.Crop
+				ScaleType = Enum.ScaleType.Crop,
+				cornerRadius = UDim.new(0, v30.Radius.Medium)
 			}),
-			TileBadge = if not v31 then nil else React.createElement("Frame", {
+			TileBadge = if not v37 then nil else React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				ZIndex = 2,
 				Size = UDim2.fromScale(1, 1)
 			}, {
 				Badge = React.createElement(GameTileThumbnailBadges, {
-					tileBadgesByPosition = v31
+					tileBadgesByPosition = v37
 				})
 			}),
 			Logo = if not t1.logoImageAssetId then nil else React.createElement(FoundationImage, {
 				ZIndex = 2,
 				Image = `rbxassetid://{ t1.logoImageAssetId }`,
-				Position = UDim2.new(1, -v26.Padding.Medium, 0, v26.Padding.Medium),
+				Position = UDim2.new(1, -v30.Padding.Medium, 0, v30.Padding.Medium),
 				AnchorPoint = Vector2.new(1, 0),
-				Size = UDim2.new(v37, 0, 1, 0),
-				aspectRatio = v36
+				Size = UDim2.new(v43, 0, 1, 0),
+				aspectRatio = v42
 			}),
-			OverflowMenuButton = if not v30 then nil else React.createElement(IconButton, {
-				isCircular = true,
+			OverflowMenuButton = if not v34 then nil else React.createElement(View, {
+				tag = "auto-xy bg-over-media-0 radius-circle",
 				ZIndex = 4,
-				icon = IconName.ThreeDotsHorizontal,
-				size = InputSize.Small,
-				variant = ButtonVariant.Utility,
-				onActivated = noop,
-				Position = UDim2.new(1, -v26.Padding.Medium, 0, v26.Padding.Medium),
+				Position = UDim2.new(1, -v30.Padding.Medium, 0, v30.Padding.Medium),
 				AnchorPoint = Vector2.new(1, 0)
+			}, {
+				Button = React.createElement(IconButton, {
+					isCircular = true,
+					icon = IconName.ThreeDotsHorizontal,
+					size = InputSize.Small,
+					variant = ButtonVariant.Utility,
+					onActivated = noop
+				})
 			}),
 			BottomStack = React.createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -149,7 +180,7 @@ local function OneByTwoTile(t1: {[any]: any}) -- line: 52
 						Text = t1.headline,
 						Font = TitleLarge.Font,
 						TextSize = TitleLarge.FontSize,
-						TextColor3 = v26.LightMode.ActionOverMedia.Foreground.Color3,
+						TextColor3 = v30.LightMode.ActionOverMedia.Foreground.Color3,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						TextYAlignment = Enum.TextYAlignment.Top
 					}),
@@ -162,12 +193,12 @@ local function OneByTwoTile(t1: {[any]: any}) -- line: 52
 						Text = t1.subtitle,
 						Font = BodySmall.Font,
 						TextSize = BodySmall.FontSize,
-						TextColor3 = v26.LightMode.ActionOverMedia.Foreground.Color3,
+						TextColor3 = v30.LightMode.ActionOverMedia.Foreground.Color3,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						TextYAlignment = Enum.TextYAlignment.Top
 					})
 				}),
-				CtaButton = if not v33 then if not t1.universeId then nil else React.createElement(PlayButton, {
+				CtaButton = if not v39 then if not t1.universeId then nil else React.createElement(PlayButton, {
 					LayoutOrder = 2,
 					eventContext = "OneByTwoTile",
 					launchSource = "OneByTwoTile",
@@ -175,7 +206,7 @@ local function OneByTwoTile(t1: {[any]: any}) -- line: 52
 					universeId = t1.universeId,
 					placeId = if not t1.placeIdOverride then t1.placeId else t1.placeIdOverride,
 					referralSource = t1.referralSource,
-					playableText = v34,
+					playableText = v40,
 					buttonSize = Small,
 					reportExperienceLaunched = t1.reportExperienceLaunched,
 					experienceJoinData = if not t1.launchDataOverride then nil else {
@@ -186,19 +217,19 @@ local function OneByTwoTile(t1: {[any]: any}) -- line: 52
 					BorderSizePixel = 0,
 					Size = UDim2.fromOffset(0, Size_800),
 					AutomaticSize = Enum.AutomaticSize.X,
-					BackgroundColor3 = v26.Color.Extended.White.White_20.Color3,
-					BackgroundTransparency = v26.Color.Extended.White.White_20.Transparency,
-					Text = v34,
-					TextColor3 = v26.LightMode.ActionOverMedia.Foreground.Color3,
+					BackgroundColor3 = v30.Color.Extended.White.White_20.Color3,
+					BackgroundTransparency = v30.Color.Extended.White.White_20.Transparency,
+					Text = v40,
+					TextColor3 = v30.LightMode.ActionOverMedia.Foreground.Color3,
 					Font = TitleSmall.Font,
 					TextSize = TitleSmall.FontSize
 				}, {
 					UICorner = React.createElement("UICorner", {
-						CornerRadius = UDim.new(0, v26.Radius.Medium)
+						CornerRadius = UDim.new(0, v30.Radius.Medium)
 					}),
 					UIPadding = React.createElement("UIPadding", {
-						PaddingLeft = UDim.new(0, v26.Padding.Large),
-						PaddingRight = UDim.new(0, v26.Padding.Large)
+						PaddingLeft = UDim.new(0, v30.Padding.Large),
+						PaddingRight = UDim.new(0, v30.Padding.Large)
 					})
 				})
 			})

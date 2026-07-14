@@ -1,3 +1,0 @@
-return {
-	Checks = require(script.Checks)
-}

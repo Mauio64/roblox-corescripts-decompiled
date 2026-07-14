@@ -1,12 +1,13 @@
 local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local ChatMute = require(Parent.ChatMute)
 local ExpChatShared = require(Parent.ExpChatShared)
 local UserMuted = require(Parent.ExpChatShared).Actions.UserMuted
-local FFlagExpChatUseMessagesStore = require(Parent.SharedFlags).FFlagExpChatUseMessagesStore
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagExpChatUseChatMuteStore = SharedFlags.FFlagExpChatUseChatMuteStore
+local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
 
-function muteUser(n1: number, p1) -- line: 11
-	-- upvalues: ExpChatShared (copy), FFlagExpChatUseMessagesStore (copy), UserMuted (copy)
-	local context = ExpChatShared.context
-
+function muteUser(n1: number, p1) -- line: 14
+	-- upvalues: FFlagExpChatUseChatMuteStore (copy), ChatMute (copy), ExpChatShared (copy), FFlagExpChatUseMessagesStore (copy), UserMuted (copy)
 	if not n1 or not p1 then
 		return false
 	end
@@ -15,7 +16,17 @@ function muteUser(n1: number, p1) -- line: 11
 		return false
 	end
 
-	if n1 and context.store then
+	if FFlagExpChatUseChatMuteStore then
+		ChatMute.mutePlayer({
+			userId = tostring(n1)
+		})
+
+		return true
+	end
+
+	local context = ExpChatShared.context
+
+	if context.store then
 		if FFlagExpChatUseMessagesStore then
 			if context.messagesStore then
 				context.messagesStore.muteUser(n1)
@@ -33,13 +44,17 @@ function muteUser(n1: number, p1) -- line: 11
 
 	return false
 end
-function isUserMuted(n2: number) -- line: 36
-	-- upvalues: ExpChatShared (copy), FFlagExpChatUseMessagesStore (copy)
-	local context = ExpChatShared.context
-
+function isUserMuted(n2: number) -- line: 44
+	-- upvalues: FFlagExpChatUseChatMuteStore (copy), ChatMute (copy), ExpChatShared (copy), FFlagExpChatUseMessagesStore (copy)
 	if not n2 then
 		return false
 	end
+
+	if FFlagExpChatUseChatMuteStore then
+		return ChatMute.isUserIdMuted((tostring(n2)))
+	end
+
+	local context = ExpChatShared.context
 
 	if context.store then
 		if FFlagExpChatUseMessagesStore then

@@ -453,7 +453,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 		v92,
 		LineHeight
 	})
-	local v95 = if not Flags.FoundationSupportPrefixSuffixNumberInput then nil else React.useMemo(function() -- line: 549
+	local v95 = if not Flags.FoundationNumberInputBeta then nil else React.useMemo(function() -- line: 549
 		-- upvalues: v41 (copy)
 		return {
 			left = if not v41.horizontalPadding then nil else v41.horizontalPadding.innerLeft,
@@ -643,7 +643,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 			layout = v98,
 			onCanvasPositionChanged = if not v44 then nil else v103,
 			scrollingFrameRef = if not v44 then nil else v101,
-			padding = if not Flags.FoundationSupportPrefixSuffixNumberInput then nil else v95,
+			padding = if not Flags.FoundationNumberInputBeta then nil else v95,
 			testId = `{ v41.testId }--textbox-wrapper`
 		}, {
 			TextBox = if v62 then nil else React.createElement(v33, {

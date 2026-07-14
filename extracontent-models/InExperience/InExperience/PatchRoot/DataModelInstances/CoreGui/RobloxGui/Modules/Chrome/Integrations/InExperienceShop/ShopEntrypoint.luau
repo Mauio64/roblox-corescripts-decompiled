@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 local React = require(CorePackages.Packages.React)
 local Service = require(Chrome.Service)
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
 local WindowSizeSignal = require(Chrome.ChromeShared.Service.WindowSizeSignal)
 local Constants = require(Chrome.ChromeShared.Unibar.Constants)
 local CommonIcon = require(Chrome.Integrations.CommonIcon)
@@ -12,6 +13,7 @@ local ShopChromeWrapper = require(Chrome.Integrations.InExperienceShop.ShopChrom
 local ShopWindowLayout = require(Chrome.Integrations.InExperienceShop.ShopWindowLayout)
 local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
 local MappedSignal = ChromeUtils.MappedSignal
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
 local InExperienceShop = require(CorePackages.Workspace.Packages.InExperienceShop)
 local FFlagEnableShopPrefetch = InExperienceShop.FFlagEnableShopPrefetch
 local FFlagHideShopMenuOnFailure = InExperienceShop.FFlagHideShopMenuOnFailure
@@ -22,30 +24,30 @@ local FFlagEnableMenuTrailingBadge = SharedFlags.FFlagEnableMenuTrailingBadge
 local FFlagExperienceShopNewIconography = InExperienceShop.FFlagExperienceShopNewIconography
 local EngineFeature = game:GetEngineFeature("ShopCoreGuiToggleSupported")
 local EngineFeature2 = game:GetEngineFeature("EnableOpenShopSignal")
-local v25 = MappedSignal.new(Service:onIntegrationStatusChanged(), function() -- line: 30
+local v27 = MappedSignal.new(Service:onIntegrationStatusChanged(), function() -- line: 32
 	-- upvalues: Service (copy), Constants (copy)
 	return Service:isWindowOpen(Constants.IN_EXPERIENCE_SHOP_ID)
 end)
 local MAX_WINDOW_WIDTH = ShopWindowLayout.MAX_WINDOW_WIDTH
 local MAX_WINDOW_HEIGHT = ShopWindowLayout.MAX_WINDOW_HEIGHT
-local v28 = WindowSizeSignal.new(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT, false, true)
-local v29 = game:DefineFastString("InExperienceShopNewBadgeStorageKey", "InExperienceShopNewBadgeStorageKey")
-local v30 = game:DefineFastInt("NewBadgeDismissalMaxCountInExperienceShop", 5)
-local v31 = game:DefineFastFlag("EnableNewBadgeInExperienceShop", false) and FFlagEnableMenuTrailingBadge
-local u32 = not not EngineFeature and (StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.All) or StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.ExperienceShop))
-local u33 = true
+local v30 = WindowSizeSignal.new(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT, false, true)
+local v31 = game:DefineFastString("InExperienceShopNewBadgeStorageKey", "InExperienceShopNewBadgeStorageKey")
+local v32 = game:DefineFastInt("NewBadgeDismissalMaxCountInExperienceShop", 5)
+local v33 = game:DefineFastFlag("EnableNewBadgeInExperienceShop", false) and FFlagEnableMenuTrailingBadge
+local u34 = not not EngineFeature and (StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.All) or StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.ExperienceShop))
+local u35 = true
 
-local function getInitialAvailability() -- line: 66
-	-- upvalues: u32 (ref), FFlagHideShopMenuOnFailure (copy), u33 (ref), Service (copy)
-	if not u32 or FFlagHideShopMenuOnFailure then
-		u33 = false
+local function getInitialAvailability() -- line: 68
+	-- upvalues: u34 (ref), FFlagHideShopMenuOnFailure (copy), u35 (ref), Service (copy)
+	if not u34 or FFlagHideShopMenuOnFailure then
+		u35 = false
 
 		return Service.AvailabilitySignal.Unavailable
 	end
 
 	return Service.AvailabilitySignal.Available
 end
-local function toggleShopWindow() -- line: 74
+local function toggleShopWindow() -- line: 76
 	-- upvalues: FFlagCenterInExperienceShopWindow (copy), ShopWindowLayout (copy), Service (copy), Constants (copy)
 	if FFlagCenterInExperienceShopWindow then
 		ShopWindowLayout.toggleInExperienceShopWindow()
@@ -63,8 +65,8 @@ local t1 = {
 }
 local Unavailable
 
-if not u32 or FFlagHideShopMenuOnFailure then
-	u33 = false
+if not u34 or FFlagHideShopMenuOnFailure then
+	u35 = false
 	Unavailable = Service.AvailabilitySignal.Unavailable
 else
 	Unavailable = Service.AvailabilitySignal.Available
@@ -72,10 +74,11 @@ end
 
 t1.initialAvailability = Unavailable
 t1.id = Constants.IN_EXPERIENCE_SHOP_ID
-t1.windowSize = v28
+t1.sideSheetPlacement = SideSheetPlacement.Page
+t1.windowSize = v30
 t1.startingWindowPosition = ShopWindowLayout.getStartingWindowPosition()
 
-function t1.activated(_) -- line: 91
+function t1.activated(_) -- line: 94
 	-- upvalues: FFlagCenterInExperienceShopWindow (copy), ShopWindowLayout (copy), Service (copy), Constants (copy)
 	if FFlagCenterInExperienceShopWindow then
 		ShopWindowLayout.toggleInExperienceShopWindow()
@@ -86,45 +89,45 @@ function t1.activated(_) -- line: 91
 	Service:toggleWindow(Constants.IN_EXPERIENCE_SHOP_ID)
 end
 
-t1.menuTrailingBadgeConfig = if not v31 then nil else {
-	localStorageKey = v29,
-	maxViewCount = v30
+t1.menuTrailingBadgeConfig = if not v33 then nil else {
+	localStorageKey = v31,
+	maxViewCount = v32
 }
-t1.isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 102
-	-- upvalues: v25 (copy)
-	return v25:get()
-end or v25
+t1.isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 105
+	-- upvalues: v27 (copy)
+	return v27:get()
+end or v27
 t1.components = {
-	Icon = function() -- line: 106
-		-- upvalues: CommonIcon (copy), FFlagExperienceShopNewIconography (copy), v25 (copy)
-		return CommonIcon(not FFlagExperienceShopNewIconography and "BuildingStore" or "ShoppingBasket", nil, v25)
+	Icon = function() -- line: 109
+		-- upvalues: CommonIcon (copy), FFlagExperienceShopNewIconography (copy), v27 (copy)
+		return CommonIcon(not FFlagExperienceShopNewIconography and "BuildingStore" or "ShoppingBasket", nil, v27)
 	end,
-	Window = function() -- line: 113
-		-- upvalues: React (copy), ShopChromeWrapper (copy), v28 (copy), MAX_WINDOW_WIDTH (copy), MAX_WINDOW_HEIGHT (copy)
+	Window = function() -- line: 116
+		-- upvalues: React (copy), ShopChromeWrapper (copy), v30 (copy), MAX_WINDOW_WIDTH (copy), MAX_WINDOW_HEIGHT (copy)
 		return React.createElement(ShopChromeWrapper, {
-			windowSize = v28,
+			windowSize = v30,
 			maxWindowWidth = MAX_WINDOW_WIDTH,
 			maxWindowHeight = MAX_WINDOW_HEIGHT
 		})
 	end
 }
 
-local v38 = Service:register(t1)
+local v40 = Service:register(t1)
 
 if FFlagEnableShopPrefetch then
 	local prefetchShopDataOnGameJoin = require(CorePackages.Workspace.Packages.InExperienceShop.prefetchShopDataOnGameJoin)
 
 	if FFlagHideShopMenuOnFailure then
-		task.spawn(prefetchShopDataOnGameJoin, function(b1: boolean) -- line: 131
-			-- upvalues: u33 (ref), u32 (ref), v38 (copy)
+		task.spawn(prefetchShopDataOnGameJoin, function(b1: boolean) -- line: 134
+			-- upvalues: u35 (ref), u34 (ref), v40 (copy)
 			if not b1 then
 				return
 			end
 
-			u33 = true
+			u35 = true
 
-			if u32 then
-				v38.availability:available()
+			if u34 then
+				v40.availability:available()
 			end
 		end)
 	else
@@ -133,10 +136,10 @@ if FFlagEnableShopPrefetch then
 end
 
 if EngineFeature2 then
-	MarketplaceService.OpenShopRequested:Connect(function(p2) -- line: 155
-		-- upvalues: Players (copy), FFlagHideShopMenuOnFailure (copy), u33 (ref), Service (copy), Constants (copy), FFlagCenterInExperienceShopWindow (copy), ShopWindowLayout (copy)
+	MarketplaceService.OpenShopRequested:Connect(function(p2) -- line: 158
+		-- upvalues: Players (copy), FFlagHideShopMenuOnFailure (copy), u35 (ref), Service (copy), Constants (copy), FFlagCenterInExperienceShopWindow (copy), ShopWindowLayout (copy)
 		if p2 == Players.LocalPlayer then
-			if FFlagHideShopMenuOnFailure and not u33 then
+			if FFlagHideShopMenuOnFailure and not u35 then
 				return
 			end
 
@@ -154,10 +157,10 @@ if EngineFeature2 then
 end
 
 if EngineFeature then
-	local function updateShopAvailability() -- line: 173
-		-- upvalues: u32 (ref), FFlagHideShopMenuOnFailure (copy), u33 (ref), v38 (copy), Service (copy), Constants (copy)
-		if u32 and (not FFlagHideShopMenuOnFailure or u33) then
-			v38.availability:available()
+	local function updateShopAvailability() -- line: 176
+		-- upvalues: u34 (ref), FFlagHideShopMenuOnFailure (copy), u35 (ref), v40 (copy), Service (copy), Constants (copy)
+		if u34 and (not FFlagHideShopMenuOnFailure or u35) then
+			v40.availability:available()
 
 			return
 		end
@@ -166,15 +169,15 @@ if EngineFeature then
 			Service:toggleWindow(Constants.IN_EXPERIENCE_SHOP_ID)
 		end
 
-		v38.availability:unavailable()
+		v40.availability:unavailable()
 	end
 
-	ChromeUtils.setCoreGuiAvailability(v38, Enum.CoreGuiType.ExperienceShop, function(p3) -- line: 185
-		-- upvalues: u32 (ref), FFlagHideShopMenuOnFailure (copy), u33 (ref), v38 (copy), Service (copy), Constants (copy)
-		u32 = p3
+	ChromeUtils.setCoreGuiAvailability(v40, Enum.CoreGuiType.ExperienceShop, function(p3) -- line: 188
+		-- upvalues: u34 (ref), FFlagHideShopMenuOnFailure (copy), u35 (ref), v40 (copy), Service (copy), Constants (copy)
+		u34 = p3
 
-		if u32 and (not FFlagHideShopMenuOnFailure or u33) then
-			v38.availability:available()
+		if u34 and (not FFlagHideShopMenuOnFailure or u35) then
+			v40.availability:available()
 
 			return
 		end
@@ -183,8 +186,8 @@ if EngineFeature then
 			Service:toggleWindow(Constants.IN_EXPERIENCE_SHOP_ID)
 		end
 
-		v38.availability:unavailable()
+		v40.availability:unavailable()
 	end)
 end
 
-return v38
+return v40

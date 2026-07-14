@@ -7,7 +7,7 @@ local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent.Parent
 local withLocalization = require(ParentParent.Localization.withLocalization)
 local Assets = require(ParentParent.Resources.Assets)
@@ -27,18 +27,28 @@ function v18.init(p1) -- line: 38
 	p1.buttonRef = Roact.createRef()
 end
 function v18.render(p2) -- line: 42
-	-- upvalues: withStyle (copy), withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), GuiService (copy), Button (copy), ButtonType (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), GuiService (copy), Button (copy), ButtonType (copy)
 	local props = p2.props
 
-	return withStyle(function(p3) -- line: 45
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 45
+		return {
+			Font = {
+				BaseSize = 1,
+				Body = {
+					Font = p3.Typography.BodyLarge.Font,
+					RelativeSize = p3.Typography.BodyLarge.FontSize
+				}
+			}
+		}
+	end, function(p4) -- line: 52
 		-- upvalues: withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
 		return withLocalization({
 			errorOccured = "CoreScripts.InGameMenu.InviteFriends.ErrorOccured"
-		})(function(p4) -- line: 48
-			-- upvalues: p3 (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
-			local BodyFont = p3.Font.Body.Font
-			local v25 = p3.Font.Body.RelativeSize * p3.Font.BaseSize
-			local Y = TextService:GetTextSize(p4.errorOccured, v25, BodyFont, Vector2.new(304, 1e999)).Y
+		})(function(p5) -- line: 55
+			-- upvalues: p4 (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
+			local BodyFont = p4.Font.Body.Font
+			local v26 = p4.Font.Body.RelativeSize * p4.Font.BaseSize
+			local Y = TextService:GetTextSize(p5.errorOccured, v26, BodyFont, Vector2.new(304, 1e999)).Y
 
 			return Roact.createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -68,23 +78,23 @@ function v18.render(p2) -- line: 42
 						fontKey = "Body",
 						themeKey = "TextEmphasis",
 						TextWrapped = true,
-						Text = p4.errorOccured,
+						Text = p5.errorOccured,
 						Position = UDim2.new(0, 0, 0, 10),
 						Size = UDim2.new(1, 0, 1, -36),
 						TextXAlignment = Enum.TextXAlignment.Center
 					})
 				}),
 				RootedConnection = Roact.createElement(RootedConnection, {
-					render = function(p5) -- line: 98
+					render = function(p6) -- line: 105
 						-- upvalues: Roact (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy), Assets (copy)
 						return Roact.createElement(FocusHandler, {
-							isFocused = props.canCaptureFocus and p5,
-							didFocus = function() -- line: 102
+							isFocused = props.canCaptureFocus and p6,
+							didFocus = function() -- line: 109
 								-- upvalues: GuiService (copy), p2 (copy)
 								GuiService.SelectedCoreObject = p2.buttonRef:getValue()
 							end
 						}, {
-							RetryButton = p5 and Roact.createElement(Button, {
+							RetryButton = p6 and Roact.createElement(Button, {
 								layoutOrder = 3,
 								buttonType = ButtonType.Secondary,
 								size = UDim2.new(1, 0, 0, 48),

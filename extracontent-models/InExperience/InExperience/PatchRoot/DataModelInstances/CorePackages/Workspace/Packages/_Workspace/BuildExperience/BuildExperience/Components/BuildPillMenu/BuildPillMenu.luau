@@ -13,10 +13,10 @@ require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenu
 
 local useSessionSummary = require(BuildExperience.Chat.useSessionSummary)
 
-local function BuildPillMenu(t1: {[any]: any}) -- line: 36
+local function BuildPillMenu(t1: {[any]: any}) -- line: 43
 	-- upvalues: GetBuildOverflowMenuStore (copy), React (copy), CreatorAgentChat (copy), useSessionSummary (copy), View (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), IconName (copy)
 	local v14 = t1.store or GetBuildOverflowMenuStore()
-	local v15 = React.useMemo(function() -- line: 38
+	local v15 = React.useMemo(function() -- line: 45
 		-- upvalues: CreatorAgentChat (copy), t1 (copy)
 		return CreatorAgentChat.getCreatorAgentChatStore().getSessionForProject(t1.target.universeId, t1.target.placeId, t1.target.sessionId)
 	end, {
@@ -24,9 +24,10 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 36
 		t1.target.placeId,
 		t1.target.sessionId
 	})
-	local subagentTaskState = useSessionSummary(v15).subagentTaskState
-	local v17 = subagentTaskState ~= nil and #subagentTaskState.groups > 0
-	local v18 = React.useCallback(function(p1) -- line: 45
+	local v16 = useSessionSummary(v15)
+	local subagentTaskState = v16.subagentTaskState
+	local v18 = subagentTaskState ~= nil and #subagentTaskState.groups > 0
+	local v19 = React.useCallback(function(p1) -- line: 53
 		-- upvalues: t1 (copy)
 		if p1.type == "openPage" then
 			if t1.onOpenPage then
@@ -41,9 +42,9 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 36
 		t1.onAction,
 		t1.onOpenPage
 	})
-	local v19 = React.useCallback(function() -- line: 55
-		-- upvalues: v17 (copy), t1 (copy)
-		if not v17 then
+	local v20 = React.useCallback(function() -- line: 63
+		-- upvalues: v18 (copy), t1 (copy)
+		if not v18 then
 			return
 		end
 
@@ -51,7 +52,7 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 36
 			t1.onOpenAgentsPage()
 		end
 	end, {
-		v17,
+		v18,
 		t1.onOpenAgentsPage
 	})
 
@@ -65,15 +66,16 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 36
 		}, {
 			AgentDetail = React.createElement(AgentDetailMenu, {
 				layoutOrder = 1,
-				isDisabled = not v17,
-				onActivated = v19
+				isDisabled = not v18,
+				onActivated = v20
 			}),
 			Overflow = React.createElement(BuildOverflowMenuButton, {
 				layoutOrder = 2,
 				icon = IconName.ThreeDotsHorizontal,
 				store = v14,
 				target = t1.target,
-				onAction = v18
+				hasPublishedTurn = v16.hasPublishedTurn,
+				onAction = v19
 			})
 		})
 	})

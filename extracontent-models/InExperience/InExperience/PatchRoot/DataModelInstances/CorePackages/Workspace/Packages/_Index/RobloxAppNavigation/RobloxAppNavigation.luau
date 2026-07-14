@@ -1,7 +1,9 @@
 local NavigationCommands = require(script.NavigationCommands)
+local AppNavigationRegistry = require(script.AppNavigationRegistry)
 
 return {
-	AppNavigationRegistry = require(script.AppNavigationRegistry),
+	AppNavigationRegistry = AppNavigationRegistry,
+	isNavigationAvailable = AppNavigationRegistry.isRegistered,
 	NavigationCommands = NavigationCommands,
 	useNavigationProps = require(script.useNavigationProps),
 	withNavigationProps = require(script.withNavigationProps),

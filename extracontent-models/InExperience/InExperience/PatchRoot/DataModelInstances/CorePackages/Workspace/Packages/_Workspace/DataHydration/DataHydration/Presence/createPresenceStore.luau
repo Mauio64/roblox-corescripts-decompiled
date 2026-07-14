@@ -17,10 +17,10 @@ local v10 = game:DefineFastInt("RTEPresenceStorePollingTtlSec", 0)
 
 game:DefineFastInt("PresenceStoreProcessDelaySec", 1)
 
-local function getFIntPresenceStoreProcessDelaySec() -- line: 47
+local function getFIntPresenceStoreProcessDelaySec() -- line: 48
 	return game:GetFastInt("PresenceStoreProcessDelaySec")
 end
-local function createPresenceStore() -- line: 51
+local function createPresenceStore() -- line: 52
 	-- upvalues: createDataCache (copy), v9 (copy), v10 (copy), createDataResolver (copy), Cryo (copy), Requests (copy), normalizePresenceRawData (copy), Signals (copy)
 	local v13 = createDataCache(v9)
 	local v14 = createDataCache(not (v10 > 0) and 1e999 or v10)
@@ -29,19 +29,19 @@ local function createPresenceStore() -- line: 51
 	local v17 = createDataResolver({
 		cache = v13,
 		queueProcessDelaySec = game:GetFastInt("PresenceStoreProcessDelaySec"),
-		fetchFn = function(t3: {[any]: any}) -- line: 85
+		fetchFn = function(t3: {[any]: any}) -- line: 86
 			-- upvalues: Cryo (copy), Requests (copy), normalizePresenceRawData (copy)
 			local v20 = Cryo.Dictionary.keys(t3)
 
-			return Requests.MultiGetPresenceByUserIds(v20):andThen(function(p1) -- line: 87
+			return Requests.MultiGetPresenceByUserIds(v20):andThen(function(p1) -- line: 88
 				-- upvalues: normalizePresenceRawData (copy)
 				local t4 = {}
 
-				for _, v36 in p1 and (not not p1.responseBody and p1.responseBody.userPresences) or {} do
-					local v37 = normalizePresenceRawData(v36)
+				for _, v37 in p1 and (not not p1.responseBody and p1.responseBody.userPresences) or {} do
+					local v38 = normalizePresenceRawData(v37)
 
-					if v37 then
-						t4[v37.id] = v37
+					if v38 then
+						t4[v38.id] = v38
 					end
 				end
 
@@ -50,29 +50,29 @@ local function createPresenceStore() -- line: 51
 		end
 	})
 
-	local function disposeLockAwarePresenceEffects() -- line: 138
+	local function disposeLockAwarePresenceEffects() -- line: 143
 		-- upvalues: t2 (copy)
-		for _, v28 in t2 do
-			v28()
+		for _, v29 in t2 do
+			v29()
 		end
 
 		table.clear(t2)
 	end
 
 	return {
-		GetPresenceByUserId = function(s1: string, t5: {[any]: any}?) -- line: 105
+		GetPresenceByUserId = function(s1: string, t5: {[any]: any}?) -- line: 106
 			-- upvalues: v17 (copy), t2 (copy), Signals (copy), v14 (copy)
 			if t5 and t5.skipFetch == true then
 				return v17.getCachedItem(s1)
 			end
 
 			if t2[s1] == nil then
-				t2[s1] = Signals.createEffect(function(p2) -- line: 111
+				t2[s1] = Signals.createEffect(function(p2) -- line: 112
 					-- upvalues: v14 (copy), s1 (copy), v17 (copy)
-					local v39, _ = v14.getItem(s1)
-					local v41 = v17.getCachedItem(s1)
+					local v40, _ = v14.getItem(s1)
+					local v42 = v17.getCachedItem(s1)
 
-					if v39.data(p2) == true and v41 ~= nil then
+					if v40.data(p2) == true and v42 ~= nil then
 						return
 					end
 
@@ -82,7 +82,7 @@ local function createPresenceStore() -- line: 51
 
 			return v17.getCachedItem(s1)
 		end,
-		UpdateUserPresence = function(s2: string, p3, t6: {[any]: any}?) -- line: 126
+		UpdateUserPresence = function(s2: string, p3, t6: {[any]: any}?) -- line: 127
 			-- upvalues: v13 (copy), v14 (copy), t1 (copy)
 			v13.replaceItem(s2, p3)
 
@@ -91,20 +91,24 @@ local function createPresenceStore() -- line: 51
 			v14.replaceItem(s2, v26)
 			t1[s2] = v26
 		end,
-		clear = function() -- line: 145
+		RefreshPresenceByUserId = function(s3: string) -- line: 139
+			-- upvalues: v17 (copy)
+			v17.fetchItem(s3)
+		end,
+		clear = function() -- line: 150
 			-- upvalues: t2 (copy), v14 (copy), v17 (copy)
-			for _, v30 in t2 do
-				v30()
+			for _, v31 in t2 do
+				v31()
 			end
 
 			table.clear(t2)
 			v14.clear()
 			v17.clear()
 		end,
-		dispose = function() -- line: 151
+		dispose = function() -- line: 156
 			-- upvalues: t2 (copy), v14 (copy), v17 (copy)
-			for _, v32 in t2 do
-				v32()
+			for _, v33 in t2 do
+				v33()
 			end
 
 			table.clear(t2)

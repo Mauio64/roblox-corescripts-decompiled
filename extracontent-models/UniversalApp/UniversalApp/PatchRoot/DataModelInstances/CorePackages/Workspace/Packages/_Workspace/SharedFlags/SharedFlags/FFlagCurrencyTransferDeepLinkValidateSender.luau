@@ -1,3 +1,0 @@
-local FFlagEnableCurrencyTransferDeepLink = require(script.Parent.FFlagEnableCurrencyTransferDeepLink)
-
-return game:DefineFastFlag("CurrencyTransferDeepLinkValidateSender", false) and FFlagEnableCurrencyTransferDeepLink

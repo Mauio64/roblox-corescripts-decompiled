@@ -11,24 +11,26 @@ local t1 = {}
 
 t1.__index = t1
 
-function t1._new() -- line: 52
+function t1._new() -- line: 66
 	-- upvalues: t1 (copy)
 	local t2 = {
 		_visible = false,
 		_wasVisible = false,
 		unreadCount = 0,
 		currentSquadId = "",
+		requestedRoute = nil,
 		topMargin = 12,
 		visibilitySignal = Instance.new("BindableEvent"),
 		unreadCountSignal = Instance.new("BindableEvent"),
-		currentSquadIdSignal = Instance.new("BindableEvent")
+		currentSquadIdSignal = Instance.new("BindableEvent"),
+		requestedRouteSignal = Instance.new("BindableEvent")
 	}
 
 	setmetatable(t2, t1)
 
 	return t2
 end
-function t1.initialize(p1, n1: number?, p2, p3, p4, p5) -- line: 68
+function t1.initialize(p1, n1: number?, p2, p3, p4, p5) -- line: 84
 	-- upvalues: Tokens (copy), Constants (copy), getFFlagAppChatInExperienceTabBarAdjustment (copy)
 	if n1 then
 		p1.topMargin = n1
@@ -44,7 +46,7 @@ function t1.initialize(p1, n1: number?, p2, p3, p4, p5) -- line: 68
 	p1.chatSelector = p4
 	p1.playerListManager = p5
 end
-function t1.setVisible(p6, b1: boolean) -- line: 92
+function t1.setVisible(p6, b1: boolean) -- line: 108
 	-- upvalues: CoreGui (copy), getFFlagAppChatInExperienceTabBarAdjustment (copy), GuiService (copy), v8 (copy)
 	if b1 == p6._visible then
 		return
@@ -94,15 +96,15 @@ function t1.setVisible(p6, b1: boolean) -- line: 92
 		ImageButton.Parent = ScreenGui
 
 		if getFFlagAppChatInExperienceTabBarAdjustment() and p6.viewportUtil then
-			local function v24() -- line: 137
+			local function v24() -- line: 153
 				-- upvalues: p6 (copy), UIPadding (copy), GuiService (copy)
-				local v34 = p6.viewportUtil.screenSize:get()
+				local v37 = p6.viewportUtil.screenSize:get()
 
-				if not v34 or (not v34.X or not v34.Y) then
+				if not v37 or (not v37.X or not v37.Y) then
 					return
 				end
 
-				if v34.Y > v34.X then
+				if v37.Y > v37.X then
 					UIPadding.PaddingBottom = UDim.new(0, 0)
 
 					return
@@ -144,23 +146,32 @@ function t1.setVisible(p6, b1: boolean) -- line: 92
 		p6.settingsHub:SetBackgroundVisibility(b1, false)
 	end
 end
-function t1.toggleVisibility(p7) -- line: 188
+function t1.toggleVisibility(p7) -- line: 204
 	if p7.default then
 		local _visible = p7.default._visible
 
 		p7.default:setVisible(not _visible)
 	end
 end
-function t1.getVisible(p8) -- line: 196
+function t1.getVisible(p8) -- line: 212
 	return p8.default._visible
 end
-function t1.setUnreadCount(t3: {[any]: any}, n2: number) -- line: 201
+function t1.setUnreadCount(t3: {[any]: any}, n2: number) -- line: 217
 	t3.default.unreadCount = n2
 	t3.default.unreadCountSignal:Fire(n2)
 end
-function t1.setCurrentSquadId(t4: {[any]: any}, s1: string) -- line: 206
+function t1.setCurrentSquadId(t4: {[any]: any}, s1: string) -- line: 222
 	t4.default.currentSquadId = s1
 	t4.default.currentSquadIdSignal:Fire(s1)
+end
+function t1.openToScreen(p9, t5: {[any]: any}) -- line: 227
+	p9.requestedRoute = t5
+	p9.requestedRouteSignal:Fire(t5)
+	p9:setVisible(true)
+end
+function t1.clearRequestedRoute(p10) -- line: 233
+	p10.requestedRoute = nil
+	p10.requestedRouteSignal:Fire(nil)
 end
 
 t1.default = t1._new()

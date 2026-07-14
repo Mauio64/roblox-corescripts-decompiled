@@ -3,5 +3,7 @@ local PlaceVersionHistoryStoreTypes = require(script.PlaceVersionHistoryStoreTyp
 return {
 	createPlaceVersionHistoryStore = require(script.createPlaceVersionHistoryStore),
 	getPlaceVersionHistoryStore = require(script.getPlaceVersionHistoryStore),
-	PlaceVersionHistoryStoreTypes = PlaceVersionHistoryStoreTypes
+	PlaceVersionHistoryStoreTypes = PlaceVersionHistoryStoreTypes,
+	SaveType = PlaceVersionHistoryStoreTypes.SaveType,
+	PublishStatus = PlaceVersionHistoryStoreTypes.PublishStatus
 }

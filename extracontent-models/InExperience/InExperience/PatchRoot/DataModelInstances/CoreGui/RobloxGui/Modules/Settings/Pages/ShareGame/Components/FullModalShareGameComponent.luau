@@ -35,6 +35,7 @@ function v16.render(p1) -- line: 31
 	local inviteMessageId = p1.props.inviteMessageId
 	local launchData = p1.props.launchData
 	local isLoading = p1.props.isLoading
+	local requestImpl = p1.props.requestImpl
 
 	if GetFFlagExtraInviteModalStringValidation() and promptMessage then
 		if not inviteUserId then
@@ -66,7 +67,8 @@ function v16.render(p1) -- line: 31
 					inviteUserId = inviteUserId,
 					inviteMessageId = inviteMessageId,
 					launchData = launchData,
-					onAfterClosePage = function() -- line: 74
+					requestImpl = requestImpl,
+					onAfterClosePage = function() -- line: 76
 						-- upvalues: store (copy), onAfterClosePage (copy)
 						local t1 = {}
 

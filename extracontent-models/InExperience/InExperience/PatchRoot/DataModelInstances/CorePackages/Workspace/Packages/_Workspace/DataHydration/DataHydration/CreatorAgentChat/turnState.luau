@@ -1,15 +1,15 @@
 require(script.Parent.types)
 
-local function getSequenceIndex(p1) -- line: 45
-	local v29 = if p1 == nil then nil else p1.sequenceNumber
+local function getSequenceIndex(p1) -- line: 43
+	local v28 = if p1 == nil then nil else p1.sequenceNumber
 
-	if typeof(v29) ~= "number" or v29 < 0 then
+	if typeof(v28) ~= "number" or v28 < 0 then
 		return nil
 	end
 
-	return v29 + 1
+	return v28 + 1
 end
-local function getMessageId(p2) -- line: 53
+local function getMessageId(p2) -- line: 51
 	local messageId = p2.messageId
 
 	if typeof(messageId) == "string" and messageId ~= "" then
@@ -18,202 +18,191 @@ local function getMessageId(p2) -- line: 53
 
 	return nil
 end
-local function cloneArray(t1: {[any]: any}) -- line: 58
+local function cloneArray(t1: {[any]: any}) -- line: 56
 	local t2 = {}
 
-	for _, v35 in t1 do
-		table.insert(t2, v35)
+	for _, v34 in t1 do
+		table.insert(t2, v34)
 	end
 
 	return t2
 end
-local function contentBlocksToText(t3: {[any]: any}) -- line: 66
+local function contentBlocksToText(t3: {[any]: any}) -- line: 64
 	local t4 = {}
 
-	for _, v39 in t3 do
-		if v39.type == "text" and typeof(v39.text) == "string" then
-			table.insert(t4, v39.text)
+	for _, v38 in t3 do
+		if v38.type == "text" and typeof(v38.text) == "string" then
+			table.insert(t4, v38.text)
 		end
 	end
 
 	return table.concat(t4)
 end
-local function messageMapToText(t5: {[any]: any}, t6: {[any]: any}) -- line: 76
+local function messageMapToText(t5: {[any]: any}, t6: {[any]: any}) -- line: 74
 	-- upvalues: contentBlocksToText (copy)
 	local t7 = {}
 
-	for _, v44 in t6 do
-		local v45 = t5[v44]
+	for _, v43 in t6 do
+		local v44 = t5[v43]
 
-		if v45 ~= nil then
-			table.insert(t7, contentBlocksToText(v45))
+		if v44 ~= nil then
+			table.insert(t7, contentBlocksToText(v44))
 		end
 	end
 
 	return table.concat(t7)
 end
-local function ensureMessageOrder(t8: {[any]: any}, s1: string) -- line: 87
-	for _, v49 in t8 do
-		if v49 == s1 then
+local function ensureMessageOrder(t8: {[any]: any}, s1: string) -- line: 85
+	for _, v48 in t8 do
+		if v48 == s1 then
 			return t8
 		end
 	end
 
 	local t9 = {}
 
-	for _, v52 in t8 do
-		table.insert(t9, v52)
+	for _, v51 in t8 do
+		table.insert(t9, v51)
 	end
 
 	table.insert(t9, s1)
 
 	return t9
 end
-local function replaceMessageContent(t10: {[any]: any}, t11: {[any]: any}, s2: string, t12: {[any]: any}) -- line: 98
-	local v57 = table.clone(t10)
+local function replaceMessageContent(t10: {[any]: any}, t11: {[any]: any}, s2: string, t12: {[any]: any}) -- line: 96
+	local v56 = table.clone(t10)
 	local t13 = {}
 
-	for _, v60 in t12 do
-		table.insert(t13, v60)
+	for _, v59 in t12 do
+		table.insert(t13, v59)
 	end
 
-	v57[s2] = t13
+	v56[s2] = t13
 
-	for _, v62 in t11 do
-		if v62 == s2 then
-			return v57, t11
+	for _, v61 in t11 do
+		if v61 == s2 then
+			return v56, t11
 		end
 	end
 
 	local t14 = {}
 
-	for _, v65 in t11 do
-		table.insert(t14, v65)
+	for _, v64 in t11 do
+		table.insert(t14, v64)
 	end
 
 	table.insert(t14, s2)
 
-	return v57, t14
+	return v56, t14
 end
-local function appendMessageContent(t15: {[any]: any}, t16: {[any]: any}, s3: string, p3) -- line: 109
-	local v70 = table.clone(t15)
-	local v71 = v70[s3]
+local function appendMessageContent(t15: {[any]: any}, t16: {[any]: any}, s3: string, p3) -- line: 107
+	local v69 = table.clone(t15)
+	local v70 = v69[s3]
 	local t17
 
-	if v71 ~= nil then
+	if v70 ~= nil then
 		t17 = {}
 
-		for _, v74 in v71 do
-			table.insert(t17, v74)
+		for _, v73 in v70 do
+			table.insert(t17, v73)
 		end
 	else
 		t17 = {}
 	end
 
 	table.insert(t17, p3)
-	v70[s3] = t17
+	v69[s3] = t17
 
-	for _, v76 in t16 do
-		if v76 == s3 then
-			return v70, t16
+	for _, v75 in t16 do
+		if v75 == s3 then
+			return v69, t16
 		end
 	end
 
 	local t18 = {}
 
-	for _, v79 in t16 do
-		table.insert(t18, v79)
+	for _, v78 in t16 do
+		table.insert(t18, v78)
 	end
 
 	table.insert(t18, s3)
 
-	return v70, t18
+	return v69, t18
 end
-local function buildContiguousThoughtText(t19: {[any]: any}) -- line: 123
-	local t20 = {}
+local function buildActivityItems(t19: {[any]: any}, t20: {[any]: any}) -- line: 121
+	local t21 = {}
+	local t22 = {}
 
-	for i = 1, #t19 do
-		local v83 = t19[i]
-
-		if v83 ~= "" then
-			table.insert(t20, v83)
-		end
+	for v83 in t19 do
+		table.insert(t22, v83)
 	end
 
-	return table.concat(t20)
-end
-local function buildActivityItems(t21: {[any]: any}, t22: {[any]: any}) -- line: 134
-	local t23 = {}
-	local t24 = {}
-	local t25 = {}
+	table.sort(t22)
 
-	local function flushThought() -- line: 142
-		-- upvalues: t24 (ref), t23 (copy)
-		if #t24 == 0 then
-			return
-		end
+	for _, v85 in t22 do
+		local v86 = t19[v85]
 
-		table.insert(t23, {
-			kind = "thought",
-			text = table.concat(t24)
-		})
-		t24 = {}
-	end
-
-	for v90 in t21 do
-		table.insert(t25, v90)
-	end
-
-	table.sort(t25)
-
-	for _, v92 in t25 do
-		local v93 = t21[v92]
-
-		if v93.kind == "agent_message" then
-			flushThought()
-			table.insert(t23, {
+		if v86.kind == "agent_message" then
+			table.insert(t21, {
 				kind = "agent_message",
-				text = v93.text
+				text = v86.text
 			})
-		elseif v93.kind == "thought" then
-			table.insert(t24, v93.text)
-		elseif v93.kind == "tool_call" then
-			flushThought()
+		elseif v86.kind == "tool_call" then
+			local v87 = t20[v86.toolCallId]
 
-			local v94 = t22[v93.toolCallId]
-
-			table.insert(t23, {
+			table.insert(t21, {
 				kind = "tool_call",
-				toolCallId = v93.toolCallId,
-				title = if not v94 then nil else v94.title,
-				status = if not v94 then nil else v94.status
+				toolCallId = v86.toolCallId,
+				title = if not v87 then nil else v87.title,
+				status = if not v87 then nil else v87.status
 			})
 		end
 	end
 
-	flushThought()
-
-	return t23
+	return t21
 end
-local function refreshActivityItems(p4) -- line: 184
+local function refreshActivityItems(p4) -- line: 154
 	-- upvalues: buildActivityItems (copy)
 	p4.activityItems = buildActivityItems(p4.activitySlots, p4.toolCalls)
 end
-local function recordActivitySlotAtIndex(p5, n1: number, p6) -- line: 188
+local function recordActivitySlotAtIndex(p5, n1: number, p6) -- line: 158
 	-- upvalues: buildActivityItems (copy)
 	if n1 <= 0 then
 		return
 	end
 
-	local v99 = table.clone(p5.activitySlots)
+	local v92 = table.clone(p5.activitySlots)
 
-	v99[n1] = p6
-	p5.activitySlots = v99
+	v92[n1] = p6
+	p5.activitySlots = v92
 	p5.activityItems = buildActivityItems(p5.activitySlots, p5.toolCalls)
 end
-local function recordActivitySlot(p7, p8, p9) -- line: 199
+local function recordActivitySlot(p7, p8, p9) -- line: 169
 	-- upvalues: buildActivityItems (copy)
-	local v103 = if p8 == nil then nil else p8.sequenceNumber
+	local v96 = if p8 == nil then nil else p8.sequenceNumber
+	local v97 = if typeof(v96) == "number" and not (v96 < 0) then v96 + 1 else nil
+
+	if v97 == nil then
+		return
+	end
+
+	if v97 <= 0 then
+		return
+	end
+
+	local v98 = table.clone(p7.activitySlots)
+
+	v98[v97] = p9
+	p7.activitySlots = v98
+	p7.activityItems = buildActivityItems(p7.activitySlots, p7.toolCalls)
+end
+local function recordToolCallSequenceSlot(p10, p11, s4: string) -- line: 178
+	-- upvalues: buildActivityItems (copy)
+	local t23 = {
+		kind = "tool_call",
+		toolCallId = s4
+	}
+	local v103 = if p11 == nil then nil else p11.sequenceNumber
 	local v104 = if typeof(v103) == "number" and not (v103 < 0) then v103 + 1 else nil
 
 	if v104 == nil then
@@ -224,245 +213,197 @@ local function recordActivitySlot(p7, p8, p9) -- line: 199
 		return
 	end
 
-	local v105 = table.clone(p7.activitySlots)
+	local v105 = table.clone(p10.activitySlots)
 
-	v105[v104] = p9
-	p7.activitySlots = v105
-	p7.activityItems = buildActivityItems(p7.activitySlots, p7.toolCalls)
-end
-local function recordThoughtSequenceSlot(p10, p11, s4: string?) -- line: 208
-	-- upvalues: buildContiguousThoughtText (copy), buildActivityItems (copy)
-	local v109 = if p11 == nil then nil else p11.sequenceNumber
-	local v110 = if typeof(v109) == "number" and not (v109 < 0) then v109 + 1 else nil
-
-	if v110 == nil then
-		return
-	end
-
-	if s4 == nil then
-		local v111 = table.clone(p10.thoughtChunks)
-
-		v111[v110] = v111[v110] or ""
-		p10.thoughtChunks = v111
-		p10.thoughtText = buildContiguousThoughtText(v111)
-
-		local t26 = {
-			kind = "empty"
-		}
-		local v113 = if p11 == nil then nil else p11.sequenceNumber
-		local v114 = if typeof(v113) == "number" and not (v113 < 0) then v113 + 1 else nil
-
-		if v114 == nil then
-			return
-		end
-
-		if v114 <= 0 then
-			return
-		end
-
-		local v115 = table.clone(p10.activitySlots)
-
-		v115[v114] = t26
-		p10.activitySlots = v115
-		p10.activityItems = buildActivityItems(p10.activitySlots, p10.toolCalls)
-
-		return
-	end
-
-	local v116 = table.clone(p10.thoughtChunks)
-
-	v116[v110] = s4
-	p10.thoughtChunks = v116
-	p10.thoughtText = buildContiguousThoughtText(v116)
-
-	local t27 = {
-		kind = "thought",
-		text = s4
-	}
-	local v118 = if p11 == nil then nil else p11.sequenceNumber
-	local v119 = if typeof(v118) == "number" and not (v118 < 0) then v118 + 1 else nil
-
-	if v119 == nil then
-		return
-	end
-
-	if v119 <= 0 then
-		return
-	end
-
-	local v120 = table.clone(p10.activitySlots)
-
-	v120[v119] = t27
-	p10.activitySlots = v120
+	v105[v104] = t23
+	p10.activitySlots = v105
 	p10.activityItems = buildActivityItems(p10.activitySlots, p10.toolCalls)
 end
-local function recordToolCallSequenceSlot(p12, p13, s5: string) -- line: 230
-	-- upvalues: buildActivityItems (copy)
-	local t28 = {
-		kind = "tool_call",
-		toolCallId = s5
-	}
-	local v125 = if p13 == nil then nil else p13.sequenceNumber
-	local v126 = if typeof(v125) == "number" and not (v125 < 0) then v125 + 1 else nil
-
-	if v126 == nil then
-		return
-	end
-
-	if v126 <= 0 then
-		return
-	end
-
-	local v127 = table.clone(p12.activitySlots)
-
-	v127[v126] = t28
-	p12.activitySlots = v127
-	p12.activityItems = buildActivityItems(p12.activitySlots, p12.toolCalls)
-end
-local function hasToolCallActivitySlot(p14, s6: string) -- line: 234
-	for _, v131 in p14.activitySlots do
-		if v131.kind == "tool_call" and s6 == v131.toolCallId then
+local function hasToolCallActivitySlot(p12, s5: string) -- line: 182
+	for _, v109 in p12.activitySlots do
+		if v109.kind == "tool_call" and s5 == v109.toolCallId then
 			return true
 		end
 	end
 
 	return false
 end
-local function clearPendingAgentMessage(p15) -- line: 243
-	p15.pendingAgentMessageId = nil
-	p15.pendingAgentMessageContent = {}
-	p15.pendingAgentMessageSequenceIndex = nil
+local function clearPendingAgentMessage(p13) -- line: 191
+	p13.pendingAgentMessageId = nil
+	p13.pendingAgentMessageContent = {}
+	p13.pendingAgentMessageSequenceIndex = nil
 end
-local function appendPendingAgentMessage(p16, s7: string, p17, p18) -- line: 249
+local function appendPendingAgentMessage(p14, s6: string, p15, p16) -- line: 197
 	-- upvalues: contentBlocksToText (copy), buildActivityItems (copy)
-	if p16.pendingAgentMessageId ~= nil and s7 ~= p16.pendingAgentMessageId then
-		local v137 = contentBlocksToText(p16.pendingAgentMessageContent)
+	if p14.pendingAgentMessageId ~= nil and s6 ~= p14.pendingAgentMessageId then
+		local v115 = contentBlocksToText(p14.pendingAgentMessageContent)
 
-		if v137 ~= "" then
-			local pendingAgentMessageSequenceIndex = p16.pendingAgentMessageSequenceIndex
+		if v115 ~= "" then
+			local pendingAgentMessageSequenceIndex = p14.pendingAgentMessageSequenceIndex
 
 			if pendingAgentMessageSequenceIndex ~= nil then
-				local t29 = {
+				local t24 = {
 					kind = "agent_message",
-					text = v137
+					text = v115
 				}
 
 				if not (pendingAgentMessageSequenceIndex <= 0) then
-					local v140 = table.clone(p16.activitySlots)
+					local v118 = table.clone(p14.activitySlots)
 
-					v140[pendingAgentMessageSequenceIndex] = t29
-					p16.activitySlots = v140
-					p16.activityItems = buildActivityItems(p16.activitySlots, p16.toolCalls)
+					v118[pendingAgentMessageSequenceIndex] = t24
+					p14.activitySlots = v118
+					p14.activityItems = buildActivityItems(p14.activitySlots, p14.toolCalls)
 				end
 			end
 		end
 
-		p16.pendingAgentMessageId = nil
-		p16.pendingAgentMessageContent = {}
-		p16.pendingAgentMessageSequenceIndex = nil
+		p14.pendingAgentMessageId = nil
+		p14.pendingAgentMessageContent = {}
+		p14.pendingAgentMessageSequenceIndex = nil
 	end
 
-	local t30 = {}
+	local t25 = {}
 
-	for _, v143 in p16.pendingAgentMessageContent do
-		table.insert(t30, v143)
+	for _, v121 in p14.pendingAgentMessageContent do
+		table.insert(t25, v121)
 	end
 
-	table.insert(t30, p17)
-	p16.pendingAgentMessageId = s7
-	p16.pendingAgentMessageContent = t30
+	table.insert(t25, p15)
+	p14.pendingAgentMessageId = s6
+	p14.pendingAgentMessageContent = t25
 
-	if p16.pendingAgentMessageSequenceIndex == nil then
-		local v144 = if p18 == nil then nil else p18.sequenceNumber
+	if p14.pendingAgentMessageSequenceIndex == nil then
+		local v122 = if p16 == nil then nil else p16.sequenceNumber
 
-		p16.pendingAgentMessageSequenceIndex = if typeof(v144) == "number" and not (v144 < 0) then v144 + 1 else nil
+		p14.pendingAgentMessageSequenceIndex = if typeof(v122) == "number" and not (v122 < 0) then v122 + 1 else nil
 	end
 end
-local function flushPendingAgentMessageToActivity(p19) -- line: 275
+local function flushPendingAgentMessageToActivity(p17) -- line: 223
 	-- upvalues: contentBlocksToText (copy), buildActivityItems (copy)
-	local v146 = contentBlocksToText(p19.pendingAgentMessageContent)
+	local v124 = contentBlocksToText(p17.pendingAgentMessageContent)
 
-	if v146 ~= "" then
-		local pendingAgentMessageSequenceIndex = p19.pendingAgentMessageSequenceIndex
+	if v124 ~= "" then
+		local pendingAgentMessageSequenceIndex = p17.pendingAgentMessageSequenceIndex
 
 		if pendingAgentMessageSequenceIndex ~= nil then
-			local t31 = {
+			local t26 = {
 				kind = "agent_message",
-				text = v146
+				text = v124
 			}
 
 			if not (pendingAgentMessageSequenceIndex <= 0) then
-				local v149 = table.clone(p19.activitySlots)
+				local v127 = table.clone(p17.activitySlots)
 
-				v149[pendingAgentMessageSequenceIndex] = t31
-				p19.activitySlots = v149
-				p19.activityItems = buildActivityItems(p19.activitySlots, p19.toolCalls)
+				v127[pendingAgentMessageSequenceIndex] = t26
+				p17.activitySlots = v127
+				p17.activityItems = buildActivityItems(p17.activitySlots, p17.toolCalls)
 			end
 		end
 	end
 
-	p19.pendingAgentMessageId = nil
-	p19.pendingAgentMessageContent = {}
-	p19.pendingAgentMessageSequenceIndex = nil
+	p17.pendingAgentMessageId = nil
+	p17.pendingAgentMessageContent = {}
+	p17.pendingAgentMessageSequenceIndex = nil
 end
-local function flushPendingAgentMessageToAssistant(p20) -- line: 286
+local function flushPendingAgentMessageToAssistant(p18) -- line: 234
 	-- upvalues: appendMessageContent (copy), messageMapToText (copy)
-	local pendingAgentMessageId = p20.pendingAgentMessageId
+	local pendingAgentMessageId = p18.pendingAgentMessageId
 
 	if pendingAgentMessageId == nil then
-		p20.pendingAgentMessageId = nil
-		p20.pendingAgentMessageContent = {}
-		p20.pendingAgentMessageSequenceIndex = nil
+		p18.pendingAgentMessageId = nil
+		p18.pendingAgentMessageContent = {}
+		p18.pendingAgentMessageSequenceIndex = nil
 
 		return
 	end
 
-	local assistantMessages = p20.assistantMessages
-	local assistantMessageOrder = p20.assistantMessageOrder
+	local assistantMessages = p18.assistantMessages
+	local assistantMessageOrder = p18.assistantMessageOrder
 
-	for _, v155 in p20.pendingAgentMessageContent do
-		assistantMessages, assistantMessageOrder = appendMessageContent(assistantMessages, assistantMessageOrder, pendingAgentMessageId, v155)
+	for _, v133 in p18.pendingAgentMessageContent do
+		assistantMessages, assistantMessageOrder = appendMessageContent(assistantMessages, assistantMessageOrder, pendingAgentMessageId, v133)
 	end
 
-	p20.assistantMessages = assistantMessages
-	p20.assistantMessageOrder = assistantMessageOrder
-	p20.assistantText = messageMapToText(assistantMessages, assistantMessageOrder)
-	p20.pendingAgentMessageId = nil
-	p20.pendingAgentMessageContent = {}
-	p20.pendingAgentMessageSequenceIndex = nil
+	p18.assistantMessages = assistantMessages
+	p18.assistantMessageOrder = assistantMessageOrder
+	p18.assistantText = messageMapToText(assistantMessages, assistantMessageOrder)
+	p18.pendingAgentMessageId = nil
+	p18.pendingAgentMessageContent = {}
+	p18.pendingAgentMessageSequenceIndex = nil
 end
-local function extractRobloxMeta(p21) -- line: 304
-	local v157 = p21._meta and p21._meta._roblox
+local function extractRobloxMeta(p19) -- line: 252
+	local v135 = p19._meta and p19._meta._roblox
 
-	if typeof(v157) == "table" then
-		return v157
-	end
-
-	return nil
-end
-local function extractTurnId(p22) -- line: 309
-	local v159 = p22._meta and p22._meta._roblox
-	local v160 = if typeof(v159) ~= "table" then nil else v159
-	local v161 = if typeof(v160) ~= "table" then nil else v160.turnId
-
-	if typeof(v161) == "number" and v161 > 0 then
-		return v161
+	if typeof(v135) == "table" then
+		return v135
 	end
 
 	return nil
 end
-local function extractReferenceId(p23) -- line: 315
-	local v163 = p23._meta and p23._meta._roblox
-	local v164 = if typeof(v163) ~= "table" then nil else v163
-	local v165 = if typeof(v164) ~= "table" then nil else v164.referenceId
+local function recordEventMeta(p20, n2: number?, p21) -- line: 257
+	if typeof(n2) ~= "number" or n2 < 0 then
+		return
+	end
 
-	if typeof(v165) == "string" and v165 ~= "" then
-		return v165
+	local v139 = p21._meta and p21._meta._roblox
+	local v140 = if typeof(v139) ~= "table" then nil else v139
+
+	if v140 == nil then
+		return
+	end
+
+	local turnId = v140.turnId
+	local emittedTime = v140.emittedTime
+	local referenceId = v140.referenceId
+	local v144 = typeof(turnId) == "number" and turnId > 0
+	local v145 = typeof(emittedTime) == "string" and emittedTime ~= ""
+	local v146 = typeof(referenceId) == "string" and referenceId ~= ""
+
+	if not v144 and not v145 and not v146 then
+		return
+	end
+
+	local v147 = if p20.eventMetaBySequenceId == nil then {} else table.clone(p20.eventMetaBySequenceId)
+	local v148 = if v147[n2] == nil then {} else table.clone(v147[n2])
+
+	if v144 then
+		v148.turnId = turnId
+	end
+
+	if v145 then
+		v148.emittedTime = emittedTime
+	end
+
+	if v146 then
+		v148.referenceId = referenceId
+	end
+
+	v147[n2] = v148
+	p20.eventMetaBySequenceId = v147
+end
+local function extractTurnId(p22) -- line: 296
+	local v150 = p22._meta and p22._meta._roblox
+	local v151 = if typeof(v150) ~= "table" then nil else v150
+	local v152 = if typeof(v151) ~= "table" then nil else v151.turnId
+
+	if typeof(v152) == "number" and v152 > 0 then
+		return v152
 	end
 
 	return nil
 end
-local function applyToolCallUpdate(p24, p25, p26) -- line: 321
+local function extractReferenceId(p23) -- line: 302
+	local v154 = p23._meta and p23._meta._roblox
+	local v155 = if typeof(v154) ~= "table" then nil else v154
+	local v156 = if typeof(v155) ~= "table" then nil else v155.referenceId
+
+	if typeof(v156) == "string" and v156 ~= "" then
+		return v156
+	end
+
+	return nil
+end
+local function applyToolCallUpdate(p24, p25, p26) -- line: 308
 	-- upvalues: buildActivityItems (copy)
 	local toolCallId = p25.toolCallId
 
@@ -470,112 +411,112 @@ local function applyToolCallUpdate(p24, p25, p26) -- line: 321
 		return
 	end
 
-	local v170 = p24.toolCalls[toolCallId]
-	local v171 = v170 == nil
-	local v172 = if v170 == nil then {
+	local v161 = p24.toolCalls[toolCallId]
+	local v162 = v161 == nil
+	local v163 = if v161 == nil then {
 		toolCallId = toolCallId
-	} else table.clone(v170)
-	local g185 = nil
-	local v184 = nil
+	} else table.clone(v161)
+	local g176 = nil
+	local v175 = nil
 
 	if p25.title ~= nil then
-		v172.title = p25.title
+		v163.title = p25.title
 	end
 
 	if p25.kind ~= nil then
-		v172.kind = p25.kind
+		v163.kind = p25.kind
 	end
 
 	if p25.status ~= nil then
-		v172.status = p25.status
+		v163.status = p25.status
 	end
 
 	if p25.rawInput ~= nil then
-		v172.rawInput = p25.rawInput
+		v163.rawInput = p25.rawInput
 	end
 
 	if p25.rawOutput ~= nil then
-		v172.rawOutput = p25.rawOutput
+		v163.rawOutput = p25.rawOutput
 	end
 
 	if p25.content ~= nil then
-		v172.content = p25.content
+		v163.content = p25.content
 	end
 
-	local v173 = p25._meta and p25._meta._roblox
-	local v174 = if typeof(v173) ~= "table" then nil else v173
-	local v175 = if typeof(v174) ~= "table" then nil else v174.turnId
-	local v176 = if typeof(v175) ~= "number" or not (v175 > 0) then nil else v175
+	local v164 = p25._meta and p25._meta._roblox
+	local v165 = if typeof(v164) ~= "table" then nil else v164
+	local v166 = if typeof(v165) ~= "table" then nil else v165.turnId
+	local v167 = if typeof(v166) ~= "number" or not (v166 > 0) then nil else v166
 
-	if v176 ~= nil then
-		v172.turnId = v176
+	if v167 ~= nil then
+		v163.turnId = v167
 	end
 
-	local v177 = p25._meta and p25._meta._roblox
-	local v178 = if typeof(v177) ~= "table" then nil else v177
-	local v179 = if typeof(v178) ~= "table" then nil else v178.referenceId
-	local v180 = if typeof(v179) ~= "string" or v179 == "" then nil else v179
+	local v168 = p25._meta and p25._meta._roblox
+	local v169 = if typeof(v168) ~= "table" then nil else v168
+	local v170 = if typeof(v169) ~= "table" then nil else v169.referenceId
+	local v171 = if typeof(v170) ~= "string" or v170 == "" then nil else v170
 
-	if v180 ~= nil then
-		v172.referenceId = v180
+	if v171 ~= nil then
+		v163.referenceId = v171
 	end
 
-	local v181 = table.clone(p24.toolCalls)
+	local v172 = table.clone(p24.toolCalls)
 
-	v181[toolCallId] = v172
-	p24.toolCalls = v181
+	v172[toolCallId] = v163
+	p24.toolCalls = v172
 
-	if v171 then
+	if v162 then
 		p24.toolCallCount = p24.toolCallCount + 1
 	end
 
-	if not v171 then
-		for _, v183 in p24.activitySlots do
-			if v183.kind == "tool_call" and toolCallId == v183.toolCallId then
-				v184 = true
-				g185 = true
+	if not v162 then
+		for _, v174 in p24.activitySlots do
+			if v174.kind == "tool_call" and toolCallId == v174.toolCallId then
+				v175 = true
+				g176 = true
 			end
 
-			if g185 then
+			if g176 then
 				break
 			end
 		end
 
-		if not g185 then
-			v184 = false
+		if not g176 then
+			v175 = false
 		end
 
-		g185 = false
+		g176 = false
 
-		if v184 then
+		if v175 then
 			p24.activityItems = buildActivityItems(p24.activitySlots, p24.toolCalls)
 
 			return
 		end
 	end
 
-	local t32 = {
+	local t27 = {
 		kind = "tool_call",
 		toolCallId = toolCallId
 	}
-	local v187 = if p26 == nil then nil else p26.sequenceNumber
-	local v188 = if typeof(v187) == "number" and not (v187 < 0) then v187 + 1 else nil
+	local v178 = if p26 == nil then nil else p26.sequenceNumber
+	local v179 = if typeof(v178) == "number" and not (v178 < 0) then v178 + 1 else nil
 
-	if v188 == nil then
+	if v179 == nil then
 		return
 	end
 
-	if v188 <= 0 then
+	if v179 <= 0 then
 		return
 	end
 
-	local v189 = table.clone(p24.activitySlots)
+	local v180 = table.clone(p24.activitySlots)
 
-	v189[v188] = t32
-	p24.activitySlots = v189
+	v180[v179] = t27
+	p24.activitySlots = v180
 	p24.activityItems = buildActivityItems(p24.activitySlots, p24.toolCalls)
 end
-local function applyToolCallContentChunk(p27, p28, p29) -- line: 370
+local function applyToolCallContentChunk(p27, p28, p29) -- line: 357
 	-- upvalues: buildActivityItems (copy)
 	local toolCallId = p28.toolCallId
 	local content = p28.content
@@ -584,335 +525,228 @@ local function applyToolCallContentChunk(p27, p28, p29) -- line: 370
 		return
 	end
 
-	local v195 = p27.toolCalls[toolCallId]
-	local v196 = v195 == nil
-	local v197 = if v195 == nil then {
+	local v186 = p27.toolCalls[toolCallId]
+	local v187 = v186 == nil
+	local v188 = if v186 == nil then {
 		toolCallId = toolCallId
-	} else table.clone(v195)
-	local content2 = v197.content
-	local g206 = nil
-	local v205 = nil
-	local t33
+	} else table.clone(v186)
+	local content2 = v188.content
+	local g197 = nil
+	local v196 = nil
+	local t28
 
 	if content2 ~= nil then
-		t33 = {}
+		t28 = {}
 
-		for _, v201 in content2 do
-			table.insert(t33, v201)
+		for _, v192 in content2 do
+			table.insert(t28, v192)
 		end
 	else
-		t33 = {}
+		t28 = {}
 	end
 
-	table.insert(t33, content)
-	v197.content = t33
+	table.insert(t28, content)
+	v188.content = t28
 
-	local v202 = table.clone(p27.toolCalls)
+	local v193 = table.clone(p27.toolCalls)
 
-	v202[toolCallId] = v197
-	p27.toolCalls = v202
+	v193[toolCallId] = v188
+	p27.toolCalls = v193
 
-	if v196 then
+	if v187 then
 		p27.toolCallCount = p27.toolCallCount + 1
 	end
 
-	if not v196 then
-		for _, v204 in p27.activitySlots do
-			if v204.kind == "tool_call" and toolCallId == v204.toolCallId then
-				v205 = true
-				g206 = true
+	if not v187 then
+		for _, v195 in p27.activitySlots do
+			if v195.kind == "tool_call" and toolCallId == v195.toolCallId then
+				v196 = true
+				g197 = true
 			end
 
-			if g206 then
+			if g197 then
 				break
 			end
 		end
 
-		if not g206 then
-			v205 = false
+		if not g197 then
+			v196 = false
 		end
 
-		g206 = false
+		g197 = false
 
-		if v205 then
+		if v196 then
 			p27.activityItems = buildActivityItems(p27.activitySlots, p27.toolCalls)
 
 			return
 		end
 	end
 
-	local t34 = {
+	local t29 = {
 		kind = "tool_call",
 		toolCallId = toolCallId
 	}
-	local v208 = if p29 == nil then nil else p29.sequenceNumber
-	local v209 = if typeof(v208) == "number" and not (v208 < 0) then v208 + 1 else nil
+	local v199 = if p29 == nil then nil else p29.sequenceNumber
+	local v200 = if typeof(v199) == "number" and not (v199 < 0) then v199 + 1 else nil
 
-	if v209 == nil then
+	if v200 == nil then
 		return
 	end
 
-	if v209 <= 0 then
+	if v200 <= 0 then
 		return
 	end
 
-	local v210 = table.clone(p27.activitySlots)
+	local v201 = table.clone(p27.activitySlots)
 
-	v210[v209] = t34
-	p27.activitySlots = v210
+	v201[v200] = t29
+	p27.activitySlots = v201
 	p27.activityItems = buildActivityItems(p27.activitySlots, p27.toolCalls)
 end
 
 return {
-	applySessionUpdate = function(p30, p31, p32) -- line: 399
-		-- upvalues: flushPendingAgentMessageToAssistant (copy), flushPendingAgentMessageToActivity (copy), buildContiguousThoughtText (copy), buildActivityItems (copy), messageMapToText (copy), appendPendingAgentMessage (copy), recordThoughtSequenceSlot (copy), applyToolCallUpdate (copy), applyToolCallContentChunk (copy)
+	applySessionUpdate = function(p30, p31, p32) -- line: 386
+		-- upvalues: recordEventMeta (copy), flushPendingAgentMessageToAssistant (copy), flushPendingAgentMessageToActivity (copy), messageMapToText (copy), appendPendingAgentMessage (copy), applyToolCallUpdate (copy), applyToolCallContentChunk (copy)
 		local sessionUpdate = p31.sessionUpdate
-		local v215 = table.clone(p30)
-		local g235 = nil
-		local v234 = nil
-		local g253 = nil
-		local v252 = nil
+		local v206 = table.clone(p30)
+		local v207 = if p32 == nil then nil else p32.sequenceNumber
 
-		if v215.status == "queued" then
-			v215.status = "streaming"
+		recordEventMeta(v206, v207, p31)
+
+		local g220 = nil
+		local v219 = nil
+
+		if v206.status == "queued" then
+			v206.status = "streaming"
 		end
 
 		if sessionUpdate ~= "agent_message_chunk" then
 			if sessionUpdate == "state_change" and p31.state == "idle" then
-				flushPendingAgentMessageToAssistant(v215)
+				flushPendingAgentMessageToAssistant(v206)
 			else
-				flushPendingAgentMessageToActivity(v215)
-			end
-		end
-
-		if sessionUpdate ~= "agent_thought" and sessionUpdate ~= "agent_thought_chunk" then
-			local v216 = if p32 == nil then nil else p32.sequenceNumber
-			local v217 = if typeof(v216) == "number" and not (v216 < 0) then v216 + 1 else nil
-
-			if v217 ~= nil then
-				local v218 = table.clone(v215.thoughtChunks)
-
-				v218[v217] = v218[v217] or ""
-				v215.thoughtChunks = v218
-				v215.thoughtText = buildContiguousThoughtText(v218)
-
-				local t35 = {
-					kind = "empty"
-				}
-				local v220 = if p32 == nil then nil else p32.sequenceNumber
-				local v221 = if typeof(v220) == "number" and not (v220 < 0) then v220 + 1 else nil
-
-				if v221 ~= nil and not (v221 <= 0) then
-					local v222 = table.clone(v215.activitySlots)
-
-					v222[v221] = t35
-					v215.activitySlots = v222
-					v215.activityItems = buildActivityItems(v215.activitySlots, v215.toolCalls)
-				end
+				flushPendingAgentMessageToActivity(v206)
 			end
 		end
 
 		if sessionUpdate == "agent_message" then
 			local messageId = p31.messageId
+			local v209 = if typeof(messageId) ~= "string" or messageId == "" then nil else messageId
+			local content = p31.content
+
+			if v209 ~= nil and typeof(content) == "table" then
+				local assistantMessages = v206.assistantMessages
+				local assistantMessageOrder = v206.assistantMessageOrder
+				local v213 = table.clone(assistantMessages)
+				local t30 = {}
+
+				for _, v216 in content do
+					table.insert(t30, v216)
+				end
+
+				v213[v209] = t30
+
+				for _, v218 in assistantMessageOrder do
+					if v218 == v209 then
+						v219 = assistantMessageOrder
+						g220 = true
+					end
+
+					if g220 then
+						break
+					end
+				end
+
+				if not g220 then
+					v219 = {}
+
+					for _, v222 in assistantMessageOrder do
+						table.insert(v219, v222)
+					end
+
+					table.insert(v219, v209)
+				end
+
+				g220 = false
+				v206.assistantMessages = v213
+				v206.assistantMessageOrder = v219
+				v206.assistantText = messageMapToText(v206.assistantMessages, v206.assistantMessageOrder)
+
+				return v206
+			end
+		elseif sessionUpdate == "agent_message_chunk" then
+			local messageId = p31.messageId
 			local v224 = if typeof(messageId) ~= "string" or messageId == "" then nil else messageId
 			local content = p31.content
 
 			if v224 ~= nil and typeof(content) == "table" then
-				local assistantMessages = v215.assistantMessages
-				local assistantMessageOrder = v215.assistantMessageOrder
-				local v228 = table.clone(assistantMessages)
-				local t36 = {}
+				appendPendingAgentMessage(v206, v224, content, p32)
 
-				for _, v231 in content do
-					table.insert(t36, v231)
-				end
-
-				v228[v224] = t36
-
-				for _, v233 in assistantMessageOrder do
-					if v233 == v224 then
-						v234 = assistantMessageOrder
-						g235 = true
-					end
-
-					if g235 then
-						break
-					end
-				end
-
-				if not g235 then
-					v234 = {}
-
-					for _, v237 in assistantMessageOrder do
-						table.insert(v234, v237)
-					end
-
-					table.insert(v234, v224)
-				end
-
-				g235 = false
-				v215.assistantMessages = v228
-				v215.assistantMessageOrder = v234
-				v215.assistantText = messageMapToText(v215.assistantMessages, v215.assistantMessageOrder)
-
-				return v215
-			end
-		elseif sessionUpdate == "agent_message_chunk" then
-			local messageId = p31.messageId
-			local v239 = if typeof(messageId) ~= "string" or messageId == "" then nil else messageId
-			local content = p31.content
-
-			if v239 ~= nil and typeof(content) == "table" then
-				appendPendingAgentMessage(v215, v239, content, p32)
-
-				return v215
-			end
-		elseif sessionUpdate == "agent_thought" then
-			local messageId = p31.messageId
-			local v242 = if typeof(messageId) ~= "string" or messageId == "" then nil else messageId
-			local content = p31.content
-
-			if v242 ~= nil and typeof(content) == "table" then
-				local thoughtMessages = v215.thoughtMessages
-				local thoughtMessageOrder = v215.thoughtMessageOrder
-				local v246 = table.clone(thoughtMessages)
-				local t37 = {}
-
-				for _, v249 in content do
-					table.insert(t37, v249)
-				end
-
-				v246[v242] = t37
-
-				for _, v251 in thoughtMessageOrder do
-					if v251 == v242 then
-						v252 = thoughtMessageOrder
-						g253 = true
-					end
-
-					if g253 then
-						break
-					end
-				end
-
-				if not g253 then
-					v252 = {}
-
-					for _, v255 in thoughtMessageOrder do
-						table.insert(v252, v255)
-					end
-
-					table.insert(v252, v242)
-				end
-
-				g253 = false
-				v215.thoughtMessages = v246
-				v215.thoughtMessageOrder = v252
-
-				local v256 = messageMapToText(v215.thoughtMessages, v215.thoughtMessageOrder)
-
-				v215.thoughtText = v256
-
-				local t38 = {
-					kind = "thought",
-					text = v256
-				}
-				local v258 = if p32 == nil then nil else p32.sequenceNumber
-				local v259 = if typeof(v258) == "number" and not (v258 < 0) then v258 + 1 else nil
-
-				if v259 == nil then
-					return v215
-				end
-
-				if v259 <= 0 then
-					return v215
-				end
-
-				local v260 = table.clone(v215.activitySlots)
-
-				v260[v259] = t38
-				v215.activitySlots = v260
-				v215.activityItems = buildActivityItems(v215.activitySlots, v215.toolCalls)
-
-				return v215
-			end
-		elseif sessionUpdate == "agent_thought_chunk" then
-			local messageId = p31.messageId
-			local v262 = if typeof(messageId) ~= "string" or messageId == "" then nil else messageId
-			local content = p31.content
-
-			if v262 ~= nil and content and content.type == "text" and typeof(content.text) == "string" then
-				recordThoughtSequenceSlot(v215, p32, content.text)
-
-				return v215
+				return v206
 			end
 		else
 			if sessionUpdate == "tool_call_update" then
-				applyToolCallUpdate(v215, p31, p32)
+				applyToolCallUpdate(v206, p31, p32)
 
-				return v215
+				return v206
 			end
 
 			if sessionUpdate == "tool_call_content_chunk" then
-				applyToolCallContentChunk(v215, p31, p32)
+				applyToolCallContentChunk(v206, p31, p32)
 
-				return v215
+				return v206
 			end
 
 			if sessionUpdate == "state_change" then
 				if p31.state == "running" or p31.state == "requires_action" then
-					v215.status = "streaming"
+					v206.status = "streaming"
 
-					return v215
+					return v206
 				end
 
 				if p31.state == "idle" then
 					local stop_reason = p31.stop_reason
 
 					if typeof(stop_reason) == "string" then
-						v215.stopReason = stop_reason
+						v206.stopReason = stop_reason
 					else
-						v215.stopReason = "end_turn"
+						v206.stopReason = "end_turn"
 					end
 
-					v215.status = v215.stopReason ~= "cancelled" and "succeeded" or "cancelled"
-					v215.isDone = true
+					v206.status = v206.stopReason ~= "cancelled" and "succeeded" or "cancelled"
+					v206.isDone = true
 
-					return v215
+					return v206
 				end
 			elseif sessionUpdate == "session_info_update" then
-				v215.infoUpdate = {
+				v206.infoUpdate = {
 					title = p31.title
 				}
 			end
 		end
 
-		return v215
+		return v206
 	end,
-	createEmptyTurnState = function(s8: string, p33) -- line: 18
+	createEmptyTurnState = function(s7: string, p33) -- line: 19
 		return {
 			status = "queued",
 			assistantText = "",
 			pendingAgentMessageId = nil,
 			pendingAgentMessageSequenceIndex = nil,
-			thoughtText = "",
 			toolCallCount = 0,
 			infoUpdate = nil,
 			stopReason = nil,
 			error = nil,
 			errorCode = nil,
 			isDone = false,
-			sessionId = s8,
+			sessionId = s7,
 			requestId = p33,
 			assistantMessages = {},
 			assistantMessageOrder = {},
 			pendingAgentMessageContent = {},
-			thoughtMessages = {},
-			thoughtMessageOrder = {},
-			thoughtChunks = {},
 			activitySlots = {},
 			activityItems = {},
-			toolCalls = {}
+			toolCalls = {},
+			eventMetaBySequenceId = {}
 		}
 	end
 }

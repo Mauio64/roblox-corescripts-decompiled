@@ -7,7 +7,7 @@ local LoaderContext = require(GenericAbuseReporting.BeduiV2.Loaders.LoaderContex
 local MockProviders = require(GenericAbuseReporting.MockProviders)
 local LoaderProvider = LoaderContext.LoaderProvider
 
-local function findEventsBySubType(p1, s1: string, p2: ((...any) -> ...any)?) -- line: 109
+local function findEventsBySubType(p1, s1: string, p2: ((...any) -> ...any)?) -- line: 108
 	local t1 = {}
 
 	for _, v18 in p1.mock.calls do
@@ -87,7 +87,6 @@ return {
 					type = "list",
 					eyebrow = "Report",
 					title = "Select an option",
-					formKey = "test",
 					nextButtonText = "Continue",
 					items = {{
 						id = "test",
@@ -101,7 +100,7 @@ return {
 			translations = {}
 		}
 	end,
-	makeMalformedConfig = function() -- line: 96
+	makeMalformedConfig = function() -- line: 95
 		return {
 			version = 1,
 			resources = {},
@@ -114,17 +113,17 @@ return {
 		}
 	end,
 	findEventsBySubType = findEventsBySubType,
-	findRenderErrorEvents = function(p4) -- line: 126
+	findRenderErrorEvents = function(p4) -- line: 125
 		-- upvalues: findEventsBySubType (copy)
-		return (findEventsBySubType(p4, "Error", function(p5) -- line: 127
+		return (findEventsBySubType(p4, "Error", function(p5) -- line: 126
 			local v23 = p5.error_detail and p5.error_detail.error_message
 
 			return type(v23) == "string" and v23:sub(1, 13) == "Render error:"
 		end))
 	end,
-	findFetchErrorEvents = function(p6) -- line: 133
+	findFetchErrorEvents = function(p6) -- line: 132
 		-- upvalues: findEventsBySubType (copy)
-		return (findEventsBySubType(p6, "Error", function(p7) -- line: 134
+		return (findEventsBySubType(p6, "Error", function(p7) -- line: 133
 			local v25 = p7.error_detail and p7.error_detail.error_message
 
 			return type(v25) == "string" and v25:sub(1, 23) == "Failed to fetch config:"

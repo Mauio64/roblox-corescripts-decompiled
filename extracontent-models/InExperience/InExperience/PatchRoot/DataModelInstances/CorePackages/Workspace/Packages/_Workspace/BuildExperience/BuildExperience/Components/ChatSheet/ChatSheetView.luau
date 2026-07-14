@@ -10,7 +10,7 @@ local Sheet = require(BuildExperience.FoundationFork.Sheet)
 require(BuildExperience.Chat.chatTypes)
 require(BuildExperience.Chat.useChatSessionCore)
 
-local function ChatSheetView(t1: {[any]: any}) -- line: 41
+local function ChatSheetView(t1: {[any]: any}) -- line: 42
 	-- upvalues: ChatMessageList (copy), React (copy), BuildEmptyState (copy), Sheet (copy), ChatActions (copy), BuildPillMenuPortal (copy)
 	local v11 = ChatMessageList({
 		messages = t1.messages,
@@ -38,6 +38,7 @@ local function ChatSheetView(t1: {[any]: any}) -- line: 41
 				onComposerChanged = t1.onComposerChanged,
 				textBoxRef = t1.textBoxRef,
 				isAssistantResponding = t1.isAssistantResponding,
+				canStopAssistantResponse = t1.canStopAssistantResponse,
 				onSend = t1.onSend,
 				onStop = t1.onStop
 			})

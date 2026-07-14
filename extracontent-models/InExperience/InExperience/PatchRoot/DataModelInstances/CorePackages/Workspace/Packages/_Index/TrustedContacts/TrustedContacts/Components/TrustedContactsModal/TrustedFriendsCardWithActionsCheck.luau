@@ -13,61 +13,63 @@ local Analytics = require(TrustedContacts.Analytics)
 local useTCAnalytics = Analytics.useTCAnalytics
 local EventNames = Analytics.EventNames
 local FFlagTFUpdateAnalytics = require(TrustedContacts.Flags.FFlagTFUpdateAnalytics)
+local FFlagTFPassQRCodeSource = require(TrustedContacts.Flags.FFlagTFPassQRCodeSource)
 
 require(TrustedContacts.Common.Types)
 
-local function TrustedFriendsCardWithActionsCheck(p1) -- line: 32
-	-- upvalues: useNavigation (copy), useTrustedFriendAction (copy), FFlagTFUpdateAnalytics (copy), useTCAnalytics (copy), React (copy), EventNames (copy), AppPage (copy), TFActionsEnum (copy), RoactUtils (copy), Foundation (copy), IconSize (copy), TrustedContactsModalContainer (copy)
-	local v18 = useNavigation()
+local function TrustedFriendsCardWithActionsCheck(p1) -- line: 33
+	-- upvalues: useNavigation (copy), useTrustedFriendAction (copy), FFlagTFPassQRCodeSource (copy), FFlagTFUpdateAnalytics (copy), useTCAnalytics (copy), React (copy), EventNames (copy), AppPage (copy), TFActionsEnum (copy), RoactUtils (copy), Foundation (copy), IconSize (copy), TrustedContactsModalContainer (copy)
+	local v19 = useNavigation()
 	local userId = p1.userId
-	local v20 = useTrustedFriendAction({
+	local v21 = useTrustedFriendAction({
 		userId = userId,
-		tokens = p1.tokens
+		tokens = p1.tokens,
+		sentFromQrCode = if not FFlagTFPassQRCodeSource then nil else p1.sentFromQrCode
 	})
-	local isLoading = v20.isLoading
-	local enum = v20.enum
-	local v23 = if not FFlagTFUpdateAnalytics then nil else useTCAnalytics({
+	local isLoading = v21.isLoading
+	local enum = v21.enum
+	local v24 = if not FFlagTFUpdateAnalytics then nil else useTCAnalytics({
 		friendId = userId,
 		source = p1.source,
 		tfActionsEnum = enum
 	}).fireAnalyticsEvent
-	local v24 = React.useCallback(function() -- line: 52
-		-- upvalues: FFlagTFUpdateAnalytics (copy), v23 (copy), EventNames (copy), p1 (copy), v18 (copy), AppPage (copy)
+	local v25 = React.useCallback(function() -- line: 54
+		-- upvalues: FFlagTFUpdateAnalytics (copy), v24 (copy), EventNames (copy), p1 (copy), v19 (copy), AppPage (copy)
 		if FFlagTFUpdateAnalytics then
-			v23(EventNames.TCUpsellAgePrecheckTriggered)
+			v24(EventNames.TCUpsellAgePrecheckTriggered)
 		end
 
 		p1.externalNavigation.openFacialAgeEstimationUpsell({
-			onSuccess = function() -- line: 58
-				-- upvalues: FFlagTFUpdateAnalytics (copy), v23 (copy), EventNames (copy), v18 (copy), AppPage (copy)
+			onSuccess = function() -- line: 60
+				-- upvalues: FFlagTFUpdateAnalytics (copy), v24 (copy), EventNames (copy), v19 (copy), AppPage (copy)
 				if FFlagTFUpdateAnalytics then
-					v23(EventNames.TCUpsellAgePrecheckSucceeded)
+					v24(EventNames.TCUpsellAgePrecheckSucceeded)
 				end
 
-				v18.replace(AppPage.TrustedFriendsUserModal, {})
+				v19.replace(AppPage.TrustedFriendsUserModal, {})
 			end,
-			onFailure = function() -- line: 64
-				-- upvalues: FFlagTFUpdateAnalytics (copy), v23 (copy), EventNames (copy), p1 (copy)
+			onFailure = function() -- line: 66
+				-- upvalues: FFlagTFUpdateAnalytics (copy), v24 (copy), EventNames (copy), p1 (copy)
 				if FFlagTFUpdateAnalytics then
-					v23(EventNames.TCUpsellAgePrecheckFailed)
+					v24(EventNames.TCUpsellAgePrecheckFailed)
 				end
 
 				p1.externalNavigation.closeModal()
 			end
 		})
 	end, {
-		v18,
+		v19,
 		p1.externalNavigation,
-		v23
+		v24
 	})
-	local v25 = enum == TFActionsEnum.UnlockTrustedFriendByFAE
+	local v26 = enum == TFActionsEnum.UnlockTrustedFriendByFAE
 
-	RoactUtils.Hooks.useEffectOnce(function() -- line: 75
-		-- upvalues: v24 (copy)
-		v24()
-	end, v25)
+	RoactUtils.Hooks.useEffectOnce(function() -- line: 77
+		-- upvalues: v25 (copy)
+		v25()
+	end, v26)
 
-	if v25 then
+	if v26 then
 		return nil
 	end
 

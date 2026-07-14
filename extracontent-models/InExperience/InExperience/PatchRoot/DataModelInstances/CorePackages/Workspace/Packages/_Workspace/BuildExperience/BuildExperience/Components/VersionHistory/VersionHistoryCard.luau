@@ -43,7 +43,7 @@ local function VersionHistoryCard(t1: {[any]: any}) -- line: 29
 				}, {
 					Title = React.createElement(FoundationText, {
 						LayoutOrder = 1,
-						tag = "auto-xy text-title-medium text-align-x-left text-truncate-end content-emphasis",
+						tag = "shrink auto-xy text-title-medium text-wrap text-align-x-left text-truncate-none content-emphasis",
 						Text = t1.title
 					}),
 					Badge = if not t1.badgeText then nil else React.createElement(Badge, {

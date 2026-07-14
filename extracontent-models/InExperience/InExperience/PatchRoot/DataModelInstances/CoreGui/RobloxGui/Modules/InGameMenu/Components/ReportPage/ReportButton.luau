@@ -11,21 +11,43 @@ local OpenReportDialog = require(ParentParent.Actions.OpenReportDialog)
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
-local v14 = t.strictInterface({
+local Image = require(CorePackages.Packages.Foundation).Image
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v16 = t.strictInterface({
 	userId = t.optional(t.integer),
 	userName = t.optional(t.string),
 	LayoutOrder = t.integer,
 	dispatchOpenReportDialog = t.callback
 })
 
-local function ReportButton(p1) -- line: 28
-	-- upvalues: GlobalConfig (copy), v14 (copy), withSelectionCursorProvider (copy), Roact (copy), ImageSetButton (copy), Assets (copy), CursorKind (copy)
+local function ReportButton(p1) -- line: 33
+	-- upvalues: GlobalConfig (copy), v16 (copy), withSelectionCursorProvider (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), Assets (copy), CursorKind (copy), ImageSetButton (copy)
 	if GlobalConfig.propValidation then
-		assert(v14(p1))
+		assert(v16(p1))
 	end
 
-	return withSelectionCursorProvider(function(p2) -- line: 33
-		-- upvalues: Roact (copy), ImageSetButton (copy), Assets (copy), p1 (copy), CursorKind (copy)
+	return withSelectionCursorProvider(function(p2) -- line: 38
+		-- upvalues: FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), Assets (copy), p1 (copy), CursorKind (copy), ImageSetButton (copy)
+		if FFlagCoreUiMigrateUIBloxToFoundation then
+			return Roact.createElement(Image, {
+				Image = Assets.Images.ReportIcon,
+				Size = UDim2.new(0, 36, 0, 36),
+				imageStyle = {
+					Transparency = 0,
+					Color3 = Color3.fromRGB(255, 255, 255)
+				},
+				LayoutOrder = p1.LayoutOrder,
+				selection = {
+					Selectable = false,
+					SelectionImageObject = p2(CursorKind.RoundedRectNoInset)
+				},
+				onActivated = function() -- line: 52
+					-- upvalues: p1 (copy)
+					p1.dispatchOpenReportDialog(p1.userId, p1.userName)
+				end
+			})
+		end
+
 		return Roact.createElement(ImageSetButton, {
 			Selectable = false,
 			Image = Assets.Images.ReportIcon,
@@ -34,7 +56,7 @@ local function ReportButton(p1) -- line: 28
 			BackgroundTransparency = 1,
 			LayoutOrder = p1.LayoutOrder,
 			SelectionImageObject = p2(CursorKind.RoundedRectNoInset),
-			[Roact.Event.Activated] = function() -- line: 42
+			[Roact.Event.Activated] = function() -- line: 65
 				-- upvalues: p1 (copy)
 				p1.dispatchOpenReportDialog(p1.userId, p1.userName)
 			end
@@ -42,10 +64,10 @@ local function ReportButton(p1) -- line: 28
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p3) -- line: 49
+return RoactRodux.UNSTABLE_connect2(nil, function(p3) -- line: 73
 	-- upvalues: OpenReportDialog (copy)
 	return {
-		dispatchOpenReportDialog = function(p4, p5) -- line: 51
+		dispatchOpenReportDialog = function(p4, p5) -- line: 75
 			-- upvalues: p3 (copy), OpenReportDialog (copy)
 			p3(OpenReportDialog(p4, p5))
 		end

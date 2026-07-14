@@ -35,11 +35,11 @@ local FFlagEnableHeaderBarButtonsUpdate = SharedFlags.FFlagEnableHeaderBarButton
 local FFlagStreamNotificationDropdownSingleOwner = SharedFlags.FFlagStreamNotificationDropdownSingleOwner
 local v36 = Images["icons/common/notificationOff"]
 
-local function GetIsFriendCommunicationRestricted() -- line: 45
+local function GetIsFriendCommunicationRestricted() -- line: 44
 	-- upvalues: ThirdPartyUserService (copy)
 	return ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)
 end
-local function v38(t1: {[any]: any}) -- line: 65
+local function v38(t1: {[any]: any}) -- line: 64
 	-- upvalues: React (copy), FFlagStreamNotificationDropdownSingleOwner (copy), StreamNotificationStore (copy), HttpService (copy), FFlagEnableNotificationsDeeplink (copy), useSignalState (copy), StreamNotificationDropdownExperimentation (copy), useTokens (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), constants (copy), FFlagStreamNotificationBellEntryPoint (copy), StreamNotifications2 (copy), GetFFlagNotificationsComplianceShouldRestrictStream (copy), ThirdPartyUserService (copy), ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Foundation (copy), isAppNavEnabled (copy), Popover (copy), PopoverSide (copy), PopoverAlign (copy), v36 (copy), UtilityActionIcon (copy), IconButton (copy), IconSize (copy), Badge (copy), BadgeVariant (copy)
 	local v40, v41 = React.useState(false)
 	local current = nil
@@ -78,7 +78,7 @@ local function v38(t1: {[any]: any}) -- line: 65
 		n1 = 34
 	end
 
-	React.useEffect(function() -- line: 113
+	React.useEffect(function() -- line: 112
 		-- upvalues: v49 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), constants (copy), FFlagStreamNotificationBellEntryPoint (copy), t1 (copy)
 		if v49 > 0 then
 			NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.seen, analyticsConstants.EventNames.openCTAShown, {
@@ -89,7 +89,7 @@ local function v38(t1: {[any]: any}) -- line: 65
 		end
 	end, { v49 })
 
-	local v52 = React.useMemo(function() -- line: 128
+	local v52 = React.useMemo(function() -- line: 127
 		-- upvalues: u44 (ref), React (copy), StreamNotifications2 (copy), FFlagEnableNotificationsDeeplink (copy), StreamNotificationStore (copy), v41 (copy)
 		if u44 then
 			return React.createElement(StreamNotifications2, {
@@ -106,7 +106,7 @@ local function v38(t1: {[any]: any}) -- line: 65
 
 	local v53 = if not (ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)) then if not (v49 > 0) then nil else v49 else nil
 
-	local function onBellActivated() -- line: 156
+	local function onBellActivated() -- line: 155
 		-- upvalues: StreamNotificationDropdownExperimentation (copy), ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy), v47 (copy), FFlagEnableNotificationsDeeplink (copy), FFlagStreamNotificationDropdownSingleOwner (copy), StreamNotificationStore (copy), u44 (ref), current (ref), v41 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), v49 (copy), constants (copy), FFlagStreamNotificationBellEntryPoint (copy), t1 (copy)
 		StreamNotificationDropdownExperimentation.logExposure()
 		ixpHelper.logUserLayerExposure(GetFStringNotificationsStreamNotificationUXLayer())
@@ -155,7 +155,7 @@ local function v38(t1: {[any]: any}) -- line: 65
 			entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else t1.entryPoint
 		})
 	end
-	local function onPopoverDismiss() -- line: 220
+	local function onPopoverDismiss() -- line: 219
 		-- upvalues: FFlagEnableNotificationsDeeplink (copy), FFlagStreamNotificationDropdownSingleOwner (copy), StreamNotificationStore (copy), v41 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy)
 		if FFlagEnableNotificationsDeeplink then
 			if FFlagStreamNotificationDropdownSingleOwner then
@@ -273,7 +273,7 @@ local function v38(t1: {[any]: any}) -- line: 65
 end
 
 if GetFFlagNotificationsComplianceShouldRestrictStream() then
-	v38 = RoactAppPolicy.connect(function(p1, _) -- line: 353
+	v38 = RoactAppPolicy.connect(function(p1, _) -- line: 352
 		return {
 			shouldRestrictStream = p1.getNotificationsCanReceiveStream() or false
 		}

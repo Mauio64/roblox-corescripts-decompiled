@@ -8,28 +8,27 @@ local useDesignTokens = require(CorePackages.Workspace.Packages.Style).useDesign
 local useStyle = UIBlox.Core.Style.useStyle
 local GlobalSettings = require(Modules.Shell.GlobalSettings)
 local LocalizedStrings = require(Modules.Shell.LocalizedStrings)
-local FFlagAppShellMigrateLocales = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAppShellMigrateLocales
 local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
 local useNavigation = require(CorePackages.Workspace.Packages.Navigation).useNavigation
 local ControllerHint = require(Modules.Shell.Components.Overscan.ControllerHint)
 local Edges = require(script.Parent.Edges)
 
-local function Overscan(t1: {[any]: any}) -- line: 28
-	-- upvalues: useNavigation (copy), useLocalization (copy), useDesignTokens (copy), useStyle (copy), React (copy), GlobalSettings (copy), FFlagAppShellMigrateLocales (copy), LocalizedStrings (copy), ControllerHint (copy), ButtonStack (copy), ButtonType (copy), Edges (copy)
-	local v18 = useNavigation()
-	local v19 = t1.onUnmount or v18.goBack
-	local v20 = useLocalization({
+local function Overscan(t1: {[any]: any}) -- line: 27
+	-- upvalues: useNavigation (copy), useLocalization (copy), useDesignTokens (copy), useStyle (copy), React (copy), GlobalSettings (copy), LocalizedStrings (copy), ControllerHint (copy), ButtonStack (copy), ButtonType (copy), Edges (copy)
+	local v17 = useNavigation()
+	local v18 = t1.onUnmount or v17.goBack
+	local v19 = useLocalization({
 		accept = "CommonUI.Controls.Action.Accept",
 		cancel = "CommonUI.Controls.Action.Cancel"
 	})
-	local v21 = useDesignTokens(function(p1) -- line: 38
+	local v20 = useDesignTokens(function(p1) -- line: 37
 		return {
 			buttonHeight = p1.Size.Size_1200,
 			marginBetween = p1.Size.Size_300
 		}
 	end)
-	local v22 = useStyle()
-	local v23 = React.useRef(nil)
+	local v21 = useStyle()
+	local v22 = React.useRef(nil)
 
 	return React.createElement("Frame", {
 		BorderSizePixel = 1,
@@ -52,7 +51,7 @@ local function Overscan(t1: {[any]: any}) -- line: 28
 			FontSize = GlobalSettings.HeaderSize,
 			TextColor3 = GlobalSettings.WhiteTextColor,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Text = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ScreenSizeWord") else LocalizedStrings:LocStringUA("Xbox.Old.ScreenSizeWord")
+			Text = LocalizedStrings:LocStringUA("Xbox.Old.ScreenSizeWord")
 		}),
 		Prompt = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
@@ -61,7 +60,7 @@ local function Overscan(t1: {[any]: any}) -- line: 28
 			FontSize = GlobalSettings.ButtonSize,
 			TextColor3 = GlobalSettings.WhiteTextColor,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Text = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ResizeScreenPrompt") else LocalizedStrings:LocStringUA("Xbox.Old.ResizeScreenPrompt")
+			Text = LocalizedStrings:LocStringUA("Xbox.Old.ResizeScreenPrompt")
 		}),
 		Controller = React.createElement(ControllerHint),
 		Actions = React.createElement("Frame", {
@@ -69,27 +68,27 @@ local function Overscan(t1: {[any]: any}) -- line: 28
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = UDim2.new(0.5, 0, 1, -201)
 		}, { React.createElement(ButtonStack, {
-			buttonHeight = v21.buttonHeight,
-			marginBetween = v21.marginBetween,
+			buttonHeight = v20.buttonHeight,
+			marginBetween = v20.marginBetween,
 			forcedFillDirection = Enum.FillDirection.Horizontal,
 			buttons = {
 				{
 					buttonType = ButtonType.Secondary,
 					props = {
-						text = v20.cancel,
-						fontStyle = v22.Font.Header1,
-						onActivated = v19
+						text = v19.cancel,
+						fontStyle = v21.Font.Header1,
+						onActivated = v18
 					}
 				},
 				{
 					buttonType = ButtonType.PrimarySystem,
 					props = {
-						text = v20.accept,
-						fontStyle = v22.Font.Header1,
-						onActivated = function() -- line: 113
-							-- upvalues: v23 (copy)
-							if v23.current then
-								v23.current.onAccept()
+						text = v19.accept,
+						fontStyle = v21.Font.Header1,
+						onActivated = function() -- line: 108
+							-- upvalues: v22 (copy)
+							if v22.current then
+								v22.current.onAccept()
 							end
 						end
 					}
@@ -97,8 +96,8 @@ local function Overscan(t1: {[any]: any}) -- line: 28
 			}
 		}) }),
 		EdgeSelector = React.createElement(Edges, {
-			onSetEdges = v19,
-			ref = v23
+			onSetEdges = v18,
+			ref = v22
 		})
 	})
 end

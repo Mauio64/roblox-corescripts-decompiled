@@ -2100,7 +2100,6 @@ return {
 	["Feature.GameDetails.Message.LeavingRobloxTitle"] = "Ты покидаешь Roblox",
 	["Feature.GameDetails.Message.PurchaseGame"] = "Разблокировать доступ к игре {gameName} за {X} Robux?",
 	["Feature.GameDetails.Message.PurchaseGameV2"] = "Разблокировать доступ к игре {gameName} за {X} Robux?",
-	["Feature.GameDetails.Message.SuggestLessExperiences"] = "Мы предложим меньше таких плейсов",
 	["Feature.GameDetails.Message.SuggestLessOften"] = "Мы будем предлагать это реже",
 	["Feature.GameDetails.RatingPercentOnly"] = "Рейтинг {percentRating}%",
 	["Feature.GameDetails.Toast.LinkCopied"] = "Скопировано в буфер обмена",

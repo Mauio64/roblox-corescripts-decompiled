@@ -16,7 +16,6 @@ return {
 	FoundationSheetPreventCloseOnResize = SafeFlags.createGetFFlag("FoundationSheetPreventCloseOnResize")(),
 	FoundationCenterSheetUseStableContainer = SafeFlags.createGetFFlag("FoundationCenterSheetUseStableContainer")(),
 	FoundationBottomSheetImproveSpring = SafeFlags.createGetFFlag("FoundationBottomSheetImproveSpring2")(),
-	FoundationDialogTitleEmphasisFix = SafeFlags.createGetFFlag("FoundationDialogTitleEmphasisFix")(),
 	FoundationGuiObjectInputSinkProperty = SafeFlags.createGetFFlag("FoundationGuiObjectInputSinkProperty")(),
 	FoundationDisableStyleProviderDerives = v3,
 	FoundationDisableTokenScaling = SafeFlags.createGetFFlag("FoundationDisableTokenScaling2")(),
@@ -30,7 +29,6 @@ return {
 	FoundationSheetFullBleed = SafeFlags.createGetFFlag("FoundationSheetFullBleed")(),
 	FoundationTabsNavArrowsOnlyOnHover = SafeFlags.createGetFFlag("FoundationTabsNavArrowsOnlyOnHover")(),
 	FoundationPopoverPluginSecurityGate = SafeFlags.createGetFFlag("FoundationPopoverPluginSecurityGate")(),
-	FoundationSegmentedControlIconSupport = SafeFlags.createGetFFlag("FoundationSegmentedControlIconSupport")(),
 	FoundationActionEmphasisStatusIndicator = SafeFlags.createGetFFlag("FoundationActionEmphasisStatusIndicator")(),
 	FoundationPopoverPluginPrewarmDepthPool = v5 and v4,
 	FoundationInputSelectionProps = SafeFlags.createGetFFlag("FoundationInputSelectionProps")(),
@@ -62,7 +60,12 @@ return {
 	FoundationSegmentedControlCircular = SafeFlags.createGetFFlag("FoundationSegmentedControlCircular")(),
 	FoundationStatusIndicatorBeta = SafeFlags.createGetFFlag("FoundationStatusIndicatorBeta2")(),
 	FoundationCoachmarkInteractionFixes = SafeFlags.createGetFFlag("FoundationCoachmarkInteractionFixes")(),
-	FoundationSupportPrefixSuffixNumberInput = SafeFlags.createGetFFlag("FoundationSupportPrefixSuffixNumberInput")(),
 	FoundationPopoverPluginUriAnchor = SafeFlags.createGetFFlag("FoundationPopoverPluginUriAnchor")(),
-	FoundationSystemBannerWrapActionsOnXSmall = SafeFlags.createGetFFlag("FoundationSystemBannerWrapActionsOnXSmall")()
+	FoundationSystemBannerWrapActionsOnXSmall = SafeFlags.createGetFFlag("FoundationSystemBannerWrapActionsOnXSmall")(),
+	FoundationAvatarBeta = SafeFlags.createGetFFlag("FoundationAvatarBeta2")(),
+	FoundationBaseMenuContentSizing = SafeFlags.createGetFFlag("FoundationBaseMenuContentSizing")(),
+	FoundationBottomSheetOnSnapPointChanged = SafeFlags.createGetFFlag("FoundationBottomSheetOnSnapPointChanged")(),
+	FoundationBottomSheetScrollAtMaxTolerance = SafeFlags.createGetFFlag("FoundationBottomSheetScrollAtMaxTolerance")(),
+	FoundationNumberInputBeta = SafeFlags.createGetFFlag("FoundationNumberInputBeta")(),
+	FoundationSegmentedControlAutoXFix = SafeFlags.createGetFFlag("FoundationSegmentedControlAutoXFix")()
 }

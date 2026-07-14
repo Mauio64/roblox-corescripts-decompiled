@@ -1,3 +1,0 @@
-return {
-	CheckForAndFireValidCookieForNoCachedUserEvent = require(script.CheckForAndFireValidCookieForNoCachedUserEvent)
-}

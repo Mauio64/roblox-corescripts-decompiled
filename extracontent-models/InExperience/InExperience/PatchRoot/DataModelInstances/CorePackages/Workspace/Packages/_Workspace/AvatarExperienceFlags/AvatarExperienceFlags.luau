@@ -21,6 +21,7 @@ return {
 	FFlagAXPhotoboothFunctionality = require(script.FFlagAXPhotoboothFunctionality),
 	FFlagAXFavoritesManagerNavEntry = require(script.FFlagAXFavoritesManagerNavEntry),
 	FFlagAXItemCardComponentsMemo = require(script.FFlagAXItemCardComponentsMemo),
+	FFlagAXTestSkeletonInCatalog = require(script.FFlagAXTestSkeletonInCatalog),
 	FFlagAXMISEnableMultiShopping = require(script.FFlagAXMISEnableMultiShopping),
 	FFlagAXMISWithOffers = require(script.FFlagAXMISWithOffers),
 	FFlagAXMISSaveWearFix = require(script.FFlagAXMISSaveWearFix),
@@ -159,7 +160,6 @@ return {
 	FFlagAXTallTilesForMakeupLooks = require(script.FFlagAXTallTilesForMakeupLooks),
 	FFlagAXTallTilesForAdvancedBodiesWidget = require(script.FFlagAXTallTilesForAdvancedBodiesWidget),
 	FFlagAXMoveAllTabToWidgetOnly = require(script.FFlagAXMoveAllTabToWidgetOnly),
-	FFlagAXFixBulkPurchaseFreeItems = require(script.FFlagAXFixBulkPurchaseFreeItems),
 	FFlagAXPurchaseFromQuantityFirst = require(script.FFlagAXPurchaseFromQuantityFirst),
 	FFlagAXResetAvatarButton = require(script.FFlagAXResetAvatarButton),
 	FFlagAXResetAvatarButtonExposureLogging = require(script.FFlagAXResetAvatarButtonExposureLogging),
@@ -177,6 +177,7 @@ return {
 	FFlagAXInventoryDurablesExpiredFilter = require(script.FFlagAXInventoryDurablesExpiredFilter),
 	FFlagAXDurablesFooter = require(script.FFlagAXDurablesFooter),
 	FFlagAXFixIaBTimedOptionsPopoverFocus = require(script.FFlagAXFixIaBTimedOptionsPopoverFocus),
+	FFlagAXTimedOptionsPopoverSkipFocusOnCursor = require(script.FFlagAXTimedOptionsPopoverSkipFocusOnCursor),
 	FFlagAXDurables2Option = require(script.FFlagAXDurables2Option),
 	FFlagAvatarSwitcherWarningLayoutFix = require(script.FFlagAvatarSwitcherWarningLayoutFix),
 	FFlagAvatarSwitcherUiFixes = require(script.FFlagAvatarSwitcherUiFixes),
@@ -310,5 +311,10 @@ return {
 	FFlagAXHeroUnitUIBloxDarkScope = require(script.FFlagAXHeroUnitUIBloxDarkScope),
 	FFlagAXFavoritePillOnItemDetails = require(script.FFlagAXFavoritePillOnItemDetails),
 	FFlagAXCatalogItemCardDarkerBackground = require(script.FFlagAXCatalogItemCardDarkerBackground),
-	FFlagAXCatalogItemCardDarkerBackgroundLogExposure = require(script.FFlagAXCatalogItemCardDarkerBackgroundLogExposure)
+	FFlagAXCatalogItemCardDarkerBackgroundLogExposure = require(script.FFlagAXCatalogItemCardDarkerBackgroundLogExposure),
+	FFlagAXResetSubcategoryRowOnCategoryChange = require(script.FFlagAXResetSubcategoryRowOnCategoryChange),
+	FFlagAXSortsBodyTabRecExposureLogging = require(script.FFlagAXSortsBodyTabRecExposureLogging),
+	FStringAXSortsBodyTabRecLayerName = require(script.FStringAXSortsBodyTabRecLayerName),
+	FStringAXTaxonomyM20ExperimentLayerName = require(script.FStringAXTaxonomyM20ExperimentLayerName),
+	FStringAXTaxonomyM21ExperimentLayerName = require(script.FStringAXTaxonomyM21ExperimentLayerName)
 }

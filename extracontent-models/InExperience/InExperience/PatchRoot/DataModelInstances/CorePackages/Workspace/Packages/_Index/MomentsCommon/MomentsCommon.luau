@@ -11,16 +11,19 @@ local GradientBackdrop = require(script.Components.GradientBackdrop)
 local MusicThumbnailIcon = require(script.Components.MusicThumbnailIcon)
 local Reaction = require(script.Components.Reaction.Reaction)
 local ScrollingGridView = require(script.Components.ScrollingGridView)
+local OverlayDisplay = require(script.Components.OverlayDisplay)
 local TextOverlay = require(script.Components.TextOverlay)
 local TextOverlayDisplay = require(script.Components.TextOverlayDisplay)
 local Performance = require(script.Performance)
 local ArgusExperiment = require(script.Flags.ArgusExperiment)
 local GetFFlagMomentsAnalyticsProducerPrereqs = require(script.Flags.GetFFlagMomentsAnalyticsProducerPrereqs)
+local GetFFlagMomentsStickerButton = require(script.Flags.GetFFlagMomentsStickerButton)
+local GetFFlagMomentsAnalyticsSchemaIdentity = require(script.Flags.GetFFlagMomentsAnalyticsSchemaIdentity)
 local t1 = {
 	useDeviceInsets = require(script.Hooks.useDeviceInsets),
 	useFormFactor = require(script.Hooks.useFormFactor),
 	useImageLoadingState = require(script.Hooks.useImageLoadingState),
-	useMomentsGating = function(...) -- line: 64
+	useMomentsGating = function(...) -- line: 70
 		return require(script.Hooks.useMomentsGating)(...)
 	end,
 	useScreenSize = require(script.Hooks.useScreenSize),
@@ -31,12 +34,15 @@ return {
 	Analytics = Analytics,
 	Flags = {
 		ArgusExperiment = ArgusExperiment,
-		GetFFlagMomentsAnalyticsProducerPrereqs = GetFFlagMomentsAnalyticsProducerPrereqs
+		GetFFlagMomentsAnalyticsProducerPrereqs = GetFFlagMomentsAnalyticsProducerPrereqs,
+		GetFFlagMomentsStickerButton = GetFFlagMomentsStickerButton,
+		GetFFlagMomentsAnalyticsSchemaIdentity = GetFFlagMomentsAnalyticsSchemaIdentity
 	},
 	Components = {
 		GradientBackdrop = GradientBackdrop,
 		MusicThumbnailIcon = MusicThumbnailIcon,
 		Reaction = Reaction,
+		OverlayDisplay = OverlayDisplay,
 		TextOverlay = TextOverlay,
 		TextOverlayDisplay = TextOverlayDisplay
 	},
@@ -61,7 +67,8 @@ return {
 	},
 	Performance = Performance,
 	Utils = {
-		clampTextOverlayPosition = require(script.Utils.clampTextOverlayPosition),
+		clampOverlayPosition = require(script.Utils.clampOverlayPosition),
+		clampTextOverlayPosition = require(script.Utils.clampOverlayPosition),
 		getCropSize = require(script.Utils.getCropSize),
 		getEasingNumberSequence = require(script.Utils.getEasingNumberSequence),
 		getFitSize = require(script.Utils.getFitSize),

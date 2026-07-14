@@ -4,7 +4,7 @@ local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependenc
 local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local ParentParent = script.Parent.Parent.Parent
@@ -145,10 +145,19 @@ function v14.init(p15, p16) -- line: 142
 	end
 end
 function v14.renderWithSelectionCursor(p19, p20) -- line: 176
-	-- upvalues: withStyle (copy), Roact (copy), CursorKind (copy), InviteStatus (copy), ImageSetLabel (copy), Images (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), CursorKind (copy), InviteStatus (copy), ImageSetLabel (copy), Images (copy)
 	local props = p19.props
 
-	return withStyle(function(p21) -- line: 179
+	return withFoundationOrUIBloxStyle(function(p21) -- line: 179
+		return {
+			Theme = {
+				IconEmphasis = {
+					Color = p21.Color.Content.Emphasis.Color3,
+					Transparency = p21.Color.Content.Emphasis.Transparency
+				}
+			}
+		}
+	end, function(p22) -- line: 185
 		-- upvalues: Roact (copy), p20 (copy), CursorKind (copy), props (copy), InviteStatus (copy), p19 (copy), ImageSetLabel (copy), Images (copy)
 		return Roact.createElement("TextButton", {
 			Selectable = false,
@@ -156,12 +165,12 @@ function v14.renderWithSelectionCursor(p19, p20) -- line: 176
 			BackgroundTransparency = 1,
 			Text = "",
 			SelectionImageObject = p20(CursorKind.InputFields),
-			[Roact.Event.Activated] = function() -- line: 187
+			[Roact.Event.Activated] = function() -- line: 193
 				-- upvalues: props (copy), InviteStatus (copy), p19 (copy)
-				local v70 = props.userInviteStatus == InviteStatus.Pending
-				local v71 = props.userInviteStatus == InviteStatus.Success
+				local v71 = props.userInviteStatus == InviteStatus.Pending
+				local v72 = props.userInviteStatus == InviteStatus.Success
 
-				if not p19.renderSteppedConnection and (not v70 and not v71) then
+				if not p19.renderSteppedConnection and (not v71 and not v72) then
 					props.onActivated()
 				end
 			end
@@ -170,7 +179,7 @@ function v14.renderWithSelectionCursor(p19, p20) -- line: 176
 				BackgroundTransparency = 1,
 				Image = Images["icons/actions/friends/friendInvite"],
 				Size = UDim2.new(1, 0, 1, 0),
-				ImageColor3 = p21.Theme.IconEmphasis.Color,
+				ImageColor3 = p22.Theme.IconEmphasis.Color,
 				ImageTransparency = p19.bindings.sendTransparency
 			}),
 			SuccessLabel = Roact.createElement(ImageSetLabel, {
@@ -178,7 +187,7 @@ function v14.renderWithSelectionCursor(p19, p20) -- line: 176
 				Image = Images["icons/status/success"],
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				ImageColor3 = p21.Theme.IconEmphasis.Color,
+				ImageColor3 = p22.Theme.IconEmphasis.Color,
 				ImageTransparency = p19.bindings.successTransparency,
 				Size = p19.bindings.successSize
 			}),
@@ -186,57 +195,57 @@ function v14.renderWithSelectionCursor(p19, p20) -- line: 176
 				BackgroundTransparency = 1,
 				Image = Images["icons/status/alert"],
 				Size = UDim2.new(1, 0, 1, 0),
-				ImageColor3 = p21.Theme.IconEmphasis.Color,
+				ImageColor3 = p22.Theme.IconEmphasis.Color,
 				ImageTransparency = p19.bindings.failTransparency,
 				Position = p19.bindings.failPos
 			})
 		})
 	end)
 end
-function v14.render(p22) -- line: 226
+function v14.render(p23) -- line: 232
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p23) -- line: 227
-		-- upvalues: p22 (copy)
-		return p22:renderWithSelectionCursor(p23)
+	return withSelectionCursorProvider(function(p24) -- line: 233
+		-- upvalues: p23 (copy)
+		return p23:renderWithSelectionCursor(p24)
 	end)
 end
-function v14.didUpdate(p24, p25) -- line: 232
+function v14.didUpdate(p25, p26) -- line: 238
 	-- upvalues: t1 (copy)
-	if p24.props.userInviteStatus and p24.props.userInviteStatus ~= p25.userInviteStatus then
-		p24:playAnimation(t1[p24.props.userInviteStatus])
+	if p25.props.userInviteStatus and p25.props.userInviteStatus ~= p26.userInviteStatus then
+		p25:playAnimation(t1[p25.props.userInviteStatus])
 	end
 end
-function v14.didMount(p26) -- line: 238
+function v14.didMount(p27) -- line: 244
 	-- upvalues: t1 (copy)
-	if p26.props.userInviteStatus then
-		p26:playAnimation(t1[p26.props.userInviteStatus])
+	if p27.props.userInviteStatus then
+		p27:playAnimation(t1[p27.props.userInviteStatus])
 	end
 end
-function v14.playAnimation(p27, p28) -- line: 244
+function v14.playAnimation(p28, p29) -- line: 250
 	-- upvalues: RunService (copy)
-	p27.animationStartTime = tick()
-	p27.animationFunction = p28
+	p28.animationStartTime = tick()
+	p28.animationFunction = p29
 
-	if not p27.renderSteppedConnection then
-		p27.renderSteppedConnection = RunService.RenderStepped:Connect(function() -- line: 249
-			-- upvalues: p27 (copy)
-			p27.animationFunction(tick() - p27.animationStartTime, p27.updateBindings, function() -- line: 250
-				-- upvalues: p27 (copy)
-				p27:stopAnimation()
+	if not p28.renderSteppedConnection then
+		p28.renderSteppedConnection = RunService.RenderStepped:Connect(function() -- line: 255
+			-- upvalues: p28 (copy)
+			p28.animationFunction(tick() - p28.animationStartTime, p28.updateBindings, function() -- line: 256
+				-- upvalues: p28 (copy)
+				p28:stopAnimation()
 			end)
 		end)
-		p27.props.animationBegun()
+		p28.props.animationBegun()
 	end
 end
-function v14.stopAnimation(p29) -- line: 258
-	if p29.renderSteppedConnection then
-		p29.renderSteppedConnection:Disconnect()
-		p29.renderSteppedConnection = nil
-		p29.props.animationEnded()
+function v14.stopAnimation(p30) -- line: 264
+	if p30.renderSteppedConnection then
+		p30.renderSteppedConnection:Disconnect()
+		p30.renderSteppedConnection = nil
+		p30.props.animationEnded()
 	end
 end
-function v14.willUnmount(p30) -- line: 266
-	p30:stopAnimation()
+function v14.willUnmount(p31) -- line: 272
+	p31:stopAnimation()
 end
 
 return v14

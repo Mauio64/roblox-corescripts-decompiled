@@ -3,6 +3,8 @@ local SessionService = game:GetService("SessionService")
 local TelemetryService = game:GetService("TelemetryService")
 
 game:DefineFastInt("LuaVoiceChatThrottleHundrethsPercent", 10000)
+game:DefineFastInt("LuaVoiceVolumeControlsEligibilityThrottleHundredthsPercent", 10000)
+game:DefineFastInt("LuaVoiceVolumeControlsImpressionsThrottleHundredthsPercent", 10000)
 game:DefineFastInt("LuaVoiceChatAnalyticsPointsThrottle", 0)
 game:DefineFastFlag("LuaVoiceChatAnalyticsUsePointsV2", false)
 game:DefineFastFlag("LuaVoiceChatAnalyticsUseCounterV2", false)
@@ -17,7 +19,7 @@ t1.INFO = "info"
 t1.WARNING = "warning"
 t1.ERROR = "error"
 
-function t1.new(t2: {[any]: any}?) -- line: 137
+function t1.new(t2: {[any]: any}?) -- line: 158
 	-- upvalues: RbxAnalyticsService (copy), t1 (copy)
 	if not t2 then
 		t2 = RbxAnalyticsService
@@ -30,10 +32,10 @@ function t1.new(t2: {[any]: any}?) -- line: 137
 	}, t1))
 end
 
-local function stub() -- line: 150
+local function stub() -- line: 171
 end
 
-function t1.stubService() -- line: 152
+function t1.stubService() -- line: 173
 	-- upvalues: stub (copy)
 	return {
 		SetRBXEvent = stub,
@@ -44,10 +46,10 @@ function t1.stubService() -- line: 152
 		ReportInfluxSeries = stub
 	}
 end
-function t1.setImpl(p1, p2) -- line: 163
+function t1.setImpl(p1, p2) -- line: 184
 	p1._impl = p2
 end
-function t1._report(p3, p4, p5, p6, p7) -- line: 167
+function t1._report(p3, p4, p5, p6, p7) -- line: 188
 	local v14 = p4 .. "-" .. p5
 
 	if game:GetFastFlag("LuaVoiceChatAnalyticsUsePointsV2") then
@@ -70,7 +72,7 @@ function t1._report(p3, p4, p5, p6, p7) -- line: 167
 		p3._impl:SendEventDeferred("client", p4, p5, p7)
 	end
 end
-function t1.reportVoiceChatJoinResult(p8, p9, p10, p11) -- line: 189
+function t1.reportVoiceChatJoinResult(p8, p9, p10, p11) -- line: 210
 	-- upvalues: t1 (copy)
 	p8:_report("voiceChat", "defaultChannelJoinResults", p10, {
 		success = p9,
@@ -78,12 +80,12 @@ function t1.reportVoiceChatJoinResult(p8, p9, p10, p11) -- line: 189
 		logLevel = p11 or t1.INFO
 	})
 end
-function t1.reportBanMessageEvent(t3: {[any]: any}, s1: string) -- line: 197
+function t1.reportBanMessageEvent(t3: {[any]: any}, s1: string) -- line: 218
 	if game:GetFastFlag("LuaVoiceChatAnalyticsBanMessage") then
 		t3._impl:ReportCounter("voiceChat-reportBanMessage" .. s1, 1)
 	end
 end
-function t1.reportBanMessageEventV2(t4: {[any]: any}, s2: string, n1: number, n2: number, s3: string) -- line: 203
+function t1.reportBanMessageEventV2(t4: {[any]: any}, s2: string, n1: number, n2: number, s3: string) -- line: 224
 	t4:_report("voiceChat", "reportBanEvent", nil, {
 		eventType = s2,
 		banReason = n1,
@@ -91,15 +93,15 @@ function t1.reportBanMessageEventV2(t4: {[any]: any}, s2: string, n1: number, n2
 		voiceSessionId = s3
 	})
 end
-function t1.reportReconnectDueToMissedSequence(p12) -- line: 212
+function t1.reportReconnectDueToMissedSequence(p12) -- line: 233
 	if game:GetFastFlag("LuaVoiceChatReconnectMissedSequence") then
 		p12._impl:ReportCounter("voiceChat-reconnectMissedSequence", 1)
 	end
 end
-function t1.reportOutOfOrderSequence(p13) -- line: 218
+function t1.reportOutOfOrderSequence(p13) -- line: 239
 	p13._impl:ReportCounter("voiceChat-outOfOrderSequence", 1)
 end
-function t1.reportReceivedNudge(t5: {[any]: any}, t6: {[any]: any}, n3: number, s4: string) -- line: 222
+function t1.reportReceivedNudge(t5: {[any]: any}, t6: {[any]: any}, n3: number, s4: string) -- line: 243
 	local UnixTimestampMillis = DateTime.fromIsoDate(t6.deliveryTime).UnixTimestampMillis
 	local v33 = DateTime.now().UnixTimestampMillis - UnixTimestampMillis
 
@@ -112,7 +114,7 @@ function t1.reportReceivedNudge(t5: {[any]: any}, t6: {[any]: any}, n3: number, 
 		voiceSessionId = s4
 	})
 end
-function t1.reportClosedNudge(t7: {[any]: any}, n4: number, s5: string) -- line: 239
+function t1.reportClosedNudge(t7: {[any]: any}, n4: number, s5: string) -- line: 260
 	t7._impl:ReportCounter("voicechat-closednudge", 1)
 	t7._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
 		closeType = "CLOSED",
@@ -120,7 +122,7 @@ function t1.reportClosedNudge(t7: {[any]: any}, n4: number, s5: string) -- line:
 		voiceSessionId = s5
 	})
 end
-function t1.reportAcknowledgedNudge(t8: {[any]: any}, n5: number, s6: string) -- line: 248
+function t1.reportAcknowledgedNudge(t8: {[any]: any}, n5: number, s6: string) -- line: 269
 	t8._impl:ReportCounter("voicechat-acknowledgednudge", 1)
 	t8._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
 		closeType = "ACKNOWLEDGED",
@@ -128,7 +130,7 @@ function t1.reportAcknowledgedNudge(t8: {[any]: any}, n5: number, s6: string) --
 		voiceSessionId = s6
 	})
 end
-function t1.reportDeniedNudge(t9: {[any]: any}, n6: number, s7: string) -- line: 257
+function t1.reportDeniedNudge(t9: {[any]: any}, n6: number, s7: string) -- line: 278
 	t9._impl:ReportCounter("voicechat-deniednudge", 1)
 	t9._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
 		closeType = "DENIED",
@@ -136,7 +138,7 @@ function t1.reportDeniedNudge(t9: {[any]: any}, n6: number, s7: string) -- line:
 		voiceSessionId = s7
 	})
 end
-function t1.reportVoiceMuteIndividual(t10: {[any]: any}, t11: {[any]: any}) -- line: 266
+function t1.reportVoiceMuteIndividual(t10: {[any]: any}, t11: {[any]: any}) -- line: 287
 	t10._impl:SendEventDeferred("client", "voice", "voiceUIMuteUnmuteIndividual", {
 		user_id = t11.userId,
 		client_session_id = t11.clientSessionId,
@@ -146,7 +148,7 @@ function t1.reportVoiceMuteIndividual(t10: {[any]: any}, t11: {[any]: any}) -- l
 		muted = t11.muted
 	})
 end
-function t1.reportVoiceMuteGroup(t12: {[any]: any}, t13: {[any]: any}) -- line: 277
+function t1.reportVoiceMuteGroup(t12: {[any]: any}, t13: {[any]: any}) -- line: 298
 	t12._impl:SendEventDeferred("client", "voice", "voiceUIMuteUnmuteGroup", {
 		user_id = t13.userId,
 		client_session_id = t13.clientSessionId,
@@ -156,7 +158,7 @@ function t1.reportVoiceMuteGroup(t12: {[any]: any}, t13: {[any]: any}) -- line: 
 		muted = t13.muted
 	})
 end
-function t1.reportVoiceMuteSelf(t14: {[any]: any}, t15: {[any]: any}) -- line: 288
+function t1.reportVoiceMuteSelf(t14: {[any]: any}, t15: {[any]: any}) -- line: 309
 	t14._impl:SendEventDeferred("client", "voice", "voiceUIMuteUnmuteSelf", {
 		user_id = t15.userId,
 		client_session_id = t15.clientSessionId,
@@ -165,7 +167,7 @@ function t1.reportVoiceMuteSelf(t14: {[any]: any}, t15: {[any]: any}) -- line: 2
 		muted = t15.muted
 	})
 end
-function t1.reportJoinVoiceButtonEvent(t16: {[any]: any}, s8: string, n7: number, n8: number, s9: string, s10: string?, s11: string?) -- line: 298
+function t1.reportJoinVoiceButtonEvent(t16: {[any]: any}, s8: string, n7: number, n8: number, s9: string, s10: string?, s11: string?) -- line: 319
 	t16._impl:SendEventDeferred("client", "voice", "joinVoiceButtonEvent", {
 		eventType = s8,
 		universeId = n7,
@@ -175,7 +177,7 @@ function t1.reportJoinVoiceButtonEvent(t16: {[any]: any}, s8: string, n7: number
 		buttonConsequence = s11
 	})
 end
-function t1.reportJoinVoiceButtonEventWithVoiceSessionId(t17: {[any]: any}, s12: string, n9: number, n10: number, s13: string, s14: string, s15: string?, s16: string?) -- line: 316
+function t1.reportJoinVoiceButtonEventWithVoiceSessionId(t17: {[any]: any}, s12: string, n9: number, n10: number, s13: string, s14: string, s15: string?, s16: string?) -- line: 337
 	t17._impl:SendEventDeferred("client", "voice", "joinVoiceButtonEvent", {
 		eventType = s12,
 		universeId = n9,
@@ -186,7 +188,7 @@ function t1.reportJoinVoiceButtonEventWithVoiceSessionId(t17: {[any]: any}, s12:
 		buttonConsequence = s16
 	})
 end
-function t1.reportJoinVoiceUpsellEvent(_: {[any]: any}, s17: string, s18: string, b1: boolean, s19: string?, s20: string?) -- line: 336
+function t1.reportJoinVoiceUpsellEvent(_: {[any]: any}, s17: string, s18: string, b1: boolean, s19: string?, s20: string?) -- line: 357
 	-- upvalues: SessionService (copy), TelemetryService (copy)
 	local t19 = {
 		description = "Event fired when user sees or interacts with Join Voice button",
@@ -219,7 +221,7 @@ function t1.reportJoinVoiceUpsellEvent(_: {[any]: any}, s17: string, s18: string
 		}
 	})
 end
-function t1.reportLeaveVoiceButtonEvent(t21: {[any]: any}, s21: string, n11: number, n12: number, s22: string, s23: string) -- line: 369
+function t1.reportLeaveVoiceButtonEvent(t21: {[any]: any}, s21: string, n11: number, n12: number, s22: string, s23: string) -- line: 390
 	t21._impl:SendEventDeferred("client", "voice", "leaveVoiceButtonEvent", {
 		eventType = s21,
 		universeId = n11,
@@ -228,7 +230,7 @@ function t1.reportLeaveVoiceButtonEvent(t21: {[any]: any}, s21: string, n11: num
 		voiceSessionId = s23
 	})
 end
-function t1.reportInExpConsent(t22: {[any]: any}, s24: string, s25: string, n13: number, n14: number, s26: string) -- line: 385
+function t1.reportInExpConsent(t22: {[any]: any}, s24: string, s25: string, n13: number, n14: number, s26: string) -- line: 406
 	t22._impl:SendEventDeferred("client", "voiceChat", "inExpConsentModalEvent", {
 		eventType = s24,
 		entry = s25,
@@ -237,7 +239,7 @@ function t1.reportInExpConsent(t22: {[any]: any}, s24: string, s25: string, n13:
 		playSessionId = s26
 	})
 end
-function t1.reportDevicePermissionsModalEvent(t23: {[any]: any}, s27: string, s28: string, n15: number, n16: number, s29: string) -- line: 401
+function t1.reportDevicePermissionsModalEvent(t23: {[any]: any}, s27: string, s28: string, n15: number, n16: number, s29: string) -- line: 422
 	local v90 = string.sub(s29, 2, #s29 - 1)
 
 	t23._impl:SendEventDeferred("client", "voiceChat", "devicePermissionsModalEvent", {
@@ -248,11 +250,72 @@ function t1.reportDevicePermissionsModalEvent(t23: {[any]: any}, s27: string, s2
 		voiceSessionId = s28
 	})
 end
-function t1.reportConnectDisconnectEvents(p14, p15, p16) -- line: 420
+function t1.reportConnectDisconnectEvents(p14, p15, p16) -- line: 441
 	p14._impl:SendEventDeferred("client", "voiceChat", p15, p16)
 end
-function t1.reportVoiceEvents(p17, p18, p19) -- line: 424
+function t1.reportVoiceEvents(p17, p18, p19) -- line: 445
 	p17._impl:SendEventDeferred("client", "voice", p18, p19)
+end
+function t1.reportVoiceVolumeEligibility(_: {[any]: any}, t25: {[any]: any}) -- line: 449
+	-- upvalues: TelemetryService (copy)
+	local t26 = {
+		eventName = "VoiceVolumeControlsEligibility",
+		description = "Records voice volume eligibility state on voice join for VVC telemetry",
+		links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/voice/voice_volume_controls_eligibility.proto",
+		backends = { "EventIngest" },
+		throttlingPercentage = game:GetFastInt("LuaVoiceVolumeControlsEligibilityThrottleHundredthsPercent"),
+		lastUpdated = {
+			2026,
+			7,
+			7
+		}
+	}
+	local t27 = {
+		playSessionId = t25.playSessionId,
+		voiceSessionId = t25.voiceSessionId,
+		voiceChatVolume = t25.voiceChatVolume,
+		usesNewAudioApi = t25.usesNewAudioApi,
+		enablesVoiceVolumeControls = t25.enablesVoiceVolumeControls,
+		isEligible = t25.isEligible
+	}
+
+	TelemetryService:LogEvent(t26, {
+		customFields = t27,
+		standardizedFields = {
+			"addPlaceId",
+			"addUniverseId"
+		}
+	})
+end
+function t1.reportVoiceVolumeImpressions(_: {[any]: any}, t29: {[any]: any}) -- line: 470
+	-- upvalues: TelemetryService (copy)
+	local t30 = {
+		eventName = "VoiceVolumeControlsImpressions",
+		description = "Records whether the voice volume slider was seen during a voice session for Voice Volume Controls telemetry. Only recorded for voice volume control eligible users",
+		links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/voice/voice_volume_controls_impressions.proto",
+		backends = { "EventIngest" },
+		throttlingPercentage = game:GetFastInt("LuaVoiceVolumeControlsImpressionsThrottleHundredthsPercent"),
+		lastUpdated = {
+			2026,
+			7,
+			7
+		}
+	}
+	local t31 = {
+		playSessionId = t29.playSessionId,
+		voiceSessionId = t29.voiceSessionId,
+		sliderSeen = t29.sliderSeen,
+		voiceJoinTimestampMs = t29.voiceJoinTimestampMs,
+		sliderSeenTimestampMs = t29.sliderSeenTimestampMs
+	}
+
+	TelemetryService:LogEvent(t30, {
+		customFields = t31,
+		standardizedFields = {
+			"addPlaceId",
+			"addUniverseId"
+		}
+	})
 end
 
 return t1

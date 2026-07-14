@@ -1,4 +1,0 @@
-return {
-	Limited = "Limited",
-	Collectible = "Collectible"
-}

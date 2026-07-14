@@ -1,53 +1,36 @@
-local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
-local FFlagAXTTIEnableColdWarmDetection = require(TimeToInteractiveTrackerParent.SharedFlags).FFlagAXTTIEnableColdWarmDetection
+local Parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
+local FFlagAXTTIEnableColdWarmDetection = require(Parent.SharedFlags).FFlagAXTTIEnableColdWarmDetection
 
 require(script.Parent.Parent.types)
 
 local now = require(script.Parent.Parent.Parent.Utils.now)
-local FFlagTTITrackerMemoryTracking = require(TimeToInteractiveTracker.Utils.FFlagTTITrackerMemoryTracking)
 
-return function(p1) -- line: 18
-	-- upvalues: FFlagTTITrackerMemoryTracking (copy), now (copy), FFlagAXTTIEnableColdWarmDetection (copy)
+return function(p1) -- line: 16
+	-- upvalues: now (copy), FFlagAXTTIEnableColdWarmDetection (copy)
 	local t1 = {}
 
-	return function(s1: string, p2) -- line: 24
-		-- upvalues: FFlagTTITrackerMemoryTracking (copy), p1 (copy), now (copy), FFlagAXTTIEnableColdWarmDetection (copy), t1 (copy)
-		local u10 = nil
-		local u12
+	return function(s1: string, b1: boolean?) -- line: 22
+		-- upvalues: p1 (copy), now (copy), FFlagAXTTIEnableColdWarmDetection (copy), t1 (copy)
+		p1(function(p2) -- line: 23
+			-- upvalues: s1 (copy), now (copy), FFlagAXTTIEnableColdWarmDetection (copy), b1 (copy), t1 (copy)
+			local v9 = p2[s1]
+			local v10 = now()
+			local v11 = table.clone(p2)
 
-		if FFlagTTITrackerMemoryTracking then
-			local v11 = if type(p2) ~= "boolean" then p2 else {
-				autoDetectColdVsWarm = p2
-			}
-
-			u12 = if not v11 then nil else v11.autoDetectColdVsWarm
-			u10 = if not v11 then nil else v11.trackMemory
-		else
-			u12 = if type(p2) ~= "boolean" then nil else p2
-		end
-
-		p1(function(p3) -- line: 39
-			-- upvalues: s1 (copy), now (copy), u10 (ref), FFlagAXTTIEnableColdWarmDetection (copy), u12 (ref), t1 (copy)
-			local v14 = p3[s1]
-			local v15 = now()
-			local v16 = table.clone(p3)
-
-			v16[s1] = {
+			v11[s1] = {
 				endTime = nil,
 				deltaMs = nil,
 				sent = nil,
-				startTime = v15,
-				trackMemory = u10,
-				metadata = if v14 == nil then {} else table.clone(v14.metadata)
+				startTime = v10,
+				metadata = if v9 == nil then {} else table.clone(v9.metadata)
 			}
 
-			if FFlagAXTTIEnableColdWarmDetection and u12 then
-				v16[s1].metadata.coldStart = not t1[s1]
+			if FFlagAXTTIEnableColdWarmDetection and b1 then
+				v11[s1].metadata.coldStart = not t1[s1]
 				t1[s1] = true
 			end
 
-			return v16
+			return v11
 		end)
 	end
 end

@@ -56,8 +56,8 @@ local t4 = {
 	[CatalogItemCardItemInfoEnum.DynamicHead] = t1.DYNAMIC_HEAD
 }
 
-return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 124
-	-- upvalues: useTokens (copy), t4 (copy), t3 (copy), t2 (copy), React (copy), ItemCardHeader (copy), ItemCardHeaderCornersOverlay (copy), ItemCardBadge (copy), ItemCardStatus (copy), ItemCardIcon (copy), CatalogRowItemCardFooter (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy), FFlagAXDurables2Option (copy)
+return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 128
+	-- upvalues: useTokens (copy), t4 (copy), t3 (copy), t2 (copy), React (copy), ItemCardHeader (copy), ItemCardHeaderCornersOverlay (copy), ItemCardBadge (copy), ItemCardStatus (copy), ItemCardIcon (copy), CatalogRowItemCardFooter (copy), FFlagAXDurables2Option (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy)
 	local v28 = useTokens()
 	local v29 = if not t5.itemInfo then nil else t4[t5.itemInfo]
 	local v30 = if not t5.itemType then nil else t3[t5.itemType]
@@ -123,6 +123,7 @@ return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 124
 			itemSubType = t5.itemSubType,
 			creatorHasVerifiedBadge = if not t5.creator then nil else t5.creator.verified,
 			priceLineContent = t5.priceLineContent,
+			itemStatusInCheckout = if not FFlagAXDurables2Option then nil else t5.itemStatusInCheckout,
 			expirationTime = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.expirationTime,
 			isOwned = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.isOwned,
 			timedOptions = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.timedOptions,
@@ -131,10 +132,13 @@ return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 124
 			setSelectedTimedOptionPrice = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.setSelectedTimedOptionPrice,
 			selectedTimedOptionIndexInReducer = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.selectedTimedOptionIndexInReducer,
 			wearTimeSelectedOptionInList = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.wearTimeSelectedOptionInList,
-			wearTimeOptionButton = if not FFlagAXDurables2Option then nil else t5.wearTimeOptionButton,
 			onRemove = if not FFlagAXDurables2Option then nil else t5.onRemove,
+			hideTimedOptionSelections = if not FFlagAXDurables2Option then nil else t5.hideTimedOptionSelections,
 			Size = t5.footerSize,
-			AutomaticSize = if not t5.footerAutomaticSize then Enum.AutomaticSize.Y else t5.footerAutomaticSize
+			AutomaticSize = if not t5.footerAutomaticSize then Enum.AutomaticSize.Y else t5.footerAutomaticSize,
+			offersLocalized = if not FFlagAXDurables2Option then nil else t5.offersLocalized,
+			offerApplied = if not FFlagAXDurables2Option then nil else t5.offerApplied,
+			showOfferPillTooltip = if not FFlagAXDurables2Option then nil else t5.showOfferPillTooltip
 		})
 	})
 end))

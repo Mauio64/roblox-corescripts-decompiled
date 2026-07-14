@@ -4,7 +4,7 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
 local t = InGameMenuDependencies.t
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local OpenTypeSupport = UIBlox.Utility.OpenTypeSupport
@@ -63,16 +63,29 @@ function v19.renderButtons(p2) -- line: 76
 	}))
 end
 function v19.renderWithSelectionCursor(p3, p4) -- line: 91
-	-- upvalues: withStyle (copy), FFlagLuaMenuPerfImprovements (copy), Roact (copy), CursorKind (copy), ImageSetLabel (copy), Cryo (copy), t1 (copy), ThemedTextLabel (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), GetFFlagLuaAppEnableOpenTypeIGMFix (copy), OpenTypeSupport (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), FFlagLuaMenuPerfImprovements (copy), Roact (copy), CursorKind (copy), ImageSetLabel (copy), Cryo (copy), t1 (copy), ThemedTextLabel (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), GetFFlagLuaAppEnableOpenTypeIGMFix (copy), OpenTypeSupport (copy)
 	local props = p3.props
 	local v26 = props.displayName ~= "" and props.displayName or props.username
 
-	return withStyle(function(p5) -- line: 101
+	return withFoundationOrUIBloxStyle(function(p5) -- line: 101
+		return {
+			Theme = {
+				BackgroundContrast = {
+					Color = p5.Color.Surface.Surface_100.Color3,
+					Transparency = p5.Color.Surface.Surface_100.Transparency
+				},
+				BackgroundOnHover = {
+					Color = p5.Color.State.Hover.Color3,
+					Transparency = p5.Color.State.Hover.Transparency
+				}
+			}
+		}
+	end, function(p6) -- line: 108
 		-- upvalues: p3 (copy), FFlagLuaMenuPerfImprovements (copy), Roact (copy), props (copy), p4 (copy), CursorKind (copy), ImageSetLabel (copy), Cryo (copy), t1 (copy), ThemedTextLabel (copy), v26 (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), GetFFlagLuaAppEnableOpenTypeIGMFix (copy), OpenTypeSupport (copy)
-		local BackgroundContrast = p5.Theme.BackgroundContrast
+		local BackgroundContrast = p6.Theme.BackgroundContrast
 
 		if p3.props.isSelected then
-			BackgroundContrast = p5.Theme.BackgroundOnHover
+			BackgroundContrast = p6.Theme.BackgroundOnHover
 		end
 
 		local onActivated = p3.props.onActivated
@@ -132,17 +145,17 @@ function v19.renderWithSelectionCursor(p3, p4) -- line: 91
 		})
 	end)
 end
-function v19.render(p6) -- line: 182
+function v19.render(p7) -- line: 189
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p7) -- line: 183
-		-- upvalues: p6 (copy)
-		return p6:renderWithSelectionCursor(p7)
+	return withSelectionCursorProvider(function(p8) -- line: 190
+		-- upvalues: p7 (copy)
+		return p7:renderWithSelectionCursor(p8)
 	end)
 end
 
-return Roact.forwardRef(function(p8, p9) -- line: 188
+return Roact.forwardRef(function(p9, p10) -- line: 195
 	-- upvalues: Roact (copy), v19 (copy), Cryo (copy)
-	return Roact.createElement(v19, Cryo.Dictionary.join(p8, {
-		forwardRef = p9
+	return Roact.createElement(v19, Cryo.Dictionary.join(p9, {
+		forwardRef = p10
 	}))
 end)

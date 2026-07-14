@@ -12,6 +12,8 @@ local GetDeepLinkStore = require(Moments.Stores.GetDeepLinkStore)
 local createMomentsStore = require(Moments.Stores.GetMomentsStore.createMomentsStore)
 local GetImmersiveChromeStore = require(Moments.Stores.GetImmersiveChromeStore)
 local GetFFlagMomentsFixShareDeeplink = require(Moments.Flags.GetFFlagMomentsFixShareDeeplink)
+local GetFFlagMomentsFixPeekReturnChrome = require(Moments.Flags.GetFFlagMomentsFixPeekReturnChrome)
+local useMomentsTabIsVisible = require(Moments.Hooks.useMomentsTabIsVisible)
 local InnerNavigator = require(Moments.Navigation.InnerNavigator)
 local MomentsHostShell = require(Moments.Components.MomentsHostShell)
 local useResetTeleportingOnGameLeave = require(Moments.Hooks.useResetTeleportingOnGameLeave)
@@ -26,11 +28,11 @@ local MomentsSurfaceLoadManager = MomentsCommon.Performance.MomentsSurfaceLoadMa
 local useMomentsGating = MomentsCommon.Hooks.useMomentsGating
 local FFlagMomentsWatchSessionalization = SharedFlags.FFlagMomentsWatchSessionalization
 local FFlagMomentsSurfaceLoadTTI = SharedFlags.FFlagMomentsSurfaceLoadTTI
-local v29 = RoactNavigation.createAppContainer(InnerNavigator)
+local v31 = RoactNavigation.createAppContainer(InnerNavigator)
 local getActiveRoutes = Navigation.getActiveRoutes
-local v31 = GetFFlagMomentsFixShareDeeplink()
+local v33 = GetFFlagMomentsFixShareDeeplink()
 
-local function normalizeDeepLinkedMomentId(p1) -- line: 67
+local function normalizeDeepLinkedMomentId(p1) -- line: 69
 	if type(p1) == "string" and p1 ~= "" then
 		return p1
 	end
@@ -41,13 +43,13 @@ local function normalizeDeepLinkedMomentId(p1) -- line: 67
 
 	return nil
 end
-local function getMomentIdFromLaunchData(p2) -- line: 76
+local function getMomentIdFromLaunchData(p2) -- line: 78
 	-- upvalues: HttpService (copy)
 	if type(p2) ~= "string" or p2 == "" then
 		return nil
 	end
 
-	local ok, result = pcall(function() -- line: 81
+	local ok, result = pcall(function() -- line: 83
 		-- upvalues: HttpService (copy), p2 (copy)
 		return HttpService:JSONDecode(p2)
 	end)
@@ -68,7 +70,7 @@ local function getMomentIdFromLaunchData(p2) -- line: 76
 
 	return nil
 end
-local function getDeepLinkedMomentIdFromParams(p3) -- line: 91
+local function getDeepLinkedMomentIdFromParams(p3) -- line: 93
 	-- upvalues: getMomentIdFromLaunchData (copy)
 	if type(p3) ~= "table" then
 		return nil
@@ -78,29 +80,29 @@ local function getDeepLinkedMomentIdFromParams(p3) -- line: 91
 
 	if type(extraProps) == "table" then
 		local postId = extraProps.postId
-		local v50 = if type(postId) ~= "string" or postId == "" then if type(postId) ~= "number" then nil else tostring(postId) else postId
+		local v52 = if type(postId) ~= "string" or postId == "" then if type(postId) ~= "number" then nil else tostring(postId) else postId
 
-		if v50 ~= nil then
-			return v50
+		if v52 ~= nil then
+			return v52
 		end
 
-		local v51 = getMomentIdFromLaunchData(extraProps.launchData)
+		local v53 = getMomentIdFromLaunchData(extraProps.launchData)
 
-		if v51 ~= nil then
-			return v51
+		if v53 ~= nil then
+			return v53
 		end
 	end
 
 	local postId = p3.postId
-	local v53 = if type(postId) ~= "string" or postId == "" then if type(postId) ~= "number" then nil else tostring(postId) else postId
+	local v55 = if type(postId) ~= "string" or postId == "" then if type(postId) ~= "number" then nil else tostring(postId) else postId
 
-	if v53 ~= nil then
-		return v53
+	if v55 ~= nil then
+		return v55
 	end
 
 	return (getMomentIdFromLaunchData(p3.launchData))
 end
-local function getDeepLinkRequestFromNavigationParams(p4, s1: string) -- line: 122
+local function getDeepLinkRequestFromNavigationParams(p4, s1: string) -- line: 124
 	-- upvalues: getDeepLinkedMomentIdFromParams (copy)
 	if not p4 or not p4.getParam then
 		return nil
@@ -111,45 +113,45 @@ local function getDeepLinkRequestFromNavigationParams(p4, s1: string) -- line: 1
 		postId = p4.getParam("postId"),
 		launchData = p4.getParam("launchData")
 	}
-	local v57 = getDeepLinkedMomentIdFromParams(t1)
+	local v59 = getDeepLinkedMomentIdFromParams(t1)
 
-	if v57 == nil then
+	if v59 == nil then
 		return nil
 	end
 
 	return {
-		momentId = v57,
-		key = `{ s1 }:params:{ tostring(t1.extraProps) }:{ tostring(t1.postId) }:{ tostring(t1.launchData) }:{ v57 }`
+		momentId = v59,
+		key = `{ s1 }:params:{ tostring(t1.extraProps) }:{ tostring(t1.postId) }:{ tostring(t1.launchData) }:{ v59 }`
 	}
 end
-local function getDeepLinkRequestFromNavigationState(p5, s2: string) -- line: 143
+local function getDeepLinkRequestFromNavigationState(p5, s2: string) -- line: 145
 	-- upvalues: getActiveRoutes (copy), getDeepLinkedMomentIdFromParams (copy)
-	local v60 = getActiveRoutes(p5)
+	local v62 = getActiveRoutes(p5)
 
-	for i = #v60, 1, -1 do
-		local v62 = v60[i]
-		local v63 = getDeepLinkedMomentIdFromParams(v62.params)
+	for i = #v62, 1, -1 do
+		local v64 = v62[i]
+		local v65 = getDeepLinkedMomentIdFromParams(v64.params)
 
-		if v63 ~= nil then
+		if v65 ~= nil then
 			return {
-				momentId = v63,
-				key = `{ s2 }:state:{ tostring(v62.key) }:{ tostring(v62.params) }:{ v63 }`
+				momentId = v65,
+				key = `{ s2 }:state:{ tostring(v64.key) }:{ tostring(v64.params) }:{ v65 }`
 			}
 		end
 	end
 
 	return nil
 end
-local function getDeepLinkRequest(p6) -- line: 159
+local function getDeepLinkRequest(p6) -- line: 161
 	-- upvalues: getDeepLinkRequestFromNavigationParams (copy), getDeepLinkRequestFromNavigationState (copy)
 	local n1 = 0
 
 	while p6 ~= nil do
 		local str = tostring(n1)
-		local v67 = getDeepLinkRequestFromNavigationParams(p6, str) or getDeepLinkRequestFromNavigationState(p6.state, str)
+		local v69 = getDeepLinkRequestFromNavigationParams(p6, str) or getDeepLinkRequestFromNavigationState(p6.state, str)
 
-		if v67 ~= nil then
-			return v67
+		if v69 ~= nil then
+			return v69
 		end
 
 		if not p6._dangerouslyGetParent then
@@ -162,102 +164,102 @@ local function getDeepLinkRequest(p6) -- line: 159
 
 	return nil
 end
-local function getEntrySource(p7) -- line: 180
+local function getEntrySource(p7) -- line: 182
 	if not p7 or not p7.getParam then
 		return "watch_tab"
 	end
 
-	local v69 = p7.getParam("extraProps")
+	local v71 = p7.getParam("extraProps")
 
-	if type(v69) == "table" and type(v69.source) == "string" then
-		return v69.source
+	if type(v71) == "table" and type(v71.source) == "string" then
+		return v71.source
 	end
 
 	return p7.getParam("source", "watch_tab")
 end
-local function MomentsTabEntry(t2: {[any]: any}) -- line: 191
-	-- upvalues: React (copy), createMomentsStore (copy), useResetTeleportingOnGameLeave (copy), v31 (copy), getDeepLinkRequest (copy), GetDeepLinkStore (copy), RobloxAppEvents (copy), AppPage (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy), fireFunnelAnalyticsEvent (copy), FFlagMomentsSurfaceLoadTTI (copy), MomentsSurfaceLoadManager (copy), getExperienceDetailsSheetStore (copy), GetImmersiveChromeStore (copy), RoactNavigation (copy), useMomentsGating (copy), InnerNavigator (copy), v29 (copy), MomentsHostShell (copy)
-	local v71 = React.useRef(t2)
+local function MomentsTabEntry(t2: {[any]: any}) -- line: 193
+	-- upvalues: React (copy), createMomentsStore (copy), useResetTeleportingOnGameLeave (copy), v33 (copy), getDeepLinkRequest (copy), GetDeepLinkStore (copy), RobloxAppEvents (copy), AppPage (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy), fireFunnelAnalyticsEvent (copy), FFlagMomentsSurfaceLoadTTI (copy), MomentsSurfaceLoadManager (copy), getExperienceDetailsSheetStore (copy), GetImmersiveChromeStore (copy), RoactNavigation (copy), useMomentsTabIsVisible (copy), GetFFlagMomentsFixPeekReturnChrome (copy), useMomentsGating (copy), InnerNavigator (copy), v31 (copy), MomentsHostShell (copy)
+	local v73 = React.useRef(t2)
 
-	v71.current = t2
+	v73.current = t2
 
-	local v72 = React.useRef(false)
-	local v73 = React.useRef(false)
-	local v74 = React.useRef(nil)
+	local v74 = React.useRef(false)
+	local v75 = React.useRef(false)
+	local v76 = React.useRef(nil)
 
-	if v74.current == nil then
-		v74.current = createMomentsStore()
+	if v76.current == nil then
+		v76.current = createMomentsStore()
 	end
 
 	useResetTeleportingOnGameLeave()
 
-	local u75 = nil
+	local u77 = nil
 
-	if v31 then
-		local v76 = getDeepLinkRequest(t2.navigation)
-		local v77 = if v76 == nil then nil else v76.momentId
-		local v78 = if v76 == nil then nil else v76.key
+	if v33 then
+		local v78 = getDeepLinkRequest(t2.navigation)
+		local v79 = if v78 == nil then nil else v78.momentId
+		local v80 = if v78 == nil then nil else v78.key
 
-		u75 = React.useRef(nil)
+		u77 = React.useRef(nil)
 
-		if v77 ~= nil and v78 ~= u75.current then
-			GetDeepLinkStore().setDeepLinkedMomentId(v77)
-			u75.current = v78
+		if v79 ~= nil and v80 ~= u77.current then
+			GetDeepLinkStore().setDeepLinkedMomentId(v79)
+			u77.current = v80
 		end
 
-		React.useEffect(function() -- line: 227
-			-- upvalues: v77 (copy), v73 (copy), RobloxAppEvents (copy), AppPage (copy)
-			if v77 ~= nil and v73.current then
+		React.useEffect(function() -- line: 229
+			-- upvalues: v79 (copy), v75 (copy), RobloxAppEvents (copy), AppPage (copy)
+			if v79 ~= nil and v75.current then
 				RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
 			end
 
-			v73.current = true
+			v75.current = true
 		end, {
-			v78,
-			v77,
+			v80,
+			v79,
 			t2.navigation
 		})
 	else
-		React.useEffect(function() -- line: 238
-			-- upvalues: t2 (copy), GetDeepLinkStore (copy), v73 (copy), RobloxAppEvents (copy), AppPage (copy)
+		React.useEffect(function() -- line: 240
+			-- upvalues: t2 (copy), GetDeepLinkStore (copy), v75 (copy), RobloxAppEvents (copy), AppPage (copy)
 			local navigation = t2.navigation
 
 			if not navigation or not navigation.getParam then
 				return
 			end
 
-			local v88 = navigation.getParam("extraProps")
+			local v91 = navigation.getParam("extraProps")
 
-			if type(v88) == "table" and type(v88.postId) == "string" then
-				GetDeepLinkStore().setDeepLinkedMomentId(v88.postId)
+			if type(v91) == "table" and type(v91.postId) == "string" then
+				GetDeepLinkStore().setDeepLinkedMomentId(v91.postId)
 
-				if v73.current then
+				if v75.current then
 					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
 				end
 			end
 
-			v73.current = true
+			v75.current = true
 		end, { t2.navigation })
 	end
 
-	local v79 = React.useCallback(function() -- line: 255
-		-- upvalues: v72 (copy), v74 (copy), v71 (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy), fireFunnelAnalyticsEvent (copy)
-		if v72.current then
+	local v81 = React.useCallback(function() -- line: 257
+		-- upvalues: v74 (copy), v76 (copy), v73 (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy), fireFunnelAnalyticsEvent (copy)
+		if v74.current then
 			return
 		end
 
-		v72.current = true
+		v74.current = true
 
-		local current = v74.current
-		local navigation = v71.current.navigation
+		local current = v76.current
+		local navigation = v73.current.navigation
 		local s3
 
 		if not navigation or not navigation.getParam then
 			s3 = "watch_tab"
 		else
-			local v92 = navigation.getParam("extraProps")
+			local v95 = navigation.getParam("extraProps")
 
-			s3 = if type(v92) ~= "table" or type(v92.source) ~= "string" then navigation.getParam("source", "watch_tab") else v92.source
+			s3 = if type(v95) ~= "table" or type(v95.source) ~= "string" then navigation.getParam("source", "watch_tab") else v95.source
 		end
 
 		current.resetSession()
@@ -267,17 +269,17 @@ local function MomentsTabEntry(t2: {[any]: any}) -- line: 191
 			source = s3
 		})
 
-		local v93 = SessionManager.startSession(FunnelEventNames.FunnelTypes.AppNavigation)
+		local v96 = SessionManager.startSession(FunnelEventNames.FunnelTypes.AppNavigation)
 
-		fireFunnelAnalyticsEvent(FunnelEventNames.FunnelTypes.AppNavigation, FunnelEventNames.AppNavigationSteps.AppLaunched, v93)
+		fireFunnelAnalyticsEvent(FunnelEventNames.FunnelTypes.AppNavigation, FunnelEventNames.AppNavigationSteps.AppLaunched, v96)
 	end, {})
-	local v80 = React.useCallback(function() -- line: 280
-		-- upvalues: v72 (copy), FFlagMomentsSurfaceLoadTTI (copy), MomentsSurfaceLoadManager (copy), getExperienceDetailsSheetStore (copy), v74 (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy)
-		if not v72.current then
+	local v82 = React.useCallback(function() -- line: 282
+		-- upvalues: v74 (copy), FFlagMomentsSurfaceLoadTTI (copy), MomentsSurfaceLoadManager (copy), getExperienceDetailsSheetStore (copy), v76 (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy)
+		if not v74.current then
 			return
 		end
 
-		v72.current = false
+		v74.current = false
 
 		if FFlagMomentsSurfaceLoadTTI then
 			MomentsSurfaceLoadManager.abort()
@@ -285,95 +287,107 @@ local function MomentsTabEntry(t2: {[any]: any}) -- line: 191
 
 		getExperienceDetailsSheetStore(false).close()
 
-		local current = v74.current
-		local v95 = os.clock() - current.getSessionStartTime(false)
+		local current = v76.current
+		local v98 = os.clock() - current.getSessionStartTime(false)
 
 		fireAnalyticsEvent(EventNames.MomentsSessionEnded, {
 			moments_session_id = current.getMomentsSessionId(false),
 			source = current.getSessionSource(false),
-			duration_seconds = tostring((math.floor(v95)))
+			duration_seconds = tostring((math.floor(v98)))
 		})
 		SessionManager.endSession(FunnelEventNames.FunnelTypes.AppNavigation)
 	end, {})
-	local v81 = React.useCallback(function() -- line: 310
-		-- upvalues: GetImmersiveChromeStore (copy), v71 (copy)
+	local v83 = React.useCallback(function() -- line: 312
+		-- upvalues: GetImmersiveChromeStore (copy), v73 (copy)
 		GetImmersiveChromeStore(false).setOverlayCovering(false)
 
-		local onTabFocused = v71.current.onTabFocused
+		local onTabFocused = v73.current.onTabFocused
 
 		if onTabFocused then
 			onTabFocused()
 		end
 	end, {})
 
-	React.useEffect(function() -- line: 323
-		-- upvalues: t2 (copy), v79 (copy), v81 (copy), v80 (copy), RoactNavigation (copy), v31 (copy), getDeepLinkRequest (copy), GetDeepLinkStore (copy), u75 (ref), RobloxAppEvents (copy), AppPage (copy)
+	React.useEffect(function() -- line: 325
+		-- upvalues: t2 (copy), v81 (copy), v83 (copy), v82 (copy), RoactNavigation (copy), v33 (copy), getDeepLinkRequest (copy), GetDeepLinkStore (copy), u77 (ref), RobloxAppEvents (copy), AppPage (copy)
 		local navigation = t2.navigation
 
 		if not navigation or not navigation.addListener then
-			v79()
 			v81()
+			v83()
 
-			return function() -- line: 328
-				-- upvalues: v80 (copy)
-				v80()
+			return function() -- line: 330
+				-- upvalues: v82 (copy)
+				v82()
 			end
 		end
 
-		v79()
 		v81()
+		v83()
 
-		local v98 = navigation.addListener(RoactNavigation.Events.DidFocus, function() -- line: 336
-			-- upvalues: v31 (copy), getDeepLinkRequest (copy), navigation (copy), GetDeepLinkStore (copy), u75 (ref), RobloxAppEvents (copy), AppPage (copy), v79 (copy), v81 (copy)
-			if v31 then
-				local v102 = getDeepLinkRequest(navigation)
+		local v101 = navigation.addListener(RoactNavigation.Events.DidFocus, function() -- line: 338
+			-- upvalues: v33 (copy), getDeepLinkRequest (copy), navigation (copy), GetDeepLinkStore (copy), u77 (ref), RobloxAppEvents (copy), AppPage (copy), v81 (copy), v83 (copy)
+			if v33 then
+				local v105 = getDeepLinkRequest(navigation)
 
-				if v102 ~= nil then
-					GetDeepLinkStore().setDeepLinkedMomentId(v102.momentId)
-					u75.current = v102.key
+				if v105 ~= nil then
+					GetDeepLinkStore().setDeepLinkedMomentId(v105.momentId)
+					u77.current = v105.key
 					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
 				end
 			else
-				local v103 = navigation.getParam("extraProps")
+				local v106 = navigation.getParam("extraProps")
 
-				if type(v103) == "table" and type(v103.postId) == "string" then
-					GetDeepLinkStore().setDeepLinkedMomentId(v103.postId)
+				if type(v106) == "table" and type(v106.postId) == "string" then
+					GetDeepLinkStore().setDeepLinkedMomentId(v106.postId)
 					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
 				end
 			end
 
-			v79()
 			v81()
+			v83()
 		end)
-		local v99 = navigation.addListener(RoactNavigation.Events.WillBlur, function() -- line: 355
-			-- upvalues: v80 (copy)
-			v80()
+		local v102 = navigation.addListener(RoactNavigation.Events.WillBlur, function() -- line: 357
+			-- upvalues: v82 (copy)
+			v82()
 		end)
 
-		return function() -- line: 359
-			-- upvalues: v80 (copy), v98 (copy), v99 (copy)
-			v80()
-			v98.remove()
-			v99.remove()
+		return function() -- line: 361
+			-- upvalues: v82 (copy), v101 (copy), v102 (copy)
+			v82()
+			v101.remove()
+			v102.remove()
 		end
 	end, {
-		v79,
-		v80,
-		v81
+		v81,
+		v82,
+		v83
 	})
 
-	local v82 = React.useMemo(function() -- line: 370
+	local v84 = useMomentsTabIsVisible()
+
+	React.useEffect(function() -- line: 376
+		-- upvalues: GetFFlagMomentsFixPeekReturnChrome (copy), v84 (copy), v83 (copy)
+		if GetFFlagMomentsFixPeekReturnChrome() and v84 then
+			v83()
+		end
+	end, {
+		v84,
+		v83
+	})
+
+	local v85 = React.useMemo(function() -- line: 386
 		-- upvalues: t2 (copy), GetImmersiveChromeStore (copy)
 		local openProfile = t2.openProfile
 		local openOwnMoments = t2.openOwnMoments
 
 		return {
-			openProfile = if not openProfile then nil else function(n2: number) -- line: 375
+			openProfile = if not openProfile then nil else function(n2: number) -- line: 391
 				-- upvalues: GetImmersiveChromeStore (copy), openProfile (copy)
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
 				openProfile(n2)
 			end,
-			openOwnMoments = if not openOwnMoments then nil else function() -- line: 381
+			openOwnMoments = if not openOwnMoments then nil else function() -- line: 397
 				-- upvalues: GetImmersiveChromeStore (copy), openOwnMoments (copy)
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
 				openOwnMoments()
@@ -383,23 +397,23 @@ local function MomentsTabEntry(t2: {[any]: any}) -- line: 191
 		t2.openProfile,
 		t2.openOwnMoments
 	})
-	local v83 = useMomentsGating()
+	local v86 = useMomentsGating()
 
-	if not v83.isTabEnabled and (not v83.isFlyoutEntryEnabled or not v83.platformIntegrationEnabled) then
+	if not v86.isTabEnabled and (not v86.isFlyoutEntryEnabled or not v86.platformIntegrationEnabled) then
 		return nil
 	end
 
-	local v84 = if not t2.useRootOwnedNavigation then React.createElement(v29) else React.createElement(InnerNavigator, {
+	local v87 = if not t2.useRootOwnedNavigation then React.createElement(v31) else React.createElement(InnerNavigator, {
 		navigation = t2.navigation
 	})
 
 	return React.createElement(MomentsHostShell, {
-		sessionStore = v74.current,
-		openProfile = v82.openProfile,
-		openOwnMoments = v82.openOwnMoments
-	}, v84)
+		sessionStore = v76.current,
+		openProfile = v85.openProfile,
+		openOwnMoments = v85.openOwnMoments
+	}, v87)
 end
-local function MomentsTabEntrySessionized(t3: {[any]: any}) -- line: 417
+local function MomentsTabEntrySessionized(t3: {[any]: any}) -- line: 433
 	-- upvalues: React (copy), MomentsTabEntry (copy)
 	return React.createElement(MomentsTabEntry, {
 		useRootOwnedNavigation = true,
@@ -410,17 +424,17 @@ local function MomentsTabEntrySessionized(t3: {[any]: any}) -- line: 417
 	})
 end
 
-local v41 = React.Component:extend("MomentsTabEntryScreen")
+local v43 = React.Component:extend("MomentsTabEntryScreen")
 
-function v41.render(p8) -- line: 432
+function v43.render(p8) -- line: 448
 	-- upvalues: React (copy), MomentsTabEntrySessionized (copy)
 	return React.createElement(MomentsTabEntrySessionized, p8.props)
 end
 
-v41.router = InnerNavigator.router
+v43.router = InnerNavigator.router
 
 if FFlagMomentsWatchSessionalization then
-	return v41
+	return v43
 end
 
 return MomentsTabEntry

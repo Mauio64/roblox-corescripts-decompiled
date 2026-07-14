@@ -33,6 +33,7 @@ local t1 = {
 	ChatWindowMessageHideRootFadeThreshold = 0.85,
 	ChatWindowMaxWidth = 475,
 	ChatWindowMaxHeight = 275,
+	ChatWindowScrollBarThickness = 8,
 	ChannelTabsSettings = {
 		HorizontalBarHeight = 40,
 		BackgroundTransparency = 0,

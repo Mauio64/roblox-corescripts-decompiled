@@ -10,7 +10,7 @@ local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent
 local Constants = require(ParentParent.Resources.Constants)
 local Assets = require(ParentParent.Resources.Assets)
@@ -58,15 +58,39 @@ function v20.init(p1) -- line: 59
 	p1.buttonContainerRef = Roact.createRef()
 end
 function v20.render(p3) -- line: 75
-	-- upvalues: withStyle (copy), TextService (copy), Roact (copy), CoreGui (copy), Constants (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), TextService (copy), Roact (copy), CoreGui (copy), Constants (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy)
 	local props = p3.props
 
-	return withStyle(function(p4) -- line: 78
+	return withFoundationOrUIBloxStyle(function(p4) -- line: 78
+		return {
+			Theme = {
+				Overlay = {
+					Color = p4.Color.Common.Scrim.Color3,
+					Transparency = p4.Color.Common.Scrim.Transparency
+				},
+				BackgroundUIDefault = {
+					Color = p4.Color.Surface.Surface_300.Color3,
+					Transparency = p4.Color.Surface.Surface_300.Transparency
+				},
+				Divider = {
+					Color = p4.Color.Stroke.Emphasis.Color3,
+					Transparency = p4.Color.Stroke.Emphasis.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Body = {
+					Font = p4.Typography.BodyLarge.Font,
+					RelativeSize = p4.Typography.BodyLarge.FontSize
+				}
+			}
+		}
+	end, function(p5) -- line: 90
 		-- upvalues: props (copy), TextService (copy), Roact (copy), CoreGui (copy), Constants (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), p3 (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy)
-		local BodyFont = p4.Font.Body.Font
-		local v36 = p4.Font.Body.RelativeSize * p4.Font.BaseSize
+		local BodyFont = p5.Font.Body.Font
+		local v37 = p5.Font.Body.RelativeSize * p5.Font.BaseSize
 		local bodyText = props.bodyText
-		local v38 = math.max(TextService:GetTextSize(bodyText, v36, BodyFont, Vector2.new(295, 1e999)).Y, v36 * 2) + 20 + 20
+		local v39 = math.max(TextService:GetTextSize(bodyText, v37, BodyFont, Vector2.new(295, 1e999)).Y, v37 * 2) + 20 + 20
 
 		return Roact.createElement(Roact.Portal, {
 			target = CoreGui
@@ -82,19 +106,19 @@ function v20.render(p3) -- line: 75
 					AutoButtonColor = false,
 					BorderSizePixel = 0,
 					Text = "",
-					BackgroundColor3 = p4.Theme.Overlay.Color,
-					BackgroundTransparency = p4.Theme.Overlay.Transparency,
+					BackgroundColor3 = p5.Theme.Overlay.Color,
+					BackgroundTransparency = p5.Theme.Overlay.Transparency,
 					Size = UDim2.new(1, 0, 1, 0)
 				}),
 				DialogMainFrame = Roact.createElement(ImageSetLabel, {
 					BackgroundTransparency = 1,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Image = Assets.Images.RoundedRect.Image,
-					ImageColor3 = p4.Theme.BackgroundUIDefault.Color,
-					ImageTransparency = p4.Theme.BackgroundUIDefault.Transparency,
+					ImageColor3 = p5.Theme.BackgroundUIDefault.Color,
+					ImageTransparency = p5.Theme.BackgroundUIDefault.Transparency,
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					ScaleType = Assets.Images.RoundedRect.ScaleType,
-					Size = UDim2.new(0, 335, 0, v38 + 49 + 36 + 20),
+					Size = UDim2.new(0, 335, 0, v39 + 49 + 36 + 20),
 					SliceCenter = Assets.Images.RoundedRect.SliceCenter
 				}, {
 					Padding = Roact.createElement("UIPadding", {
@@ -117,14 +141,14 @@ function v20.render(p3) -- line: 75
 					Divider = Roact.createElement("Frame", {
 						BorderSizePixel = 0,
 						LayoutOrder = 3,
-						BackgroundColor3 = p4.Theme.Divider.Color,
-						BackgroundTransparency = p4.Theme.Divider.Transparency,
+						BackgroundColor3 = p5.Theme.Divider.Color,
+						BackgroundTransparency = p5.Theme.Divider.Transparency,
 						Size = UDim2.new(0.8, 0, 0, 1)
 					}),
 					BodyTextContainer = Roact.createElement("Frame", {
 						BackgroundTransparency = 1,
 						LayoutOrder = 4,
-						Size = UDim2.new(1, 0, 0, v38)
+						Size = UDim2.new(1, 0, 0, v39)
 					}, {
 						BodyText = Roact.createElement(ThemedTextLabel, {
 							TextWrapped = true,
@@ -166,7 +190,7 @@ function v20.render(p3) -- line: 75
 			}),
 			FocusHandler = Roact.createElement(FocusHandler, {
 				isFocused = p3.state.isRooted and (p3.props.visible and p3.props.inputType == Constants.InputType.Gamepad),
-				didFocus = function() -- line: 198
+				didFocus = function() -- line: 210
 					-- upvalues: GuiService (copy), p3 (copy)
 					GuiService:RemoveSelectionGroup("InGameMenuModalButtonsSelectionParent")
 					GuiService:AddSelectionParent("InGameMenuModalButtonsSelectionParent", p3.buttonContainerRef:getValue())
@@ -176,64 +200,64 @@ function v20.render(p3) -- line: 75
 		})
 	end)
 end
-function v20.updateBlur(p5) -- line: 209
+function v20.updateBlur(p6) -- line: 221
 	-- upvalues: RunService (copy)
-	local v25 = p5.props.blurBackground and p5.props.visible
+	local v25 = p6.props.blurBackground and p6.props.visible
 
 	RunService:SetRobloxGuiFocused(v25)
 end
-function v20.bindActions(p6) -- line: 215
+function v20.bindActions(p7) -- line: 227
 	-- upvalues: ContextActionService (copy)
-	local function confirmFunc(_, p8, _) -- line: 216
-		-- upvalues: p6 (copy)
-		if p8 == Enum.UserInputState.Begin then
-			p6.props.onConfirm()
+	local function confirmFunc(_, p9, _) -- line: 228
+		-- upvalues: p7 (copy)
+		if p9 == Enum.UserInputState.Begin then
+			p7.props.onConfirm()
 		end
 	end
 
-	if p6.props.bindReturnToConfirm then
+	if p7.props.bindReturnToConfirm then
 		ContextActionService:BindCoreAction("InGameMenuModalConfirm", confirmFunc, false, Enum.KeyCode.Return)
 	end
 
-	local function cancelFunc(_, p11, _) -- line: 226
-		-- upvalues: p6 (copy)
-		if p11 == Enum.UserInputState.Begin then
-			p6.props.onCancel()
+	local function cancelFunc(_, p12, _) -- line: 238
+		-- upvalues: p7 (copy)
+		if p12 == Enum.UserInputState.Begin then
+			p7.props.onCancel()
 		end
 	end
 
 	ContextActionService:BindCoreAction("InGameMenuModalCancel", cancelFunc, false, Enum.KeyCode.Escape)
 end
-function v20.unbindActions(_) -- line: 235
+function v20.unbindActions(_) -- line: 247
 	-- upvalues: ContextActionService (copy)
 	ContextActionService:UnbindCoreAction("InGameMenuModalConfirm")
 	ContextActionService:UnbindCoreAction("InGameMenuModalCancel")
 end
-function v20.didMount(p14) -- line: 240
-	p14:updateBlur()
-
-	if p14.props.visible then
-		p14:bindActions()
-	end
-end
-function v20.didUpdate(p15) -- line: 248
+function v20.didMount(p15) -- line: 252
 	p15:updateBlur()
 
 	if p15.props.visible then
 		p15:bindActions()
+	end
+end
+function v20.didUpdate(p16) -- line: 260
+	p16:updateBlur()
+
+	if p16.props.visible then
+		p16:bindActions()
 
 		return
 	end
 
-	p15:unbindActions()
+	p16:unbindActions()
 end
-function v20.willUnmount(p16) -- line: 258
+function v20.willUnmount(p17) -- line: 270
 	-- upvalues: RunService (copy)
-	if p16.props.blurBackground then
+	if p17.props.blurBackground then
 		RunService:SetRobloxGuiFocused(false)
 	end
 
-	p16:unbindActions()
+	p17:unbindActions()
 end
 
 return v20

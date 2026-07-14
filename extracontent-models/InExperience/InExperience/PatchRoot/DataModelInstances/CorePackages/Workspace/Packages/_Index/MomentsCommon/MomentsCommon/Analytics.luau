@@ -7,6 +7,7 @@ require(script.Types)
 
 local fireAnalyticsEvent = require(script.fireAnalyticsEvent)
 local fireFunnelAnalyticsEvent = require(script.fireFunnelAnalyticsEvent)
+local reportMomentSkip = require(script.reportMomentSkip)
 
 return {
 	EventNames = EventNames,
@@ -14,5 +15,6 @@ return {
 	RecommendationSource = RecommendationSource,
 	SessionManager = SessionManager,
 	fireAnalyticsEvent = fireAnalyticsEvent,
-	fireFunnelAnalyticsEvent = fireFunnelAnalyticsEvent
+	fireFunnelAnalyticsEvent = fireFunnelAnalyticsEvent,
+	reportMomentSkip = reportMomentSkip
 }

@@ -15,14 +15,16 @@ local MarketplaceAsset = require(script.MarketplaceAsset)
 local MarketplaceBundle = require(script.MarketplaceBundle)
 local MarketplaceLook = require(script.MarketplaceLook)
 local Song = require(script.Song)
+local UserSettings = require(script.UserSettings)
 local DataHydrationUtils = require(script.DataHydrationUtils)
 local FFlagSduiExperienceDetailsSupport = require(script.Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
-local v20 = if not FFlagSduiExperienceDetailsSupport then nil else require(script.UserProfile)
+local v21 = if not FFlagSduiExperienceDetailsSupport then nil else require(script.UserProfile)
 
 return {
 	["jest.config"] = script["jest.config"],
 	createDataResolver = require(script.createDataResolver),
 	createDataCache = require(script.createDataCache),
+	createMutationLayer = require(script.createMutationLayer),
 	DataHydrationTypes = DataHydrationTypes,
 	DataHydrationUtils = DataHydrationUtils,
 	DataStatus = DataHydrationTypes.DataStatus,
@@ -42,5 +44,6 @@ return {
 	MarketplaceBundle = MarketplaceBundle,
 	MarketplaceLook = MarketplaceLook,
 	Song = Song,
-	UserProfile = if not FFlagSduiExperienceDetailsSupport then nil else v20
+	UserSettings = UserSettings,
+	UserProfile = if not FFlagSduiExperienceDetailsSupport then nil else v21
 }

@@ -81,7 +81,7 @@ local function variantsFactory(p1) -- line: 92
 		[InputSize.Medium] = computeProps({
 			containerTag = "size-full-1000 gap-large",
 			radius = p1.Radius.Medium,
-			horizontalPadding = if not Flags.FoundationSupportPrefixSuffixNumberInput then p1.Padding.Small else p1.Padding.Medium,
+			horizontalPadding = if not Flags.FoundationNumberInputBeta then p1.Padding.Small else p1.Padding.Medium,
 			typography = p1.Typography.BodyMedium,
 			iconSize = IconSize.Small,
 			minContainerHeight = p1.Size.Size_1000,
@@ -106,7 +106,7 @@ local function variantsFactory(p1) -- line: 92
 	}
 end
 
-return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?, b3: boolean?) -- line: 162
+return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?, b3: boolean?) -- line: 160
 	-- upvalues: VariantsContext (copy), variantsFactory (copy), getInputVariantsFactory (copy), InputVariant (copy), composeStyleVariant (copy), Flags (copy)
 	local v24 = VariantsContext.useVariants("TextInput", variantsFactory, p2)
 	local v25 = VariantsContext.useVariants("InputField", getInputVariantsFactory, p2)

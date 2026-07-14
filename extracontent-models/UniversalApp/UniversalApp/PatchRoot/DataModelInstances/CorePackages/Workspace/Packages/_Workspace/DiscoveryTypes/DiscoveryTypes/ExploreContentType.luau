@@ -1,5 +1,0 @@
-return {
-	Filters = "Filters",
-	Games = "Games",
-	Songs = "Songs"
-}

@@ -28,31 +28,27 @@ local function Segment(p1, p2) -- line: 44
 		assert(p1.text == nil or p1.icon == nil, "Segment: `text` and `icon` are mutually exclusive. Only one can be provided.")
 	end
 
-	local v16 = nil
+	local v16 = p1.icon ~= nil
 	local name = nil
 	local variant = nil
 	local icon = nil
 
-	if Flags.FoundationSegmentedControlIconSupport then
-		v16 = p1.icon ~= nil
+	if v16 then
+		if typeof(p1.icon) == "table" then
+			local icon2 = p1.icon
 
-		if v16 then
-			if typeof(p1.icon) == "table" then
-				local icon2 = p1.icon
-
-				name = icon2.name
-				variant = icon2.variant
-			else
-				name = p1.icon
-			end
-
-			icon = v15.icon
+			name = icon2.name
+			variant = icon2.variant
+		else
+			name = p1.icon
 		end
+
+		icon = v15.icon
 	end
 
 	return React.createElement(View, withCommonProps(p1, {
 		tag = v15.segment.tag,
-		onActivated = function() -- line: 85
+		onActivated = function() -- line: 82
 			-- upvalues: p1 (copy)
 			p1.onActivated(p1.id)
 		end,

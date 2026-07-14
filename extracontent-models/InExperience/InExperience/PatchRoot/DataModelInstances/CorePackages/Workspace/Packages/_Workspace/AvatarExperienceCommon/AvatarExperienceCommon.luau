@@ -39,6 +39,8 @@ local CatalogSubcategories = require(script.Enums.CatalogSubcategories)
 local CatalogCategoryIds = require(script.Enums.CatalogCategoryIds)
 local CatalogSubcategoryIds = require(script.Enums.CatalogSubcategoryIds)
 local CatalogSDUICategoryIds = require(script.Enums.CatalogSDUICategoryIds)
+local CatalogCategoryKey = require(script.Enums.CatalogCategoryKey)
+local CatalogSubcategoryKey = require(script.Enums.CatalogSubcategoryKey)
 local NoPriceStatus = require(script.Enums.NoPriceStatus)
 local ItemPurchaseActionTypeEnum = require(script.Enums.ItemPurchaseActionTypeEnum)
 local FullView = require(script.Enums.FullView)
@@ -121,6 +123,8 @@ return {
 		CatalogCategoryIds = CatalogCategoryIds,
 		CatalogSubcategoryIds = CatalogSubcategoryIds,
 		CatalogSDUICategoryIds = CatalogSDUICategoryIds,
+		CatalogCategoryKeys = CatalogCategoryKey,
+		CatalogSubcategoryKeys = CatalogSubcategoryKey,
 		FullView = FullView,
 		WearTimeFilter = WearTimeFilter,
 		DiscountTypeEnum = require(script.Enums.DiscountType)

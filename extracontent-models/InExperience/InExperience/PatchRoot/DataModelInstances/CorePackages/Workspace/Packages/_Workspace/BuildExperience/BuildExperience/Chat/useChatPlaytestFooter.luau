@@ -6,36 +6,38 @@ local GetPlaytestLoadingStore = require(BuildExperience.Stores.GetPlaytestLoadin
 
 local function getIsPlaytestLoadingForPlaceId(p1, n1: number?) -- line: 21
 	-- upvalues: GetPlaytestLoadingStore (copy)
+	local v10 = GetPlaytestLoadingStore(p1)
+
 	if n1 == nil then
 		return false
 	end
 
-	return GetPlaytestLoadingStore(p1).getIsPlaytestLoadingForPlaceId(n1)(p1)
+	return v10.getIsPlaytestLoadingForPlaceId(n1)(p1)
 end
-local function useChatPlaytestFooter(t1: {[any]: any}, s1: string) -- line: 28
+local function useChatPlaytestFooter(t1: {[any]: any}, s1: string) -- line: 29
 	-- upvalues: React (copy), getIsPlaytestLoadingForPlaceId (copy), SignalsReact (copy)
 	local launchPlaytest = t1.launchPlaytest
-	local v13 = React.useCallback(function(p2) -- line: 30
+	local v14 = React.useCallback(function(p2) -- line: 31
 		-- upvalues: getIsPlaytestLoadingForPlaceId (copy), t1 (copy)
 		return getIsPlaytestLoadingForPlaceId(p2, t1.playtestPlaceId)
 	end, { t1.playtestPlaceId })
-	local v14 = SignalsReact.useSignalState(v13)
-	local v15 = React.useCallback(function() -- line: 35
-		-- upvalues: launchPlaytest (copy), v14 (copy), s1 (copy)
-		if not launchPlaytest or v14 then
+	local v15 = SignalsReact.useSignalState(v14)
+	local v16 = React.useCallback(function() -- line: 36
+		-- upvalues: launchPlaytest (copy), v15 (copy), s1 (copy)
+		if not launchPlaytest or v15 then
 			return
 		end
 
 		launchPlaytest(s1)
 	end, {
-		v14,
+		v15,
 		launchPlaytest,
 		s1
 	})
 
 	return {
-		onPlaytest = if t1.playtestPlaceId == nil or not launchPlaytest then nil else v15,
-		isPlaytestLoading = v14
+		onPlaytest = if t1.playtestPlaceId == nil or not launchPlaytest then nil else v16,
+		isPlaytestLoading = v15
 	}
 end
 

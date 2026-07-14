@@ -70,6 +70,13 @@ return {
 			local t4 = {}
 
 			sessionHistoryMerge.mergeHistoryIntoMap(t3, t2, t4)
+
+			for v38, v39 in t1.getOverlayBySequenceId() do
+				if t3[v38] == nil then
+					t4[v38] = v39
+				end
+			end
+
 			t1.setLoadedBySequenceId(t3)
 			t1.setOverlayBySequenceId(t4)
 			t1.setNextHistoryPageToken(s8)
@@ -79,44 +86,44 @@ return {
 
 			return true
 		end
-		local function prefetchOlderHistoryPagesInBackground(s9: string, s10: string?, p5: ((...any) -> ...any), n7: number, n8: number) -- line: 126
+		local function prefetchOlderHistoryPagesInBackground(s9: string, s10: string?, p5: ((...any) -> ...any), n7: number, n8: number) -- line: 133
 			-- upvalues: constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-			task.spawn(function() -- line: 133
+			task.spawn(function() -- line: 140
 				-- upvalues: s10 (copy), constants (copy), s9 (copy), n7 (copy), n8 (copy), p5 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-				local v70 = s10
-				local v71 = constants.getPrefetchHistoryPagesOnRefresh()
+				local v72 = s10
+				local v73 = constants.getPrefetchHistoryPagesOnRefresh()
 
-				while v71 > 0 and v70 ~= nil do
-					local v72 = s9
-					local v73 = n7
-					local v74 = n8
+				while v73 > 0 and v72 ~= nil do
+					local v74 = s9
+					local v75 = n7
+					local v76 = n8
 
-					if p5() or (v72 ~= t1.getCasSessionId() or v74 ~= t1.getRefreshGeneration()) or v73 ~= n1 then
+					if p5() or (v74 ~= t1.getCasSessionId() or v76 ~= t1.getRefreshGeneration()) or v75 ~= n1 then
 						return
 					end
 
-					local v75, v76
+					local v77, v78
 
-					v75, v76, v70 = loadHistoryPage(s9, v70, p5)
+					v77, v78, v72 = loadHistoryPage(s9, v72, p5)
 
-					if not v75 then
+					if not v77 then
 						return
 					end
 
-					local v77 = s9
-					local v78 = n7
-					local v79 = n8
+					local v79 = s9
+					local v80 = n7
+					local v81 = n8
 
-					if p5() or (v77 ~= t1.getCasSessionId() or v79 ~= t1.getRefreshGeneration()) or v78 ~= n1 then
+					if p5() or (v79 ~= t1.getCasSessionId() or v81 ~= t1.getRefreshGeneration()) or v80 ~= n1 then
 						return
 					end
 
-					t1.mergeHistoryPage(v76, v70)
-					v71 -= 1
+					t1.mergeHistoryPage(v78, v72)
+					v73 -= 1
 				end
 			end)
 		end
-		local function beginPrefetchGeneration() -- line: 151
+		local function beginPrefetchGeneration() -- line: 158
 			-- upvalues: n1 (ref)
 			n1 += 1
 
@@ -124,47 +131,47 @@ return {
 		end
 
 		return {
-			refreshSession = function(p6: ((...any) -> ...any)) -- line: 156
+			refreshSession = function(p6: ((...any) -> ...any)) -- line: 163
 				-- upvalues: t1 (copy), u6 (ref), historyPageUtils (copy), loadHistoryPage (copy), constants (copy), commitRefreshedHistory (copy), n1 (ref)
-				local v44 = t1.getCasSessionId()
+				local v46 = t1.getCasSessionId()
 
-				if v44 == nil or v44 == "" then
+				if v46 == nil or v46 == "" then
 					return false
 				end
 
-				local v45 = t1.getRefreshGeneration()
-				local g46 = nil
-				local v47 = nil
+				local v47 = t1.getRefreshGeneration()
+				local g48 = nil
+				local v49 = nil
 
 				repeat
-					if g46 or t1.getHistoryLoadInFlight() then
-						if g46 or v44 == u6 then
-							if not g46 then
-								v47 = false
+					if g48 or t1.getHistoryLoadInFlight() then
+						if g48 or v46 == u6 then
+							if not g48 then
+								v49 = false
 							end
 
-							g46 = false
+							g48 = false
 
-							if not v47 then
+							if not v49 then
 								return false
 							end
 
-							local v48 = t1.buildMergedHistory()
-							local v49 = historyPageUtils.collectSequenceIds(v48)
-							local v50 = #v48 > 0
-							local v51 = not v50
+							local v50 = t1.buildMergedHistory()
+							local v51 = historyPageUtils.collectSequenceIds(v50)
+							local v52 = #v50 > 0
+							local v53 = not v52
 							local t5 = {}
 							local t6 = {}
-							local u54 = nil
+							local u56 = nil
 							local n9 = 0
 
 							repeat
 								n9 += 1
 
-								local v56, v57, v58 = loadHistoryPage(v44, u54, p6)
+								local v58, v59, v60 = loadHistoryPage(v46, u56, p6)
 
-								if not v56 or (p6() or (v44 ~= t1.getCasSessionId() or v45 ~= t1.getRefreshGeneration())) then
-									if v44 == u6 then
+								if not v58 or (p6() or (v46 ~= t1.getCasSessionId() or v47 ~= t1.getRefreshGeneration())) then
+									if v46 == u6 then
 										t1.setHistoryLoadInFlight(false)
 										u6 = nil
 									end
@@ -172,24 +179,24 @@ return {
 									return false
 								end
 
-								if v50 and historyPageUtils.historyOverlapsSequenceIds(v57, v49) then
-									v51 = true
+								if v52 and historyPageUtils.historyOverlapsSequenceIds(v59, v51) then
+									v53 = true
 								end
 
-								historyPageUtils.appendUniqueHistoryBySequenceId(t5, v57, t6)
-								u54 = v58
-							until not v50 or v51 or u54 == nil or n9 >= constants.getMaxReconciliationHistoryPages()
+								historyPageUtils.appendUniqueHistoryBySequenceId(t5, v59, t6)
+								u56 = v60
+							until not v52 or v53 or u56 == nil or n9 >= constants.getMaxReconciliationHistoryPages()
 
-							if v50 and v51 then
-								if historyPageUtils.appendUniqueHistoryBySequenceId(t5, v48, t6) > 0 then
-									u54 = t1.getNextHistoryPageToken()
+							if v52 and v53 then
+								if historyPageUtils.appendUniqueHistoryBySequenceId(t5, v50, t6) > 0 then
+									u56 = t1.getNextHistoryPageToken()
 								end
-							elseif v50 then
-								historyPageUtils.appendUniqueHistoryBySequenceId(t5, v48, t6)
+							elseif v52 then
+								historyPageUtils.appendUniqueHistoryBySequenceId(t5, v50, t6)
 							end
 
-							if not commitRefreshedHistory(v44, v45, t5, u54, p6) then
-								if v44 == u6 then
+							if not commitRefreshedHistory(v46, v47, t5, u56, p6) then
+								if v46 == u6 then
 									t1.setHistoryLoadInFlight(false)
 									u6 = nil
 								end
@@ -197,56 +204,56 @@ return {
 								return false
 							end
 
-							if v44 == u6 then
+							if v46 == u6 then
 								t1.setHistoryLoadInFlight(false)
 								u6 = nil
 							end
 
-							if not v50 and u54 ~= nil then
+							if not v52 and u56 ~= nil then
 								n1 += 1
 
-								local v59 = n1
+								local v61 = n1
 
-								task.defer(function() -- line: 217
-									-- upvalues: v44 (copy), u54 (ref), p6 (copy), v59 (copy), v45 (copy), constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-									local v80 = v44
-									local v81 = u54
-									local v82 = p6
-									local v83 = v59
-									local v84 = v45
+								task.defer(function() -- line: 224
+									-- upvalues: v46 (copy), u56 (ref), p6 (copy), v61 (copy), v47 (copy), constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
+									local v82 = v46
+									local v83 = u56
+									local v84 = p6
+									local v85 = v61
+									local v86 = v47
 
-									task.spawn(function() -- line: 133
-										-- upvalues: v81 (copy), constants (copy), v80 (copy), v83 (copy), v84 (copy), v82 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-										local v90 = v81
-										local v91 = constants.getPrefetchHistoryPagesOnRefresh()
+									task.spawn(function() -- line: 140
+										-- upvalues: v83 (copy), constants (copy), v82 (copy), v85 (copy), v86 (copy), v84 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
+										local v92 = v83
+										local v93 = constants.getPrefetchHistoryPagesOnRefresh()
 
-										while v91 > 0 and v90 ~= nil do
-											local v92 = v80
-											local v93 = v83
-											local v94 = v84
+										while v93 > 0 and v92 ~= nil do
+											local v94 = v82
+											local v95 = v85
+											local v96 = v86
 
-											if v82() or (v92 ~= t1.getCasSessionId() or v94 ~= t1.getRefreshGeneration()) or v93 ~= n1 then
+											if v84() or (v94 ~= t1.getCasSessionId() or v96 ~= t1.getRefreshGeneration()) or v95 ~= n1 then
 												return
 											end
 
-											local v95, v96
+											local v97, v98
 
-											v95, v96, v90 = loadHistoryPage(v80, v90, v82)
+											v97, v98, v92 = loadHistoryPage(v82, v92, v84)
 
-											if not v95 then
+											if not v97 then
 												return
 											end
 
-											local v97 = v80
-											local v98 = v83
-											local v99 = v84
+											local v99 = v82
+											local v100 = v85
+											local v101 = v86
 
-											if v82() or (v97 ~= t1.getCasSessionId() or v99 ~= t1.getRefreshGeneration()) or v98 ~= n1 then
+											if v84() or (v99 ~= t1.getCasSessionId() or v101 ~= t1.getRefreshGeneration()) or v100 ~= n1 then
 												return
 											end
 
-											t1.mergeHistoryPage(v96, v90)
-											v91 -= 1
+											t1.mergeHistoryPage(v98, v92)
+											v93 -= 1
 										end
 									end)
 								end)
@@ -259,42 +266,42 @@ return {
 						u6 = nil
 					end
 
-					u6 = v44
+					u6 = v46
 					t1.setHistoryLoadInFlight(true)
-					v47 = true
-					g46 = true
-				until not g46
+					v49 = true
+					g48 = true
+				until not g48
 			end,
-			loadOlderHistory = function(p7: ((...any) -> ...any)) -- line: 231
+			loadOlderHistory = function(p7: ((...any) -> ...any)) -- line: 238
 				-- upvalues: t1 (copy), u6 (ref), loadHistoryPage (copy), n1 (ref), constants (copy)
-				local v61 = t1.getCasSessionId()
-				local v62 = t1.getNextHistoryPageToken()
+				local v63 = t1.getCasSessionId()
+				local v64 = t1.getNextHistoryPageToken()
 
-				if v61 == nil or v62 == nil then
+				if v63 == nil or v64 == nil then
 					return false
 				end
 
-				local v63 = t1.getRefreshGeneration()
-				local g64 = nil
-				local v65 = nil
+				local v65 = t1.getRefreshGeneration()
+				local g66 = nil
+				local v67 = nil
 
 				repeat
-					if g64 or t1.getHistoryLoadInFlight() then
-						if g64 or v61 == u6 then
-							if not g64 then
-								v65 = false
+					if g66 or t1.getHistoryLoadInFlight() then
+						if g66 or v63 == u6 then
+							if not g66 then
+								v67 = false
 							end
 
-							g64 = false
+							g66 = false
 
-							if not v65 then
+							if not v67 then
 								return false
 							end
 
-							local v66, v67, v68 = loadHistoryPage(v61, v62, p7)
+							local v68, v69, v70 = loadHistoryPage(v63, v64, p7)
 
-							if not v66 or (p7() or (v61 ~= t1.getCasSessionId() or v63 ~= t1.getRefreshGeneration())) then
-								if v61 == u6 then
+							if not v68 or (p7() or (v63 ~= t1.getCasSessionId() or v65 ~= t1.getRefreshGeneration())) then
+								if v63 == u6 then
 									t1.setHistoryLoadInFlight(false)
 									u6 = nil
 								end
@@ -302,62 +309,62 @@ return {
 								return false
 							end
 
-							t1.mergeHistoryPage(v67, v68)
+							t1.mergeHistoryPage(v69, v70)
 
-							if v61 == u6 then
+							if v63 == u6 then
 								t1.setHistoryLoadInFlight(false)
 								u6 = nil
 							end
 
-							if p7() or (v61 ~= t1.getCasSessionId() or v63 ~= t1.getRefreshGeneration()) then
+							if p7() or (v63 ~= t1.getCasSessionId() or v65 ~= t1.getRefreshGeneration()) then
 								return false
 							end
 
-							if v68 ~= nil then
+							if v70 ~= nil then
 								n1 += 1
 
-								local v69 = n1
+								local v71 = n1
 
-								task.defer(function() -- line: 257
-									-- upvalues: v61 (copy), v68 (copy), p7 (copy), v69 (copy), v63 (copy), constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-									local v85 = v61
-									local v86 = v68
-									local v87 = p7
-									local v88 = v69
-									local v89 = v63
+								task.defer(function() -- line: 264
+									-- upvalues: v63 (copy), v70 (copy), p7 (copy), v71 (copy), v65 (copy), constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
+									local v87 = v63
+									local v88 = v70
+									local v89 = p7
+									local v90 = v71
+									local v91 = v65
 
-									task.spawn(function() -- line: 133
-										-- upvalues: v86 (copy), constants (copy), v85 (copy), v88 (copy), v89 (copy), v87 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-										local v100 = v86
-										local v101 = constants.getPrefetchHistoryPagesOnRefresh()
+									task.spawn(function() -- line: 140
+										-- upvalues: v88 (copy), constants (copy), v87 (copy), v90 (copy), v91 (copy), v89 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
+										local v102 = v88
+										local v103 = constants.getPrefetchHistoryPagesOnRefresh()
 
-										while v101 > 0 and v100 ~= nil do
-											local v102 = v85
-											local v103 = v88
-											local v104 = v89
+										while v103 > 0 and v102 ~= nil do
+											local v104 = v87
+											local v105 = v90
+											local v106 = v91
 
-											if v87() or (v102 ~= t1.getCasSessionId() or v104 ~= t1.getRefreshGeneration()) or v103 ~= n1 then
+											if v89() or (v104 ~= t1.getCasSessionId() or v106 ~= t1.getRefreshGeneration()) or v105 ~= n1 then
 												return
 											end
 
-											local v105, v106
+											local v107, v108
 
-											v105, v106, v100 = loadHistoryPage(v85, v100, v87)
+											v107, v108, v102 = loadHistoryPage(v87, v102, v89)
 
-											if not v105 then
+											if not v107 then
 												return
 											end
 
-											local v107 = v85
-											local v108 = v88
-											local v109 = v89
+											local v109 = v87
+											local v110 = v90
+											local v111 = v91
 
-											if v87() or (v107 ~= t1.getCasSessionId() or v109 ~= t1.getRefreshGeneration()) or v108 ~= n1 then
+											if v89() or (v109 ~= t1.getCasSessionId() or v111 ~= t1.getRefreshGeneration()) or v110 ~= n1 then
 												return
 											end
 
-											t1.mergeHistoryPage(v106, v100)
-											v101 -= 1
+											t1.mergeHistoryPage(v108, v102)
+											v103 -= 1
 										end
 									end)
 								end)
@@ -370,11 +377,11 @@ return {
 						u6 = nil
 					end
 
-					u6 = v61
+					u6 = v63
 					t1.setHistoryLoadInFlight(true)
-					v65 = true
-					g64 = true
-				until not g64
+					v67 = true
+					g66 = true
+				until not g66
 			end
 		}
 	end

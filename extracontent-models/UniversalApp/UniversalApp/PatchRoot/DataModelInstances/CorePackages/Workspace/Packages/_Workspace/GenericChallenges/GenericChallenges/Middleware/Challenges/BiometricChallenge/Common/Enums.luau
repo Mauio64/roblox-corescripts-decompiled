@@ -1,5 +1,0 @@
-return {
-	BiometricTypeEnum = {
-		PersonaLiveness = "personaliveness"
-	}
-}

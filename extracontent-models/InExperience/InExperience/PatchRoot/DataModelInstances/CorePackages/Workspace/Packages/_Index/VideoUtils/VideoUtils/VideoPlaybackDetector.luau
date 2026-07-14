@@ -14,32 +14,35 @@ require(VideoUtils.Analytics.VideoAnalyticsTypes)
 local VideoEndReason = require(VideoUtils.Analytics.Enums).VideoEndReason
 local VideoPlaybackCoordinator = require(VideoUtils.VideoPlaybackCoordinator)
 local VideoHoverPlaybackDetector = require(VideoUtils.VideoHoverPlaybackDetector)
+local VideoPlaybackDetectionMethod = require(VideoUtils.VideoPlaybackDetectionMethod)
+local VideoSelectionPlaybackDetector = require(VideoUtils.VideoSelectionPlaybackDetector)
 local VideoViewportPlaybackDetector = require(VideoUtils.VideoViewportPlaybackDetector)
 
 require(VideoUtils.ViewportVideoAutoplayController)
 
 local FFlagLuaAppEdpMediaGalleryVideoPreview = require(VideoUtilsParent.SharedFlags).FFlagLuaAppEdpMediaGalleryVideoPreview
 local FFlagLuaAppHomeTouchAutoplay = require(VideoUtilsParent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
+local FFlagLuaAppGameTileSelectionVideoPlayback = require(VideoUtilsParent.SharedFlags).FFlagLuaAppGameTileSelectionVideoPlayback
 
-local function VideoPlaybackDetector(t1: {[any]: any}) -- line: 46
-	-- upvalues: VideoPlaybackCoordinator (copy), React (copy), FFlagLuaAppEdpMediaGalleryVideoPreview (copy), useLastInput (copy), FFlagLuaAppHomeTouchAutoplay (copy), AppLifecycleObserverService (copy), VideoEndReason (copy), ExperienceService (copy), VideoHoverPlaybackDetector (copy), Responsive (copy), VideoViewportPlaybackDetector (copy)
-	local v16 = t1.videoPlaybackCoordinator or VideoPlaybackCoordinator.default
-	local v17, v18 = React.useState(false)
-	local v19 = if not FFlagLuaAppEdpMediaGalleryVideoPreview then useLastInput() else nil
-	local v20 = React.useCallback(function(b1: boolean) -- line: 55
-		-- upvalues: t1 (copy), v16 (copy)
+local function VideoPlaybackDetector(t1: {[any]: any}) -- line: 53
+	-- upvalues: VideoPlaybackCoordinator (copy), React (copy), FFlagLuaAppEdpMediaGalleryVideoPreview (copy), FFlagLuaAppGameTileSelectionVideoPlayback (copy), useLastInput (copy), FFlagLuaAppHomeTouchAutoplay (copy), AppLifecycleObserverService (copy), VideoEndReason (copy), ExperienceService (copy), VideoPlaybackDetectionMethod (copy), VideoHoverPlaybackDetector (copy), VideoViewportPlaybackDetector (copy), VideoSelectionPlaybackDetector (copy), Responsive (copy)
+	local v19 = t1.videoPlaybackCoordinator or VideoPlaybackCoordinator.default
+	local v20, v21 = React.useState(false)
+	local v22 = if not FFlagLuaAppEdpMediaGalleryVideoPreview and not FFlagLuaAppGameTileSelectionVideoPlayback then useLastInput() else nil
+	local v23 = React.useCallback(function(b1: boolean) -- line: 64
+		-- upvalues: t1 (copy), v19 (copy)
 		if t1.onPlaybackCandidate then
 			t1.onPlaybackCandidate()
 		end
 
 		if t1.isVideoEligible then
-			v16:requestPlayback(t1.videoKey, b1, t1.videoDwellTimeInSec, t1.itemIndex, t1.videoAnalytics)
+			v19:requestPlayback(t1.videoKey, b1, t1.videoDwellTimeInSec, t1.itemIndex, t1.videoAnalytics)
 
 			return
 		end
 
 		if t1.onVideoIneligible then
-			t1.onVideoIneligible(v16.currentPlaybackSessionId)
+			t1.onVideoIneligible(v19.currentPlaybackSessionId)
 		end
 	end, {
 		t1.videoKey,
@@ -49,62 +52,62 @@ local function VideoPlaybackDetector(t1: {[any]: any}) -- line: 46
 		t1.onVideoIneligible,
 		t1.onPlaybackCandidate,
 		t1.videoDwellTimeInSec,
-		v16
+		v19
 	})
-	local v21 = React.useCallback(function(s1: string) -- line: 85
-		-- upvalues: v16 (copy), t1 (copy)
-		v16:cancelPlayback(t1.videoKey, s1, t1.itemIndex, t1.videoAnalytics)
+	local v24 = React.useCallback(function(s1: string) -- line: 94
+		-- upvalues: v19 (copy), t1 (copy)
+		v19:cancelPlayback(t1.videoKey, s1, t1.itemIndex, t1.videoAnalytics)
 	end, {
 		t1.videoKey,
 		t1.itemIndex,
 		t1.videoAnalytics,
-		v16
+		v19
 	})
 
-	React.useEffect(function() -- line: 97
-		-- upvalues: t1 (copy), v17 (copy), v18 (copy), v16 (copy)
-		local function checkAndUpdateState(s2: string?) -- line: 98
-			-- upvalues: t1 (copy), v17 (copy), v18 (copy)
-			local v32 = s2 == t1.videoKey
+	React.useEffect(function() -- line: 106
+		-- upvalues: t1 (copy), v20 (copy), v21 (copy), v19 (copy)
+		local function checkAndUpdateState(s2: string?) -- line: 107
+			-- upvalues: t1 (copy), v20 (copy), v21 (copy)
+			local v35 = s2 == t1.videoKey
 
-			if v32 ~= v17 then
-				t1.onPlaybackChange(v32)
-				v18(v32)
+			if v35 ~= v20 then
+				t1.onPlaybackChange(v35)
+				v21(v35)
 			end
 		end
 
-		local v25 = v16.playingVideoKey == t1.videoKey
+		local v28 = v19.playingVideoKey == t1.videoKey
 
-		if v25 ~= v17 then
-			t1.onPlaybackChange(v25)
-			v18(v25)
+		if v28 ~= v20 then
+			t1.onPlaybackChange(v28)
+			v21(v28)
 		end
 
-		local u26 = v16.changed:connect(function(p1) -- line: 109
-			-- upvalues: t1 (copy), v17 (copy), v18 (copy)
-			local v34 = p1 == t1.videoKey
+		local u29 = v19.changed:connect(function(p1) -- line: 118
+			-- upvalues: t1 (copy), v20 (copy), v21 (copy)
+			local v37 = p1 == t1.videoKey
 
-			if v34 ~= v17 then
-				t1.onPlaybackChange(v34)
-				v18(v34)
+			if v37 ~= v20 then
+				t1.onPlaybackChange(v37)
+				v21(v37)
 			end
 		end)
 
-		return function() -- line: 113
-			-- upvalues: u26 (ref)
-			if u26 ~= nil then
-				u26:disconnect()
-				u26 = nil
+		return function() -- line: 122
+			-- upvalues: u29 (ref)
+			if u29 ~= nil then
+				u29:disconnect()
+				u29 = nil
 			end
 		end
 	end, {
 		t1.videoKey,
 		t1.onPlaybackChange,
-		v16,
-		v17
+		v19,
+		v20
 	})
-	React.useEffect(function() -- line: 123
-		-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), t1 (copy), AppLifecycleObserverService (copy), VideoEndReason (copy), v21 (copy), ExperienceService (copy)
+	React.useEffect(function() -- line: 132
+		-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), t1 (copy), AppLifecycleObserverService (copy), VideoEndReason (copy), v24 (copy), ExperienceService (copy)
 		local viewportVideoAutoplayController = nil
 		local current = nil
 
@@ -113,38 +116,38 @@ local function VideoPlaybackDetector(t1: {[any]: any}) -- line: 46
 			current = t1.itemFrameRef.current
 		end
 
-		local connection = AppLifecycleObserverService.OnHide:Connect(function() -- line: 132
-			-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), viewportVideoAutoplayController (ref), VideoEndReason (copy), v21 (copy)
+		local connection = AppLifecycleObserverService.OnHide:Connect(function() -- line: 141
+			-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), viewportVideoAutoplayController (ref), VideoEndReason (copy), v24 (copy)
 			if FFlagLuaAppHomeTouchAutoplay and viewportVideoAutoplayController then
 				viewportVideoAutoplayController:reset(VideoEndReason.AppBackgrounded)
 
 				return
 			end
 
-			v21(VideoEndReason.AppBackgrounded)
+			v24(VideoEndReason.AppBackgrounded)
 		end)
-		local u30 = ExperienceService:RegisterForExperienceJoin(function() -- line: 142
-			-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), viewportVideoAutoplayController (ref), VideoEndReason (copy), v21 (copy)
+		local u33 = ExperienceService:RegisterForExperienceJoin(function() -- line: 151
+			-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), viewportVideoAutoplayController (ref), VideoEndReason (copy), v24 (copy)
 			if FFlagLuaAppHomeTouchAutoplay and viewportVideoAutoplayController then
 				viewportVideoAutoplayController:reset(VideoEndReason.ExperienceLaunched)
 
 				return
 			end
 
-			v21(VideoEndReason.ExperienceLaunched)
+			v24(VideoEndReason.ExperienceLaunched)
 		end)
 
-		return function() -- line: 151
-			-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), viewportVideoAutoplayController (ref), current (ref), VideoEndReason (copy), v21 (copy), u30 (ref), connection (ref)
+		return function() -- line: 160
+			-- upvalues: FFlagLuaAppHomeTouchAutoplay (copy), viewportVideoAutoplayController (ref), current (ref), VideoEndReason (copy), v24 (copy), u33 (ref), connection (ref)
 			if FFlagLuaAppHomeTouchAutoplay and (viewportVideoAutoplayController and current) then
 				viewportVideoAutoplayController:resetIfActiveInstance(current, VideoEndReason.Unmounted)
 			else
-				v21(VideoEndReason.Unmounted)
+				v24(VideoEndReason.Unmounted)
 			end
 
-			if u30 then
-				u30:Disconnect()
-				u30 = nil
+			if u33 then
+				u33:Disconnect()
+				u33 = nil
 			end
 
 			if connection then
@@ -153,30 +156,61 @@ local function VideoPlaybackDetector(t1: {[any]: any}) -- line: 46
 			end
 		end
 	end, {
-		v21,
+		v24,
 		if not FFlagLuaAppHomeTouchAutoplay then nil else t1.viewportVideoAutoplayController,
 		if not FFlagLuaAppHomeTouchAutoplay then nil else t1.itemFrameRef
 	})
 
-	if t1.isHoverSupported then
-		return React.createElement(VideoHoverPlaybackDetector, {
-			videoPlaybackCoordinator = v16,
-			requestVideoPlayback = v20,
-			cancelVideoPlayback = v21,
-			isHovered = t1.isHovered
-		})
-	end
+	if FFlagLuaAppGameTileSelectionVideoPlayback then
+		if t1.playbackDetectionMethod == VideoPlaybackDetectionMethod.Hover then
+			return React.createElement(VideoHoverPlaybackDetector, {
+				videoPlaybackCoordinator = v19,
+				requestVideoPlayback = v23,
+				cancelVideoPlayback = v24,
+				isHovered = t1.isHovered
+			})
+		end
 
-	if FFlagLuaAppEdpMediaGalleryVideoPreview and t1.autoplay or v19 == Responsive.Input.Touch then
-		return React.createElement(VideoViewportPlaybackDetector, {
-			videoPlaybackCoordinator = v16,
-			requestVideoPlayback = v20,
-			cancelVideoPlayback = v21,
-			itemFrameRef = t1.itemFrameRef,
-			isItemOccluded = t1.isItemOccluded,
-			videoVisiblePercent = t1.videoVisiblePercent,
-			viewportVideoAutoplayController = if not FFlagLuaAppHomeTouchAutoplay then nil else t1.viewportVideoAutoplayController
-		})
+		if t1.playbackDetectionMethod == VideoPlaybackDetectionMethod.Viewport then
+			return React.createElement(VideoViewportPlaybackDetector, {
+				videoPlaybackCoordinator = v19,
+				requestVideoPlayback = v23,
+				cancelVideoPlayback = v24,
+				itemFrameRef = t1.itemFrameRef,
+				isItemOccluded = t1.isItemOccluded,
+				videoVisiblePercent = t1.videoVisiblePercent,
+				viewportVideoAutoplayController = if not FFlagLuaAppHomeTouchAutoplay then nil else t1.viewportVideoAutoplayController
+			})
+		end
+
+		if t1.playbackDetectionMethod == VideoPlaybackDetectionMethod.Selection then
+			return React.createElement(VideoSelectionPlaybackDetector, {
+				requestVideoPlayback = v23,
+				cancelVideoPlayback = v24,
+				isSelected = t1.isSelected
+			})
+		end
+	else
+		if t1.isHoverSupported then
+			return React.createElement(VideoHoverPlaybackDetector, {
+				videoPlaybackCoordinator = v19,
+				requestVideoPlayback = v23,
+				cancelVideoPlayback = v24,
+				isHovered = t1.isHovered
+			})
+		end
+
+		if FFlagLuaAppEdpMediaGalleryVideoPreview and t1.autoplay or v22 == Responsive.Input.Touch then
+			return React.createElement(VideoViewportPlaybackDetector, {
+				videoPlaybackCoordinator = v19,
+				requestVideoPlayback = v23,
+				cancelVideoPlayback = v24,
+				itemFrameRef = t1.itemFrameRef,
+				isItemOccluded = t1.isItemOccluded,
+				videoVisiblePercent = t1.videoVisiblePercent,
+				viewportVideoAutoplayController = if not FFlagLuaAppHomeTouchAutoplay then nil else t1.viewportVideoAutoplayController
+			})
+		end
 	end
 
 	return nil

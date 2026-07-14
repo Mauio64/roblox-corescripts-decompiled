@@ -53,24 +53,25 @@ local function onVersionHistoryActivated(t7: {[any]: any}) -- line: 90
 	}
 end
 local function createBuildOverflowMenuStore() -- line: 100
-	-- upvalues: UniverseConfiguration (copy), GameConfigurationLabels (copy), isAssistantDisabled (copy), onAssistantActivated (copy), isPlaytestDisabled (copy), onPlaytestActivated (copy), isVersionHistoryDisabled (copy), onVersionHistoryActivated (copy), isArchiveDisabled (copy), Signals (copy), SignalsReact (copy)
+	-- upvalues: Signals (copy), UniverseConfiguration (copy), GameConfigurationLabels (copy), isAssistantDisabled (copy), onAssistantActivated (copy), isPlaytestDisabled (copy), onPlaytestActivated (copy), isVersionHistoryDisabled (copy), onVersionHistoryActivated (copy), isArchiveDisabled (copy), SignalsReact (copy)
 	local t8 = {}
+	local v26 = Signals.createSignal(nil)
 
-	local function getConfigurationData(t9: {[any]: any}) -- line: 103
+	local function getConfigurationData(t9: {[any]: any}) -- line: 104
 		-- upvalues: t8 (copy), UniverseConfiguration (copy)
-		local v32 = t8[t9.universeId]
+		local v33 = t8[t9.universeId]
 
-		if v32 ~= nil then
-			return v32
+		if v33 ~= nil then
+			return v33
 		end
 
 		return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchConfiguration(t9.universeId).data()
 	end
-	local function isShareDisabled(t10: {[any]: any}) -- line: 112
+	local function isShareDisabled(t10: {[any]: any}) -- line: 113
 		-- upvalues: GameConfigurationLabels (copy), getConfigurationData (copy)
 		return GameConfigurationLabels.isPrivateAudience(getConfigurationData(t10))
 	end
-	local function onShareActivated(t11: {[any]: any}) -- line: 116
+	local function onShareActivated(t11: {[any]: any}) -- line: 117
 		-- upvalues: GameConfigurationLabels (copy), getConfigurationData (copy)
 		if GameConfigurationLabels.isPrivateAudience(getConfigurationData(t11)) or t11.placeId == nil then
 			return nil
@@ -104,7 +105,7 @@ local function createBuildOverflowMenuStore() -- line: 100
 				{
 					id = "publish",
 					text = "Publish",
-					onActivated = function() -- line: 149
+					onActivated = function() -- line: 150
 						return {
 							type = "openPage",
 							page = "publish"
@@ -114,7 +115,7 @@ local function createBuildOverflowMenuStore() -- line: 100
 				{
 					id = "settings",
 					text = "Settings",
-					onActivated = function() -- line: 159
+					onActivated = function() -- line: 160
 						return {
 							type = "openPage",
 							page = "settings"
@@ -140,7 +141,7 @@ local function createBuildOverflowMenuStore() -- line: 100
 				id = "archive-game",
 				text = "Archive game",
 				isDisabled = isArchiveDisabled,
-				onActivated = function() -- line: 186
+				onActivated = function() -- line: 187
 					return {
 						type = "archive"
 					}
@@ -148,18 +149,27 @@ local function createBuildOverflowMenuStore() -- line: 100
 			}}
 		}
 	}
-	local v30 = Signals.createSignal(t12)
+	local v31 = Signals.createSignal(t12)
 
 	return {
-		getItems = v30,
-		useItems = function(t13: {[any]: any}) -- line: 195
-			-- upvalues: SignalsReact (copy), UniverseConfiguration (copy), t8 (copy), v30 (copy)
-			local v36 = SignalsReact.useSignalState(UniverseConfiguration.getUniverseConfigurationStore)
-			local v37 = SignalsReact.useSignalState(v36.getAndFetchConfiguration(t13.universeId).data)
+		getItems = v31,
+		useItems = function(t13: {[any]: any}?) -- line: 196
+			-- upvalues: SignalsReact (copy), UniverseConfiguration (copy), v26 (copy), t8 (copy), v31 (copy)
+			local v37 = SignalsReact.useSignalState(UniverseConfiguration.getUniverseConfigurationStore)
+			local v38 = if t13 == nil then v26 else v37.getAndFetchConfiguration(t13.universeId).data
+			local v39 = SignalsReact.useSignalState(v38)
 
-			t8[t13.universeId] = v37
+			if t13 ~= nil then
+				t8[t13.universeId] = v39
+			end
 
-			return SignalsReact.useSignalState(v30)
+			local v40 = SignalsReact.useSignalState(v31)
+
+			if t13 == nil then
+				return {}
+			end
+
+			return v40
 		end
 	}
 end

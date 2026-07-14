@@ -7,7 +7,7 @@ local useCallback = React.useCallback
 local useMemo = React.useMemo
 local View = Foundation.View
 local TextOverlay = require(MomentsCommon.Components.TextOverlay)
-local clampTextOverlayPosition = require(MomentsCommon.Utils.clampTextOverlayPosition)
+local clampOverlayPosition = require(MomentsCommon.Utils.clampOverlayPosition)
 local getCropSize = require(MomentsCommon.Utils.getCropSize)
 local getFitSize = require(MomentsCommon.Utils.getFitSize)
 local getScale = require(MomentsCommon.Utils.getScale)
@@ -24,7 +24,7 @@ local function arePositionsEqual(uDim2: UDim2, uDim2_2: UDim2) -- line: 48
 	return math.abs(uDim2.X.Scale - uDim2_2.X.Scale) < 0.0001 and (math.abs(uDim2.X.Offset - uDim2_2.X.Offset) < 0.0001 and (math.abs(uDim2.Y.Scale - uDim2_2.Y.Scale) < 0.0001 and math.abs(uDim2.Y.Offset - uDim2_2.Y.Offset) < 0.0001))
 end
 local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
-	-- upvalues: React (copy), useMemo (copy), getFitSize (copy), getCropSize (copy), getScale (copy), getAbsoluteSize (copy), getVisibleBounds (copy), useCallback (copy), clampTextOverlayPosition (copy), Dash (copy), arePositionsEqual (copy), TextOverlay (copy), View (copy)
+	-- upvalues: React (copy), useMemo (copy), getFitSize (copy), getCropSize (copy), getScale (copy), getAbsoluteSize (copy), getVisibleBounds (copy), useCallback (copy), clampOverlayPosition (copy), Dash (copy), arePositionsEqual (copy), TextOverlay (copy), View (copy)
 	local v25 = React.useRef(nil)
 	local v26 = React.useRef(nil)
 	local v27 = React.useRef(nil)
@@ -65,13 +65,13 @@ local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
 		t1.itemSize
 	})
 	local v36 = useCallback(function(uDim2: UDim2) -- line: 87
-		-- upvalues: v30 (copy), t1 (copy), clampTextOverlayPosition (copy), v33 (copy), v28 (copy), v34 (copy), v35 (copy), Dash (copy)
+		-- upvalues: v30 (copy), t1 (copy), clampOverlayPosition (copy), v33 (copy), v28 (copy), v34 (copy), v35 (copy), Dash (copy)
 		if not v30 then
 			return nil
 		end
 
 		if t1.clampToBoundsEnabled == true then
-			uDim2 = clampTextOverlayPosition(uDim2, v33, v28, v34, v35)
+			uDim2 = clampOverlayPosition(uDim2, v33, v28, v34, v35)
 		end
 
 		return Dash.joinDeep(v30, {
@@ -85,7 +85,7 @@ local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
 		v34,
 		v35
 	})
-	local v37 = useCallback(function() -- line: 110
+	local v37 = useCallback(function() -- line: 105
 		-- upvalues: v27 (copy), t1 (copy), v36 (copy)
 		if not v27.current or not t1.onTextOverlayDragEnd then
 			return
@@ -102,7 +102,7 @@ local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
 		t1.onTextOverlayDragEnd,
 		v36
 	})
-	local v38 = useCallback(function(p1) -- line: 123
+	local v38 = useCallback(function(p1) -- line: 118
 		-- upvalues: t1 (copy), v29 (copy)
 		if t1.clampToBoundsEnabled ~= true then
 			return
@@ -110,7 +110,7 @@ local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
 
 		local AbsoluteSize = p1.AbsoluteSize
 
-		v29(function(p2) -- line: 129
+		v29(function(p2) -- line: 124
 			-- upvalues: AbsoluteSize (copy)
 			if p2 == AbsoluteSize then
 				return p2
@@ -120,13 +120,13 @@ local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
 		end)
 	end, { t1.clampToBoundsEnabled })
 
-	React.useEffect(function() -- line: 139
-		-- upvalues: t1 (copy), v30 (copy), v33 (copy), v28 (copy), clampTextOverlayPosition (copy), v34 (copy), v35 (copy), arePositionsEqual (copy), Dash (copy)
+	React.useEffect(function() -- line: 134
+		-- upvalues: t1 (copy), v30 (copy), v33 (copy), v28 (copy), clampOverlayPosition (copy), v34 (copy), v35 (copy), arePositionsEqual (copy), Dash (copy)
 		if t1.clampToBoundsEnabled ~= true or (not t1.onTextOverlayDragEnd or not v30 or v33.X <= 0 or v33.Y <= 0 or v28.X <= 0 or v28.Y <= 0) then
 			return
 		end
 
-		local v47 = clampTextOverlayPosition(v30.position, v33, v28, v34, v35)
+		local v47 = clampOverlayPosition(v30.position, v33, v28, v34, v35)
 
 		if arePositionsEqual(v47, v30.position) then
 			return
@@ -145,7 +145,7 @@ local function TextOverlayDisplay(t1: {[any]: any}) -- line: 55
 		v35
 	})
 
-	local v39 = useCallback(function(p3) -- line: 181
+	local v39 = useCallback(function(p3) -- line: 176
 		-- upvalues: t1 (copy), React (copy), TextOverlay (copy), v32 (copy), v26 (copy), v25 (copy), v27 (copy), v38 (copy), v37 (copy)
 		if not p3 then
 			return nil

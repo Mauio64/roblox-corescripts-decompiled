@@ -7,7 +7,7 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
 local t = InGameMenuDependencies.t
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local ParentParent = script.Parent.Parent
@@ -92,7 +92,7 @@ function v18.renderFocusHandler(p3) -- line: 87
 	}) or nil
 end
 function v18.renderWithSelectionCursor(p6, p7) -- line: 119
-	-- upvalues: Cryo (copy), Roact (copy), Slider (copy), withStyle (copy), AssetImage (copy), CursorKind (copy), ExternalEventConnection (copy), UserInputService (copy)
+	-- upvalues: Cryo (copy), Roact (copy), Slider (copy), withFoundationOrUIBloxStyle (copy), AssetImage (copy), CursorKind (copy), ExternalEventConnection (copy), UserInputService (copy)
 	local props = p6.props
 	local v25 = Cryo.Dictionary.join(props, {
 		width = UDim.new(1, -80),
@@ -110,15 +110,40 @@ function v18.renderWithSelectionCursor(p6, p7) -- line: 119
 		LayoutOrder = props.LayoutOrder
 	}, {
 		Slider = Roact.createElement(Slider, v25),
-		TextContainer = withStyle(function(p8) -- line: 137
+		TextContainer = withFoundationOrUIBloxStyle(function(p8) -- line: 137
+			return {
+				Theme = {
+					TextMuted = {
+						Color = p8.Color.Content.Muted.Color3,
+						Transparency = p8.Color.Content.Muted.Transparency
+					},
+					TextDefault = {
+						Color = p8.Color.Content.Default.Color3,
+						Transparency = p8.Color.Content.Default.Transparency
+					},
+					BackgroundUIContrast = {
+						Color = p8.Color.OverMedia.OverMedia_0.Color3,
+						Transparency = p8.Color.OverMedia.OverMedia_0.Transparency
+					}
+				},
+				Font = {
+					BaseSize = 1,
+					Body = {
+						Font = p8.Typography.BodyLarge.Font,
+						RelativeSize = p8.Typography.BodyLarge.FontSize,
+						RelativeMinSize = p8.Typography.BodyLarge.FontSize
+					}
+				}
+			}
+		end, function(p9) -- line: 149
 			-- upvalues: props (copy), Roact (copy), AssetImage (copy), p6 (copy), p7 (copy), CursorKind (copy)
-			local v29 = props.disabled and p8.Theme.TextMuted or p8.Theme.TextDefault
+			local v30 = props.disabled and p9.Theme.TextMuted or p9.Theme.TextDefault
 
 			return Roact.createElement(AssetImage.Label, {
 				BackgroundTransparency = 1,
 				imageKey = "RoundedRect",
-				ImageTransparency = p8.Theme.BackgroundUIContrast.Transparency,
-				ImageColor3 = p8.Theme.BackgroundUIContrast.Color,
+				ImageTransparency = p9.Theme.BackgroundUIContrast.Transparency,
+				ImageColor3 = p9.Theme.BackgroundUIContrast.Color,
 				Size = UDim2.new(0, 64, 0, 36),
 				Position = UDim2.new(1, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(1, 0.5)
@@ -129,37 +154,37 @@ function v18.renderWithSelectionCursor(p6, p7) -- line: 119
 					Size = UDim2.new(1, 0, 1, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
-					Font = p8.Font.Body.Font,
+					Font = p9.Font.Body.Font,
 					TextScaled = true,
 					ClearTextOnFocus = false,
 					TextEditable = not props.disabled,
-					TextColor3 = v29.Color,
-					TextTransparency = v29.Transparency,
+					TextColor3 = v30.Color,
+					TextTransparency = v30.Transparency,
 					Text = tostring(props.value),
 					NextSelectionLeft = p6.props.sliderDotRef,
 					SelectionImageObject = p7(CursorKind.InputFields),
 					[Roact.Event.SelectionLost] = p6.props.onSelectionLost,
 					[Roact.Event.SelectionGained] = p6.props.onSelectionGained,
 					[Roact.Ref] = p6.textBoxRef,
-					[Roact.Event.Focused] = props.disabled and function(p9) -- line: 167
-						p9:ReleaseFocus(false)
-					end or function() -- line: 169
+					[Roact.Event.Focused] = props.disabled and function(p10) -- line: 179
+						p10:ReleaseFocus(false)
+					end or function() -- line: 181
 						-- upvalues: p6 (copy)
 						p6:setState({
 							textEntryMode = true
 						})
 					end,
-					[Roact.Event.FocusLost] = function(p10, _) -- line: 172
+					[Roact.Event.FocusLost] = function(p11, _) -- line: 184
 						-- upvalues: p6 (copy), props (copy)
 						p6:setState({
 							textEntryMode = false
 						})
 
-						local num = tonumber(p10.Text)
+						local num = tonumber(p11.Text)
 
 						if num ~= props.value then
 							if num == nil then
-								p10.Text = tostring(props.value)
+								p11.Text = tostring(props.value)
 
 								return
 							end
@@ -170,28 +195,28 @@ function v18.renderWithSelectionCursor(p6, p7) -- line: 119
 								stepInterval = props.keyboardInputStepInterval
 							end
 
-							local v43 = math.clamp(math.floor(num / stepInterval + 0.5) * stepInterval, props.min, props.max)
+							local v44 = math.clamp(math.floor(num / stepInterval + 0.5) * stepInterval, props.min, props.max)
 
-							p10.Text = tostring(v43)
+							p11.Text = tostring(v44)
 
-							if v43 ~= props.value then
-								props.valueChanged(v43)
+							if v44 ~= props.value then
+								props.valueChanged(v44)
 							end
 						end
 					end
 				}, {
 					TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
-						MinTextSize = p8.Font.Body.RelativeMinSize * p8.Font.BaseSize,
-						MaxTextSize = p8.Font.Body.RelativeSize * p8.Font.BaseSize
+						MinTextSize = p9.Font.Body.RelativeMinSize * p9.Font.BaseSize,
+						MaxTextSize = p9.Font.Body.RelativeSize * p9.Font.BaseSize
 					})
 				})
 			})
 		end),
 		UserInputConnection = not props.disabled and Roact.createElement(ExternalEventConnection, {
 			event = UserInputService.InputBegan,
-			callback = function(p12, _) -- line: 210
+			callback = function(p13, _) -- line: 222
 				-- upvalues: UserInputService (copy), p6 (copy), props (copy)
-				if p12.UserInputType ~= Enum.UserInputType.Keyboard then
+				if p13.UserInputType ~= Enum.UserInputType.Keyboard then
 					return
 				end
 
@@ -201,9 +226,9 @@ function v18.renderWithSelectionCursor(p6, p7) -- line: 119
 
 				local n1 = 0
 
-				if p12.KeyCode == Enum.KeyCode.Up then
+				if p13.KeyCode == Enum.KeyCode.Up then
 					n1 = 1
-				elseif p12.KeyCode == Enum.KeyCode.Down then
+				elseif p13.KeyCode == Enum.KeyCode.Down then
 					n1 = -1
 				end
 
@@ -212,21 +237,21 @@ function v18.renderWithSelectionCursor(p6, p7) -- line: 119
 				end
 
 				if n1 ~= 0 then
-					local v33 = math.clamp(math.floor((props.value + props.stepInterval * n1) / props.stepInterval + 0.5) * props.stepInterval, props.min, props.max)
+					local v34 = math.clamp(math.floor((props.value + props.stepInterval * n1) / props.stepInterval + 0.5) * props.stepInterval, props.min, props.max)
 
-					if v33 ~= props.value then
-						props.valueChanged(v33)
+					if v34 ~= props.value then
+						props.valueChanged(v34)
 					end
 				end
 			end
 		})
 	})
 end
-function v18.render(p14) -- line: 250
+function v18.render(p15) -- line: 262
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p15) -- line: 251
-		-- upvalues: p14 (copy)
-		return p14:renderWithSelectionCursor(p15)
+	return withSelectionCursorProvider(function(p16) -- line: 263
+		-- upvalues: p15 (copy)
+		return p15:renderWithSelectionCursor(p16)
 	end)
 end
 

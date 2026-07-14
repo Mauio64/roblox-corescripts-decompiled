@@ -6,18 +6,21 @@ local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenam
 local FoundationImage = Foundation.Image
 local Skeleton = Foundation.Skeleton
 local EnumsRadius = Foundation.Enums.Radius
+local ItemCardThumbnailSkeleton = require(script.Parent.ItemCardThumbnailSkeleton)
 local useDesignTokens = require(Parent.Style).useDesignTokens
 local FFlagAXMigrateAXToGlobalAutofocus = require(Parent.SharedFlags).FFlagAXMigrateAXToGlobalAutofocus
 local FFlagLuaAppHomePageFirstImageLoadObserver = require(Parent.SharedFlags).FFlagLuaAppHomePageFirstImageLoadObserver
+local FFlagAXTestSkeletonInCatalog = require(Parent.AvatarExperienceFlags).FFlagAXTestSkeletonInCatalog
+local v14 = game:DefineFastFlag("AXTestDontUseSkeletonOnloadInCatalog", false) and FFlagAXTestSkeletonInCatalog
 
-local function ItemCardThumbnail(t1: {[any]: any}, p1) -- line: 30
-	-- upvalues: React (copy), useDesignTokens (copy), FFlagAXMigrateAXToGlobalAutofocus (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy), RunService (copy), Skeleton (copy), EnumsRadius (copy), FoundationImage (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
-	local v15, v16 = React.useState(false)
-	local v17 = useDesignTokens()
-	local v18 = if not FFlagAXMigrateAXToGlobalAutofocus then nil else t1.tag
-	local v19 = if not FFlagLuaAppHomePageFirstImageLoadObserver then v18 else not v18 and "observed-image" or `{ v18 } observed-image`
-	local v20 = React.useCallback(function(p2) -- line: 39
-		-- upvalues: FFlagAXMigrateAXToGlobalAutofocus (copy), p1 (copy), v16 (copy), t1 (copy), RunService (copy)
+local function ItemCardThumbnail(t1: {[any]: any}, p1) -- line: 37
+	-- upvalues: React (copy), useDesignTokens (copy), FFlagAXMigrateAXToGlobalAutofocus (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy), RunService (copy), FFlagAXTestSkeletonInCatalog (copy), v14 (copy), ItemCardThumbnailSkeleton (copy), EnumsRadius (copy), FoundationImage (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Skeleton (copy)
+	local v18, v19 = React.useState(false)
+	local v20 = useDesignTokens()
+	local v21 = if not FFlagAXMigrateAXToGlobalAutofocus then nil else t1.tag
+	local v22 = if not FFlagLuaAppHomePageFirstImageLoadObserver then v21 else not v21 and "observed-image" or `{ v21 } observed-image`
+	local v23 = React.useCallback(function(p2) -- line: 46
+		-- upvalues: FFlagAXMigrateAXToGlobalAutofocus (copy), p1 (copy), v19 (copy), t1 (copy), RunService (copy)
 		if FFlagAXMigrateAXToGlobalAutofocus then
 			if typeof(p1) == "function" then
 				p1(p2)
@@ -26,18 +29,18 @@ local function ItemCardThumbnail(t1: {[any]: any}, p1) -- line: 30
 			end
 		end
 
-		v16(false)
+		v19(false)
 
 		if p2 and t1.url then
 			local connection = nil
 			local timestamp = tick()
 
-			connection = RunService.Heartbeat:Connect(function(dt) -- line: 51
-				-- upvalues: timestamp (ref), p2 (copy), v16 (copy), t1 (copy), connection (ref)
+			connection = RunService.Heartbeat:Connect(function(dt) -- line: 58
+				-- upvalues: timestamp (ref), p2 (copy), v19 (copy), t1 (copy), connection (ref)
 				timestamp += dt
 
 				if p2.IsLoaded then
-					v16(true)
+					v19(true)
 
 					if t1.onLoaded then
 						t1.onLoaded(timestamp)
@@ -58,8 +61,32 @@ local function ItemCardThumbnail(t1: {[any]: any}, p1) -- line: 30
 		t1.url
 	})
 
+	if FFlagAXTestSkeletonInCatalog and t1.inSkeletonExperiment then
+		return React.createElement(React.Fragment, nil, {
+			ItemCardThumbnailSkeleton = if v14 or v18 then nil else React.createElement(ItemCardThumbnailSkeleton, {
+				ZIndex = 2,
+				Size = UDim2.fromScale(1, 1),
+				testId = `item-card-thumbnail-skeleton-{ t1.url }`,
+				radius = EnumsRadius.Medium
+			}),
+			ItemCardThumbnailImage = React.createElement(FoundationImage, {
+				imageRect = t1.imageRect,
+				Image = t1.url,
+				Size = UDim2.fromScale(1, 1),
+				ScaleType = Enum.ScaleType.Crop,
+				ref = v23,
+				testId = `item-card-thumbnail-image-{ t1.url }`,
+				tag = if not FFlagAXMigrateAXToGlobalAutofocus then nil else t1.tag
+			}, {
+				CornerRadius = React.createElement("UICorner", {
+					CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v20.Semantic.Radius.Medium else v20.Radius.Medium)
+				})
+			})
+		})
+	end
+
 	return React.createElement(React.Fragment, nil, {
-		ItemCardThumbnailSkeleton = if v15 then nil else React.createElement(Skeleton, {
+		ItemCardThumbnailSkeleton = if v18 then nil else React.createElement(Skeleton, {
 			ZIndex = 2,
 			Size = UDim2.fromScale(1, 1),
 			testId = `item-card-thumbnail-skeleton-{ t1.url }`,
@@ -70,12 +97,12 @@ local function ItemCardThumbnail(t1: {[any]: any}, p1) -- line: 30
 			Image = t1.url,
 			Size = UDim2.fromScale(1, 1),
 			ScaleType = Enum.ScaleType.Crop,
-			ref = v20,
+			ref = v23,
 			testId = `item-card-thumbnail-image-{ t1.url }`,
-			tag = v19
+			tag = v22
 		}, {
 			CornerRadius = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v17.Semantic.Radius.Medium else v17.Radius.Medium)
+				CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v20.Semantic.Radius.Medium else v20.Radius.Medium)
 			})
 		})
 	})

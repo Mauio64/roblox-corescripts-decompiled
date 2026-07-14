@@ -1,17 +1,16 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+local Flags = require(Foundation.Utility.Flags)
 local NumberInputControlsVariant = require(Foundation.Enums.NumberInputControlsVariant)
 local InputSize = require(Foundation.Enums.InputSize)
-
-require(Foundation.Enums.InputVariant)
-
+local IconSize = require(Foundation.Enums.IconSize)
 local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 
 require(Foundation.Providers.Style.Tokens)
 
 local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 
-local function computeProps(t1: {[any]: any}) -- line: 22
-	local v9 = if not t1.width or not t1.horizontalPadding then nil else UDim.new(0, (t1.buttonWidth - t1.horizontalPadding) / 2)
+local function computeProps(t1: {[any]: any}) -- line: 23
+	local v11 = if not t1.width or not t1.horizontalPadding then nil else UDim.new(0, (t1.buttonWidth - t1.horizontalPadding) / 2)
 
 	return {
 		container = {
@@ -20,9 +19,9 @@ local function computeProps(t1: {[any]: any}) -- line: 22
 		button = {
 			tag = "fill size-full",
 			width = t1.buttonWidth,
-			padding = if not v9 then nil else {
-				left = v9,
-				right = v9
+			padding = if not v11 then nil else {
+				left = v11,
+				right = v11
 			}
 		},
 		upButton = {
@@ -40,9 +39,9 @@ local function computeProps(t1: {[any]: any}) -- line: 22
 		}
 	}
 end
-local function variantsFactory(p1) -- line: 65
-	-- upvalues: InputSize (copy), computeProps (copy), NumberInputControlsVariant (copy)
-	local t2 = {
+local function variantsFactory(p1) -- line: 66
+	-- upvalues: Flags (copy), InputSize (copy), IconSize (copy), computeProps (copy), NumberInputControlsVariant (copy)
+	local v13 = if not Flags.FoundationNumberInputBeta then {
 		upButton = {
 			tag = "fill size-full padding-bottom-xsmall"
 		},
@@ -52,8 +51,12 @@ local function variantsFactory(p1) -- line: 65
 		icon = {
 			tag = "content-default"
 		}
+	} else {
+		controls = {
+			tag = "row align-y-center bg-action-standard"
+		}
 	}
-	local t3 = {
+	local v14 = if not Flags.FoundationNumberInputBeta then {
 		[InputSize.XSmall] = computeProps({
 			upButtonTag = "padding-top-xxsmall",
 			downButtonTag = "padding-bottom-xxsmall",
@@ -90,23 +93,64 @@ local function variantsFactory(p1) -- line: 65
 			horizontalPadding = p1.Size.Size_150,
 			splitButtonSize = p1.Size.Size_1200
 		})
+	} else {
+		[InputSize.XSmall] = {
+			controls = {
+				tag = "radius-small",
+				width = p1.Size.Size_1200,
+				buttonSize = p1.Size.Size_600,
+				iconSize = IconSize.XSmall,
+				radius = p1.Radius.Small
+			}
+		},
+		[InputSize.Small] = {
+			controls = {
+				tag = "radius-medium",
+				width = p1.Size.Size_1600,
+				buttonSize = p1.Size.Size_800,
+				iconSize = IconSize.Small,
+				radius = p1.Radius.Medium
+			}
+		},
+		[InputSize.Medium] = {
+			controls = {
+				tag = "radius-medium",
+				width = p1.Size.Size_2000,
+				buttonSize = p1.Size.Size_1000,
+				iconSize = IconSize.Medium,
+				radius = p1.Radius.Medium
+			}
+		},
+		[InputSize.Large] = {
+			controls = {
+				tag = "radius-medium",
+				width = p1.Size.Size_2400,
+				buttonSize = p1.Size.Size_1200,
+				iconSize = IconSize.Large,
+				radius = p1.Radius.Medium
+			}
+		}
 	}
-	local t4 = {
+	local v15 = if not Flags.FoundationNumberInputBeta then {
 		[NumberInputControlsVariant.Stacked] = computeProps({
 			iconTag = "size-150-100"
 		})
-	}
+	} else nil
 
 	return {
-		common = t2,
-		sizes = t3,
-		controlVariants = t4
+		common = v13,
+		sizes = v14,
+		controlVariants = v15
 	}
 end
 
-return function(p2, p3, p4) -- line: 126
-	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
-	local v17 = VariantsContext.useVariants("NumberInput", variantsFactory, p2)
+return function(p2, p3, p4) -- line: 174
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), Flags (copy), composeStyleVariant (copy)
+	local v19 = VariantsContext.useVariants("NumberInput", variantsFactory, p2)
 
-	return composeStyleVariant(v17.common, v17.sizes[p3], v17.controlVariants[p4])
+	if Flags.FoundationNumberInputBeta then
+		return composeStyleVariant(v19.common, v19.sizes[p3])
+	end
+
+	return composeStyleVariant(v19.common, v19.sizes[p3], v19.controlVariants[p4])
 end

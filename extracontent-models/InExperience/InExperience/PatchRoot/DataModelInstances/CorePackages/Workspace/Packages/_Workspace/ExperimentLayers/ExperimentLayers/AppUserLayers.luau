@@ -101,6 +101,7 @@ return {
 	ExperienceMenuLayer = "Experience.Menu",
 	ExperienceMenuGamepadExposureLayer = v10,
 	ExperienceMenuSettingsExposureLayer = "Experience.Menu.Settings.Exposure",
+	ExperienceMenuExitModalLayer = "Experience.Menu.ExitModal",
 	ConsoleExperienceMenuLayer = "Experience.Menu.Console",
 	LoadingScreenLayer = "Interactivity.LoadingScreen",
 	LuaDesktopToastNotificationLayer = getFStringDesktopToastNotificationLayer(),

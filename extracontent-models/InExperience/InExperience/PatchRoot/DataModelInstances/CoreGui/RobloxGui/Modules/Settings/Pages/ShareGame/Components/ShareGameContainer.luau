@@ -18,7 +18,7 @@ v14.defaultProps = {
 }
 
 function v14.init(p1) -- line: 30
-	p1.props.reFetch()
+	p1.props.reFetch(p1.props.requestImpl)
 end
 function v14.render(p2) -- line: 34
 	-- upvalues: Roact (copy)
@@ -38,12 +38,12 @@ end, function(p5) -- line: 44
 			-- upvalues: p5 (copy), ClosePage (copy), Constants (copy)
 			p5(ClosePage(Constants.PageRoute.SHARE_GAME))
 		end,
-		reFetch = function() -- line: 50
+		reFetch = function(p6) -- line: 50
 			-- upvalues: Players (copy), httpRequest (copy), HttpRbxApiService (copy), p5 (copy), FetchUserFriends (copy)
 			local str = tostring(Players.LocalPlayer.UserId)
-			local v21 = httpRequest(HttpRbxApiService)
+			local v22 = p6 or httpRequest(HttpRbxApiService)
 
-			p5(FetchUserFriends(v21, str))
+			p5(FetchUserFriends(v22, str))
 		end
 	}
 end)(v14))

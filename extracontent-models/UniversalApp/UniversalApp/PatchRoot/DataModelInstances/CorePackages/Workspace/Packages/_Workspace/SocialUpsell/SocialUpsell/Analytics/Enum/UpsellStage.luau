@@ -1,4 +1,0 @@
-return {
-	Fae = "fae",
-	FaeDetails = "faeDetails"
-}

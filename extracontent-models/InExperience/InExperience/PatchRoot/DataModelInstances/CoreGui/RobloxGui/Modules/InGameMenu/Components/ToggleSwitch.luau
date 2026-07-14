@@ -4,9 +4,9 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local Otter = InGameMenuDependencies.Otter
 local t = InGameMenuDependencies.t
-local withStyle = UIBlox.Core.Style.withStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent
 local divideTransparency = require(ParentParent.Utility.divideTransparency)
 local AssetImage = require(script.Parent.AssetImage)
@@ -49,8 +49,21 @@ function v16.init(p1) -- line: 42
 	p1.motor:onStep(p1.setProgress)
 end
 function v16.renderWithSelectionCursor(p4, p5) -- line: 58
-	-- upvalues: withStyle (copy), Roact (copy), AssetImage (copy), divideTransparency (copy), CursorKind (copy)
-	return withStyle(function(p6) -- line: 59
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), AssetImage (copy), divideTransparency (copy), CursorKind (copy)
+	return withFoundationOrUIBloxStyle(function(p6) -- line: 59
+		return {
+			Theme = {
+				SecondaryDefault = {
+					Color = p6.Color.Extended.White.White_70.Color3,
+					Transparency = p6.Color.Extended.White.White_70.Transparency
+				},
+				Success = {
+					Color = p6.Color.System.Success.Color3,
+					Transparency = p6.Color.System.Success.Transparency
+				}
+			}
+		}
+	end, function(p7) -- line: 66
 		-- upvalues: Roact (copy), AssetImage (copy), p4 (copy), divideTransparency (copy), p5 (copy), CursorKind (copy)
 		return Roact.createElement(AssetImage.Button, {
 			Size = UDim2.new(0, 60, 0, 36),
@@ -59,8 +72,8 @@ function v16.renderWithSelectionCursor(p4, p5) -- line: 58
 			LayoutOrder = p4.props.LayoutOrder,
 			imageKey = "ToggleOutline",
 			AnchorPoint = p4.props.AnchorPoint,
-			ImageColor3 = p6.Theme.SecondaryDefault.Color,
-			ImageTransparency = divideTransparency(p6.Theme.SecondaryDefault.Transparency, not p4.props.disabled and 1 or 4),
+			ImageColor3 = p7.Theme.SecondaryDefault.Color,
+			ImageTransparency = divideTransparency(p7.Theme.SecondaryDefault.Transparency, not p4.props.disabled and 1 or 4),
 			NextSelectionUp = p4.props.NextSelectionUp,
 			[Roact.Event.Activated] = p4.props.onToggled,
 			[Roact.Ref] = p4.props.buttonRef,
@@ -72,7 +85,7 @@ function v16.renderWithSelectionCursor(p4, p5) -- line: 58
 				BackgroundTransparency = 1,
 				imageKey = "ToggleFill",
 				Size = UDim2.new(1, 0, 1, 0),
-				ImageColor3 = p6.Theme.Success.Color,
+				ImageColor3 = p7.Theme.Success.Color,
 				ImageTransparency = p4.fillTransparency
 			}),
 			Knob = Roact.createElement(AssetImage.Label, {
@@ -87,21 +100,21 @@ function v16.renderWithSelectionCursor(p4, p5) -- line: 58
 		})
 	end)
 end
-function v16.render(p7) -- line: 99
+function v16.render(p8) -- line: 106
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p8) -- line: 100
-		-- upvalues: p7 (copy)
-		return p7:renderWithSelectionCursor(p8)
+	return withSelectionCursorProvider(function(p9) -- line: 107
+		-- upvalues: p8 (copy)
+		return p8:renderWithSelectionCursor(p9)
 	end)
 end
-function v16.didUpdate(p9) -- line: 105
+function v16.didUpdate(p10) -- line: 112
 	-- upvalues: Otter (copy), t1 (copy)
-	local v25 = not p9.props.checked and 0 or 1
+	local v25 = not p10.props.checked and 0 or 1
 
-	p9.motor:setGoal(Otter.spring(v25, t1))
+	p10.motor:setGoal(Otter.spring(v25, t1))
 end
-function v16.willUnmount(p10) -- line: 110
-	p10.motor:destroy()
+function v16.willUnmount(p11) -- line: 117
+	p11.motor:destroy()
 end
 
 return v16

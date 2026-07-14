@@ -1,4 +1,0 @@
-return {
-	Standard = "standard",
-	Continuous = "continuous"
-}

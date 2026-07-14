@@ -1,3 +1,0 @@
-return {
-	DEFAULT_ERROR_LEVEL = "error"
-}

@@ -29,13 +29,14 @@ local FFlagLuaAppFixDetailsPageThumbnailRenderInPhone = require(AppBloxParent.Sh
 local FFlagLuaAppFixSDPLayout = require(AppBloxParent.SharedFlags).FFlagLuaAppFixSDPLayout
 local v30 = game:DefineFastFlag("LuaAppDisableStickyBarMediaGallery", false)
 local FFlagLuaAppAddTestIdsForArrow = require(AppBloxParent.SharedFlags).FFlagLuaAppAddTestIdsForArrow
-local v32 = Roact.PureComponent:extend("DetailsPageTemplate")
+local FFlagLuaAppEdpConsoleMediaGalleryVideo = require(AppBloxParent.SharedFlags).FFlagLuaAppEdpConsoleMediaGalleryVideo
+local v33 = Roact.PureComponent:extend("DetailsPageTemplate")
 
-local function applyTokenScaling(n1: number, p1) -- line: 59
+local function applyTokenScaling(n1: number, p1) -- line: 60
 	return n1 * p1.Stroke.Standard
 end
 
-v32.validateProps = t.strictInterface({
+v33.validateProps = t.strictInterface({
 	foundationTokens = t.table,
 	thumbnailImageUrl = t.optional(t.string),
 	thumbnailHeight = t.optional(t.number),
@@ -76,21 +77,22 @@ v32.validateProps = t.strictInterface({
 	backgroundImageSize = if not FFlagLuaAppFixSDPLayout then nil else t.optional(t.UDim2),
 	headerPadding = if not FFlagLuaAppFixSDPLayout then nil else t.optional(t.number),
 	disableStickyActionBar = t.optional(t.boolean),
-	hideCloseButton = t.optional(t.boolean)
+	hideCloseButton = t.optional(t.boolean),
+	backgroundContentOverride = if not FFlagLuaAppEdpConsoleMediaGalleryVideo then nil else t.optional(t.table)
 })
-v32.defaultProps = {
+v33.defaultProps = {
 	isFullscreen = false,
 	deviceType = DeviceType.Desktop
 }
 
-local function getHeaderPaddingHeight(p2, n2: number) -- line: 170
+local function getHeaderPaddingHeight(p2, n2: number) -- line: 174
 	-- upvalues: getPlatformConfig (copy)
-	local v39 = getPlatformConfig(p2.deviceType)
+	local v40 = getPlatformConfig(p2.deviceType)
 
-	return n2 - if not p2.headerBarBackgroundHeight then v39.headerBarBackgroundHeight * p2.foundationTokens.Stroke.Standard else p2.headerBarBackgroundHeight
+	return n2 - if not p2.headerBarBackgroundHeight then v40.headerBarBackgroundHeight * p2.foundationTokens.Stroke.Standard else p2.headerBarBackgroundHeight
 end
 
-function v32.init(p3) -- line: 179
+function v33.init(p3) -- line: 183
 	-- upvalues: Roact (copy), Signal (copy), getPlatformConfig (copy), DeviceType (copy)
 	p3.containerRef = Roact.createRef()
 	p3.scrollingFrameRef = p3.props.scrollingFrameRef
@@ -103,38 +105,38 @@ function v32.init(p3) -- line: 179
 		containerSize = Vector2.new(500, 500)
 	}
 
-	function p3.onContainerSizeChange(p4) -- line: 191
+	function p3.onContainerSizeChange(p4) -- line: 195
 		-- upvalues: p3 (copy)
 		p3:setState({
 			containerSize = p4.AbsoluteSize
 		})
 	end
-	function p3.onBackgroundComponentFrameSizeChange(p5) -- line: 197
+	function p3.onBackgroundComponentFrameSizeChange(p5) -- line: 201
 		-- upvalues: p3 (copy), getPlatformConfig (copy)
-		p3:setState(function(_, p7) -- line: 199
+		p3:setState(function(_, p7) -- line: 203
 			-- upvalues: p5 (copy), getPlatformConfig (copy)
 			local AbsoluteSizeY = p5.AbsoluteSize.Y
-			local v83 = getPlatformConfig(p7.deviceType)
-			local v84 = math.max(0, AbsoluteSizeY - (if not p7.headerBarBackgroundHeight then v83.headerBarBackgroundHeight * p7.foundationTokens.Stroke.Standard else p7.headerBarBackgroundHeight)) / 2
+			local v84 = getPlatformConfig(p7.deviceType)
+			local v85 = math.max(0, AbsoluteSizeY - (if not p7.headerBarBackgroundHeight then v84.headerBarBackgroundHeight * p7.foundationTokens.Stroke.Standard else p7.headerBarBackgroundHeight)) / 2
 
 			return {
 				backgroundHeight = AbsoluteSizeY,
-				backgroundComponentPosition = v84
+				backgroundComponentPosition = v85
 			}
 		end)
 	end
-	function p3.canvasPositionChange(p8) -- line: 210
+	function p3.canvasPositionChange(p8) -- line: 214
 		-- upvalues: p3 (copy), getPlatformConfig (copy), DeviceType (copy)
 		p3.scrollViewPositionChangedSignal:fire()
 		p3.scrolled = true
-		p3:setState(function(p9, p10) -- line: 214
+		p3:setState(function(p9, p10) -- line: 218
 			-- upvalues: getPlatformConfig (copy), p8 (copy), p3 (copy), DeviceType (copy)
 			local backgroundHeight = p9.backgroundHeight
-			local v88 = getPlatformConfig(p10.deviceType)
-			local v89 = backgroundHeight - if not p10.headerBarBackgroundHeight then v88.headerBarBackgroundHeight * p10.foundationTokens.Stroke.Standard else p10.headerBarBackgroundHeight
-			local v90 = math.max(0, v89 - p8.CanvasPosition.Y) / 2
+			local v89 = getPlatformConfig(p10.deviceType)
+			local v90 = backgroundHeight - if not p10.headerBarBackgroundHeight then v89.headerBarBackgroundHeight * p10.foundationTokens.Stroke.Standard else p10.headerBarBackgroundHeight
+			local v91 = math.max(0, v90 - p8.CanvasPosition.Y) / 2
 
-			if v89 < p8.CanvasPosition.Y then
+			if v90 < p8.CanvasPosition.Y then
 				if p9.showStickyActionTopBar == false and p3.props.deviceType ~= DeviceType.Phone and not p3.props.disableStickyActionBar then
 					return {
 						showStickyActionTopBar = true
@@ -147,65 +149,65 @@ function v32.init(p3) -- line: 179
 			if p9.showStickyActionTopBar == true then
 				return {
 					showStickyActionTopBar = false,
-					backgroundComponentPosition = v90
+					backgroundComponentPosition = v91
 				}
 			end
 
 			return {
-				backgroundComponentPosition = v90
+				backgroundComponentPosition = v91
 			}
 		end)
 	end
 end
-function v32.render(p11) -- line: 251
+function v33.render(p11) -- line: 255
 	-- upvalues: DeviceType (copy), getPlatformConfig (copy), FFlagLuaAppFixSDPLayout (copy), withStyle (copy), getIconSize (copy), IconSize (copy), Roact (copy), getIconSizeUDim2 (copy), React (copy), FFlagLuaAppAddTestIdsForArrow (copy), getTestId (copy), IconButton (copy), Images (copy), LoadableImage (copy), v30 (copy), StickyActionBar (copy), VerticalScrollView (copy), DetailsPageHeader (copy), FFlagLuaAppFixDetailsPageThumbnailRenderInPhone (copy), DetailsPageBody (copy), ActionBar (copy)
-	local v42 = p11.props.deviceType == DeviceType.Phone
-	local v43 = getPlatformConfig(p11.props.deviceType)
-	local v44 = if not p11.props.thumbnailHeight then v43.thumbnailHeight * p11.props.foundationTokens.Stroke.Standard else p11.props.thumbnailHeight
-	local v45 = if not p11.props.headerBarBackgroundHeight then v43.headerBarBackgroundHeight * p11.props.foundationTokens.Stroke.Standard else p11.props.headerBarBackgroundHeight
-	local v46 = if not p11.props.sideMargin then v43.sideMargin else p11.props.sideMargin
-	local v47 = if not p11.props.dualPanelBreakpoint then v43.dualPanelBreakpoint else p11.props.dualPanelBreakpoint
-	local g49 = nil
+	local v43 = p11.props.deviceType == DeviceType.Phone
+	local v44 = getPlatformConfig(p11.props.deviceType)
+	local v45 = if not p11.props.thumbnailHeight then v44.thumbnailHeight * p11.props.foundationTokens.Stroke.Standard else p11.props.thumbnailHeight
+	local v46 = if not p11.props.headerBarBackgroundHeight then v44.headerBarBackgroundHeight * p11.props.foundationTokens.Stroke.Standard else p11.props.headerBarBackgroundHeight
+	local v47 = if not p11.props.sideMargin then v44.sideMargin else p11.props.sideMargin
+	local v48 = if not p11.props.dualPanelBreakpoint then v44.dualPanelBreakpoint else p11.props.dualPanelBreakpoint
+	local g50 = nil
 	local headerPadding = nil
 
 	if FFlagLuaAppFixSDPLayout then
 		headerPadding = p11.props.headerPadding
 
 		if headerPadding then
-			g49 = true
+			g50 = true
 		end
 	end
 
-	if not g49 then
+	if not g50 then
 		local props = p11.props
 		local backgroundHeight = p11.state.backgroundHeight
-		local v52 = getPlatformConfig(props.deviceType)
+		local v53 = getPlatformConfig(props.deviceType)
 
-		headerPadding = backgroundHeight - if not props.headerBarBackgroundHeight then v52.headerBarBackgroundHeight * props.foundationTokens.Stroke.Standard else props.headerBarBackgroundHeight
+		headerPadding = backgroundHeight - if not props.headerBarBackgroundHeight then v53.headerBarBackgroundHeight * props.foundationTokens.Stroke.Standard else props.headerBarBackgroundHeight
 	end
 
-	g49 = false
+	g50 = false
 
-	local v53 = headerPadding
+	local v54 = headerPadding
 	local backgroundComponentPosition = p11.state.backgroundComponentPosition
 	local containerSize = p11.state.containerSize
 	local isFullscreen = p11.props.isFullscreen
 	local renderFullscreenContent = p11.props.renderFullscreenContent
-	local v58 = not v42 and (not not isFullscreen and not not renderFullscreenContent)
+	local v59 = not v43 and (not not isFullscreen and not not renderFullscreenContent)
 
-	return withStyle(function(p12) -- line: 275
-		-- upvalues: p11 (copy), v42 (copy), getIconSize (copy), IconSize (copy), v45 (copy), Roact (copy), getIconSizeUDim2 (copy), React (copy), FFlagLuaAppAddTestIdsForArrow (copy), getTestId (copy), IconButton (copy), v58 (copy), Images (copy), LoadableImage (copy), backgroundComponentPosition (copy), FFlagLuaAppFixSDPLayout (copy), containerSize (copy), v30 (copy), StickyActionBar (copy), VerticalScrollView (copy), v53 (copy), DetailsPageHeader (copy), v44 (copy), FFlagLuaAppFixDetailsPageThumbnailRenderInPhone (copy), v46 (copy), DetailsPageBody (copy), v47 (copy), renderFullscreenContent (copy), ActionBar (copy)
+	return withStyle(function(p12) -- line: 279
+		-- upvalues: p11 (copy), v43 (copy), getIconSize (copy), IconSize (copy), v46 (copy), Roact (copy), getIconSizeUDim2 (copy), React (copy), FFlagLuaAppAddTestIdsForArrow (copy), getTestId (copy), IconButton (copy), v59 (copy), Images (copy), LoadableImage (copy), backgroundComponentPosition (copy), FFlagLuaAppFixSDPLayout (copy), containerSize (copy), v30 (copy), StickyActionBar (copy), VerticalScrollView (copy), v54 (copy), DetailsPageHeader (copy), v45 (copy), FFlagLuaAppFixDetailsPageThumbnailRenderInPhone (copy), v47 (copy), DetailsPageBody (copy), v48 (copy), renderFullscreenContent (copy), ActionBar (copy)
 		local Theme = p12.Theme
-		local v76 = p11.props.bannerImageUrl == nil
-		local v77 = p11.props.bannerPlaceholderGradient or {
+		local v77 = p11.props.bannerImageUrl == nil
+		local v78 = p11.props.bannerPlaceholderGradient or {
 			Rotation = 90,
 			Color = ColorSequence.new({
 				ColorSequenceKeypoint.new(0, Theme.BackgroundMuted.Color),
 				ColorSequenceKeypoint.new(1, Theme.BackgroundUIDefault.Color)
 			})
 		}
-		local v78 = v42 and (getIconSize(IconSize.Large) + 22) / 2 or v45 / 2
-		local v79 = v42 and p11.props.actionBarProps
+		local v79 = v43 and (getIconSize(IconSize.Large) + 22) / 2 or v46 / 2
+		local v80 = v43 and p11.props.actionBarProps
 
 		return Roact.createElement("TextButton", {
 			Text = "",
@@ -223,13 +225,13 @@ function v32.render(p11) -- line: 251
 				BackgroundTransparency = 1,
 				Size = getIconSizeUDim2(IconSize.Large),
 				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.new(0, 22, 0, v78),
+				Position = UDim2.new(0, 22, 0, v79),
 				ZIndex = 2,
 				[React.Tag] = if not FFlagLuaAppAddTestIdsForArrow then nil else getTestId("details-close-button")
 			}, {
 				CloseButton = Roact.createElement(IconButton, {
 					size = UDim2.fromScale(1, 1),
-					icon = v58 and Images["icons/navigation/pushBack"] or Images["icons/navigation/close"],
+					icon = v59 and Images["icons/navigation/pushBack"] or Images["icons/navigation/close"],
 					iconColor3 = p12.Theme.UIEmphasis.Color,
 					iconSize = IconSize.Medium,
 					onActivated = p11.props.onClose,
@@ -245,11 +247,11 @@ function v32.render(p11) -- line: 251
 				Position = UDim2.fromScale(0.5, 0),
 				[Roact.Change.AbsoluteSize] = p11.onBackgroundComponentFrameSizeChange
 			}, {
-				GradientPlaceholder = v76 and Roact.createElement("UIGradient", v77) or nil,
-				UIAspectRatioConstraint = if not v76 and not p11.props.disableBackgroundAspectRatio then Roact.createElement("UIAspectRatioConstraint", {
+				GradientPlaceholder = v77 and Roact.createElement("UIGradient", v78) or nil,
+				UIAspectRatioConstraint = if not v77 and not p11.props.disableBackgroundAspectRatio then Roact.createElement("UIAspectRatioConstraint", {
 					AspectRatio = 1.7777777777777777
 				}) else nil,
-				BackgroundImage = v76 == false and Roact.createElement(LoadableImage, {
+				BackgroundImage = v77 == false and Roact.createElement(LoadableImage, {
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0, backgroundComponentPosition),
 					Size = FFlagLuaAppFixSDPLayout and p11.props.backgroundImageSize or UDim2.new(0, containerSize.x, 1, 0),
@@ -258,11 +260,11 @@ function v32.render(p11) -- line: 251
 					BackgroundTransparency = p11.props.backgroundImageTransparency
 				}) or nil
 			}),
-			StickyActionBarFrame = not (not p11.state.showStickyActionTopBar and not (if not v30 then v58 else v58 and not p11.props.disableStickyActionBar)) and Roact.createElement("TextButton", {
+			StickyActionBarFrame = not (not p11.state.showStickyActionTopBar and not (if not v30 then v59 else v59 and not p11.props.disableStickyActionBar)) and Roact.createElement("TextButton", {
 				Text = "",
 				AutoButtonColor = false,
 				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, v45),
+				Size = UDim2.new(1, 0, 0, v46),
 				BackgroundColor3 = Theme.BackgroundUIDefault.Color,
 				BackgroundTransparency = Theme.BackgroundUIDefault.Transparency
 			}, {
@@ -279,7 +281,7 @@ function v32.render(p11) -- line: 251
 				size = UDim2.fromScale(1, 1),
 				canvasSizeY = UDim.new(1, 0),
 				useAutomaticCanvasSize = true,
-				scrollingEnabled = not p11.props.disableScrollingForFocusNav and not v58,
+				scrollingEnabled = not p11.props.disableScrollingForFocusNav and not v59,
 				[Roact.Change.CanvasPosition] = p11.canvasPositionChange,
 				scrollingFrameRef = p11.scrollingFrameRef,
 				isGamepadFocusable = false,
@@ -292,7 +294,7 @@ function v32.render(p11) -- line: 251
 				Padding = Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
 					LayoutOrder = 1,
-					Size = UDim2.new(1, 0, 0, v53)
+					Size = UDim2.new(1, 0, 0, v54)
 				}),
 				MainView = Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
@@ -307,23 +309,23 @@ function v32.render(p11) -- line: 251
 					HeaderContainer = Roact.createElement("Frame", {
 						BackgroundTransparency = 1,
 						LayoutOrder = 1,
-						Size = UDim2.new(1, 0, 0, v45)
+						Size = UDim2.new(1, 0, 0, v46)
 					}, {
 						DetailsPageHeader = Roact.createElement(DetailsPageHeader, {
 							thumbnailImageUrl = p11.props.thumbnailImageUrl,
 							thumbnailAspectRatio = p11.props.thumbnailAspectRatio,
-							thumbnailHeight = v44,
+							thumbnailHeight = v45,
 							thumbnailShadowHeight = if not FFlagLuaAppFixDetailsPageThumbnailRenderInPhone then nil else p11.props.thumbnailShadowHeight,
 							titleText = p11.props.titleText,
 							subTitleText = p11.props.subTitleText,
 							actionBarLabelText = p11.props.actionBarLabelText,
 							renderInfoContent = p11.props.renderInfoContent,
 							renderCustomHeader = p11.props.renderCustomHeader,
-							actionBarProps = if p11.state.showStickyActionTopBar or if not v30 then v58 else not p11.props.disableStickyActionBar and v58 then nil else p11.props.actionBarProps,
+							actionBarProps = if p11.state.showStickyActionTopBar or if not v30 then v59 else not p11.props.disableStickyActionBar and v59 then nil else p11.props.actionBarProps,
 							actionBarWidth = p11.props.actionBarWidth,
 							actionBarHeight = p11.props.actionBarHeight,
-							headerBarBackgroundHeight = v45,
-							sideMargin = v46,
+							headerBarBackgroundHeight = v46,
+							sideMargin = v47,
 							maxContentWidth = p11.props.maxContentWidth,
 							deviceType = p11.props.deviceType,
 							gradientHeight = p11.props.gradientHeight,
@@ -353,33 +355,33 @@ function v32.render(p11) -- line: 251
 								renderInfoContent = p11.props.renderInfoContent,
 								bodyClipsDescendants = p11.props.bodyClipsDescendants,
 								componentList = p11.props.componentList,
-								dualPanelBreakpoint = v47,
-								sideMargin = v46,
+								dualPanelBreakpoint = v48,
+								sideMargin = v47,
 								maxContentWidth = p11.props.maxContentWidth,
 								deviceType = p11.props.deviceType,
-								showPageDetails = v42 and p11.props.renderCustomHeader == nil
+								showPageDetails = v43 and p11.props.renderCustomHeader == nil
 							})
 						})
 					})
 				}),
-				MobileActionViewPadding = v79 and Roact.createElement("Frame", {
+				MobileActionViewPadding = v80 and Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
 					LayoutOrder = 3,
 					Size = UDim2.new(1, 0, 0, 72)
 				})
 			}),
-			FullscreenFrame = v58 and Roact.createElement("TextButton", {
+			FullscreenFrame = v59 and Roact.createElement("TextButton", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				AutoButtonColor = false,
 				ClipsDescendants = true,
 				ZIndex = 2,
-				Size = UDim2.new(1, 0, 1, -v45),
-				Position = UDim2.fromOffset(0, v45)
+				Size = UDim2.new(1, 0, 1, -v46),
+				Position = UDim2.fromOffset(0, v46)
 			}, {
 				FullscreenContent = renderFullscreenContent()
 			}) or nil,
-			MobileActionBarFrame = v79 and Roact.createElement("TextButton", {
+			MobileActionBarFrame = v80 and Roact.createElement("TextButton", {
 				Text = "",
 				AutoButtonColor = false,
 				BorderSizePixel = 0,
@@ -413,38 +415,38 @@ function v32.render(p11) -- line: 251
 		})
 	end)
 end
-function v32.didMount(p13) -- line: 527
+function v33.didMount(p13) -- line: 531
 	if p13.containerRef.current then
 		p13.onContainerSizeChange(p13.containerRef.current)
 	end
 end
-function v32.didUpdate(p14) -- line: 533
+function v33.didUpdate(p14) -- line: 537
 	-- upvalues: getPlatformConfig (copy)
-	local v61 = getPlatformConfig(p14.props.deviceType)
+	local v62 = getPlatformConfig(p14.props.deviceType)
 
 	if p14.scrolled == false and p14.scrollingFrameRef.current then
-		local v62 = if not p14.props.startingOffsetPosition then v61.startingOffsetPosition else p14.props.startingOffsetPosition
+		local v63 = if not p14.props.startingOffsetPosition then v62.startingOffsetPosition else p14.props.startingOffsetPosition
 		local props = p14.props
 		local backgroundHeight = p14.state.backgroundHeight
-		local v65 = getPlatformConfig(props.deviceType)
-		local v66 = math.max(0, backgroundHeight - (if not props.headerBarBackgroundHeight then v65.headerBarBackgroundHeight * props.foundationTokens.Stroke.Standard else props.headerBarBackgroundHeight) - v62)
+		local v66 = getPlatformConfig(props.deviceType)
+		local v67 = math.max(0, backgroundHeight - (if not props.headerBarBackgroundHeight then v66.headerBarBackgroundHeight * props.foundationTokens.Stroke.Standard else props.headerBarBackgroundHeight) - v63)
 
-		p14.scrollingFrameRef.current.CanvasPosition = Vector2.new(0, v66)
+		p14.scrollingFrameRef.current.CanvasPosition = Vector2.new(0, v67)
 	end
 end
 
-return function(p15) -- line: 547
-	-- upvalues: React (copy), useAnimateScrollViewToSelection (copy), useTokens (copy), useLastInputMode (copy), v32 (copy), Cryo (copy)
-	local v68 = React.useRef(nil)
+return function(p15) -- line: 551
+	-- upvalues: React (copy), useAnimateScrollViewToSelection (copy), useTokens (copy), useLastInputMode (copy), v33 (copy), Cryo (copy)
+	local v69 = React.useRef(nil)
 
-	useAnimateScrollViewToSelection(v68, 0.4)
+	useAnimateScrollViewToSelection(v69, 0.4)
 
-	local v69 = useTokens()
-	local v70 = useLastInputMode() ~= "Cursor"
+	local v70 = useTokens()
+	local v71 = useLastInputMode() ~= "Cursor"
 
-	return React.createElement(v32, Cryo.Dictionary.join(p15, {
-		foundationTokens = v69,
-		scrollingFrameRef = v68,
-		disableScrollingForFocusNav = v70
+	return React.createElement(v33, Cryo.Dictionary.join(p15, {
+		foundationTokens = v70,
+		scrollingFrameRef = v69,
+		disableScrollingForFocusNav = v71
 	}))
 end

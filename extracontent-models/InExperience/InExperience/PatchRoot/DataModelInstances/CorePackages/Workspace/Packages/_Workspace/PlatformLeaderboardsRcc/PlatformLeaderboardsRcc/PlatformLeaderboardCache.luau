@@ -139,24 +139,24 @@ function t1.startGlobalRefresh(p17, n7: number) -- line: 187
 	local function loop() -- line: 198
 		-- upvalues: p17 (copy), v5 (copy), v4 (copy), u49 (ref)
 		repeat
-			local ok, result, v73 = pcall(p17._fetcher.fetchGlobalLeaderboard, p17._config.leaderboardId)
+			local ok, result, v74 = pcall(p17._fetcher.fetchGlobalLeaderboard, p17._config.leaderboardId)
 
-			if ok and result and v73 then
+			if ok and result and v74 then
 				local t5 = {
-					entries = v73.entries,
+					entries = v74.entries,
 					lastRefreshedAt = os.time()
 				}
 
 				p17._globalData = t5
 				p17:_rebuildGlobalIndex()
-				p17._globalUpdated:fire(t5, v73.config)
+				p17._globalUpdated:fire(t5, v74.config)
 			end
 
 			p17:_resolveUserScoresParallel()
 
-			local v75 = math.random(-v5, v5)
+			local v76 = math.random(-v5, v5)
 
-			p17._scheduler.wait((math.max(1, v4 + v75)))
+			p17._scheduler.wait((math.max(1, v4 + v76)))
 		until p17._globalTimer ~= u49
 	end
 
@@ -197,30 +197,32 @@ function t1.startFriendsRefresh(p19, n9: number) -- line: 240
 	end
 
 	local u55 = nil
+	local u56 = true
 
-	local function loop() -- line: 250
-		-- upvalues: p19 (copy), v7 (copy), v6 (copy), u55 (ref)
+	local function loop() -- line: 253
+		-- upvalues: p19 (copy), u56 (ref), v7 (copy), v6 (copy), u55 (ref)
 		repeat
 			table.clear(p19._friendsData)
 
-			for v76 in p19._currentFriendsLeaderboardViewersById do
-				local v77 = math.random(0, v7)
+			for v77 in p19._currentFriendsLeaderboardViewersById do
+				local v78 = if not u56 then math.random(0, v7) else 0
 
-				p19._scheduler.spawn(function() -- line: 255
-					-- upvalues: p19 (copy), v77 (copy), v76 (copy)
-					p19._scheduler.wait(v77)
+				p19._scheduler.spawn(function() -- line: 258
+					-- upvalues: p19 (copy), v78 (copy), v77 (copy)
+					p19._scheduler.wait(v78)
 
-					if p19._currentFriendsLeaderboardViewersById[v76] then
-						p19:_fetchFriendsLeaderboardForUser(v76)
+					if p19._currentFriendsLeaderboardViewersById[v77] then
+						p19:_fetchFriendsLeaderboardForUser(v77)
 					end
 				end)
 			end
 
+			u56 = false
 			p19._scheduler.wait((math.max(1, v6)))
 		until p19._friendsTimer ~= u55
 	end
 
-	u55 = p19._scheduler.defer(function() -- line: 267
+	u55 = p19._scheduler.defer(function() -- line: 271
 		-- upvalues: loop (copy), p19 (copy), u55 (ref)
 		if not pcall(loop) and p19._friendsTimer == u55 then
 			p19._friendsTimer = nil
@@ -228,7 +230,7 @@ function t1.startFriendsRefresh(p19, n9: number) -- line: 240
 	end)
 	p19._friendsTimer = u55
 end
-function t1.stopFriendsRefresh(p20, n10: number) -- line: 276
+function t1.stopFriendsRefresh(p20, n10: number) -- line: 280
 	p20._currentFriendsLeaderboardViewersById[n10] = nil
 
 	if next(p20._currentFriendsLeaderboardViewersById) then
@@ -240,7 +242,7 @@ function t1.stopFriendsRefresh(p20, n10: number) -- line: 276
 		p20._friendsTimer = nil
 	end
 end
-function t1.forceRefresh(p21, p22, b1: boolean) -- line: 288
+function t1.forceRefresh(p21, p22, b1: boolean) -- line: 292
 	p21._config = p22
 
 	if b1 then
@@ -250,12 +252,12 @@ function t1.forceRefresh(p21, p22, b1: boolean) -- line: 288
 		table.clear(p21._userScoreEntries)
 	end
 
-	local v62 = next(p21._currentlyActiveGlobalLeaderboardViewersByUserId)
+	local v63 = next(p21._currentlyActiveGlobalLeaderboardViewersByUserId)
 
-	if p21._globalTimer and v62 then
+	if p21._globalTimer and v63 then
 		pcall(p21._scheduler.cancel, p21._globalTimer)
 		p21._globalTimer = nil
-		p21:startGlobalRefresh(v62)
+		p21:startGlobalRefresh(v63)
 	end
 
 	if p21._friendsTimer then
@@ -264,22 +266,22 @@ function t1.forceRefresh(p21, p22, b1: boolean) -- line: 288
 
 		local t6 = {}
 
-		for v64 in p21._currentFriendsLeaderboardViewersById do
-			table.insert(t6, v64)
+		for v65 in p21._currentFriendsLeaderboardViewersById do
+			table.insert(t6, v65)
 		end
 
 		table.clear(p21._currentFriendsLeaderboardViewersById)
 
-		for _, v66 in t6 do
-			p21:startFriendsRefresh(v66)
+		for _, v67 in t6 do
+			p21:startFriendsRefresh(v67)
 		end
 	end
 end
-function t1.cleanupForUserId(p23, n11: number) -- line: 325
+function t1.cleanupForUserId(p23, n11: number) -- line: 329
 	p23:stopGlobalRefresh(n11)
 	p23:stopFriendsRefresh(n11)
 end
-function t1.teardown(p24) -- line: 330
+function t1.teardown(p24) -- line: 334
 	if p24._globalTimer then
 		pcall(p24._scheduler.cancel, p24._globalTimer)
 	end
@@ -298,7 +300,7 @@ function t1.teardown(p24) -- line: 330
 	table.clear(p24._friendsData)
 	table.clear(p24._userScoreEntries)
 end
-function t1.destroy(p25) -- line: 347
+function t1.destroy(p25) -- line: 351
 	p25:teardown()
 end
 

@@ -90,6 +90,7 @@ local function CallToActionBar(t2: {[any]: any}) -- line: 57
 				placeId = v35,
 				universeId = v36,
 				itemId = v32.feedItemId or v32.momentId,
+				feedItemId = v32.feedItemIdRaw,
 				tracingId = v32.feedSessionId
 			})
 		end,
@@ -115,6 +116,7 @@ local function CallToActionBar(t2: {[any]: any}) -- line: 57
 				placeId = v35,
 				universeId = v36,
 				itemId = v32.feedItemId or v32.momentId,
+				feedItemId = v32.feedItemIdRaw,
 				tracingId = v32.feedSessionId
 			},
 			text = v47,
@@ -122,7 +124,7 @@ local function CallToActionBar(t2: {[any]: any}) -- line: 57
 		}) else React.createElement(Button, {
 			LayoutOrder = 2,
 			isDisabled = v37 or v38,
-			onActivated = function() -- line: 175
+			onActivated = function() -- line: 176
 			end,
 			size = Foundation.Enums.InputSize.Medium,
 			text = v47,

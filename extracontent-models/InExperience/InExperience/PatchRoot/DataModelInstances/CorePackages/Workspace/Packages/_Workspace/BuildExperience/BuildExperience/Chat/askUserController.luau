@@ -14,147 +14,192 @@ local debug = CreatorAgentChat.debug
 local awaitRequestState = toolControllerUtils.awaitRequestState
 local getToolCallOrder = toolControllerUtils.getToolCallOrder
 
-local function makeAnswerStackPrompt(t1: {[any]: any}, t2: {[any]: any}?) -- line: 57
-	local v16 = if t2 == nil or t2.option == nil then nil else t2.option.id
-	local v17 = if t2 == nil then nil else t2.customResponseText
+local function getSelectedOptionId(t1: {[any]: any}?) -- line: 58
+	if t1 == nil then
+		return nil
+	end
 
+	if t1.options ~= nil then
+		local t2 = {}
+
+		for _, v19 in t1.options do
+			table.insert(t2, v19.id)
+		end
+
+		return t2
+	end
+
+	if t1.option ~= nil then
+		return t1.option.id
+	end
+
+	return nil
+end
+local function makeAnswerStackPrompt(t3: {[any]: any}, t4: {[any]: any}?) -- line: 75
+	-- upvalues: getSelectedOptionId (copy)
 	return {
-		question = t1.questions[t1.currentIndex],
-		selectedOptionId = v16,
-		customResponseText = v17,
-		toolCallId = t1.toolCallId,
-		callOrder = t1.callOrder
+		question = t3.questions[t3.currentIndex],
+		selectedOptionId = getSelectedOptionId(t4),
+		customResponseText = if t4 == nil then nil else t4.customResponseText,
+		toolCallId = t3.toolCallId,
+		callOrder = t3.callOrder,
+		isLastQuestion = t3.currentIndex >= #t3.questions
 	}
 end
-local function buildOptimisticAskUserTool(t3: {[any]: any}) -- line: 71
-	local t4 = {}
+local function buildOptimisticAskUserTool(t5: {[any]: any}) -- line: 86
+	-- upvalues: getSelectedOptionId (copy)
+	local t6 = {}
 
-	for v20, v21 in t3.selections do
-		t4[v20] = {
-			selectedOptionId = if v21.option == nil then nil else v21.option.id,
-			customResponseText = v21.customResponseText
+	for v24, v25 in t5.selections do
+		t6[v24] = {
+			selectedOptionId = getSelectedOptionId(v25),
+			customResponseText = v25.customResponseText
 		}
 	end
 
 	return {
-		toolCallId = t3.toolCallId,
-		callOrder = t3.callOrder,
-		currentIndex = t3.currentIndex,
-		selections = t4
+		toolCallId = t5.toolCallId,
+		callOrder = t5.callOrder,
+		currentIndex = t5.currentIndex,
+		selections = t6
 	}
 end
-local function createAnswerStackSync(p1: ((...any) -> ...any), p2: ((...any) -> ...any), p3: ((...any) -> ...any)) -- line: 87
+local function toggleOptionInSelection(t7: {[any]: any}?, p1) -- line: 102
+	local t8 = {}
+	local v29 = false
+
+	for _, v31 in if t7 == nil or t7.options == nil then {} else t7.options do
+		if v31.id == p1.id then
+			v29 = true
+		else
+			table.insert(t8, v31)
+		end
+	end
+
+	if not v29 then
+		table.insert(t8, p1)
+	end
+
+	return {
+		option = nil,
+		customResponseText = nil,
+		options = t8
+	}
+end
+local function createAnswerStackSync(p2: ((...any) -> ...any), p3: ((...any) -> ...any), p4: ((...any) -> ...any)) -- line: 125
 	-- upvalues: StudioAskUserTool (copy), debug (copy), composerLockSignal (copy), getToolCallOrder (copy)
-	local u25 = nil
-	local u26 = nil
-	local u27 = false
+	local u35 = nil
+	local u36 = nil
+	local u37 = false
 
-	return function(p4) -- line: 96
-		-- upvalues: StudioAskUserTool (copy), p3 (copy), u27 (ref), debug (copy), u25 (ref), u26 (ref), p2 (copy), composerLockSignal (copy), getToolCallOrder (copy), p1 (copy)
-		local v46, v47, v48, v49, v50 = StudioAskUserTool.findQuestionsInTurnState(p4, p3())
+	return function(p5) -- line: 134
+		-- upvalues: StudioAskUserTool (copy), p4 (copy), u37 (ref), debug (copy), u35 (ref), u36 (ref), p3 (copy), composerLockSignal (copy), getToolCallOrder (copy), p2 (copy)
+		local v59, v60, v61, v62, v63 = StudioAskUserTool.findQuestionsInTurnState(p5, p4())
 
-		if v46 == nil or v47 == nil then
-			if u27 then
+		if v59 == nil or v60 == nil then
+			if u37 then
 				debug.log("info", "studio_ask_user answer stack cleared", {
-					turn = debug.formatTurnState(p4)
+					turn = debug.formatTurnState(p5)
 				})
-				u27 = false
-				u25 = nil
-				u26 = nil
-				p2(nil)
+				u37 = false
+				u35 = nil
+				u36 = nil
+				p3(nil)
 				composerLockSignal.setComposerMode("normal")
 			end
 
 			return false
 		end
 
-		u27 = true
+		u37 = true
 
-		if v47 ~= u25 or v48 ~= u26 then
-			u25 = v47
-			u26 = v48
+		if v60 ~= u35 or v61 ~= u36 then
+			u35 = v60
+			u36 = v61
 
-			local t5 = {
+			local t9 = {
 				currentIndex = 1,
 				submitted = false,
-				sessionId = p4.sessionId,
-				toolCallId = v47,
-				callOrder = getToolCallOrder(p4, v47),
-				turnId = v49,
-				referenceId = v50,
-				questions = v46,
+				sessionId = p5.sessionId,
+				toolCallId = v60,
+				callOrder = getToolCallOrder(p5, v60),
+				turnId = v62,
+				referenceId = v63,
+				questions = v59,
 				selections = {}
 			}
 
-			p2(t5)
-			p1({
-				selectedOptionId = nil,
+			p3(t9)
+			p2({
 				customResponseText = nil,
-				question = t5.questions[t5.currentIndex],
-				toolCallId = t5.toolCallId,
-				callOrder = t5.callOrder
+				question = t9.questions[t9.currentIndex],
+				selectedOptionId = nil,
+				toolCallId = t9.toolCallId,
+				callOrder = t9.callOrder,
+				isLastQuestion = t9.currentIndex >= #t9.questions
 			})
 			composerLockSignal.setComposerMode("tool_response")
 			debug.log("info", "studio_ask_user answer stack displayed", {
-				toolCallId = v47,
-				turnId = v49,
-				referenceId = v50,
-				questions = debug.formatStudioAskUserQuestions(v46),
-				turn = debug.formatTurnState(p4)
+				toolCallId = v60,
+				turnId = v62,
+				referenceId = v63,
+				questions = debug.formatStudioAskUserQuestions(v59),
+				turn = debug.formatTurnState(p5)
 			})
 		end
 
 		return true
 	end
 end
-local function createAskUserController(p5, t6: {[any]: any}, p6) -- line: 143
-	-- upvalues: buildOptimisticAskUserTool (copy), StudioAskUserTool (copy), debug (copy), composerLockSignal (copy), getToolCallOrder (copy), awaitRequestState (copy), chatConstants (copy)
-	local u31 = nil
-	local u32 = nil
+local function createAskUserController(p6, t10: {[any]: any}, p7) -- line: 181
+	-- upvalues: buildOptimisticAskUserTool (copy), StudioAskUserTool (copy), debug (copy), composerLockSignal (copy), getToolCallOrder (copy), awaitRequestState (copy), chatConstants (copy), toggleOptionInSelection (copy)
+	local u41 = nil
+	local u42 = nil
+	local u43 = nil
 
-	local function setAnswerFlow(t7: {[any]: any}?) -- line: 151
-		-- upvalues: u31 (ref)
-		u31 = t7
+	local function setAnswerFlow(t11: {[any]: any}?) -- line: 190
+		-- upvalues: u41 (ref)
+		u41 = t11
 	end
-	local function setCurrentAnswerStackPrompt(p7) -- line: 155
-		-- upvalues: u31 (ref), p6 (copy), buildOptimisticAskUserTool (copy), u32 (ref)
-		local v54 = u31
+	local function setCurrentAnswerStackPrompt(p8) -- line: 194
+		-- upvalues: u41 (ref), p7 (copy), buildOptimisticAskUserTool (copy), u42 (ref), u43 (ref)
+		local v67 = u41
 
-		if p7 == nil then
-			if v54 ~= nil then
-				p6.removeAskUserTool(v54.toolCallId)
-				p6.removeAnswerAction(v54.toolCallId)
+		if p8 == nil then
+			if v67 ~= nil then
+				p7.removeAskUserTool(v67.toolCallId)
+				p7.removeAnswerAction(v67.toolCallId)
 			end
 
 			return
 		end
 
-		if v54 ~= nil then
-			p6.setAskUserTool((buildOptimisticAskUserTool(v54)))
-			p6.setAnswerAction(v54.toolCallId, u32)
+		if v67 ~= nil then
+			p7.setAskUserTool((buildOptimisticAskUserTool(v67)))
+			p7.setAnswerAction(v67.toolCallId, u42, u43)
 		end
 	end
-	local function getSubmittedToolCallIds() -- line: 170
-		-- upvalues: t6 (copy)
-		return t6
+	local function getSubmittedToolCallIds() -- line: 209
+		-- upvalues: t10 (copy)
+		return t10
 	end
 
-	local u36 = nil
-	local u37 = nil
-	local u38 = false
+	local u47 = nil
+	local u48 = nil
+	local u49 = false
 
-	local function v39(p8) -- line: 96
-		-- upvalues: StudioAskUserTool (copy), getSubmittedToolCallIds (copy), u38 (ref), debug (copy), u36 (ref), u37 (ref), setAnswerFlow (copy), composerLockSignal (copy), getToolCallOrder (copy), setCurrentAnswerStackPrompt (copy)
-		local v56, v57, v58, v59, v60 = StudioAskUserTool.findQuestionsInTurnState(p8, getSubmittedToolCallIds())
+	local function v50(p9) -- line: 134
+		-- upvalues: StudioAskUserTool (copy), getSubmittedToolCallIds (copy), u49 (ref), debug (copy), u47 (ref), u48 (ref), setAnswerFlow (copy), composerLockSignal (copy), getToolCallOrder (copy), setCurrentAnswerStackPrompt (copy)
+		local v69, v70, v71, v72, v73 = StudioAskUserTool.findQuestionsInTurnState(p9, getSubmittedToolCallIds())
 
-		if v56 == nil or v57 == nil then
-			if u38 then
+		if v69 == nil or v70 == nil then
+			if u49 then
 				debug.log("info", "studio_ask_user answer stack cleared", {
-					turn = debug.formatTurnState(p8)
+					turn = debug.formatTurnState(p9)
 				})
-				u38 = false
-				u36 = nil
-				u37 = nil
+				u49 = false
+				u47 = nil
+				u48 = nil
 				setAnswerFlow(nil)
 				composerLockSignal.setComposerMode("normal")
 			end
@@ -162,214 +207,304 @@ local function createAskUserController(p5, t6: {[any]: any}, p6) -- line: 143
 			return false
 		end
 
-		u38 = true
+		u49 = true
 
-		if v57 ~= u36 or v58 ~= u37 then
-			u36 = v57
-			u37 = v58
+		if v70 ~= u47 or v71 ~= u48 then
+			u47 = v70
+			u48 = v71
 
-			local t8 = {
+			local t12 = {
 				currentIndex = 1,
 				submitted = false,
-				sessionId = p8.sessionId,
-				toolCallId = v57,
-				callOrder = getToolCallOrder(p8, v57),
-				turnId = v59,
-				referenceId = v60,
-				questions = v56,
+				sessionId = p9.sessionId,
+				toolCallId = v70,
+				callOrder = getToolCallOrder(p9, v70),
+				turnId = v72,
+				referenceId = v73,
+				questions = v69,
 				selections = {}
 			}
 
-			setAnswerFlow(t8)
+			setAnswerFlow(t12)
 			setCurrentAnswerStackPrompt({
-				selectedOptionId = nil,
 				customResponseText = nil,
-				question = t8.questions[t8.currentIndex],
-				toolCallId = t8.toolCallId,
-				callOrder = t8.callOrder
+				question = t12.questions[t12.currentIndex],
+				selectedOptionId = nil,
+				toolCallId = t12.toolCallId,
+				callOrder = t12.callOrder,
+				isLastQuestion = t12.currentIndex >= #t12.questions
 			})
 			composerLockSignal.setComposerMode("tool_response")
 			debug.log("info", "studio_ask_user answer stack displayed", {
-				toolCallId = v57,
-				turnId = v59,
-				referenceId = v60,
-				questions = debug.formatStudioAskUserQuestions(v56),
-				turn = debug.formatTurnState(p8)
+				toolCallId = v70,
+				turnId = v72,
+				referenceId = v73,
+				questions = debug.formatStudioAskUserQuestions(v69),
+				turn = debug.formatTurnState(p9)
 			})
 		end
 
 		return true
 	end
 
-	local u40 = false
+	local u51 = false
 
-	local function submitAskUserResponses(t9: {[any]: any}) -- line: 177
-		-- upvalues: StudioAskUserTool (copy), debug (copy), p5 (copy), awaitRequestState (copy), chatConstants (copy), t6 (copy), p6 (copy), u31 (ref), composerLockSignal (copy)
-		local t10 = {}
+	local function submitAskUserResponses(t13: {[any]: any}) -- line: 216
+		-- upvalues: StudioAskUserTool (copy), debug (copy), p6 (copy), awaitRequestState (copy), chatConstants (copy), t10 (copy), p7 (copy), u41 (ref), composerLockSignal (copy)
+		local t14 = {}
 
-		for v64, v65 in t9.questions do
-			local v66 = t9.selections[v64]
+		for v77, v78 in t13.questions do
+			local v79 = t13.selections[v77]
 
-			if v66 == nil then
+			if v79 == nil then
 				return
 			end
 
-			table.insert(t10, {
-				question = v65,
-				option = v66.option,
-				customResponseText = v66.customResponseText
+			table.insert(t14, {
+				question = v78,
+				option = v79.option,
+				options = v79.options,
+				customResponseText = v79.customResponseText
 			})
 		end
 
-		local v67 = StudioAskUserTool.formatToolResultContent(t10)
+		local v80 = StudioAskUserTool.formatToolResultContent(t14)
 
 		debug.log("info", "studio_ask_user tool_result submitting", {
-			sessionId = t9.sessionId,
-			toolCallId = t9.toolCallId,
-			turnId = t9.turnId,
-			referenceId = t9.referenceId,
-			questionCount = #t9.questions
+			sessionId = t13.sessionId,
+			toolCallId = t13.toolCallId,
+			turnId = t13.turnId,
+			referenceId = t13.referenceId,
+			questionCount = #t13.questions
 		})
 
 		local elapsed = os.clock()
-		local v69 = p5.submitActiveToolResult(v67, false, t9.turnId, t9.referenceId)
+		local v82 = p6.submitActiveToolResult(v80, false, t13.turnId, t13.referenceId)
 
-		if v69 == nil then
+		if v82 == nil then
 			debug.log("warn", "studio_ask_user tool_result submit aborted (no active session)", {
-				toolCallId = t9.toolCallId
+				toolCallId = t13.toolCallId
 			})
-			t9.submitted = false
+			t13.submitted = false
 
 			return
 		end
 
-		local v70 = awaitRequestState(v69.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
-		local v71 = math.floor((os.clock() - elapsed) * 1000 + 0.5)
+		local v83 = awaitRequestState(v82.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
+		local v84 = math.floor((os.clock() - elapsed) * 1000 + 0.5)
 
-		if v70.status ~= "succeeded" then
-			t9.submitted = false
+		if v83.status ~= "succeeded" then
+			t13.submitted = false
 			debug.log("warn", "studio_ask_user tool_result submit failed", {
-				sessionId = t9.sessionId,
-				toolCallId = t9.toolCallId,
-				turnId = t9.turnId,
-				referenceId = t9.referenceId,
-				durationMs = v71,
-				state = debug.formatRequestState(v70)
+				sessionId = t13.sessionId,
+				toolCallId = t13.toolCallId,
+				turnId = t13.turnId,
+				referenceId = t13.referenceId,
+				durationMs = v84,
+				state = debug.formatRequestState(v83)
 			})
 
 			return
 		end
 
 		debug.log("info", "studio_ask_user tool_result submitted", {
-			sessionId = t9.sessionId,
-			toolCallId = t9.toolCallId,
-			turnId = t9.turnId,
-			referenceId = t9.referenceId,
-			questionCount = #t9.questions,
-			durationMs = v71
+			sessionId = t13.sessionId,
+			toolCallId = t13.toolCallId,
+			turnId = t13.turnId,
+			referenceId = t13.referenceId,
+			questionCount = #t13.questions,
+			durationMs = v84
 		})
-		t6[t9.toolCallId] = true
-		p6.markSubmitted(t9.toolCallId)
-		p6.removeAnswerAction(t9.toolCallId)
-		u31 = nil
+		t10[t13.toolCallId] = true
+		p7.markSubmitted(t13.toolCallId)
+		p7.removeAnswerAction(t13.toolCallId)
+		u41 = nil
 		composerLockSignal.setComposerMode("normal")
 	end
-	local function submitAskUserCancellation(t11: {[any]: any}) -- line: 240
-		-- upvalues: StudioAskUserTool (copy), t6 (copy), p6 (copy), u31 (ref), composerLockSignal (copy), p5 (copy), debug (copy), awaitRequestState (copy), chatConstants (copy)
-		local v73 = StudioAskUserTool.formatCancellationContent()
+	local function submitAskUserCancellation(t15: {[any]: any}) -- line: 280
+		-- upvalues: StudioAskUserTool (copy), t10 (copy), p7 (copy), u41 (ref), composerLockSignal (copy), p6 (copy), debug (copy), awaitRequestState (copy), chatConstants (copy)
+		local v86 = StudioAskUserTool.formatCancellationContent()
 
-		t6[t11.toolCallId] = true
-		p6.markSubmitted(t11.toolCallId)
-		p6.removeAnswerAction(t11.toolCallId)
+		t10[t15.toolCallId] = true
+		p7.markSubmitted(t15.toolCallId)
+		p7.removeAnswerAction(t15.toolCallId)
 
-		local v74 = u31
+		local v87 = u41
 
-		if v74 ~= nil then
-			p6.removeAskUserTool(v74.toolCallId)
-			p6.removeAnswerAction(v74.toolCallId)
+		if v87 ~= nil then
+			p7.removeAskUserTool(v87.toolCallId)
+			p7.removeAnswerAction(v87.toolCallId)
 		end
 
-		u31 = nil
+		u41 = nil
 		composerLockSignal.setComposerMode("normal")
 
-		local v75 = p5.submitActiveToolResult(v73, false, t11.turnId, t11.referenceId)
+		local v88 = p6.submitActiveToolResult(v86, false, t15.turnId, t15.referenceId)
 
-		if v75 == nil then
+		if v88 == nil then
 			debug.log("warn", "studio_ask_user cancel aborted (no active session)", {
-				toolCallId = t11.toolCallId
+				toolCallId = t15.toolCallId
 			})
 
 			return
 		end
 
-		awaitRequestState(v75.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
+		awaitRequestState(v88.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
 	end
-	local function advanceToNextQuestion(t12: {[any]: any}) -- line: 260
-		-- upvalues: p6 (copy), buildOptimisticAskUserTool (copy)
-		if t12.currentIndex >= #t12.questions then
+	local function advanceToNextQuestion(t16: {[any]: any}) -- line: 300
+		-- upvalues: p7 (copy), buildOptimisticAskUserTool (copy)
+		if t16.currentIndex >= #t16.questions then
 			return false
 		end
 
-		t12.currentIndex = t12.currentIndex + 1
-		p6.setAskUserTool((buildOptimisticAskUserTool(t12)))
+		t16.currentIndex = t16.currentIndex + 1
+		p7.setAskUserTool((buildOptimisticAskUserTool(t16)))
 
 		return true
 	end
-	local function onAnswerSelectedImpl(p9, p10) -- line: 270
-		-- upvalues: u31 (ref), debug (copy), p6 (copy), buildOptimisticAskUserTool (copy), submitAskUserResponses (copy)
-		local v79 = u31
+	local function commitCurrentSelectionAndAdvance(t17: {[any]: any}) -- line: 310
+		-- upvalues: p7 (copy), buildOptimisticAskUserTool (copy), submitAskUserResponses (copy)
+		local v91
 
-		if v79 == nil or v79.submitted then
+		if t17.currentIndex >= #t17.questions then
+			v91 = false
+		else
+			t17.currentIndex = t17.currentIndex + 1
+			p7.setAskUserTool((buildOptimisticAskUserTool(t17)))
+			v91 = true
+		end
+
+		if v91 then
 			return
 		end
 
-		local v80 = v79.questions[v79.currentIndex]
+		t17.submitted = true
+		task.spawn(function() -- line: 316
+			-- upvalues: submitAskUserResponses (copy), t17 (copy)
+			submitAskUserResponses(t17)
+		end)
+	end
+	local function onAnswerSelectedImpl(p10, p11) -- line: 321
+		-- upvalues: u41 (ref), toggleOptionInSelection (copy), p7 (copy), buildOptimisticAskUserTool (copy), debug (copy), submitAskUserResponses (copy)
+		local v94 = u41
 
-		if v80 == nil or v80.id ~= p9.id then
+		if v94 == nil or v94.submitted then
+			return
+		end
+
+		local v95 = v94.questions[v94.currentIndex]
+
+		if v95 == nil or v95.id ~= p10.id then
+			return
+		end
+
+		if v95.responseType == "multi_select" then
+			v94.selections[v94.currentIndex] = toggleOptionInSelection(v94.selections[v94.currentIndex], p11)
+			p7.setAskUserTool((buildOptimisticAskUserTool(v94)))
+			debug.log("info", "studio_ask_user multi-select toggled", {
+				toolCallId = v94.toolCallId,
+				questionId = p10.id,
+				questionIndex = v94.currentIndex,
+				optionId = p11.id,
+				optionTitle = p11.title
+			})
+
 			return
 		end
 
 		debug.log("info", "studio_ask_user answer selected", {
-			toolCallId = v79.toolCallId,
-			questionId = p9.id,
-			questionIndex = v79.currentIndex,
-			optionId = p10.id,
-			optionTitle = p10.title
+			toolCallId = v94.toolCallId,
+			questionId = p10.id,
+			questionIndex = v94.currentIndex,
+			optionId = p11.id,
+			optionTitle = p11.title
 		})
-		v79.selections[v79.currentIndex] = {
+		v94.selections[v94.currentIndex] = {
+			options = nil,
 			customResponseText = nil,
-			option = p10
+			option = p11
 		}
-		p6.setAskUserTool((buildOptimisticAskUserTool(v79)))
+		p7.setAskUserTool((buildOptimisticAskUserTool(v94)))
 
-		local v81
+		local v96
 
-		if v79.currentIndex >= #v79.questions then
-			v81 = false
+		if v94.currentIndex >= #v94.questions then
+			v96 = false
 		else
-			v79.currentIndex = v79.currentIndex + 1
-			p6.setAskUserTool((buildOptimisticAskUserTool(v79)))
-			v81 = true
+			v94.currentIndex = v94.currentIndex + 1
+			p7.setAskUserTool((buildOptimisticAskUserTool(v94)))
+			v96 = true
 		end
 
-		if v81 then
+		if v96 then
 			return
 		end
 
-		v79.submitted = true
-		task.spawn(function() -- line: 299
-			-- upvalues: submitAskUserResponses (copy), v79 (copy)
-			submitAskUserResponses(v79)
+		v94.submitted = true
+		task.spawn(function() -- line: 316
+			-- upvalues: submitAskUserResponses (copy), v94 (copy)
+			submitAskUserResponses(v94)
 		end)
 	end
 
-	u32 = onAnswerSelectedImpl
+	u42 = onAnswerSelectedImpl
+
+	local function onAnswerConfirmedImpl() -- line: 364
+		-- upvalues: u41 (ref), debug (copy), p7 (copy), buildOptimisticAskUserTool (copy), submitAskUserResponses (copy)
+		local v97 = u41
+
+		if v97 == nil or v97.submitted then
+			return
+		end
+
+		local v98 = v97.questions[v97.currentIndex]
+
+		if v98 == nil or v98.responseType ~= "multi_select" then
+			return
+		end
+
+		local v99 = v97.selections[v97.currentIndex]
+		local v100 = if v99 == nil then nil else v99.options
+
+		if v100 == nil or #v100 == 0 then
+			return
+		end
+
+		debug.log("info", "studio_ask_user multi-select confirmed", {
+			toolCallId = v97.toolCallId,
+			questionId = v98.id,
+			questionIndex = v97.currentIndex,
+			selectedCount = #v100
+		})
+
+		local v101
+
+		if v97.currentIndex >= #v97.questions then
+			v101 = false
+		else
+			v97.currentIndex = v97.currentIndex + 1
+			p7.setAskUserTool((buildOptimisticAskUserTool(v97)))
+			v101 = true
+		end
+
+		if v101 then
+			return
+		end
+
+		v97.submitted = true
+		task.spawn(function() -- line: 316
+			-- upvalues: submitAskUserResponses (copy), v97 (copy)
+			submitAskUserResponses(v97)
+		end)
+	end
+
+	u43 = onAnswerConfirmedImpl
 
 	return {
-		syncAnswerStack = function(p11) -- line: 337
-			-- upvalues: v39 (copy), u40 (ref)
-			if v39(p11) then
-				u40 = true
+		syncAnswerStack = function(p12) -- line: 427
+			-- upvalues: v50 (copy), u51 (ref)
+			if v50(p12) then
+				u51 = true
 
 				return true
 			end
@@ -377,69 +512,74 @@ local function createAskUserController(p5, t6: {[any]: any}, p6) -- line: 143
 			return false
 		end,
 		getSubmittedToolCallIds = getSubmittedToolCallIds,
-		hasDisplayedAnswerStack = function() -- line: 360
-			-- upvalues: u40 (ref)
-			return u40
+		hasDisplayedAnswerStack = function() -- line: 450
+			-- upvalues: u51 (ref)
+			return u51
 		end,
-		stopPendingAnswer = function() -- line: 345
-			-- upvalues: u31 (ref), submitAskUserCancellation (copy)
-			local v87 = u31
+		stopPendingAnswer = function() -- line: 435
+			-- upvalues: u41 (ref), submitAskUserCancellation (copy)
+			local v107 = u41
 
-			if v87 == nil or v87.submitted then
+			if v107 == nil or v107.submitted then
 				return false
 			end
 
-			v87.submitted = true
-			task.spawn(function() -- line: 351
-				-- upvalues: submitAskUserCancellation (copy), v87 (copy)
-				submitAskUserCancellation(v87)
+			v107.submitted = true
+			task.spawn(function() -- line: 441
+				-- upvalues: submitAskUserCancellation (copy), v107 (copy)
+				submitAskUserCancellation(v107)
 			end)
 
 			return true
 		end,
-		trySubmitComposerText = function(s1: string) -- line: 305
-			-- upvalues: u31 (ref), debug (copy), p6 (copy), buildOptimisticAskUserTool (copy), submitAskUserResponses (copy)
-			local v83 = u31
+		trySubmitComposerText = function(s1: string) -- line: 391
+			-- upvalues: u41 (ref), debug (copy), p7 (copy), buildOptimisticAskUserTool (copy), submitAskUserResponses (copy)
+			local v103 = u41
 
-			if v83 == nil or v83.submitted then
+			if v103 == nil or v103.submitted then
 				return false
 			end
 
-			local v84 = v83.questions[v83.currentIndex]
+			local v104 = v103.questions[v103.currentIndex]
 
-			if v84 == nil then
+			if v104 == nil then
+				return false
+			end
+
+			if v104.responseType == "multi_select" then
 				return false
 			end
 
 			debug.log("info", "studio_ask_user custom answer submitted", {
-				toolCallId = v83.toolCallId,
-				questionId = v84.id,
-				questionIndex = v83.currentIndex
+				toolCallId = v103.toolCallId,
+				questionId = v104.id,
+				questionIndex = v103.currentIndex
 			})
-			v83.selections[v83.currentIndex] = {
+			v103.selections[v103.currentIndex] = {
 				option = nil,
+				options = nil,
 				customResponseText = s1
 			}
-			p6.setAskUserTool((buildOptimisticAskUserTool(v83)))
+			p7.setAskUserTool((buildOptimisticAskUserTool(v103)))
 
-			local v85
+			local v105
 
-			if v83.currentIndex >= #v83.questions then
-				v85 = false
+			if v103.currentIndex >= #v103.questions then
+				v105 = false
 			else
-				v83.currentIndex = v83.currentIndex + 1
-				p6.setAskUserTool((buildOptimisticAskUserTool(v83)))
-				v85 = true
+				v103.currentIndex = v103.currentIndex + 1
+				p7.setAskUserTool((buildOptimisticAskUserTool(v103)))
+				v105 = true
 			end
 
-			if v85 then
+			if v105 then
 				return true
 			end
 
-			v83.submitted = true
-			task.spawn(function() -- line: 331
-				-- upvalues: submitAskUserResponses (copy), v83 (copy)
-				submitAskUserResponses(v83)
+			v103.submitted = true
+			task.spawn(function() -- line: 421
+				-- upvalues: submitAskUserResponses (copy), v103 (copy)
+				submitAskUserResponses(v103)
 			end)
 
 			return true

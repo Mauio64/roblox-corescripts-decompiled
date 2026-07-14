@@ -62,17 +62,13 @@ local function createActivityText(s1: string, n2: number) -- line: 74
 end
 local function createActivityItem(p4, n3: number) -- line: 82
 	-- upvalues: createActivityText (copy), turnDisplay (copy)
-	if p4.kind == "thought" then
-		return createActivityText(p4.text, n3)
-	end
-
 	if p4.kind == "tool_call" then
 		return createActivityText(turnDisplay.getToolActivityLabel(p4), n3)
 	end
 
 	return nil
 end
-local function createActivitySummaryActionText(s2: string, n4: number, p5, b1: boolean?) -- line: 92
+local function createActivitySummaryActionText(s2: string, n4: number, p5, b1: boolean?) -- line: 90
 	-- upvalues: React (copy), FoundationText (copy), createThinkingGradient (copy)
 	return React.createElement(FoundationText, {
 		tag = "size-full-0 auto-y text-body-medium text-no-wrap text-align-x-left text-truncate-end content-muted",
@@ -83,8 +79,8 @@ local function createActivitySummaryActionText(s2: string, n4: number, p5, b1: b
 		ThinkingGradient = createThinkingGradient(p5)
 	})
 end
-local function TurnActivitySummary(t2: {[any]: any}) -- line: 114
-	-- upvalues: useReactiveValue (copy), t1 (copy), React (copy), Foundation (copy), FoundationText (copy), turnDisplay (copy), View (copy), createActivitySummaryActionText (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), ScrollView (copy)
+local function TurnActivitySummary(t2: {[any]: any}) -- line: 112
+	-- upvalues: useReactiveValue (copy), t1 (copy), React (copy), Foundation (copy), turnDisplay (copy), FoundationText (copy), View (copy), createActivitySummaryActionText (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), ScrollView (copy)
 	local segment = t2.segment
 	local v36 = useReactiveValue(segment.label)
 	local v37 = useReactiveValue(segment.activityItems or t1)
@@ -93,30 +89,30 @@ local function TurnActivitySummary(t2: {[any]: any}) -- line: 114
 	local v41, v42 = React.useBinding(0)
 	local v43 = React.useRef(nil)
 	local v44 = Foundation.Hooks.useTokens()
-	local v45 = React.useCallback(function() -- line: 124
+	local v45 = React.useCallback(function() -- line: 122
 		-- upvalues: v40 (copy)
-		v40(function(b2: boolean) -- line: 125
+		v40(function(b2: boolean) -- line: 123
 			return not b2
 		end)
 	end, {})
-	local v46 = React.useCallback(function(p6) -- line: 130
+	local v46 = React.useCallback(function(p6) -- line: 128
 		-- upvalues: v43 (copy)
 		if p6 == nil then
 			return
 		end
 
-		task.defer(function() -- line: 135
+		task.defer(function() -- line: 133
 			-- upvalues: v43 (copy), p6 (copy)
 			if v43.current ~= p6 then
 				return
 			end
 
-			local v66 = math.max(0, p6.AbsoluteCanvasSize.Y - p6.AbsoluteWindowSize.Y)
+			local v65 = math.max(0, p6.AbsoluteCanvasSize.Y - p6.AbsoluteWindowSize.Y)
 
-			p6.CanvasPosition = Vector2.new(0, v66)
+			p6.CanvasPosition = Vector2.new(0, v65)
 		end)
 	end, {})
-	local v47 = React.useCallback(function(p7) -- line: 146
+	local v47 = React.useCallback(function(p7) -- line: 144
 		-- upvalues: v43 (copy), v46 (copy)
 		v43.current = p7
 
@@ -124,7 +120,7 @@ local function TurnActivitySummary(t2: {[any]: any}) -- line: 114
 			v46(p7)
 		end
 	end, { v46 })
-	local v48 = React.useCallback(function(p8) -- line: 153
+	local v48 = React.useCallback(function(p8) -- line: 151
 		-- upvalues: v42 (copy), v46 (copy)
 		v42(p8.AbsoluteCanvasSize.Y)
 		v46(p8)
@@ -132,16 +128,16 @@ local function TurnActivitySummary(t2: {[any]: any}) -- line: 114
 		v42,
 		v46
 	})
-	local v49 = React.useCallback(function(p9) -- line: 158
+	local v49 = React.useCallback(function(p9) -- line: 156
 		-- upvalues: v46 (copy)
 		v46(p9)
 	end, { v46 })
 
-	React.useEffect(function() -- line: 162
+	React.useEffect(function() -- line: 160
 		-- upvalues: v46 (copy), v43 (copy)
 		v46(v43.current)
 
-		return function() -- line: 164
+		return function() -- line: 162
 		end
 	end, {
 		v46,
@@ -153,33 +149,25 @@ local function TurnActivitySummary(t2: {[any]: any}) -- line: 114
 	for v51, v52 in v37 do
 		local v54
 
-		if v52.kind == "thought" then
-			local text = v52.text
+		if v52.kind == "tool_call" then
+			local v53 = turnDisplay.getToolActivityLabel(v52)
 
 			v54 = React.createElement(FoundationText, {
 				tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-muted",
 				LayoutOrder = v51,
-				Text = text
-			})
-		elseif v52.kind == "tool_call" then
-			local v55 = turnDisplay.getToolActivityLabel(v52)
-
-			v54 = React.createElement(FoundationText, {
-				tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-muted",
-				LayoutOrder = v51,
-				Text = v55
+				Text = v53
 			})
 		else
 			v54 = nil
 		end
 
 		if v54 ~= nil then
-			t3[if v52.kind ~= "thought" then `Tool{ v51 }` else `Thought{ v51 }`] = v54
+			t3[`Tool{ v51 }`] = v54
 		end
 	end
 
-	local v56 = next(t3) ~= nil
-	local v57 = if not v38 then React.createElement(FoundationText, {
+	local v55 = next(t3) ~= nil
+	local v56 = if not v38 then React.createElement(FoundationText, {
 		LayoutOrder = 2,
 		tag = "fill text-body-medium text-wrap text-align-x-left content-muted",
 		Text = v36
@@ -210,13 +198,13 @@ local function TurnActivitySummary(t2: {[any]: any}) -- line: 114
 				size = IconSize.XSmall,
 				style = v44.Color.Content.Muted
 			}),
-			Label = v57
+			Label = v56
 		}),
-		ActivityHistory = if not v39 or not v56 then nil else React.createElement(ScrollView, {
+		ActivityHistory = if not v39 or not v55 then nil else React.createElement(ScrollView, {
 			LayoutOrder = 2,
 			tag = "size-full-0 clip",
 			testId = "TurnActivitySummary.ActivityHistory",
-			Size = v41:map(function(n5: number) -- line: 213
+			Size = v41:map(function(n5: number) -- line: 210
 				return UDim2.new(1, 0, 0, (math.clamp(n5, 24, 220)))
 			end),
 			scrollingFrameRef = v47,

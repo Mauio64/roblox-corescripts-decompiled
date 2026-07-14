@@ -15,6 +15,7 @@ local RobloxSubscriptionSignals = require(_script.Store.RobloxSubscriptionSignal
 return {
 	FFlagRobloxPlusFAEFreeTrial = FFlagRobloxPlusFAEFreeTrial,
 	initiateRobloxSubscriptionPurchase = require(script.Flows.initiateRobloxSubscriptionPurchase),
+	startRobloxSubscriptionPurchaseFromUpsell = require(script.Flows.startRobloxSubscriptionPurchaseFromUpsell),
 	SurfaceContext = SurfaceContext,
 	SurfaceName = SurfaceName,
 	PurchaseClientSessionIdType = PurchaseClientSessionIdType,

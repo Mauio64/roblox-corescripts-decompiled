@@ -9,15 +9,16 @@ local v8 = require(Parent.TelemetryService).EventStreamReporter.new(default)
 local isSpatial = AppCommonLib.isSpatial
 local ttiDebugLog = require(script.Parent.ttiDebugLog)
 local Util = require(script.Parent.Util)
+local FFlagTTITrackerMemoryTracking = require(script.Parent.FFlagTTITrackerMemoryTracking)
 
 require(script.Parent.Parent.Stores.types)
 
-local v12 = game:DefineFastString("TTIMetricsTableName", "marketplacePerformanceMetric")
-local v13 = game:DefineFastFlag("AXTTIAddNumElementsRendered", false)
+local v13 = game:DefineFastString("TTIMetricsTableName", "marketplacePerformanceMetric")
+local v14 = game:DefineFastFlag("AXTTIAddNumElementsRendered", false)
 
 game:DefineFastInt("TimeToInteractiveTrackerSampleRate", 0)
 
-local function getDefaultMetadata(p1) -- line: 56
+local function getDefaultMetadata(p1) -- line: 57
 	-- upvalues: UserInputService (copy), isSpatial (copy), RunService (copy), HttpService (copy), Dash (copy)
 	local str = tostring(UserInputService:GetPlatform())
 
@@ -34,8 +35,8 @@ local function getDefaultMetadata(p1) -- line: 56
 
 	return Dash.assign(t1, p1)
 end
-local function sendTTIStat(t2: {[any]: any}) -- line: 80
-	-- upvalues: RunService (copy), getDefaultMetadata (copy), default (copy), Util (copy), v13 (copy), HttpService (copy), v8 (copy), v12 (copy), ttiDebugLog (copy)
+local function sendTTIStat(t2: {[any]: any}) -- line: 81
+	-- upvalues: RunService (copy), getDefaultMetadata (copy), default (copy), Util (copy), FFlagTTITrackerMemoryTracking (copy), v14 (copy), HttpService (copy), v8 (copy), v13 (copy), ttiDebugLog (copy)
 	if math.clamp((if t2.samplingRateOverride == nil then game:GetFastInt("TimeToInteractiveTrackerSampleRate") else t2.samplingRateOverride), 0, 1000) < math.random(1, 1000) and not RunService:IsStudio() then
 		return
 	end
@@ -51,17 +52,42 @@ local function sendTTIStat(t2: {[any]: any}) -- line: 80
 			14
 		}
 	}
-	local v21 = getDefaultMetadata(t2.metaData)
+	local v22 = getDefaultMetadata(t2.metaData)
 
-	default:logRobloxTelemetryStat(t3, t2.deltaMs, v21)
+	local function logMemoryStats(s1: string, n1: number?, n2: number?) -- line: 118
+		-- upvalues: t3 (copy), default (copy), v22 (copy)
+		if n1 then
+			local v35 = table.clone(t3)
+
+			v35.eventName = s1 .. "_TotalMemoryMB"
+			default:logRobloxTelemetryStat(v35, n1, v22)
+		end
+
+		if n2 then
+			local v36 = table.clone(t3)
+
+			v36.eventName = s1 .. "_LuaHeapMB"
+			default:logRobloxTelemetryStat(v36, n2, v22)
+		end
+	end
+
+	default:logRobloxTelemetryStat(t3, t2.deltaMs, v22)
 
 	if t2.milestones then
-		for _, v23 in (Util.generateMilestoneStats(t2.statName, t2.milestones)) do
-			local v24 = table.clone(t3)
+		for _, v25 in (Util.generateMilestoneStats(t2.statName, t2.milestones)) do
+			local v26 = table.clone(t3)
 
-			v24.eventName = v23.eventName
-			default:logRobloxTelemetryStat(v24, v23.deltaMs, v21)
+			v26.eventName = v25.eventName
+			default:logRobloxTelemetryStat(v26, v25.deltaMs, v22)
+
+			if FFlagTTITrackerMemoryTracking then
+				logMemoryStats(v25.eventName, v25.totalMemoryMB, v25.luaHeapMB)
+			end
 		end
+	end
+
+	if FFlagTTITrackerMemoryTracking then
+		logMemoryStats(t2.statName, t2.totalMemoryMB, t2.luaHeapMB)
 	end
 
 	local t4 = {
@@ -76,25 +102,25 @@ local function sendTTIStat(t2: {[any]: any}) -- line: 80
 		t4.page = t2.metaData.page
 		t4.opaquePage = t2.metaData.opaquePage
 
-		if v13 then
+		if v14 then
 			t4.num_elements_rendered = t2.metaData.numElementsRendered
 		end
 	end
 
-	local v26 = getDefaultMetadata({})
+	local v28 = getDefaultMetadata({})
 
-	t4.appVersion = v26.AppVersion
-	t4.userAgent = v26.UserAgent
-	t4.coreScriptVersion = v26.CoreScriptVersion
-	t4.platform = v26.Platform
+	t4.appVersion = v28.AppVersion
+	t4.userAgent = v28.UserAgent
+	t4.coreScriptVersion = v28.CoreScriptVersion
+	t4.platform = v28.Platform
 	t4.total_memory_mb = t2.totalMemoryMB
 	t4.lua_heap_mb = t2.luaHeapMB
 
 	if t2.milestones then
-		local v27 = Util.milestonesToProto(t2.milestones)
-		local ok, result = pcall(function() -- line: 165
-			-- upvalues: HttpService (copy), v27 (copy)
-			return HttpService:JSONEncode(v27)
+		local v29 = Util.milestonesToProto(t2.milestones)
+		local ok, result = pcall(function() -- line: 187
+			-- upvalues: HttpService (copy), v29 (copy)
+			return HttpService:JSONEncode(v29)
 		end)
 
 		if ok then
@@ -102,7 +128,7 @@ local function sendTTIStat(t2: {[any]: any}) -- line: 80
 		end
 	end
 
-	v8:sendTelemetryEvent(v12, v12, t4)
+	v8:sendTelemetryEvent(v13, v13, t4)
 	ttiDebugLog("sendTTIStat", t2.statName, t2.deltaMs, t4, t2.milestones)
 end
 

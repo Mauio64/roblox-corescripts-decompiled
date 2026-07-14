@@ -4,22 +4,25 @@ local Signals = require(Parent.Signals)
 local SignalsReact = require(Parent.SignalsReact)
 local v5 = require(Parent.DataHydration).Presence.PresenceStore.get()
 
-local function useGetPresenceByUserId(s1: string?) -- line: 12
+local function useGetPresenceByUserId(s1: string?, p1) -- line: 13
 	-- upvalues: React (copy), Signals (copy), v5 (copy), SignalsReact (copy)
-	local v8 = not s1 and "" or tostring(s1)
-	local v9 = React.useMemo(function() -- line: 15
-		-- upvalues: Signals (copy), v8 (copy), v5 (copy)
-		return Signals.createComputed(function(p1) -- line: 16
-			-- upvalues: v8 (copy), v5 (copy)
-			if v8 == "" then
+	local v9 = not s1 and "" or tostring(s1)
+	local v10 = React.useMemo(function() -- line: 16
+		-- upvalues: Signals (copy), v9 (copy), v5 (copy), p1 (copy)
+		return Signals.createComputed(function(p2) -- line: 17
+			-- upvalues: v9 (copy), v5 (copy), p1 (copy)
+			if v9 == "" then
 				return nil
 			end
 
-			return v5.GetPresenceByUserId(v8).data(p1)
+			return v5.GetPresenceByUserId(v9, p1).data(p2)
 		end)
-	end, { v8 })
+	end, {
+		v9,
+		p1
+	})
 
-	return SignalsReact.useSignalState(v9)
+	return SignalsReact.useSignalState(v10)
 end
 
 return useGetPresenceByUserId

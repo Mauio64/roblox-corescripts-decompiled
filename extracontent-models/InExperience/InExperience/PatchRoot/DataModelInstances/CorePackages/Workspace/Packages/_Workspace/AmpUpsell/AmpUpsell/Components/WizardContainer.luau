@@ -108,7 +108,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 	local v71 = useCompletionCallbackWithReturnPage(v48, completionCallback, metadata)
 	local v72 = if not FFlagEnableAmpWizardDeepLink then completionCallback else v71
 	local v73 = React.useCallback(function(_, p2) -- line: 149
-		-- upvalues: ActionTypeEnum (copy), AppScreens (copy), v63 (copy), Cryo (copy), v62 (copy), ActionStatusEnum (copy), v72 (copy), AccessResponseEnum (copy), GetFFlagEnableAmpEmailUpsellSupport (copy), GetFFlagEnableAmpIDVUpsellSupport (copy), featureName (copy), GetFFlagEnableAmpIDVUpsellPopOnCompletion (copy), v48 (copy), recourseData (copy), entryPointEventCtx (copy), v60 (copy), GetFFlagEnableAmpWizardVPCNavigationFix (copy), metadata (copy), t4 (copy), logEventOnceIfEnabled (copy), GetFFlagEnableAmpSubscriptionUpsell (copy)
+		-- upvalues: ActionTypeEnum (copy), AppScreens (copy), v63 (copy), Cryo (copy), v62 (copy), ActionStatusEnum (copy), v72 (copy), AccessResponseEnum (copy), GetFFlagEnableAmpEmailUpsellSupport (copy), GetFFlagEnableAmpIDVUpsellSupport (copy), featureName (copy), entryPointEventCtx (copy), metadata (copy), GetFFlagEnableAmpIDVUpsellPopOnCompletion (copy), v48 (copy), recourseData (copy), v60 (copy), GetFFlagEnableAmpWizardVPCNavigationFix (copy), t4 (copy), logEventOnceIfEnabled (copy), GetFFlagEnableAmpSubscriptionUpsell (copy)
 		local action = p2.action
 
 		if action == ActionTypeEnum.Phone then
@@ -163,7 +163,9 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 		if GetFFlagEnableAmpIDVUpsellSupport() and action == ActionTypeEnum.GovernmentId then
 			return {
 				featureName = featureName,
-				onSuccess = function() -- line: 196
+				entryPointEventCtx = entryPointEventCtx,
+				metadata = metadata,
+				onSuccess = function() -- line: 198
 					-- upvalues: GetFFlagEnableAmpIDVUpsellPopOnCompletion (copy), v48 (copy), v63 (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					if GetFFlagEnableAmpIDVUpsellPopOnCompletion() then
 						v48.pop()
@@ -173,7 +175,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[ActionTypeEnum.GovernmentId] = ActionStatusEnum.Success
 					}))
 				end,
-				onFailure = function() -- line: 207
+				onFailure = function() -- line: 209
 					-- upvalues: GetFFlagEnableAmpIDVUpsellPopOnCompletion (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					if GetFFlagEnableAmpIDVUpsellPopOnCompletion() then
 						v48.pop()
@@ -183,7 +185,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[ActionTypeEnum.GovernmentId] = ActionStatusEnum.Failure
 					}))
 				end,
-				onCancelled = function() -- line: 219
+				onCancelled = function() -- line: 221
 					-- upvalues: GetFFlagEnableAmpIDVUpsellPopOnCompletion (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					if GetFFlagEnableAmpIDVUpsellPopOnCompletion() then
 						v48.pop()
@@ -203,7 +205,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 				recourseData = recourseData,
 				entryPointEventCtx = entryPointEventCtx,
 				isInExperienceEntry = v60,
-				onCancel = function() -- line: 240
+				onCancel = function() -- line: 242
 					-- upvalues: GetFFlagEnableAmpWizardVPCNavigationFix (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), action (copy), ActionStatusEnum (copy)
 					if GetFFlagEnableAmpWizardVPCNavigationFix() then
 						v48.pop()
@@ -213,7 +215,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[action] = ActionStatusEnum.Cancelled
 					}))
 				end,
-				onSuccess = function() -- line: 249
+				onSuccess = function() -- line: 251
 					-- upvalues: GetFFlagEnableAmpWizardVPCNavigationFix (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), action (copy), ActionStatusEnum (copy)
 					if GetFFlagEnableAmpWizardVPCNavigationFix() then
 						v48.pop()
@@ -223,7 +225,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[action] = ActionStatusEnum.Success
 					}))
 				end,
-				onRetryAmp = function() -- line: 258
+				onRetryAmp = function() -- line: 260
 					-- upvalues: v48 (copy), v63 (copy), Cryo (copy), v62 (copy), action (copy), ActionStatusEnum (copy)
 					v48.pop()
 					v63(Cryo.Dictionary.join(v62, {
@@ -239,7 +241,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 				entryPointEventCtx = entryPointEventCtx,
 				metadata = metadata,
 				skipFacialAgeEstimationWebLinkModal = t4.skipFacialAgeEstimationWebLinkModal,
-				onSuccess = function() -- line: 271
+				onSuccess = function() -- line: 273
 					-- upvalues: logEventOnceIfEnabled (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					logEventOnceIfEnabled("complete_flow_with_success")
 					v48.pop()
@@ -247,7 +249,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[ActionTypeEnum.AgeEstimation] = ActionStatusEnum.Success
 					}))
 				end,
-				onFailure = function() -- line: 282
+				onFailure = function() -- line: 284
 					-- upvalues: logEventOnceIfEnabled (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					logEventOnceIfEnabled("complete_flow_with_error")
 					v48.pop()
@@ -255,7 +257,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[ActionTypeEnum.AgeEstimation] = ActionStatusEnum.Failure
 					}))
 				end,
-				onCancel = function() -- line: 293
+				onCancel = function() -- line: 295
 					-- upvalues: logEventOnceIfEnabled (copy), v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					logEventOnceIfEnabled("complete_flow_with_cancel")
 					v48.pop()
@@ -263,7 +265,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 						[ActionTypeEnum.AgeEstimation] = ActionStatusEnum.Cancelled
 					}))
 				end,
-				onRetry = function() -- line: 304
+				onRetry = function() -- line: 306
 					-- upvalues: v48 (copy), v63 (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					v48.pop()
 					v63(Cryo.Dictionary.join(v62, {
@@ -281,21 +283,21 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 				surfaceName = v81 and v81.surfaceName,
 				surfaceContext = v81 and v81.surfaceContext,
 				analyticsContext = v81 and v81.analyticsContext,
-				onSuccess = function() -- line: 321
+				onSuccess = function() -- line: 323
 					-- upvalues: v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					v48.pop()
 					v72(AccessResponseEnum.Granted, Cryo.Dictionary.join(v62, {
 						[ActionTypeEnum.Subscription] = ActionStatusEnum.Success
 					}))
 				end,
-				onFailure = function() -- line: 331
+				onFailure = function() -- line: 333
 					-- upvalues: v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					v48.pop()
 					v72(AccessResponseEnum.Denied, Cryo.Dictionary.join(v62, {
 						[ActionTypeEnum.Subscription] = ActionStatusEnum.Failure
 					}))
 				end,
-				onCancel = function() -- line: 341
+				onCancel = function() -- line: 343
 					-- upvalues: v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), ActionTypeEnum (copy), ActionStatusEnum (copy)
 					v48.pop()
 					v72(AccessResponseEnum.Denied, Cryo.Dictionary.join(v62, {
@@ -310,7 +312,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 		v62,
 		v72
 	})
-	local v74 = React.useCallback(function(p4) -- line: 362
+	local v74 = React.useCallback(function(p4) -- line: 364
 		-- upvalues: ActionTypeEnum (copy), UserSettingsSettingNameEnum (copy), openUpsells (copy)
 		local action = p4.action
 
@@ -324,7 +326,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 
 		return openUpsells[action]
 	end, { openUpsells })
-	local v75 = React.useCallback(function(_, t5: {[any]: any}?) -- line: 376
+	local v75 = React.useCallback(function(_, t5: {[any]: any}?) -- line: 378
 		-- upvalues: v65 (copy), v74 (copy), v73 (copy), ActionTypeEnum (copy), t4 (copy), GetFFlagEnableAmpVPCPrologue (copy), v67 (copy), GetFFlagEnableAmpWizardInlineVPCForFAE (copy), UserSettingsSettingNameEnum (copy), v69 (copy), v72 (copy), AccessResponseEnum (copy), v62 (copy), accountSettingsUpsellStringsFn (copy), v59 (copy), featureName (copy), v48 (copy), Cryo (copy), ActionStatusEnum (copy)
 		if t5 == nil or #t5 == 0 then
 			v65(true)
@@ -382,7 +384,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 		v59({
 			featureName = featureName,
 			localizationStrings = v93,
-			onCloseModal = function() -- line: 420
+			onCloseModal = function() -- line: 422
 				-- upvalues: v48 (copy), v72 (copy), AccessResponseEnum (copy), Cryo (copy), v62 (copy), action (copy), ActionStatusEnum (copy)
 				v48.pop()
 				v72(AccessResponseEnum.Denied, Cryo.Dictionary.join(v62, {
@@ -401,7 +403,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 		t4.usePrologue,
 		v69
 	})
-	local v76 = React.useCallback(function(p6, p7) -- line: 440
+	local v76 = React.useCallback(function(p6, p7) -- line: 442
 		-- upvalues: v65 (copy), logEventOnceIfEnabled (copy), GetFFlagEnableAmpUpsellGql (copy), v57 (copy), v70 (copy), getSuccessfulActions (copy), v62 (copy), extraParameters (copy), AccessResponseEnum (copy), v75 (copy), v72 (copy)
 		v65(false)
 		logEventOnceIfEnabled("amp_feature_access_init")
@@ -442,11 +444,11 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 		v72
 	})
 
-	React.useEffect(function() -- line: 473
+	React.useEffect(function() -- line: 475
 		-- upvalues: sendModalActionEvent (copy), v58 (copy), AppScreens (copy), featureName (copy)
 		sendModalActionEvent(v58, AppScreens.AmpWizardContainer, featureName, "Shown")
 	end, { v58 })
-	React.useEffect(function() -- line: 477
+	React.useEffect(function() -- line: 479
 		-- upvalues: v76 (copy), featureName (copy), nameSpace (copy)
 		v76(featureName, nameSpace)
 	end, {
@@ -455,13 +457,13 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 		v76,
 		nameSpace
 	})
-	React.useEffect(function() -- line: 483
+	React.useEffect(function() -- line: 485
 		-- upvalues: GetFFlagEnableAmpWizardInlineVPCForFAE (copy), v68 (copy), VPCRequestTypeEnum (copy), v73 (copy), Cryo (copy), recourseData (copy), VPCApiProvider (copy), v61 (copy), ActionTypeEnum (copy), openUpsells (copy), GetFFlagEnableAmpVPCPrologue (copy), v67 (copy), v69 (copy)
 		if not GetFFlagEnableAmpWizardInlineVPCForFAE() or v68 == nil then
 			return
 		end
 
-		local function buildFAEProps(p8) -- line: 490
+		local function buildFAEProps(p8) -- line: 492
 			-- upvalues: VPCRequestTypeEnum (copy), v73 (copy), Cryo (copy), recourseData (copy)
 			local t6 = {
 				action = p8,
@@ -477,7 +479,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 			})
 		end
 
-		VPCApiProvider.getLinkedParentEmails(v61):andThen(function(p9) -- line: 501
+		VPCApiProvider.getLinkedParentEmails(v61):andThen(function(p9) -- line: 503
 			-- upvalues: ActionTypeEnum (copy), buildFAEProps (copy), openUpsells (copy), GetFFlagEnableAmpVPCPrologue (copy), v67 (copy), v69 (copy)
 			local v104 = if not ((p9.parentEmails and #p9.parentEmails or 0) > 0) then ActionTypeEnum.ParentLink else ActionTypeEnum.ParentConsent
 			local v105 = buildFAEProps(v104)
@@ -494,7 +496,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 			end
 
 			v69(nil)
-		end):catch(function(_) -- line: 520
+		end):catch(function(_) -- line: 522
 			-- upvalues: buildFAEProps (copy), ActionTypeEnum (copy), openUpsells (copy), v69 (copy)
 			local v108 = buildFAEProps(ActionTypeEnum.ParentLink)
 
@@ -515,7 +517,7 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 			recourseData = recourseData,
 			handleCompletion = v72,
 			actionsTaken = v62,
-			onDone = function() -- line: 534
+			onDone = function() -- line: 536
 				-- upvalues: v67 (copy)
 				v67(nil)
 			end
@@ -525,12 +527,12 @@ local function WizardContainer(t4: {[any]: any}) -- line: 117
 	if v64 then
 		return React.createElement(ErrorScreen, {
 			featureName = featureName,
-			onRetry = function() -- line: 543
+			onRetry = function() -- line: 545
 				-- upvalues: v65 (copy), v76 (copy), featureName (copy)
 				v65(false)
 				v76(featureName)
 			end,
-			onCancel = function() -- line: 547
+			onCancel = function() -- line: 549
 				-- upvalues: v72 (copy), AccessResponseEnum (copy), v62 (copy)
 				v72(AccessResponseEnum.Denied, v62)
 			end

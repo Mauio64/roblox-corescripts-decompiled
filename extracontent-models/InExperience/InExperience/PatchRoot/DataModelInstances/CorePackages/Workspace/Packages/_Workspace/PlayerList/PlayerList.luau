@@ -9,6 +9,7 @@ return {
 	LeaderboardStoreInstanceManager = require(script.Common.LeaderboardStoreInstanceManager),
 	LeaderboardStoreContext = require(script.Common.LeaderboardStoreContext),
 	PlayerListVisibilityStore = require(script.Common.PlayerListVisibilityStore),
+	PlayerRelationshipStore = require(script.Common.PlayerRelationshipStore),
 	Flags = {
 		FFlagAddNewPlayerListFocusNav = require(script.Flags.FFlagAddNewPlayerListFocusNav),
 		FFlagAddNewPlayerListMobileFocusNav = require(script.Flags.FFlagAddNewPlayerListMobileFocusNav),
@@ -20,7 +21,10 @@ return {
 		FFlagPlayerListDropDownShowPlatformName = require(script.Flags.FFlagPlayerListDropDownShowPlatformName),
 		FFlagPlayerListFoundationSubscriptionIcon = require(script.Flags.FFlagPlayerListFoundationSubscriptionIcon),
 		FFlagPlayerListReskin = require(script.Flags.FFlagPlayerListReskin),
-		FFlagPlayerListTwoTabs = require(script.Flags.FFlagPlayerListTwoTabs)
+		FFlagPlayerListTwoTabs = require(script.Flags.FFlagPlayerListTwoTabs),
+		FFlagPlayerListLocalizeGameText = require(script.Flags.FFlagPlayerListLocalizeGameText),
+		FFlagEnablePlayerListExposureEvents = require(script.Flags.FFlagEnablePlayerListExposureEvents),
+		FStringPlayerListIXPLayer = require(script.Flags.FStringPlayerListIXPLayer)
 	},
 	Hooks = {
 		useLeaderboardStore = require(script.Hooks.useLeaderboardStore),
@@ -36,10 +40,12 @@ return {
 		Constants = require(script.Common.Constants),
 		PlayerListVisibilityStore = require(script.Common.PlayerListVisibilityStore),
 		computeStatColumns = require(script.Common.computeStatColumns),
-		PlatformLeaderboardStoreContext = require(script.Common.PlatformLeaderboardStoreContext)
+		PlatformLeaderboardStoreContext = require(script.Common.PlatformLeaderboardStoreContext),
+		GameTextTranslatorContext = require(script.Common.GameTextTranslatorContext)
 	},
 	Container = {
-		PlayerListContainer = require(script.Components.Containers.PlayerListContainer)
+		PlayerListContainer = require(script.Components.Containers.PlayerListContainer),
+		PlatformLeaderboardContainer = require(script.Components.Containers.PlatformLeaderboardContainer)
 	},
 	PlayerContextualMenuStore = PlayerContextualMenuStore,
 	builderIcon = require(script.Common.builderIcon),
@@ -52,6 +58,9 @@ return {
 		PlayerContextualMenuView = require(script.Components.Presentation.PlayerContextualMenuView),
 		LeaderboardScrim = require(script.Components.Presentation.LeaderboardScrim),
 		LeaderboardTabs = require(script.Components.Presentation.LeaderboardTabs),
-		EmptyAndErrorStates = require(script.Components.Presentation.EmptyAndErrorStates)
+		EmptyAndErrorStates = require(script.Components.Presentation.EmptyAndErrorStates),
+		PlatformLeaderboardView = require(script.Components.Presentation.PlatformLeaderboardView),
+		PlatformEntryView = require(script.Components.Presentation.PlatformEntryView),
+		TabbedLeaderboardBody = require(script.Components.Presentation.TabbedLeaderboardBody)
 	}
 }

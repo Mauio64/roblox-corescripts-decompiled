@@ -1,3 +1,0 @@
-local FFlagAXCatalogSupportDisableFilters = require(script.Parent.FFlagAXCatalogSupportDisableFilters)
-
-return game:DefineFastFlag("AXCatalogSearchSupportDisableFilters", false) and FFlagAXCatalogSupportDisableFilters

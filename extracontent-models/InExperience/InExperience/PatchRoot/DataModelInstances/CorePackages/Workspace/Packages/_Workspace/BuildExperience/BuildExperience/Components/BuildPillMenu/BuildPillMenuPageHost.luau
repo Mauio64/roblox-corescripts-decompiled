@@ -10,9 +10,6 @@ local OverlayProvider = Foundation.OverlayProvider
 local useOverlay = Foundation.Hooks.useOverlay
 local useStyleSheet = Foundation.Hooks.useStyleSheet
 local IconName = Foundation.Enums.IconName
-
-require(script.Parent.BuildOverflowMenuButton)
-
 local BuildOverflowMenuScreens = require(script.Parent.BuildOverflowMenuScreens)
 local OverflowMenuPageShell = require(script.Parent.OverflowMenuPageShell)
 local SubagentStatus = require(BuildExperience.Components.SubagentStatus)
@@ -27,7 +24,7 @@ local t1 = {
 	BuildAgentDetails = "BuildPillMenuAgentDetails"
 }
 
-local function findGroup(p1, s1: string?) -- line: 54
+local function findGroup(p1, s1: string?) -- line: 60
 	if p1 == nil or s1 == nil then
 		return nil
 	end
@@ -40,12 +37,12 @@ local function findGroup(p1, s1: string?) -- line: 54
 
 	return nil
 end
-local function LauncherScreen(p2) -- line: 68
+local function LauncherScreen(p2) -- line: 74
 	-- upvalues: React (copy), BuildOverflowMenuScreens (copy)
 	local navigation = p2.navigation
 	local screenProps = p2.screenProps
 
-	React.useEffect(function() -- line: 72
+	React.useEffect(function() -- line: 78
 		-- upvalues: screenProps (copy), navigation (copy), BuildOverflowMenuScreens (copy)
 		if screenProps.initialPage ~= nil then
 			navigation.navigate(BuildOverflowMenuScreens.SCREEN_BY_PAGE[screenProps.initialPage], {
@@ -69,12 +66,12 @@ local function LauncherScreen(p2) -- line: 68
 
 	return nil
 end
-local function BuildAgentsScreen(p3) -- line: 87
+local function BuildAgentsScreen(p3) -- line: 93
 	-- upvalues: React (copy), SubagentStatus (copy), OverflowMenuPageShell (copy)
 	local navigation = p3.navigation
 	local screenProps = p3.screenProps
 	local subagentTaskState = screenProps.subagentTaskState
-	local v39 = React.useCallback(function(p4) -- line: 92
+	local v39 = React.useCallback(function(p4) -- line: 98
 		-- upvalues: navigation (copy), screenProps (copy)
 		navigation.navigate("BuildPillMenuAgentDetails", {
 			target = screenProps.target,
@@ -97,7 +94,7 @@ local function BuildAgentsScreen(p3) -- line: 87
 		content = v40
 	})
 end
-local function BuildAgentDetailsScreen(p5) -- line: 113
+local function BuildAgentDetailsScreen(p5) -- line: 119
 	-- upvalues: BuildNavigationParams (copy), React (copy), SubagentStatus (copy), View (copy), OverflowMenuPageShell (copy), IconName (copy)
 	local navigation = p5.navigation
 	local screenProps = p5.screenProps
@@ -129,7 +126,7 @@ local function BuildAgentDetailsScreen(p5) -- line: 113
 
 	g49 = false
 
-	local v50 = React.useCallback(function() -- line: 120
+	local v50 = React.useCallback(function() -- line: 126
 		-- upvalues: navigation (copy)
 		navigation.goBack()
 	end, { navigation })
@@ -189,28 +186,28 @@ local v23 = RoactNavigation.createAppContainer(RoactNavigation.createRobloxStack
 	initialRouteName = "BuildPillMenuLauncher"
 }))
 
-local function getOverlayScreenGui(p6) -- line: 185
+local function getOverlayScreenGui(p6) -- line: 191
 	if p6:IsA("ScreenGui") then
 		return p6
 	end
 
 	return p6:FindFirstAncestorOfClass("ScreenGui")
 end
-local function getInitialPage(t2: {[any]: any}?) -- line: 193
+local function getInitialPage(t2: {[any]: any}?) -- line: 199
 	if t2 ~= nil and t2.type == "overflow" then
 		return t2.page
 	end
 
 	return nil
 end
-local function getInitialScreen(t3: {[any]: any}?) -- line: 197
+local function getInitialScreen(t3: {[any]: any}?) -- line: 203
 	if t3 ~= nil and t3.type == "agents" then
 		return "BuildPillMenuAgents"
 	end
 
 	return nil
 end
-local function BuildPillMenuPageHost(t4: {[any]: any}) -- line: 201
+local function BuildPillMenuPageHost(t4: {[any]: any}) -- line: 207
 	-- upvalues: useOverlay (copy), useStyleSheet (copy), React (copy), t1 (copy), CreatorAgentChat (copy), useSessionSummary (copy), View (copy), v23 (copy), ReactRoblox (copy), OverlayProvider (copy)
 	local v56 = useOverlay()
 	local v57 = useStyleSheet()
@@ -219,10 +216,7 @@ local function BuildPillMenuPageHost(t4: {[any]: any}) -- line: 201
 	local v61 = if activePage == nil or activePage.type ~= "overflow" then nil else activePage.page
 	local activePage2 = t4.activePage
 	local v63 = if activePage2 == nil or activePage2.type ~= "agents" then nil else t1.BuildAgents
-	local v64 = if v56 == nil then nil else if not v56:IsA("ScreenGui") then v56:FindFirstAncestorOfClass("ScreenGui") else v56
-	local v65 = if v64 == nil or v64.Parent == nil then v56 else v64.Parent
-	local v66 = v64 == nil and 0 or v64.DisplayOrder
-	local v67 = React.useMemo(function() -- line: 212
+	local v64 = React.useMemo(function() -- line: 213
 		-- upvalues: CreatorAgentChat (copy), t4 (copy)
 		return CreatorAgentChat.getCreatorAgentChatStore().getSessionForProject(t4.target.universeId, t4.target.placeId, t4.target.sessionId)
 	end, {
@@ -230,9 +224,12 @@ local function BuildPillMenuPageHost(t4: {[any]: any}) -- line: 201
 		t4.target.placeId,
 		t4.target.sessionId
 	})
-	local subagentTaskState = useSessionSummary(v67).subagentTaskState
+	local subagentTaskState = useSessionSummary(v64).subagentTaskState
+	local v66 = if v56 == nil then nil else if not v56:IsA("ScreenGui") then v56:FindFirstAncestorOfClass("ScreenGui") else v56
+	local v67 = if v66 == nil or v66.Parent == nil then v56 else v66.Parent
+	local v68 = v66 == nil and 0 or v66.DisplayOrder
 
-	React.useEffect(function() -- line: 218
+	React.useEffect(function() -- line: 224
 		-- upvalues: t4 (copy), v59 (copy)
 		if t4.activePage == nil then
 			v59(nil)
@@ -270,7 +267,7 @@ local function BuildPillMenuPageHost(t4: {[any]: any}) -- line: 201
 		ClipToDeviceSafeArea = false,
 		IgnoreGuiInset = true,
 		Name = "BuildExperiencePillMenuPage",
-		DisplayOrder = v66,
+		DisplayOrder = v68,
 		ref = v59,
 		ScreenInsets = Enum.ScreenInsets.None,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -283,7 +280,7 @@ local function BuildPillMenuPageHost(t4: {[any]: any}) -- line: 201
 		}, {
 			Page = v69
 		})
-	}), v65)
+	}), v67)
 end
 
 return React.memo(BuildPillMenuPageHost)

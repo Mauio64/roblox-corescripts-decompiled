@@ -11,13 +11,13 @@ local View = Foundation.View
 local useOverlay = Foundation.Hooks.useOverlay
 local useStyleSheet = Foundation.Hooks.useStyleSheet
 
-local function getOverlayPosition(p1, p2) -- line: 32
+local function getOverlayPosition(p1, p2) -- line: 27
 	local v17 = if not p2:IsA("GuiObject") then Vector2.zero else p2.AbsolutePosition
 	local v18 = p1.AbsolutePosition - v17
 
 	return UDim2.fromOffset(v18.X, v18.Y)
 end
-local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 39
+local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
 	-- upvalues: GetBuildPillMenuPortalStore (copy), SignalsReact (copy), useOverlay (copy), useStyleSheet (copy), React (copy), View (copy), BuildPillMenu (copy), ReactRoblox (copy), BuildPillMenuPageHost (copy)
 	local v20 = GetBuildPillMenuPortalStore()
 	local v21 = SignalsReact.useSignalState(v20.getPortalTarget)
@@ -25,7 +25,7 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 39
 	local v23 = useStyleSheet()
 	local v24 = React.useRef(nil)
 	local v25, v26 = React.useState(nil)
-	local v27 = React.useCallback(function() -- line: 47
+	local v27 = React.useCallback(function() -- line: 42
 		-- upvalues: v24 (copy), v21 (copy), v22 (copy)
 		local current = v24.current
 
@@ -43,30 +43,30 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 39
 		v21,
 		v22
 	})
-	local v28 = React.useCallback(function(p3) -- line: 56
+	local v28 = React.useCallback(function(p3) -- line: 51
 		-- upvalues: v24 (copy), v27 (copy)
 		v24.current = p3
 		v27()
 	end, { v27 })
-	local v29 = React.useCallback(function(p4) -- line: 61
+	local v29 = React.useCallback(function(p4) -- line: 56
 		-- upvalues: v26 (copy)
 		v26({
 			type = "overflow",
 			page = p4
 		})
 	end, {})
-	local v30 = React.useCallback(function() -- line: 68
+	local v30 = React.useCallback(function() -- line: 63
 		-- upvalues: v26 (copy)
 		v26({
 			type = "agents"
 		})
 	end, {})
-	local v31 = React.useCallback(function() -- line: 74
+	local v31 = React.useCallback(function() -- line: 69
 		-- upvalues: v26 (copy)
 		v26(nil)
 	end, {})
 
-	React.useLayoutEffect(function() -- line: 78
+	React.useLayoutEffect(function() -- line: 73
 		-- upvalues: v21 (copy), v22 (copy), v27 (copy)
 		if v21 == nil or v22 == nil then
 			return
@@ -77,7 +77,7 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 39
 		local connection = v21:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
 		local v41 = if not v22:IsA("GuiObject") then nil else v22:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
 
-		return function() -- line: 91
+		return function() -- line: 86
 			-- upvalues: connection (copy), v41 (copy)
 			connection:Disconnect()
 

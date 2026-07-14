@@ -3,10 +3,9 @@ local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
 local GlobalSettings = require(Modules.Shell.GlobalSettings)
 local LocalizedStrings = require(Modules.Shell.LocalizedStrings)
-local FFlagAppShellMigrateLocales = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAppShellMigrateLocales
 
-return function(_) -- line: 11
-	-- upvalues: Roact (copy), GlobalSettings (copy), FFlagAppShellMigrateLocales (copy), LocalizedStrings (copy)
+return function(_) -- line: 10
+	-- upvalues: Roact (copy), GlobalSettings (copy), LocalizedStrings (copy)
 	return Roact.createElement("ImageLabel", {
 		BackgroundTransparency = 1,
 		Image = "rbxasset://textures/ui/Shell/ScreenAdjustment/Controller@1080.png",
@@ -29,7 +28,7 @@ return function(_) -- line: 11
 				FontSize = GlobalSettings.ButtonSize,
 				TextColor3 = GlobalSettings.WhiteTextColor,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Text = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ResizeScreenInputHint") else LocalizedStrings:LocStringUA("Xbox.Old.ResizeScreenInputHint")
+				Text = LocalizedStrings:LocStringUA("Xbox.Old.ResizeScreenInputHint")
 			})
 		})
 	})

@@ -1,13 +1,15 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Foundation = require(ParentParentParent.Foundation)
 local View = Foundation.View
 local FoundationText = Foundation.Text
+local Constants = require(ParentParent.Common.Constants)
 
-local function EmptyFriendsStateImpl(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), View (copy), FoundationText (copy)
+local function EmptyFriendsStateImpl(t1: {[any]: any}) -- line: 16
+	-- upvalues: React (copy), View (copy), Constants (copy), FoundationText (copy)
 	return React.createElement(View, {
-		tag = "col size-full padding-large gap-medium align-x-center align-y-center bg-over-media-0",
+		tag = Constants.STATE_PANEL_TAG,
 		LayoutOrder = t1.layoutOrder
 	}, {
 		Message = React.createElement(FoundationText, {

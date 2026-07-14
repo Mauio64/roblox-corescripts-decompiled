@@ -1,3 +1,0 @@
-return {
-	FindFriendsButton = "findFriends"
-}

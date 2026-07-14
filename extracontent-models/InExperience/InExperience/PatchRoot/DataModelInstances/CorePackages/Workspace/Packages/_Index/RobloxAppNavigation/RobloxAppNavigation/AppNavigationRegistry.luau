@@ -29,7 +29,11 @@ return {
 		-- upvalues: u2 (ref), t1 (copy)
 		return u2 or t1
 	end,
-	_resetForTest = function() -- line: 38
+	isRegistered = function() -- line: 41
+		-- upvalues: u2 (ref)
+		return u2 ~= nil
+	end,
+	_resetForTest = function() -- line: 45
 		-- upvalues: u2 (ref)
 		u2 = nil
 	end

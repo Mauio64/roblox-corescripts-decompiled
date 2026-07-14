@@ -8,7 +8,7 @@ local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local DevConsoleMaster = require(CoreGui.RobloxGui.Modules.DevConsoleMaster)
@@ -56,8 +56,24 @@ if not GetFFlagIGMGamepadSelectionHistory() then
 end
 
 function v29.renderWithSelectionCursor(p4, p5) -- line: 71
-	-- upvalues: withStyle (copy), Roact (copy), Page (copy), GetFFlagIGMGamepadSelectionHistory (copy), FocusHandler (copy), Constants (copy), GuiService (copy), CategoryHeader (copy), ToggleEntry (copy), UserGameSettings (copy), SendAnalytics (copy), withLocalization (copy), CursorKind (copy), DevConsoleMaster (copy), Divider (copy), VersionReporter (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy)
-	return withStyle(function(p6) -- line: 72
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), Page (copy), GetFFlagIGMGamepadSelectionHistory (copy), FocusHandler (copy), Constants (copy), GuiService (copy), CategoryHeader (copy), ToggleEntry (copy), UserGameSettings (copy), SendAnalytics (copy), withLocalization (copy), CursorKind (copy), DevConsoleMaster (copy), Divider (copy), VersionReporter (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy)
+	return withFoundationOrUIBloxStyle(function(p6) -- line: 72
+		return {
+			Theme = {
+				TextEmphasis = {
+					Color = p6.Color.Content.Emphasis.Color3,
+					Transparency = p6.Color.Content.Emphasis.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Header2 = {
+					Font = p6.Typography.TitleLarge.Font,
+					RelativeSize = p6.Typography.TitleLarge.FontSize
+				}
+			}
+		}
+	end, function(p7) -- line: 82
 		-- upvalues: Roact (copy), Page (copy), p4 (copy), GetFFlagIGMGamepadSelectionHistory (copy), FocusHandler (copy), Constants (copy), GuiService (copy), CategoryHeader (copy), ToggleEntry (copy), UserGameSettings (copy), SendAnalytics (copy), withLocalization (copy), p5 (copy), CursorKind (copy), DevConsoleMaster (copy), Divider (copy), VersionReporter (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy)
 		return Roact.createElement(Page, {
 			zIndex = 2,
@@ -69,9 +85,9 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 			FocusHandler = GetFFlagIGMGamepadSelectionHistory() and Roact.createElement(FocusHandler, {
 				isFocused = p4.props.canCaptureFocus,
 				shouldForgetPreviousSelection = p4.props.currentPage ~= Constants.advancedSettingsPageKey or p4.props.currentZone == 0,
-				didFocus = function(p7) -- line: 85
+				didFocus = function(p8) -- line: 95
 					-- upvalues: GuiService (copy), p4 (copy)
-					GuiService.SelectedCoreObject = p7 or p4.performanceToggleRef:getValue()
+					GuiService.SelectedCoreObject = p8 or p4.performanceToggleRef:getValue()
 				end
 			}) or nil,
 			Layout = Roact.createElement("UIListLayout", {
@@ -87,7 +103,7 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 				LayoutOrder = 2,
 				labelKey = "CoreScripts.InGameMenu.GameSettings.ShowPerfStats",
 				checked = p4.state.performanceStatsEnabled,
-				onToggled = function() -- line: 103
+				onToggled = function() -- line: 113
 					-- upvalues: UserGameSettings (copy), SendAnalytics (copy), Constants (copy)
 					UserGameSettings.PerformanceStatsVisible = not UserGameSettings.PerformanceStatsVisible
 					SendAnalytics(Constants.AnalyticsSettingsChangeName, nil, {}, true)
@@ -99,7 +115,7 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 				LayoutOrder = 3,
 				labelKey = "CoreScripts.InGameMenu.GameSettings.ShowMicroProfiler",
 				checked = p4.state.microProfilerEnabled,
-				onToggled = function() -- line: 114
+				onToggled = function() -- line: 124
 					-- upvalues: UserGameSettings (copy), SendAnalytics (copy), Constants (copy)
 					UserGameSettings.OnScreenProfilerEnabled = not UserGameSettings.OnScreenProfilerEnabled
 					SendAnalytics(Constants.AnalyticsSettingsChangeName, nil, {}, true)
@@ -107,19 +123,19 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 			}),
 			DeveloperConsole = withLocalization({
 				text = "CoreScripts.InGameMenu.GameSettings.DeveloperConsole"
-			})(function(p8) -- line: 121
-				-- upvalues: Roact (copy), p6 (copy), p5 (copy), CursorKind (copy), DevConsoleMaster (copy), p4 (copy)
+			})(function(p9) -- line: 131
+				-- upvalues: Roact (copy), p7 (copy), p5 (copy), CursorKind (copy), DevConsoleMaster (copy), p4 (copy)
 				return Roact.createElement("TextButton", {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 0, 54),
-					Text = p8.text,
-					TextColor3 = p6.Theme.TextEmphasis.Color,
-					Font = p6.Font.Header2.Font,
-					TextSize = p6.Font.Header2.RelativeSize * p6.Font.BaseSize,
+					Text = p9.text,
+					TextColor3 = p7.Theme.TextEmphasis.Color,
+					Font = p7.Font.Header2.Font,
+					TextSize = p7.Font.Header2.RelativeSize * p7.Font.BaseSize,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					LayoutOrder = 4,
 					SelectionImageObject = p5(CursorKind.Square),
-					[Roact.Event.Activated] = function() -- line: 132
+					[Roact.Event.Activated] = function() -- line: 142
 						-- upvalues: DevConsoleMaster (copy), p4 (copy)
 						DevConsoleMaster:SetVisibility(true)
 						p4.props.closeMenu()
@@ -139,7 +155,7 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 			}),
 			MicroProfilerVisibilityListener = Roact.createElement(ExternalEventConnection, {
 				event = PropertyChangedSignal,
-				callback = function() -- line: 152
+				callback = function() -- line: 162
 					-- upvalues: p4 (copy), UserGameSettings (copy)
 					p4:setState({
 						microProfilerEnabled = UserGameSettings.OnScreenProfilerEnabled
@@ -148,7 +164,7 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 			}),
 			PerformanceStatsVisibilityListener = Roact.createElement(ExternalEventConnection, {
 				event = UserGameSettings.PerformanceStatsVisibleChanged,
-				callback = function() -- line: 160
+				callback = function() -- line: 170
 					-- upvalues: p4 (copy), UserGameSettings (copy)
 					p4:setState({
 						performanceStatsEnabled = UserGameSettings.PerformanceStatsVisible
@@ -158,34 +174,34 @@ function v29.renderWithSelectionCursor(p4, p5) -- line: 71
 		})
 	end)
 end
-function v29.render(p9) -- line: 170
+function v29.render(p10) -- line: 180
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p10) -- line: 171
-		-- upvalues: p9 (copy)
-		return p9:renderWithSelectionCursor(p10)
+	return withSelectionCursorProvider(function(p11) -- line: 181
+		-- upvalues: p10 (copy)
+		return p10:renderWithSelectionCursor(p11)
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p11) -- line: 176
+return RoactRodux.UNSTABLE_connect2(function(p12) -- line: 186
 	-- upvalues: Constants (copy), GetFFlagIGMGamepadSelectionHistory (copy)
-	local v37 = p11.menuPage == "AdvancedGameSettings" and (p11.displayOptions.inputType == Constants.InputType.Gamepad and (not p11.respawn.dialogOpen and p11.currentZone == 1))
+	local v37 = p12.menuPage == "AdvancedGameSettings" and (p12.displayOptions.inputType == Constants.InputType.Gamepad and (not p12.respawn.dialogOpen and p12.currentZone == 1))
 	local currentZone = nil
 
 	if GetFFlagIGMGamepadSelectionHistory() then
-		currentZone = p11.currentZone
+		currentZone = p12.currentZone
 	end
 
 	return {
 		canCaptureFocus = v37,
-		currentPage = GetFFlagIGMGamepadSelectionHistory() and p11.menuPage or nil,
+		currentPage = GetFFlagIGMGamepadSelectionHistory() and p12.menuPage or nil,
 		currentZone = currentZone
 	}
-end, function(p12) -- line: 192
+end, function(p13) -- line: 202
 	-- upvalues: CloseMenu (copy)
 	return {
-		closeMenu = function() -- line: 194
-			-- upvalues: p12 (copy), CloseMenu (copy)
-			p12(CloseMenu)
+		closeMenu = function() -- line: 204
+			-- upvalues: p13 (copy), CloseMenu (copy)
+			p13(CloseMenu)
 		end
 	}
 end)(v29)

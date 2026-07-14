@@ -1,5 +1,0 @@
-return {
-	Bottom = "Bottom",
-	Center = "Center",
-	Side = "Side"
-}

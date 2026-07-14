@@ -2,7 +2,7 @@ local Parent = script:FindFirstAncestor("Moments").Parent
 local Analytics = require(Parent.MomentsCommon).Analytics
 local FunnelEventNames = Analytics.FunnelEventNames
 
-local function logCreateIntent(s1: string) -- line: 26
+local function logCreateIntent(s1: string) -- line: 28
 	-- upvalues: Analytics (copy), FunnelEventNames (copy)
 	local v6 = Analytics.SessionManager.startSession(FunnelEventNames.FunnelTypes.CreationFlow)
 

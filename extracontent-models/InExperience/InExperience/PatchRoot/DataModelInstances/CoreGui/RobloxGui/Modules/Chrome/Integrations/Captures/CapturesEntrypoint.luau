@@ -23,7 +23,7 @@ local v19 = Service:register({
 	id = "camera_entrypoint",
 	label = "Feature.SettingsHub.Label.Captures",
 	initialAvailability = v17,
-	sideSheetPlacement = SideSheetPlacement.Vertical,
+	sideSheetPlacement = SideSheetPlacement.Page,
 	activated = function(_) -- line: 37
 		-- upvalues: CapturesApp (copy)
 		CapturesApp.onToggleActivationFromChrome()

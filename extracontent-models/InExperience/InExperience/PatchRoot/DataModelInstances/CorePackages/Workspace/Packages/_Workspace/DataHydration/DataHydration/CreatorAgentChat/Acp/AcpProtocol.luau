@@ -59,14 +59,20 @@ return {
 		return nil
 	end,
 	buildSessionNewWireParams = function(t5: {[any]: any}) -- line: 63
+		local t6 = {
+			universeId = t5.project.universeId,
+			placeId = t5.project.placeId
+		}
+
+		if t5.experiment ~= nil then
+			t6.experiment = t5.experiment
+		end
+
 		return {
 			cwd = t5.cwd,
 			mcpServers = t5.mcpServers,
 			_meta = {
-				_roblox = {
-					universeId = t5.project.universeId,
-					placeId = t5.project.placeId
-				}
+				_roblox = t6
 			}
 		}
 	end

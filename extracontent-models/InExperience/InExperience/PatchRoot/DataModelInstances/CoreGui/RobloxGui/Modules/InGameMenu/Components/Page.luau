@@ -3,7 +3,7 @@ local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependenc
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local UIBlox = InGameMenuDependencies.UIBlox
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local ParentParent = script.Parent.Parent
@@ -13,26 +13,51 @@ local Constants = require(ParentParent.Resources.Constants)
 local ZonePortal = require(ParentParent.Components.ZonePortal)
 local Direction = require(ParentParent.Enums.Direction)
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+local Image = require(CorePackages.Packages.Foundation).Image
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 local ThemedTextLabel = require(script.Parent.ThemedTextLabel)
 
-local function renderWithSelectionCursor(p1, p2) -- line: 28
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetButton (copy), Assets (copy), CursorKind (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
-	return withStyle(function(p3) -- line: 29
-		-- upvalues: p1 (copy), Roact (copy), ImageSetButton (copy), Assets (copy), p2 (copy), CursorKind (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
+local function renderWithSelectionCursor(p1, p2) -- line: 33
+	-- upvalues: withFoundationOrUIBloxStyle (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), Assets (copy), CursorKind (copy), ImageSetButton (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 34
+		return {
+			Theme = {
+				IconEmphasis = {
+					Color = p3.Color.Content.Emphasis.Color3,
+					Transparency = p3.Color.Content.Emphasis.Transparency
+				},
+				BackgroundContrast = {
+					Color = p3.Color.Surface.Surface_100.Color3,
+					Transparency = p3.Color.Surface.Surface_100.Transparency
+				}
+			}
+		}
+	end, function(p4) -- line: 41
+		-- upvalues: p1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), Assets (copy), p2 (copy), CursorKind (copy), ImageSetButton (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
 		local t1 = {
 			ExtraChildren = p1.titleChildren,
-			BackButton = Roact.createElement(ImageSetButton, {
+			BackButton = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetButton, {
 				BackgroundTransparency = 1,
 				Image = Assets.Images.NavigateBack,
 				AnchorPoint = Vector2.new(0, 0.5),
-				ImageColor3 = p3.Theme.IconEmphasis.Color,
-				ImageTransparency = p3.Theme.IconEmphasis.Transparency,
+				ImageColor3 = p4.Theme.IconEmphasis.Color,
+				ImageTransparency = p4.Theme.IconEmphasis.Transparency,
 				Position = UDim2.new(0, 4, 0.5, 0),
 				Size = UDim2.new(0, 36, 0, 36),
 				NextSelectionDown = p1.NextSelectionDown,
 				[Roact.Event.Activated] = p1.navigateUp,
 				[Roact.Ref] = p1.buttonRef,
 				SelectionImageObject = p2(CursorKind.RoundedRect)
+			}) else Roact.createElement(Image, {
+				tag = "content-emphasis anchor-center-left size-900",
+				Image = Assets.Images.NavigateBack,
+				Position = UDim2.new(0, 4, 0.5, 0),
+				selection = {
+					NextSelectionDown = p1.NextSelectionDown,
+					SelectionImageObject = p2(CursorKind.RoundedRect)
+				},
+				onActivated = p1.navigateUp,
+				ref = p1.buttonRef
 			})
 		}
 
@@ -41,8 +66,8 @@ local function renderWithSelectionCursor(p1, p2) -- line: 28
 			Text = "",
 			BorderSizePixel = 0,
 			Selectable = false,
-			BackgroundColor3 = p3.Theme.BackgroundContrast.Color,
-			BackgroundTransparency = p3.Theme.BackgroundContrast.Transparency,
+			BackgroundColor3 = p4.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = p4.Theme.BackgroundContrast.Transparency,
 			Position = p1.position,
 			Size = UDim2.new(1, 0, 1, 0),
 			Visible = p1.visible and not p1.pageIsModal,
@@ -69,20 +94,20 @@ local function renderWithSelectionCursor(p1, p2) -- line: 28
 		})
 	end)
 end
-local function Page(p4) -- line: 82
+local function Page(p5) -- line: 106
 	-- upvalues: withSelectionCursorProvider (copy), renderWithSelectionCursor (copy)
-	return withSelectionCursorProvider(function(p5) -- line: 83
-		-- upvalues: renderWithSelectionCursor (copy), p4 (copy)
-		return renderWithSelectionCursor(p4, p5)
+	return withSelectionCursorProvider(function(p6) -- line: 107
+		-- upvalues: renderWithSelectionCursor (copy), p5 (copy)
+		return renderWithSelectionCursor(p5, p6)
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p6) -- line: 88
+return RoactRodux.UNSTABLE_connect2(nil, function(p7) -- line: 112
 	-- upvalues: NavigateUp (copy)
 	return {
-		navigateUp = function() -- line: 90
-			-- upvalues: p6 (copy), NavigateUp (copy)
-			p6(NavigateUp)
+		navigateUp = function() -- line: 114
+			-- upvalues: p7 (copy), NavigateUp (copy)
+			p7(NavigateUp)
 		end
 	}
 end)(Page)

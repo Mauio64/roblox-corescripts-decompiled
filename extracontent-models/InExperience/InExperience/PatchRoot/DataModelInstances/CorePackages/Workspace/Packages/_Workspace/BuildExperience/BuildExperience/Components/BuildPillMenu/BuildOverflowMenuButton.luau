@@ -1,12 +1,10 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
 local BuildExperienceParent = BuildExperience.Parent
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
 local ArchiveGameDialog = require(script.Parent.ArchiveGameDialog)
 local VersionHistoryContainer = require(BuildExperience.Components.VersionHistory.VersionHistoryContainer)
 local leaveExperience = require(BuildExperience.utils.leaveExperience)
-local useSessionSummary = require(BuildExperience.Chat.useSessionSummary)
 local IconButton = Foundation.IconButton
 local Menu = Foundation.Menu
 local useScaledValue = Foundation.Hooks.useScaledValue
@@ -20,161 +18,182 @@ require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenu
 local releaseAnyFocus = require(BuildExperience.utils.releaseAnyFocus)
 local sharePublishedExperience = require(BuildExperience.utils.sharePublishedExperience).sharePublishedExperience
 local useArchiveGameFlow = require(BuildExperience.utils.useArchiveGameFlow)
-local v20 = game:DefineFastInt("BuildOverflowMenuWidth", 172)
+local v18 = game:DefineFastInt("BuildOverflowMenuWidth", 172)
 
 local function BuildOverflowMenuButton(t1: {[any]: any}) -- line: 56
-	-- upvalues: useScaledValue (copy), v20 (copy), React (copy), useArchiveGameFlow (copy), CreatorAgentChat (copy), useSessionSummary (copy), releaseAnyFocus (copy), sharePublishedExperience (copy), leaveExperience (copy), ArchiveGameDialog (copy), VersionHistoryContainer (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy)
-	local v23 = useScaledValue(v20)
+	-- upvalues: useScaledValue (copy), v18 (copy), React (copy), useArchiveGameFlow (copy), releaseAnyFocus (copy), sharePublishedExperience (copy), leaveExperience (copy), ArchiveGameDialog (copy), VersionHistoryContainer (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy)
+	local v21 = useScaledValue(v18)
+	local v22, v23 = React.useState(false)
 	local v24, v25 = React.useState(false)
-	local v26, v27 = React.useState(false)
-	local v28 = useArchiveGameFlow()
-	local v29 = React.useMemo(function() -- line: 61
-		-- upvalues: CreatorAgentChat (copy), t1 (copy)
-		return CreatorAgentChat.getCreatorAgentChatStore().getSessionForProject(t1.target.universeId, t1.target.placeId, t1.target.sessionId)
-	end, {
-		t1.target.universeId,
-		t1.target.placeId,
-		t1.target.sessionId
-	})
-	local hasPublishedTurn = useSessionSummary(v29).hasPublishedTurn
-	local v31 = React.useMemo(function() -- line: 67
-		-- upvalues: t1 (copy), hasPublishedTurn (copy)
+	local v26 = useArchiveGameFlow()
+	local v27 = t1.isDisabled == true or t1.target.universeId == nil
+	local v28 = t1.hasPublishedTurn == true
+	local v29 = React.useMemo(function() -- line: 64
+		-- upvalues: t1 (copy), v28 (copy)
+		if t1.target.universeId == nil then
+			return nil
+		end
+
 		return {
 			universeId = t1.target.universeId,
 			placeId = t1.target.placeId,
 			isNewGameTarget = t1.target.isNewGameTarget,
-			hasPublishedTurn = hasPublishedTurn
+			hasPublishedTurn = v28
 		}
 	end, {
 		t1.target.universeId,
 		t1.target.placeId,
 		t1.target.isNewGameTarget,
-		hasPublishedTurn
+		v28
 	})
-	local v32 = t1.store.useItems(v31)
-	local t2 = {}
-
-	for _, v35 in v32 do
-		local t3 = {
-			items = {}
-		}
-
-		for _, v38 in v35.items do
-			local v39 = if v38.isDisabled == nil then nil else v38.isDisabled(v31)
-			local t4 = {
-				id = v38.id,
-				text = v38.text,
-				icon = v38.icon,
-				isDisabled = v39
-			}
-
-			table.insert(t3.items, t4)
+	local v30 = t1.store.useItems(v29)
+	local v31 = React.useMemo(function() -- line: 84
+		-- upvalues: v27 (copy), v29 (copy), v30 (copy)
+		if v27 or v29 == nil then
+			return {}
 		end
 
-		table.insert(t2, t3)
-	end
+		local t2 = {}
 
-	local v41 = React.useCallback(function() -- line: 102
-		-- upvalues: v25 (copy), t1 (copy)
-		v25(function(p1) -- line: 103
+		for _, v41 in v30 do
+			local t3 = {
+				items = {}
+			}
+
+			for _, v44 in v41.items do
+				local v45 = if v44.isDisabled == nil then nil else v44.isDisabled(v29)
+				local t4 = {
+					id = v44.id,
+					text = v44.text,
+					icon = v44.icon,
+					isDisabled = v45
+				}
+
+				table.insert(t3.items, t4)
+			end
+
+			table.insert(t2, t3)
+		end
+
+		return t2
+	end, {
+		v27,
+		v30,
+		v29
+	})
+	local v32 = React.useCallback(function() -- line: 108
+		-- upvalues: v27 (copy), v23 (copy), t1 (copy)
+		if v27 then
+			return
+		end
+
+		v23(function(p1) -- line: 112
 			return not p1
 		end)
 
 		if t1.onActivated then
 			t1.onActivated()
 		end
-	end, { t1.onActivated })
-	local v42 = React.useCallback(function() -- line: 111
-		-- upvalues: v25 (copy)
-		v25(false)
+	end, {
+		v27,
+		t1.onActivated
+	})
+	local v33 = React.useCallback(function() -- line: 120
+		-- upvalues: v23 (copy)
+		v23(false)
 	end, {})
-	local v43 = React.useCallback(function(p2) -- line: 115
-		-- upvalues: v32 (copy), v31 (copy), v28 (copy), t1 (copy), releaseAnyFocus (copy), v27 (copy), sharePublishedExperience (copy), v25 (copy), leaveExperience (copy)
-		for _, v50 in v32 do
-			for _, v52 in v50.items do
-				if p2 == v52.id then
-					local v53 = if not v52.onActivated then nil else v52.onActivated(v31)
+	local v34 = React.useCallback(function(p2) -- line: 124
+		-- upvalues: v29 (copy), v30 (copy), v26 (copy), t1 (copy), releaseAnyFocus (copy), v25 (copy), sharePublishedExperience (copy), v23 (copy), leaveExperience (copy)
+		if v29 == nil then
+			return
+		end
 
-					if v53 ~= nil then
-						if v53.type == "archive" then
-							v28.requestArchive(t1.target.universeId)
-						elseif v53.type == "openPage" then
+		for _, v49 in v30 do
+			for _, v51 in v49.items do
+				if p2 == v51.id then
+					local v52 = if not v51.onActivated then nil else v51.onActivated(v29)
+
+					if v52 ~= nil then
+						if v52.type == "archive" then
+							v26.requestArchive(v29.universeId)
+						elseif v52.type == "openPage" then
 							if t1.onAction then
-								t1.onAction(v53)
+								t1.onAction(v52)
 							end
-						elseif v53.type == "openVersionHistory" then
+						elseif v52.type == "openVersionHistory" then
 							releaseAnyFocus()
-							v27(true)
-						elseif v53.type == "share" then
-							sharePublishedExperience(v53.placeId)
-						elseif v53.type == "leaveExperience" then
-							v25(false)
+							v25(true)
+						elseif v52.type == "share" then
+							sharePublishedExperience(v52.placeId)
+						elseif v52.type == "leaveExperience" then
+							v23(false)
 							leaveExperience()
 
 							return
 						end
 					end
 
-					v25(false)
+					v23(false)
 
 					return
 				end
 			end
 		end
 	end, {
-		v32,
-		v31,
+		v30,
+		v29,
 		t1.onAction,
-		v28.requestArchive,
+		v26.requestArchive,
 		t1.target.universeId
 	})
-	local v44 = React.useCallback(function() -- line: 145
-		-- upvalues: v27 (copy)
-		v27(false)
+	local v35 = React.useCallback(function() -- line: 157
+		-- upvalues: v25 (copy)
+		v25(false)
 	end, {})
-	local v45 = React.useCallback(function() -- line: 149
-		-- upvalues: v28 (copy), t1 (copy)
-		v28.confirm()
+	local v36 = React.useCallback(function() -- line: 161
+		-- upvalues: v26 (copy), t1 (copy)
+		v26.confirm()
 
 		if t1.onClose then
 			t1.onClose()
 		end
 	end, {
-		v28.confirm,
+		v26.confirm,
 		t1.onClose
 	})
-	local v46 = if not v28.isOpen then nil else React.createElement(ArchiveGameDialog, {
+	local v37 = if not v26.isOpen then nil else React.createElement(ArchiveGameDialog, {
 		isOpen = true,
-		onArchive = v45,
-		onCancel = v28.cancel
+		onArchive = v36,
+		onCancel = v26.cancel
 	})
-	local v47 = if not v26 or t1.target.placeId == nil then nil else React.createElement(VersionHistoryContainer, {
+	local v38 = if not v24 or t1.target.placeId == nil then nil else React.createElement(VersionHistoryContainer, {
 		isOpen = true,
 		testId = "build-version-history",
 		placeId = t1.target.placeId,
-		onClose = v44
+		onClose = v35
 	})
 
 	return React.createElement(React.Fragment, nil, {
 		Menu = React.createElement(Menu, {
-			isOpen = v24,
-			items = t2,
+			isOpen = v22 and not v27,
+			items = v31,
 			side = PopoverSide.Bottom,
 			align = PopoverAlign.End,
-			onPressedOutside = v42,
-			onActivated = v43,
+			onPressedOutside = v33,
+			onActivated = v34,
 			LayoutOrder = t1.layoutOrder,
-			width = UDim.new(0, v23)
+			width = UDim.new(0, v21)
 		}, React.createElement(IconButton, {
 			isCircular = true,
 			testId = "build-header-overflow-button",
 			icon = t1.icon,
 			variant = ButtonVariant.Utility,
 			size = InputSize.Medium,
-			onActivated = v41
+			isDisabled = v27,
+			onActivated = v32
 		})),
-		ArchiveDialog = v46,
-		VersionHistory = v47
+		ArchiveDialog = v37,
+		VersionHistory = v38
 	})
 end
 

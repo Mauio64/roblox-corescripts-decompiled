@@ -9,35 +9,40 @@ local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.Shared
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagFixSpatialUICaptures = SharedFlags.FFlagFixSpatialUICaptures
 local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
+local v12 = game:DefineFastFlag("UpdateGalleryIcon", false)
 local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
-local v13 = CapturesPolicy.PolicyImplementation.read()
-local v14 = not not v13 and CapturesPolicy.Mapper(v13).eligibleForCapturesFeature()
-local v15 = isInExperienceUIVREnabled and FFlagFixSpatialUICaptures
-local v16 = v14 and (not v15 or not isSpatial())
+local v14 = CapturesPolicy.PolicyImplementation.read()
+local v15 = not not v14 and CapturesPolicy.Mapper(v14).eligibleForCapturesFeature()
+local v16 = isInExperienceUIVREnabled and FFlagFixSpatialUICaptures
+local v17 = v15 and (not v16 or not isSpatial())
 
-if not v16 then
+if not v17 then
 	return nil
 end
 
-local v17 = InGameMenuIntegrationUtils.createPageOpenSignal("CapturesPage")
+local v18 = InGameMenuIntegrationUtils.createPageOpenSignal("CapturesPage")
 
 return Service:register({
 	id = "gallery",
 	label = "Feature.Captures.Title.Gallery",
-	initialAvailability = if not v16 then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Available,
+	initialAvailability = if not v17 then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Available,
 	sideSheetPlacement = SideSheetPlacement.Page,
-	activated = function(_) -- line: 37
-		-- upvalues: InGameMenuIntegrationUtils (copy), v17 (copy)
-		InGameMenuIntegrationUtils.toggleIGMPage("CapturesPage", v17:get())
+	activated = function(_) -- line: 39
+		-- upvalues: InGameMenuIntegrationUtils (copy), v18 (copy)
+		InGameMenuIntegrationUtils.toggleIGMPage("CapturesPage", v18:get())
 	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 42
-		-- upvalues: v17 (copy)
-		return v17:get()
-	end or v17,
+	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 44
+		-- upvalues: v18 (copy)
+		return v18:get()
+	end or v18,
 	components = {
-		Icon = function(_) -- line: 46
-			-- upvalues: CommonIcon (copy), v17 (copy)
-			return CommonIcon("icons/controls/cameraOff", "icons/controls/cameraOn", v17)
+		Icon = function(_) -- line: 48
+			-- upvalues: v12 (copy), CommonIcon (copy), v18 (copy)
+			if v12 then
+				return CommonIcon("Image", nil, v18)
+			end
+
+			return CommonIcon("icons/controls/cameraOff", "icons/controls/cameraOn", v18)
 		end
 	}
 })

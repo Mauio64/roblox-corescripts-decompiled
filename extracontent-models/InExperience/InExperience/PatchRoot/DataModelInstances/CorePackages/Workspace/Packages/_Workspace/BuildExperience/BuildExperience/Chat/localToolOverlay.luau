@@ -3,7 +3,7 @@ local Signals = require(Parent.Signals)
 
 require(script.Parent.chatTypes)
 
-local function createLocalToolOverlay() -- line: 35
+local function createLocalToolOverlay() -- line: 39
 	-- upvalues: Signals (copy)
 	local v4, v5 = Signals.createSignal({
 		submittedToolCallIds = {},
@@ -12,10 +12,11 @@ local function createLocalToolOverlay() -- line: 35
 	})
 	local v6, v7 = Signals.createSignal({
 		onAnswerSelectedByToolCallId = {},
+		onAnswerConfirmedByToolCallId = {},
 		onPlanAcceptedByToolCallId = {}
 	})
 
-	local function updateOptimistic(p1: ((...any) -> ...any)) -- line: 46
+	local function updateOptimistic(p1: ((...any) -> ...any)) -- line: 51
 		-- upvalues: v4 (copy), v5 (copy)
 		local v11 = v4(false)
 		local t1 = {
@@ -27,11 +28,12 @@ local function createLocalToolOverlay() -- line: 35
 		p1(t1)
 		v5(t1)
 	end
-	local function updateActions(p2: ((...any) -> ...any)) -- line: 57
+	local function updateActions(p2: ((...any) -> ...any)) -- line: 62
 		-- upvalues: v6 (copy), v7 (copy)
 		local v14 = v6(false)
 		local t2 = {
 			onAnswerSelectedByToolCallId = table.clone(v14.onAnswerSelectedByToolCallId),
+			onAnswerConfirmedByToolCallId = table.clone(v14.onAnswerConfirmedByToolCallId),
 			onPlanAcceptedByToolCallId = table.clone(v14.onPlanAcceptedByToolCallId)
 		}
 
@@ -42,67 +44,76 @@ local function createLocalToolOverlay() -- line: 35
 	return {
 		getOptimisticLocalTools = v4,
 		getLocalToolActions = v6,
-		markSubmitted = function(p3) -- line: 70
+		markSubmitted = function(p3) -- line: 76
 			-- upvalues: updateOptimistic (copy)
-			updateOptimistic(function(p4) -- line: 71
+			updateOptimistic(function(p4) -- line: 77
 				-- upvalues: p3 (copy)
 				p4.submittedToolCallIds[p3] = true
 			end)
 		end,
-		setAskUserTool = function(p5) -- line: 75
+		setAskUserTool = function(p5) -- line: 81
 			-- upvalues: updateOptimistic (copy)
-			updateOptimistic(function(p6) -- line: 76
+			updateOptimistic(function(p6) -- line: 82
 				-- upvalues: p5 (copy)
 				p6.askUserByToolCallId[p5.toolCallId] = p5
 			end)
 		end,
-		removeAskUserTool = function(p7) -- line: 80
+		removeAskUserTool = function(p7) -- line: 86
 			-- upvalues: updateOptimistic (copy)
-			updateOptimistic(function(p8) -- line: 81
+			updateOptimistic(function(p8) -- line: 87
 				-- upvalues: p7 (copy)
 				p8.askUserByToolCallId[p7] = nil
 			end)
 		end,
-		setPlanTool = function(p9) -- line: 85
+		setPlanTool = function(p9) -- line: 91
 			-- upvalues: updateOptimistic (copy)
-			updateOptimistic(function(p10) -- line: 86
+			updateOptimistic(function(p10) -- line: 92
 				-- upvalues: p9 (copy)
 				p10.planByToolCallId[p9.toolCallId] = p9
 			end)
 		end,
-		removePlanTool = function(p11) -- line: 90
+		removePlanTool = function(p11) -- line: 96
 			-- upvalues: updateOptimistic (copy)
-			updateOptimistic(function(p12) -- line: 91
+			updateOptimistic(function(p12) -- line: 97
 				-- upvalues: p11 (copy)
 				p12.planByToolCallId[p11] = nil
 			end)
 		end,
-		setAnswerAction = function(p13, p14) -- line: 95
+		setAnswerAction = function(p13, p14, p15) -- line: 101
 			-- upvalues: updateActions (copy)
-			updateActions(function(p15) -- line: 96
-				-- upvalues: p13 (copy), p14 (copy)
-				p15.onAnswerSelectedByToolCallId[p13] = p14
+			updateActions(function(p16) -- line: 102
+				-- upvalues: p13 (copy), p14 (copy), p15 (copy)
+				p16.onAnswerSelectedByToolCallId[p13] = p14
+
+				if p15 ~= nil then
+					p16.onAnswerConfirmedByToolCallId[p13] = p15
+
+					return
+				end
+
+				p16.onAnswerConfirmedByToolCallId[p13] = nil
 			end)
 		end,
-		removeAnswerAction = function(p16) -- line: 100
+		removeAnswerAction = function(p17) -- line: 111
 			-- upvalues: updateActions (copy)
-			updateActions(function(p17) -- line: 101
-				-- upvalues: p16 (copy)
-				p17.onAnswerSelectedByToolCallId[p16] = nil
+			updateActions(function(p18) -- line: 112
+				-- upvalues: p17 (copy)
+				p18.onAnswerSelectedByToolCallId[p17] = nil
+				p18.onAnswerConfirmedByToolCallId[p17] = nil
 			end)
 		end,
-		setPlanAction = function(p18, p19) -- line: 105
+		setPlanAction = function(p19, p20) -- line: 117
 			-- upvalues: updateActions (copy)
-			updateActions(function(p20) -- line: 106
-				-- upvalues: p18 (copy), p19 (copy)
-				p20.onPlanAcceptedByToolCallId[p18] = p19
+			updateActions(function(p21) -- line: 118
+				-- upvalues: p19 (copy), p20 (copy)
+				p21.onPlanAcceptedByToolCallId[p19] = p20
 			end)
 		end,
-		removePlanAction = function(p21) -- line: 110
+		removePlanAction = function(p22) -- line: 122
 			-- upvalues: updateActions (copy)
-			updateActions(function(p22) -- line: 111
-				-- upvalues: p21 (copy)
-				p22.onPlanAcceptedByToolCallId[p21] = nil
+			updateActions(function(p23) -- line: 123
+				-- upvalues: p22 (copy)
+				p23.onPlanAcceptedByToolCallId[p22] = nil
 			end)
 		end
 	}

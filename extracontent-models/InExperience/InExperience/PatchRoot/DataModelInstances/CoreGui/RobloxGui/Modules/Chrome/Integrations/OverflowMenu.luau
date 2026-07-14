@@ -196,7 +196,7 @@ end
 local v65 = Service:register({
 	id = "backpack",
 	label = "CoreScripts.TopBar.Inventory",
-	sideSheetPlacement = SideSheetPlacement.Vertical,
+	sideSheetPlacement = SideSheetPlacement.Page,
 	activated = function(_) -- line: 204
 		-- upvalues: FFlagEnableNewBackpack (copy), v22 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), InExperienceUIVRIXP (copy), ChromeIntegrationUtils (copy), v23 (copy)
 		if FFlagEnableNewBackpack then

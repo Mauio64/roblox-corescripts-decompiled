@@ -19,30 +19,23 @@ local reducer = require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.reduc
 local resolveArConfig = require(GenericAbuseReporting.BeduiV2.Utils.Resolver.configResolvers).resolveArConfig
 local resolveStartNode = require(GenericAbuseReporting.BeduiV2.Utils.Resolver.resolveStartNode).resolveStartNode
 local sendReport = require(GenericAbuseReporting.BeduiV2.Api.sendReport)
-
-require(GenericAbuseReporting.BeduiV2.Types)
-
 local useOpenLink = require(GenericAbuseReporting.BeduiV2.Hooks.useOpenLink)
 local getNewRunId = reducer.getNewRunId
 local reducer2 = reducer.reducer
-local selectContext = reducer.selectContext
-local selectFormData = reducer.selectFormData
 local selectStore = reducer.selectStore
 local sendAnalyticsEvent = analyticsService.sendAnalyticsEvent
 local TelemetryEventType = analyticsService.TelemetryEventType
 local FFlagAbuseReportMenuV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportMenuV2
-local FFlagAbuseReportConfigStoreResolver = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportConfigStoreResolver
-local v24 = game:DefineFastFlag("DynamicReportV2SubmitFailErrorEvent", false)
 local FFlagFixAnalyticsForDynamicReportV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagFixAnalyticsForDynamicReportV2
 local FFlagAbuseReportInlineAlertStateOutsideReducer = require(GenericAbuseReporting.Flags.FFlagAbuseReportInlineAlertStateOutsideReducer)
 
-local function useAbuseSheetAnalytics(p1, p2, s1: string, s2: string?) -- line: 60
+local function useAbuseSheetAnalytics(p1, p2, s1: string, s2: string?) -- line: 50
 	-- upvalues: React (copy), Dash (copy), FFlagAbuseReportMenuV2 (copy), sendAnalyticsEvent (copy)
-	return (React.useCallback(function(p3) -- line: 62
+	return (React.useCallback(function(p3) -- line: 52
 		-- upvalues: p1 (copy), Dash (copy), p2 (copy), s1 (copy), FFlagAbuseReportMenuV2 (copy), s2 (copy), sendAnalyticsEvent (copy)
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
-		local v70 = not p1.openTime and 0 or UnixTimestampMillis - p1.openTime
-		local v71 = Dash.map(p1.stack, function(p4) -- line: 65
+		local v64 = not p1.openTime and 0 or UnixTimestampMillis - p1.openTime
+		local v65 = Dash.map(p1.stack, function(p4) -- line: 55
 			return p4.nodeId
 		end)
 		local t1 = {
@@ -50,8 +43,8 @@ local function useAbuseSheetAnalytics(p1, p2, s1: string, s2: string?) -- line: 
 			user_id = p1.userId,
 			abuse_vector = p2,
 			target_id = s1,
-			total_duration = v70,
-			path = v71,
+			total_duration = v64,
+			path = v65,
 			config_name = if not FFlagAbuseReportMenuV2 then nil else s2
 		}
 
@@ -65,9 +58,9 @@ local function useAbuseSheetAnalytics(p1, p2, s1: string, s2: string?) -- line: 
 		if not FFlagAbuseReportMenuV2 then nil else s2
 	}))
 end
-local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
-	-- upvalues: React (copy), FFlagAbuseReportMenuV2 (copy), resolveStartNode (copy), reducer2 (copy), getInitialState (copy), getNewRunId (copy), useOpenLink (copy), useRoactService (copy), RoactNetworking (copy), useAbuseSheetAnalytics (copy), FFlagAbuseReportConfigStoreResolver (copy), selectContext (copy), selectFormData (copy), selectStore (copy), resolveArConfig (copy), TelemetryEventType (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendReport (copy), v24 (copy), ContentNode (copy)
-	local v35 = React.useMemo(function() -- line: 144
+local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 115
+	-- upvalues: React (copy), FFlagAbuseReportMenuV2 (copy), resolveStartNode (copy), reducer2 (copy), getInitialState (copy), getNewRunId (copy), useOpenLink (copy), useRoactService (copy), RoactNetworking (copy), useAbuseSheetAnalytics (copy), selectStore (copy), resolveArConfig (copy), TelemetryEventType (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendReport (copy), ContentNode (copy)
+	local v31 = React.useMemo(function() -- line: 134
 		-- upvalues: FFlagAbuseReportMenuV2 (copy), p5 (copy), resolveStartNode (copy)
 		if FFlagAbuseReportMenuV2 and p5 then
 			return (resolveStartNode(p5))
@@ -75,53 +68,33 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 
 		return "root"
 	end, { p5 })
-	local u38, u39
+	local u34, u35
 
 	if FFlagAbuseReportMenuV2 then
-		local v36, v37 = React.useReducer(reducer2, nil, function() -- line: 149
-			-- upvalues: getInitialState (copy), getNewRunId (copy), v35 (copy)
-			return getInitialState(getNewRunId(), DateTime.now().UnixTimestampMillis, v35)
+		local v32, v33 = React.useReducer(reducer2, nil, function() -- line: 139
+			-- upvalues: getInitialState (copy), getNewRunId (copy), v31 (copy)
+			return getInitialState(getNewRunId(), DateTime.now().UnixTimestampMillis, v31)
 		end)
 
-		u38 = v36
-		u39 = v37
+		u34 = v32
+		u35 = v33
 	else
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
-		local v41, v42 = React.useReducer(reducer2, getInitialState(getNewRunId(), UnixTimestampMillis, v35))
+		local v37, v38 = React.useReducer(reducer2, getInitialState(getNewRunId(), UnixTimestampMillis, v31))
 
-		u38 = v41
-		u39 = v42
+		u34 = v37
+		u35 = v38
 	end
 
-	local v43 = useOpenLink()
-	local v44 = useRoactService(RoactNetworking)
-	local v45 = useAbuseSheetAnalytics(u38, t2.abuseVector, t2.targetId, if not FFlagAbuseReportMenuV2 or not p5 then nil else p5.name)
-	local v46 = React.useMemo(function() -- line: 167
-		-- upvalues: FFlagAbuseReportConfigStoreResolver (copy), selectContext (copy), u38 (ref)
-		if not FFlagAbuseReportConfigStoreResolver then
-			return (selectContext(u38))
-		end
-
-		return {}
-	end, { u38 })
-	local v47 = React.useMemo(function() -- line: 171
-		-- upvalues: FFlagAbuseReportConfigStoreResolver (copy), selectFormData (copy), u38 (ref)
-		if not FFlagAbuseReportConfigStoreResolver then
-			return (selectFormData(u38))
-		end
-
-		return {}
-	end, { u38 })
-	local v48 = React.useMemo(function() -- line: 175
-		-- upvalues: FFlagAbuseReportConfigStoreResolver (copy), selectStore (copy), u38 (ref)
-		if FFlagAbuseReportConfigStoreResolver then
-			return (selectStore(u38))
-		end
-
-		return {}
-	end, { u38 })
-	local v49 = React.useMemo(function() -- line: 180
-		-- upvalues: p5 (copy), resolveArConfig (copy), FFlagAbuseReportConfigStoreResolver (copy), v46 (copy), v47 (copy), v48 (copy)
+	local v39 = useOpenLink()
+	local v40 = useRoactService(RoactNetworking)
+	local v41 = useAbuseSheetAnalytics(u34, t2.abuseVector, t2.targetId, if not FFlagAbuseReportMenuV2 or not p5 then nil else p5.name)
+	local v42 = React.useMemo(function() -- line: 157
+		-- upvalues: selectStore (copy), u34 (ref)
+		return selectStore(u34)
+	end, { u34 })
+	local v43 = React.useMemo(function() -- line: 162
+		-- upvalues: p5 (copy), resolveArConfig (copy), v42 (copy)
 		if not p5 then
 			return nil
 		end
@@ -129,67 +102,63 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 		return resolveArConfig(p5, {
 			attribute = p5.attributes,
 			resources = p5.resources or {},
-			context = if FFlagAbuseReportConfigStoreResolver then {} else v46,
-			formData = if FFlagAbuseReportConfigStoreResolver then {} else v47,
-			store = if not FFlagAbuseReportConfigStoreResolver then {} else v48
+			store = v42
 		})
 	end, {
 		p5,
-		if FFlagAbuseReportConfigStoreResolver then nil else v46,
-		if FFlagAbuseReportConfigStoreResolver then nil else v47,
-		if not FFlagAbuseReportConfigStoreResolver then nil else v48
+		v42
 	})
-	local v50 = React.useRef(true)
-	local v51 = React.useRef(false)
-	local v52 = FFlagAbuseReportMenuV2 and t2.attemptTrigger == "onFirstAction"
-	local v53 = React.useRef("none")
-	local v54 = React.useRef(v45)
+	local v44 = React.useRef(true)
+	local v45 = React.useRef(false)
+	local v46 = FFlagAbuseReportMenuV2 and t2.attemptTrigger == "onFirstAction"
+	local v47 = React.useRef("none")
+	local v48 = React.useRef(v41)
 
-	v54.current = v45
+	v48.current = v41
 
-	local v55 = React.useRef(u38.submissionState)
+	local v49 = React.useRef(u34.submissionState)
 
-	v55.current = u38.submissionState
+	v49.current = u34.submissionState
 
-	local function setNonReducerPendingInlineAlert(p6) -- line: 215
+	local function setNonReducerPendingInlineAlert(p6) -- line: 193
 		-- upvalues: t2 (copy)
 		if t2.inlineAlertController then
 			t2.inlineAlertController.setInlineAlert(p6)
 		end
 	end
 
-	React.useEffect(function() -- line: 223
-		-- upvalues: FFlagAbuseReportMenuV2 (copy), v53 (copy), v54 (copy), v55 (copy), TelemetryEventType (copy)
+	React.useEffect(function() -- line: 201
+		-- upvalues: FFlagAbuseReportMenuV2 (copy), v47 (copy), v48 (copy), v49 (copy), TelemetryEventType (copy)
 		if not FFlagAbuseReportMenuV2 then
 			return
 		end
 
-		return function() -- line: 227
-			-- upvalues: v53 (copy), v54 (copy), v55 (copy), TelemetryEventType (copy)
-			if v53.current ~= "started" then
+		return function() -- line: 205
+			-- upvalues: v47 (copy), v48 (copy), v49 (copy), TelemetryEventType (copy)
+			if v47.current ~= "started" then
 				return
 			end
 
-			v53.current = "completed"
-			v54.current(if v55.current ~= "completed" then {
+			v47.current = "completed"
+			v48.current(if v49.current ~= "completed" then {
 				sub_event_type = TelemetryEventType.ReportAbandoned
 			} else {
 				sub_event_type = TelemetryEventType.ReportCompleted
 			})
 		end
 	end, {})
-	React.useEffect(function() -- line: 245
-		-- upvalues: t2 (copy), v50 (copy), getNewRunId (copy), u39 (ref), v35 (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), v51 (copy), FFlagAbuseReportMenuV2 (copy), v52 (copy), v45 (copy), TelemetryEventType (copy), v53 (copy)
-		if t2.open and not v50.current then
-			local v74 = getNewRunId()
+	React.useEffect(function() -- line: 223
+		-- upvalues: t2 (copy), v44 (copy), getNewRunId (copy), u35 (ref), v31 (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), v45 (copy), FFlagAbuseReportMenuV2 (copy), v46 (copy), v41 (copy), TelemetryEventType (copy), v47 (copy)
+		if t2.open and not v44.current then
+			local v68 = getNewRunId()
 			local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-			u39({
+			u35({
 				type = "reset",
 				payload = {
-					runId = v74,
+					runId = v68,
 					initialEnterTime = UnixTimestampMillis,
-					startNodeId = v35
+					startNodeId = v31
 				}
 			})
 
@@ -198,24 +167,24 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			end
 
 			if FFlagFixAnalyticsForDynamicReportV2 then
-				v51.current = false
+				v45.current = false
 			end
 		end
 
-		v50.current = false
+		v44.current = false
 
-		if t2.open and not FFlagAbuseReportMenuV2 or FFlagAbuseReportMenuV2 and t2.open and not v52 then
-			v45({
+		if t2.open and not FFlagAbuseReportMenuV2 or FFlagAbuseReportMenuV2 and t2.open and not v46 then
+			v41({
 				sub_event_type = TelemetryEventType.ReportStarted
 			})
 
 			if FFlagAbuseReportMenuV2 then
-				v53.current = "started"
+				v47.current = "started"
 			end
 		end
 	end, { t2.open })
-	React.useLayoutEffect(function() -- line: 292
-		-- upvalues: FFlagAbuseReportMenuV2 (copy), p5 (copy), u38 (ref), v35 (copy), u39 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy)
+	React.useLayoutEffect(function() -- line: 270
+		-- upvalues: FFlagAbuseReportMenuV2 (copy), p5 (copy), u34 (ref), v31 (copy), u35 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy)
 		if not FFlagAbuseReportMenuV2 then
 			return
 		end
@@ -224,45 +193,45 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			return
 		end
 
-		if #u38.stack > 1 then
+		if #u34.stack > 1 then
 			return
 		end
 
-		local v76 = u38.stack[1]
+		local v70 = u34.stack[1]
 
-		if v76 and v76.nodeId == v35 then
+		if v70 and v70.nodeId == v31 then
 			return
 		end
 
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-		u39({
+		u35({
 			type = "reset",
 			payload = {
-				runId = u38.runId,
-				initialEnterTime = u38.openTime or UnixTimestampMillis,
-				startNodeId = v35,
-				inlineAlert = if FFlagAbuseReportInlineAlertStateOutsideReducer then nil else u38.pendingInlineAlert
+				runId = u34.runId,
+				initialEnterTime = u34.openTime or UnixTimestampMillis,
+				startNodeId = v31,
+				inlineAlert = if FFlagAbuseReportInlineAlertStateOutsideReducer then nil else u34.pendingInlineAlert
 			}
 		})
 	end, {
 		p5,
-		v35
+		v31
 	})
 
-	local v57 = Dash.last(u38.stack)
-	local v58 = v49 and (v49.nodes and (v57 and v49.nodes[v57.nodeId]))
+	local v51 = Dash.last(u34.stack)
+	local v52 = v43 and (v43.nodes and (v51 and v43.nodes[v51.nodeId]))
 
 	if not FFlagFixAnalyticsForDynamicReportV2 then
-		if not v57 then
-			v45({
+		if not v51 then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
 					error_message = "No current page found in abuse sheet flow."
 				}
 			})
-		elseif not v57.nodeId then
-			v45({
+		elseif not v51.nodeId then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
 					error_message = "Current page has no nodeId in abuse sheet flow."
@@ -270,8 +239,8 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			})
 		end
 
-		if not v49 or not v49.nodes then
-			v45({
+		if not v43 or not v43.nodes then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
 					error_message = "Abuse sheet flow config or nodes is nil."
@@ -279,19 +248,19 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			})
 		end
 
-		if not v58 then
-			v45({
+		if not v52 then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
-					error_message = `No config found for current nodeId: { v57 and v57.nodeId }`
+					error_message = `No config found for current nodeId: { v51 and v51.nodeId }`
 				}
 			})
 		end
 	end
 
-	React.useEffect(function() -- line: 359
-		-- upvalues: FFlagFixAnalyticsForDynamicReportV2 (copy), t2 (copy), v51 (copy), p5 (copy), v57 (copy), v45 (copy), TelemetryEventType (copy), v49 (copy), v58 (copy)
-		if not FFlagFixAnalyticsForDynamicReportV2 or (not t2.open or v51.current) then
+	React.useEffect(function() -- line: 337
+		-- upvalues: FFlagFixAnalyticsForDynamicReportV2 (copy), t2 (copy), v45 (copy), p5 (copy), v51 (copy), v41 (copy), TelemetryEventType (copy), v43 (copy), v52 (copy)
+		if not FFlagFixAnalyticsForDynamicReportV2 or (not t2.open or v45.current) then
 			return
 		end
 
@@ -299,107 +268,107 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			return
 		end
 
-		if not v57 then
-			v45({
+		if not v51 then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
 					error_message = "No current page found in abuse sheet flow."
 				}
 			})
-			v51.current = true
+			v45.current = true
 
 			return
 		end
 
-		if not v57.nodeId then
-			v45({
+		if not v51.nodeId then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
 					error_message = "Current page has no nodeId in abuse sheet flow."
 				}
 			})
-			v51.current = true
+			v45.current = true
 
 			return
 		end
 
-		if not v49 or not v49.nodes then
-			v45({
+		if not v43 or not v43.nodes then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
 					error_message = "Abuse sheet flow config or nodes is nil."
 				}
 			})
-			v51.current = true
+			v45.current = true
 
 			return
 		end
 
-		if not v58 then
-			v45({
+		if not v52 then
+			v41({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
-					error_message = `No config found for current nodeId: { v57.nodeId }`
+					error_message = `No config found for current nodeId: { v51.nodeId }`
 				}
 			})
-			v51.current = true
+			v45.current = true
 		end
 	end, {
 		t2.open,
 		p5,
-		v49,
-		v57,
-		v58,
-		v45
+		v43,
+		v51,
+		v52,
+		v41
 	})
 
-	local function notifyFinish() -- line: 396
-		-- upvalues: FFlagAbuseReportMenuV2 (copy), t2 (copy), v55 (copy), v53 (copy), v54 (copy), TelemetryEventType (copy)
+	local function notifyFinish() -- line: 374
+		-- upvalues: FFlagAbuseReportMenuV2 (copy), t2 (copy), v49 (copy), v47 (copy), v48 (copy), TelemetryEventType (copy)
 		if FFlagAbuseReportMenuV2 and t2.onFinish then
 			t2.onFinish({
-				didSubmit = v55.current == "completed"
+				didSubmit = v49.current == "completed"
 			})
 		end
 
-		if FFlagAbuseReportMenuV2 and v53.current == "started" then
-			v53.current = "completed"
-			v54.current(if v55.current ~= "completed" then {
+		if FFlagAbuseReportMenuV2 and v47.current == "started" then
+			v47.current = "completed"
+			v48.current(if v49.current ~= "completed" then {
 				sub_event_type = TelemetryEventType.ReportAbandoned
 			} else {
 				sub_event_type = TelemetryEventType.ReportCompleted
 			})
 		end
 	end
-	local function handleClose() -- line: 411
-		-- upvalues: notifyFinish (copy), t2 (copy), FFlagAbuseReportMenuV2 (copy), u38 (ref), v45 (copy), TelemetryEventType (copy)
+	local function handleClose() -- line: 389
+		-- upvalues: notifyFinish (copy), t2 (copy), FFlagAbuseReportMenuV2 (copy), u34 (ref), v41 (copy), TelemetryEventType (copy)
 		notifyFinish()
 		t2.onClose()
 
 		if not FFlagAbuseReportMenuV2 then
-			if u38.submissionState ~= "completed" and u38.openTime ~= nil then
-				v45({
+			if u34.submissionState ~= "completed" and u34.openTime ~= nil then
+				v41({
 					sub_event_type = TelemetryEventType.ReportAbandoned
 				})
 
 				return
 			end
 
-			v45({
+			v41({
 				sub_event_type = TelemetryEventType.ReportCompleted
 			})
 		end
 	end
-	local function reset(p7) -- line: 427
-		-- upvalues: getNewRunId (copy), u39 (ref), v35 (copy), FFlagAbuseReportMenuV2 (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), t2 (copy), v53 (copy)
-		local v79 = getNewRunId()
+	local function reset(p7) -- line: 405
+		-- upvalues: getNewRunId (copy), u35 (ref), v31 (copy), FFlagAbuseReportMenuV2 (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), t2 (copy), v47 (copy)
+		local v73 = getNewRunId()
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-		u39({
+		u35({
 			type = "reset",
 			payload = {
-				runId = v79,
+				runId = v73,
 				initialEnterTime = UnixTimestampMillis,
-				startNodeId = v35,
+				startNodeId = v31,
 				inlineAlert = if not FFlagAbuseReportMenuV2 or FFlagAbuseReportInlineAlertStateOutsideReducer then nil else p7
 			}
 		})
@@ -408,35 +377,35 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			t2.inlineAlertController.setInlineAlert(p7)
 		end
 
-		v53.current = "none"
+		v47.current = "none"
 	end
 
-	React.useEffect(function() -- line: 458
-		-- upvalues: v49 (copy), v58 (copy), u38 (ref), Dash (copy), t2 (copy), FFlagAbuseReportMenuV2 (copy), u39 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), v43 (copy), handleClose (copy), notifyFinish (copy), reset (copy), sendReport (copy), v44 (copy), v45 (copy), TelemetryEventType (copy), v55 (copy), v24 (copy)
-		if not v49 or not v58 then
+	React.useEffect(function() -- line: 436
+		-- upvalues: v43 (copy), v52 (copy), u34 (ref), Dash (copy), t2 (copy), FFlagAbuseReportMenuV2 (copy), u35 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), v39 (copy), handleClose (copy), notifyFinish (copy), reset (copy), sendReport (copy), v40 (copy), v41 (copy), TelemetryEventType (copy), v49 (copy)
+		if not v43 or not v52 then
 			return
 		end
 
-		if u38.navigationState ~= "gotoNext" then
+		if u34.navigationState ~= "gotoNext" then
 			return
 		end
 
-		local v81 = Dash.last(u38.stack)
+		local v75 = Dash.last(u34.stack)
 
-		if not v81 or not v81.nodeId then
+		if not v75 or not v75.nodeId then
 			warn("Navigation triggered but current page or nodeId is invalid")
 
 			return
 		end
 
-		if not v49.nodes[v81.nodeId] then
-			warn(`Navigation triggered but no config found for nodeId: { v81.nodeId }`)
+		if not v43.nodes[v75.nodeId] then
+			warn(`Navigation triggered but no config found for nodeId: { v75.nodeId }`)
 
 			return
 		end
 
-		local function handleNextSimple(p8) -- line: 480
-			-- upvalues: t2 (copy), FFlagAbuseReportMenuV2 (copy), u39 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), v43 (copy), handleClose (copy), notifyFinish (copy), reset (copy)
+		local function handleNextSimple(p8) -- line: 458
+			-- upvalues: t2 (copy), FFlagAbuseReportMenuV2 (copy), u35 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), v39 (copy), handleClose (copy), notifyFinish (copy), reset (copy)
 			if not p8 then
 				warn("handleNextSimple called with nil next value")
 				t2.onClose()
@@ -445,10 +414,10 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			end
 
 			local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
-			local v93 = if not FFlagAbuseReportMenuV2 or type(p8) ~= "table" then nil else p8.inlineAlert
+			local v87 = if not FFlagAbuseReportMenuV2 or type(p8) ~= "table" then nil else p8.inlineAlert
 
 			if type(p8) == "string" then
-				u39({
+				u35({
 					type = "gotoNode",
 					payload = {
 						nodeId = p8,
@@ -463,22 +432,22 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 				end
 			elseif type(p8) == "table" and p8.type == "goto" then
 				if FFlagAbuseReportMenuV2 and p8.replace then
-					u39({
+					u35({
 						type = "replaceAndGotoNode",
 						payload = {
 							nodeId = p8.nodeId,
 							enterTime = UnixTimestampMillis,
-							inlineAlert = if FFlagAbuseReportInlineAlertStateOutsideReducer then nil else v93
+							inlineAlert = if FFlagAbuseReportInlineAlertStateOutsideReducer then nil else v87
 						}
 					})
 
 					if FFlagAbuseReportInlineAlertStateOutsideReducer and t2.inlineAlertController then
-						t2.inlineAlertController.setInlineAlert(v93)
+						t2.inlineAlertController.setInlineAlert(v87)
 
 						return
 					end
 				else
-					u39({
+					u35({
 						type = "gotoNode",
 						payload = {
 							nodeId = p8.nodeId,
@@ -494,7 +463,7 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 				end
 			else
 				if type(p8) == "table" and p8.type == "link" then
-					v43("", p8.href)
+					v39("", p8.href)
 					handleClose()
 
 					return
@@ -508,7 +477,7 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 
 				if FFlagAbuseReportMenuV2 and type(p8) == "table" and p8.type == "reset" then
 					notifyFinish()
-					reset(v93)
+					reset(v87)
 
 					return
 				end
@@ -517,18 +486,18 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 				handleClose()
 			end
 		end
-		local function onSubmitForm() -- line: 544
-			-- upvalues: v49 (copy), FFlagAbuseReportMenuV2 (copy), t2 (copy), sendReport (copy), v44 (copy)
-			local submission = v49.submission
+		local function onSubmitForm() -- line: 522
+			-- upvalues: v43 (copy), FFlagAbuseReportMenuV2 (copy), t2 (copy), sendReport (copy), v40 (copy)
+			local submission = v43.submission
 
 			if FFlagAbuseReportMenuV2 and t2.onCustomSubmit then
 				return t2.onCustomSubmit(submission)
 			end
 
-			return sendReport(v44, submission.endpoint, submission.data)
+			return sendReport(v40, submission.endpoint, submission.data)
 		end
 
-		local next = v58.next
+		local next = v52.next
 
 		if not next then
 			warn("currentNode.next is nil, closing")
@@ -540,21 +509,21 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 		if type(next) == "table" and next.type == "submitForm" then
 			local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-			v45({
+			v41({
 				sub_event_type = TelemetryEventType.Submit
 			})
-			u39({
+			u35({
 				type = "startedSubmission"
 			})
 
-			local submission = v49.submission;
+			local submission = v43.submission;
 
-			((if not FFlagAbuseReportMenuV2 or not t2.onCustomSubmit then sendReport(v44, submission.endpoint, submission.data) else t2.onCustomSubmit(submission))):andThen(function(p9) -- line: 562
-				-- upvalues: u39 (ref), v45 (copy), TelemetryEventType (copy), UnixTimestampMillis (copy), FFlagAbuseReportMenuV2 (copy), v55 (copy), handleNextSimple (copy), next (copy)
-				u39({
+			((if not FFlagAbuseReportMenuV2 or not t2.onCustomSubmit then sendReport(v40, submission.endpoint, submission.data) else t2.onCustomSubmit(submission))):andThen(function(p9) -- line: 540
+				-- upvalues: u35 (ref), v41 (copy), TelemetryEventType (copy), UnixTimestampMillis (copy), FFlagAbuseReportMenuV2 (copy), v49 (copy), handleNextSimple (copy), next (copy)
+				u35({
 					type = "completedSubmission"
 				})
-				v45({
+				v41({
 					sub_event_type = TelemetryEventType.SubmitSuccess,
 					submit_detail = {
 						report_id = p9.responseBody and p9.responseBody.reportId,
@@ -563,35 +532,32 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 				})
 
 				if FFlagAbuseReportMenuV2 then
-					v55.current = "completed"
+					v49.current = "completed"
 				end
 
 				handleNextSimple(next.onSuccess)
-			end):catch(function(p10) -- line: 578
-				-- upvalues: u39 (ref), v45 (copy), TelemetryEventType (copy), UnixTimestampMillis (copy), v24 (copy), Dash (copy), FFlagAbuseReportMenuV2 (copy), v55 (copy), next (copy), handleNextSimple (copy)
-				u39({
+			end):catch(function(p10) -- line: 556
+				-- upvalues: u35 (ref), v41 (copy), TelemetryEventType (copy), UnixTimestampMillis (copy), Dash (copy), FFlagAbuseReportMenuV2 (copy), v49 (copy), next (copy), handleNextSimple (copy)
+				u35({
 					type = "submissionFailed"
 				})
-				v45({
+				v41({
 					sub_event_type = TelemetryEventType.SubmitFail,
 					submit_detail = {
 						submit_api_duration = DateTime.now().UnixTimestampMillis - UnixTimestampMillis
 					}
 				})
-
-				if v24 then
-					v45({
-						sub_event_type = TelemetryEventType.Error,
-						error_detail = {
-							error_message = "submitReport: " .. Dash.pretty(p10, {
-								depth = 10
-							})
-						}
-					})
-				end
+				v41({
+					sub_event_type = TelemetryEventType.Error,
+					error_detail = {
+						error_message = "submitReport: " .. Dash.pretty(p10, {
+							depth = 10
+						})
+					}
+				})
 
 				if FFlagAbuseReportMenuV2 then
-					v55.current = "failed"
+					v49.current = "failed"
 				end
 
 				if next.onFailure then
@@ -603,20 +569,20 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 		end
 
 		handleNextSimple(next)
-	end, { u38.navigationState })
+	end, { u34.navigationState })
 
-	local v62 = #u38.stack > 1 and u38.submissionState ~= "completed"
+	local v56 = #u34.stack > 1 and u34.submissionState ~= "completed"
 
-	local function goBack() -- line: 605
-		-- upvalues: v49 (copy), v58 (copy), v57 (copy), v62 (copy), u39 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), t2 (copy), v45 (copy), TelemetryEventType (copy)
-		if not v49 or (not v58 or not v57) then
+	local function goBack() -- line: 581
+		-- upvalues: v43 (copy), v52 (copy), v51 (copy), v56 (copy), u35 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), t2 (copy), v41 (copy), TelemetryEventType (copy)
+		if not v43 or (not v52 or not v51) then
 			return
 		end
 
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-		if v62 then
-			u39({
+		if v56 then
+			u35({
 				type = "goBack"
 			})
 
@@ -624,58 +590,56 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 				t2.inlineAlertController.setInlineAlert(nil)
 			end
 
-			v45({
+			v41({
 				sub_event_type = TelemetryEventType.NodeDone,
 				node_done_detail = {
 					node_exit_reason = "back",
-					node_id = v57.nodeId,
-					node_type = v58.type,
-					node_duration = UnixTimestampMillis - v57.enterTime
+					node_id = v51.nodeId,
+					node_type = v52.type,
+					node_duration = UnixTimestampMillis - v51.enterTime
 				}
 			})
 		end
 	end
 
-	local v64 = v58 and v58.next ~= nil
+	local v58 = v52 and v52.next ~= nil
 
-	local function onNext(t3: {[any]: any}?) -- line: 628
-		-- upvalues: v49 (copy), v58 (copy), v57 (copy), FFlagAbuseReportMenuV2 (copy), v53 (copy), v54 (copy), TelemetryEventType (copy), u39 (ref), FFlagAbuseReportConfigStoreResolver (copy), v45 (copy)
-		if not v49 or (not v58 or not v57) then
+	local function onNext(t3: {[any]: any}?) -- line: 604
+		-- upvalues: v43 (copy), v52 (copy), v51 (copy), FFlagAbuseReportMenuV2 (copy), v47 (copy), v48 (copy), TelemetryEventType (copy), u35 (ref), v41 (copy)
+		if not v43 or (not v52 or not v51) then
 			return
 		end
 
-		if FFlagAbuseReportMenuV2 and v53.current == "none" then
-			v53.current = "started"
-			v54.current({
+		if FFlagAbuseReportMenuV2 and v47.current == "none" then
+			v47.current = "started"
+			v48.current({
 				sub_event_type = TelemetryEventType.ReportStarted
 			})
 		end
 
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-		u39({
+		u35({
 			type = "updateDataAndNavigateNext",
 			payload = {
-				data = if FFlagAbuseReportConfigStoreResolver or (not t3 or not t3.data) then {} else t3.data,
-				context = if FFlagAbuseReportConfigStoreResolver or (not t3 or not t3.context) then {} else t3.context,
-				store = if not FFlagAbuseReportConfigStoreResolver or (not t3 or not t3.store) then {} else t3.store,
-				expectedFromNodeId = if not FFlagAbuseReportMenuV2 then nil else v57.nodeId
+				store = if not t3 or not t3.store then {} else t3.store,
+				expectedFromNodeId = if not FFlagAbuseReportMenuV2 then nil else v51.nodeId
 			}
 		})
-		v45({
+		v41({
 			sub_event_type = TelemetryEventType.NodeDone,
 			node_done_detail = {
 				node_exit_reason = "next",
-				node_id = v57.nodeId,
-				node_type = v58.type,
-				node_duration = UnixTimestampMillis - v57.enterTime
+				node_id = v51.nodeId,
+				node_type = v52.type,
+				node_duration = UnixTimestampMillis - v51.enterTime
 			}
 		})
 	end
 
-	local v66 = React.useCallback(function() -- line: 665
-		-- upvalues: u39 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), t2 (copy)
-		u39({
+	local v60 = React.useCallback(function() -- line: 635
+		-- upvalues: u35 (ref), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), t2 (copy)
+		u35({
 			type = "clearInlineAlert"
 		})
 
@@ -683,36 +647,35 @@ local function useAbuseSheetFlow(p5, t2: {[any]: any}) -- line: 125
 			t2.inlineAlertController.setInlineAlert(nil)
 		end
 	end, {})
-	local v67 = React.useMemo(function() -- line: 672
-		-- upvalues: v45 (copy)
+	local v61 = React.useMemo(function() -- line: 642
+		-- upvalues: v41 (copy)
 		return {
-			sendEvent = v45
+			sendEvent = v41
 		}
-	end, { v45 })
+	end, { v41 })
 
-	return if not not v49 and (not not v58 and v57) then {
-		config = v49,
-		canGoBack = v62,
+	return if not not v43 and (not not v52 and v51) then {
+		config = v43,
+		canGoBack = v56,
 		goBack = goBack,
 		reset = reset,
-		isSubmitting = u38.submissionState == "submitting",
-		display = v49.display,
+		isSubmitting = u34.submissionState == "submitting",
+		display = v43.display,
 		onClose = handleClose,
 		currentPageElement = React.createElement(ContentNode, {
-			key = v57.nodeId,
-			node = v58,
-			onNext = if not v64 then nil else onNext,
+			key = v51.nodeId,
+			node = v52,
+			onNext = if not v58 then nil else onNext,
 			goBack = if not FFlagAbuseReportMenuV2 then nil else goBack,
-			data = if FFlagAbuseReportConfigStoreResolver then {} else v47,
-			store = if not FFlagAbuseReportConfigStoreResolver then {} else v48,
-			isSubmitting = u38.submissionState == "submitting"
+			store = v42,
+			isSubmitting = u34.submissionState == "submitting"
 		}),
-		currentNodeId = if not FFlagAbuseReportMenuV2 then nil else v57.nodeId,
-		currentNodeType = if not FFlagAbuseReportMenuV2 then nil else v58.type,
-		navigationDirection = if not FFlagAbuseReportMenuV2 then nil else u38.lastNavigationDirection,
-		analytics = v67,
-		pendingInlineAlert = if not FFlagAbuseReportMenuV2 then nil else if not FFlagAbuseReportInlineAlertStateOutsideReducer then u38.pendingInlineAlert else if not t2.inlineAlertController then nil else t2.inlineAlertController.pendingInlineAlert,
-		dismissInlineAlert = v66
+		currentNodeId = if not FFlagAbuseReportMenuV2 then nil else v51.nodeId,
+		currentNodeType = if not FFlagAbuseReportMenuV2 then nil else v52.type,
+		navigationDirection = if not FFlagAbuseReportMenuV2 then nil else u34.lastNavigationDirection,
+		analytics = v61,
+		pendingInlineAlert = if not FFlagAbuseReportMenuV2 then nil else if not FFlagAbuseReportInlineAlertStateOutsideReducer then u34.pendingInlineAlert else if not t2.inlineAlertController then nil else t2.inlineAlertController.pendingInlineAlert,
+		dismissInlineAlert = v60
 	} else nil
 end
 

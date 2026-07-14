@@ -1,4 +1,0 @@
-return {
-	Bleed = "Bleed",
-	Inline = "Inline"
-}

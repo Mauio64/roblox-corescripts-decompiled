@@ -1,5 +1,0 @@
-game:DefineFastFlag("ShouldUsePeekViewForLoginDisambiguation2", false)
-
-return function() -- line: 3
-	return game:GetFastFlag("ShouldUsePeekViewForLoginDisambiguation2")
-end

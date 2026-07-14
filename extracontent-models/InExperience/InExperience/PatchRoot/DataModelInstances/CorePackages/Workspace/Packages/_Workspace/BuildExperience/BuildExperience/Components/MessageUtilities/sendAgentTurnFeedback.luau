@@ -29,7 +29,8 @@ local function sendAgentTurnFeedback(p1, p2) -- line: 24
 		universeid = p2.universeId,
 		placeid = p2.placeId,
 		sessionid = p2.sessionId,
-		sequenceId = p2.sequenceId
+		sequenceId = p2.sequenceId,
+		turnId = p2.turnId
 	}
 
 	debug.log("info", "agent_turn_feedback sending event", {

@@ -2,13 +2,19 @@ local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
 local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
 local React = require(AvatarExperienceUIKitParent.React)
 local Foundation = require(AvatarExperienceUIKitParent.Foundation)
+local Badge = Foundation.Badge
 local Coachmark = Foundation.Coachmark
 local IconButton = Foundation.IconButton
 local View = Foundation.View
+local BadgeVariant = Foundation.Enums.BadgeVariant
 local InputSize = Foundation.Enums.InputSize
 local IconVariant = Foundation.Enums.IconVariant
 local PopoverSide = Foundation.Enums.PopoverSide
 local PopoverAlign = Foundation.Enums.PopoverAlign
+local AvatarExperienceFlags = require(AvatarExperienceUIKitParent.AvatarExperienceFlags)
+local FFlagAXResetSubcategoryRowOnCategoryChange = AvatarExperienceFlags.FFlagAXResetSubcategoryRowOnCategoryChange
+local FFlagAXMigrateAllTabToSduiDev = AvatarExperienceFlags.FFlagAXMigrateAllTabToSduiDev
+local v17 = game:DefineFastFlag("AXCategoryMenuBadgePositionTokens", false)
 local TabGroup = require(AvatarExperienceUIKit.TabGroup.TabGroup)
 local CategoryMenuButtonsLocationEnum = require(script.Parent.CategoryMenuButtonsLocationEnum)
 local t1 = {
@@ -28,12 +34,13 @@ local t3 = {
 	FlexMode = Enum.UIFlexMode.Fill
 }
 
-local function CategoryMenuButtonGroup(t4: {[any]: any}) -- line: 58
-	-- upvalues: React (copy), IconButton (copy), IconVariant (copy), InputSize (copy), View (copy)
+local function CategoryMenuButtonGroup(t4: {[any]: any}) -- line: 74
+	-- upvalues: v17 (copy), Foundation (copy), React (copy), FFlagAXMigrateAllTabToSduiDev (copy), IconVariant (copy), View (copy), IconButton (copy), InputSize (copy), Badge (copy), BadgeVariant (copy)
+	local v26 = if not v17 then nil else Foundation.Hooks.useTokens()
 	local t4BackgroundColor3 = t4.BackgroundColor3
 	local t4BackgroundTransparency = t4.BackgroundTransparency
-	local v22 = React.useMemo(function() -- line: 61
-		-- upvalues: React (copy), t4 (copy), IconButton (copy), IconVariant (copy), InputSize (copy), t4BackgroundColor3 (copy), t4BackgroundTransparency (copy)
+	local v29 = React.useMemo(function() -- line: 80
+		-- upvalues: React (copy), t4 (copy), v17 (copy), FFlagAXMigrateAllTabToSduiDev (copy), IconVariant (copy), View (copy), IconButton (copy), InputSize (copy), t4BackgroundColor3 (copy), t4BackgroundTransparency (copy), Badge (copy), BadgeVariant (copy), v26 (copy)
 		local t5 = {
 			FlexItem = React.createElement("UIFlexItem", {
 				FlexMode = Enum.UIFlexMode.None
@@ -47,19 +54,52 @@ local function CategoryMenuButtonGroup(t4: {[any]: any}) -- line: 58
 		}
 
 		if t4.buttons then
-			for v39, v40 in t4.buttons do
-				t5[`Button-{ v40.id }`] = React.createElement(IconButton, {
-					onActivated = v40.onActivated,
-					LayoutOrder = v39,
-					icon = {
-						name = v40.icon,
-						variant = IconVariant.Filled
-					},
-					size = InputSize.Small,
-					isDisabled = v40.isDisabled,
-					BackgroundColor3 = t4BackgroundColor3,
-					BackgroundTransparency = t4BackgroundTransparency == nil and 1 or t4BackgroundTransparency
-				})
+			for v49, v50 in t4.buttons do
+				local v51 = `Button-{ v50.id }`
+
+				if v17 then
+					local badgeCount = v50.badgeCount
+					local v53 = typeof(badgeCount) == "number" and badgeCount > 0
+					local v54 = if not FFlagAXMigrateAllTabToSduiDev then IconVariant.Filled else IconVariant.Regular
+					local v55 = v50.iconVariant or v54
+
+					t5[v51] = React.createElement(View, {
+						LayoutOrder = v49,
+						AutomaticSize = Enum.AutomaticSize.XY
+					}, {
+						IconButton = React.createElement(IconButton, {
+							onActivated = v50.onActivated,
+							icon = {
+								name = v50.icon,
+								variant = v55
+							},
+							size = InputSize.Small,
+							isDisabled = v50.isDisabled,
+							BackgroundColor3 = t4BackgroundColor3,
+							BackgroundTransparency = t4BackgroundTransparency == nil and 1 or t4BackgroundTransparency
+						}),
+						CountBadge = if not v53 then nil else React.createElement(Badge, {
+							ZIndex = 2,
+							text = if not (badgeCount > 99) then tostring(badgeCount) else "99+",
+							variant = BadgeVariant.Contrast,
+							AnchorPoint = Vector2.new(1, 0),
+							Position = if not v26 then UDim2.new(1, 0, 0, -4) else UDim2.new(1, v26.Gap.XXSmall, 0, -v26.Gap.XXSmall)
+						})
+					})
+				else
+					t5[v51] = React.createElement(IconButton, {
+						onActivated = v50.onActivated,
+						LayoutOrder = v49,
+						icon = {
+							name = v50.icon,
+							variant = IconVariant.Filled
+						},
+						size = InputSize.Small,
+						isDisabled = v50.isDisabled,
+						BackgroundColor3 = t4BackgroundColor3,
+						BackgroundTransparency = t4BackgroundTransparency == nil and 1 or t4BackgroundTransparency
+					})
+				end
 			end
 		end
 
@@ -67,34 +107,60 @@ local function CategoryMenuButtonGroup(t4: {[any]: any}) -- line: 58
 	end, {
 		t4.buttons,
 		t4BackgroundColor3,
-		t4BackgroundTransparency
+		t4BackgroundTransparency,
+		v26
 	})
 
 	return React.createElement(View, {
 		AutomaticSize = Enum.AutomaticSize.XY,
 		LayoutOrder = t4.LayoutOrder
-	}, v22)
+	}, v29)
 end
-local function CategoryMenu(t6: {[any]: any}, p1) -- line: 140
-	-- upvalues: React (copy), Foundation (copy), CategoryMenuButtonsLocationEnum (copy), View (copy), t2 (copy), t1 (copy), CategoryMenuButtonGroup (copy), t3 (copy), TabGroup (copy), Coachmark (copy), PopoverSide (copy), PopoverAlign (copy)
-	local v25 = React.useRef(nil)
-	local v26 = Foundation.Hooks.useTokens()
+local function CategoryMenu(t6: {[any]: any}, p1) -- line: 202
+	-- upvalues: React (copy), Foundation (copy), FFlagAXResetSubcategoryRowOnCategoryChange (copy), CategoryMenuButtonsLocationEnum (copy), View (copy), t2 (copy), t1 (copy), CategoryMenuButtonGroup (copy), t3 (copy), TabGroup (copy), Coachmark (copy), PopoverSide (copy), PopoverAlign (copy)
+	local v32 = React.useRef(nil)
+	local v33 = Foundation.Hooks.useTokens()
+	local v34 = nil
+
+	if FFlagAXResetSubcategoryRowOnCategoryChange then
+		local v35 = React.useRef(nil)
+
+		v34 = v35
+
+		local v36 = React.useRef(false)
+
+		React.useEffect(function() -- line: 215
+			-- upvalues: v36 (copy), v35 (copy)
+			if not v36.current then
+				v36.current = true
+
+				return
+			end
+
+			local current = v35.current
+
+			if current then
+				current.setOffset(0)
+			end
+		end, { t6.activeCategoryId })
+	end
+
 	local activeTooltipIdx = t6.activeTooltipIdx
 	local tooltips = t6.tooltips
-	local v29 = if not activeTooltipIdx or not tooltips then nil else tooltips[activeTooltipIdx]
-	local v30 = React.useMemo(function() -- line: 147
-		-- upvalues: v29 (copy), t6 (copy), v25 (copy)
+	local v39 = if not activeTooltipIdx or not tooltips then nil else tooltips[activeTooltipIdx]
+	local v40 = React.useMemo(function() -- line: 230
+		-- upvalues: v39 (copy), t6 (copy), v32 (copy)
 		local t7 = {}
 
-		if v29 then
-			for _, v43 in t6.categories do
-				if v43.id == v29.anchorId then
-					local v44 = table.clone(v43)
+		if v39 then
+			for _, v59 in t6.categories do
+				if v59.id == v39.anchorId then
+					local v60 = table.clone(v59)
 
-					v44.ref = v25
-					table.insert(t7, v44)
+					v60.ref = v32
+					table.insert(t7, v60)
 				else
-					table.insert(t7, v43)
+					table.insert(t7, v59)
 				end
 			end
 
@@ -104,15 +170,15 @@ local function CategoryMenu(t6: {[any]: any}, p1) -- line: 140
 		return t6.categories
 	end, {
 		t6.categories,
-		v29
+		v39
 	})
-	local v31 = if not t6.categoryBackgroundStyle then v26.Color.Common.NavigationBar else t6.categoryBackgroundStyle
-	local v32 = if not t6.subcategoryBackgroundStyle then v26.Color.Common.NavigationBar else t6.subcategoryBackgroundStyle
-	local v33 = if not t6.buttonsLocation then CategoryMenuButtonsLocationEnum.SubcategoriesStart else t6.buttonsLocation
-	local v34 = not not t6.buttons and #t6.buttons > 0
+	local v41 = if not t6.categoryBackgroundStyle then v33.Color.Common.NavigationBar else t6.categoryBackgroundStyle
+	local v42 = if not t6.subcategoryBackgroundStyle then v33.Color.Common.NavigationBar else t6.subcategoryBackgroundStyle
+	local v43 = if not t6.buttonsLocation then CategoryMenuButtonsLocationEnum.SubcategoriesStart else t6.buttonsLocation
+	local v44 = not not t6.buttons and #t6.buttons > 0
 	local subcategories = t6.subcategories
-	local v36 = not not subcategories and #subcategories > 0
-	local v37 = v36 or v34
+	local v46 = not not subcategories and #subcategories > 0
+	local v47 = v46 or v44
 
 	return React.createElement(View, {
 		ref = p1,
@@ -129,11 +195,11 @@ local function CategoryMenu(t6: {[any]: any}, p1) -- line: 140
 			AutomaticSize = Enum.AutomaticSize.Y,
 			layout = t1
 		}, {
-			ButtonsStart = if not v34 or v33 ~= CategoryMenuButtonsLocationEnum.CategoriesStart then nil else React.createElement(CategoryMenuButtonGroup, {
+			ButtonsStart = if not v44 or v43 ~= CategoryMenuButtonsLocationEnum.CategoriesStart then nil else React.createElement(CategoryMenuButtonGroup, {
 				LayoutOrder = 1,
 				buttons = t6.buttons,
-				BackgroundColor3 = v31.Color3,
-				BackgroundTransparency = v31.Transparency
+				BackgroundColor3 = v41.Color3,
+				BackgroundTransparency = v41.Transparency
 			}),
 			Categories = React.createElement(View, {
 				LayoutOrder = 2,
@@ -142,37 +208,37 @@ local function CategoryMenu(t6: {[any]: any}, p1) -- line: 140
 				flexItem = t3
 			}, {
 				TabGroup = React.createElement(TabGroup, {
-					items = v30,
+					items = v40,
 					activeTabId = t6.activeCategoryId,
 					onTabActivated = t6.onCategoryActivated,
 					tabFontStyle = t6.categoryFontStyle,
 					tabPadding = t6.categoryPadding,
 					tabTextStyle = t6.categoryTextStyle,
 					tabActiveTextStyle = t6.categoryActiveTextStyle,
-					BackgroundColor3 = v31.Color3,
-					BackgroundTransparency = v31.Transparency
+					BackgroundColor3 = v41.Color3,
+					BackgroundTransparency = v41.Transparency
 				})
 			}),
-			ButtonsEnd = if not v34 or v33 ~= CategoryMenuButtonsLocationEnum.CategoriesEnd then nil else React.createElement(CategoryMenuButtonGroup, {
+			ButtonsEnd = if not v44 or v43 ~= CategoryMenuButtonsLocationEnum.CategoriesEnd then nil else React.createElement(CategoryMenuButtonGroup, {
 				LayoutOrder = 3,
 				buttons = t6.buttons,
-				BackgroundColor3 = v31.Color3,
-				BackgroundTransparency = v31.Transparency
+				BackgroundColor3 = v41.Color3,
+				BackgroundTransparency = v41.Transparency
 			})
 		}),
-		SubcategoryRow = if not v37 then nil else React.createElement(View, {
+		SubcategoryRow = if not v47 then nil else React.createElement(View, {
 			LayoutOrder = 2,
 			Size = UDim2.fromScale(1, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			layout = t1
 		}, {
-			ButtonsStart = if not v34 or v33 ~= CategoryMenuButtonsLocationEnum.SubcategoriesStart then nil else React.createElement(CategoryMenuButtonGroup, {
+			ButtonsStart = if not v44 or v43 ~= CategoryMenuButtonsLocationEnum.SubcategoriesStart then nil else React.createElement(CategoryMenuButtonGroup, {
 				LayoutOrder = 1,
 				buttons = t6.buttons,
-				BackgroundColor3 = v32.Color3,
-				BackgroundTransparency = v32.Transparency
+				BackgroundColor3 = v42.Color3,
+				BackgroundTransparency = v42.Transparency
 			}),
-			Subcategories = if not v36 then nil else React.createElement(View, {
+			Subcategories = if not v46 then nil else React.createElement(View, {
 				LayoutOrder = 2,
 				Size = UDim2.new(0, 0, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
@@ -186,27 +252,28 @@ local function CategoryMenu(t6: {[any]: any}, p1) -- line: 140
 					tabPadding = t6.subcategoryPadding,
 					tabTextStyle = t6.subcategoryTextStyle,
 					tabActiveTextStyle = t6.subcategoryActiveTextStyle,
-					BackgroundColor3 = v32.Color3,
-					BackgroundTransparency = v32.Transparency
+					BackgroundColor3 = v42.Color3,
+					BackgroundTransparency = v42.Transparency,
+					controllerRef = v34
 				})
 			}),
-			ButtonsEnd = if not v34 or v33 ~= CategoryMenuButtonsLocationEnum.SubcategoriesEnd then nil else React.createElement(CategoryMenuButtonGroup, {
+			ButtonsEnd = if not v44 or v43 ~= CategoryMenuButtonsLocationEnum.SubcategoriesEnd then nil else React.createElement(CategoryMenuButtonGroup, {
 				LayoutOrder = 3,
 				buttons = t6.buttons,
-				BackgroundColor3 = v32.Color3,
-				BackgroundTransparency = v32.Transparency
+				BackgroundColor3 = v42.Color3,
+				BackgroundTransparency = v42.Transparency
 			})
 		}),
-		ToolTip = if not v29 then nil else React.createElement(Coachmark, {
+		ToolTip = if not v39 then nil else React.createElement(Coachmark, {
 			LayoutOrder = 3,
-			title = v29.title,
-			text = v29.text,
-			isOpen = v29.isOpen,
-			side = v29.side or PopoverSide.Bottom,
-			align = v29.align or PopoverAlign.Center,
-			anchorRef = v25,
-			onClose = v29.onClose,
-			actions = v29.actions
+			title = v39.title,
+			text = v39.text,
+			isOpen = v39.isOpen,
+			side = v39.side or PopoverSide.Bottom,
+			align = v39.align or PopoverAlign.Center,
+			anchorRef = v32,
+			onClose = v39.onClose,
+			actions = v39.actions
 		})
 	})
 end

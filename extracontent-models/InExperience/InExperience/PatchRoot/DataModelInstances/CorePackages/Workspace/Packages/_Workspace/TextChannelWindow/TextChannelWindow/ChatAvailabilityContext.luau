@@ -45,10 +45,10 @@ local v8 = React.createContext(t3)
 
 return {
 	Context = v8,
-	Provider = function(t4: {[any]: any}) -- line: 85
+	Provider = function(t4: {[any]: any}) -- line: 84
 		-- upvalues: Players (copy), React (copy), useEventConnection (copy), t1 (copy), t2 (copy), v8 (copy)
 		local v13 = t4.subjectPlayer or Players.LocalPlayer
-		local v14, v15 = React.useState(function() -- line: 88
+		local v14, v15 = React.useState(function() -- line: 87
 			-- upvalues: t4 (copy), v13 (copy)
 			if t4.value ~= nil then
 				return t4.value
@@ -61,20 +61,20 @@ return {
 			return "Enabled"
 		end)
 
-		useEventConnection(if t4.value ~= nil or not v13 then nil else v13:GetPropertyChangedSignal("ChatAvailabilityStatus"), function() -- line: 98
+		useEventConnection(if t4.value ~= nil or not v13 then nil else v13:GetPropertyChangedSignal("ChatAvailabilityStatus"), function() -- line: 97
 			-- upvalues: v13 (copy), v15 (copy)
 			if v13 then
 				v15(v13.ChatAvailabilityStatus)
 			end
 		end, {})
-		React.useEffect(function() -- line: 108
+		React.useEffect(function() -- line: 107
 			-- upvalues: t4 (copy), v15 (copy)
 			if t4.value ~= nil then
 				v15(t4.value)
 			end
 		end, { t4.value })
 
-		local v16 = React.useMemo(function() -- line: 115
+		local v16 = React.useMemo(function() -- line: 114
 			-- upvalues: v14 (copy), t1 (copy), t2 (copy)
 			local v17 = t1[v14]
 			local v18 = if not v17 then nil else t2[v17]
@@ -91,7 +91,7 @@ return {
 			value = v16
 		}, t4.children)
 	end,
-	resolve = function(s1: string) -- line: 55
+	resolve = function(s1: string) -- line: 54
 		-- upvalues: t1 (copy), t2 (copy)
 		local v10 = t1[s1]
 		local v11 = if not v10 then nil else t2[v10]
@@ -103,7 +103,7 @@ return {
 			messageFallback = if not v11 then nil else v11.fallback
 		}
 	end,
-	useLocalUserChatAvailability = function() -- line: 124
+	useLocalUserChatAvailability = function() -- line: 123
 		-- upvalues: React (copy), v8 (copy)
 		return React.useContext(v8)
 	end

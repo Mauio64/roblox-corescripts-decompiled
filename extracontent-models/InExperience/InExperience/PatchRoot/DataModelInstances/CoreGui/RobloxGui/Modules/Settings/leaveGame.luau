@@ -9,12 +9,14 @@ local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableGameLeftMessage = SharedFlags.FFlagEnableGameLeftMessage
 local FFlagSurvBloxEventTypeEnabled = SharedFlags.FFlagSurvBloxEventTypeEnabled
 local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local FFlagRemoveExitModal = require(RobloxGui.Modules.Settings.Flags.FFlagRemoveExitModal)
+local v13 = require(CorePackages.Workspace.Packages.VoiceChatCore).Flags.GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry()
 local PerfUtils = require(RobloxGui.Modules.Common.PerfUtils)
 local Cryo = require(CorePackages.Packages.Cryo)
 local MessageBus = require(CorePackages.Workspace.Packages.MessageBus).MessageBus
 local SurveyEventPublisher = require(CorePackages.Workspace.Packages.OnPlatformSurveys.SurveyEventPublisher)
 local WebViewEventType = require(CorePackages.Workspace.Packages.OnPlatformSurveys.WebViewEventType)
-local v17 = require(script:FindFirstAncestor("Settings").Analytics.CoreGuiFinalStateAnalytics).new()
+local v19 = require(script:FindFirstAncestor("Settings").Analytics.CoreGuiFinalStateAnalytics).new()
 
 RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
 
@@ -23,9 +25,10 @@ local FFlagLeaveActionChromeShortcutTelemetry = require(RobloxGui.Modules.Chrome
 local GetDefaultQualityLevel = require(CorePackages.Workspace.Packages.AppCommonLib).GetDefaultQualityLevel
 local Constants = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
 local ReactSchedulingTracker = require(RobloxGui.Modules.Common.ReactSchedulingTracker)
+local v25 = if not v13 then nil else require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
 
-return function(b1: boolean, t1: {[any]: any}?) -- line: 43
-	-- upvalues: FFlagEnableGameLeftMessage (copy), MessageBus (copy), Constants (copy), GetFFlagEnableInGameMenuDurationLogger (copy), PerfUtils (copy), ReactSchedulingTracker (copy), CorePackages (copy), GuiService (copy), EngineFeature (copy), RbxAnalyticsService (copy), FFlagLeaveActionChromeShortcutTelemetry (copy), Cryo (copy), FFlagSurvBloxEventTypeEnabled (copy), SurveyEventPublisher (copy), WebViewEventType (copy), Players (copy), v17 (copy), RunService (copy), GetDefaultQualityLevel (copy)
+return function(b1: boolean, t1: {[any]: any}?) -- line: 50
+	-- upvalues: FFlagEnableGameLeftMessage (copy), MessageBus (copy), Constants (copy), GetFFlagEnableInGameMenuDurationLogger (copy), PerfUtils (copy), ReactSchedulingTracker (copy), CorePackages (copy), GuiService (copy), EngineFeature (copy), RbxAnalyticsService (copy), FFlagLeaveActionChromeShortcutTelemetry (copy), Cryo (copy), FFlagSurvBloxEventTypeEnabled (copy), SurveyEventPublisher (copy), WebViewEventType (copy), Players (copy), v19 (copy), v13 (copy), v25 (copy), RunService (copy), FFlagRemoveExitModal (copy), GetDefaultQualityLevel (copy)
 	if FFlagEnableGameLeftMessage then
 		MessageBus.publish(Constants.OnAppRatingPromptEventDescriptor, {
 			gameTime = game:getGameTime()
@@ -38,10 +41,10 @@ return function(b1: boolean, t1: {[any]: any}?) -- line: 43
 
 	ReactSchedulingTracker:reportSession()
 
-	local v25 = require(CorePackages.Workspace.Packages.Memory).MemoryTracker()
+	local v28 = require(CorePackages.Workspace.Packages.Memory).MemoryTracker()
 
-	if v25 then
-		v25:destroy()
+	if v28 then
+		v28:destroy()
 	end
 
 	GuiService.SelectedCoreObject = nil
@@ -82,9 +85,24 @@ return function(b1: boolean, t1: {[any]: any}?) -- line: 43
 		end
 	end
 
-	v17:sendCoreGuiFinalAnalytic()
+	v19:sendCoreGuiFinalAnalytic()
+
+	if v13 then
+		v25:ReportVoiceVolumeImpressionsIfNeeded()
+	end
+
 	RunService.RenderStepped:wait()
 	RunService.RenderStepped:wait()
-	game:Shutdown()
+
+	if not FFlagRemoveExitModal or not t1 or not t1.shouldNativeExit then
+		game:Shutdown()
+	end
+
 	settings().Rendering.QualityLevel = GetDefaultQualityLevel()
+
+	if FFlagRemoveExitModal and t1 and t1.shouldNativeExit then
+		local NotificationTypeList = GuiService:GetNotificationTypeList()
+
+		GuiService:BroadcastNotification("", NotificationTypeList.NATIVE_EXIT)
+	end
 end

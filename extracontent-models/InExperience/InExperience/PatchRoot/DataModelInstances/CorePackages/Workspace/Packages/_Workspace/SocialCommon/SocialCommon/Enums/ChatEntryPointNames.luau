@@ -8,6 +8,7 @@ return {
 	SystemBar = "SystemBar",
 	ChromeUnibar = "ChromeUnibar",
 	ChromeDropdown = "ChromeDropdown",
+	ExperienceChatTabBar = "ExperienceChatTabBar",
 	ToastInExp = "ToastInExp",
 	ToastUniversalApp = "ToastUniversalApp",
 	PartyNotificationPush = "PartyNotificationPush",

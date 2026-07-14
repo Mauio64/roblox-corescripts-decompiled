@@ -45,7 +45,7 @@ return function(p1, p2) -- line: 24
 		end
 
 		local v17 = (v15 - v16.startTime) * 1000
-		local v18 = if not (FFlagTTITrackerMemoryTracking and v16.trackMemory == true) then nil else getMemoryMb()
+		local v18 = if not FFlagTTITrackerMemoryTracking then nil else getMemoryMb()
 		local t1 = {
 			name = p3,
 			id = if not p4 then nil else p4.id,

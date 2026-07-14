@@ -125,7 +125,7 @@ return {
 			})
 
 			if FFlagInlineSurveyEnhancements then
-				local v27 = p1.index >= #p1.questions
+				local v27 = inlineSurveyHelpers.isLastQuestion(p1.questions, p1.index, p1.answer)
 				local v28 = v25 or not inlineSurveyHelpers.canAdvance(p1.questions, p1.index, p1.answersByQuestionId, p1.answer)
 
 				return {

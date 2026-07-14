@@ -15,15 +15,15 @@ local function variantsFactory(p1) -- line: 29
 	-- upvalues: Flags (copy), InputSize (copy), IconSize (copy)
 	local t1 = {
 		container = {
-			tag = "row align-y-center auto-xy bg-surface-300"
+			tag = not Flags.FoundationSegmentedControlAutoXFix and "row align-y-center auto-xy bg-surface-300" or "row align-y-center auto-x bg-surface-300"
 		},
 		segment = {
-			tag = "row align-y-center size-0-full auto-xy"
+			tag = not Flags.FoundationSegmentedControlAutoXFix and "row align-y-center size-0-full auto-xy" or "row align-y-center size-0-full auto-x"
 		},
 		text = {
 			tag = "auto-x text-truncate-end content-emphasis"
 		},
-		icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+		icon = {
 			style = p1.Color.Content.Emphasis
 		},
 		divider = {
@@ -46,7 +46,7 @@ local function variantsFactory(p1) -- line: 29
 				text = {
 					tag = "text-caption-small"
 				},
-				icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+				icon = {
 					size = IconSize.Small
 				},
 				divider = {
@@ -66,7 +66,7 @@ local function variantsFactory(p1) -- line: 29
 				text = {
 					tag = "text-caption-small"
 				},
-				icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+				icon = {
 					size = IconSize.Medium
 				},
 				divider = {
@@ -83,7 +83,7 @@ local function variantsFactory(p1) -- line: 29
 				text = {
 					tag = "text-caption-medium"
 				},
-				icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+				icon = {
 					size = IconSize.Medium
 				},
 				divider = {
@@ -100,7 +100,7 @@ local function variantsFactory(p1) -- line: 29
 				text = {
 					tag = "text-caption-medium"
 				},
-				icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+				icon = {
 					size = IconSize.Large
 				},
 				divider = {
@@ -179,7 +179,7 @@ local function variantsFactory(p1) -- line: 29
 			text = {
 				tag = "text-caption-small"
 			},
-			icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+			icon = {
 				size = IconSize.Small
 			},
 			divider = {
@@ -196,7 +196,7 @@ local function variantsFactory(p1) -- line: 29
 			text = {
 				tag = "text-caption-small"
 			},
-			icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+			icon = {
 				size = IconSize.Medium
 			},
 			divider = {
@@ -213,7 +213,7 @@ local function variantsFactory(p1) -- line: 29
 			text = {
 				tag = "text-caption-medium"
 			},
-			icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+			icon = {
 				size = IconSize.Medium
 			},
 			divider = {
@@ -230,7 +230,7 @@ local function variantsFactory(p1) -- line: 29
 			text = {
 				tag = "text-caption-medium"
 			},
-			icon = if not Flags.FoundationSegmentedControlIconSupport then nil else {
+			icon = {
 				size = IconSize.Large
 			},
 			divider = {
@@ -247,7 +247,7 @@ local function variantsFactory(p1) -- line: 29
 	}
 end
 
-return function(p2, p3, b1: boolean?) -- line: 187
+return function(p2, p3, b1: boolean?) -- line: 193
 	-- upvalues: VariantsContext (copy), variantsFactory (copy), Flags (copy), composeStyleVariant (copy)
 	local v17 = VariantsContext.useVariants("SegmentedControl", variantsFactory, p2)
 

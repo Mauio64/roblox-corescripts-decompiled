@@ -207,13 +207,14 @@ local function convertApiMomentToMomentItem(p9) -- line: 168
 	t2.momentId = v49
 	t2.recommendationMetadata = {
 		itemId = p9.feedItemId or v49,
+		feedItemId = p9.feedItemId,
 		tracingId = p9.feedSessionId
 	}
 	t2.status = v53
 
 	return t2
 end
-local function convertApiMomentsToMomentItems(t4: {[any]: any}?) -- line: 217
+local function convertApiMomentsToMomentItems(t4: {[any]: any}?) -- line: 218
 	-- upvalues: convertApiMomentToMomentItem (copy)
 	local t5 = {}
 

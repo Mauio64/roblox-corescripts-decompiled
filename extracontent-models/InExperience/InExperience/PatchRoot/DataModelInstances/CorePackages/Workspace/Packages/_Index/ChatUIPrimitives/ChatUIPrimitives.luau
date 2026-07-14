@@ -9,7 +9,9 @@ return {
 	useMessagePool = useMessagePool,
 	Utils = {
 		computeNameColor = require(script.Utils.computeNameColor),
-		getMessageTextSize = require(script.Utils.getMessageTextSize)
+		getMessageTextSize = require(script.Utils.getMessageTextSize),
+		formatInlineIcon = require(script.Utils.formatInlineIcon),
+		escapeRichText = require(script.Utils.escapeRichText)
 	},
 	Hooks = {
 		useStableSignal = require(script.Hooks.useStableSignal),

@@ -7,10 +7,8 @@ local Url = require(GenericAbuseReportingParent.Http).Url
 
 require(GenericAbuseReporting.Enums.AbuseVector)
 
-local v7 = not require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportConfigStoreResolver and "" or "&version=2"
-
-return function(p1, p2, t1: {[any]: any}?) -- line: 19
-	-- upvalues: ArgCheck (copy), LocalizationService (copy), HttpService (copy), Url (copy), v7 (copy)
+return function(p1, p2, t1: {[any]: any}?) -- line: 17
+	-- upvalues: ArgCheck (copy), LocalizationService (copy), HttpService (copy), Url (copy)
 	ArgCheck.assert(p2, "abuseVector is required")
 	ArgCheck.isType(p2, "string", "fetchConfigWithAttributes expects abuseVector as a string")
 
@@ -23,8 +21,8 @@ return function(p1, p2, t1: {[any]: any}?) -- line: 19
 		s1 = `&attributes={ HttpService:UrlEncode(json) }`
 	end
 
-	local v14 = HttpService:UrlEncode(p2)
-	local v15 = HttpService:UrlEncode(RobloxLocaleId)
+	local v13 = HttpService:UrlEncode(p2)
+	local v14 = HttpService:UrlEncode(RobloxLocaleId)
 
-	return p1(`{ Url.APIS_URL }abuse-reporting/v1/dynamic-config?abuseVector={ v14 }&locale={ v15 }&entryPoint=ua{ s1 }{ v7 }`, "GET")
+	return p1(`{ Url.APIS_URL }abuse-reporting/v1/dynamic-config?abuseVector={ v13 }&locale={ v14 }&entryPoint=ua{ s1 }&version=2`, "GET")
 end

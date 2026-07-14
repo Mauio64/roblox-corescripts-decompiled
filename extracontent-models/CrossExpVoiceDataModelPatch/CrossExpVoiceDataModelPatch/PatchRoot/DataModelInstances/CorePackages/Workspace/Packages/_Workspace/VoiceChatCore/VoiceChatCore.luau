@@ -1,6 +1,7 @@
 local CoreVoiceManager = require(script.CoreVoiceManager)
 local Analytics = require(script.Analytics)
 local Constants = require(script.Constants)
+local VoiceVolumeControlsEligibility = require(script.VoiceVolumeControlsEligibility)
 local Requests = script.Requests
 local Flags = script.Flags
 
@@ -8,6 +9,7 @@ return {
 	CoreVoiceManager = CoreVoiceManager,
 	Constants = Constants,
 	Analytics = Analytics,
+	VoiceVolumeControlsEligibility = VoiceVolumeControlsEligibility,
 	Flags = {
 		GetFFlagUpdateDeviceInputPlayerChanged = require(Flags.GetFFlagUpdateDeviceInputPlayerChanged),
 		GetFFlagVoiceChatServiceManagerUseAvatarChat = require(Flags.GetFFlagVoiceChatServiceManagerUseAvatarChat),
@@ -16,7 +18,8 @@ return {
 		GetFFlagEnableFtuxExitOnMuteToggle = require(Flags.GetFFlagEnableFtuxExitOnMuteToggle),
 		GetFFlagEnableExpJoinMicPermAnalytics = require(Flags.GetFFlagEnableExpJoinMicPermAnalytics),
 		GetFFlagEnableSeamlessVoiceFeature = require(Flags.GetFFlagEnableSeamlessVoiceFeature),
-		GetFFlagFixGetPlayerByUserIdStringCast = require(Flags.GetFFlagFixGetPlayerByUserIdStringCast)
+		GetFFlagFixGetPlayerByUserIdStringCast = require(Flags.GetFFlagFixGetPlayerByUserIdStringCast),
+		GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry = require(Flags.GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry)
 	},
 	Requests = {
 		GetShowAgeVerificationOverlay = require(Requests.GetShowAgeVerificationOverlay)

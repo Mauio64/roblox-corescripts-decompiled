@@ -68,29 +68,33 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 55
 		-- upvalues: GetPlaytestLoadingStore (copy), v24 (copy)
 		local v39 = GetPlaytestLoadingStore(p1)
 
-		return v24 ~= nil and v39.getAgentStatusForPlaceId(v24)(p1) == "Loading"
+		if v24 == nil then
+			return false
+		end
+
+		return v39.getAgentStatusForPlaceId(v24)(p1) == "Loading"
 	end, { v24 })
 	local v27 = SignalsReact.useSignalState(v26)
 	local v28 = SignalsReact.useSignalState(v25.get)
-	local v29 = React.useCallback(function() -- line: 68
+	local v29 = React.useCallback(function() -- line: 71
 		-- upvalues: v23 (copy)
 		v23("")
 	end, {})
-	local v30 = React.useCallback(function() -- line: 72
+	local v30 = React.useCallback(function() -- line: 75
 		-- upvalues: v25 (copy)
 		v25.set(true)
 	end, { v25 })
-	local v31 = React.useCallback(function() -- line: 75
+	local v31 = React.useCallback(function() -- line: 78
 		-- upvalues: v25 (copy), v23 (copy)
 		v25.set(false)
 		v23("Reverted agent publish.")
 	end, { v25 })
-	local v32 = React.useCallback(function() -- line: 79
+	local v32 = React.useCallback(function() -- line: 82
 		-- upvalues: v25 (copy), v23 (copy)
 		v25.set(false)
 		v23("Couldn't revert agent publish. Try again.")
 	end, { v25 })
-	local v33 = React.useCallback(function(p2) -- line: 83
+	local v33 = React.useCallback(function(p2) -- line: 86
 		-- upvalues: turnFeedbackIds (copy), feedbackIcons (copy), v30 (copy), v31 (copy), v32 (copy)
 		if turnFeedbackIds == nil then
 			return

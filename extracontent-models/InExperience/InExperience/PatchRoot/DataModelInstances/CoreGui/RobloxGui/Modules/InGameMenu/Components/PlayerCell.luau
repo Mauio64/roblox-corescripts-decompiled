@@ -12,7 +12,7 @@ local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local LoadableImage = UIBlox.App.Loading.LoadableImage
 local LoadingStrategy = UIBlox.App.Loading.Enum.LoadingStrategy
 local Images = UIBlox.App.ImageSet.Images
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local ParentParent = script.Parent.Parent
 local Assets = require(ParentParent.Resources.Assets)
@@ -65,17 +65,34 @@ function v21.renderButtons(p2) -- line: 71
 	}))
 end
 function v21.renderWithSelectionCursor(p3, _) -- line: 86
-	-- upvalues: withStyle (copy), Roact (copy), Cell (copy), ImageSetLabel (copy), Images (copy), uDim (copy), LoadableImage (copy), Assets (copy), VerifiedBadges (copy), ThemedTextLabel (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), Cell (copy), ImageSetLabel (copy), Images (copy), uDim (copy), LoadableImage (copy), Assets (copy), VerifiedBadges (copy), ThemedTextLabel (copy)
 	local props = p3.props
 	local v28 = props.displayName ~= "" and props.displayName or props.username
 
-	return withStyle(function(p5) -- line: 96
+	return withFoundationOrUIBloxStyle(function(p5) -- line: 96
+		return {
+			Theme = {
+				BackgroundContrast = {
+					Color = p5.Color.Surface.Surface_100.Color3,
+					Transparency = p5.Color.Surface.Surface_100.Transparency
+				},
+				BackgroundOnHover = {
+					Color = p5.Color.State.Hover.Color3,
+					Transparency = p5.Color.State.Hover.Transparency
+				},
+				OnlineStatus = {
+					Color = p5.Color.System.Success.Color3,
+					Transparency = p5.Color.System.Success.Transparency
+				}
+			}
+		}
+	end, function(p6) -- line: 104
 		-- upvalues: p3 (copy), Roact (copy), Cell (copy), props (copy), ImageSetLabel (copy), Images (copy), uDim (copy), LoadableImage (copy), Assets (copy), VerifiedBadges (copy), ThemedTextLabel (copy), v28 (copy)
-		local BackgroundContrast = p5.Theme.BackgroundContrast
+		local BackgroundContrast = p6.Theme.BackgroundContrast
 		local n1 = 1.1
 
 		if p3.props.isSelected then
-			BackgroundContrast = p5.Theme.BackgroundOnHover
+			BackgroundContrast = p6.Theme.BackgroundOnHover
 			n1 = 0.23
 		end
 
@@ -121,7 +138,7 @@ function v21.renderWithSelectionCursor(p3, _) -- line: 86
 						Size = UDim2.fromScale(1, 1),
 						ImageColor3 = props.isOnline and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(115, 115, 115),
 						Image = props.userId > 0 and "rbxthumb://type=AvatarHeadShot&id=" .. props.userId .. "&w=60&h=60" or "",
-						renderOnFailed = function() -- line: 149
+						renderOnFailed = function() -- line: 157
 							-- upvalues: Roact (copy), ImageSetLabel (copy), Images (copy), uDim (copy)
 							return Roact.createElement(ImageSetLabel, {
 								BackgroundTransparency = 1,
@@ -141,7 +158,7 @@ function v21.renderWithSelectionCursor(p3, _) -- line: 86
 						ZIndex = 3,
 						AnchorPoint = Vector2.new(1, 1),
 						Image = Assets.Images.Circle,
-						ImageColor3 = props.isOnline and p5.Theme.OnlineStatus.Color or nil,
+						ImageColor3 = props.isOnline and p6.Theme.OnlineStatus.Color or nil,
 						Position = UDim2.new(1, -3, 1, -3),
 						Size = UDim2.new(0, 6, 0, 6)
 					}, {
@@ -210,15 +227,15 @@ function v21.renderWithSelectionCursor(p3, _) -- line: 86
 		})
 	end)
 end
-function v21.render(p6) -- line: 245
+function v21.render(p7) -- line: 253
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p7) -- line: 246
-		-- upvalues: p6 (copy)
-		return p6:renderWithSelectionCursor(p7)
+	return withSelectionCursorProvider(function(p8) -- line: 254
+		-- upvalues: p7 (copy)
+		return p7:renderWithSelectionCursor(p8)
 	end)
 end
 
-return React.memo(v21, function(p8, p9) -- line: 251
+return React.memo(v21, function(p9, p10) -- line: 259
 	-- upvalues: Roact (copy)
-	return p8.isSelected == p9.isSelected and (p8.isOnline == p9.isOnline and (p8[Roact.Change.AbsolutePosition] == p9[Roact.Change.AbsolutePosition] and (p8.forwardRef == p9.forwardRef and (p8.memoKey == p9.memoKey and p8.loadingStrategy == p9.loadingStrategy))))
+	return p9.isSelected == p10.isSelected and (p9.isOnline == p10.isOnline and (p9[Roact.Change.AbsolutePosition] == p10[Roact.Change.AbsolutePosition] and (p9.forwardRef == p10.forwardRef and (p9.memoKey == p10.memoKey and p9.loadingStrategy == p10.loadingStrategy))))
 end)

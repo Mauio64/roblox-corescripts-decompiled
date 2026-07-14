@@ -50,7 +50,7 @@ return {
 						p1.onCompleted(p2)
 					end
 				end
-				local function stop() -- line: 129
+				local function stop() -- line: 130
 					-- upvalues: u11 (ref), u12 (ref), u13 (ref), u15 (ref), u14 (ref), fireCompleted (copy)
 					if u11 then
 						return
@@ -97,27 +97,30 @@ return {
 								return
 							end
 
-							if not t1.ensureInitialized() then
+							local v19, v20 = t1.ensureInitialized()
+
+							if not v19 then
 								v9({
-									stage = "initialize"
+									stage = "initialize",
+									errorCode = v20
 								})
 								fireCompleted(nil)
 
 								return
 							end
 
-							local v19, v20 = t1.ensureCasSession()
+							local v21, v22 = t1.ensureCasSession()
 
-							if v19 == nil then
-								local v21 = v9
+							if v21 == nil then
+								local v23 = v9
 
-								if not v20 then
-									v20 = {
+								if not v22 then
+									v22 = {
 										stage = "session_new"
 									}
 								end
 
-								v21(v20)
+								v23(v22)
 								fireCompleted(nil)
 
 								return
@@ -129,29 +132,29 @@ return {
 								return
 							end
 
-							local v22 = t1.sessionPrompt({
-								sessionId = v19,
+							local v24 = t1.sessionPrompt({
+								sessionId = v21,
 								prompt = p1.prompt,
 								_meta = p1.promptMeta
 							})
 
-							u13 = v22
-							v7(v22)
+							u13 = v24
+							v7(v24)
 
 							if u12 then
-								v22.cancel()
+								v24.cancel()
 							end
 
-							u14 = t1.startPollingTurnFromHistory(v19, v22, {
+							u14 = t1.startPollingTurnFromHistory(v21, v24, {
 								rtnIdleFallbackSeconds = p1.rtnIdleFallbackSeconds,
 								pollMinIntervalSeconds = p1.pollMinIntervalSeconds,
 								pollMaxIntervalSeconds = p1.pollMaxIntervalSeconds,
 								afterSequenceId = t1.getLatestObservedHistorySequenceId()
 							})
-							u15 = Signals.createEffect(function(p3) -- line: 121
-								-- upvalues: v22 (copy), fireCompleted (copy)
-								if v22.state(p3).isDone then
-									fireCompleted(v22.state(false))
+							u15 = Signals.createEffect(function(p3) -- line: 122
+								-- upvalues: v24 (copy), fireCompleted (copy)
+								if v24.state(p3).isDone then
+									fireCompleted(v24.state(false))
 								end
 							end)
 						end)

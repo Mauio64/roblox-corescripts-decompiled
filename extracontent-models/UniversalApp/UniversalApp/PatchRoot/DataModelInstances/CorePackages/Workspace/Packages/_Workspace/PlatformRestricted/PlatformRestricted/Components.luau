@@ -1,3 +1,0 @@
-return {
-	PlatformLockedPage = require(script.PlatformLockedPage)
-}

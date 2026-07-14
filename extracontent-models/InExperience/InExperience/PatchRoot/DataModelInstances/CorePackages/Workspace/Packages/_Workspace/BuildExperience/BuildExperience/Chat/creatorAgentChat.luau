@@ -12,65 +12,104 @@ local StudioAskUserTool = CreatorAgentChat.StudioAskUserTool
 local StudioClientLogsTool = CreatorAgentChat.StudioClientLogsTool
 local StudioProposePlanTool = CreatorAgentChat.StudioProposePlanTool
 local debug = CreatorAgentChat.debug
+local ErrorCodes = CreatorAgentChat.ErrorCodes
+local Forbidden = ErrorCodes.Forbidden
+local t1 = {
+	[ErrorCodes.InvalidParams] = "Something went wrong with your message. Please edit it and try again.",
+	[ErrorCodes.Unauthorized] = "You're signed out. Please sign in and try again.",
+	[ErrorCodes.Forbidden] = "The assistant isn't available for your account right now.",
+	[ErrorCodes.NotFound] = "We couldn't find this chat. Please start a new one.",
+	[ErrorCodes.Conflict] = "The assistant is busy with another request. Please wait a moment and try again.",
+	[ErrorCodes.Gone] = "This chat is no longer available. Please start a new one.",
+	[ErrorCodes.UpstreamUnavailable] = "The assistant is temporarily unavailable. Please try again in a moment.",
+	[ErrorCodes.InternalError] = "The assistant ran into a problem. Please try again."
+}
 
-local function isContentPolicyViolation(p1) -- line: 45
-	if p1 == nil or p1.status ~= "failed" then
-		return false
+local function resolvePromptFailure(p1, p2) -- line: 89
+	-- upvalues: Forbidden (copy)
+	if p1 == nil then
+		if p2 == nil then
+			return nil
+		end
+
+		return {
+			isContentPolicy = false,
+			errorCode = p2.errorCode,
+			setupStage = p2.stage
+		}
 	end
 
-	return p1.errorCode == -32001
+	if p1.status ~= "failed" then
+		return nil
+	end
+
+	return {
+		errorCode = p1.errorCode,
+		isContentPolicy = p1.errorCode == Forbidden
+	}
 end
-local function formatSetupErrorMessage(p2) -- line: 53
-	if p2.message ~= nil and p2.message ~= "" then
-		return p2.message
+local function formatSetupErrorMessage(p3) -- line: 109
+	-- upvalues: t1 (copy)
+	local t2 = {
+		isContentPolicy = false,
+		errorCode = p3.errorCode,
+		setupStage = p3.stage
+	}
+
+	if t2.isContentPolicy then
+		return "Your message violates Roblox safety policy. Edit it and try again."
 	end
 
-	if p2.stage == "missing_project" then
+	if t2.setupStage == "missing_project" then
 		return "An experience is required to chat with the assistant."
 	end
 
-	if p2.stage == "session_new" then
-		return "The assistant couldn't start a session. Please try again."
+	if t2.errorCode ~= nil then
+		local v24 = t1[t2.errorCode]
+
+		if v24 ~= nil then
+			return v24
+		end
 	end
 
 	return "The assistant couldn't connect. Please try again."
 end
-local function createLocalToolControllers(p3) -- line: 70
+local function createLocalToolControllers(p4) -- line: 120
 	-- upvalues: localToolOverlay (copy), askUserController (copy), proposePlanController (copy), clientLogsController (copy)
-	local t1 = {}
-	local v19 = localToolOverlay()
-	local v20 = askUserController(p3, t1, v19)
-	local v21 = proposePlanController(p3, t1, v19)
-	local v22 = clientLogsController(p3, t1)
+	local t3 = {}
+	local v27 = localToolOverlay()
+	local v28 = askUserController(p4, t3, v27)
+	local v29 = proposePlanController(p4, t3, v27)
+	local v30 = clientLogsController(p4, t3)
 
 	return {
-		getOptimisticLocalTools = v19.getOptimisticLocalTools,
-		getLocalToolActions = v19.getLocalToolActions,
-		hasDisplayedAnswerStack = v20.hasDisplayedAnswerStack,
-		syncFromTurnState = function(p4) -- line: 81
-			-- upvalues: v20 (copy), v21 (copy), v22 (copy)
-			v20.syncAnswerStack(p4)
-			v21.syncPlanProposal(p4)
-			v22.syncClientLogsRequest(p4)
+		getOptimisticLocalTools = v27.getOptimisticLocalTools,
+		getLocalToolActions = v27.getLocalToolActions,
+		hasDisplayedAnswerStack = v28.hasDisplayedAnswerStack,
+		syncFromTurnState = function(p5) -- line: 131
+			-- upvalues: v28 (copy), v29 (copy), v30 (copy)
+			v28.syncAnswerStack(p5)
+			v29.syncPlanProposal(p5)
+			v30.syncClientLogsRequest(p5)
 		end,
-		trySubmitComposerText = function(s1: string) -- line: 86
-			-- upvalues: v20 (copy), v21 (copy)
-			return v20.trySubmitComposerText(s1) or v21.trySubmitComposerText(s1)
+		trySubmitComposerText = function(s1: string) -- line: 136
+			-- upvalues: v28 (copy), v29 (copy)
+			return v28.trySubmitComposerText(s1) or v29.trySubmitComposerText(s1)
 		end,
-		stopPending = function() -- line: 89
-			-- upvalues: v20 (copy), v21 (copy)
-			v20.stopPendingAnswer()
-			v21.stopPendingPlan()
+		stopPending = function() -- line: 139
+			-- upvalues: v28 (copy), v29 (copy)
+			v28.stopPendingAnswer()
+			v29.stopPendingPlan()
 		end
 	}
 end
 
 return {
-	createLiveAssistantTurn = function(p5, s2: string, p6: ((...any) -> ...any)) -- line: 98
-		-- upvalues: createLocalToolControllers (copy), StudioAskUserTool (copy), StudioProposePlanTool (copy), StudioClientLogsTool (copy), debug (copy)
-		local v26 = createLocalToolControllers(p5)
-		local universeId = p5.universeId
-		local t2 = {
+	createLiveAssistantTurn = function(p6, s2: string, p7: ((...any) -> ...any)) -- line: 148
+		-- upvalues: createLocalToolControllers (copy), StudioAskUserTool (copy), StudioProposePlanTool (copy), StudioClientLogsTool (copy), resolvePromptFailure (copy), debug (copy), t1 (copy)
+		local v34 = createLocalToolControllers(p6)
+		local universeId = p6.universeId
+		local t4 = {
 			_roblox = {
 				localTools = {
 					StudioAskUserTool.LOCAL_TOOL_DEFINITION,
@@ -82,41 +121,64 @@ return {
 				}
 			}
 		}
-		local u29 = p5.sendPrompt({
+		local u37 = nil
+
+		u37 = p6.sendPrompt({
 			prompt = s2,
-			promptMeta = t2,
-			onCompleted = function(p7) -- line: 125
-				-- upvalues: p6 (copy)
-				p6(if not (p7 ~= nil and (p7.status == "failed" and p7.errorCode == -32001)) then nil else "content_policy")
+			promptMeta = t4,
+			onCompleted = function(p8) -- line: 175
+				-- upvalues: resolvePromptFailure (copy), u37 (ref), debug (copy), universeId (copy), p6 (copy), p7 (copy)
+				local v52 = resolvePromptFailure(p8, u37.getSetupError(false))
+
+				if v52 ~= nil then
+					debug.log("info", "prompt send failed", {
+						errorCode = v52.errorCode,
+						isContentPolicy = v52.isContentPolicy,
+						setupStage = v52.setupStage,
+						universeId = universeId,
+						placeId = p6.placeId
+					})
+				end
+
+				p7(v52)
 			end
 		})
-
 		debug.log("info", "creator agent local tools registered for prompt", {
 			universeId = universeId,
-			placeId = p5.placeId,
+			placeId = p6.placeId,
 			toolName = StudioAskUserTool.TOOL_NAME,
 			planToolName = StudioProposePlanTool.TOOL_NAME,
 			logsToolName = StudioClientLogsTool.TOOL_NAME
 		})
 
 		return {
-			getOptimisticLocalTools = v26.getOptimisticLocalTools,
-			getLocalToolActions = v26.getLocalToolActions,
-			getSetupErrorText = function(p8) -- line: 133
-				-- upvalues: u29 (ref)
-				local v45 = u29.getSetupError(p8)
+			getOptimisticLocalTools = v34.getOptimisticLocalTools,
+			getLocalToolActions = v34.getLocalToolActions,
+			getSetupErrorText = function(p9) -- line: 193
+				-- upvalues: u37 (ref), t1 (copy)
+				local v54 = u37.getSetupError(p9)
 
-				if v45 ~= nil then
-					if v45.message ~= nil and v45.message ~= "" then
-						return v45.message
+				if v54 ~= nil then
+					local t5 = {
+						isContentPolicy = false,
+						errorCode = v54.errorCode,
+						setupStage = v54.stage
+					}
+
+					if t5.isContentPolicy then
+						return "Your message violates Roblox safety policy. Edit it and try again."
 					end
 
-					if v45.stage == "missing_project" then
+					if t5.setupStage == "missing_project" then
 						return "An experience is required to chat with the assistant."
 					end
 
-					if v45.stage == "session_new" then
-						return "The assistant couldn't start a session. Please try again."
+					if t5.errorCode ~= nil then
+						local v56 = t1[t5.errorCode]
+
+						if v56 ~= nil then
+							return v56
+						end
 					end
 
 					return "The assistant couldn't connect. Please try again."
@@ -124,110 +186,130 @@ return {
 
 				return nil
 			end,
-			start = function() -- line: 146
-				-- upvalues: u29 (ref)
-				u29.start()
-			end,
-			stop = function() -- line: 152
-				-- upvalues: v26 (copy), u29 (ref)
-				v26.stopPending()
-				u29.stop()
-			end,
-			syncFromTurnState = v26.syncFromTurnState,
-			trySubmitComposerText = v26.trySubmitComposerText
-		}
-	end,
-	createResumedAssistantTurn = function(p9, p10, p11: ((...any) -> ...any), n1: number?) -- line: 168
-		-- upvalues: createLocalToolControllers (copy), Signals (copy)
-		local v34 = createLocalToolControllers(p9)
-		local v35 = Signals.createSignal(nil)
-		local u36 = false
-		local u37 = false
-		local u38 = nil
-		local u39 = nil
-
-		local function finish() -- line: 188
-			-- upvalues: u37 (ref), u39 (ref), u38 (ref), p11 (copy)
-			if u37 then
-				return
-			end
-
-			u37 = true
-
-			if u39 ~= nil then
-				u39()
-				u39 = nil
-			end
-
-			if u38 ~= nil then
-				u38()
-				u38 = nil
-			end
-
-			p11(nil)
-		end
-
-		return {
-			getOptimisticLocalTools = v34.getOptimisticLocalTools,
-			getLocalToolActions = v34.getLocalToolActions,
-			getSetupErrorText = v35,
 			start = function() -- line: 206
-				-- upvalues: u36 (ref), n1 (copy), u38 (ref), p9 (copy), u39 (ref), Signals (copy), p10 (copy), u37 (ref), p11 (copy)
-				if u36 then
-					return
-				end
-
-				u36 = true
-
-				local t3 = {}
-
-				if n1 ~= nil then
-					t3.afterSequenceId = n1
-				end
-
-				u38 = p9.startPollingActiveTurn(t3)
-				u39 = Signals.createEffect(function(p12) -- line: 217
-					-- upvalues: p10 (copy), u37 (ref), u39 (ref), u38 (ref), p11 (copy)
-					if p10.state(p12).isDone then
-						if u37 then
-							return
-						end
-
-						u37 = true
-
-						if u39 ~= nil then
-							u39()
-							u39 = nil
-						end
-
-						if u38 ~= nil then
-							u38()
-							u38 = nil
-						end
-
-						p11(nil)
-					end
-				end)
+				-- upvalues: u37 (ref)
+				u37.start()
 			end,
-			stop = function() -- line: 229
-				-- upvalues: u37 (ref), u39 (ref), u38 (ref), v34 (copy), p10 (copy)
-				u37 = true
-
-				if u39 ~= nil then
-					u39()
-					u39 = nil
-				end
-
-				if u38 ~= nil then
-					u38()
-					u38 = nil
-				end
-
+			stop = function() -- line: 212
+				-- upvalues: v34 (copy), u37 (ref)
 				v34.stopPending()
-				p10.cancel()
+				u37.stop()
 			end,
 			syncFromTurnState = v34.syncFromTurnState,
 			trySubmitComposerText = v34.trySubmitComposerText
 		}
+	end,
+	createResumedAssistantTurn = function(p10, p11, p12: ((...any) -> ...any), n1: number?) -- line: 228
+		-- upvalues: createLocalToolControllers (copy), Signals (copy)
+		local v42 = createLocalToolControllers(p10)
+		local v43 = Signals.createSignal(nil)
+		local u44 = false
+		local u45 = false
+		local u46 = nil
+		local u47 = nil
+
+		local function finish() -- line: 248
+			-- upvalues: u45 (ref), u47 (ref), u46 (ref), p12 (copy)
+			if u45 then
+				return
+			end
+
+			u45 = true
+
+			if u47 ~= nil then
+				u47()
+				u47 = nil
+			end
+
+			if u46 ~= nil then
+				u46()
+				u46 = nil
+			end
+
+			p12(nil)
+		end
+
+		return {
+			getOptimisticLocalTools = v42.getOptimisticLocalTools,
+			getLocalToolActions = v42.getLocalToolActions,
+			getSetupErrorText = v43,
+			start = function() -- line: 266
+				-- upvalues: u44 (ref), n1 (copy), u46 (ref), p10 (copy), u47 (ref), Signals (copy), p11 (copy), u45 (ref), p12 (copy)
+				if u44 then
+					return
+				end
+
+				u44 = true
+
+				local t6 = {}
+
+				if n1 ~= nil then
+					t6.afterSequenceId = n1
+				end
+
+				u46 = p10.startPollingActiveTurn(t6)
+				u47 = Signals.createEffect(function(p13) -- line: 277
+					-- upvalues: p11 (copy), u45 (ref), u47 (ref), u46 (ref), p12 (copy)
+					if p11.state(p13).isDone then
+						if u45 then
+							return
+						end
+
+						u45 = true
+
+						if u47 ~= nil then
+							u47()
+							u47 = nil
+						end
+
+						if u46 ~= nil then
+							u46()
+							u46 = nil
+						end
+
+						p12(nil)
+					end
+				end)
+			end,
+			stop = function() -- line: 289
+				-- upvalues: u45 (ref), u47 (ref), u46 (ref), v42 (copy), p11 (copy)
+				u45 = true
+
+				if u47 ~= nil then
+					u47()
+					u47 = nil
+				end
+
+				if u46 ~= nil then
+					u46()
+					u46 = nil
+				end
+
+				v42.stopPending()
+				p11.cancel()
+			end,
+			syncFromTurnState = v42.syncFromTurnState,
+			trySubmitComposerText = v42.trySubmitComposerText
+		}
+	end,
+	getPromptFailureComposerError = function(t7: {[any]: any}) -- line: 71
+		-- upvalues: t1 (copy)
+		if t7.isContentPolicy then
+			return "Your message violates Roblox safety policy. Edit it and try again."
+		end
+
+		if t7.setupStage == "missing_project" then
+			return "An experience is required to chat with the assistant."
+		end
+
+		if t7.errorCode ~= nil then
+			local v19 = t1[t7.errorCode]
+
+			if v19 ~= nil then
+				return v19
+			end
+		end
+
+		return "The assistant couldn't connect. Please try again."
 	end
 }

@@ -41,7 +41,7 @@ return Service:register({
 	cachePosition = true,
 	label = "CoreScripts.TopBar.Music",
 	initialAvailability = Service.AvailabilitySignal.Available,
-	sideSheetPlacement = SideSheetPlacement.Vertical,
+	sideSheetPlacement = SideSheetPlacement.Page,
 	windowSize = v20,
 	activated = function() -- line: 55
 		-- upvalues: Responsive (copy), Chrome2 (copy), focusMusicWindow (copy), v21 (copy), Service (copy)

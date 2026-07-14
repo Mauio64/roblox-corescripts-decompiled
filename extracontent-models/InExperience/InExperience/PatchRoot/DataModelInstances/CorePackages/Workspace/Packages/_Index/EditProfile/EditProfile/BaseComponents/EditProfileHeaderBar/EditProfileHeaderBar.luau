@@ -7,11 +7,18 @@ local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
+local useTokens = Foundation.Hooks.useTokens
+local v11 = game:DefineFastFlag("EditProfileIncreaseTopPadding", false)
 
-local function EditProfileHeaderBar(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), View (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy)
+local function EditProfileHeaderBar(t1: {[any]: any}) -- line: 25
+	-- upvalues: v11 (copy), useTokens (copy), React (copy), View (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy)
+	local v14 = if not v11 then nil else useTokens()
+
 	return React.createElement(View, {
-		tag = "row flex-between align-y-center gap-small size-full-0 auto-y padding-x-xlarge padding-bottom-xlarge padding-top-xxlarge"
+		tag = not v11 and "row flex-between align-y-center gap-small size-full-0 auto-y padding-x-xlarge padding-bottom-xlarge padding-top-xxlarge" or "row flex-between align-y-center gap-small size-full-0 auto-y padding-x-xlarge padding-bottom-xlarge",
+		padding = if not v11 then nil else {
+			top = UDim.new(0, v14.Margin.Large)
+		}
 	}, {
 		HeaderBar = React.createElement(View, {
 			tag = "row align-y-center size-0-1800 auto-x gap-small"

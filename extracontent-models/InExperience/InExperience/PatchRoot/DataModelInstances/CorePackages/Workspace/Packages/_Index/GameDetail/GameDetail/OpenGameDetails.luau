@@ -11,8 +11,11 @@ local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local Selectors = NavigationRodux.Selectors
 local SharedFlags = require(GameDetailParent.SharedFlags)
 local FFlagSignalsNavP2NavigationPrimitives = SharedFlags.FFlagSignalsNavP2NavigationPrimitives
+local FFlagSignalsNavP3fGameDetails = SharedFlags.FFlagSignalsNavP3fGameDetails
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local v15 = if not FFlagSignalsNavP3Dispatch then nil else require(GameDetailParent.RobloxAppNavigation).NavigationCommands
+local RobloxAppNavigation = require(GameDetailParent.RobloxAppNavigation)
+local v17 = if not FFlagSignalsNavP3Dispatch then nil else RobloxAppNavigation.NavigationCommands
+local v18 = if not FFlagSignalsNavP3fGameDetails then nil else RobloxAppNavigation.AppNavigationRegistry
 local FFlagUseNavigationSelectors = require(GameDetailParent.SharedFlags).FFlagUseNavigationSelectors
 local FFlagLuaAppSduiEdpEnabled = require(GameDetailParent.SharedFlags).FFlagLuaAppSduiEdpEnabled
 local FFlagSduiEdpPrefetchPlayability = require(GameDetailParent.SharedFlags).FFlagSduiEdpPrefetchPlayability
@@ -26,19 +29,23 @@ local EDPTTIManager = GameDetailTelemetry.EDPTTIManager
 local FFlagEDPTTITrackingEnabled = GameDetailTelemetry.FFlagEDPTTITrackingEnabled
 local EDPTTIConstants = GameDetailTelemetry.EDPTTIConstants
 
-return function(p1, p2, t1: {[any]: any}?, p3) -- line: 41
-	-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy), FFlagEDPTTITrackingEnabled (copy), EDPTTIManager (copy), EDPTTIConstants (copy), FFlagLuaAppSduiEdpEnabled (copy), DeviceType (copy), SduiSurfaceLoadTimeTracker (copy), getExperienceDetailsPageKey (copy), Cryo (copy), FFlagSduiEdpPrefetchPlayability (copy), FetchGamePlayButtonData (copy), fetchExperienceDetailsPage (copy), FormFactor (copy), UseGameDetailsPeekView (copy), AppPage (copy), PeekViewState (copy), SetGameDetailsPeekViewState (copy), FFlagSignalsNavP3Dispatch (copy), v15 (copy), FFlagSignalsNavP2NavigationPrimitives (copy), NavigateDown (copy)
-	return function(p4) -- line: 42
-		-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy), FFlagEDPTTITrackingEnabled (copy), EDPTTIManager (copy), EDPTTIConstants (copy), FFlagLuaAppSduiEdpEnabled (copy), DeviceType (copy), SduiSurfaceLoadTimeTracker (copy), getExperienceDetailsPageKey (copy), p1 (copy), t1 (ref), Cryo (copy), FFlagSduiEdpPrefetchPlayability (copy), p3 (copy), FetchGamePlayButtonData (copy), fetchExperienceDetailsPage (copy), FormFactor (copy), UseGameDetailsPeekView (copy), AppPage (copy), PeekViewState (copy), SetGameDetailsPeekViewState (copy), p2 (copy), FFlagSignalsNavP3Dispatch (copy), v15 (copy), FFlagSignalsNavP2NavigationPrimitives (copy), NavigateDown (copy)
-		local v34 = p4:getState()
-		local FormFactor2 = v34.FormFactor
-		local viewState = v34.GameDetailsPeekView.viewState
+return function(p1, p2, t1: {[any]: any}?, p3) -- line: 44
+	-- upvalues: FFlagSignalsNavP3fGameDetails (copy), v18 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), FFlagEDPTTITrackingEnabled (copy), EDPTTIManager (copy), EDPTTIConstants (copy), FFlagLuaAppSduiEdpEnabled (copy), DeviceType (copy), SduiSurfaceLoadTimeTracker (copy), getExperienceDetailsPageKey (copy), Cryo (copy), FFlagSduiEdpPrefetchPlayability (copy), FetchGamePlayButtonData (copy), fetchExperienceDetailsPage (copy), FormFactor (copy), UseGameDetailsPeekView (copy), AppPage (copy), PeekViewState (copy), SetGameDetailsPeekViewState (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), FFlagSignalsNavP2NavigationPrimitives (copy), NavigateDown (copy)
+	return function(p4) -- line: 45
+		-- upvalues: FFlagSignalsNavP3fGameDetails (copy), v18 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), FFlagEDPTTITrackingEnabled (copy), EDPTTIManager (copy), EDPTTIConstants (copy), FFlagLuaAppSduiEdpEnabled (copy), DeviceType (copy), SduiSurfaceLoadTimeTracker (copy), getExperienceDetailsPageKey (copy), p1 (copy), t1 (ref), Cryo (copy), FFlagSduiEdpPrefetchPlayability (copy), p3 (copy), FetchGamePlayButtonData (copy), fetchExperienceDetailsPage (copy), FormFactor (copy), UseGameDetailsPeekView (copy), AppPage (copy), PeekViewState (copy), SetGameDetailsPeekViewState (copy), p2 (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), FFlagSignalsNavP2NavigationPrimitives (copy), NavigateDown (copy)
+		local v37 = p4:getState()
+		local FormFactor2 = v37.FormFactor
+		local viewState = v37.GameDetailsPeekView.viewState
 
-		if FFlagUseNavigationSelectors then
-			if Selectors.selectNavigationLocked(v34) then
+		if FFlagSignalsNavP3fGameDetails then
+			if v18.get().getIsNavigating() then
 				return
 			end
-		elseif v34.Navigation.lockNavigationActions then
+		elseif FFlagUseNavigationSelectors then
+			if Selectors.selectNavigationLocked(v37) then
+				return
+			end
+		elseif v37.Navigation.lockNavigationActions then
 			return
 		end
 
@@ -47,25 +54,25 @@ return function(p1, p2, t1: {[any]: any}?, p3) -- line: 41
 		end
 
 		if FFlagLuaAppSduiEdpEnabled then
-			local v37 = if v34.DeviceType ~= DeviceType.Phone then EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE else EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
-			local v38 = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(getExperienceDetailsPageKey((tostring(p1))), {
+			local v40 = if v37.DeviceType ~= DeviceType.Phone then EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE else EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
+			local v41 = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(getExperienceDetailsPageKey((tostring(p1))), {
 				manualSurfaceReady = true,
 				eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
 				metadata = {
 					page = EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS,
-					category = v37
+					category = v40
 				}
 			})
 
 			t1 = Cryo.Dictionary.join(t1 or {}, {
-				pageTimer = v38
+				pageTimer = v41
 			})
 
 			if FFlagSduiEdpPrefetchPlayability and p3 ~= nil then
 				p4:dispatch(FetchGamePlayButtonData.Fetch(p3, (tostring(p1))))
 			end
 
-			fetchExperienceDetailsPage(tostring(p1), v38)
+			fetchExperienceDetailsPage(tostring(p1), v41)
 		end
 
 		local t2
@@ -96,7 +103,7 @@ return function(p1, p2, t1: {[any]: any}?, p3) -- line: 41
 		end
 
 		if FFlagSignalsNavP3Dispatch then
-			v15.down(v15.fromLegacyPage(t2), FFlagSignalsNavP2NavigationPrimitives or nil)
+			v17.down(v17.fromLegacyPage(t2), FFlagSignalsNavP2NavigationPrimitives or nil)
 
 			return
 		end

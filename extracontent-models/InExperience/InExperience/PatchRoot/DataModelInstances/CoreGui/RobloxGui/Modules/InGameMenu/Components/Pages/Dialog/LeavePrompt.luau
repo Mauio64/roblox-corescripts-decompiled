@@ -12,7 +12,7 @@ local GameIcon = require(ParentParent.GameIcon)
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local ThemedTextLabel = require(ParentParent.ThemedTextLabel)
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local FocusHandler = require(ParentParent.Connection.FocusHandler)
 local ZonePortal = require(ParentParent.ZonePortal)
 local Direction = require(ParentParentParent.Enums.Direction)
@@ -41,10 +41,30 @@ function v22.init(p1) -- line: 58
 	p1.leaveButtonRef = Roact.createRef()
 end
 function v22.render(p2) -- line: 62
-	-- upvalues: withStyle (copy), Roact (copy), GameIcon (copy), ThemedTextLabel (copy), GetFFlagEnableVRFTUXExperience (copy), IsFTUXExperience (copy), PlatformEnum (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy), ZonePortal (copy), Direction (copy), ContextActionService (copy)
-	return withStyle(function(p3) -- line: 63
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), GameIcon (copy), ThemedTextLabel (copy), GetFFlagEnableVRFTUXExperience (copy), IsFTUXExperience (copy), PlatformEnum (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy), ZonePortal (copy), Direction (copy), ContextActionService (copy)
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 63
+		return {
+			Theme = {
+				BackgroundDefault = {
+					Color = p3.Color.Surface.Surface_0.Color3,
+					Transparency = p3.Color.Surface.Surface_0.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Header1 = {
+					Font = p3.Typography.HeadingSmall.Font,
+					RelativeSize = p3.Typography.HeadingSmall.FontSize
+				},
+				Body = {
+					Font = p3.Typography.BodyLarge.Font,
+					RelativeSize = p3.Typography.BodyLarge.FontSize
+				}
+			}
+		}
+	end, function(p4) -- line: 74
 		-- upvalues: Roact (copy), GameIcon (copy), ThemedTextLabel (copy), p2 (copy), GetFFlagEnableVRFTUXExperience (copy), IsFTUXExperience (copy), PlatformEnum (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy), ZonePortal (copy), Direction (copy), ContextActionService (copy)
-		local p3Font = p3.Font
+		local p4Font = p4.Font
 		local t1 = {
 			Layout = Roact.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
@@ -62,7 +82,7 @@ function v22.render(p2) -- line: 62
 				fontKey = "Header1",
 				themeKey = "TextEmphasis",
 				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, p3Font.Header1.RelativeSize * p3Font.BaseSize + 4),
+				Size = UDim2.new(1, 0, 0, p4Font.Header1.RelativeSize * p4Font.BaseSize + 4),
 				Text = p2.props.titleText
 			}),
 			BodyText = Roact.createElement(ThemedTextLabel, {
@@ -70,7 +90,7 @@ function v22.render(p2) -- line: 62
 				themeKey = "TextDefault",
 				LayoutOrder = 3,
 				TextWrapped = true,
-				Size = if not GetFFlagEnableVRFTUXExperience() or not IsFTUXExperience(PlatformEnum.QuestVR) then UDim2.fromOffset(353, 2 * (p3Font.Body.RelativeSize * p3Font.BaseSize + 4)) else UDim2.fromOffset(353, 4 * (p3Font.Body.RelativeSize * p3Font.BaseSize + 4)),
+				Size = if not GetFFlagEnableVRFTUXExperience() or not IsFTUXExperience(PlatformEnum.QuestVR) then UDim2.fromOffset(353, 2 * (p4Font.Body.RelativeSize * p4Font.BaseSize + 4)) else UDim2.fromOffset(353, 4 * (p4Font.Body.RelativeSize * p4Font.BaseSize + 4)),
 				Text = p2.props.bodyText
 			}),
 			ButtonGroup = Roact.createElement("Frame", {
@@ -105,7 +125,7 @@ function v22.render(p2) -- line: 62
 			}, t1),
 			FocusHandler = Roact.createElement(FocusHandler, {
 				isFocused = p2.props.canGamepadCaptureFocus,
-				didFocus = function() -- line: 130
+				didFocus = function() -- line: 141
 					-- upvalues: GuiService (copy), p2 (copy)
 					GuiService.SelectedCoreObject = p2.leaveButtonRef.current
 				end
@@ -116,11 +136,11 @@ function v22.render(p2) -- line: 62
 			}),
 			KeyboardFocusHandler = Roact.createElement(FocusHandler, {
 				isFocused = p2.props.canKeyboardCaptureFocus,
-				didFocus = function() -- line: 141
+				didFocus = function() -- line: 152
 					-- upvalues: ContextActionService (copy), p2 (copy)
-					ContextActionService:BindCoreAction("LeavePromptConfirm", function(_, p5) -- line: 142
+					ContextActionService:BindCoreAction("LeavePromptConfirm", function(_, p6) -- line: 153
 						-- upvalues: p2 (copy)
-						if p5 == Enum.UserInputState.End then
+						if p6 == Enum.UserInputState.End then
 							p2.props.onConfirm()
 
 							return Enum.ContextActionResult.Sink
@@ -129,7 +149,7 @@ function v22.render(p2) -- line: 62
 						return Enum.ContextActionResult.Pass
 					end, false, Enum.KeyCode.Return)
 				end,
-				didBlur = function() -- line: 151
+				didBlur = function() -- line: 162
 					-- upvalues: ContextActionService (copy)
 					ContextActionService:UnbindCoreAction("LeavePromptConfirm")
 				end
@@ -140,8 +160,8 @@ function v22.render(p2) -- line: 62
 			AutoButtonColor = false,
 			Selectable = false,
 			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = p3.Theme.BackgroundDefault.Color,
-			BackgroundTransparency = p3.Theme.BackgroundDefault.Transparency
+			BackgroundColor3 = p4.Theme.BackgroundDefault.Color,
+			BackgroundTransparency = p4.Theme.BackgroundDefault.Transparency
 		}, t2)
 	end)
 end

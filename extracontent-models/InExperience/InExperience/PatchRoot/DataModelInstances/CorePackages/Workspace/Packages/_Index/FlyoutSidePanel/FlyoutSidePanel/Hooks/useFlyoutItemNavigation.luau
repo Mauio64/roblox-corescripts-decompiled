@@ -11,33 +11,34 @@ local SharedFlags = require(Parent.SharedFlags)
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
 local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
 local FFlagEnableArgusFlyoutEntry = SharedFlags.FFlagEnableArgusFlyoutEntry
+local FFlagArgusTabImpliesFlyout = SharedFlags.FFlagArgusTabImpliesFlyout
 local FFlagEnableArgusImmersiveNav = SharedFlags.FFlagEnableArgusImmersiveNav
-local v15 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local v16 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
 local default = require(Parent.LinkingProtocol).LinkingProtocol.default
 local useRoactService = require(Parent.RobloxAppHooks).useRoactService
 local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
 local FFlagCreateConnectionsHub = require(Parent.SharedFlags).FFlagCreateConnectionsHub
 local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
 local FlyoutAnalytics = require(script.Parent.Parent.Analytics.FlyoutAnalytics)
-local v22 = game:DefineFastString("FlyoutGiftCardSourceParam", "flyout-side-panel")
+local v23 = game:DefineFastString("FlyoutGiftCardSourceParam", "flyout-side-panel")
 
-local function useFlyoutItemNavigation(p1, p2: ((...any) -> ...any), p3: ((...any) -> ...any)?) -- line: 31
-	-- upvalues: useDispatch (copy), FFlagCreateConnectionsHub (copy), FFlagEnableArgus (copy), useNavigation (copy), useSelector (copy), useAppPolicy (copy), useRoactService (copy), AppEventIngestService (copy), React (copy), AppPage (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagEnableArgusImmersiveNav (copy), FFlagSignalsNavP3Dispatch (copy), v15 (copy), NavigateDown (copy), default (copy), FlyoutContentSettings (copy), v22 (copy), FlyoutAnalytics (copy)
-	local v27 = useDispatch()
-	local v28 = if not FFlagCreateConnectionsHub and not FFlagEnableArgus then nil else useNavigation()
-	local v29 = useSelector(function(p4) -- line: 38
+local function useFlyoutItemNavigation(p1, p2: ((...any) -> ...any), p3: ((...any) -> ...any)?) -- line: 32
+	-- upvalues: useDispatch (copy), FFlagCreateConnectionsHub (copy), FFlagEnableArgus (copy), useNavigation (copy), useSelector (copy), useAppPolicy (copy), useRoactService (copy), AppEventIngestService (copy), React (copy), AppPage (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagArgusTabImpliesFlyout (copy), FFlagEnableArgusImmersiveNav (copy), FFlagSignalsNavP3Dispatch (copy), v16 (copy), NavigateDown (copy), default (copy), FlyoutContentSettings (copy), v23 (copy), FlyoutAnalytics (copy)
+	local v28 = useDispatch()
+	local v29 = if not FFlagCreateConnectionsHub and not FFlagEnableArgus then nil else useNavigation()
+	local v30 = useSelector(function(p4) -- line: 39
 		return p4.LocalUserId
 	end)
-	local v30 = useAppPolicy(function(p5) -- line: 41
+	local v31 = useAppPolicy(function(p5) -- line: 42
 		return p5.getGiftCardSourceRefOverride()
 	end)
-	local v31 = useAppPolicy(function(p6) -- line: 44
+	local v32 = useAppPolicy(function(p6) -- line: 45
 		return p6
 	end)
-	local v32 = useRoactService(AppEventIngestService)
+	local v33 = useRoactService(AppEventIngestService)
 
-	return React.useCallback(function() -- line: 50
-		-- upvalues: p2 (copy), p1 (copy), FFlagCreateConnectionsHub (copy), AppPage (copy), v28 (copy), FFlagEnableArgus (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagEnableArgusImmersiveNav (copy), FFlagSignalsNavP3Dispatch (copy), v15 (copy), v27 (copy), NavigateDown (copy), default (copy), FlyoutContentSettings (copy), v29 (copy), v30 (copy), v22 (copy), p3 (copy), v31 (copy), FlyoutAnalytics (copy), v32 (copy)
+	return React.useCallback(function() -- line: 51
+		-- upvalues: p2 (copy), p1 (copy), FFlagCreateConnectionsHub (copy), AppPage (copy), v29 (copy), FFlagEnableArgus (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagArgusTabImpliesFlyout (copy), FFlagEnableArgusImmersiveNav (copy), FFlagSignalsNavP3Dispatch (copy), v16 (copy), v28 (copy), NavigateDown (copy), default (copy), FlyoutContentSettings (copy), v30 (copy), v31 (copy), v23 (copy), p3 (copy), v32 (copy), FlyoutAnalytics (copy), v33 (copy)
 		p2()
 
 		local url = nil
@@ -49,20 +50,20 @@ local function useFlyoutItemNavigation(p1, p2: ((...any) -> ...any), p3: ((...an
 				local appPage = p1.context.appPage
 
 				if FFlagCreateConnectionsHub and appPage == AppPage.CoHubMyConnections then
-					v28.navigate(appPage)
-				elseif FFlagEnableArgus and FFlagEnableArgusFlyoutEntry and FFlagEnableArgusImmersiveNav and appPage == AppPage.Moments then
+					v29.navigate(appPage)
+				elseif FFlagEnableArgus and ((FFlagEnableArgusFlyoutEntry or FFlagArgusTabImpliesFlyout) and FFlagEnableArgusImmersiveNav and appPage == AppPage.Moments) then
 					local t1 = {
 						source = "flyout_menu",
 						name = AppPage.MomentsImmersive
 					}
 
 					if FFlagSignalsNavP3Dispatch then
-						v15.down(v15.fromLegacyPage(t1))
+						v16.down(v16.fromLegacyPage(t1))
 					else
-						v27(NavigateDown(t1))
+						v28(NavigateDown(t1))
 					end
 				elseif appPage == AppPage.Moments then
-					v28.navigate(appPage, {
+					v29.navigate(appPage, {
 						source = "flyout_menu"
 					})
 				else
@@ -71,15 +72,15 @@ local function useFlyoutItemNavigation(p1, p2: ((...any) -> ...any), p3: ((...an
 					}
 
 					if FFlagSignalsNavP3Dispatch then
-						v15.down(v15.fromLegacyPage(t2))
+						v16.down(v16.fromLegacyPage(t2))
 					else
-						v27(NavigateDown(t2))
+						v28(NavigateDown(t2))
 					end
 				end
 			elseif p1.context.appUri then
 				local appUri = p1.context.appUri
 
-				default:isURLRegistered(appUri):andThen(function(p7) -- line: 95
+				default:isURLRegistered(appUri):andThen(function(p7) -- line: 96
 					-- upvalues: default (copy), appUri (copy)
 					if p7 then
 						default:detectURL(appUri)
@@ -89,15 +90,15 @@ local function useFlyoutItemNavigation(p1, p2: ((...any) -> ...any), p3: ((...an
 				local urlGenerator = p1.context.urlGenerator
 
 				if p1.itemType == FlyoutContentSettings.ItemType.Inventory then
-					url = urlGenerator(v29)
+					url = urlGenerator(v30)
 				elseif p1.itemType == FlyoutContentSettings.ItemType.GiftCards then
-					if v30 and v30 ~= "" then
-						url = urlGenerator(v30 .. "-" .. v22)
+					if v31 and v31 ~= "" then
+						url = urlGenerator(v31 .. "-" .. v23)
 					end
 				elseif p1.itemType == FlyoutContentSettings.ItemType.CreateGames then
 					url = urlGenerator(p3)
 				elseif p1.itemType == FlyoutContentSettings.ItemType.Terms or p1.itemType == FlyoutContentSettings.ItemType.Privacy then
-					url = urlGenerator(v29, v31)
+					url = urlGenerator(v30, v32)
 				end
 			end
 		end
@@ -112,23 +113,23 @@ local function useFlyoutItemNavigation(p1, p2: ((...any) -> ...any), p3: ((...an
 			}
 
 			if FFlagSignalsNavP3Dispatch then
-				v15.down(v15.fromLegacyPage(t3))
+				v16.down(v16.fromLegacyPage(t3))
 			else
-				v27(NavigateDown(t3))
+				v28(NavigateDown(t3))
 			end
 		end
 
-		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v32, p1.itemType, v29, url)
+		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v33, p1.itemType, v30, url)
 	end, {
 		p1,
 		p2,
-		v29,
 		v30,
-		v32,
-		p3,
-		v27,
 		v31,
-		if not FFlagCreateConnectionsHub then nil else v28.navigate
+		v33,
+		p3,
+		v28,
+		v32,
+		if not FFlagCreateConnectionsHub then nil else v29.navigate
 	})
 end
 

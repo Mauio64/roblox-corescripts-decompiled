@@ -19,86 +19,80 @@ local Toast = UIBlox.App.Dialog.Toast
 require(script.Parent.CheckboxFeedbackFormModal)
 
 local SnackbarWrapper = require(script.Parent.SnackbarWrapper)
-local v19 = game:DefineFastFlag("FixProvideFeedbackToastPositioning", false)
 local FFlagLuaAppUseSnackbarForProvideFeedbackToast = SharedFlags.FFlagLuaAppUseSnackbarForProvideFeedbackToast
 
-local function ProvideFeedbackToast(t1: {[any]: any}) -- line: 56
-	-- upvalues: useDispatch (copy), useTokens (copy), useLocalization (copy), React (copy), SetCentralOverlay (copy), CentralOverlayType (copy), CloseCentralOverlay (copy), FFlagLuaAppUseSnackbarForProvideFeedbackToast (copy), SnackbarWrapper (copy), v19 (copy), useSelector (copy), Toast (copy)
-	local v23 = useDispatch()
-	local v24 = useTokens()
-	local v25 = useLocalization({
+local function ProvideFeedbackToast(t1: {[any]: any}) -- line: 55
+	-- upvalues: useDispatch (copy), useTokens (copy), useLocalization (copy), React (copy), SetCentralOverlay (copy), CentralOverlayType (copy), CloseCentralOverlay (copy), FFlagLuaAppUseSnackbarForProvideFeedbackToast (copy), SnackbarWrapper (copy), useSelector (copy), Toast (copy)
+	local v22 = useDispatch()
+	local v23 = useTokens()
+	local v24 = useLocalization({
 		giveFeedback = "Feature.GameDetails.Action.GiveFeedback",
 		helpUsImprove = "Feature.GameDetails.Message.HelpImproveExperience"
 	})
-	local v26 = React.useCallback(function() -- line: 64
-		-- upvalues: t1 (copy), v23 (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
+	local v25 = React.useCallback(function() -- line: 63
+		-- upvalues: t1 (copy), v22 (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
 		if t1.onToastActivated then
 			task.spawn(t1.onToastActivated)
 		end
 
-		v23(SetCentralOverlay(CentralOverlayType.CheckboxFeedbackFormModal, t1.feedbackFormProps))
+		v22(SetCentralOverlay(CentralOverlayType.CheckboxFeedbackFormModal, t1.feedbackFormProps))
 	end, {
 		t1.onToastActivated,
-		v23,
+		v22,
 		t1.feedbackFormProps
 	})
-	local v27 = React.useCallback(function() -- line: 71
-		-- upvalues: t1 (copy), v23 (copy), CloseCentralOverlay (copy)
+	local v26 = React.useCallback(function() -- line: 70
+		-- upvalues: t1 (copy), v22 (copy), CloseCentralOverlay (copy)
 		if t1.onToastDismissed then
 			task.spawn(t1.onToastDismissed)
 		end
 
-		v23(CloseCentralOverlay())
+		v22(CloseCentralOverlay())
 	end, {
 		t1.onToastDismissed,
-		v23
+		v22
 	})
 
 	if FFlagLuaAppUseSnackbarForProvideFeedbackToast then
 		return React.createElement(SnackbarWrapper, {
 			autoDismissDelaySeconds = 5,
-			titleText = t1.toastTitle or v25.helpUsImprove,
+			titleText = t1.toastTitle or v24.helpUsImprove,
 			icon = t1.toastIcon,
-			buttonText = t1.toastButtonText or v25.giveFeedback,
-			onButtonActivated = v26,
-			closeSnackbar = v27
+			buttonText = t1.toastButtonText or v24.giveFeedback,
+			onButtonActivated = v25,
+			closeSnackbar = v26
 		})
 	end
 
 	local t2 = {
-		Color = v24.Inverse.Surface.Surface_0.Color3,
-		Transparency = v24.Inverse.Surface.Surface_0.Transparency
+		Color = v23.Inverse.Surface.Surface_0.Color3,
+		Transparency = v23.Inverse.Surface.Surface_0.Transparency
 	}
-	local uDim2 = nil
-
-	if v19 then
-		local v30 = useSelector(function(p1) -- line: 96
-			return p1.GlobalGuiInset or {
-				left = 0,
-				top = 0,
-				right = 0,
-				bottom = 0
-			}
-		end)
-		local v31 = useSelector(function(p2) -- line: 105
-			return p2.TopBar.statusBarHeight
-		end)
-
-		uDim2 = UDim2.new(0.5, 0, 0, v30.top + 20 + v31)
-	end
+	local v28 = useSelector(function(p1) -- line: 93
+		return p1.GlobalGuiInset or {
+			left = 0,
+			top = 0,
+			right = 0,
+			bottom = 0
+		}
+	end)
+	local v29 = useSelector(function(p2) -- line: 102
+		return p2.TopBar.statusBarHeight
+	end)
+	local uDim2 = UDim2.new(0.5, 0, 0, v28.top + 20 + v29)
 
 	return React.createElement(Toast, {
 		duration = 5,
-		position = if not v19 then nil else uDim2,
+		position = uDim2,
 		toastContent = {
 			swipeUpDismiss = true,
-			buttonText = t1.toastButtonText or v25.giveFeedback,
+			buttonText = t1.toastButtonText or v24.giveFeedback,
 			iconColorStyle = t2,
 			iconImage = t1.toastIcon,
-			onActivated = v26,
+			onActivated = v25,
 			onAppeared = t1.onToastAppeared,
-			onDismissed = v27,
-			toastTitle = t1.toastTitle or v25.helpUsImprove,
+			onDismissed = v26,
+			toastTitle = t1.toastTitle or v24.helpUsImprove,
 			toastSubtitle = t1.toastSubtitle
 		}
 	})

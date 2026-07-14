@@ -1,3 +1,0 @@
-return {
-	PromptsHandler = require(script.PromptsHandler)
-}

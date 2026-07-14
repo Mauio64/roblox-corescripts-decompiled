@@ -1,3 +1,0 @@
-return {
-	ItemsList = "ItemsList"
-}

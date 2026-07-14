@@ -7,21 +7,25 @@ local SignalsReact = require(Parent.SignalsReact)
 local parseSessionStream = require(script.Parent.parseSessionStream)
 
 local function useSessionSummary(p1) -- line: 25
-	-- upvalues: SignalsReact (copy), React (copy), parseSessionStream (copy)
-	local v7 = SignalsReact.useSignalState(p1.getMergedHistory)
+	-- upvalues: React (copy), SignalsReact (copy), parseSessionStream (copy)
+	local v7 = React.useCallback(function(p2) -- line: 26
+		-- upvalues: p1 (copy)
+		return p1.getMergedHistory(p2)
+	end, { p1 })
+	local v8 = SignalsReact.useSignalState(v7)
 
-	return React.useMemo(function() -- line: 27
-		-- upvalues: parseSessionStream (copy), v7 (copy), p1 (copy)
-		local v8 = parseSessionStream(v7, {
+	return React.useMemo(function() -- line: 30
+		-- upvalues: parseSessionStream (copy), v8 (copy), p1 (copy)
+		local v10 = parseSessionStream(v8, {
 			sessionId = p1.getCasSessionId()
 		})
 
 		return {
-			subagentTaskState = v8.subagentTaskState,
-			hasPublishedTurn = v8.includesPublishTool
+			subagentTaskState = v10.subagentTaskState,
+			hasPublishedTurn = v10.includesPublishTool
 		}
 	end, {
-		v7,
+		v8,
 		p1
 	})
 end

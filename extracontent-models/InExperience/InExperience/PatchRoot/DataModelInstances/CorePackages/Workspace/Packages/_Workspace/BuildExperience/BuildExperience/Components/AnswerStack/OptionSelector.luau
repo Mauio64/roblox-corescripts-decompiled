@@ -8,16 +8,19 @@ local t1 = {
 	affordance = Foundation.Enums.StateLayerAffordance.None
 }
 
-local function OptionSelector(t2: {[any]: any}) -- line: 24
+local function OptionSelector(t2: {[any]: any}) -- line: 25
 	-- upvalues: useTokens (copy), React (copy), View (copy), t1 (copy), FoundationText (copy)
 	local v10 = useTokens()
-	local v11 = React.createElement(View, {
-		tag = "col gap-large size-full-0 auto-y padding-large stroke-standard stroke-default radius-large bg-surface-0",
+	local v11 = t2.isSelected == true
+	local v12 = t2.selectionStyle or "committed"
+	local v13 = not (v11 and v12 == "intermediate") and "col gap-large size-full-0 auto-y padding-large stroke-standard stroke-default radius-large bg-surface-0" or "col gap-large size-full-0 auto-y padding-large stroke-standard stroke-contrast radius-large bg-surface-0"
+	local v14 = React.createElement(View, {
 		ZIndex = 3,
 		LayoutOrder = t2.LayoutOrder,
 		onActivated = t2.onActivated,
-		stateLayer = if not t2.isSelected then nil else t1,
-		testId = t2.testId
+		stateLayer = if not v11 or v12 ~= "committed" then nil else t1,
+		testId = t2.testId,
+		tag = v13
 	}, {
 		Content = React.createElement(View, {
 			LayoutOrder = 1,
@@ -25,7 +28,7 @@ local function OptionSelector(t2: {[any]: any}) -- line: 24
 		}, {
 			Title = React.createElement(FoundationText, {
 				LayoutOrder = 1,
-				tag = "size-full-0 auto-y text-title-small text-no-wrap text-align-x-left text-truncate-end content-emphasis",
+				tag = "size-full-0 auto-y text-title-small text-wrap text-align-x-left content-emphasis",
 				Text = t2.title
 			}),
 			Description = React.createElement(FoundationText, {
@@ -36,15 +39,15 @@ local function OptionSelector(t2: {[any]: any}) -- line: 24
 		})
 	})
 
-	if not t2.isSelected then
-		return v11
+	if not v11 or v12 ~= "committed" then
+		return v14
 	end
 
 	return React.createElement(View, {
 		tag = "col size-full-0 auto-y",
 		LayoutOrder = t2.LayoutOrder
 	}, {
-		Card = React.cloneElement(v11, {
+		Card = React.cloneElement(v14, {
 			LayoutOrder = 1
 		}),
 		StackLayers = React.createElement(View, {

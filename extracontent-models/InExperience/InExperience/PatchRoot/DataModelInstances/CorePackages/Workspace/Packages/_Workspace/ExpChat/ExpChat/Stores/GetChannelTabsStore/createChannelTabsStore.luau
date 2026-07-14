@@ -193,10 +193,10 @@ local function createChannelTabsStore() -- line: 136
 				if s4 and v75.allChannelTabs[s4] then
 					local v76 = v75.allChannelTabs[s4]
 					local t9 = {
-						HasUnreadMessages = false,
 						type = v76.type,
 						name = v76.name,
-						tabIndex = if not b2 then v76.tabIndex else 0
+						tabIndex = if not b2 then v76.tabIndex else 0,
+						HasUnreadMessages = v76.type == "FriendsChat" and v76.HasUnreadMessages
 					}
 					local allChannelTabs = v75.allChannelTabs
 					local v79 = table.clone(allChannelTabs)
@@ -232,11 +232,11 @@ local function createChannelTabsStore() -- line: 136
 				return v75
 			end)
 		end,
-		addChannelTab = function(p9, n1: number?) -- line: 297
+		addChannelTab = function(p9, n1: number?) -- line: 302
 			-- upvalues: v33 (copy), reorderTabs (copy), getFixedTabPriority (ref)
 			local name = p9.name
 
-			v33(function(p10) -- line: 300
+			v33(function(p10) -- line: 305
 				-- upvalues: n1 (copy), p9 (copy), name (copy), reorderTabs (copy), getFixedTabPriority (ref)
 				local v83 = table.clone(p10)
 				local allChannelTabs = v83.allChannelTabs
@@ -283,9 +283,9 @@ local function createChannelTabsStore() -- line: 136
 				return v83
 			end)
 		end,
-		removeChannelTab = function(s5: string) -- line: 342
+		removeChannelTab = function(s5: string) -- line: 347
 			-- upvalues: v33 (copy)
-			v33(function(p11) -- line: 343
+			v33(function(p11) -- line: 348
 				-- upvalues: s5 (copy)
 				local v93 = table.clone(p11)
 
@@ -309,9 +309,9 @@ local function createChannelTabsStore() -- line: 136
 				return v93
 			end)
 		end,
-		handleChannelRemoved = function(s6: string) -- line: 367
+		handleChannelRemoved = function(s6: string) -- line: 372
 			-- upvalues: v33 (copy), reorderTabs (copy)
-			v33(function(p12) -- line: 368
+			v33(function(p12) -- line: 373
 				-- upvalues: s6 (copy), reorderTabs (copy)
 				local v99 = p12.allChannelTabs[s6]
 

@@ -11,13 +11,13 @@ local useReleaseFocusOnDownSwipe = require(script.Parent.useReleaseFocusOnDownSw
 local View = Foundation.View
 local InputSize = Foundation.Enums.InputSize
 
-local function trimMessage(s1: string) -- line: 37
+local function trimMessage(s1: string) -- line: 38
 	return string.gsub(s1, "^%s*(.-)%s*$", "%1")
 end
-local function ChatComposer(t1: {[any]: any}) -- line: 41
+local function ChatComposer(t1: {[any]: any}) -- line: 42
 	-- upvalues: React (copy), Signals (copy), SignalsReact (copy), composerLockSignal (copy), useReleaseFocusOnDownSwipe (copy), TextArea (copy), InputSize (copy), View (copy), ChatActionsRow (copy)
 	local v17 = React.useRef(nil)
-	local v18 = React.useMemo(function() -- line: 43
+	local v18 = React.useMemo(function() -- line: 44
 		-- upvalues: Signals (copy)
 		local v24, v25 = Signals.createSignal(true)
 
@@ -29,7 +29,7 @@ local function ChatComposer(t1: {[any]: any}) -- line: 41
 	local v19 = SignalsReact.useSignalState(composerLockSignal.getComposerMode) == "tool_response"
 	local v20 = t1.isAssistantResponding and not v19
 	local v21 = t1.composerErrorText ~= nil
-	local v22 = React.useCallback(function(s2: string) -- line: 57
+	local v22 = React.useCallback(function(s2: string) -- line: 58
 		-- upvalues: v18 (copy), t1 (copy)
 		v18.setIsComposerEmpty(string.gsub(s2, "^%s*(.-)%s*$", "%1") == "")
 		t1.onChanged(s2)
@@ -37,7 +37,7 @@ local function ChatComposer(t1: {[any]: any}) -- line: 41
 		t1.onChanged,
 		v18
 	})
-	local v23 = React.useCallback(function() -- line: 62
+	local v23 = React.useCallback(function() -- line: 63
 		-- upvalues: t1 (copy), v18 (copy)
 		if t1.onSend() then
 			v18.setIsComposerEmpty(true)
@@ -70,6 +70,7 @@ local function ChatComposer(t1: {[any]: any}) -- line: 41
 		}, {
 			Actions = React.createElement(ChatActionsRow, {
 				isAssistantResponding = t1.isAssistantResponding,
+				canStopAssistantResponse = t1.canStopAssistantResponse,
 				canSendWhileResponding = v19,
 				getIsComposerEmpty = v18.getIsComposerEmpty,
 				isSendDisabled = v21,

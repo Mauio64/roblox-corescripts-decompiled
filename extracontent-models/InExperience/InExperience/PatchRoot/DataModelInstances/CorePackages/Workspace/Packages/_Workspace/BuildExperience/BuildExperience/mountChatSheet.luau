@@ -38,10 +38,7 @@ local function ConnectedChatSheet() -- line: 27
 		defaultSnapPointIndex = 1,
 		isOpen = v22,
 		onClose = v25,
-		snapPoints = {
-			v17 / 100,
-			1
-		},
+		snapPoints = { v17 / 100 },
 		topBarPillMenuTarget = if not v22 then nil else t1,
 		universeId = if not v24 then nil else v24.universeId,
 		placeId = if not v24 then nil else v24.placeId,

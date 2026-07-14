@@ -1,3 +1,0 @@
-return {
-	FindFriendsSort = require(script.FindFriendsSort)
-}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("InlineSurveyEnhancements", false)
+return game:DefineFastFlag("InlineSurveyEnhancements2", false)

@@ -46,87 +46,98 @@ local function normalizeTarget(p1) -- line: 57
 		isNewGameTarget = p1.isNewGameTarget
 	}
 end
-local function getTargetWithGameInfo(p2, p3) -- line: 72
-	if p2 == nil then
-		return p2
+local function getGameInfoName(p2) -- line: 72
+	if p2 == nil or (p2.isUnavailable or typeof(p2.name) ~= "string" or p2.name == "") then
+		return nil
 	end
 
-	local v32 = if not (p3 ~= nil and not p3.isUnavailable) then nil else p3
-	local v33 = if not v32 then nil else v32.creator
+	return p2.name
+end
+local function getTargetWithGameInfo(p3, p4) -- line: 80
+	if p3 == nil then
+		return p3
+	end
+
+	local v35 = if not (p4 ~= nil and not p4.isUnavailable) then nil else p4
+	local v36 = if not v35 then nil else v35.creator
+	local v37 = if p4 ~= nil and (not p4.isUnavailable and (typeof(p4.name) == "string" and p4.name ~= "")) then p4.name else nil
 
 	return {
-		universeId = p2.universeId,
-		placeId = p2.placeId or if not v32 then nil else tonumber(v32.rootPlaceId),
-		sessionId = p2.sessionId,
-		experienceName = if not v32 or v32.name == "" then p2.experienceName else v32.name,
-		description = not v32 and "Loading..." or (v32.description or ""),
-		creatorName = (not v33 or v33.name == "") and "Loading..." or v33.name,
-		gameIcon = p2.gameIcon,
-		isCreatorVerified = not not v33 and v33.hasVerifiedBadge == true,
-		isNewGameTarget = p2.isNewGameTarget
+		universeId = p3.universeId,
+		placeId = p3.placeId or if not v35 then nil else tonumber(v35.rootPlaceId),
+		sessionId = p3.sessionId,
+		experienceName = v37,
+		description = not v35 and "Loading..." or (v35.description or ""),
+		creatorName = (not v36 or v36.name == "") and "Loading..." or v36.name,
+		gameIcon = p3.gameIcon,
+		isCreatorVerified = not not v36 and v36.hasVerifiedBadge == true,
+		isNewGameTarget = p3.isNewGameTarget
 	}
 end
-local function useGameInfo(n1: number?) -- line: 98
+local function isTitleDescriptionReady(p5) -- line: 105
+	return ((if p5 ~= nil and (not p5.isUnavailable and (typeof(p5.name) == "string" and p5.name ~= "")) then p5.name else nil)) ~= nil
+end
+local function useGameInfo(n1: number?) -- line: 109
 	-- upvalues: React (copy), Signals (copy), DataHydration (copy), SignalsReact (copy)
-	local v35 = if n1 ~= nil then tostring(n1) else nil
-	local v36 = React.useMemo(function() -- line: 100
-		-- upvalues: Signals (copy), v35 (copy), DataHydration (copy)
-		return Signals.createComputed(function(p4) -- line: 101
-			-- upvalues: v35 (copy), DataHydration (copy)
-			if v35 == nil then
+	local v40 = if n1 ~= nil then tostring(n1) else nil
+	local v41 = React.useMemo(function() -- line: 111
+		-- upvalues: Signals (copy), v40 (copy), DataHydration (copy)
+		return Signals.createComputed(function(p6) -- line: 112
+			-- upvalues: v40 (copy), DataHydration (copy)
+			if v40 == nil then
 				return nil
 			end
 
-			return DataHydration.Game.getGameInfoStore(p4).getAndFetchGameInfo(v35).data(p4)
+			return DataHydration.Game.getGameInfoStore(p6).getAndFetchGameInfo(v40).data(p6)
 		end)
-	end, { v35 })
+	end, { v40 })
 
-	return SignalsReact.useSignalState(v36)
+	return SignalsReact.useSignalState(v41)
 end
-local function BuildFullscreenPage(t3: {[any]: any}) -- line: 118
+local function BuildFullscreenPage(t3: {[any]: any}) -- line: 129
 	-- upvalues: useBuildPageLayout (copy), React (copy), FullscreenPageWithSafeArea (copy)
-	local v38 = useBuildPageLayout()
+	local v43 = useBuildPageLayout()
 
 	return React.createElement(FullscreenPageWithSafeArea, {
 		includeStatusBar = true,
-		BackgroundColor3 = v38.tokens.Color.Surface.Surface_0.Color3,
-		BackgroundTransparency = v38.tokens.Color.Surface.Surface_0.Transparency,
-		includeBottomBar = v38.shouldIncludeBottomBar and t3.hideBottomBar ~= true
+		BackgroundColor3 = v43.tokens.Color.Surface.Surface_0.Color3,
+		BackgroundTransparency = v43.tokens.Color.Surface.Surface_0.Transparency,
+		includeBottomBar = v43.shouldIncludeBottomBar and t3.hideBottomBar ~= true
 	}, {
 		Page = t3.pageContent
 	})
 end
-local function BuildSheetPage(t4: {[any]: any}) -- line: 131
+local function BuildSheetPage(t4: {[any]: any}) -- line: 142
 	-- upvalues: useTokens (copy), React (copy), View (copy)
-	local v40 = useTokens()
+	local v45 = useTokens()
 
 	return React.createElement(View, {
 		tag = "size-full",
-		BackgroundColor3 = v40.Color.Surface.Surface_0.Color3,
-		BackgroundTransparency = v40.Color.Surface.Surface_0.Transparency
+		BackgroundColor3 = v45.Color.Surface.Surface_0.Color3,
+		BackgroundTransparency = v45.Color.Surface.Surface_0.Transparency
 	}, {
 		Page = t4.pageContent
 	})
 end
-local function ConfigurationScreen(t5: {[any]: any}, p5, s1: string) -- line: 143
+local function ConfigurationScreen(t5: {[any]: any}, p7, s1: string) -- line: 154
 	-- upvalues: BuildNavigationParams (copy), useGameInfo (copy), getTargetWithGameInfo (copy), React (copy), t1 (copy), BuildOverflowMenuPage (copy), BuildSheetPage (copy), BuildFullscreenPage (copy)
 	local navigation = t5.navigation
-	local v45 = t5.screenProps or {}
-	local v46 = BuildNavigationParams.getTarget(navigation) or v45.target
-	local v47 = if v46 ~= nil then {
-		universeId = v46.universeId,
-		placeId = v46.placeId,
-		sessionId = v46.sessionId,
-		experienceName = v46.experienceName,
-		gameIcon = v46.gameIcon,
-		isNewGameTarget = v46.isNewGameTarget
+	local v50 = t5.screenProps or {}
+	local v51 = BuildNavigationParams.getTarget(navigation) or v50.target
+	local v52 = if v51 ~= nil then {
+		universeId = v51.universeId,
+		placeId = v51.placeId,
+		sessionId = v51.sessionId,
+		experienceName = v51.experienceName,
+		gameIcon = v51.gameIcon,
+		isNewGameTarget = v51.isNewGameTarget
 	} else nil
-	local v48 = useGameInfo(if not v47 then nil else v47.universeId)
-	local v49 = getTargetWithGameInfo(v47, v48)
-	local v50 = React.useCallback(function() -- line: 150
-		-- upvalues: v45 (copy), navigation (copy)
-		if v45.onClose then
-			v45.onClose()
+	local v53 = useGameInfo(if not v52 then nil else v52.universeId)
+	local v54 = getTargetWithGameInfo(v52, v53)
+	local v55 = React.useCallback(function() -- line: 161
+		-- upvalues: v50 (copy), navigation (copy)
+		if v50.onClose then
+			v50.onClose()
 
 			return
 		end
@@ -134,95 +145,102 @@ local function ConfigurationScreen(t5: {[any]: any}, p5, s1: string) -- line: 14
 		navigation.goBack()
 	end, {
 		navigation,
-		v45.onClose
+		v50.onClose
 	})
-	local v51 = React.useCallback(function() -- line: 157
-		-- upvalues: v45 (copy), navigation (copy), t1 (copy), v49 (copy)
-		if v45.onOpenAudiencePage then
-			v45.onOpenAudiencePage()
+	local v56 = React.useCallback(function() -- line: 168
+		-- upvalues: v50 (copy), navigation (copy), t1 (copy), v54 (copy)
+		if v50.onOpenAudiencePage then
+			v50.onOpenAudiencePage()
 
 			return
 		end
 
 		navigation.navigate(t1.BuildAudience, {
-			target = v49
+			target = v54
 		})
 	end, {
 		navigation,
-		v45.onOpenAudiencePage,
-		v49
+		v50.onOpenAudiencePage,
+		v54
 	})
-	local v52 = React.useCallback(function() -- line: 166
-		-- upvalues: v45 (copy), navigation (copy), t1 (copy), v49 (copy)
-		if v45.onOpenTitleDescriptionPage then
-			v45.onOpenTitleDescriptionPage()
+	local v57 = React.useCallback(function() -- line: 177
+		-- upvalues: v53 (copy), v50 (copy), navigation (copy), t1 (copy), v54 (copy)
+		local v85 = v53
+
+		if ((if v85 ~= nil and (not v85.isUnavailable and (typeof(v85.name) == "string" and v85.name ~= "")) then v85.name else nil)) == nil then
+			return
+		end
+
+		if v50.onOpenTitleDescriptionPage then
+			v50.onOpenTitleDescriptionPage()
 
 			return
 		end
 
 		navigation.navigate(t1.BuildTitleDescription, {
-			target = v49
+			target = v54
 		})
 	end, {
+		v53,
 		navigation,
-		v45.onOpenTitleDescriptionPage,
-		v49
+		v50.onOpenTitleDescriptionPage,
+		v54
 	})
-	local v53 = React.useCallback(function() -- line: 175
-		-- upvalues: v45 (copy), navigation (copy), t1 (copy), v49 (copy)
-		if v45.onOpenMediaSelectionPage then
-			v45.onOpenMediaSelectionPage()
+	local v58 = React.useCallback(function() -- line: 189
+		-- upvalues: v50 (copy), navigation (copy), t1 (copy), v54 (copy)
+		if v50.onOpenMediaSelectionPage then
+			v50.onOpenMediaSelectionPage()
 
 			return
 		end
 
 		navigation.navigate(t1.BuildMediaSelection, {
-			target = v49
+			target = v54
 		})
 	end, {
 		navigation,
-		v45.onOpenMediaSelectionPage,
-		v49
+		v50.onOpenMediaSelectionPage,
+		v54
 	})
-	local v54 = if v49 ~= nil then React.createElement(BuildOverflowMenuPage, {
-		page = p5,
-		target = v49,
+	local v59 = if v54 ~= nil then React.createElement(BuildOverflowMenuPage, {
+		page = p7,
+		target = v54,
 		testId = s1,
-		onClose = v50,
-		onOpenAudiencePage = v51,
-		onOpenTitleDescriptionPage = v52,
-		onOpenMediaSelectionPage = v53,
-		showPreviewButton = v45.showPreviewButton
+		onClose = v55,
+		onOpenAudiencePage = v56,
+		onOpenTitleDescriptionPage = v57,
+		onOpenMediaSelectionPage = v58,
+		showPreviewButton = v50.showPreviewButton
 	}) else nil
 
-	if v45.onClose then
+	if v50.onClose then
 		return React.createElement(BuildSheetPage, {
-			pageContent = v54
+			pageContent = v59
 		})
 	end
 
 	return React.createElement(BuildFullscreenPage, {
-		pageContent = v54
+		pageContent = v59
 	})
 end
-local function BuildTitleDescriptionContent(t6: {[any]: any}) -- line: 255
+local function BuildTitleDescriptionContent(t6: {[any]: any}) -- line: 269
 	-- upvalues: useGameInfo (copy), getTargetWithGameInfo (copy), React (copy), TitleDescriptionPage (copy)
-	local v65 = useGameInfo(t6.target.universeId)
+	local v70 = useGameInfo(t6.target.universeId)
 
-	if v65 == nil or v65.isUnavailable then
+	if ((if v70 ~= nil and (not v70.isUnavailable and (typeof(v70.name) == "string" and v70.name ~= "")) then v70.name else nil)) == nil then
 		return nil
 	end
 
-	local v66 = getTargetWithGameInfo(t6.target, v65)
+	local v71 = getTargetWithGameInfo(t6.target, v70)
 
-	if v66 == nil then
+	if v71 == nil then
 		return nil
 	end
 
 	return React.createElement(TitleDescriptionPage, {
-		universeId = v66.universeId,
-		titleText = v66.experienceName or "Loading...",
-		descriptionText = v66.description or "",
+		universeId = v71.universeId,
+		titleText = v71.experienceName or "Loading...",
+		descriptionText = v71.description or "",
 		onBack = t6.onBack,
 		testId = t6.testId
 	})
@@ -231,103 +249,103 @@ end
 return {
 	Screens = t1,
 	SCREEN_BY_PAGE = t2,
-	BuildPublishScreen = function(t7: {[any]: any}) -- line: 209
+	BuildPublishScreen = function(t7: {[any]: any}) -- line: 223
 		-- upvalues: ConfigurationScreen (copy)
 		return ConfigurationScreen(t7, "publish", "BuildPage.publish.Page")
 	end,
-	BuildSettingsScreen = function(t8: {[any]: any}) -- line: 213
+	BuildSettingsScreen = function(t8: {[any]: any}) -- line: 227
 		-- upvalues: ConfigurationScreen (copy)
 		return ConfigurationScreen(t8, "settings", "BuildPage.settings.Page")
 	end,
-	BuildAudienceScreen = function(t9: {[any]: any}) -- line: 217
+	BuildAudienceScreen = function(t9: {[any]: any}) -- line: 231
 		-- upvalues: BuildNavigationParams (copy), React (copy), OverflowMenuPageShell (copy), IconName (copy), AudienceConfigurationContent (copy), BuildSheetPage (copy), BuildFullscreenPage (copy)
 		local navigation = t9.navigation
-		local v59 = t9.screenProps or {}
-		local v60 = BuildNavigationParams.getTarget(navigation) or v59.target
-		local v61 = if v60 ~= nil then {
-			universeId = v60.universeId,
-			placeId = v60.placeId,
-			sessionId = v60.sessionId,
-			experienceName = v60.experienceName,
-			gameIcon = v60.gameIcon,
-			isNewGameTarget = v60.isNewGameTarget
+		local v64 = t9.screenProps or {}
+		local v65 = BuildNavigationParams.getTarget(navigation) or v64.target
+		local v66 = if v65 ~= nil then {
+			universeId = v65.universeId,
+			placeId = v65.placeId,
+			sessionId = v65.sessionId,
+			experienceName = v65.experienceName,
+			gameIcon = v65.gameIcon,
+			isNewGameTarget = v65.isNewGameTarget
 		} else nil
-		local v62 = React.useCallback(function() -- line: 222
+		local v67 = React.useCallback(function() -- line: 236
 			-- upvalues: navigation (copy)
 			navigation.goBack()
 		end, { navigation })
-		local v63 = if v61 ~= nil then React.createElement(OverflowMenuPageShell, {
+		local v68 = if v66 ~= nil then React.createElement(OverflowMenuPageShell, {
 			title = "Audience",
 			testId = "BuildPage.audience.Page",
 			closeIcon = IconName.ChevronLargeLeft,
-			onClose = v62,
+			onClose = v67,
 			content = React.createElement(AudienceConfigurationContent, {
-				universeId = v61.universeId
+				universeId = v66.universeId
 			})
 		}) else nil
 
-		if v59.onClose then
+		if v64.onClose then
 			return React.createElement(BuildSheetPage, {
-				pageContent = v63
+				pageContent = v68
 			})
 		end
 
 		return React.createElement(BuildFullscreenPage, {
-			pageContent = v63
+			pageContent = v68
 		})
 	end,
-	BuildTitleDescriptionScreen = function(t10: {[any]: any}) -- line: 277
+	BuildTitleDescriptionScreen = function(t10: {[any]: any}) -- line: 291
 		-- upvalues: BuildNavigationParams (copy), useOnScreenKeyboardVisible (copy), React (copy), BuildTitleDescriptionContent (copy), BuildSheetPage (copy), BuildFullscreenPage (copy)
 		local navigation = t10.navigation
-		local v69 = t10.screenProps or {}
-		local v70 = BuildNavigationParams.getTarget(navigation) or v69.target
-		local v71 = if v70 ~= nil then {
-			universeId = v70.universeId,
-			placeId = v70.placeId,
-			sessionId = v70.sessionId,
-			experienceName = v70.experienceName,
-			gameIcon = v70.gameIcon,
-			isNewGameTarget = v70.isNewGameTarget
+		local v74 = t10.screenProps or {}
+		local v75 = BuildNavigationParams.getTarget(navigation) or v74.target
+		local v76 = if v75 ~= nil then {
+			universeId = v75.universeId,
+			placeId = v75.placeId,
+			sessionId = v75.sessionId,
+			experienceName = v75.experienceName,
+			gameIcon = v75.gameIcon,
+			isNewGameTarget = v75.isNewGameTarget
 		} else nil
-		local v72 = useOnScreenKeyboardVisible()
-		local v73 = if v71 ~= nil then React.createElement(BuildTitleDescriptionContent, {
+		local v77 = useOnScreenKeyboardVisible()
+		local v78 = if v76 ~= nil then React.createElement(BuildTitleDescriptionContent, {
 			testId = "BuildPage.titleDescription.Page",
-			target = v71,
+			target = v76,
 			onBack = navigation.goBack
 		}) else nil
 
-		if v69.onClose then
+		if v74.onClose then
 			return React.createElement(BuildSheetPage, {
-				pageContent = v73
+				pageContent = v78
 			})
 		end
 
 		return React.createElement(BuildFullscreenPage, {
-			hideBottomBar = v72,
-			pageContent = v73
+			hideBottomBar = v77,
+			pageContent = v78
 		})
 	end,
-	BuildMediaSelectionScreen = function(p6) -- line: 303
+	BuildMediaSelectionScreen = function(p8) -- line: 317
 		-- upvalues: BuildNavigationParams (copy), useBuildPageLayout (copy), React (copy), MediaSelectionPage (copy), FullscreenPageWithSafeArea (copy)
-		local navigation = p6.navigation
-		local v76 = BuildNavigationParams.getTarget(navigation)
-		local v77 = useBuildPageLayout()
-		local v78 = React.useCallback(function() -- line: 308
+		local navigation = p8.navigation
+		local v81 = BuildNavigationParams.getTarget(navigation)
+		local v82 = useBuildPageLayout()
+		local v83 = React.useCallback(function() -- line: 322
 			-- upvalues: navigation (copy)
 			navigation.goBack()
 		end, { navigation })
-		local v79 = if v76 ~= nil then React.createElement(MediaSelectionPage, {
-			onClose = v78,
-			universeId = v76.universeId
+		local v84 = if v81 ~= nil and v81.universeId ~= nil then React.createElement(MediaSelectionPage, {
+			onClose = v83,
+			universeId = v81.universeId
 		}) else nil
 
 		return React.createElement(FullscreenPageWithSafeArea, {
 			includeStatusBar = true,
-			BackgroundColor3 = v77.tokens.Color.Surface.Surface_0.Color3,
-			BackgroundTransparency = v77.tokens.Color.Surface.Surface_0.Transparency,
-			includeBottomBar = v77.shouldIncludeBottomBar
+			BackgroundColor3 = v82.tokens.Color.Surface.Surface_0.Color3,
+			BackgroundTransparency = v82.tokens.Color.Surface.Surface_0.Transparency,
+			includeBottomBar = v82.shouldIncludeBottomBar
 		}, {
-			Page = v79
+			Page = v84
 		})
 	end
 }

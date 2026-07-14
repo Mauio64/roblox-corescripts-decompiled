@@ -11,7 +11,7 @@ return Service:register({
 	id = "people",
 	label = "CoreScripts.InGameMenu.PageTitle.Players",
 	initialAvailability = Service.AvailabilitySignal.Available,
-	sideSheetPlacement = SideSheetPlacement.Page,
+	sideSheetPlacement = SideSheetPlacement.Vertical,
 	activated = function(_) -- line: 22
 		-- upvalues: InGameMenuIntegrationUtils (copy), v8 (copy)
 		InGameMenuIntegrationUtils.toggleIGMPage("PlayersPage", v8:get())

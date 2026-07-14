@@ -18,5 +18,8 @@ return {
 	record2svCompletion = require(script.record2svCompletion),
 	PreviousAccountEntry = require(script.PreviousAccountEntry),
 	parseCredentialsProtocolIsAvailableResponse = require(script.parseCredentialsProtocolIsAvailableResponse),
-	getTwoStepLoginErrorKey = require(script.getTwoStepLoginErrorKey)
+	getTwoStepLoginErrorKey = require(script.getTwoStepLoginErrorKey),
+	isIosAuthServiceEnabled = require(script.isIosAuthServiceEnabled),
+	coarseLoginErrorBucket = require(script.coarseLoginErrorBucket),
+	isNonTerminalLoginError = require(script.isNonTerminalLoginError)
 }

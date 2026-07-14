@@ -1,1 +1,0 @@
-return game:DefineFastInt("ExpChatDefaultARButtonPadding", 9)

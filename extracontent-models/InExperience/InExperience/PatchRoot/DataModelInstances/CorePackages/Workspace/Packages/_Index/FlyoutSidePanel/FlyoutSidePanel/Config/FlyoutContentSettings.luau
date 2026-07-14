@@ -13,6 +13,7 @@ local v12 = game:DefineFastString("FlyoutLearnPlaceURI", "roblox://experiences/s
 local FFlagCreateConnectionsHub = SharedFlags.FFlagCreateConnectionsHub
 local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
 local FFlagEnableArgusFlyoutEntry = SharedFlags.FFlagEnableArgusFlyoutEntry
+local FFlagArgusTabImpliesFlyout = SharedFlags.FFlagArgusTabImpliesFlyout
 local FFlagEnableBlackbird = SharedFlags.FFlagEnableBlackbird
 local FFlagEnableBlackbirdOnFlyoutMenu = SharedFlags.FFlagEnableBlackbirdOnFlyoutMenu
 local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
@@ -94,7 +95,7 @@ local t4 = {
 		textKey = t3[t1.Inventory],
 		icon = BuilderIcons.Icon.Backpack,
 		context = {
-			urlGenerator = function(p1) -- line: 120
+			urlGenerator = function(p1) -- line: 121
 				-- upvalues: UrlBuilder (copy)
 				return p1 and UrlBuilder.user.inventory({
 					userId = p1
@@ -148,7 +149,7 @@ local t4 = {
 		itemType = t1.Moments,
 		textKey = t3[t1.Moments],
 		icon = BuilderIcons.Icon.Moments,
-		context = if not FFlagEnableArgusFlyoutEntry or not FFlagEnableArgus then {
+		context = if not FFlagEnableArgusFlyoutEntry and not FFlagArgusTabImpliesFlyout or not FFlagEnableArgus then {
 			appUri = v11
 		} else {
 			appPage = AppPage.Moments
@@ -173,7 +174,7 @@ local t4 = {
 		textKey = t3[t1.CreateGames],
 		icon = BuilderIcons.Icon.Studio,
 		context = {
-			urlGenerator = function(p2) -- line: 193
+			urlGenerator = function(p2) -- line: 194
 				return p2({
 					utm_content = "side_panel"
 				})
@@ -193,7 +194,7 @@ local t4 = {
 		textKey = t3[t1.GiftCards],
 		icon = BuilderIcons.Icon.GiftCard,
 		context = {
-			urlGenerator = function(p3) -- line: 211
+			urlGenerator = function(p3) -- line: 212
 				-- upvalues: UrlBuilder (copy)
 				return UrlBuilder.static.giftCards(p3)
 			end
@@ -219,21 +220,21 @@ local t4 = {
 		itemType = t1.Terms,
 		textKey = t3[t1.Terms],
 		context = {
-			urlGenerator = function(_, p5) -- line: 239
+			urlGenerator = function(_, p5) -- line: 240
 				-- upvalues: UrlBuilder (copy)
-				local v31 = nil
+				local v32 = nil
 
 				if p5 then
-					v31 = p5.getTermsOfUseLink()
+					v32 = p5.getTermsOfUseLink()
 				end
 
-				if v31 == nil or v31 == "" then
-					v31 = UrlBuilder.static.about.terms({
+				if v32 == nil or v32 == "" then
+					v32 = UrlBuilder.static.about.terms({
 						useGameQQUrls = true
 					})
 				end
 
-				return v31
+				return v32
 			end
 		}
 	},
@@ -241,21 +242,21 @@ local t4 = {
 		itemType = t1.Privacy,
 		textKey = t3[t1.Privacy],
 		context = {
-			urlGenerator = function(_, p7) -- line: 257
+			urlGenerator = function(_, p7) -- line: 258
 				-- upvalues: UrlBuilder (copy)
-				local v34 = nil
+				local v35 = nil
 
 				if p7 then
-					v34 = p7.getPrivacyPolicyLink()
+					v35 = p7.getPrivacyPolicyLink()
 				end
 
-				if v34 == nil or v34 == "" then
-					v34 = UrlBuilder.static.about.privacy({
+				if v35 == nil or v35 == "" then
+					v35 = UrlBuilder.static.about.privacy({
 						useGameQQUrls = true
 					})
 				end
 
-				return v34
+				return v35
 			end
 		}
 	}

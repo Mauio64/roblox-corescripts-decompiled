@@ -7,7 +7,6 @@ local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 
 require(Foundation.Providers.Style.Tokens)
 
-local Flags = require(Foundation.Utility.Flags)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 local useDialog = require(script.Parent.useDialog)
@@ -17,8 +16,8 @@ local t1 = {
 	[DialogSize.Large] = 640
 }
 
-local function variantsFactory(p1) -- line: 45
-	-- upvalues: Flags (copy), DialogSize (copy), t1 (copy)
+local function variantsFactory(p1) -- line: 43
+	-- upvalues: DialogSize (copy), t1 (copy)
 	local t2 = {
 		backdrop = {
 			backgroundStyle = p1.Color.Common.Backdrop
@@ -43,7 +42,7 @@ local function variantsFactory(p1) -- line: 45
 			tag = "size-full-0 auto-y"
 		},
 		titleText = {
-			tag = `size-full-0 auto-y text-wrap text-align-x-left { not Flags.FoundationDialogTitleEmphasisFix and "content-emphasized" or "content-emphasis" }`
+			tag = "size-full-0 auto-y text-wrap text-align-x-left content-emphasis"
 		},
 		content = {
 			tag = "fill size-full auto-y"
@@ -148,13 +147,13 @@ local function variantsFactory(p1) -- line: 45
 	}
 end
 
-function useDialogVariants() -- line: 179
+function useDialogVariants() -- line: 175
 	-- upvalues: useTokens (copy), VariantsContext (copy), variantsFactory (copy), useDialog (copy), composeStyleVariant (copy)
-	local v13 = useTokens()
-	local v14 = VariantsContext.useVariants("Dialog", variantsFactory, v13)
-	local v15 = useDialog()
+	local v12 = useTokens()
+	local v13 = VariantsContext.useVariants("Dialog", variantsFactory, v12)
+	local v14 = useDialog()
 
-	return composeStyleVariant(v14.common, v14.size[v15.responsiveSize])
+	return composeStyleVariant(v13.common, v13.size[v14.responsiveSize])
 end
 
 return {

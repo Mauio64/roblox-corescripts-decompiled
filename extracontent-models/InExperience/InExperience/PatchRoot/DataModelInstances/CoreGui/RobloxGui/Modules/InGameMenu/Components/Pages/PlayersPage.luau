@@ -11,7 +11,7 @@ local RoactRodux = InGameMenuDependencies.RoactRodux
 local t = InGameMenuDependencies.t
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local Images = UIBlox.App.ImageSet.Images
 local ParentParent = script.Parent.Parent.Parent
 local withLocalization = require(ParentParent.Localization.withLocalization)
@@ -339,7 +339,7 @@ function v41.renderFocusHandler(p13, p14) -- line: 340
 	})
 end
 function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
-	-- upvalues: v40 (copy), Roact (copy), PlayerContextualMenu (copy), Page (copy), default (copy), Constants (copy), CursorKind (copy), withStyle (copy), BarOnTopScrollingFrame (copy), PageNavigationWatcher (copy), Players (copy)
+	-- upvalues: v40 (copy), Roact (copy), PlayerContextualMenu (copy), Page (copy), default (copy), Constants (copy), CursorKind (copy), withFoundationOrUIBloxStyle (copy), BarOnTopScrollingFrame (copy), PageNavigationWatcher (copy), Players (copy)
 	local n2 = 0
 	local n3 = 0
 	local t3 = {}
@@ -389,15 +389,17 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 			SelectionImageObject = p18(CursorKind.RoundedRect)
 		})
 	}, {
-		PlayerListContent = withStyle(function(_) -- line: 435
+		PlayerListContent = withFoundationOrUIBloxStyle(function(_) -- line: 435
+			return {}
+		end, function(_) -- line: 437
 			-- upvalues: Roact (copy), p16 (copy), BarOnTopScrollingFrame (copy), u81 (ref)
 			return Roact.createElement("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
-				[Roact.Change.AbsoluteSize] = function(p20) -- line: 440
+				[Roact.Change.AbsoluteSize] = function(p21) -- line: 442
 					-- upvalues: p16 (copy)
 					p16:setState({
-						pageSizeY = p20.AbsoluteSize.Y
+						pageSizeY = p21.AbsoluteSize.Y
 					})
 				end
 			}, {
@@ -413,13 +415,13 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 		FocusHandler = p16:renderFocusHandler(v80),
 		Watcher = Roact.createElement(PageNavigationWatcher, {
 			desiredPage = "Players",
-			onNavigateTo = function() -- line: 459
+			onNavigateTo = function() -- line: 461
 				-- upvalues: p16 (copy), Players (copy)
 				p16:setState({
 					players = Players:GetPlayers()
 				})
 			end,
-			onNavigateAway = function() -- line: 464
+			onNavigateAway = function() -- line: 466
 				-- upvalues: p16 (copy), Roact (copy)
 				p16:setState({
 					selectedPlayer = Roact.None
@@ -428,14 +430,14 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 		})
 	})
 end
-function v41.renderWithLocalized(p21, p22) -- line: 473
+function v41.renderWithLocalized(p22, p23) -- line: 475
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p23) -- line: 474
-		-- upvalues: p21 (copy), p22 (copy)
-		return p21:renderWithLocalizedAndSelectionCursor(p22, p23)
+	return withSelectionCursorProvider(function(p24) -- line: 476
+		-- upvalues: p22 (copy), p23 (copy)
+		return p22:renderWithLocalizedAndSelectionCursor(p23, p24)
 	end)
 end
-function v41.render(p24) -- line: 479
+function v41.render(p25) -- line: 481
 	-- upvalues: withLocalization (copy)
 	return withLocalization({
 		addFriend = "CoreScripts.InGameMenu.Actions.AddFriend",
@@ -446,53 +448,53 @@ function v41.render(p24) -- line: 479
 		reportAbuse = "CoreScripts.InGameMenu.Actions.ReportAbuse",
 		blockPlayer = "CoreScripts.InGameMenu.Actions.BlockPlayer",
 		unblockPlayer = "CoreScripts.InGameMenu.Actions.UnblockPlayer"
-	})(function(p25) -- line: 489
-		-- upvalues: p24 (copy)
-		return p24:renderWithLocalized(p25)
+	})(function(p26) -- line: 491
+		-- upvalues: p25 (copy)
+		return p25:renderWithLocalized(p26)
 	end)
 end
-function v41.didUpdate(p26, p27, _) -- line: 494
+function v41.didUpdate(p27, p28, _) -- line: 496
 	-- upvalues: Players (copy), Roact (copy)
-	if p26.props.isMenuOpen and not p27.isMenuOpen then
-		p26:setState({
+	if p27.props.isMenuOpen and not p28.isMenuOpen then
+		p27:setState({
 			players = Players:GetPlayers(),
 			selectedPlayer = Roact.None
 		})
 	end
 
-	local selectedPlayerRef = p26.state.selectedPlayerRef
+	local selectedPlayerRef = p27.state.selectedPlayerRef
 
-	if selectedPlayerRef and p26.state.selectedPlayerPosition ~= selectedPlayerRef.AbsolutePosition then
-		p26:setState({
+	if selectedPlayerRef and p27.state.selectedPlayerPosition ~= selectedPlayerRef.AbsolutePosition then
+		p27:setState({
 			selectedPlayerPosition = selectedPlayerRef.AbsolutePosition
 		})
 	end
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p29, _) -- line: 512
+return RoactRodux.UNSTABLE_connect2(function(p30, _) -- line: 514
 	-- upvalues: Constants2 (copy)
 	return {
-		isMenuOpen = p29.isMenuOpen,
-		voiceEnabled = p29.voiceState.voiceEnabled,
-		friends = p29.friends,
-		inspectMenuEnabled = p29.displayOptions.inspectMenuEnabled,
-		screenSize = p29.screenSize,
-		currentPage = p29.menuPage,
-		isRespawnDialogOpen = p29.respawn.dialogOpen,
-		isReportDialogOpen = p29.report.dialogOpen or p29.report.reportSentOpen,
-		isGamepadLastInput = p29.displayOptions.inputType == Constants2.InputType.Gamepad,
-		isCurrentZoneActive = p29.currentZone == 1
+		isMenuOpen = p30.isMenuOpen,
+		voiceEnabled = p30.voiceState.voiceEnabled,
+		friends = p30.friends,
+		inspectMenuEnabled = p30.displayOptions.inspectMenuEnabled,
+		screenSize = p30.screenSize,
+		currentPage = p30.menuPage,
+		isRespawnDialogOpen = p30.respawn.dialogOpen,
+		isReportDialogOpen = p30.report.dialogOpen or p30.report.reportSentOpen,
+		isGamepadLastInput = p30.displayOptions.inputType == Constants2.InputType.Gamepad,
+		isCurrentZoneActive = p30.currentZone == 1
 	}
-end, function(p31) -- line: 525
+end, function(p32) -- line: 527
 	-- upvalues: CloseMenu (copy), UnblockPlayer (copy)
 	return {
-		closeMenu = function() -- line: 527
-			-- upvalues: p31 (copy), CloseMenu (copy)
-			p31(CloseMenu)
+		closeMenu = function() -- line: 529
+			-- upvalues: p32 (copy), CloseMenu (copy)
+			p32(CloseMenu)
 		end,
-		unblockPlayer = function(p32) -- line: 531
-			-- upvalues: p31 (copy), UnblockPlayer (copy)
-			return p31(UnblockPlayer(p32))
+		unblockPlayer = function(p33) -- line: 533
+			-- upvalues: p32 (copy), UnblockPlayer (copy)
+			return p32(UnblockPlayer(p33))
 		end
 	}
 end)(v41)

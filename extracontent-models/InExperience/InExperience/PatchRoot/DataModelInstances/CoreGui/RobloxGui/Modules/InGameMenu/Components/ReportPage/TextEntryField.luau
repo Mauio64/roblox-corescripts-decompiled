@@ -5,7 +5,7 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
 local Cryo = InGameMenuDependencies.Cryo
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local Images = UIBlox.App.ImageSet.Images
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
@@ -69,22 +69,42 @@ function v17.calculateNeedsRescroll(p2, p3, p4) -- line: 64
 	end)
 end
 function v17.renderWithSelectionCursor(p7, p8) -- line: 87
-	-- upvalues: withStyle (copy), TextService (copy), v18 (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), CursorKind (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy)
-	return withStyle(function(p9) -- line: 88
+	-- upvalues: withFoundationOrUIBloxStyle (copy), TextService (copy), v18 (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), CursorKind (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy)
+	return withFoundationOrUIBloxStyle(function(p9) -- line: 88
+		return {
+			Theme = {
+				TextDefault = {
+					Color = p9.Color.Content.Default.Color3,
+					Transparency = p9.Color.Content.Default.Transparency
+				},
+				BackgroundMuted = {
+					Color = p9.Color.Surface.Surface_200.Color3,
+					Transparency = p9.Color.Surface.Surface_200.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Body = {
+					Font = p9.Typography.BodyLarge.Font,
+					RelativeSize = p9.Typography.BodyLarge.FontSize
+				}
+			}
+		}
+	end, function(p10) -- line: 99
 		-- upvalues: TextService (copy), p7 (copy), v18 (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), p8 (copy), CursorKind (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy)
-		local TextDefault = p9.Theme.TextDefault
-		local Body = p9.Font.Body
-		local TextSize = TextService:GetTextSize(p7.props.text, Body.RelativeSize * p9.Font.BaseSize, Body.Font, Vector2.new(p7.state.textBoxWidth, 10000))
+		local TextDefault = p10.Theme.TextDefault
+		local Body = p10.Font.Body
+		local TextSize = TextService:GetTextSize(p7.props.text, Body.RelativeSize * p10.Font.BaseSize, Body.Font, Vector2.new(p7.state.textBoxWidth, 10000))
 		local ImageRectSize = v18.ImageRectSize
 		local ImageRectOffset = v18.ImageRectOffset
 		local ImageRectSizeX = ImageRectSize.X
-		local v44 = ImageRectSizeX / 2
+		local v45 = ImageRectSizeX / 2
 
 		return Roact.createElement(ImageSetLabel, {
 			BackgroundTransparency = 1,
 			Image = Assets.Images.RoundedRect.Image,
-			ImageColor3 = p9.Theme.BackgroundMuted.Color,
-			ImageTransparency = p9.Theme.BackgroundMuted.Transparency,
+			ImageColor3 = p10.Theme.BackgroundMuted.Color,
+			ImageTransparency = p10.Theme.BackgroundMuted.Transparency,
 			Position = p7.props.Position,
 			ScaleType = Assets.Images.RoundedRect.ScaleType,
 			Size = p7.props.Size,
@@ -102,19 +122,19 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 				VerticalScrollBarInset = Enum.ScrollBarInset.Always,
 				CanvasPosition = Vector2.new(0, p7.state.canvasPosition),
 				Selectable = false,
-				[Roact.Change.CanvasPosition] = function(p10) -- line: 127
+				[Roact.Change.CanvasPosition] = function(p11) -- line: 138
 					-- upvalues: p7 (copy)
 					p7:setState({
-						canvasPosition = p10.CanvasPosition.Y
+						canvasPosition = p11.CanvasPosition.Y
 					})
 				end,
-				[Roact.Change.AbsoluteSize] = function(p11) -- line: 133
-					-- upvalues: p7 (copy), p9 (copy), Body (copy)
+				[Roact.Change.AbsoluteSize] = function(p12) -- line: 144
+					-- upvalues: p7 (copy), p10 (copy), Body (copy)
 					p7:setState({
-						scrollingFrameHeight = p11.AbsoluteSize.Y
-					}, function() -- line: 134
-						-- upvalues: p7 (copy), p9 (copy), Body (copy)
-						p7:calculateNeedsRescroll(p9, Body)
+						scrollingFrameHeight = p12.AbsoluteSize.Y
+					}, function() -- line: 145
+						-- upvalues: p7 (copy), p10 (copy), Body (copy)
+						p7:calculateNeedsRescroll(p10, Body)
 					end)
 				end
 			}, {
@@ -131,44 +151,44 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 					TextColor3 = TextDefault.Color,
 					TextTransparency = TextDefault.Transparency,
 					Font = Body.Font,
-					TextSize = Body.RelativeSize * p9.Font.BaseSize,
+					TextSize = Body.RelativeSize * p10.Font.BaseSize,
 					TextWrapped = true,
 					SelectionImageObject = p8(CursorKind.InputFields),
 					[Roact.Ref] = p7.textBoxRef,
-					[Roact.Change.Text] = function(p12) -- line: 159
-						-- upvalues: p7 (copy), p9 (copy), Body (copy)
-						if utf8.len(utf8.nfcnormalize(p12.Text)) > p7.props.maxTextLength then
-							local v49 = utf8.offset(p12.Text, p7.props.maxTextLength + 1) - 1
+					[Roact.Change.Text] = function(p13) -- line: 170
+						-- upvalues: p7 (copy), p10 (copy), Body (copy)
+						if utf8.len(utf8.nfcnormalize(p13.Text)) > p7.props.maxTextLength then
+							local v50 = utf8.offset(p13.Text, p7.props.maxTextLength + 1) - 1
 
-							p12.Text = string.sub(p12.Text, 1, v49)
+							p13.Text = string.sub(p13.Text, 1, v50)
 
 							return
 						end
 
-						p7.props.textChanged(p12.Text)
+						p7.props.textChanged(p13.Text)
 						p7:setState({
-							cursorPosition = p12.CursorPosition
-						}, function() -- line: 166
-							-- upvalues: p7 (copy), p9 (copy), Body (copy)
-							p7:calculateNeedsRescroll(p9, Body)
+							cursorPosition = p13.CursorPosition
+						}, function() -- line: 177
+							-- upvalues: p7 (copy), p10 (copy), Body (copy)
+							p7:calculateNeedsRescroll(p10, Body)
 						end)
 					end,
-					[Roact.Change.AbsoluteSize] = function(p13) -- line: 171
-						-- upvalues: p7 (copy), p9 (copy), Body (copy)
+					[Roact.Change.AbsoluteSize] = function(p14) -- line: 182
+						-- upvalues: p7 (copy), p10 (copy), Body (copy)
 						p7:setState({
-							textBoxWidth = p13.AbsoluteSize.X
-						}, function() -- line: 172
-							-- upvalues: p7 (copy), p9 (copy), Body (copy)
-							p7:calculateNeedsRescroll(p9, Body)
+							textBoxWidth = p14.AbsoluteSize.X
+						}, function() -- line: 183
+							-- upvalues: p7 (copy), p10 (copy), Body (copy)
+							p7:calculateNeedsRescroll(p10, Body)
 						end)
 					end,
-					[Roact.Change.CursorPosition] = function(p14) -- line: 177
-						-- upvalues: p7 (copy), p9 (copy), Body (copy)
+					[Roact.Change.CursorPosition] = function(p15) -- line: 188
+						-- upvalues: p7 (copy), p10 (copy), Body (copy)
 						p7:setState({
-							cursorPosition = p14.CursorPosition
-						}, function() -- line: 178
-							-- upvalues: p7 (copy), p9 (copy), Body (copy)
-							p7:calculateNeedsRescroll(p9, Body)
+							cursorPosition = p15.CursorPosition
+						}, function() -- line: 189
+							-- upvalues: p7 (copy), p10 (copy), Body (copy)
+							p7:calculateNeedsRescroll(p10, Body)
 						end)
 					end
 				}, {
@@ -189,15 +209,15 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 				BackgroundTransparency = 1,
 				ImageTransparency = 0,
 				Image = v18.Image,
-				ImageColor3 = p9.Theme.BackgroundMuted.Color,
+				ImageColor3 = p10.Theme.BackgroundMuted.Color,
 				ScaleType = Enum.ScaleType.Slice,
 				AnchorPoint = Vector2.new(0, 1),
 				Position = UDim2.new(0, 0, 1, 0),
 				Size = UDim2.new(1, 0, 0, 32),
-				SliceCenter = Rect.new(v44 - 1, 0, v44 + 1, 1),
+				SliceCenter = Rect.new(v45 - 1, 0, v45 + 1, 1),
 				SliceScale = 1 / Images.ImagesResolutionScale,
-				ImageRectSize = Vector2.new(ImageRectSizeX, v44),
-				ImageRectOffset = ImageRectOffset + Vector2.new(0, v44)
+				ImageRectSize = Vector2.new(ImageRectSizeX, v45),
+				ImageRectOffset = ImageRectOffset + Vector2.new(0, v45)
 			}, {
 				TextAmmountIndicator = Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
@@ -211,34 +231,34 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 					fillFraction = utf8.len(utf8.nfcnormalize(p7.props.text)) / (p7.props.maxTextLength - 10),
 					largerCircleFraction = (p7.props.maxTextLength - 20) / p7.props.maxTextLength,
 					shakeCircleFraction = p7.props.maxTextLength / (p7.props.maxTextLength - 10),
-					BackgroundColor = p9.Theme.BackgroundMuted.Color
+					BackgroundColor = p10.Theme.BackgroundMuted.Color
 				}) })
 			})
 		})
 	end)
 end
-function v17.render(p15) -- line: 236
+function v17.render(p16) -- line: 247
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p16) -- line: 237
-		-- upvalues: p15 (copy)
-		return p15:renderWithSelectionCursor(p16)
+	return withSelectionCursorProvider(function(p17) -- line: 248
+		-- upvalues: p16 (copy)
+		return p16:renderWithSelectionCursor(p17)
 	end)
 end
-function v17.didUpdate(p17, p18, _) -- line: 242
-	if not p17.props.enabled and p18.enabled then
-		if p17.textBoxRef.current and p17.textBoxRef.current:IsFocused() then
-			p17.textBoxRef.current:ReleaseFocus()
+function v17.didUpdate(p18, p19, _) -- line: 253
+	if not p18.props.enabled and p19.enabled then
+		if p18.textBoxRef.current and p18.textBoxRef.current:IsFocused() then
+			p18.textBoxRef.current:ReleaseFocus()
 
 			return
 		end
-	elseif p17.props.enabled and not p18.enabled and p17.props.autoFocusOnEnabled and p17.textBoxRef.current then
-		p17.textBoxRef.current:CaptureFocus()
+	elseif p18.props.enabled and not p19.enabled and p18.props.autoFocusOnEnabled and p18.textBoxRef.current then
+		p18.textBoxRef.current:CaptureFocus()
 	end
 end
 
-return Roact.forwardRef(function(p20, p21) -- line: 255
+return Roact.forwardRef(function(p21, p22) -- line: 266
 	-- upvalues: Roact (copy), v17 (copy), Cryo (copy)
-	return Roact.createElement(v17, Cryo.Dictionary.join(p20, {
-		textBoxRef = p21
+	return Roact.createElement(v17, Cryo.Dictionary.join(p21, {
+		textBoxRef = p22
 	}))
 end)

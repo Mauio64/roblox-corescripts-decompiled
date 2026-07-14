@@ -2,63 +2,62 @@ local ParentParent = script.Parent.Parent
 local React = require(ParentParent.React)
 local Signals = require(ParentParent.Signals)
 local ChatApp = require(script.Parent.ChatApp)
+
+require(script.Parent.Message)
+
 local mountToTargetInstance = require(script.Parent.mountToTargetInstance)
-local TextChatServiceIntegration = require(script.Parent.TextChatServiceIntegration)
 local useTextChannelWindowProps = require(script.Parent.useTextChannelWindowProps)
 local useLocalUserInTextChannel = require(script.Parent.useLocalUserInTextChannel)
 local useRobloxSystemMessage = require(script.Parent.useRobloxSystemMessage)
 local ChatAvailabilityContext = require(script.Parent.ChatAvailabilityContext)
 local MessageWriterContext = require(script.Parent.MessageWriterContext)
+local createChannelMessagesStore = require(script.Parent.createChannelMessagesStore)
+local TextChatServiceBridge = require(script.Parent.TextChatServiceBridge)
 local useLocalUserChatAvailability = ChatAvailabilityContext.useLocalUserChatAvailability
+local v14 = Signals.createSignal({})
 
-local function TextChannelWindowRoot(t1: {[any]: any}) -- line: 24
-	-- upvalues: useTextChannelWindowProps (copy), useLocalUserInTextChannel (copy), useLocalUserChatAvailability (copy), useRobloxSystemMessage (copy), React (copy), TextChatServiceIntegration (copy), ChatApp (copy)
-	local v16 = useTextChannelWindowProps(t1.textChannelWindow)
-	local target = v16.target
-	local v18 = useLocalUserInTextChannel(target, t1.localUserId)
-	local v19 = if target ~= nil then v18 and "member" or "not-member" else "no-channel"
-	local v20 = if v19 ~= "member" then nil else target
-	local v21 = useLocalUserChatAvailability()
-	local v22 = useRobloxSystemMessage()
-
-	React.useEffect(function() -- line: 42
-		-- upvalues: t1 (copy), TextChatServiceIntegration (copy), v20 (copy)
-		t1.setMessages(function() -- line: 43
-			return {}
-		end)
-
-		return TextChatServiceIntegration.subscribeToMessages({
-			channel = v20,
-			textChatService = t1.textChatService,
-			localUserId = t1.localUserId,
-			setMessages = t1.setMessages
-		})
-	end, {
-		v20,
-		t1.localUserId,
-		t1.setMessages,
-		t1.textChatService
-	})
-	React.useEffect(function() -- line: 54
-		-- upvalues: v21 (copy), v22 (copy)
-		if v21.messageKey then
-			v22.displayRobloxSystemMessage(v21.messageKey, v21.messageFallback or "")
+local function TextChannelWindowRoot(t1: {[any]: any}) -- line: 27
+	-- upvalues: useTextChannelWindowProps (copy), useLocalUserInTextChannel (copy), useLocalUserChatAvailability (copy), useRobloxSystemMessage (copy), React (copy), v14 (copy), ChatApp (copy)
+	local v18 = useTextChannelWindowProps(t1.textChannelWindow)
+	local target = v18.target
+	local v20 = useLocalUserInTextChannel(target, t1.localUserId)
+	local v21 = if target ~= nil then v20 and "member" or "not-member" else "no-channel"
+	local v22 = if v21 ~= "member" then nil else target
+	local v23 = useLocalUserChatAvailability()
+	local v24 = useRobloxSystemMessage()
+	local v25 = React.useMemo(function() -- line: 47
+		-- upvalues: v22 (copy), t1 (copy), v14 (copy)
+		if v22 then
+			return t1.getChannelMessages(v22)
 		end
 
-		return v22.clearAvailabilityMessage
+		return v14
 	end, {
 		v22,
-		v21.messageKey,
-		v21.messageFallback
+		t1.getChannelMessages,
+		v14
+	})
+
+	React.useEffect(function() -- line: 54
+		-- upvalues: v23 (copy), v24 (copy)
+		if v23.messageKey then
+			v24.displayRobloxSystemMessage(v23.messageKey, v23.messageFallback or "")
+		end
+
+		return v24.clearAvailabilityMessage
+	end, {
+		v24,
+		v23.messageKey,
+		v23.messageFallback
 	})
 
 	return React.createElement(ChatApp, {
-		messagesSignal = t1.getMessages,
+		messagesSignal = v25,
 		localUserId = t1.localUserId,
-		targetChannel = v20,
-		channelState = v19,
-		canLocalUserChat = v21.canChat,
-		backgroundColor = v16.backgroundColor
+		targetChannel = v22,
+		channelState = v21,
+		canLocalUserChat = v23.canChat,
+		backgroundColor = v18.backgroundColor
 	})
 end
 
@@ -66,29 +65,44 @@ local t2 = {}
 
 return {
 	start = function() -- line: 73
-		-- upvalues: t2 (copy), Signals (copy), React (copy), MessageWriterContext (copy), ChatAvailabilityContext (copy), TextChannelWindowRoot (copy), mountToTargetInstance (copy)
-		local function onRemoved(p1) -- line: 74
-			-- upvalues: t2 (copy)
-			local v29 = t2[p1]
+		-- upvalues: createChannelMessagesStore (copy), t2 (copy), React (copy), MessageWriterContext (copy), ChatAvailabilityContext (copy), TextChannelWindowRoot (copy), mountToTargetInstance (copy), TextChatServiceBridge (copy)
+		local LocalPlayer = game:GetService("Players").LocalPlayer
 
-			if v29 then
-				v29()
+		if not LocalPlayer then
+			return
+		end
+
+		local str = tostring(LocalPlayer.UserId)
+		local v28 = createChannelMessagesStore()
+
+		local function onRemoved(p1) -- line: 83
+			-- upvalues: t2 (copy)
+			local v35 = t2[p1]
+
+			if v35 then
+				v35()
 				t2[p1] = nil
 			end
 		end
-		local function onAdded(p2) -- line: 82
-			-- upvalues: Signals (copy), React (copy), MessageWriterContext (copy), ChatAvailabilityContext (copy), TextChannelWindowRoot (copy), mountToTargetInstance (copy), t2 (copy)
-			local LocalPlayer = game:GetService("Players").LocalPlayer
+		local function onAdded(p2) -- line: 91
+			-- upvalues: v28 (copy), React (copy), MessageWriterContext (copy), ChatAvailabilityContext (copy), LocalPlayer (copy), TextChannelWindowRoot (copy), str (copy), mountToTargetInstance (copy), t2 (copy)
+			local v37 = React.createElement(MessageWriterContext.Provider, {
+				upsertMessage = function(p3) -- line: 92
+					-- upvalues: p2 (copy), v28 (copy)
+					local p2Target = p2.Target
 
-			if not LocalPlayer then
-				return
-			end
+					if p2Target and p2Target:IsA("TextChannel") then
+						v28.upsertMessage(p2Target, p3)
+					end
+				end,
+				removeMessage = function(s1: string) -- line: 99
+					-- upvalues: p2 (copy), v28 (copy)
+					local p2Target = p2.Target
 
-			local str = tostring(LocalPlayer.UserId)
-			local TextChatService = game:GetService("TextChatService")
-			local v34, v35 = Signals.createSignal({})
-			local v36 = React.createElement(MessageWriterContext.Provider, {
-				setMessages = v35
+					if p2Target and p2Target:IsA("TextChannel") then
+						v28.removeMessage(p2Target, s1)
+					end
+				end
 			}, {
 				availability = React.createElement(ChatAvailabilityContext.Provider, {
 					subjectPlayer = LocalPlayer
@@ -96,27 +110,25 @@ return {
 					root = React.createElement(TextChannelWindowRoot, {
 						localUserId = str,
 						textChannelWindow = p2,
-						textChatService = TextChatService,
-						getMessages = v34,
-						setMessages = v35
+						getChannelMessages = v28.getMessagesForChannel
 					})
 				})
 			})
-			local v37 = mountToTargetInstance(p2, v36)
+			local v38 = mountToTargetInstance(p2, v37)
 
-			if v37 then
-				t2[p2] = v37
+			if v38 then
+				t2[p2] = v38
 			end
 
-			p2.AncestryChanged:Connect(function() -- line: 110
+			p2.AncestryChanged:Connect(function() -- line: 126
 				-- upvalues: p2 (copy), t2 (copy)
 				if not p2:IsDescendantOf(game) then
-					local v38 = p2
-					local v39 = t2[v38]
+					local v43 = p2
+					local v44 = t2[v43]
 
-					if v39 then
-						v39()
-						t2[v38] = nil
+					if v44 then
+						v44()
+						t2[v43] = nil
 					end
 				end
 			end)
@@ -124,8 +136,10 @@ return {
 
 		local TextChatService = game:GetService("TextChatService")
 
-		for _, v27 in TextChatService:GetTextChannelWindows() do
-			onAdded(v27)
+		TextChatServiceBridge(TextChatService, str, v28)
+
+		for _, v33 in TextChatService:GetTextChannelWindows() do
+			onAdded(v33)
 		end
 
 		TextChatService.TextChannelWindowAdded:Connect(onAdded)

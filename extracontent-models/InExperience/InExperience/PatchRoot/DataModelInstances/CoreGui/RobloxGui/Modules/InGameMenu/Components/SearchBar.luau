@@ -5,7 +5,7 @@ local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
 local ParentParent = script.Parent.Parent
@@ -101,18 +101,38 @@ function v13.focus(p8) -- line: 113
 	end
 end
 function v13.render(p9) -- line: 119
-	-- upvalues: withStyle (copy), withLocalization (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
-	return withStyle(function(p10) -- line: 120
+	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
+	return withFoundationOrUIBloxStyle(function(p10) -- line: 120
+		return {
+			Theme = {
+				TextEmphasis = {
+					Color = p10.Color.Content.Emphasis.Color3,
+					Transparency = p10.Color.Content.Emphasis.Transparency
+				},
+				TextDefault = {
+					Color = p10.Color.Content.Default.Color3,
+					Transparency = p10.Color.Content.Default.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Body = {
+					Font = p10.Typography.BodyLarge.Font,
+					RelativeSize = p10.Typography.BodyLarge.FontSize
+				}
+			}
+		}
+	end, function(p11) -- line: 131
 		-- upvalues: withLocalization (copy), p9 (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
 		return withLocalization({
 			search = "CoreScripts.InGameMenu.InviteFriends.Search",
 			cancel = "CoreScripts.InGameMenu.Cancel"
-		})(function(p11) -- line: 124
-			-- upvalues: p10 (copy), p9 (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
-			local Body = p10.Font.Body
-			local v29 = p10.Font.BaseSize * Body.RelativeSize
-			local Body2 = p10.Font.Body
-			local v31 = p10.Font.BaseSize * Body2.RelativeSize
+		})(function(p12) -- line: 135
+			-- upvalues: p11 (copy), p9 (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
+			local Body = p11.Font.Body
+			local v30 = p11.Font.BaseSize * Body.RelativeSize
+			local Body2 = p11.Font.Body
+			local v32 = p11.Font.BaseSize * Body2.RelativeSize
 			local t1 = {
 				BackgroundTransparency = 1,
 				GroupTransparency = 0.5,
@@ -121,7 +141,7 @@ function v13.render(p9) -- line: 119
 				Visible = p9.props.visible,
 				[Roact.Ref] = p9.props.forwardRef or Roact.createRef()
 			}
-			local v33 = if UserInputService:GetPlatform() ~= Enum.Platform.Android then Enum.TextInputType.NoSuggestions else Enum.TextInputType.PasswordShown
+			local v34 = if UserInputService:GetPlatform() ~= Enum.Platform.Android then Enum.TextInputType.NoSuggestions else Enum.TextInputType.PasswordShown
 
 			return Roact.createElement("CanvasGroup", t1, {
 				SearchPanelLayout = Roact.createElement("UIListLayout", {
@@ -172,12 +192,12 @@ function v13.render(p9) -- line: 119
 							Size = UDim2.new(1, -28, 0, 20),
 							Font = Body2.Font,
 							Text = p9.props.text or "",
-							TextInputType = v33,
-							TextSize = v31,
-							TextColor3 = p10.Theme.TextEmphasis.Color,
+							TextInputType = v34,
+							TextSize = v32,
+							TextColor3 = p11.Theme.TextEmphasis.Color,
 							TextXAlignment = Enum.TextXAlignment.Left,
-							PlaceholderText = p11.search,
-							PlaceholderColor3 = p10.Theme.TextDefault.Color,
+							PlaceholderText = p12.search,
+							PlaceholderColor3 = p11.Theme.TextDefault.Color,
 							ClearTextOnFocus = false,
 							ClipsDescendants = true,
 							[Roact.Change.Text] = p9.searchTextChanged,
@@ -193,9 +213,9 @@ function v13.render(p9) -- line: 119
 					BackgroundTransparency = 1,
 					Size = UDim2.fromOffset(57, 20),
 					Font = Body.Font,
-					TextSize = v29,
-					Text = p11.cancel,
-					TextColor3 = p10.Theme.TextEmphasis.Color,
+					TextSize = v30,
+					Text = p12.cancel,
+					TextColor3 = p11.Theme.TextEmphasis.Color,
 					[Roact.Event.Activated] = p9.searchCancel
 				})
 			})
@@ -203,9 +223,9 @@ function v13.render(p9) -- line: 119
 	end)
 end
 
-return Roact.forwardRef(function(p12, p13) -- line: 236
+return Roact.forwardRef(function(p13, p14) -- line: 247
 	-- upvalues: Roact (copy), v13 (copy), Cryo (copy)
-	return Roact.createElement(v13, Cryo.Dictionary.join(p12, {
-		forwardRef = p13
+	return Roact.createElement(v13, Cryo.Dictionary.join(p13, {
+		forwardRef = p14
 	}))
 end)

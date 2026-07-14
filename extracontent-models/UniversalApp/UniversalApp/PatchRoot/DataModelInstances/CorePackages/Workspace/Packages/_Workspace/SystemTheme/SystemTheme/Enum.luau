@@ -1,3 +1,0 @@
-return {
-	SystemThemeEnum = require(script.SystemThemeEnum)
-}

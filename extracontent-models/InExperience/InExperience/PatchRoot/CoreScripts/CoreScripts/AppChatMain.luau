@@ -28,11 +28,11 @@ local v18 = Constants.ApplyDisplayScale(Constants.TopBarTopMargin)
 InExperienceAppChatModal.default:initialize(v18, SettingsHub, ViewportUtil, ChatSelector, PlayerListManager)
 
 if EngineFeature then
-	pcall(function() -- line: 37
+	pcall(function() -- line: 38
 		-- upvalues: InExperienceAppChatModal (copy)
 		local SafetyService = game:GetService("SafetyService")
 
-		InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p1) -- line: 39
+		InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p1) -- line: 40
 			-- upvalues: SafetyService (copy)
 			if p1 then
 				SafetyService:ReportPartyChatWindowOpen()
@@ -46,31 +46,40 @@ if EngineFeature then
 end
 
 renderCoreScriptInExperienceAppChat(ApolloClient, {
-	getParentContainer = function() -- line: 54
+	getParentContainer = function() -- line: 55
 		-- upvalues: InExperienceAppChatModal (copy)
 		return InExperienceAppChatModal.default.frame
 	end,
 	visibilitySignal = InExperienceAppChatModal.default.visibilitySignal.Event,
-	getShouldSetAppChatVisible = function(...) -- line: 58
+	getRequestedRoute = function() -- line: 59
+		-- upvalues: InExperienceAppChatModal (copy)
+		return InExperienceAppChatModal.default.requestedRoute
+	end,
+	requestedRouteSignal = InExperienceAppChatModal.default.requestedRouteSignal.Event,
+	clearRequestedRoute = function() -- line: 63
+		-- upvalues: InExperienceAppChatModal (copy)
+		InExperienceAppChatModal.default:clearRequestedRoute()
+	end,
+	getShouldSetAppChatVisible = function(...) -- line: 66
 		-- upvalues: InExperienceAppChatModal (copy)
 		return InExperienceAppChatModal:getVisible()
 	end,
 	entryPoint = ChatEntryPointNames.ChromeDropdown,
-	hideParentContainer = function() -- line: 64
+	hideParentContainer = function() -- line: 71
 		-- upvalues: InExperienceAppChatModal (copy)
 		InExperienceAppChatModal.default:setVisible(false)
 	end,
-	showParentContainer = function() -- line: 67
+	showParentContainer = function() -- line: 74
 		-- upvalues: InExperienceAppChatModal (copy)
 		InExperienceAppChatModal.default:setVisible(true)
 	end,
-	updateCurrentSquadId = function(p2) -- line: 70
+	updateCurrentSquadId = function(p2) -- line: 77
 		-- upvalues: GetFFlagIsSquadEnabled (copy), InExperienceAppChatModal (copy)
 		if GetFFlagIsSquadEnabled() then
 			InExperienceAppChatModal:setCurrentSquadId(p2)
 		end
 	end
-}, function(p3) -- line: 49
+}, function(p3) -- line: 50
 	-- upvalues: InExperienceAppChatModal (copy)
 	InExperienceAppChatModal:setUnreadCount(p3)
 end)

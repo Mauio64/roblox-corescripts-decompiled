@@ -1,3 +1,0 @@
-require(script.PromptsTypes)
-
-return {}

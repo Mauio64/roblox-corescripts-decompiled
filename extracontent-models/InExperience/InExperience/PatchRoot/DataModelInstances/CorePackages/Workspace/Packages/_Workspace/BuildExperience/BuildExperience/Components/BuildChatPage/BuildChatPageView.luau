@@ -28,7 +28,7 @@ local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
 local SubagentTaskStatus = CreatorAgentChat.SubagentTaskStatus
 
-local function findGroup(p1, s1: string?) -- line: 78
+local function findGroup(p1, s1: string?) -- line: 79
 	if p1 == nil or s1 == nil then
 		return nil
 	end
@@ -41,7 +41,7 @@ local function findGroup(p1, s1: string?) -- line: 78
 
 	return nil
 end
-local function getGroupStatus(p2) -- line: 90
+local function getGroupStatus(p2) -- line: 91
 	-- upvalues: SubagentTaskStatus (copy)
 	if p2.isLoading then
 		return SubagentTaskStatus.InProgress
@@ -53,7 +53,7 @@ local function getGroupStatus(p2) -- line: 90
 
 	return SubagentTaskStatus.Pending
 end
-local function toTodoItems(p3) -- line: 100
+local function toTodoItems(p3) -- line: 101
 	local t1 = {}
 
 	if p3 == nil then
@@ -71,7 +71,7 @@ local function toTodoItems(p3) -- line: 100
 
 	return t1
 end
-local function BuildChatPageView(t2: {[any]: any}) -- line: 116
+local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 	-- upvalues: ChatMessageList (copy), React (copy), BuildEmptyState (copy), SubagentTaskStatus (copy), SubagentStatus (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), FoundationText (copy), chatConstants (copy), PlayButton (copy), ButtonVariant (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), ScrollView (copy), Foundation (copy), ChatActions (copy), toTodoItems (copy)
 	local taskState = t2.taskState
 	local selectedChipGroupName = t2.selectedChipGroupName
@@ -119,7 +119,7 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 116
 				layoutOrder = v44,
 				text = v45.name,
 				isChecked = v45.isComplete,
-				onActivated = function() -- line: 135
+				onActivated = function() -- line: 136
 					-- upvalues: t2 (copy), v45 (copy)
 					t2.onChipActivated(v45.name)
 				end,
@@ -180,6 +180,8 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 116
 				Overflow = React.createElement(BuildOverflowMenuButton, {
 					layoutOrder = 5,
 					icon = IconName.ThreeDotsHorizontal,
+					isDisabled = t2.target.universeId == nil,
+					hasPublishedTurn = t2.hasPublishedTurn,
 					target = {
 						universeId = t2.target.universeId,
 						placeId = t2.target.placeId,
@@ -239,6 +241,7 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 116
 				onComposerChanged = t2.onComposerChanged,
 				textBoxRef = t2.textBoxRef,
 				isAssistantResponding = t2.isAssistantResponding,
+				canStopAssistantResponse = t2.canStopAssistantResponse,
 				onSend = t2.onSend,
 				onStop = t2.onStop
 			})

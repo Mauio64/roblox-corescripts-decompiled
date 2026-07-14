@@ -2,12 +2,11 @@ local CorePackages = game:GetService("CorePackages")
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local Cryo = InGameMenuDependencies.Cryo
-local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent
 local GlobalConfig = require(ParentParent.GlobalConfig)
-local v10 = t.strictInterface({
+local v9 = t.strictInterface({
 	themeKey = t.optional(t.string),
 	fontKey = t.optional(t.string),
 	AnchorPoint = t.optional(t.Vector2),
@@ -27,16 +26,192 @@ local v10 = t.strictInterface({
 	[Roact.Children] = t.optional(t.table)
 })
 
-local function ThemedTextLabel(p1) -- line: 34
-	-- upvalues: GlobalConfig (copy), v10 (copy), withStyle (copy), Cryo (copy), Roact (copy)
+local function ThemedTextLabel(p1) -- line: 33
+	-- upvalues: GlobalConfig (copy), v9 (copy), withFoundationOrUIBloxStyle (copy), Cryo (copy), Roact (copy)
 	if GlobalConfig.propValidation then
-		assert(v10(p1))
+		assert(v9(p1))
 	end
 
-	return withStyle(function(p2) -- line: 39
+	return withFoundationOrUIBloxStyle(function(p2) -- line: 38
+		return {
+			Theme = {
+				BackgroundDefault = {
+					Color = p2.Color.Surface.Surface_0.Color3,
+					Transparency = p2.Color.Surface.Surface_0.Transparency
+				},
+				BackgroundContrast = {
+					Color = p2.Color.Surface.Surface_100.Color3,
+					Transparency = p2.Color.Surface.Surface_100.Transparency
+				},
+				BackgroundMuted = {
+					Color = p2.Color.Surface.Surface_200.Color3,
+					Transparency = p2.Color.Surface.Surface_200.Transparency
+				},
+				BackgroundUIDefault = {
+					Color = p2.Color.Surface.Surface_300.Color3,
+					Transparency = p2.Color.Surface.Surface_300.Transparency
+				},
+				BackgroundUIContrast = {
+					Color = p2.Color.OverMedia.OverMedia_0.Color3,
+					Transparency = p2.Color.OverMedia.OverMedia_0.Transparency
+				},
+				BackgroundOnHover = {
+					Color = p2.Color.State.Hover.Color3,
+					Transparency = p2.Color.State.Hover.Transparency
+				},
+				BackgroundOnPress = {
+					Color = p2.Color.State.Press.Color3,
+					Transparency = p2.Color.State.Press.Transparency
+				},
+				UIDefault = {
+					Color = p2.Color.Shift.Shift_200.Color3,
+					Transparency = p2.Color.Shift.Shift_200.Transparency
+				},
+				UIMuted = {
+					Color = p2.Color.Shift.Shift_100.Color3,
+					Transparency = p2.Color.Shift.Shift_100.Transparency
+				},
+				UIEmphasis = {
+					Color = p2.Color.Shift.Shift_400.Color3,
+					Transparency = p2.Color.Shift.Shift_400.Transparency
+				},
+				ContextualPrimaryDefault = {
+					Color = p2.Color.ActionEmphasis.Background.Color3,
+					Transparency = p2.Color.ActionEmphasis.Background.Transparency
+				},
+				ContextualPrimaryContent = {
+					Color = p2.Color.ActionEmphasis.Foreground.Color3,
+					Transparency = p2.Color.ActionEmphasis.Foreground.Transparency
+				},
+				SystemPrimaryDefault = {
+					Color = p2.Color.ActionSubEmphasis.Background.Color3,
+					Transparency = p2.Color.ActionSubEmphasis.Background.Transparency
+				},
+				SystemPrimaryContent = {
+					Color = p2.Color.ActionSubEmphasis.Foreground.Color3,
+					Transparency = p2.Color.ActionSubEmphasis.Foreground.Transparency
+				},
+				IconDefault = {
+					Color = p2.Color.Content.Default.Color3,
+					Transparency = p2.Color.Content.Default.Transparency
+				},
+				IconEmphasis = {
+					Color = p2.Color.Content.Emphasis.Color3,
+					Transparency = p2.Color.Content.Emphasis.Transparency
+				},
+				IconOnHover = {
+					Color = p2.Color.Content.Emphasis.Color3,
+					Transparency = p2.Color.Content.Emphasis.Transparency
+				},
+				TextEmphasis = {
+					Color = p2.Color.Content.Emphasis.Color3,
+					Transparency = p2.Color.Content.Emphasis.Transparency
+				},
+				TextDefault = {
+					Color = p2.Color.Content.Default.Color3,
+					Transparency = p2.Color.Content.Default.Transparency
+				},
+				TextMuted = {
+					Color = p2.Color.Content.Muted.Color3,
+					Transparency = p2.Color.Content.Muted.Transparency
+				},
+				TextLink = {
+					Color = p2.Color.Content.Link.Color3,
+					Transparency = p2.Color.Content.Link.Transparency
+				},
+				Divider = {
+					Color = p2.Color.Stroke.Emphasis.Color3,
+					Transparency = p2.Color.Stroke.Emphasis.Transparency
+				},
+				Overlay = {
+					Color = p2.Color.Common.Scrim.Color3,
+					Transparency = p2.Color.Common.Scrim.Transparency
+				},
+				DropShadow = {
+					Color = p2.Color.Common.Shadow.Color3,
+					Transparency = p2.Color.Common.Shadow.Transparency
+				},
+				NavigationBar = {
+					Color = p2.Color.Common.NavigationBar.Color3,
+					Transparency = p2.Color.Common.NavigationBar.Transparency
+				},
+				PlaceHolder = {
+					Color = p2.Color.Common.Shimmer.Color3,
+					Transparency = p2.Color.Common.Shimmer.Transparency
+				},
+				OnlineStatus = {
+					Color = p2.Color.System.Success.Color3,
+					Transparency = p2.Color.System.Success.Transparency
+				},
+				OfflineStatus = {
+					Color = p2.Color.System.Neutral.Color3,
+					Transparency = p2.Color.System.Neutral.Transparency
+				},
+				Success = {
+					Color = p2.Color.System.Success.Color3,
+					Transparency = p2.Color.System.Success.Transparency
+				},
+				Alert = {
+					Color = p2.Color.System.Alert.Color3,
+					Transparency = p2.Color.System.Alert.Transparency
+				},
+				Badge = {
+					Color = p2.Color.System.Contrast.Color3,
+					Transparency = p2.Color.System.Contrast.Transparency
+				},
+				BadgeContent = {
+					Color = p2.Inverse.Content.Emphasis.Color3,
+					Transparency = p2.Inverse.Content.Emphasis.Transparency
+				},
+				SecondaryContent = {
+					Color = p2.Color.Extended.White.White_70.Color3,
+					Transparency = p2.Color.Extended.White.White_70.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Title = {
+					Font = p2.Typography.HeadingLarge.Font,
+					RelativeSize = p2.Typography.HeadingLarge.FontSize
+				},
+				Header1 = {
+					Font = p2.Typography.HeadingSmall.Font,
+					RelativeSize = p2.Typography.HeadingSmall.FontSize
+				},
+				Header2 = {
+					Font = p2.Typography.TitleLarge.Font,
+					RelativeSize = p2.Typography.TitleLarge.FontSize
+				},
+				SubHeader1 = {
+					Font = p2.Typography.TitleLarge.Font,
+					RelativeSize = p2.Typography.TitleLarge.FontSize
+				},
+				Body = {
+					Font = p2.Typography.BodyLarge.Font,
+					RelativeSize = p2.Typography.BodyLarge.FontSize
+				},
+				CaptionHeader = {
+					Font = p2.Typography.CaptionLarge.Font,
+					RelativeSize = p2.Typography.CaptionLarge.FontSize
+				},
+				CaptionSubHeader = {
+					Font = p2.Typography.CaptionLarge.Font,
+					RelativeSize = p2.Typography.CaptionLarge.FontSize
+				},
+				CaptionBody = {
+					Font = p2.Typography.BodySmall.Font,
+					RelativeSize = p2.Typography.BodySmall.FontSize
+				},
+				Footer = {
+					Font = p2.Typography.CaptionSmall.Font,
+					RelativeSize = p2.Typography.CaptionSmall.FontSize
+				}
+			}
+		}
+	end, function(p3) -- line: 211
 		-- upvalues: p1 (copy), Cryo (copy), Roact (copy)
-		local v14 = p2.Theme[p1.themeKey or "TextDefault"]
-		local v15 = p2.Font[p1.fontKey or "Body"]
+		local v14 = p3.Theme[p1.themeKey or "TextDefault"]
+		local v15 = p3.Font[p1.fontKey or "Body"]
 		local v16 = Cryo.Dictionary.join({
 			TextColor3 = v14.Color,
 			TextTransparency = v14.Transparency
@@ -45,7 +220,7 @@ local function ThemedTextLabel(p1) -- line: 34
 			fontKey = Cryo.None,
 			themeKey = Cryo.None,
 			Font = v15.Font,
-			TextSize = v15.RelativeSize * p2.Font.BaseSize
+			TextSize = v15.RelativeSize * p3.Font.BaseSize
 		})
 
 		return Roact.createElement("TextLabel", v16)

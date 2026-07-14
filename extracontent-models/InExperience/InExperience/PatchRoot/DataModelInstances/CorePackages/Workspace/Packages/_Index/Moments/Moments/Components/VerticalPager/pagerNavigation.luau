@@ -41,7 +41,14 @@ return {
 
 		return "next"
 	end,
-	resolveWheelGesture = function(n3: number, n4: number, n5: number) -- line: 81
+	shouldTrackDrag = function(b2: boolean, b3: boolean) -- line: 77
+		if not b2 then
+			return true
+		end
+
+		return b3
+	end,
+	resolveWheelGesture = function(n3: number, n4: number, n5: number) -- line: 99
 		return n5 <= n3 - n4, n3
 	end
 }

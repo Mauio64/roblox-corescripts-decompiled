@@ -2,15 +2,16 @@ local CorePackages = game:GetService("CorePackages")
 local UIBlox = require(CorePackages.Packages.InGameMenuDependencies).UIBlox
 local Images = require(script.Parent.Images)
 local Images2 = UIBlox.App.ImageSet.Images
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 
 return {
 	Images = {
 		RobloxLogo = Images["LuaApp/graphic/ic_logo"],
 		CloseButton = "rbxasset://textures/ui/TopBar/close.png",
 		RespawnIcon = Images["InGameMenu/Icons/RespawnIcon"],
-		ReportIcon = Images["LuaApp/icons/GameDetails/feedback"],
-		CloseModal = Images["LuaApp/icons/navigation/close"],
-		NavigateBack = Images["LuaApp/icons/navigation/pushBack"],
+		ReportIcon = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["LuaApp/icons/GameDetails/feedback"] else "icons/actions/feedback",
+		CloseModal = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["LuaApp/icons/navigation/close"] else "icons/navigation/close",
+		NavigateBack = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["LuaApp/icons/navigation/pushBack"] else "icons/navigation/pushBack",
 		NavigateForward = Images["LuaApp/icons/navigation/pushRight"],
 		SendInvite = Images["LuaApp/icons/GameDetails/invite"],
 		InviteSuccess = Images["LuaApp/icons/status_progress"],

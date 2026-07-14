@@ -1,6 +1,7 @@
 return {
 	FFlagExpChatAddUserAsyncNilCheck = require(script.FFlagExpChatAddUserAsyncNilCheck),
 	FFlagExpChatDisableUniverseBubbleChat = require(script.FFlagExpChatDisableUniverseBubbleChat),
+	FFlagExpChatFixBackspaceNilTargetChannel = require(script.FFlagExpChatFixBackspaceNilTargetChannel),
 	FFlagExpChatPresetChatEnabled = require(script.FFlagExpChatPresetChatEnabled),
 	FFlagExpChatPresetChatLoadTestEnabled = require(script.FFlagExpChatPresetChatLoadTestEnabled),
 	FFlagExpChatPresetChatSendEnabled = require(script.FFlagExpChatPresetChatSendEnabled),

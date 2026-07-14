@@ -4,7 +4,7 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
 local Cryo = InGameMenuDependencies.Cryo
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local ParentParent = script.Parent.Parent.Parent
@@ -38,7 +38,7 @@ function v15.renderButtons(p1) -- line: 42
 	}))
 end
 function v15.renderWithSelectionCursor(p2, p3) -- line: 57
-	-- upvalues: Assets (copy), withStyle (copy), Roact (copy), React (copy), CursorKind (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
+	-- upvalues: Assets (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), React (copy), CursorKind (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
 	local gameId = p2.props.gameId
 	local PlaceholderGameIcon = Assets.Images.PlaceholderGameIcon
 
@@ -46,7 +46,9 @@ function v15.renderWithSelectionCursor(p2, p3) -- line: 57
 		PlaceholderGameIcon = "rbxthumb://type=GameIcon&id=" .. gameId .. "&w=150&h=150"
 	end
 
-	return withStyle(function(_) -- line: 64
+	return withFoundationOrUIBloxStyle(function(_) -- line: 64
+		return {}
+	end, function(_) -- line: 66
 		-- upvalues: Roact (copy), React (copy), p2 (copy), p3 (copy), CursorKind (copy), ImageSetLabel (copy), PlaceholderGameIcon (ref), ThemedTextLabel (copy)
 		return Roact.createElement("TextButton", {
 			[React.Tag] = "data-testid=experienceLabel",
@@ -85,17 +87,17 @@ function v15.renderWithSelectionCursor(p2, p3) -- line: 57
 		})
 	end)
 end
-function v15.render(p5) -- line: 106
+function v15.render(p6) -- line: 108
 	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p6) -- line: 107
-		-- upvalues: p5 (copy)
-		return p5:renderWithSelectionCursor(p6)
+	return withSelectionCursorProvider(function(p7) -- line: 109
+		-- upvalues: p6 (copy)
+		return p6:renderWithSelectionCursor(p7)
 	end)
 end
 
-return Roact.forwardRef(function(p7, p8) -- line: 112
+return Roact.forwardRef(function(p8, p9) -- line: 114
 	-- upvalues: Roact (copy), v15 (copy), Cryo (copy)
-	return Roact.createElement(v15, Cryo.Dictionary.join(p7, {
-		buttonRef = p8
+	return Roact.createElement(v15, Cryo.Dictionary.join(p8, {
+		buttonRef = p9
 	}))
 end)

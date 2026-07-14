@@ -4,39 +4,37 @@ local ReactUtils = require(ParentParent.ReactUtils)
 local Foundation = require(ParentParent.Foundation)
 
 require(ParentParent.Signals)
-require(ParentParent.ChatUIPrimitives)
 
 local TextChatWindowInputBarHost = require(script.Parent.TextChatWindowInputBarHost)
 local ChatWindowTopBanner = require(script.Parent.ChatWindowTopBanner)
 local MessageListArea = require(script.Parent.MessageListArea)
+
+require(script.Parent.Message)
+
 local themeFromBackgroundColor = require(script.Parent.themeFromBackgroundColor)
 local v9 = game:DefineFastFlag("ExpChatTextChannelWindowThemeByBackground", false)
 local createNextOrder = ReactUtils.createNextOrder
-local _ = {
-	Pending = "pending",
-	Failed = "failed"
-}
 
-local function ChatAppInner(t1: {[any]: any}) -- line: 53
+local function ChatAppInner(t1: {[any]: any}) -- line: 32
 	-- upvalues: Foundation (copy), createNextOrder (copy), React (copy), v9 (copy), MessageListArea (copy), TextChatWindowInputBarHost (copy), ChatWindowTopBanner (copy)
-	local v15 = Foundation.Hooks.useTokens()
-	local v16 = createNextOrder()
+	local v14 = Foundation.Hooks.useTokens()
+	local v15 = createNextOrder()
 
 	return React.createElement(Foundation.View, {
 		Size = t1.Size or UDim2.fromScale(1, 1)
 	}, {
 		chatView = React.createElement(Foundation.View, {
 			tag = "col fill clip",
-			cornerRadius = if v9 then nil else UDim.new(0, v15.Radius.Medium),
+			cornerRadius = if v9 then nil else UDim.new(0, v14.Radius.Medium),
 			Size = UDim2.fromScale(1, 1),
 			backgroundStyle = if v9 then nil else {
 				Transparency = 0.3,
-				Color3 = v15.DarkMode.Surface.Surface_100.Color3
+				Color3 = v14.DarkMode.Surface.Surface_100.Color3
 			}
 		}, {
 			messageList = React.createElement(Foundation.View, {
 				tag = "fill",
-				LayoutOrder = v16(),
+				LayoutOrder = v15(),
 				Size = UDim2.fromScale(1, 0)
 			}, {
 				content = React.createElement(MessageListArea, {
@@ -46,7 +44,7 @@ local function ChatAppInner(t1: {[any]: any}) -- line: 53
 			}),
 			inputBar = React.createElement(Foundation.View, {
 				tag = "auto-y padding-small",
-				LayoutOrder = v16(),
+				LayoutOrder = v15(),
 				Size = UDim2.new(1, 0, 0, 0)
 			}, {
 				host = React.createElement(TextChatWindowInputBarHost, {
@@ -63,12 +61,12 @@ local function ChatAppInner(t1: {[any]: any}) -- line: 53
 		})
 	})
 end
-local function ChatApp(t2: {[any]: any}) -- line: 108
+local function ChatApp(t2: {[any]: any}) -- line: 87
 	-- upvalues: v9 (copy), themeFromBackgroundColor (copy), Foundation (copy), React (copy), ChatAppInner (copy)
-	local v18 = if not v9 or not t2.backgroundColor then Foundation.Enums.Theme.Dark else themeFromBackgroundColor(t2.backgroundColor)
+	local v17 = if not v9 or not t2.backgroundColor then Foundation.Enums.Theme.Dark else themeFromBackgroundColor(t2.backgroundColor)
 
 	return React.createElement(Foundation.FoundationProvider, {
-		theme = v18
+		theme = v17
 	}, {
 		inner = React.createElement(ChatAppInner, t2)
 	})

@@ -1,16 +1,18 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Foundation = require(ParentParentParent.Foundation)
 local View = Foundation.View
 local Empty = Foundation.Empty
 local IconSize = Foundation.Enums.IconSize
+local Constants = require(ParentParent.Common.Constants)
 
-local function v7() -- line: 15
+local function v9() -- line: 14
 end
-local function ServiceUnavailableStateImpl(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), View (copy), Empty (copy), IconSize (copy), v7 (copy)
+local function ServiceUnavailableStateImpl(t1: {[any]: any}) -- line: 21
+	-- upvalues: React (copy), View (copy), Constants (copy), Empty (copy), IconSize (copy), v9 (copy)
 	return React.createElement(View, {
-		tag = "col size-full padding-large gap-medium align-x-center align-y-center bg-over-media-0",
+		tag = Constants.STATE_PANEL_TAG,
 		LayoutOrder = t1.layoutOrder
 	}, {
 		Content = React.createElement(Empty, {
@@ -21,7 +23,7 @@ local function ServiceUnavailableStateImpl(t1: {[any]: any}) -- line: 22
 			},
 			button = {
 				text = "Retry",
-				onActivated = t1.onRetry or v7
+				onActivated = t1.onRetry or v9
 			}
 		})
 	})

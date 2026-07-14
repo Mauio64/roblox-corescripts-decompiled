@@ -19,5 +19,7 @@ return {
 	StudioClientLogsTool = StudioClientLogsTool,
 	ClientToolItems = require(script.ClientToolItems),
 	debug = require(script.debug),
+	experimentOverride = require(script.experimentOverride),
+	ErrorCodes = require(script.Acp.AcpProtocol).ErrorCodes,
 	resolveCreatorAgentAcp = require(script.Env.resolveAcpUrl).resolveCreatorAgentAcp
 }

@@ -8,7 +8,7 @@ local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local withStyle = UIBlox.Core.Style.withStyle
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ParentParent = script.Parent.Parent.Parent
 local withLocalization = require(ParentParent.Localization.withLocalization)
 local Assets = require(ParentParent.Resources.Assets)
@@ -29,19 +29,29 @@ function v20.init(p1) -- line: 41
 	p1.buttonRef = Roact.createRef()
 end
 function v20.render(p2) -- line: 45
-	-- upvalues: withStyle (copy), withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), GuiService (copy), Button (copy), ButtonType (copy)
+	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), GuiService (copy), Button (copy), ButtonType (copy)
 	local props = p2.props
 
-	return withStyle(function(p3) -- line: 48
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 48
+		return {
+			Font = {
+				BaseSize = 1,
+				Body = {
+					Font = p3.Typography.BodyLarge.Font,
+					RelativeSize = p3.Typography.BodyLarge.FontSize
+				}
+			}
+		}
+	end, function(p4) -- line: 55
 		-- upvalues: withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
 		return withLocalization({
 			noFriendsText = "CoreScripts.InGameMenu.InviteFriends.NoFriends",
 			makeFriendsNow = "CoreScripts.InGameMenu.InviteFriends.MakeFriendsNow"
-		})(function(p4) -- line: 52
-			-- upvalues: p3 (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
-			local BodyFont = p3.Font.Body.Font
-			local v28 = p3.Font.Body.RelativeSize * p3.Font.BaseSize
-			local Y = TextService:GetTextSize(p4.noFriendsText, v28, BodyFont, Vector2.new(304, 1e999)).Y
+		})(function(p5) -- line: 59
+			-- upvalues: p4 (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
+			local BodyFont = p4.Font.Body.Font
+			local v29 = p4.Font.Body.RelativeSize * p4.Font.BaseSize
+			local Y = TextService:GetTextSize(p5.noFriendsText, v29, BodyFont, Vector2.new(304, 1e999)).Y
 
 			return Roact.createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -71,27 +81,27 @@ function v20.render(p2) -- line: 45
 						fontKey = "Body",
 						themeKey = "TextEmphasis",
 						TextWrapped = true,
-						Text = p4.noFriendsText,
+						Text = p5.noFriendsText,
 						Position = UDim2.new(0, 0, 0, 4),
 						Size = UDim2.new(1, 0, 1, -20),
 						TextXAlignment = Enum.TextXAlignment.Center
 					})
 				}),
 				RootedConnection = Roact.createElement(RootedConnection, {
-					render = function(p5) -- line: 102
-						-- upvalues: Roact (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy), p4 (copy)
+					render = function(p6) -- line: 109
+						-- upvalues: Roact (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy), p5 (copy)
 						return Roact.createElement(FocusHandler, {
-							isFocused = props.canCaptureFocus and p5,
-							didFocus = function() -- line: 106
+							isFocused = props.canCaptureFocus and p6,
+							didFocus = function() -- line: 113
 								-- upvalues: GuiService (copy), p2 (copy)
 								GuiService.SelectedCoreObject = p2.buttonRef:getValue()
 							end
 						}, {
-							MakeFriendsButton = p5 and Roact.createElement(Button, {
+							MakeFriendsButton = p6 and Roact.createElement(Button, {
 								layoutOrder = 3,
 								buttonType = ButtonType.Secondary,
 								size = UDim2.new(1, 0, 0, 48),
-								text = p4.makeFriendsNow,
+								text = p5.makeFriendsNow,
 								onActivated = props.switchToPlayers,
 								buttonRef = p2.buttonRef
 							}) or nil
@@ -103,12 +113,12 @@ function v20.render(p2) -- line: 45
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p6) -- line: 128
+return RoactRodux.UNSTABLE_connect2(nil, function(p7) -- line: 135
 	-- upvalues: SetCurrentPage (copy)
 	return {
-		switchToPlayers = function() -- line: 130
-			-- upvalues: p6 (copy), SetCurrentPage (copy)
-			p6(SetCurrentPage("Players"))
+		switchToPlayers = function() -- line: 137
+			-- upvalues: p7 (copy), SetCurrentPage (copy)
+			p7(SetCurrentPage("Players"))
 		end
 	}
 end)(v20)

@@ -42,13 +42,18 @@ function t1.withAnalytics(p5, p6) -- line: 56
 
 	return p5
 end
-function t1._createTree(t3: {[any]: any}, b1: boolean, t4: {[any]: any}?) -- line: 61
+function t1.withRequestImpl(p7, p8) -- line: 61
+	p7.requestImpl = p8
+
+	return p7
+end
+function t1._createTree(t3: {[any]: any}, b1: boolean, t4: {[any]: any}?) -- line: 66
 	-- upvalues: GetFFlagEnableSharedInviteStore (copy), InviteStore (copy), Rodux (copy), AppReducer (copy), renderWithCoreScriptsStyleProvider (copy), Roact (copy), FullModalShareGameComponent (copy)
-	local v30 = if not GetFFlagEnableSharedInviteStore() then Rodux.Store.new(AppReducer, nil, { Rodux.thunkMiddleware }) else InviteStore
+	local v32 = if not GetFFlagEnableSharedInviteStore() then Rodux.Store.new(AppReducer, nil, { Rodux.thunkMiddleware }) else InviteStore
 
 	return renderWithCoreScriptsStyleProvider({
 		FullModalShareGame = Roact.createElement(FullModalShareGameComponent, {
-			store = v30,
+			store = v32,
 			isVisible = b1,
 			analytics = t3.analytics,
 			promptMessage = t4 and t4.promptMessage,
@@ -56,14 +61,15 @@ function t1._createTree(t3: {[any]: any}, b1: boolean, t4: {[any]: any}?) -- lin
 			inviteMessageId = t4 and t4.inviteMessageId,
 			launchData = t4 and t4.launchData,
 			isLoading = t4 and t4.isLoading,
-			onAfterClosePage = function(_) -- line: 75
+			requestImpl = t3.requestImpl,
+			onAfterClosePage = function(_) -- line: 81
 				-- upvalues: t3 (copy)
 				t3:hide({})
 			end
 		})
 	})
 end
-function t1.show(t5: {[any]: any}, t6: {[any]: any}?) -- line: 89
+function t1.show(t5: {[any]: any}, t6: {[any]: any}?) -- line: 95
 	-- upvalues: Constants (copy), GameInviteEvents (copy), GetFFlagAbuseReportAnalyticsHasLaunchData (copy), Roact (copy), ContextActionService (copy)
 	if t5.isActive then
 		return
@@ -73,11 +79,11 @@ function t1.show(t5: {[any]: any}, t6: {[any]: any}?) -- line: 89
 	t5.isActive = not t5.isLoading
 
 	if t6 then
-		local v33 = if not t6.inviteUserId then Constants.Triggers.DeveloperMultiple else Constants.Triggers.DeveloperSingle
-		local v34 = t6.launchData ~= nil and t6.launchData ~= ""
+		local v35 = if not t6.inviteUserId then Constants.Triggers.DeveloperMultiple else Constants.Triggers.DeveloperSingle
+		local v36 = t6.launchData ~= nil and t6.launchData ~= ""
 
-		t5.analytics:sendEvent(v33, GameInviteEvents.ModalOpened, if not GetFFlagAbuseReportAnalyticsHasLaunchData() then nil else {
-			isLaunchDataProvided = v34
+		t5.analytics:sendEvent(v35, GameInviteEvents.ModalOpened, if not GetFFlagAbuseReportAnalyticsHasLaunchData() then nil else {
+			isLaunchDataProvided = v36
 		})
 	end
 
@@ -91,35 +97,35 @@ function t1.show(t5: {[any]: any}, t6: {[any]: any}?) -- line: 89
 		t5.analytics:inputShareGameEntryPoint()
 	end
 
-	ContextActionService:BindCoreAction("hideInvitePrompt", function(_, p9, _) -- line: 118
+	ContextActionService:BindCoreAction("hideInvitePrompt", function(_, p11, _) -- line: 124
 		-- upvalues: t5 (copy)
-		if p9 == Enum.UserInputState.Begin then
+		if p11 == Enum.UserInputState.Begin then
 			t5:hide()
 		end
 	end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Backspace)
 end
-function t1.hide(p11, _) -- line: 125
+function t1.hide(p13, _) -- line: 131
 	-- upvalues: Roact (copy), ContextActionService (copy), GuiService (copy)
-	if not p11.isActive and not p11.isLoading then
+	if not p13.isActive and not p13.isLoading then
 		return
 	end
 
-	p11.isLoading = false
-	p11.isActive = false
-	p11.instance = Roact.update(p11.instance, p11:_createTree(false))
+	p13.isLoading = false
+	p13.isActive = false
+	p13.instance = Roact.update(p13.instance, p13:_createTree(false))
 
-	if p11.socialService and p11.localPlayer then
-		p11.socialService:InvokeGameInvitePromptClosed(p11.localPlayer, {})
+	if p13.socialService and p13.localPlayer then
+		p13.socialService:InvokeGameInvitePromptClosed(p13.localPlayer, {})
 	end
 
 	ContextActionService:UnbindCoreAction("hideInvitePrompt")
 	GuiService.SelectedCoreObject = nil
 	GuiService:RemoveSelectionGroup("invitePrompt")
 end
-function t1.destruct(p13) -- line: 142
+function t1.destruct(p15) -- line: 148
 	-- upvalues: Roact (copy)
-	if p13.instance then
-		Roact.unmount(p13.instance)
+	if p15.instance then
+		Roact.unmount(p15.instance)
 	end
 end
 

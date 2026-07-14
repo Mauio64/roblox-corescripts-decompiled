@@ -1,4 +1,0 @@
-return {
-	Active = "Active",
-	Expired = "Expired"
-}

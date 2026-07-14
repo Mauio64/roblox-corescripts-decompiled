@@ -57,6 +57,7 @@ local InteractionFeedback = require(AppChatParent.InteractionFeedback)
 local HapticFeedbackConfig = require(AppChat.Utils.HapticFeedback).HapticFeedbackConfig
 local createConversation = require(AppChat.Conversations.Thunks.createConversation)
 local fetchLatestConversationDetails = require(AppChat.Conversations.Thunks.fetchLatestConversationDetails)
+local rootedChatDetailsNavigation = require(AppChat.Navigators.rootedChatDetailsNavigation)
 local EnumScreens = require(script.Parent.EnumScreens)
 local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
 local GetFFlagEnableCrossExpVoice = require(AppChatParent.SharedFlags).GetFFlagEnableCrossExpVoice
@@ -67,6 +68,7 @@ local getFFlagHideNotificationIconForVR = require(AppChat.Flags.getFFlagHideNoti
 local getFFlagFixChatsBottomInsetBackgroundColor = require(AppChat.Flags.getFFlagFixChatsBottomInsetBackgroundColor)
 local GetFFlagEnableAppChatInExperience = SharedFlags.GetFFlagEnableAppChatInExperience
 local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
+local getFFlagAppChatRequestedRoute = require(AppChat.Flags.getFFlagAppChatRequestedRoute)
 local FFlagSupportViewingUserProfileOnOSA = require(AppChat.Flags.FFlagSupportViewingUserProfileOnOSA)
 local GetOverlayStore = require(AppChat.Stores.GetOverlayStore)
 local navigateWithOsaGate = require(AppChat.Utils.navigateWithOsaGate)
@@ -84,99 +86,102 @@ local t1 = {
 	navigateToRootStack = nil,
 	androidBackButtonSignal = nil,
 	initialConversationId = "",
+	requestedRoute = nil,
 	logger = Logger,
-	setTabBarVisible = function() -- line: 125
+	setTabBarVisible = function() -- line: 129
 	end,
-	setInitialConversationId = function(_) -- line: 126
+	setInitialConversationId = function(_) -- line: 130
 	end,
 	chatPlacement = ChatPlacementContext.Enum.Unknown
 }
 
-function AppChatEntryPoint(p2) -- line: 139
-	-- upvalues: Cryo (copy), t1 (copy), ChatPlacementContext (copy), useTokens (copy), v13 (copy), rootNavigator (ref), AppChat (copy), rootNavigator2 (ref), useSelector (copy), useCallback (copy), useDispatch (copy), useEffect (copy), AppChatNetworking (copy), Logger2 (copy), useChatIsVisible (copy), useState (copy), React (copy), RoactNavigation (copy), getRoactChatStackNavigator (copy), useRef (copy), FFlagSupportViewingUserProfileOnOSA (copy), GetOverlayStore (copy), EnumScreens (copy), createConversation (copy), fetchLatestConversationDetails (copy), GetFFlagIsSquadEnabled (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), GetTopBarStore (copy), ArgCheck (copy), FFlagAppChatTopBarSignalsStore (copy), EnteredChatFromEntryPoint (copy), NavigateIntoChat (copy), useCurrentSquadParentChannelId (copy), GetFFlagEnableCrossExpVoice (copy), useIsVoiceConnected (copy), useAppPolicy (copy), getFFlagHideNotificationIconForVR (copy), usePageSideMargin (copy), useIsChatEnabled (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatRemoveNotifications (copy), GetFFlagEnableAppChatInExperience (copy), useStyle (copy), SetTabBarVisible (copy), UserInputService (copy), NAV_BAR_WITH_FACEPILE_SIZE (copy), FFlagEnableHeaderBarButtonsUpdate (copy), LuaAppNavigationContextProvider (copy), FFlagAppChatSignalsReplyStore (copy), ReplyingToMessageProvider (copy), InteractionFeedback (copy), HapticFeedbackConfig (copy), LayerCollectorProvider (copy), useRobloxLocale (copy), RbxAnalyticsService (copy), AnalyticsProvider (copy), AppTelemetryLayer (copy), TopBarContext (copy), getFFlagFixChatsBottomInsetBackgroundColor (copy), RoactChatAnalyticsProvider (copy)
-	local v70 = Cryo.Dictionary.join(t1, p2)
-	local v71 = ChatPlacementContext.isPlacementInExperience(v70.chatPlacement)
-	local v72 = useTokens()
+function AppChatEntryPoint(p2) -- line: 144
+	-- upvalues: Cryo (copy), t1 (copy), ChatPlacementContext (copy), useTokens (copy), v13 (copy), rootNavigator (ref), AppChat (copy), rootNavigator2 (ref), useSelector (copy), useCallback (copy), useDispatch (copy), useEffect (copy), AppChatNetworking (copy), Logger2 (copy), useChatIsVisible (copy), useState (copy), React (copy), RoactNavigation (copy), getRoactChatStackNavigator (copy), useRef (copy), FFlagSupportViewingUserProfileOnOSA (copy), GetOverlayStore (copy), EnumScreens (copy), createConversation (copy), fetchLatestConversationDetails (copy), GetFFlagIsSquadEnabled (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), getFFlagAppChatRequestedRoute (copy), rootedChatDetailsNavigation (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), GetTopBarStore (copy), ArgCheck (copy), FFlagAppChatTopBarSignalsStore (copy), EnteredChatFromEntryPoint (copy), NavigateIntoChat (copy), useCurrentSquadParentChannelId (copy), GetFFlagEnableCrossExpVoice (copy), useIsVoiceConnected (copy), useAppPolicy (copy), getFFlagHideNotificationIconForVR (copy), usePageSideMargin (copy), useIsChatEnabled (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatRemoveNotifications (copy), GetFFlagEnableAppChatInExperience (copy), useStyle (copy), SetTabBarVisible (copy), UserInputService (copy), NAV_BAR_WITH_FACEPILE_SIZE (copy), FFlagEnableHeaderBarButtonsUpdate (copy), LuaAppNavigationContextProvider (copy), FFlagAppChatSignalsReplyStore (copy), ReplyingToMessageProvider (copy), InteractionFeedback (copy), HapticFeedbackConfig (copy), LayerCollectorProvider (copy), useRobloxLocale (copy), RbxAnalyticsService (copy), AnalyticsProvider (copy), AppTelemetryLayer (copy), TopBarContext (copy), getFFlagFixChatsBottomInsetBackgroundColor (copy), RoactChatAnalyticsProvider (copy)
+	local v72 = Cryo.Dictionary.join(t1, p2)
+	local v73 = ChatPlacementContext.isPlacementInExperience(v72.chatPlacement)
+	local v74 = useTokens()
 
 	if v13 then
 		rootNavigator = require(AppChat.Navigators.Compact.rootNavigator)
 		rootNavigator2 = require(AppChat.Navigators.Wide.rootNavigator)
 	end
 
-	local v73 = useSelector(useCallback(function(p3) -- line: 150
+	local v75 = useSelector(useCallback(function(p3) -- line: 155
 		return p3.LocalUserId
-	end, {})) or v70.localUserId
-	local v74 = useSelector(useCallback(function(p4) -- line: 153
+	end, {})) or v72.localUserId
+	local v76 = useSelector(useCallback(function(p4) -- line: 158
 		return p4.GlobalGuiInset
 	end, {})) or {
 		bottom = 0
 	}
-	local v75 = useSelector(useCallback(function(p5) -- line: 156
+	local v77 = useCallback(function(p5) -- line: 161
 		return p5.ChatAppReducer.LastEntryPoint
-	end, {}))
-	local v76 = useDispatch()
+	end, {})
+	local v78 = useSelector(v77)
+	local v79 = useDispatch()
 
-	useEffect(function() -- line: 162
-		-- upvalues: v76 (copy), AppChatNetworking (copy), v71 (copy), Logger2 (copy)
-		v76(AppChatNetworking.rodux.GetChatLandingModal.API(v71)):catch(function(p6) -- line: 163
+	useEffect(function() -- line: 168
+		-- upvalues: v79 (copy), AppChatNetworking (copy), v73 (copy), Logger2 (copy)
+		v79(AppChatNetworking.rodux.GetChatLandingModal.API(v73)):catch(function(p6) -- line: 169
 			-- upvalues: Logger2 (copy)
 			Logger2:warning("Error in GetChatLandingModal request. Error: {}", (tostring(p6)))
 		end)
 	end, {
-		v76,
-		v73,
-		v71
+		v79,
+		v75,
+		v73
 	})
 
-	local v77 = useChatIsVisible()
-	local v78, v79 = useState({})
-	local v80 = React.useMemo(function() -- line: 172
-		-- upvalues: RoactNavigation (copy), getRoactChatStackNavigator (copy), v70 (copy), rootNavigator2 (ref), rootNavigator (ref)
-		return RoactNavigation.createAppContainer(getRoactChatStackNavigator(v70.wideMode and rootNavigator2 or rootNavigator, v70.navigateToRootStack, v70.androidBackButtonSignal, v70.androidBackButtonConnection))
+	local v80 = useChatIsVisible()
+	local v81, v82 = useState({})
+	local v83 = React.useMemo(function() -- line: 178
+		-- upvalues: RoactNavigation (copy), getRoactChatStackNavigator (copy), v72 (copy), rootNavigator2 (ref), rootNavigator (ref)
+		return RoactNavigation.createAppContainer(getRoactChatStackNavigator(v72.wideMode and rootNavigator2 or rootNavigator, v72.navigateToRootStack, v72.androidBackButtonSignal, v72.androidBackButtonConnection))
 	end, {
-		v70.wideMode,
+		v72.wideMode,
 		rootNavigator2,
 		rootNavigator,
-		v70.navigateToRootStack,
-		v70.androidBackButtonSignal,
-		v70.androidBackButtonConnection
+		v72.navigateToRootStack,
+		v72.androidBackButtonSignal,
+		v72.androidBackButtonConnection
 	})
-	local v81 = if not v71 then useRef(RoactNavigation.createAppContainer(getRoactChatStackNavigator(v70.wideMode and rootNavigator2 or rootNavigator, v70.navigateToRootStack, v70.androidBackButtonSignal, v70.androidBackButtonConnection))) else v80
+	local v84 = useRef(nil)
 
-	if not v71 then
-		v81 = v81.current
+	if not v73 and v84.current == nil then
+		v84.current = RoactNavigation.createAppContainer(getRoactChatStackNavigator(v72.wideMode and rootNavigator2 or rootNavigator, v72.navigateToRootStack, v72.androidBackButtonSignal, v72.androidBackButtonConnection))
 	end
 
-	local v82 = useRef(false)
-	local v83 = useRef(nil)
-	local v84 = useRef(function(...) -- line: 209
+	local v85 = if not v73 then v84.current else v83
+	local v86 = useRef(false)
+	local v87 = useRef(nil)
+	local v88 = useRef(function(...) -- line: 211
 	end)
 
-	useEffect(function() -- line: 211
-		-- upvalues: v70 (copy), Logger2 (copy)
-		if v70.logger then
-			Logger2:setParent(v70.logger)
+	useEffect(function() -- line: 213
+		-- upvalues: v72 (copy), Logger2 (copy)
+		if v72.logger then
+			Logger2:setParent(v72.logger)
 		end
-	end, { v70.logger })
+	end, { v72.logger })
 
-	local v85 = useCallback(function(p7) -- line: 217
-		-- upvalues: v82 (copy), v84 (copy)
-		if not v82.current then
+	local v89 = useCallback(function(p7) -- line: 219
+		-- upvalues: v86 (copy), v88 (copy)
+		if not v86.current then
 			return
 		end
 
-		if v84.current then
-			v84.current(p7)
+		if v88.current then
+			v88.current(p7)
 		end
 	end, {
-		v82,
-		v84
+		v86,
+		v88
 	})
 
 	if FFlagSupportViewingUserProfileOnOSA then
-		local navigateToLuaAppPages = v70.navigateToLuaAppPages
+		local navigateToLuaAppPages = v72.navigateToLuaAppPages
 
-		useEffect(function() -- line: 229
+		useEffect(function() -- line: 231
 			-- upvalues: GetOverlayStore (copy), navigateToLuaAppPages (copy), EnumScreens (copy)
 			GetOverlayStore(false).setOverlayDefaultProps({
 				onViewUserProfile = if not navigateToLuaAppPages then nil else navigateToLuaAppPages[EnumScreens.ViewUserProfile]
@@ -184,7 +189,7 @@ function AppChatEntryPoint(p2) -- line: 139
 		end, { navigateToLuaAppPages })
 	end
 
-	local v87 = useCallback(function(p8) -- line: 239
+	local v91 = useCallback(function(p8) -- line: 241
 		-- upvalues: RoactNavigation (copy), EnumScreens (copy)
 		return RoactNavigation.Actions.navigate({
 			routeName = EnumScreens.ChatConversation,
@@ -193,8 +198,8 @@ function AppChatEntryPoint(p2) -- line: 139
 			}
 		})
 	end, {})
-	local v88 = useCallback(function(p9, p10) -- line: 247
-		-- upvalues: RoactNavigation (copy), EnumScreens (copy), v70 (copy)
+	local v92 = useCallback(function(p9, p10) -- line: 249
+		-- upvalues: RoactNavigation (copy), EnumScreens (copy), v72 (copy)
 		local t2 = {
 			RoactNavigation.Actions.navigate({
 				routeName = EnumScreens.ChatConversation,
@@ -211,7 +216,7 @@ function AppChatEntryPoint(p2) -- line: 139
 			})
 		}
 
-		if v70.wideMode then
+		if v72.wideMode then
 			return RoactNavigation.Actions.navigate({
 				routeName = EnumScreens.ChatLanding,
 				params = {
@@ -238,75 +243,97 @@ function AppChatEntryPoint(p2) -- line: 139
 				actions = t2
 			})
 		})
-	end, { v70.wideMode })
-	local v89 = useCallback(function(p11) -- line: 296
-		-- upvalues: v76 (copy), createConversation (copy)
-		return v76(createConversation("one_to_one", { p11 }))
-	end, { v76 })
-	local v90 = useCallback(function(s1: string) -- line: 300
-		-- upvalues: v76 (copy), fetchLatestConversationDetails (copy)
-		return v76(fetchLatestConversationDetails(s1))
-	end, { v76 })
-	local v91 = useCallback(function(p12: ((...any) -> ...any)) -- line: 304
-		-- upvalues: v84 (copy), v70 (copy), GetFFlagIsSquadEnabled (copy), Cryo (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v76 (copy), v88 (copy), EnumScreens (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v90 (copy), Logger2 (copy), v87 (copy), v89 (copy), RoactNavigation (copy)
-		v84.current = p12
+	end, { v72.wideMode })
+	local v93 = useCallback(function(p11) -- line: 298
+		-- upvalues: v79 (copy), createConversation (copy)
+		return v79(createConversation("one_to_one", { p11 }))
+	end, { v79 })
+	local v94 = useCallback(function(s1: string) -- line: 302
+		-- upvalues: v79 (copy), fetchLatestConversationDetails (copy)
+		return v79(fetchLatestConversationDetails(s1))
+	end, { v79 })
+	local v95 = useCallback(function(p12: ((...any) -> ...any)) -- line: 307
+		-- upvalues: v88 (copy), v72 (copy), GetFFlagIsSquadEnabled (copy), Cryo (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v79 (copy), v92 (copy), EnumScreens (copy), getFFlagAppChatRequestedRoute (copy), rootedChatDetailsNavigation (copy), v94 (copy), RoactNavigation (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), Logger2 (copy), v91 (copy), v93 (copy)
+		v88.current = p12
 
-		if not v70.updateExternalNavigationForScreen then
-			return function() -- line: 307
-				-- upvalues: v84 (copy)
-				v84.current = nil
+		if not v72.updateExternalNavigationForScreen then
+			return function() -- line: 310
+				-- upvalues: v88 (copy)
+				v88.current = nil
 			end
 		end
 
-		local updateExternalNavigationForScreen = v70.updateExternalNavigationForScreen
+		local updateExternalNavigationForScreen = v72.updateExternalNavigationForScreen
 
 		if GetFFlagIsSquadEnabled() then
-			updateExternalNavigationForScreen(function(p13) -- line: 314
-				-- upvalues: Cryo (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v76 (copy), p12 (copy), v88 (copy)
+			updateExternalNavigationForScreen(function(p13) -- line: 317
+				-- upvalues: Cryo (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v79 (copy), p12 (copy), v92 (copy)
 				local conversationId = p13.conversationId
-				local v149 = Cryo.Dictionary.omit(p13, "conversationId")
+				local v153 = Cryo.Dictionary.omit(p13, "conversationId")
 
 				if FFlagAppChatShowOSAOnPageEntry then
 					navigateWithOsaGate({
 						requireMultiUserForU13 = true,
 						conversationId = conversationId,
-						dispatch = v76,
-						onAccepted = function() -- line: 321
-							-- upvalues: p12 (copy), v88 (copy), conversationId (copy), v149 (copy)
-							p12(v88(conversationId, v149))
+						dispatch = v79,
+						onAccepted = function() -- line: 324
+							-- upvalues: p12 (copy), v92 (copy), conversationId (copy), v153 (copy)
+							p12(v92(conversationId, v153))
 						end
 					})
 
 					return
 				end
 
-				p12(v88(conversationId, v149))
+				p12(v92(conversationId, v153))
 			end, EnumScreens.SquadLobby)
 		end
 
-		updateExternalNavigationForScreen(function(p14) -- line: 332
-			-- upvalues: FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v76 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v90 (copy), Logger2 (copy), p12 (copy), v87 (copy), v89 (copy)
-			local v151 = p14 and p14.conversationId
+		if getFFlagAppChatRequestedRoute() then
+			updateExternalNavigationForScreen(function(p14) -- line: 336
+				-- upvalues: rootedChatDetailsNavigation (copy), p12 (copy), v79 (copy), v94 (copy), RoactNavigation (copy), EnumScreens (copy)
+				if not p14 or not p14.conversationId then
+					return
+				end
 
-			if v151 then
+				if rootedChatDetailsNavigation.tryNavigateToRootedChatDetails({
+					callback = p12,
+					dispatch = v79,
+					fetchLatestConversationDetails = v94
+				}, p14) then
+					return
+				end
+
+				p12(RoactNavigation.Actions.navigate({
+					routeName = EnumScreens.ChatDetails,
+					params = p14
+				}))
+			end, EnumScreens.ChatDetails)
+		end
+
+		updateExternalNavigationForScreen(function(p15) -- line: 359
+			-- upvalues: FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v79 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v94 (copy), Logger2 (copy), p12 (copy), v91 (copy), v93 (copy)
+			local v156 = p15 and p15.conversationId
+
+			if v156 then
 				if not FFlagAppChatShowOSAOnPageEntry then
 					if FFlagAppChatPerfTracking then
 						AppChatPerfTracker.start(AppChatPerfTracker.Events.ChatConversationTTI, {
-							conversationId = v151
+							conversationId = v156
 						})
 					end
 
-					v90(v151):andThen(function() -- line: 374
-						-- upvalues: Logger2 (copy), v151 (copy), p12 (copy), v87 (copy)
-						Logger2:info("Successfully fetched conversation details for conversationId {} for external navigation", v151)
-						p12(v87(v151))
-					end):catch(function(p15) -- line: 381
-						-- upvalues: Logger2 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v151 (copy)
-						Logger2:warning("Error in fetchLatestConversationDetails request before navigate to conversation. error: {}", (tostring(p15)))
+					v94(v156):andThen(function() -- line: 401
+						-- upvalues: Logger2 (copy), v156 (copy), p12 (copy), v91 (copy)
+						Logger2:info("Successfully fetched conversation details for conversationId {} for external navigation", v156)
+						p12(v91(v156))
+					end):catch(function(p16) -- line: 408
+						-- upvalues: Logger2 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v156 (copy)
+						Logger2:warning("Error in fetchLatestConversationDetails request before navigate to conversation. error: {}", (tostring(p16)))
 
 						if FFlagAppChatPerfTracking then
 							AppChatPerfTracker.cancel(AppChatPerfTracker.Events.ChatConversationTTI, {
-								conversationId = v151
+								conversationId = v156
 							})
 						end
 					end)
@@ -315,27 +342,27 @@ function AppChatEntryPoint(p2) -- line: 139
 				end
 
 				navigateWithOsaGate({
-					conversationId = v151,
-					dispatch = v76,
-					onAccepted = function() -- line: 340
-						-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v151 (copy), v90 (copy), Logger2 (copy), p12 (copy), v87 (copy)
+					conversationId = v156,
+					dispatch = v79,
+					onAccepted = function() -- line: 367
+						-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v156 (copy), v94 (copy), Logger2 (copy), p12 (copy), v91 (copy)
 						if FFlagAppChatPerfTracking then
 							AppChatPerfTracker.start(AppChatPerfTracker.Events.ChatConversationTTI, {
-								conversationId = v151
+								conversationId = v156
 							})
 						end
 
-						v90(v151):andThen(function() -- line: 347
-							-- upvalues: Logger2 (copy), v151 (copy), p12 (copy), v87 (copy)
-							Logger2:info("Successfully fetched conversation details for conversationId {} for external navigation", v151)
-							p12(v87(v151))
-						end):catch(function(p16) -- line: 354
-							-- upvalues: Logger2 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v151 (copy)
-							Logger2:warning("Error in fetchLatestConversationDetails request before navigate to conversation. error: {}", (tostring(p16)))
+						v94(v156):andThen(function() -- line: 374
+							-- upvalues: Logger2 (copy), v156 (copy), p12 (copy), v91 (copy)
+							Logger2:info("Successfully fetched conversation details for conversationId {} for external navigation", v156)
+							p12(v91(v156))
+						end):catch(function(p17) -- line: 381
+							-- upvalues: Logger2 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v156 (copy)
+							Logger2:warning("Error in fetchLatestConversationDetails request before navigate to conversation. error: {}", (tostring(p17)))
 
 							if FFlagAppChatPerfTracking then
 								AppChatPerfTracker.cancel(AppChatPerfTracker.Events.ChatConversationTTI, {
-									conversationId = v151
+									conversationId = v156
 								})
 							end
 						end)
@@ -343,348 +370,390 @@ function AppChatEntryPoint(p2) -- line: 139
 				})
 			end
 
-			local v152 = p14 and p14.userId
+			local v157 = p15 and p15.userId
 
-			if not v152 then
+			if not v157 then
 				return
 			end
 
-			spawn(function() -- line: 402
-				-- upvalues: v89 (copy), v152 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), Logger2 (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v76 (copy), p12 (copy), v87 (copy)
-				v89(v152):andThen(function(p17) -- line: 404
-					-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), Logger2 (copy), v152 (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v76 (copy), p12 (copy), v87 (copy)
+			spawn(function() -- line: 429
+				-- upvalues: v93 (copy), v157 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), Logger2 (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v79 (copy), p12 (copy), v91 (copy)
+				v93(v157):andThen(function(p18) -- line: 431
+					-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), Logger2 (copy), v157 (copy), FFlagAppChatShowOSAOnPageEntry (copy), navigateWithOsaGate (copy), v79 (copy), p12 (copy), v91 (copy)
 					if FFlagAppChatPerfTracking then
 						AppChatPerfTracker.start(AppChatPerfTracker.Events.ChatConversationTTI, {
-							conversationId = p17.id
+							conversationId = p18.id
 						})
 					end
 
-					Logger2:info("Successfully fetched conversation details for userId {} for external navigation", v152)
+					Logger2:info("Successfully fetched conversation details for userId {} for external navigation", v157)
 
 					if FFlagAppChatShowOSAOnPageEntry then
 						navigateWithOsaGate({
-							conversationId = p17.id,
-							dispatch = v76,
-							onAccepted = function() -- line: 418
-								-- upvalues: p12 (copy), v87 (copy), p17 (copy)
-								p12(v87(p17.id))
+							conversationId = p18.id,
+							dispatch = v79,
+							onAccepted = function() -- line: 445
+								-- upvalues: p12 (copy), v91 (copy), p18 (copy)
+								p12(v91(p18.id))
 							end
 						})
 
 						return
 					end
 
-					p12(v87(p17.id))
-				end):catch(function(p18) -- line: 426
+					p12(v91(p18.id))
+				end):catch(function(p19) -- line: 453
 					-- upvalues: Logger2 (copy)
-					Logger2:warning("Error in CreateConversation request before navigate to conversation. error: {}", (tostring(p18)))
+					Logger2:warning("Error in CreateConversation request before navigate to conversation. error: {}", (tostring(p19)))
 				end)
 			end)
 		end, EnumScreens.ChatConversation)
-		updateExternalNavigationForScreen(function(p19) -- line: 436
-			-- upvalues: p12 (copy), RoactNavigation (copy), EnumScreens (copy), v70 (copy)
+		updateExternalNavigationForScreen(function(p20) -- line: 463
+			-- upvalues: p12 (copy), RoactNavigation (copy), EnumScreens (copy), v72 (copy)
 			p12(RoactNavigation.Actions.navigate({
 				routeName = EnumScreens.ChatLanding,
-				params = p19
+				params = p20
 			}))
 
-			if v70.wideMode then
+			if v72.wideMode then
 				p12(RoactNavigation.Actions.navigate({
 					routeName = EnumScreens.EmptyConversation
 				}))
 			end
 		end, EnumScreens.ChatLanding)
 
-		return function() -- line: 448
-			-- upvalues: updateExternalNavigationForScreen (copy), EnumScreens (copy), GetFFlagIsSquadEnabled (copy), v84 (copy)
+		return function() -- line: 475
+			-- upvalues: updateExternalNavigationForScreen (copy), EnumScreens (copy), getFFlagAppChatRequestedRoute (copy), GetFFlagIsSquadEnabled (copy), v88 (copy)
 			updateExternalNavigationForScreen(nil, EnumScreens.ChatLanding)
+
+			if getFFlagAppChatRequestedRoute() then
+				updateExternalNavigationForScreen(nil, EnumScreens.ChatDetails)
+			end
+
 			updateExternalNavigationForScreen(nil, EnumScreens.ChatConversation)
 
 			if GetFFlagIsSquadEnabled() then
 				updateExternalNavigationForScreen(nil, EnumScreens.SquadLobby)
 			end
 
-			v84.current = nil
+			v88.current = nil
 		end
-	end, { v84 })
-	local v92 = useCallback(function(p20) -- line: 459
+	end, {
+		v88,
+		v93,
+		v79,
+		v94,
+		v91,
+		v92,
+		v72.updateExternalNavigationForScreen,
+		v72.wideMode
+	})
+	local v96 = useCallback(function(p21) -- line: 500
 		-- upvalues: GetTopBarStore (copy)
-		return GetTopBarStore(false).getScreenTopBar(p20)(false)
+		return GetTopBarStore(false).getScreenTopBar(p21)(false)
 	end, {})
-	local v93 = useCallback(function(p21, p22) -- line: 464
+	local v97 = useCallback(function(p22, p23) -- line: 505
 		-- upvalues: GetTopBarStore (copy)
-		GetTopBarStore(false).setScreenTopBar(p21, p22)
+		GetTopBarStore(false).setScreenTopBar(p22, p23)
 	end, {})
-	local v94 = useCallback(function(p23) -- line: 468
-		-- upvalues: ArgCheck (copy), v78 (copy)
-		ArgCheck.isType(p23, "string", "screen")
-
-		return v78[p23] or {}
-	end, { v78 })
-	local v95 = useCallback(function(p24, p25) -- line: 473
-		-- upvalues: ArgCheck (copy), v79 (copy), Cryo (copy)
+	local v98 = useCallback(function(p24) -- line: 509
+		-- upvalues: ArgCheck (copy), v81 (copy)
 		ArgCheck.isType(p24, "string", "screen")
-		ArgCheck.isType(p25, "table", "state")
-		v79(function(p26) -- line: 476
-			-- upvalues: Cryo (copy), p24 (copy), p25 (copy)
-			local v155 = Cryo.Dictionary.join(p26[p24] or {}, p25)
 
-			return Cryo.Dictionary.join(p26, {
-				[p24] = v155
+		return v81[p24] or {}
+	end, { v81 })
+	local v99 = useCallback(function(p25, p26) -- line: 514
+		-- upvalues: ArgCheck (copy), v82 (copy), Cryo (copy)
+		ArgCheck.isType(p25, "string", "screen")
+		ArgCheck.isType(p26, "table", "state")
+		v82(function(p27) -- line: 517
+			-- upvalues: Cryo (copy), p25 (copy), p26 (copy)
+			local v160 = Cryo.Dictionary.join(p27[p25] or {}, p26)
+
+			return Cryo.Dictionary.join(p27, {
+				[p25] = v160
 			})
 		end)
 	end, {})
-	local v96 = if not FFlagAppChatTopBarSignalsStore then v94 else v92
-	local v97 = if not FFlagAppChatTopBarSignalsStore then v95 else v93
-	local v98 = useCallback(function(p27) -- line: 491
-		-- upvalues: v83 (copy), v85 (copy)
-		if v83.current then
-			v83.current:disconnect()
-			v83.current = nil
+	local v100 = if not FFlagAppChatTopBarSignalsStore then v98 else v96
+	local v101 = if not FFlagAppChatTopBarSignalsStore then v99 else v97
+	local v102 = useCallback(function(p28) -- line: 532
+		-- upvalues: v87 (copy), v89 (copy)
+		if v87.current then
+			v87.current:disconnect()
+			v87.current = nil
 		end
 
-		if p27 then
-			v83.current = p27:connect(v85)
-		end
-	end, { v83 })
-
-	useEffect(function() -- line: 502
-		-- upvalues: v82 (copy), v98 (copy), v70 (copy), v76 (copy), EnteredChatFromEntryPoint (copy)
-		v82.current = true
-		v98(v70.rnBypassActionSignal)
-
-		return function() -- line: 506
-			-- upvalues: v82 (copy), v98 (copy), v76 (copy), EnteredChatFromEntryPoint (copy)
-			v82.current = false
-			v98(nil)
-			v76(EnteredChatFromEntryPoint())
-		end
-	end, {})
-	useEffect(function() -- line: 514
-		-- upvalues: v70 (copy), v71 (copy), v76 (copy), NavigateIntoChat (copy), EnumScreens (copy), v73 (copy)
-		if v70.initialConversationId and (v70.initialConversationId ~= "" and v71) then
-			v76(NavigateIntoChat({
-				screen = EnumScreens.ChatConversation,
-				params = {
-					userId = v73,
-					conversationId = v70.initialConversationId
-				}
-			}))
-			v70.setInitialConversationId("")
-		end
-
-		return function() -- line: 523
+		if p28 then
+			v87.current = p28:connect(v89)
 		end
 	end, {
-		v76,
-		v73,
-		v70.initialConversationId,
-		v70.setInitialConversationId
+		v87,
+		v89
 	})
 
-	local u99 = nil
-	local u100 = nil
+	useEffect(function() -- line: 544
+		-- upvalues: v86 (copy), v102 (copy), v72 (copy), v79 (copy), EnteredChatFromEntryPoint (copy)
+		v86.current = true
+		v102(v72.rnBypassActionSignal)
+
+		return function() -- line: 548
+			-- upvalues: v86 (copy), v102 (copy), v79 (copy), EnteredChatFromEntryPoint (copy)
+			v86.current = false
+			v102(nil)
+			v79(EnteredChatFromEntryPoint())
+		end
+	end, {})
+	useEffect(function() -- line: 557
+		-- upvalues: v72 (copy), v73 (copy), v79 (copy), NavigateIntoChat (copy), EnumScreens (copy), v75 (copy)
+		if v72.initialConversationId and (v72.initialConversationId ~= "" and v73) then
+			v79(NavigateIntoChat({
+				screen = EnumScreens.ChatConversation,
+				params = {
+					userId = v75,
+					conversationId = v72.initialConversationId
+				}
+			}))
+			v72.setInitialConversationId("")
+		end
+
+		return function() -- line: 566
+		end
+	end, {
+		v79,
+		v75,
+		v72.initialConversationId,
+		v72.setInitialConversationId
+	})
+
+	if getFFlagAppChatRequestedRoute() then
+		useEffect(function() -- line: 571
+			-- upvalues: v72 (copy), v73 (copy), v79 (copy), NavigateIntoChat (copy)
+			if v72.requestedRoute and v73 then
+				v79(NavigateIntoChat(v72.requestedRoute))
+
+				if v72.clearRequestedRoute then
+					v72.clearRequestedRoute()
+				end
+			end
+
+			return function() -- line: 579
+			end
+		end, {
+			v79,
+			v73,
+			v72.requestedRoute,
+			v72.clearRequestedRoute
+		})
+	end
+
+	local u103 = nil
+	local u104 = nil
 
 	if GetFFlagIsSquadEnabled() then
-		u99 = useCurrentSquadParentChannelId()
+		u103 = useCurrentSquadParentChannelId()
 
 		if GetFFlagEnableCrossExpVoice() then
-			u100 = useIsVoiceConnected()
+			u104 = useIsVoiceConnected()
 		end
 	end
 
-	useEffect(function() -- line: 535
-		-- upvalues: GetFFlagIsSquadEnabled (copy), v71 (copy), v70 (copy), u99 (ref), GetFFlagEnableCrossExpVoice (copy), u100 (ref), v76 (copy), NavigateIntoChat (copy), EnumScreens (copy), v73 (copy)
-		if GetFFlagIsSquadEnabled() and (v71 and v70.initialConversationId == "" and u99) then
-			if GetFFlagEnableCrossExpVoice() and u100 then
-				v76(NavigateIntoChat({
+	useEffect(function() -- line: 598
+		-- upvalues: GetFFlagIsSquadEnabled (copy), v73 (copy), v72 (copy), u103 (ref), GetFFlagEnableCrossExpVoice (copy), u104 (ref), v79 (copy), NavigateIntoChat (copy), EnumScreens (copy), v75 (copy)
+		if GetFFlagIsSquadEnabled() and (v73 and v72.initialConversationId == "" and u103) then
+			if GetFFlagEnableCrossExpVoice() and u104 then
+				v79(NavigateIntoChat({
 					screen = EnumScreens.SquadLobby,
 					params = {
-						userId = v73,
-						conversationId = u99
+						userId = v75,
+						conversationId = u103
 					}
 				}))
 
 				return
 			end
 
-			v76(NavigateIntoChat({
+			v79(NavigateIntoChat({
 				screen = EnumScreens.ChatConversation,
 				params = {
-					userId = v73,
-					conversationId = u99
+					userId = v75,
+					conversationId = u103
 				}
 			}))
 		end
 	end, {})
-	useEffect(function() -- line: 556
-		-- upvalues: v98 (copy), v70 (copy)
-		v98(v70.rnBypassActionSignal)
-	end, { v70.rnBypassActionSignal })
-	useEffect(function() -- line: 560
-		-- upvalues: FFlagAppChatTopBarSignalsStore (copy), Cryo (copy), v78 (copy), v79 (copy)
-		if not FFlagAppChatTopBarSignalsStore and not Cryo.isEmpty(v78) then
-			v79({})
+	useEffect(function() -- line: 619
+		-- upvalues: v102 (copy), v72 (copy)
+		v102(v72.rnBypassActionSignal)
+	end, {
+		v72.rnBypassActionSignal,
+		v102
+	})
+	useEffect(function() -- line: 623
+		-- upvalues: FFlagAppChatTopBarSignalsStore (copy), Cryo (copy), v81 (copy), v82 (copy)
+		if not FFlagAppChatTopBarSignalsStore and not Cryo.isEmpty(v81) then
+			v82({})
 		end
 	end, {
-		v70.wideMode,
-		FFlagAppChatTopBarSignalsStore
+		v72.wideMode,
+		FFlagAppChatTopBarSignalsStore,
+		v81
 	})
 
-	local v101 = useAppPolicy(function(p28) -- line: 566
-		return p28.getChatHeaderSearch()
+	local v105 = useAppPolicy(function(p29) -- line: 629
+		return p29.getChatHeaderSearch()
 	end)
-	local v102 = useAppPolicy(function(p29) -- line: 569
-		return p29.getChatHeaderCreateChatGroup()
+	local v106 = useAppPolicy(function(p30) -- line: 632
+		return p30.getChatHeaderCreateChatGroup()
 	end)
-	local v103 = useAppPolicy(function(p30) -- line: 572
+	local v107 = useAppPolicy(function(p31) -- line: 635
 		-- upvalues: getFFlagHideNotificationIconForVR (copy)
-		return p30.getChatHeaderNotifications() and (not getFFlagHideNotificationIconForVR() or p30.getWebViewSupport())
+		return p31.getChatHeaderNotifications() and (not getFFlagHideNotificationIconForVR() or p31.getWebViewSupport())
 	end)
-	local v104 = usePageSideMargin(v81.current)
-	local v105 = React.useMemo(function() -- line: 578
-		-- upvalues: v71 (copy), v104 (copy)
+	local v108 = usePageSideMargin(v85.current)
+	local v109 = React.useMemo(function() -- line: 641
+		-- upvalues: v73 (copy), v108 (copy)
 		return {
 			default = 12,
-			outer = if not v71 then v104 else 12,
-			inner = if not v71 then v104 else 12
+			outer = if not v73 then v108 else 12,
+			inner = if not v73 then v108 else 12
 		}
 	end, {
-		v104,
-		v71
+		v108,
+		v73
 	})
-	local v106 = useIsChatEnabled()
-	local v107 = if not FFlagAppChatTopBarConfigDriven() then not v71 and (v103 and not FFlagAppChatRemoveNotifications) else nil
-	local v108 = if not FFlagAppChatTopBarConfigDriven() then v101 and (not v71 and v106) else nil
-	local v109 = if not FFlagAppChatTopBarConfigDriven() then v102 and v106 else nil
-	local v110 = if not FFlagAppChatTopBarConfigDriven() then v71 and GetFFlagEnableAppChatInExperience() else nil
-	local v111 = useStyle()
-	local v112 = useCallback(function(p31) -- line: 604
-		-- upvalues: v76 (copy), SetTabBarVisible (copy)
-		v76(SetTabBarVisible(p31))
-	end, { v76 })
-	local v113 = React.createElement(v81, {
-		externalDispatchConnector = v91,
-		parameters = v70.parameters,
-		setActiveConversationId = v70.setActiveConversationId,
-		setBackButtonEnabled = v70.setBackButtonEnabled,
-		setTabBarVisible = v112,
-		chatIsVisible = v77,
+	local v110 = useIsChatEnabled()
+	local v111 = if not FFlagAppChatTopBarConfigDriven() then not v73 and (v107 and not FFlagAppChatRemoveNotifications) else nil
+	local v112 = if not FFlagAppChatTopBarConfigDriven() then v105 and (not v73 and v110) else nil
+	local v113 = if not FFlagAppChatTopBarConfigDriven() then v106 and v110 else nil
+	local v114 = if not FFlagAppChatTopBarConfigDriven() then v73 and GetFFlagEnableAppChatInExperience() else nil
+	local v115 = useStyle()
+	local v116 = useCallback(function(p32) -- line: 667
+		-- upvalues: v79 (copy), SetTabBarVisible (copy)
+		v79(SetTabBarVisible(p32))
+	end, { v79 })
+	local v117 = React.createElement(v85, {
+		externalDispatchConnector = v95,
+		parameters = v72.parameters,
+		setActiveConversationId = v72.setActiveConversationId,
+		setBackButtonEnabled = v72.setBackButtonEnabled,
+		setTabBarVisible = v116,
+		chatIsVisible = v80,
 		screenProps = {
-			navigateToLuaAppPages = v70.navigateToLuaAppPages,
-			topBarHeight = math.max(UserInputService.NavBarSize.Y, if not v72 then NAV_BAR_WITH_FACEPILE_SIZE else v72.Size.Size_1400),
-			wideMode = v70.wideMode,
-			isInExperience = v71,
-			isVisible = v70.isVisible,
-			notificationCount = v70.notificationCount,
-			appChatOuterPadding = v105.outer,
-			appChatInnerPadding = v105.inner,
-			appChatDefaultPadding = v105.default,
-			topBarShowSearch = v108,
-			topBarShowCreateChatGroup = v109,
-			topBarShowNotifications = v107,
-			topBarShowSnoozeNotifications = v110,
-			topBarUtilityIconSideMargin = if not FFlagEnableHeaderBarButtonsUpdate then nil else v72.Size.Size_100,
-			showSearchRow = v71,
-			navigateToRootStack = v70.navigateToRootStack,
-			navigateToAddFriends = v70.navigateToAddFriends,
-			getScreenTopBar = if not FFlagAppChatTopBarSignalsStore then v96 else nil,
-			setScreenTopBar = if not FFlagAppChatTopBarSignalsStore then v97 else nil
+			navigateToLuaAppPages = v72.navigateToLuaAppPages,
+			topBarHeight = math.max(UserInputService.NavBarSize.Y, if not v74 then NAV_BAR_WITH_FACEPILE_SIZE else v74.Size.Size_1400),
+			wideMode = v72.wideMode,
+			isInExperience = v73,
+			isVisible = v72.isVisible,
+			notificationCount = v72.notificationCount,
+			appChatOuterPadding = v109.outer,
+			appChatInnerPadding = v109.inner,
+			appChatDefaultPadding = v109.default,
+			topBarShowSearch = v112,
+			topBarShowCreateChatGroup = v113,
+			topBarShowNotifications = v111,
+			topBarShowSnoozeNotifications = v114,
+			topBarUtilityIconSideMargin = if not FFlagEnableHeaderBarButtonsUpdate then nil else v74.Size.Size_100,
+			showSearchRow = v73,
+			navigateToRootStack = v72.navigateToRootStack,
+			navigateToAddFriends = v72.navigateToAddFriends,
+			getScreenTopBar = if not FFlagAppChatTopBarSignalsStore then v100 else nil,
+			setScreenTopBar = if not FFlagAppChatTopBarSignalsStore then v101 else nil
 		}
 	})
-	local v114 = React.createElement(LuaAppNavigationContextProvider, {
-		navigateToLuaAppPages = v70.navigateToLuaAppPages,
-		dispatch = v76
+	local v118 = React.createElement(LuaAppNavigationContextProvider, {
+		navigateToLuaAppPages = v72.navigateToLuaAppPages,
+		dispatch = v79
 	}, {
-		navigation = v113
+		navigation = v117
 	})
-	local v115 = React.createElement(ChatPlacementContext.Provider, {
+	local v119 = React.createElement(ChatPlacementContext.Provider, {
 		value = {
-			chatPlacement = v70.chatPlacement
+			chatPlacement = v72.chatPlacement
 		}
 	}, {
-		navigation = v114
+		navigation = v118
 	})
 
 	if not FFlagAppChatSignalsReplyStore then
-		v115 = React.createElement(ReplyingToMessageProvider, {}, {
-			navigation = v115
+		v119 = React.createElement(ReplyingToMessageProvider, {}, {
+			navigation = v119
 		})
 	end
 
-	local v116 = React.createElement(InteractionFeedback.InteractionFeedbackContext.Provider, {
+	local v120 = React.createElement(InteractionFeedback.InteractionFeedbackContext.Provider, {
 		value = HapticFeedbackConfig
 	}, {
-		navigation = v115
+		navigation = v119
 	})
 
-	if not v71 then
-		v116 = React.createElement(LayerCollectorProvider, {}, {
-			navigation = v116
+	if not v73 then
+		v120 = React.createElement(LayerCollectorProvider, {}, {
+			navigation = v120
 		})
 	end
 
-	local v117 = useRobloxLocale()
+	local v121 = useRobloxLocale()
 	local PlaySessionId = RbxAnalyticsService:GetPlaySessionId()
-	local v119 = if not GetFFlagIsSquadEnabled() then nil else useSelector(function(p32) -- line: 677
-		local v145 = p32.Squad and (p32.Squad.Squad and p32.Squad.Squad.currentSquad)
+	local v123 = if not GetFFlagIsSquadEnabled() then nil else useSelector(function(p33) -- line: 740
+		local v149 = p33.Squad and (p33.Squad.Squad and p33.Squad.Squad.currentSquad)
 
-		if v145 and v145.squadId then
-			return v145.squadId
+		if v149 and v149.squadId then
+			return v149.squadId
 		end
 
 		return nil
 	end)
-	local v120 = React.createElement(AnalyticsProvider, {
-		localUserId = v73,
-		entryPoint = v75
+	local v124 = React.createElement(AnalyticsProvider, {
+		localUserId = v75,
+		entryPoint = v78
 	}, {
 		telemetry = React.createElement(AppTelemetryLayer.Provider, {
 			value = {
 				context = "platformChat",
-				locale = v117,
-				entryPoint = v75 or "unknown",
-				userId = v73,
+				locale = v121,
+				entryPoint = v78 or "unknown",
+				userId = v75,
 				playSessionId = PlaySessionId,
-				currentSquadId = v119,
-				placement = v70.chatPlacement
+				currentSquadId = v123,
+				placement = v72.chatPlacement
 			}
 		}, { React.createElement(if not FFlagAppChatTopBarSignalsStore then TopBarContext.Provider else React.Fragment, if not FFlagAppChatTopBarSignalsStore then {
-			value = Cryo.Dictionary.join(v78, {
-				getScreenTopBar = v96,
-				setScreenTopBar = v97
+			value = Cryo.Dictionary.join(v81, {
+				getScreenTopBar = v100,
+				setScreenTopBar = v101
 			})
 		} else nil, {
-			navigation = v116,
-			BottomInsetBackground = if not (v74.bottom > 0) then nil else React.createElement("Frame", {
+			navigation = v120,
+			BottomInsetBackground = if not (v76.bottom > 0) then nil else React.createElement("Frame", {
 				BorderSizePixel = 0,
 				ZIndex = 3,
-				BackgroundColor3 = if not getFFlagFixChatsBottomInsetBackgroundColor() then v111.Theme.NavigationBar.Color else v111.Theme.BackgroundDefault.Color,
-				BackgroundTransparency = if not getFFlagFixChatsBottomInsetBackgroundColor() then v111.Theme.NavigationBar.Transparency else v111.Theme.BackgroundDefault.Transparency,
+				BackgroundColor3 = if not getFFlagFixChatsBottomInsetBackgroundColor() then v115.Theme.NavigationBar.Color else v115.Theme.BackgroundDefault.Color,
+				BackgroundTransparency = if not getFFlagFixChatsBottomInsetBackgroundColor() then v115.Theme.NavigationBar.Transparency else v115.Theme.BackgroundDefault.Transparency,
 				Position = UDim2.new(0, 0, 1, 0),
-				Size = UDim2.new(1, 0, 0, v74.bottom)
+				Size = UDim2.new(1, 0, 0, v76.bottom)
 			})
 		}) })
 	})
 
 	if FFlagAppChatPerfTracking then
-		useEffect(function() -- line: 730
-			-- upvalues: AppChatPerfTracker (copy), v70 (copy), v75 (copy), v119 (copy)
+		useEffect(function() -- line: 793
+			-- upvalues: AppChatPerfTracker (copy), v72 (copy), v78 (copy), v123 (copy)
 			AppChatPerfTracker.setSharedContext({
-				placement = v70.chatPlacement,
-				entryPoint = v75,
-				hasActiveParty = v119 ~= nil
+				placement = v72.chatPlacement,
+				entryPoint = v78,
+				hasActiveParty = v123 ~= nil
 			})
 		end, {
-			v70.chatPlacement,
-			v75,
-			v119
+			v72.chatPlacement,
+			v78,
+			v123
 		})
 	end
 
 	return React.createElement(RoactChatAnalyticsProvider, {
-		entryPoint = v75
-	}, { v120 })
+		entryPoint = v78
+	}, { v124 })
 end
 
 return memo(AppChatEntryPoint)

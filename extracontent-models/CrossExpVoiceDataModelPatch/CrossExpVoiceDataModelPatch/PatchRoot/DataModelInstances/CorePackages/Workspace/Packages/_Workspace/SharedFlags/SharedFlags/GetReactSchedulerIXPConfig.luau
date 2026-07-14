@@ -6,7 +6,7 @@ local GetFFlagEnableAppStorageJsonCacheInABTest = require(script.Parent.GetFFlag
 local v6 = game:DefineFastString("ExperienceReactDeferredScheduler_LayerName", "UIEcosystem.User")
 local v7 = game:DefineFastFlag("EnableReactSchedulerIXP", false)
 
-return function() -- line: 26
+return function() -- line: 28
 	-- upvalues: v7 (copy), GetFFlagEnableAppStorageJsonCacheInABTest (copy), AppStorageJsonCacheUtils (copy), v6 (copy), AppStorageService (copy), HttpService (copy)
 	if not v7 then
 		return nil
@@ -19,13 +19,13 @@ return function() -- line: 26
 			return v8[v6]
 		end
 	else
-		local ok, result = pcall(function() -- line: 37
+		local ok, result = pcall(function() -- line: 39
 			-- upvalues: AppStorageService (copy)
 			return AppStorageService:GetItem("ExperimentCache")
 		end)
 
 		if ok then
-			local ok2, result2 = pcall(function() -- line: 41
+			local ok2, result2 = pcall(function() -- line: 43
 				-- upvalues: HttpService (copy), result (copy)
 				return HttpService:JSONDecode(result)
 			end)
