@@ -1,49 +1,52 @@
 local Parent = script:FindFirstAncestor("Moments").Parent
+local SharedFlags = require(Parent.SharedFlags)
 local Signals = require(Parent.Signals)
+local FFlagMyStatsMediaSelector = SharedFlags.FFlagMyStatsMediaSelector
 
-local function isCaptureEligible(p1) -- line: 38
+local function isCaptureEligible(p1) -- line: 45
 	if p1.CaptureType == Enum.CaptureType.Video and (p1.TimeLength ~= nil and p1.TimeLength < 1) then
 		return false
 	end
 
 	return true
 end
-local function createGalleryCaptureSource(t1: {[any]: any}?, p2: ((...any) -> ...any)?) -- line: 53
-	-- upvalues: Signals (copy)
-	local v8 = t1 or game:GetService("CaptureService")
-	local v9, v10 = Signals.createSignal({})
-	local v11, v12 = Signals.createSignal(false)
-	local u13 = nil
+local function createGalleryCaptureSource(t1: {[any]: any}?, p2: ((...any) -> ...any)?, t2: {[any]: any}?) -- line: 60
+	-- upvalues: Signals (copy), FFlagMyStatsMediaSelector (copy)
+	local v11 = t1 or game:GetService("CaptureService")
+	local v12 = t2 or {}
+	local v13, v14 = Signals.createSignal({})
+	local v15, v16 = Signals.createSignal(false)
+	local u17 = nil
 
-	local function appendCurrentPage() -- line: 67
-		-- upvalues: v9 (copy), u13 (ref), v10 (copy), v12 (copy)
-		local v16 = table.clone(v9(false))
+	local function appendCurrentPage() -- line: 76
+		-- upvalues: v13 (copy), u17 (ref), v14 (copy), v16 (copy)
+		local v20 = table.clone(v13(false))
 
-		for _, v18 in u13:GetCurrentPage() do
-			if v18.CaptureType ~= Enum.CaptureType.Video or (v18.TimeLength == nil or not (v18.TimeLength < 1)) then
-				table.insert(v16, v18)
+		for _, v22 in u17:GetCurrentPage() do
+			if v22.CaptureType ~= Enum.CaptureType.Video or (v22.TimeLength == nil or not (v22.TimeLength < 1)) then
+				table.insert(v20, v22)
 			end
 		end
 
-		v10(v16)
-		v12(u13.IsFinished == true)
+		v14(v20)
+		v16(u17.IsFinished == true)
 	end
-	local function fetchInitial() -- line: 78
-		-- upvalues: v8 (copy), u13 (ref), v12 (copy), p2 (copy), appendCurrentPage (copy), v9 (copy)
-		task.spawn(function() -- line: 79
-			-- upvalues: v8 (copy), u13 (ref), v12 (copy), p2 (copy), appendCurrentPage (copy), v9 (copy)
-			local ok, result = pcall(function() -- line: 80
-				-- upvalues: v8 (copy), u13 (ref)
-				local v25, v26 = v8:ReadCapturesFromGalleryAsync({}, true)
+	local function fetchInitial() -- line: 87
+		-- upvalues: v11 (copy), FFlagMyStatsMediaSelector (copy), v12 (copy), u17 (ref), v16 (copy), p2 (copy), appendCurrentPage (copy), v13 (copy)
+		task.spawn(function() -- line: 88
+			-- upvalues: v11 (copy), FFlagMyStatsMediaSelector (copy), v12 (copy), u17 (ref), v16 (copy), p2 (copy), appendCurrentPage (copy), v13 (copy)
+			local ok, result = pcall(function() -- line: 89
+				-- upvalues: v11 (copy), FFlagMyStatsMediaSelector (copy), v12 (copy), u17 (ref)
+				local v29, v30 = v11:ReadCapturesFromGalleryAsync(if not FFlagMyStatsMediaSelector then {} else v12, true)
 
-				u13 = v26
+				u17 = v30
 
-				return v25
+				return v29
 			end)
 
-			if not ok or (u13 == nil or result ~= Enum.ReadCapturesFromGalleryResult.Success) then
-				u13 = nil
-				v12(true)
+			if not ok or (u17 == nil or result ~= Enum.ReadCapturesFromGalleryResult.Success) then
+				u17 = nil
+				v16(true)
 
 				if p2 ~= nil then
 					p2({}, false)
@@ -55,25 +58,25 @@ local function createGalleryCaptureSource(t1: {[any]: any}?, p2: ((...any) -> ..
 			appendCurrentPage()
 
 			if p2 ~= nil then
-				p2(v9(false), true)
+				p2(v13(false), true)
 			end
 		end)
 	end
 
-	task.spawn(function() -- line: 79
-		-- upvalues: v8 (copy), u13 (ref), v12 (copy), p2 (copy), appendCurrentPage (copy), v9 (copy)
-		local ok, result = pcall(function() -- line: 80
-			-- upvalues: v8 (copy), u13 (ref)
-			local v23, v24 = v8:ReadCapturesFromGalleryAsync({}, true)
+	task.spawn(function() -- line: 88
+		-- upvalues: v11 (copy), FFlagMyStatsMediaSelector (copy), v12 (copy), u17 (ref), v16 (copy), p2 (copy), appendCurrentPage (copy), v13 (copy)
+		local ok, result = pcall(function() -- line: 89
+			-- upvalues: v11 (copy), FFlagMyStatsMediaSelector (copy), v12 (copy), u17 (ref)
+			local v27, v28 = v11:ReadCapturesFromGalleryAsync(if not FFlagMyStatsMediaSelector then {} else v12, true)
 
-			u13 = v24
+			u17 = v28
 
-			return v23
+			return v27
 		end)
 
-		if not ok or (u13 == nil or result ~= Enum.ReadCapturesFromGalleryResult.Success) then
-			u13 = nil
-			v12(true)
+		if not ok or (u17 == nil or result ~= Enum.ReadCapturesFromGalleryResult.Success) then
+			u17 = nil
+			v16(true)
 
 			if p2 ~= nil then
 				p2({}, false)
@@ -85,24 +88,24 @@ local function createGalleryCaptureSource(t1: {[any]: any}?, p2: ((...any) -> ..
 		appendCurrentPage()
 
 		if p2 ~= nil then
-			p2(v9(false), true)
+			p2(v13(false), true)
 		end
 	end)
 
 	return {
-		getCaptures = v9,
-		getIsFinished = v11,
-		fetchMore = function() -- line: 101
-			-- upvalues: u13 (ref), appendCurrentPage (copy)
-			if u13 == nil or u13.IsFinished == true then
+		getCaptures = v13,
+		getIsFinished = v15,
+		fetchMore = function() -- line: 111
+			-- upvalues: u17 (ref), appendCurrentPage (copy)
+			if u17 == nil or u17.IsFinished == true then
 				return
 			end
 
-			task.spawn(function() -- line: 105
-				-- upvalues: u13 (ref), appendCurrentPage (copy)
-				if not pcall(function() -- line: 106
-					-- upvalues: u13 (ref)
-					u13:AdvanceToNextPageAsync()
+			task.spawn(function() -- line: 115
+				-- upvalues: u17 (ref), appendCurrentPage (copy)
+				if not pcall(function() -- line: 116
+					-- upvalues: u17 (ref)
+					u17:AdvanceToNextPageAsync()
 				end) then
 					return
 				end

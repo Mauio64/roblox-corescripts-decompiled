@@ -1,5 +1,3 @@
-local FFlagAXCustomizeMakeupSupport = require(script.Parent.FFlagAXCustomizeMakeupSupport)
-
-return pcall(function() -- line: 3
+return pcall(function() -- line: 1
 	return Enum.AvatarAssetType.EyeMakeup
-end) and (game:DefineFastFlag("AXCatalogMakeupSupport10", false) and FFlagAXCustomizeMakeupSupport)
+end) and game:DefineFastFlag("AXCatalogMakeupSupport10", false)

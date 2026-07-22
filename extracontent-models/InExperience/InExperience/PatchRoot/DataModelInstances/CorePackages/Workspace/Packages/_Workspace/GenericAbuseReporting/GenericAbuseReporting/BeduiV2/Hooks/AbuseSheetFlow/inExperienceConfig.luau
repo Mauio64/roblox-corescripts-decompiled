@@ -743,7 +743,7 @@ return {
 			}
 		},
 		voiceChatPlayerSelection = {
-			type = "list",
+			type = "inExpUserSelection",
 			variant = "chevron",
 			storeAs = "selectedPlayer",
 			required = true,
@@ -763,6 +763,9 @@ return {
 					}
 				}}
 			},
+			trailingAccessories = {{
+				type = "voiceSpeakingIndicator"
+			}},
 			nextButtonText = {
 				["$translate"] = "Action.Continue"
 			},

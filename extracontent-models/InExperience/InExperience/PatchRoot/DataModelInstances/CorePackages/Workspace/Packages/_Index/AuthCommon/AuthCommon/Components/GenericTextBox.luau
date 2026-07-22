@@ -7,20 +7,19 @@ local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCurso
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local OpenTypeSupport = UIBlox.Utility.OpenTypeSupport
 local GetFFlagLuaAppFixSelectionCursor = require(Parent.SharedFlags).GetFFlagLuaAppFixSelectionCursor
-local FFlagPhoneUpsellEnforceCodeInputLimit = require(Parent.SharedFlags).FFlagPhoneUpsellEnforceCodeInputLimit
-local v11 = Roact.PureComponent:extend("GenericTextBox")
+local v10 = Roact.PureComponent:extend("GenericTextBox")
 local GetFFlagLuaAppEnableOpenTypeSupport = require(Parent.SharedFlags).GetFFlagLuaAppEnableOpenTypeSupport
 local EngineFeature = game:GetEngineFeature("EnableAndroidPasswordSuggestion")
 
-v11.defaultProps = {
+v10.defaultProps = {
 	PaddingX = 0,
 	PaddingY = 0
 }
 
-function v11.render(p1) -- line: 28
+function v10.render(p1) -- line: 27
 	-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), withSelectionCursorProvider (copy)
 	if GetFFlagLuaAppFixSelectionCursor() then
-		return withSelectionCursorProvider(function(p2) -- line: 30
+		return withSelectionCursorProvider(function(p2) -- line: 29
 			-- upvalues: p1 (copy)
 			return p1:renderWithSelectionCursor(p2)
 		end)
@@ -28,8 +27,8 @@ function v11.render(p1) -- line: 28
 
 	return p1:renderWithSelectionCursor(nil)
 end
-function v11.renderWithSelectionCursor(p3, p4) -- line: 39
-	-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), CursorKind (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), EngineFeature (copy), OpenTypeSupport (copy), FFlagPhoneUpsellEnforceCodeInputLimit (copy), Roact (copy), ImageSetLabel (copy), GetImageData (copy)
+function v10.renderWithSelectionCursor(p3, p4) -- line: 38
+	-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), CursorKind (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), EngineFeature (copy), OpenTypeSupport (copy), Roact (copy), ImageSetLabel (copy), GetImageData (copy)
 	local propsSize = p3.props.Size
 	local propsPosition = p3.props.Position
 	local propsLayoutOrder = p3.props.LayoutOrder
@@ -62,35 +61,35 @@ function v11.renderWithSelectionCursor(p3, p4) -- line: 39
 	local PaddingX = p3.props.PaddingX
 	local PaddingY = p3.props.PaddingY
 	local TextBoxRef = p3.props.TextBoxRef
-	local v49 = nil
+	local v48 = nil
 
 	if GetFFlagLuaAppFixSelectionCursor() then
-		v49 = p4(CursorKind.InputButton)
+		v48 = p4(CursorKind.InputButton)
 	end
 
-	local v50 = nil
+	local v49 = nil
 
 	if GetFFlagLuaAppEnableOpenTypeSupport() then
 		if p3.props.openTypeFeatures == nil then
 			if TextInputType == Enum.TextInputType.Password or TextInputType == Enum.TextInputType.PasswordShown or TextInputType == Enum.TextInputType.OneTimePassword or EngineFeature and TextInputType == Enum.TextInputType.NewPassword or EngineFeature and TextInputType == Enum.TextInputType.NewPasswordShown then
-				v50 = OpenTypeSupport:getPasswordStylisticAlternative()
+				v49 = OpenTypeSupport:getPasswordStylisticAlternative()
 			elseif TextInputType == Enum.TextInputType.Username then
-				v50 = OpenTypeSupport:getUserNameStylisticAlternative()
+				v49 = OpenTypeSupport:getUserNameStylisticAlternative()
 			end
 		else
-			v50 = p3.props.openTypeFeatures
+			v49 = p3.props.openTypeFeatures
 		end
 	else
-		v50 = nil
+		v49 = nil
 	end
 
-	local function handleTextChanged(p5) -- line: 103
-		-- upvalues: FFlagPhoneUpsellEnforceCodeInputLimit (copy), maxLength (copy), onChangeText (copy)
-		if FFlagPhoneUpsellEnforceCodeInputLimit and maxLength then
-			local v54 = string.sub(p5.Text, 1, maxLength)
+	local function handleTextChanged(p5) -- line: 102
+		-- upvalues: maxLength (copy), onChangeText (copy)
+		if maxLength then
+			local v53 = string.sub(p5.Text, 1, maxLength)
 
-			if v54 ~= p5.Text then
-				p5.Text = v54
+			if v53 ~= p5.Text then
+				p5.Text = v53
 
 				return
 			end
@@ -143,9 +142,9 @@ function v11.renderWithSelectionCursor(p3, p4) -- line: 39
 			NextSelectionLeft = NextSelectionLeft,
 			NextSelectionRight = NextSelectionRight,
 			NextSelectionUp = NextSelectionUp,
-			SelectionImageObject = v49,
-			OpenTypeFeatures = v50 or nil,
-			RichText = not not v50 or nil,
+			SelectionImageObject = v48,
+			OpenTypeFeatures = v49 or nil,
+			RichText = not not v49 or nil,
 			[Roact.Ref] = TextBoxRef,
 			[Roact.Change.Text] = handleTextChanged,
 			[Roact.Event.AncestryChanged] = onAncestryChanged,
@@ -158,4 +157,4 @@ function v11.renderWithSelectionCursor(p3, p4) -- line: 39
 	})
 end
 
-return v11
+return v10

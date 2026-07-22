@@ -1,60 +1,77 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local BuildExperienceParent = BuildExperience.Parent
 
-require(Parent.DataHydration.ExperienceGuidelines)
+require(BuildExperienceParent.DataHydration.ExperienceGuidelines)
 
-local UniverseActivation = require(Parent.DataHydration.UniverseActivation)
-
-require(Parent.DataHydration.UniverseConfiguration)
-
+local UniverseActivation = require(BuildExperienceParent.DataHydration.UniverseActivation)
+local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local PrivacyType = UniverseConfiguration.PrivacyType
+local GAME_CONFIGURATION_AUDIENCE_PUBLIC = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLIC
+local GAME_CONFIGURATION_AUDIENCE_FRIENDS_ONLY = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_FRIENDS_ONLY
+local GAME_CONFIGURATION_AUDIENCE_PRIVATE = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PRIVATE
+local GAME_CONFIGURATION_AUDIENCE_UNKNOWN = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_UNKNOWN
 local t1 = {
-	Public = "Public",
-	FriendsOnly = "Friends only",
-	Private = "Private"
+	[PrivacyType.Public] = GAME_CONFIGURATION_AUDIENCE_PUBLIC,
+	[PrivacyType.FriendsOnly] = GAME_CONFIGURATION_AUDIENCE_FRIENDS_ONLY,
+	[PrivacyType.Private] = GAME_CONFIGURATION_AUDIENCE_PRIVATE
 }
 local t2 = {
-	[UniverseActivation.Audience.Public] = "Public",
-	[UniverseActivation.Audience.Friends] = "Friends only"
+	[PrivacyType.Public] = PrivacyType.Public,
+	[PrivacyType.FriendsOnly] = PrivacyType.FriendsOnly,
+	[PrivacyType.Private] = PrivacyType.Private
 }
 local t3 = {
+	[UniverseActivation.Audience.Public] = PrivacyType.Public,
+	[UniverseActivation.Audience.Friends] = PrivacyType.FriendsOnly
+}
+local t4 = {
 	UniverseActivation.Audience.Public,
 	UniverseActivation.Audience.Friends
 }
 
-local function getAudienceTextFromAudiences(t4: {[any]: any}) -- line: 32
-	-- upvalues: t3 (copy), t2 (copy)
-	for _, v9 in t3 do
-		if table.find(t4, v9) then
-			return t2[v9]
+local function getAudience(p1) -- line: 41
+	-- upvalues: t2 (copy), t4 (copy), t3 (copy), PrivacyType (copy)
+	if p1 == nil then
+		return nil
+	end
+
+	if p1.audiences == nil then
+		return t2[p1.privacyType]
+	end
+
+	for _, v18 in t4 do
+		if table.find(p1.audiences, v18) then
+			return t3[v18]
 		end
 	end
 
-	return "Private"
+	return PrivacyType.Private
 end
 
 return {
-	UNKNOWN_AUDIENCE_TEXT = "Unknown",
 	AudienceTextByPrivacyType = t1,
-	getAudienceText = function(p1) -- line: 42
-		-- upvalues: getAudienceTextFromAudiences (copy), t1 (copy)
-		if p1 == nil then
+	UNKNOWN_AUDIENCE_TEXT = GAME_CONFIGURATION_AUDIENCE_UNKNOWN,
+	getAudience = getAudience,
+	getAudienceText = function(p2) -- line: 59
+		-- upvalues: getAudience (copy), t1 (copy), GAME_CONFIGURATION_AUDIENCE_UNKNOWN (copy)
+		if p2 == nil then
 			return nil
 		end
 
-		if p1.audiences ~= nil then
-			return (getAudienceTextFromAudiences(p1.audiences))
+		local v20 = getAudience(p2)
+
+		if v20 ~= nil then
+			return t1[v20]
 		end
 
-		return t1[p1.privacyType] or "Unknown"
+		return GAME_CONFIGURATION_AUDIENCE_UNKNOWN
 	end,
-	getContentRatingText = function(p2) -- line: 58
-		local v13 = p2 and p2.ageRecommendationDetails
-		local v14 = v13 and v13.ageRecommendationSummary
-		local v15 = v14 and v14.ageRecommendation
+	getContentRatingText = function(p3) -- line: 68
+		local v22 = p3 and p3.ageRecommendationDetails
+		local v23 = v22 and v22.ageRecommendationSummary
+		local v24 = v23 and v23.ageRecommendation
 
-		return v15 and v15.contentMaturity
-	end,
-	isPrivateAudience = function(p3) -- line: 54
-		-- upvalues: getAudienceTextFromAudiences (copy), t1 (copy)
-		return ((if p3 ~= nil then (if p3.audiences == nil then t1[p3.privacyType] or "Unknown" else getAudienceTextFromAudiences(p3.audiences)) else nil)) == "Private"
+		return v24 and v24.contentMaturity
 	end
 }

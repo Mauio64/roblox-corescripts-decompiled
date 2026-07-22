@@ -6,12 +6,11 @@ local reportUnifiedLoggingAction = require(Parent.SduiCoreSystem).reportUnifiedL
 local ExpandableText = AppBlox.ExpandableText
 local View = Foundation.View
 local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
-local FFlagLuaAppExpandableTextTappableText = require(Parent.SharedFlags).FFlagLuaAppExpandableTextTappableText
 
-local function SduiExpandableText(p1) -- line: 27
-	-- upvalues: React (copy), reportUnifiedLoggingAction (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagLuaAppExpandableTextTappableText (copy), View (copy), ExpandableText (copy)
+local function SduiExpandableText(p1) -- line: 26
+	-- upvalues: React (copy), reportUnifiedLoggingAction (copy), FFlagSduiExperienceDetailsSupport (copy), View (copy), ExpandableText (copy)
 	local layoutOrder = p1.layoutOrder
-	local v13 = React.useCallback(function(b1: boolean) -- line: 30
+	local v12 = React.useCallback(function(b1: boolean) -- line: 29
 		-- upvalues: p1 (copy), reportUnifiedLoggingAction (copy)
 		if p1.onExpandChanged then
 			p1.onExpandChanged(b1)
@@ -35,12 +34,11 @@ local function SduiExpandableText(p1) -- line: 27
 		LayoutOrder = if not FFlagSduiExperienceDetailsSupport or (not p1.headerComponent or (not p1.text or p1.text == "")) then layoutOrder else 2,
 		compactNumberOfLines = p1.compactNumberOfLines,
 		fontStyle = p1.fontStyle,
-		textColor = if FFlagLuaAppExpandableTextTappableText then nil else p1.textColor,
-		textStyle = if not FFlagLuaAppExpandableTextTappableText then nil else p1.textStyle,
-		pressedTextStyle = if not FFlagLuaAppExpandableTextTappableText then nil else p1.pressedTextStyle,
+		textStyle = p1.textStyle,
+		pressedTextStyle = p1.pressedTextStyle,
 		expandedInitially = p1.expandedInitially,
 		avoidBlankLineClip = p1.avoidBlankLineClip,
-		onExpandChanged = v13,
+		onExpandChanged = v12,
 		selectable = if not FFlagSduiExperienceDetailsSupport then nil else p1.selectable
 	}
 

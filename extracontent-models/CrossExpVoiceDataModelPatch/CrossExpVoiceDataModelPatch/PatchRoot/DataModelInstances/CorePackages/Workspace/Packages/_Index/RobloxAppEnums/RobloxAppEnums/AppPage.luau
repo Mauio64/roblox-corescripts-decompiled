@@ -160,6 +160,7 @@ return {
 	BlockingModal = "BlockingModal",
 	AccountRecovery = "AccountRecovery",
 	AboutDetailsSheet = "AboutDetailsSheet",
+	ProfileMomentsFeed = "ProfileMomentsFeed",
 	BadgesSeeAll = "BadgesSeeAll",
 	BadgeDetails = "BadgeDetails",
 	DevStoreSeeAll = "DevStoreSeeAll",

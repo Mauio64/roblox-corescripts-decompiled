@@ -5,16 +5,19 @@ local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
 local Cryo = InGameMenuDependencies.Cryo
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v11 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent.Parent
 local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
 local Assets = require(ParentParent.Resources.Assets)
 local React = require(CorePackages.Packages.React)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v15 = Roact.PureComponent:extend("GameLabel")
+local FoundationImage = Foundation.Image
+local v18 = Roact.PureComponent:extend("GameLabel")
 
-v15.validateProps = t.strictInterface({
+v18.validateProps = t.strictInterface({
 	gameId = t.number,
 	gameName = t.string,
 	LayoutOrder = t.integer,
@@ -23,11 +26,11 @@ v15.validateProps = t.strictInterface({
 	buttonRef = t.optional(t.table)
 })
 
-function v15.renderButtons(p1) -- line: 42
+function v18.renderButtons(p1) -- line: 51
 	-- upvalues: Roact (copy), Cryo (copy)
-	local v17 = p1.props[Roact.Children] or {}
+	local v20 = p1.props[Roact.Children] or {}
 
-	return (Cryo.Dictionary.join(v17, {
+	return (Cryo.Dictionary.join(v20, {
 		List = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Right,
@@ -37,8 +40,8 @@ function v15.renderButtons(p1) -- line: 42
 		})
 	}))
 end
-function v15.renderWithSelectionCursor(p2, p3) -- line: 57
-	-- upvalues: Assets (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), React (copy), CursorKind (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
+function v18.renderWithSelectionCursor(p2, p3) -- line: 66
+	-- upvalues: Assets (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), React (copy), v11 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
 	local gameId = p2.props.gameId
 	local PlaceholderGameIcon = Assets.Images.PlaceholderGameIcon
 
@@ -46,10 +49,10 @@ function v15.renderWithSelectionCursor(p2, p3) -- line: 57
 		PlaceholderGameIcon = "rbxthumb://type=GameIcon&id=" .. gameId .. "&w=150&h=150"
 	end
 
-	return withFoundationOrUIBloxStyle(function(_) -- line: 64
+	return withFoundationOrUIBloxStyle(function(_) -- line: 73
 		return {}
-	end, function(_) -- line: 66
-		-- upvalues: Roact (copy), React (copy), p2 (copy), p3 (copy), CursorKind (copy), ImageSetLabel (copy), PlaceholderGameIcon (ref), ThemedTextLabel (copy)
+	end, function(_) -- line: 75
+		-- upvalues: Roact (copy), React (copy), p2 (copy), p3 (copy), v11 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), PlaceholderGameIcon (ref), ImageSetLabel (copy), ThemedTextLabel (copy)
 		return Roact.createElement("TextButton", {
 			[React.Tag] = "data-testid=experienceLabel",
 			BackgroundTransparency = 1,
@@ -57,12 +60,17 @@ function v15.renderWithSelectionCursor(p2, p3) -- line: 57
 			Size = UDim2.new(1, 0, 0, 70),
 			Text = "",
 			AutoButtonColor = false,
-			SelectionImageObject = p3(CursorKind.Square),
+			SelectionImageObject = p3(v11.Square),
 			[Roact.Ref] = p2.props.buttonRef,
 			[Roact.Event.Activated] = p2.props.onActivated
 		}, {
-			GameIcon = Roact.createElement(ImageSetLabel, {
+			GameIcon = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
 				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(0, 0.5),
+				Position = UDim2.new(0, 24, 0.5, 0),
+				Size = UDim2.new(0, 44, 0, 44),
+				Image = PlaceholderGameIcon
+			}) else Roact.createElement(FoundationImage, {
 				AnchorPoint = Vector2.new(0, 0.5),
 				Position = UDim2.new(0, 24, 0.5, 0),
 				Size = UDim2.new(0, 44, 0, 44),
@@ -87,17 +95,17 @@ function v15.renderWithSelectionCursor(p2, p3) -- line: 57
 		})
 	end)
 end
-function v15.render(p6) -- line: 108
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p7) -- line: 109
+function v18.render(p6) -- line: 124
+	-- upvalues: v10 (copy)
+	return v10(function(p7) -- line: 125
 		-- upvalues: p6 (copy)
 		return p6:renderWithSelectionCursor(p7)
 	end)
 end
 
-return Roact.forwardRef(function(p8, p9) -- line: 114
-	-- upvalues: Roact (copy), v15 (copy), Cryo (copy)
-	return Roact.createElement(v15, Cryo.Dictionary.join(p8, {
+return Roact.forwardRef(function(p8, p9) -- line: 130
+	-- upvalues: Roact (copy), v18 (copy), Cryo (copy)
+	return Roact.createElement(v18, Cryo.Dictionary.join(p8, {
 		buttonRef = p9
 	}))
 end)

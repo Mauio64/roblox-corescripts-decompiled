@@ -3,7 +3,7 @@ local Dash = require(Parent.Dash)
 
 require(Parent.MomentsTypes)
 
-local function makeTextOverlayEditsForEditor(t1: {[any]: any}?, p1, n1: number) -- line: 23
+local function makeTextOverlayEditsForEditor(t1: {[any]: any}?, p1, n1: number) -- line: 21
 	-- upvalues: Dash (copy)
 	local v7 = not (n1 > 0) and 1 or n1
 
@@ -13,7 +13,7 @@ local function makeTextOverlayEditsForEditor(t1: {[any]: any}?, p1, n1: number) 
 		}) }
 	end
 
-	return Dash.map(t1, function(p2) -- line: 36
+	return Dash.map(t1, function(p2) -- line: 34
 		-- upvalues: v7 (copy), Dash (copy)
 		local v9 = p2.scale * v7
 

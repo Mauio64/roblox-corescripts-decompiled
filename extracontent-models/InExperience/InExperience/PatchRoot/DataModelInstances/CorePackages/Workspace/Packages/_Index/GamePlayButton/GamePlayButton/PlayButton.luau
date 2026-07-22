@@ -2,6 +2,8 @@ local Parent = script:FindFirstAncestor("GamePlayButton").Parent
 local IXPService = game:GetService("IXPService")
 local tutils = require(Parent.tutils)
 local React = require(Parent.React)
+local Responsive = require(Parent.Responsive)
+local useBreakpointXOrSmaller = Responsive.useBreakpointXOrSmaller
 local useRoactService = require(Parent.RobloxAppHooks).useRoactService
 local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
 local useLocalization = require(Parent.Localization).Hooks.useLocalization
@@ -24,16 +26,17 @@ local RoactNetworking = require(Parent.RoactServiceTags).RoactNetworking
 local useOnPlayButtonCallback = require(script.Parent.useOnPlayButtonCallback)
 local useOnPlaySquadButtonCallback = require(script.Parent.useOnPlaySquadButtonCallback)
 local usePlayButtonState = require(script.Parent.usePlayButtonState)
+local PlayButtonGroupView = require(script.Parent.PlayButtonGroupView)
+local PlayButtonView = require(script.Parent.PlayButtonView)
 local PlayButtonStates = require(script.Parent.PlayButtonStates)
 local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
 local useUserExperiment = require(Parent.RoactAppExperiment).useUserExperiment
 local GetFFlagIsSquadEnabled = require(Parent.SharedFlags).GetFFlagIsSquadEnabled
-local FFlagLuaAppSupportUnifiedUIBloxPlayButton = require(Parent.SharedFlags).FFlagLuaAppSupportUnifiedUIBloxPlayButton
 local FFlagLuaAppUnifyPlayButtonAllSurfacesIxp = require(Parent.SharedFlags).FFlagLuaAppUnifyPlayButtonAllSurfacesIxp
-local v33 = game:DefineFastFlag("LuaAppJoinTextPlayableButton", false) or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp
-local v34 = game:DefineFastFlag("LuaAppIconPlayButton", false) or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp
-local v35 = FFlagLuaAppSupportUnifiedUIBloxPlayButton and (game:DefineFastFlag("LuaAppPlayButtonLoadingSkeleton3", false) or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)
-local v36 = game:DefineFastFlag("LuaAppFixPlayButtonDefaultLaunchSource", false)
+local FFlagLuaAppJoinTextPlayableButton = require(Parent.SharedFlags).FFlagLuaAppJoinTextPlayableButton
+local FFlagLuaAppIconPlayButton = require(Parent.SharedFlags).FFlagLuaAppIconPlayButton
+local FFlagLuaAppPlayButtonLoadingSkeleton = require(Parent.SharedFlags).FFlagLuaAppPlayButtonLoadingSkeleton
+local v39 = game:DefineFastFlag("LuaAppFixPlayButtonDefaultLaunchSource", false)
 local FFlagUpdateActionNeededPlayButtonUi = require(Parent.SharedFlags).FFlagUpdateActionNeededPlayButtonUi
 local FFlagLuaAppUnifiedPlayButtonSquadMenuDirection = require(Parent.SharedFlags).FFlagLuaAppUnifiedPlayButtonSquadMenuDirection
 local GetFFlagUIBloxUseFoundationButton = require(Parent.SharedFlags).UIBlox.GetFFlagUIBloxUseFoundationButton
@@ -44,389 +47,490 @@ local FFlagLuaAppTextOnlyPlayButton = require(Parent.SharedFlags).FFlagLuaAppTex
 local FFlagLuaAppIconTextPlayButton = require(Parent.SharedFlags).FFlagLuaAppIconTextPlayButton
 local FFlagLuaAppUpdatePlayButtonText = require(Parent.SharedFlags).FFlagLuaAppUpdatePlayButtonText
 local FFlagLuaAppLogExposurePlayButtonUX = require(Parent.SharedFlags).FFlagLuaAppLogExposurePlayButtonUX
-local v47 = game:DefineFastFlag("LuaAppUseTokenHeightForPlayButton", false)
+local FFlagLuaAppUseTokenHeightForPlayButton = require(Parent.SharedFlags).FFlagLuaAppUseTokenHeightForPlayButton
 local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp = require(Parent.SharedFlags).FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp
 local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce = require(Parent.SharedFlags).FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce
 local FFlagLuaAppLaunchWhenLoadingEdp = require(Parent.SharedFlags).FFlagLuaAppLaunchWhenLoadingEdp
 local FFlagLuaAppLaunchWhenLoadingForce = require(Parent.SharedFlags).FFlagLuaAppLaunchWhenLoadingForce
+local FFlagLuaAppDemoModePlayButton = require(Parent.SharedFlags).FFlagLuaAppDemoModePlayButton
+local FFlagLuaAppPlayButtonViewRefactor = require(Parent.SharedFlags).FFlagLuaAppPlayButtonViewRefactor
 local usePlayOnReleaseAfterUnmount = require(script.Parent.usePlayOnReleaseAfterUnmount)
-local v53 = if not v34 then nil else "play-xlarge"
-local v54 = Images["icons/common/play"]
-local v55 = Images["icons/actions/truncationCollapse"]
-local v56 = Images["icons/actions/truncationExpand"]
+local v58 = if not FFlagLuaAppIconPlayButton then nil else "play-xlarge"
+local v59 = Images["icons/common/play"]
+local v60 = Images["icons/actions/truncationCollapse"]
+local v61 = Images["icons/actions/truncationExpand"]
 
-local function v57() -- line: 85
+local function v62() -- line: 86
 end
 
-local t1 = {
+local v63 = if not FFlagLuaAppDemoModePlayButton then {
 	[InputSize.XSmall] = "Size_600",
 	[InputSize.Small] = "Size_800",
 	[InputSize.Medium] = "Size_1000",
 	[InputSize.Large] = "Size_1200"
-}
+} else require(script.Parent.ButtonHeightSizeKeyByInputSize)
 
-local function PlayButton(t2: {[any]: any}) -- line: 180
-	-- upvalues: React (copy), useRoactService (copy), RoactNetworking (copy), useSelector (copy), GamesProductInfoReducer (copy), tutils (copy), FFlagLuaAppPlayButtonLoadingDurationTelemetry (copy), usePlayButtonState (copy), FFlagLuaAppLaunchWhenLoadingForce (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), useOnPlayButtonCallback (copy), v36 (copy), FFlagLuaAppUnifiedPlayButtonSquadMenuDirection (copy), MenuDirection (copy), useOnPlaySquadButtonCallback (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy), PlayButtonStates (copy), usePlayOnReleaseAfterUnmount (copy), FFlagSduiExperienceDetailsSupport (copy), useLocalization (copy), FFlagLuaAppUpdatePlayButtonText (copy), FFlagUpdateActionNeededPlayButtonUi (copy), FFlagLuaAppUnifyPlayButtonAllSurfacesIxp (copy), useUserExperiment (copy), AppUserLayers (copy), FFlagLuaAppLogExposurePlayButtonUX (copy), IXPService (copy), FFlagLuaAppSupportUnifiedUIBloxPlayButton (copy), useTokens (copy), InputSize (copy), v47 (copy), t1 (copy), v35 (copy), Skeleton (copy), EnumsRadius (copy), ButtonVariant (copy), FFlagLuaAppIconTextPlayButton (copy), FFlagLuaAppTextOnlyPlayButton (copy), v33 (copy), v53 (copy), v34 (copy), GetFFlagIsSquadEnabled (copy), v54 (copy), ComboButton (copy), v56 (copy), v55 (copy), ButtonType (copy), Images (copy), Button (copy), v57 (copy), GetFFlagUIBloxUseFoundationButton (copy), FFlagLuaAppPlayButtonOptOutFoundationButton (copy), IconButton (copy), Button2 (copy)
-	local v61 = React.useRef(false)
+local function PlayButton(t1: {[any]: any}) -- line: 185
+	-- upvalues: React (copy), useRoactService (copy), RoactNetworking (copy), useSelector (copy), GamesProductInfoReducer (copy), tutils (copy), FFlagLuaAppPlayButtonLoadingDurationTelemetry (copy), FFlagLuaAppDemoModePlayButton (copy), useBreakpointXOrSmaller (copy), Responsive (copy), usePlayButtonState (copy), PlayButtonStates (copy), FFlagLuaAppLaunchWhenLoadingForce (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), useOnPlayButtonCallback (copy), v39 (copy), FFlagLuaAppUnifiedPlayButtonSquadMenuDirection (copy), MenuDirection (copy), useOnPlaySquadButtonCallback (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy), usePlayOnReleaseAfterUnmount (copy), FFlagSduiExperienceDetailsSupport (copy), useLocalization (copy), FFlagLuaAppUpdatePlayButtonText (copy), FFlagUpdateActionNeededPlayButtonUi (copy), FFlagLuaAppUnifyPlayButtonAllSurfacesIxp (copy), useUserExperiment (copy), AppUserLayers (copy), FFlagLuaAppLogExposurePlayButtonUX (copy), IXPService (copy), useTokens (copy), FFlagLuaAppPlayButtonViewRefactor (copy), PlayButtonGroupView (copy), PlayButtonView (copy), InputSize (copy), FFlagLuaAppUseTokenHeightForPlayButton (copy), v63 (copy), FFlagLuaAppPlayButtonLoadingSkeleton (copy), Skeleton (copy), EnumsRadius (copy), ButtonVariant (copy), FFlagLuaAppIconTextPlayButton (copy), FFlagLuaAppTextOnlyPlayButton (copy), FFlagLuaAppJoinTextPlayableButton (copy), v58 (copy), FFlagLuaAppIconPlayButton (copy), GetFFlagIsSquadEnabled (copy), v59 (copy), ComboButton (copy), v61 (copy), v60 (copy), ButtonType (copy), Images (copy), Button (copy), v62 (copy), GetFFlagUIBloxUseFoundationButton (copy), FFlagLuaAppPlayButtonOptOutFoundationButton (copy), IconButton (copy), Button2 (copy)
+	local v66 = React.useRef(false)
 
-	React.useEffect(function() -- line: 182
-		-- upvalues: v61 (copy)
-		v61.current = true
+	React.useEffect(function() -- line: 187
+		-- upvalues: v66 (copy)
+		v66.current = true
 
-		return function() -- line: 184
-			-- upvalues: v61 (copy)
-			v61.current = false
+		return function() -- line: 189
+			-- upvalues: v66 (copy)
+			v66.current = false
 		end
 	end, {})
 
-	local v62 = useRoactService(RoactNetworking)
-	local v63 = useSelector(function(p1) -- line: 190
-		-- upvalues: t2 (copy), GamesProductInfoReducer (copy)
-		if t2.universeId then
-			return p1[GamesProductInfoReducer.key][t2.universeId]
+	local v67 = useRoactService(RoactNetworking)
+	local v68 = useSelector(function(p1) -- line: 195
+		-- upvalues: t1 (copy), GamesProductInfoReducer (copy)
+		if t1.universeId then
+			return p1[GamesProductInfoReducer.key][t1.universeId]
 		end
 
 		return nil
 	end, tutils.shallowEqual)
-	local v64 = if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then nil else t2.eventContext or "PlayButton"
-	local playButtonState = usePlayButtonState(v62, t2.universeId, t2.fetchDelayInSeconds, t2.isPlayableWhenLoading, not not FFlagLuaAppPlayButtonLoadingDurationTelemetry or nil, (if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then nil else v64)).playButtonState
-	local v66 = FFlagLuaAppLaunchWhenLoadingForce or FFlagLuaAppLaunchWhenLoadingEdp and t2.launchWhenLoading == true
-	local v67 = useOnPlayButtonCallback(t2.universeId, t2.referralSource, if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then t2.eventContext or "PlayButton" else v64, nil, t2.launchSource or (not v36 and "LuaGameCard" or "UnknownLaunchSource"), t2.experienceJoinData, t2.placeId, if not FFlagLuaAppLaunchWhenLoadingEdp and not FFlagLuaAppLaunchWhenLoadingForce then nil else t2.launchWhenLoading)
-	local v68 = if not FFlagLuaAppUnifiedPlayButtonSquadMenuDirection or t2.squadButtonMenuDirection == nil then MenuDirection.Up else t2.squadButtonMenuDirection
-	local v69 = useOnPlaySquadButtonCallback(v68, playButtonState, t2.referralSource, t2.universeId)
-	local v70 = FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce or FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp and t2.launchOnReleaseAfterUnmount == true
-	local v71 = React.useCallback(function() -- line: 237
-		-- upvalues: v70 (copy), v61 (copy), t2 (copy), playButtonState (copy), PlayButtonStates (copy), v67 (copy)
-		if not v70 and not v61.current then
+	local v69 = if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then nil else t1.eventContext or "PlayButton"
+	local v70 = nil
+
+	if FFlagLuaAppDemoModePlayButton then
+		v70 = useBreakpointXOrSmaller(Responsive.Keys.Small)
+	end
+
+	local v71 = usePlayButtonState(v67, t1.universeId, t1.fetchDelayInSeconds, t1.isPlayableWhenLoading, not not FFlagLuaAppPlayButtonLoadingDurationTelemetry or nil, if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then nil else v69)
+	local playButtonState = v71.playButtonState
+	local u73 = if not FFlagLuaAppDemoModePlayButton then nil else v71.secondaryPlayButtonState
+
+	if FFlagLuaAppDemoModePlayButton and u73 ~= nil then
+		local v74 = playButtonState == PlayButtonStates.UnplayableOther
+		local v75 = u73 == PlayButtonStates.UnplayableOther
+
+		if t1.preferSecondaryPlayButton == true or v70 and v74 then
+			playButtonState = u73
+			u73 = nil
+		elseif v70 and v75 then
+			u73 = nil
+		end
+	end
+
+	local v76 = FFlagLuaAppLaunchWhenLoadingForce or FFlagLuaAppLaunchWhenLoadingEdp and t1.launchWhenLoading == true
+	local v77 = useOnPlayButtonCallback(t1.universeId, t1.referralSource, if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then t1.eventContext or "PlayButton" else v69, nil, t1.launchSource or (not v39 and "LuaGameCard" or "UnknownLaunchSource"), t1.experienceJoinData, t1.placeId, if not FFlagLuaAppLaunchWhenLoadingEdp and not FFlagLuaAppLaunchWhenLoadingForce then nil else t1.launchWhenLoading)
+	local v78 = if not FFlagLuaAppUnifiedPlayButtonSquadMenuDirection or t1.squadButtonMenuDirection == nil then MenuDirection.Up else t1.squadButtonMenuDirection
+	local v79 = useOnPlaySquadButtonCallback(v78, playButtonState, t1.referralSource, t1.universeId)
+	local v80 = FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce or FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp and t1.launchOnReleaseAfterUnmount == true
+	local v81 = nil
+	local v83
+
+	if FFlagLuaAppDemoModePlayButton then
+		local v82 = React.useCallback(function(s1: string?) -- line: 266
+			-- upvalues: v80 (copy), v66 (copy), t1 (copy), PlayButtonStates (copy), v77 (copy)
+			if s1 == nil then
+				return
+			end
+
+			if not v80 and not v66.current then
+				return
+			end
+
+			if t1.onActivated then
+				t1.onActivated()
+			end
+
+			if t1.onPurchaseRequiredCallback and (s1 == PlayButtonStates.PaidAccess or s1 == PlayButtonStates.FiatPaidAccess) then
+				t1.onPurchaseRequiredCallback()
+
+				return
+			end
+
+			v77(s1, t1.reportExperienceLaunched)
+		end, {
+			v77,
+			t1.onPurchaseRequiredCallback,
+			t1.reportExperienceLaunched,
+			t1.onActivated,
+			if not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce and not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp then nil else v80
+		})
+
+		v83 = React.useCallback(function() -- line: 303
+			-- upvalues: v82 (copy), playButtonState (ref)
+			v82(playButtonState)
+		end, {
+			v82,
+			playButtonState
+		})
+		v81 = React.useCallback(function() -- line: 307
+			-- upvalues: v82 (copy), u73 (ref)
+			v82(u73)
+		end, {
+			v82,
+			u73
+		})
+	else
+		v83 = React.useCallback(function() -- line: 312
+			-- upvalues: v80 (copy), v66 (copy), t1 (copy), playButtonState (ref), PlayButtonStates (copy), v77 (copy)
+			if not v80 and not v66.current then
+				return
+			end
+
+			if t1.onActivated then
+				t1.onActivated()
+			end
+
+			if t1.onPurchaseRequiredCallback and (playButtonState == PlayButtonStates.PaidAccess or playButtonState == PlayButtonStates.FiatPaidAccess) then
+				t1.onPurchaseRequiredCallback()
+
+				return
+			end
+
+			v77(playButtonState, t1.reportExperienceLaunched)
+		end, {
+			v77,
+			playButtonState,
+			t1.onPurchaseRequiredCallback,
+			t1.reportExperienceLaunched,
+			t1.onActivated,
+			if not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce and not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp then nil else v80
+		})
+	end
+
+	local v84 = if not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp and not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce then nil else usePlayOnReleaseAfterUnmount(v83)
+	local v85 = if not v80 or not v84 then nil else v84.playButtonRef
+	local v86 = if not v80 or not v84 then nil else v84.loadingCaptureRef
+	local v87 = if not v80 then v83 else v84.onActivated
+	local v88 = React.useCallback(function(p2) -- line: 362
+		-- upvalues: v66 (copy), t1 (copy), v79 (copy)
+		if not v66.current then
 			return
 		end
 
-		if t2.onActivated then
-			t2.onActivated()
+		if t1.onActivated then
+			t1.onActivated()
 		end
 
-		if t2.onPurchaseRequiredCallback and (playButtonState == PlayButtonStates.PaidAccess or playButtonState == PlayButtonStates.FiatPaidAccess) then
-			t2.onPurchaseRequiredCallback()
-
-			return
-		end
-
-		v67(playButtonState, t2.reportExperienceLaunched)
+		v79(p2)
 	end, {
-		v67,
-		playButtonState,
-		t2.onPurchaseRequiredCallback,
-		t2.reportExperienceLaunched,
-		t2.onActivated,
-		if not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce and not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp then nil else v70
-	})
-	local v72 = if not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp and not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountForce then nil else usePlayOnReleaseAfterUnmount(v71)
-	local v73 = if not v70 or not v72 then nil else v72.playButtonRef
-	local v74 = if not v70 or not v72 then nil else v72.loadingCaptureRef
-	local v75 = if not v70 then v71 else v72.onActivated
-	local v76 = React.useCallback(function(p2) -- line: 286
-		-- upvalues: v61 (copy), t2 (copy), v69 (copy)
-		if not v61.current then
-			return
-		end
-
-		if t2.onActivated then
-			t2.onActivated()
-		end
-
-		v69(p2)
-	end, {
-		v69,
-		t2.onActivated
+		v79,
+		t1.onActivated
 	})
 
 	if FFlagSduiExperienceDetailsSupport then
-		React.useEffect(function() -- line: 297
-			-- upvalues: t2 (copy), v75 (copy)
-			local onRegisterActivation = t2.onRegisterActivation
+		React.useEffect(function() -- line: 373
+			-- upvalues: t1 (copy), v87 (copy)
+			local onRegisterActivation = t1.onRegisterActivation
 
 			if onRegisterActivation == nil then
 				return
 			end
 
-			return onRegisterActivation(v75)
+			return onRegisterActivation(v87)
 		end, {
-			t2.onRegisterActivation,
-			v75
+			t1.onRegisterActivation,
+			v87
 		})
 	end
 
-	local v77 = useLocalization({
+	local v89 = useLocalization({
 		join = "Feature.ExperienceDetails.PlayButtonText.ActionNeeded",
 		joinWithParty = "Feature.Squads.Action.JoinWithParty",
 		unavailable = "Feature.ExperienceDetails.PlayButtonText.Unavailable",
 		waitingForParty = "Feature.Squads.Action.WaitingForParty",
 		play = if not FFlagLuaAppUpdatePlayButtonText then nil else "Feature.ExperienceDetails.PlayButtonText.Play",
+		playDemo = if not FFlagLuaAppDemoModePlayButton then nil else "Feature.ExperienceDetails.PlayButtonText.PlayDemo",
 		unlock = if not FFlagUpdateActionNeededPlayButtonUi then nil else "Feature.ExperienceDetails.PlayButtonText.Unlock"
 	})
-	local v78 = nil
-	local v79 = nil
-	local v80 = nil
+	local v90 = nil
+	local v91 = nil
+	local v92 = nil
 
 	if FFlagLuaAppUnifyPlayButtonAllSurfacesIxp then
-		v78, v79, v80 = useUserExperiment({ AppUserLayers.PlayButtonUXExposureLayer }, function(p3) -- line: 319
+		v90, v91, v92 = useUserExperiment({ AppUserLayers.PlayButtonUXExposureLayer }, function(p3) -- line: 396
 			-- upvalues: AppUserLayers (copy)
-			local v113 = p3[AppUserLayers.PlayButtonUXExposureLayer] or {}
+			local v126 = p3[AppUserLayers.PlayButtonUXExposureLayer] or {}
 
-			return v113.HasJoinTextButton, v113.HasIconPlayButton, v113.HasPlayButtonLoadingSkeleton
+			return v126.HasJoinTextButton, v126.HasIconPlayButton, v126.HasPlayButtonLoadingSkeleton
 		end, true)
 	end
 
 	if FFlagLuaAppLogExposurePlayButtonUX then
-		React.useEffect(function() -- line: 328
+		React.useEffect(function() -- line: 405
 			-- upvalues: IXPService (copy), AppUserLayers (copy)
 			IXPService:LogUserLayerExposure(AppUserLayers.PlayButtonUXExposureLayer)
 		end, {})
 	end
 
-	local v81 = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then nil else useTokens()
-	local v82 = false
-	local v83 = false
-	local v84 = false
-	local v85 = t2.buttonSize or InputSize.Medium
-	local v86 = nil
+	local v93 = useTokens()
 
-	if v47 then
-		local v87 = t1[v85] or "Size_1000"
-
-		v86 = (not v81 or not v81.Size[v87]) and 40 or v81.Size[v87]
+	if FFlagLuaAppPlayButtonViewRefactor then
+		return React.createElement(if not FFlagLuaAppDemoModePlayButton then PlayButtonView else PlayButtonGroupView, {
+			playButtonState = playButtonState,
+			secondaryPlayButtonState = if not FFlagLuaAppDemoModePlayButton then nil else u73,
+			gameProductInfo = v68,
+			localized = v89,
+			tokens = v93,
+			hasJoinTextPlayableButtonIxp = v90,
+			hasIconPlayButtonIxp = v91,
+			hasPlayButtonLoadingSkeletonIxp = v92,
+			onPlayButtonActivated = v87,
+			onSecondaryPlayButtonActivated = if not FFlagLuaAppDemoModePlayButton then nil else v81,
+			onPlaySquadButtonActivated = v88,
+			playButtonCaptureRef = v85,
+			loadingCaptureRef = v86,
+			shouldLaunchWhenLoading = v76,
+			shouldLaunchOnReleaseAfterUnmount = v80,
+			squadButtonMenuDirection = v78,
+			playableText = t1.playableText,
+			fiatText = t1.fiatText,
+			hidePlayableIcon = t1.hidePlayableIcon,
+			hideOptionalText = t1.hideOptionalText,
+			buttonSize = t1.buttonSize,
+			width = t1.width,
+			expandWidthForSecondaryPlayButton = if not FFlagLuaAppDemoModePlayButton then nil else t1.expandWidthForSecondaryPlayButton,
+			fillBehavior = t1.fillBehavior,
+			useUIBloxButton = t1.useUIBloxButton,
+			hideIfUnplayable = t1.hideIfUnplayable,
+			hideIfLoading = t1.hideIfLoading,
+			LayoutOrder = t1.LayoutOrder,
+			Position = t1.Position,
+			tag = t1.tag,
+			testId = t1.testId
+		})
 	end
 
-	local v88 = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton or not t2.width then t2.fillBehavior else "Fill"
+	local v94 = false
+	local v95 = false
+	local v96 = false
+	local v97 = t1.buttonSize or InputSize.Medium
+	local v98 = nil
+
+	if FFlagLuaAppUseTokenHeightForPlayButton then
+		local v99 = v63[v97] or "Size_1000"
+
+		v98 = (not v93 or not v93.Size[v99]) and 40 or v93.Size[v99]
+	end
+
+	local v100 = if not t1.width then t1.fillBehavior else "Fill"
 	local Emphasis = nil
-	local v90 = nil
-	local v91 = nil
-	local v92 = nil
-	local v93 = nil
+	local v102 = nil
+	local v103 = nil
+	local v104 = nil
+	local v105 = nil
 
 	if playButtonState == PlayButtonStates.Loading then
-		if t2.hideIfLoading then
+		if t1.hideIfLoading then
 			return nil
 		end
 
-		if v35 and ((not FFlagLuaAppSupportUnifiedUIBloxPlayButton or not t2.useUIBloxButton) and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or v80)) then
-			local v94
+		if FFlagLuaAppPlayButtonLoadingSkeleton and (not t1.useUIBloxButton and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or v92)) then
+			local v106
 
-			if v47 then
-				v94 = v86
+			if FFlagLuaAppUseTokenHeightForPlayButton then
+				v106 = v98
 			else
-				local v95 = t1[v85] or "Size_1000"
+				local v107 = v63[v97] or "Size_1000"
 
-				v94 = v81 and v81.Size[v95]
+				v106 = v93 and v93.Size[v107]
 			end
 
-			v93 = if v88 ~= "Fill" then UDim.new(0, v94) else UDim.new(1, 0)
+			v105 = if v100 ~= "Fill" then UDim.new(0, v106) else UDim.new(1, 0)
 
-			local uDim2 = UDim2.new(v93, UDim.new(0, v94))
-			local v97 = FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or (v66 or v70)
-			local v98 = React.createElement(Skeleton, {
+			local uDim2 = UDim2.new(v105, UDim.new(0, v106))
+			local v109 = FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or (v76 or v80)
+			local v110 = React.createElement(Skeleton, {
 				ZIndex = 2,
-				Size = if not v97 then uDim2 else UDim2.fromScale(1, 1),
+				Size = if not v109 then uDim2 else UDim2.fromScale(1, 1),
 				radius = EnumsRadius.Medium
 			})
 
-			v92 = if not v97 then v98 else React.createElement("TextButton", {
+			v104 = if not v109 then v110 else React.createElement("TextButton", {
 				Size = uDim2,
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Text = "",
 				AutoButtonColor = false,
 				ZIndex = 2,
-				ref = v74,
-				[React.Event.Activated] = v75
+				ref = v86,
+				[React.Event.Activated] = v87
 			}, {
-				Skeleton = v98
+				Skeleton = v110
 			})
-			v84 = true
+			v96 = true
 		end
 
 		Emphasis = ButtonVariant.Emphasis
 	elseif playButtonState == PlayButtonStates.Playable then
 		Emphasis = ButtonVariant.Emphasis
 
-		if FFlagLuaAppIconTextPlayButton or (FFlagLuaAppTextOnlyPlayButton or v33 and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or v78)) then
-			v91 = t2.playableText or if not FFlagLuaAppUpdatePlayButtonText then v77.join else v77.play
+		if FFlagLuaAppIconTextPlayButton or (FFlagLuaAppTextOnlyPlayButton or FFlagLuaAppJoinTextPlayableButton and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or v90)) then
+			v103 = t1.playableText or if not FFlagLuaAppUpdatePlayButtonText then v89.join else v89.play
 
-			if FFlagLuaAppIconTextPlayButton and not t2.hidePlayableIcon then
-				v90 = v53
+			if FFlagLuaAppIconTextPlayButton and not t1.hidePlayableIcon then
+				v102 = v58
 			end
 		else
-			if not v34 and not t2.hidePlayableIcon then
-				v90 = "icons/common/play"
+			if not FFlagLuaAppIconPlayButton and not t1.hidePlayableIcon then
+				v102 = "icons/common/play"
 			end
 
-			v91 = t2.playableText
+			v103 = t1.playableText
 
-			if v34 and not t2.hidePlayableIcon then
-				v90 = if not v91 or v91 == "" then v53 else "icons/common/play"
+			if FFlagLuaAppIconPlayButton and not t1.hidePlayableIcon then
+				v102 = if not v103 or v103 == "" then v58 else "icons/common/play"
 			end
 		end
 	elseif GetFFlagIsSquadEnabled() and playButtonState == PlayButtonStates.PlayableWithParty then
-		v90 = v54
-		v91 = if not t2.hideOptionalText then v77.joinWithParty else nil
-		v82 = true
+		v102 = v59
+		v103 = if not t1.hideOptionalText then v89.joinWithParty else nil
+		v94 = true
 	elseif GetFFlagIsSquadEnabled() and playButtonState == PlayButtonStates.WaitingForParty then
-		v90 = v54
-		v91 = if not t2.hideOptionalText then v77.waitingForParty else nil
-		v84 = true
-		v83 = true
-		v82 = true
+		v102 = v59
+		v103 = if not t1.hideOptionalText then v89.waitingForParty else nil
+		v96 = true
+		v95 = true
+		v94 = true
 	elseif playButtonState == PlayButtonStates.PaidAccess then
-		v91 = tostring(v63 and v63.price or 0)
+		v103 = tostring(v68 and v68.price or 0)
 		Emphasis = ButtonVariant.Emphasis
-		v90 = "icons/common/robux"
+		v102 = "icons/common/robux"
 	elseif playButtonState == PlayButtonStates.FiatPaidAccess then
 		Emphasis = ButtonVariant.Emphasis
 
-		local v99 = v63 and v63.localizedFiatPrice or ""
+		local v111 = v68 and v68.localizedFiatPrice or ""
 
-		v91 = t2.fiatText or v99
+		v103 = t1.fiatText or v111
 	elseif playButtonState == PlayButtonStates.ActionNeeded then
 		if FFlagUpdateActionNeededPlayButtonUi then
 			Emphasis = ButtonVariant.Emphasis
-			v91 = v77.unlock
+			v103 = v89.unlock
 		else
 			Emphasis = ButtonVariant.SubEmphasis
-			v90 = "icons/status/private"
-			v91 = if not t2.hideOptionalText then v77.join else nil
+			v102 = "icons/status/private"
+			v103 = if not t1.hideOptionalText then v89.join else nil
 		end
 	elseif playButtonState == PlayButtonStates.UnplayableOther then
-		if t2.hideIfUnplayable then
+		if t1.hideIfUnplayable then
 			return nil
 		end
 
 		Emphasis = ButtonVariant.Subtle
-		v90 = "icons/status/unavailable"
-		v91 = if not t2.hideOptionalText then v77.unavailable else nil
-		v84 = true
+		v102 = "icons/status/unavailable"
+		v103 = if not t1.hideOptionalText then v89.unavailable else nil
+		v96 = true
 	else
 		error("invalid play button state!")
 	end
 
-	local v101
+	local v113
 
-	if v82 then
-		if not v47 and FFlagLuaAppSupportUnifiedUIBloxPlayButton then
-			local v100 = t1[v85] or "Size_1000"
+	if v94 then
+		if not FFlagLuaAppUseTokenHeightForPlayButton then
+			local v112 = v63[v97] or "Size_1000"
 
-			v86 = (not v81 or not v81.Size[v100]) and 40 or v81.Size[v100]
+			v98 = (not v93 or not v93.Size[v112]) and 40 or v93.Size[v112]
 		end
 
-		v101 = React.createElement(ComboButton, {
-			layoutOrder = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.LayoutOrder else nil,
-			position = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.Position else nil,
-			size = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then UDim2.new(t2.width or UDim.new(1, 0), t2.squadButtonHeight or UDim.new(1, 0)) else UDim2.new(1, 0, 0, v86),
+		v113 = React.createElement(ComboButton, {
+			size = UDim2.new(1, 0, 0, v98),
 			button = {
-				icon = v90,
-				text = v91,
-				isDisabled = v84,
-				onActivated = v84 and function() -- line: 493
-				end or v75
+				icon = v102,
+				text = v103,
+				isDisabled = v96,
+				onActivated = v96 and function() -- line: 605
+				end or v87
 			},
 			overflow = {
-				icon = if not FFlagLuaAppUnifiedPlayButtonSquadMenuDirection or v68 ~= MenuDirection.Down then v55 else v56,
-				isDisabled = v83,
-				onActivated = v83 and function() -- line: 501
-				end or v76
+				icon = if not FFlagLuaAppUnifiedPlayButtonSquadMenuDirection or v78 ~= MenuDirection.Down then v60 else v61,
+				isDisabled = v95,
+				onActivated = v95 and function() -- line: 613
+				end or v88
 			},
-			testId = t2.testId
+			testId = t1.testId
 		})
-	elseif FFlagLuaAppSupportUnifiedUIBloxPlayButton and t2.useUIBloxButton then
-		if not v47 then
-			local v102 = t1[v85] or "Size_1000"
+	elseif t1.useUIBloxButton then
+		if not FFlagLuaAppUseTokenHeightForPlayButton then
+			local v114 = v63[v97] or "Size_1000"
 
-			v86 = (not v81 or not v81.Size[v102]) and 40 or v81.Size[v102]
+			v98 = (not v93 or not v93.Size[v114]) and 40 or v93.Size[v114]
 		end
 
-		local v103 = v88 == "Fit"
-		local v104 = if not v103 then UDim2.new(1, 0, 0, v86) else UDim2.new(0, 0, 0, v86)
-		local v105 = playButtonState == PlayButtonStates.Loading
-		local v106 = if Emphasis ~= ButtonVariant.SubEmphasis then if Emphasis ~= ButtonVariant.Subtle then ButtonType.PrimaryContextual else ButtonType.Secondary else ButtonType.PrimarySystem
-		local v107 = if v90 ~= v53 then v90 else v54
+		local v115 = v100 == "Fit"
+		local v116 = if not v115 then UDim2.new(1, 0, 0, v98) else UDim2.new(0, 0, 0, v98)
+		local v117 = playButtonState == PlayButtonStates.Loading
+		local v118 = if Emphasis ~= ButtonVariant.SubEmphasis then if Emphasis ~= ButtonVariant.Subtle then ButtonType.PrimaryContextual else ButtonType.Secondary else ButtonType.PrimarySystem
+		local v119 = if v102 ~= v58 then v102 else v59
 
-		if type(v107) == "string" then
-			v107 = Images[v107]
+		if type(v119) == "string" then
+			v119 = Images[v119]
 		end
 
-		v101 = React.createElement(Button, {
-			size = v104,
-			fitContent = v103,
-			buttonType = v106,
-			icon = v107,
-			text = v91,
-			isLoading = v105,
-			isDisabled = v84 or v105,
-			userInteractionEnabled = not (v84 or v105),
-			onActivated = if v84 or v105 then v57 else v75,
-			ref = v73,
-			[React.Tag] = if not t2.testId then nil else `data-testid={ t2.testId }`,
+		v113 = React.createElement(Button, {
+			size = v116,
+			fitContent = v115,
+			buttonType = v118,
+			icon = v119,
+			text = v103,
+			isLoading = v117,
+			isDisabled = v96 or v117,
+			userInteractionEnabled = not (v96 or v117),
+			onActivated = if v96 or v117 then v62 else v87,
+			ref = v85,
+			[React.Tag] = if not t1.testId then nil else `data-testid={ t1.testId }`,
 			DO_NOT_USE_useUIBloxButton = GetFFlagUIBloxUseFoundationButton() and true or (not not FFlagLuaAppPlayButtonOptOutFoundationButton or nil)
 		})
 
-		if (FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or v66 or v70) and v105 then
-			v92 = React.createElement("TextButton", {
-				Size = v104,
+		if (FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or v76 or v80) and v117 then
+			v104 = React.createElement("TextButton", {
+				Size = v116,
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Text = "",
 				AutoButtonColor = false,
 				ZIndex = 2,
-				ref = v74,
-				[React.Event.Activated] = v75
+				ref = v86,
+				[React.Event.Activated] = v87
 			})
 		end
 	else
-		local v108 = if not v34 then nil else (v91 == nil or v91 == "") and v90 ~= nil
+		local v120 = if not FFlagLuaAppIconPlayButton then nil else (v103 == nil or v103 == "") and v102 ~= nil
 
-		v101 = if not v34 or (FFlagLuaAppUnifyPlayButtonAllSurfacesIxp and not v79 or not v108) then React.createElement(Button2, {
-			LayoutOrder = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.LayoutOrder else nil,
-			Position = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.Position else nil,
-			icon = v90,
-			text = v91,
+		v113 = if not FFlagLuaAppIconPlayButton or (FFlagLuaAppUnifyPlayButtonAllSurfacesIxp and not v91 or not v120) then React.createElement(Button2, {
+			icon = v102,
+			text = v103,
 			variant = Emphasis,
-			size = v85,
-			width = if not v35 or playButtonState ~= PlayButtonStates.Loading then if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.width else nil else v93,
-			fillBehavior = v88,
-			isDisabled = v84,
-			onActivated = if v84 then v57 else v75,
-			ref = v73,
-			testId = t2.testId
+			size = v97,
+			width = if not FFlagLuaAppPlayButtonLoadingSkeleton or playButtonState ~= PlayButtonStates.Loading then nil else v105,
+			fillBehavior = v100,
+			isDisabled = v96,
+			onActivated = if v96 then v62 else v87,
+			ref = v85,
+			testId = t1.testId
 		}) else React.createElement(IconButton, {
-			LayoutOrder = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.LayoutOrder else nil,
-			Position = if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.Position else nil,
-			icon = v90,
+			icon = v102,
 			variant = Emphasis,
-			size = v85,
-			width = if not v35 or playButtonState ~= PlayButtonStates.Loading then if not FFlagLuaAppSupportUnifiedUIBloxPlayButton then t2.width else nil else v93,
-			fillBehavior = v88,
-			isDisabled = v84,
-			onActivated = if v84 then v57 else v75,
-			ref = v73,
-			testId = t2.testId
+			size = v97,
+			width = if not FFlagLuaAppPlayButtonLoadingSkeleton or playButtonState ~= PlayButtonStates.Loading then nil else v105,
+			fillBehavior = v100,
+			isDisabled = v96,
+			onActivated = if v96 then v62 else v87,
+			ref = v85,
+			testId = t1.testId
 		})
 	end
 
-	if FFlagLuaAppSupportUnifiedUIBloxPlayButton then
-		return React.createElement("Frame", {
-			LayoutOrder = t2.LayoutOrder,
-			Position = t2.Position,
-			Size = if not v47 then if not t2.width then if v88 ~= "Fill" then nil else UDim2.new(1, 0, 1, 0) else UDim2.new(t2.width, UDim.new(0, 0)) else UDim2.new(if not t2.width then if v88 ~= "Fill" then UDim.new(0, 0) else UDim.new(1, 0) else t2.width, UDim.new(0, v86)),
-			AutomaticSize = if not v47 then if v88 ~= "Fill" then Enum.AutomaticSize.XY else Enum.AutomaticSize.Y else if v88 ~= "Fill" then Enum.AutomaticSize.X else nil,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			[React.Tag] = if not FFlagSduiExperienceDetailsSupport then nil else t2.tag
-		}, {
-			LoadingSkeleton = if playButtonState ~= PlayButtonStates.Loading then nil else v92,
-			PlayButton = v101
-		})
-	end
-
-	return v101
+	return React.createElement("Frame", {
+		LayoutOrder = t1.LayoutOrder,
+		Position = t1.Position,
+		Size = if not FFlagLuaAppUseTokenHeightForPlayButton then if not t1.width then if v100 ~= "Fill" then nil else UDim2.new(1, 0, 1, 0) else UDim2.new(t1.width, UDim.new(0, 0)) else UDim2.new(if not t1.width then if v100 ~= "Fill" then UDim.new(0, 0) else UDim.new(1, 0) else t1.width, UDim.new(0, v98)),
+		AutomaticSize = if not FFlagLuaAppUseTokenHeightForPlayButton then if v100 ~= "Fill" then Enum.AutomaticSize.XY else Enum.AutomaticSize.Y else if v100 ~= "Fill" then Enum.AutomaticSize.X else nil,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		[React.Tag] = if not FFlagSduiExperienceDetailsSupport then nil else t1.tag
+	}, {
+		LoadingSkeleton = if playButtonState ~= PlayButtonStates.Loading then nil else v104,
+		PlayButton = v113
+	})
 end
 
 return React.memo(PlayButton)

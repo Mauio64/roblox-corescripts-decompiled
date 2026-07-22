@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local CreatorAgentChat = require(Parent.DataHydration.CreatorAgentChat)
-local Signals = require(Parent.Signals)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local BuildExperienceParent = BuildExperience.Parent
+local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
+local Signals = require(BuildExperienceParent.Signals)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
 require(script.Parent.chatTypes)
 
@@ -8,6 +10,7 @@ local askUserController = require(script.Parent.askUserController)
 local clientLogsController = require(script.Parent.clientLogsController)
 local localToolOverlay = require(script.Parent.localToolOverlay)
 local proposePlanController = require(script.Parent.proposePlanController)
+local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local StudioAskUserTool = CreatorAgentChat.StudioAskUserTool
 local StudioClientLogsTool = CreatorAgentChat.StudioClientLogsTool
 local StudioProposePlanTool = CreatorAgentChat.StudioProposePlanTool
@@ -15,17 +18,17 @@ local debug = CreatorAgentChat.debug
 local ErrorCodes = CreatorAgentChat.ErrorCodes
 local Forbidden = ErrorCodes.Forbidden
 local t1 = {
-	[ErrorCodes.InvalidParams] = "Something went wrong with your message. Please edit it and try again.",
-	[ErrorCodes.Unauthorized] = "You're signed out. Please sign in and try again.",
-	[ErrorCodes.Forbidden] = "The assistant isn't available for your account right now.",
-	[ErrorCodes.NotFound] = "We couldn't find this chat. Please start a new one.",
-	[ErrorCodes.Conflict] = "The assistant is busy with another request. Please wait a moment and try again.",
-	[ErrorCodes.Gone] = "This chat is no longer available. Please start a new one.",
-	[ErrorCodes.UpstreamUnavailable] = "The assistant is temporarily unavailable. Please try again in a moment.",
-	[ErrorCodes.InternalError] = "The assistant ran into a problem. Please try again."
+	[ErrorCodes.InvalidParams] = LocalizationStrings.CHAT_ERROR_INVALID_PARAMS,
+	[ErrorCodes.Unauthorized] = LocalizationStrings.CHAT_ERROR_UNAUTHORIZED,
+	[ErrorCodes.Forbidden] = LocalizationStrings.CHAT_ERROR_FORBIDDEN,
+	[ErrorCodes.NotFound] = LocalizationStrings.CHAT_ERROR_NOT_FOUND,
+	[ErrorCodes.Conflict] = LocalizationStrings.CHAT_ERROR_CONFLICT,
+	[ErrorCodes.Gone] = LocalizationStrings.CHAT_ERROR_GONE,
+	[ErrorCodes.UpstreamUnavailable] = LocalizationStrings.CHAT_ERROR_UPSTREAM_UNAVAILABLE,
+	[ErrorCodes.InternalError] = LocalizationStrings.CHAT_ERROR_INTERNAL
 }
 
-local function resolvePromptFailure(p1, p2) -- line: 89
+local function resolvePromptFailure(p1, p2) -- line: 87
 	-- upvalues: Forbidden (copy)
 	if p1 == nil then
 		if p2 == nil then
@@ -48,68 +51,83 @@ local function resolvePromptFailure(p1, p2) -- line: 89
 		isContentPolicy = p1.errorCode == Forbidden
 	}
 end
-local function formatSetupErrorMessage(p3) -- line: 109
-	-- upvalues: t1 (copy)
-	local t2 = {
+local function getPromptFailureTelemetryParameters(t2: {[any]: any}) -- line: 107
+	local t3 = {
+		isContentPolicy = tostring(t2.isContentPolicy)
+	}
+
+	if t2.errorCode ~= nil then
+		t3.errorCode = tostring(t2.errorCode)
+	end
+
+	if t2.setupStage ~= nil then
+		t3.setupStage = t2.setupStage
+	end
+
+	return t3
+end
+local function formatSetupErrorMessage(p3) -- line: 120
+	-- upvalues: LocalizationStrings (copy), t1 (copy)
+	local t4 = {
 		isContentPolicy = false,
 		errorCode = p3.errorCode,
 		setupStage = p3.stage
 	}
 
-	if t2.isContentPolicy then
-		return "Your message violates Roblox safety policy. Edit it and try again."
+	if t4.isContentPolicy then
+		return LocalizationStrings.CHAT_POLICY_REJECTION
 	end
 
-	if t2.setupStage == "missing_project" then
-		return "An experience is required to chat with the assistant."
+	if t4.setupStage == "missing_project" then
+		return LocalizationStrings.CHAT_MISSING_PROJECT
 	end
 
-	if t2.errorCode ~= nil then
-		local v24 = t1[t2.errorCode]
+	if t4.errorCode ~= nil then
+		local v30 = t1[t4.errorCode]
 
-		if v24 ~= nil then
-			return v24
+		if v30 ~= nil then
+			return v30
 		end
 	end
 
-	return "The assistant couldn't connect. Please try again."
+	return LocalizationStrings.CHAT_DEFAULT_FAILURE
 end
-local function createLocalToolControllers(p4) -- line: 120
+local function createLocalToolControllers(p4) -- line: 131
 	-- upvalues: localToolOverlay (copy), askUserController (copy), proposePlanController (copy), clientLogsController (copy)
-	local t3 = {}
-	local v27 = localToolOverlay()
-	local v28 = askUserController(p4, t3, v27)
-	local v29 = proposePlanController(p4, t3, v27)
-	local v30 = clientLogsController(p4, t3)
+	local t5 = {}
+	local v33 = localToolOverlay()
+	local v34 = askUserController(p4, t5, v33)
+	local v35 = proposePlanController(p4, t5, v33)
+	local v36 = clientLogsController(p4, t5)
 
 	return {
-		getOptimisticLocalTools = v27.getOptimisticLocalTools,
-		getLocalToolActions = v27.getLocalToolActions,
-		hasDisplayedAnswerStack = v28.hasDisplayedAnswerStack,
-		syncFromTurnState = function(p5) -- line: 131
-			-- upvalues: v28 (copy), v29 (copy), v30 (copy)
-			v28.syncAnswerStack(p5)
-			v29.syncPlanProposal(p5)
-			v30.syncClientLogsRequest(p5)
+		getOptimisticLocalTools = v33.getOptimisticLocalTools,
+		getLocalToolActions = v33.getLocalToolActions,
+		hasDisplayedAnswerStack = v34.hasDisplayedAnswerStack,
+		syncFromTurnState = function(p5) -- line: 142
+			-- upvalues: v34 (copy), v35 (copy), v36 (copy)
+			v34.syncAnswerStack(p5)
+			v35.syncPlanProposal(p5)
+			v36.syncClientLogsRequest(p5)
 		end,
-		trySubmitComposerText = function(s1: string) -- line: 136
-			-- upvalues: v28 (copy), v29 (copy)
-			return v28.trySubmitComposerText(s1) or v29.trySubmitComposerText(s1)
+		trySubmitComposerText = function(s1: string) -- line: 147
+			-- upvalues: v34 (copy), v35 (copy)
+			return v34.trySubmitComposerText(s1) or v35.trySubmitComposerText(s1)
 		end,
-		stopPending = function() -- line: 139
-			-- upvalues: v28 (copy), v29 (copy)
-			v28.stopPendingAnswer()
-			v29.stopPendingPlan()
+		stopPending = function() -- line: 150
+			-- upvalues: v34 (copy), v35 (copy)
+			v34.stopPendingAnswer()
+			v35.stopPendingPlan()
 		end
 	}
 end
 
 return {
-	createLiveAssistantTurn = function(p6, s2: string, p7: ((...any) -> ...any)) -- line: 148
-		-- upvalues: createLocalToolControllers (copy), StudioAskUserTool (copy), StudioProposePlanTool (copy), StudioClientLogsTool (copy), resolvePromptFailure (copy), debug (copy), t1 (copy)
-		local v34 = createLocalToolControllers(p6)
+	createLiveAssistantTurn = function(p6, s2: string, p7: ((...any) -> ...any)) -- line: 159
+		-- upvalues: createLocalToolControllers (copy), StudioAskUserTool (copy), StudioProposePlanTool (copy), StudioClientLogsTool (copy), sendBuildExperienceEvent (copy), resolvePromptFailure (copy), debug (copy), LocalizationStrings (copy), t1 (copy)
+		local v40 = createLocalToolControllers(p6)
 		local universeId = p6.universeId
-		local t4 = {
+		local t6 = {
 			_roblox = {
 				localTools = {
 					StudioAskUserTool.LOCAL_TOOL_DEFINITION,
@@ -121,26 +139,55 @@ return {
 				}
 			}
 		}
-		local u37 = nil
+		local u43 = nil
 
-		u37 = p6.sendPrompt({
+		u43 = p6.sendPrompt({
 			prompt = s2,
-			promptMeta = t4,
-			onCompleted = function(p8) -- line: 175
-				-- upvalues: resolvePromptFailure (copy), u37 (ref), debug (copy), universeId (copy), p6 (copy), p7 (copy)
-				local v52 = resolvePromptFailure(p8, u37.getSetupError(false))
+			promptMeta = t6,
+			onDroppedChatMessage = function(n1: number) -- line: 182
+				-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), p6 (copy)
+				sendBuildExperienceEvent("DROPPED_CHAT_MESSAGE", {
+					universeId = universeId,
+					placeId = p6.placeId,
+					conversationId = p6.getCasSessionId(),
+					messageId = n1
+				})
+			end,
+			onCompleted = function(p8) -- line: 196
+				-- upvalues: resolvePromptFailure (copy), u43 (ref), debug (copy), universeId (copy), p6 (copy), sendBuildExperienceEvent (copy), p7 (copy)
+				local v59 = resolvePromptFailure(p8, u43.getSetupError(false))
 
-				if v52 ~= nil then
+				if v59 ~= nil then
 					debug.log("info", "prompt send failed", {
-						errorCode = v52.errorCode,
-						isContentPolicy = v52.isContentPolicy,
-						setupStage = v52.setupStage,
+						errorCode = v59.errorCode,
+						isContentPolicy = v59.isContentPolicy,
+						setupStage = v59.setupStage,
 						universeId = universeId,
 						placeId = p6.placeId
 					})
+
+					local v60 = sendBuildExperienceEvent
+					local t7 = {
+						universeId = universeId,
+						placeId = p6.placeId,
+						conversationId = p6.getCasSessionId()
+					}
+					local t8 = {
+						isContentPolicy = tostring(v59.isContentPolicy)
+					}
+
+					if v59.errorCode ~= nil then
+						t8.errorCode = tostring(v59.errorCode)
+					end
+
+					if v59.setupStage ~= nil then
+						t8.setupStage = v59.setupStage
+					end
+
+					v60("SEND_PROMPT_FAILED", t7, t8)
 				end
 
-				p7(v52)
+				p7(v59)
 			end
 		})
 		debug.log("info", "creator agent local tools registered for prompt", {
@@ -152,164 +199,174 @@ return {
 		})
 
 		return {
-			getOptimisticLocalTools = v34.getOptimisticLocalTools,
-			getLocalToolActions = v34.getLocalToolActions,
-			getSetupErrorText = function(p9) -- line: 193
-				-- upvalues: u37 (ref), t1 (copy)
-				local v54 = u37.getSetupError(p9)
+			getOptimisticLocalTools = v40.getOptimisticLocalTools,
+			getLocalToolActions = v40.getLocalToolActions,
+			getSetupErrorText = function(p9) -- line: 219
+				-- upvalues: u43 (ref), LocalizationStrings (copy), t1 (copy)
+				local v64 = u43.getSetupError(p9)
 
-				if v54 ~= nil then
-					local t5 = {
+				if v64 ~= nil then
+					local t9 = {
 						isContentPolicy = false,
-						errorCode = v54.errorCode,
-						setupStage = v54.stage
+						errorCode = v64.errorCode,
+						setupStage = v64.stage
 					}
 
-					if t5.isContentPolicy then
-						return "Your message violates Roblox safety policy. Edit it and try again."
+					if t9.isContentPolicy then
+						return LocalizationStrings.CHAT_POLICY_REJECTION
 					end
 
-					if t5.setupStage == "missing_project" then
-						return "An experience is required to chat with the assistant."
+					if t9.setupStage == "missing_project" then
+						return LocalizationStrings.CHAT_MISSING_PROJECT
 					end
 
-					if t5.errorCode ~= nil then
-						local v56 = t1[t5.errorCode]
+					if t9.errorCode ~= nil then
+						local v66 = t1[t9.errorCode]
 
-						if v56 ~= nil then
-							return v56
+						if v66 ~= nil then
+							return v66
 						end
 					end
 
-					return "The assistant couldn't connect. Please try again."
+					return LocalizationStrings.CHAT_DEFAULT_FAILURE
 				end
 
 				return nil
 			end,
-			start = function() -- line: 206
-				-- upvalues: u37 (ref)
-				u37.start()
+			start = function() -- line: 232
+				-- upvalues: u43 (ref)
+				u43.start()
 			end,
-			stop = function() -- line: 212
-				-- upvalues: v34 (copy), u37 (ref)
-				v34.stopPending()
-				u37.stop()
+			stop = function() -- line: 238
+				-- upvalues: v40 (copy), u43 (ref)
+				v40.stopPending()
+				u43.stop()
 			end,
-			syncFromTurnState = v34.syncFromTurnState,
-			trySubmitComposerText = v34.trySubmitComposerText
+			syncFromTurnState = v40.syncFromTurnState,
+			trySubmitComposerText = v40.trySubmitComposerText
 		}
 	end,
-	createResumedAssistantTurn = function(p10, p11, p12: ((...any) -> ...any), n1: number?) -- line: 228
-		-- upvalues: createLocalToolControllers (copy), Signals (copy)
-		local v42 = createLocalToolControllers(p10)
-		local v43 = Signals.createSignal(nil)
-		local u44 = false
-		local u45 = false
-		local u46 = nil
-		local u47 = nil
+	createResumedAssistantTurn = function(p10, p11, p12: ((...any) -> ...any), n2: number?) -- line: 254
+		-- upvalues: createLocalToolControllers (copy), Signals (copy), sendBuildExperienceEvent (copy)
+		local v48 = createLocalToolControllers(p10)
+		local v49 = Signals.createSignal(nil)
+		local u50 = false
+		local u51 = false
+		local u52 = nil
+		local u53 = nil
 
-		local function finish() -- line: 248
-			-- upvalues: u45 (ref), u47 (ref), u46 (ref), p12 (copy)
-			if u45 then
+		local function finish() -- line: 274
+			-- upvalues: u51 (ref), u53 (ref), u52 (ref), p12 (copy)
+			if u51 then
 				return
 			end
 
-			u45 = true
+			u51 = true
 
-			if u47 ~= nil then
-				u47()
-				u47 = nil
+			if u53 ~= nil then
+				u53()
+				u53 = nil
 			end
 
-			if u46 ~= nil then
-				u46()
-				u46 = nil
+			if u52 ~= nil then
+				u52()
+				u52 = nil
 			end
 
 			p12(nil)
 		end
 
 		return {
-			getOptimisticLocalTools = v42.getOptimisticLocalTools,
-			getLocalToolActions = v42.getLocalToolActions,
-			getSetupErrorText = v43,
-			start = function() -- line: 266
-				-- upvalues: u44 (ref), n1 (copy), u46 (ref), p10 (copy), u47 (ref), Signals (copy), p11 (copy), u45 (ref), p12 (copy)
-				if u44 then
+			getOptimisticLocalTools = v48.getOptimisticLocalTools,
+			getLocalToolActions = v48.getLocalToolActions,
+			getSetupErrorText = v49,
+			start = function() -- line: 292
+				-- upvalues: u50 (ref), sendBuildExperienceEvent (copy), p10 (copy), n2 (copy), u52 (ref), u53 (ref), Signals (copy), p11 (copy), u51 (ref), p12 (copy)
+				if u50 then
 					return
 				end
 
-				u44 = true
+				u50 = true
 
-				local t6 = {}
+				local t10 = {
+					onDroppedChatMessage = function(n3: number) -- line: 298
+						-- upvalues: sendBuildExperienceEvent (copy), p10 (copy)
+						sendBuildExperienceEvent("DROPPED_CHAT_MESSAGE", {
+							universeId = p10.universeId,
+							placeId = p10.placeId,
+							conversationId = p10.getCasSessionId(),
+							messageId = n3
+						})
+					end
+				}
 
-				if n1 ~= nil then
-					t6.afterSequenceId = n1
+				if n2 ~= nil then
+					t10.afterSequenceId = n2
 				end
 
-				u46 = p10.startPollingActiveTurn(t6)
-				u47 = Signals.createEffect(function(p13) -- line: 277
-					-- upvalues: p11 (copy), u45 (ref), u47 (ref), u46 (ref), p12 (copy)
+				u52 = p10.startPollingActiveTurn(t10)
+				u53 = Signals.createEffect(function(p13) -- line: 312
+					-- upvalues: p11 (copy), u51 (ref), u53 (ref), u52 (ref), p12 (copy)
 					if p11.state(p13).isDone then
-						if u45 then
+						if u51 then
 							return
 						end
 
-						u45 = true
+						u51 = true
 
-						if u47 ~= nil then
-							u47()
-							u47 = nil
+						if u53 ~= nil then
+							u53()
+							u53 = nil
 						end
 
-						if u46 ~= nil then
-							u46()
-							u46 = nil
+						if u52 ~= nil then
+							u52()
+							u52 = nil
 						end
 
 						p12(nil)
 					end
 				end)
 			end,
-			stop = function() -- line: 289
-				-- upvalues: u45 (ref), u47 (ref), u46 (ref), v42 (copy), p11 (copy)
-				u45 = true
+			stop = function() -- line: 324
+				-- upvalues: u51 (ref), u53 (ref), u52 (ref), v48 (copy), p11 (copy)
+				u51 = true
 
-				if u47 ~= nil then
-					u47()
-					u47 = nil
+				if u53 ~= nil then
+					u53()
+					u53 = nil
 				end
 
-				if u46 ~= nil then
-					u46()
-					u46 = nil
+				if u52 ~= nil then
+					u52()
+					u52 = nil
 				end
 
-				v42.stopPending()
+				v48.stopPending()
 				p11.cancel()
 			end,
-			syncFromTurnState = v42.syncFromTurnState,
-			trySubmitComposerText = v42.trySubmitComposerText
+			syncFromTurnState = v48.syncFromTurnState,
+			trySubmitComposerText = v48.trySubmitComposerText
 		}
 	end,
-	getPromptFailureComposerError = function(t7: {[any]: any}) -- line: 71
-		-- upvalues: t1 (copy)
-		if t7.isContentPolicy then
-			return "Your message violates Roblox safety policy. Edit it and try again."
+	getPromptFailureComposerError = function(t11: {[any]: any}) -- line: 69
+		-- upvalues: LocalizationStrings (copy), t1 (copy)
+		if t11.isContentPolicy then
+			return LocalizationStrings.CHAT_POLICY_REJECTION
 		end
 
-		if t7.setupStage == "missing_project" then
-			return "An experience is required to chat with the assistant."
+		if t11.setupStage == "missing_project" then
+			return LocalizationStrings.CHAT_MISSING_PROJECT
 		end
 
-		if t7.errorCode ~= nil then
-			local v19 = t1[t7.errorCode]
+		if t11.errorCode ~= nil then
+			local v23 = t1[t11.errorCode]
 
-			if v19 ~= nil then
-				return v19
+			if v23 ~= nil then
+				return v23
 			end
 		end
 
-		return "The assistant couldn't connect. Please try again."
+		return LocalizationStrings.CHAT_DEFAULT_FAILURE
 	end
 }

@@ -18,11 +18,12 @@ local function GameConfigurationListItem(t1: {[any]: any}) -- line: 37
 	local v15 = if not row.trailingIcon then nil else React.createElement(Icon, {
 		tag = "auto-xy content-default",
 		name = row.trailingIcon,
-		size = IconSize.Small
+		size = IconSize.Large,
+		testId = `{ t1.testId }-trailing-icon`
 	})
 
 	return React.createElement(List.Item, {
-		LayoutOrder = t1.layoutOrder,
+		LayoutOrder = t1.LayoutOrder,
 		title = row.title,
 		description = row.description,
 		trailing = v15,
@@ -30,16 +31,16 @@ local function GameConfigurationListItem(t1: {[any]: any}) -- line: 37
 		testId = t1.testId
 	})
 end
-local function GameConfigurationList(t2: {[any]: any}) -- line: 60
+local function GameConfigurationList(t2: {[any]: any}) -- line: 61
 	-- upvalues: React (copy), GameConfigurationListItem (copy), View (copy), FoundationText (copy), List (copy), InputSize (copy)
 	local v17 = t2.testId or "game-configuration-list"
-	local v18 = React.useMemo(function() -- line: 62
+	local v18 = React.useMemo(function() -- line: 63
 		-- upvalues: t2 (copy), React (copy), GameConfigurationListItem (copy), v17 (copy)
 		local t3 = {}
 
 		for v20, v21 in t2.rows do
 			t3[v21.id] = React.createElement(GameConfigurationListItem, {
-				layoutOrder = v20,
+				LayoutOrder = v20,
 				row = v21,
 				testId = `{ v17 }-row-{ v21.id }`
 			})

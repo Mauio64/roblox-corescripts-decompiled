@@ -25,5 +25,6 @@ return {
 	FFlagPeoplePageRemoveSkeletons = require(script.UI.FFlagPeoplePageRemoveSkeletons),
 	FFlagPeoplePageRemoveUseMemoElements = require(script.UI.FFlagPeoplePageRemoveUseMemoElements),
 	FFlagPeopleCardsEnableVirtualizedGrid = require(script.UI.FFlagPeopleCardsEnableVirtualizedGrid),
-	FFlagFixVirtualizedGridNumItems = require(script.UI.FFlagFixVirtualizedGridNumItems)
+	FFlagFixVirtualizedGridNumItems = require(script.UI.FFlagFixVirtualizedGridNumItems),
+	FFlagEnablePeoplePageButtonOnMount = require(script.UI.FFlagEnablePeoplePageButtonOnMount)
 }

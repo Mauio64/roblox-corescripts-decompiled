@@ -17,10 +17,11 @@ local FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox = SharedFlags.FFlagLuaAppSd
 local FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox = SharedFlags.FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox
 local FFlagLuaAppLaunchWhenLoadingEdp = SharedFlags.FFlagLuaAppLaunchWhenLoadingEdp
 local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp = SharedFlags.FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp
+local FFlagLuaAppDemoModePlayButton = SharedFlags.FFlagLuaAppDemoModePlayButton
 
-local function VerifiedBadgeIcon() -- line: 61
+local function VerifiedBadgeIcon() -- line: 62
 	-- upvalues: useTokens (copy), React (copy), View (copy), Icon (copy), Foundation (copy)
-	local v22 = useTokens()
+	local v23 = useTokens()
 
 	return React.createElement(View, {
 		LayoutOrder = 2,
@@ -29,7 +30,7 @@ local function VerifiedBadgeIcon() -- line: 61
 		Backplate = React.createElement(Icon, {
 			ZIndex = 1,
 			name = Foundation.Enums.IconName.VerifiedBackplate,
-			style = v22.Color.System.Emphasis,
+			style = v23.Color.System.Emphasis,
 			size = Foundation.Enums.IconSize.Small
 		}),
 		Check = React.createElement(Icon, {
@@ -37,46 +38,46 @@ local function VerifiedBadgeIcon() -- line: 61
 			name = Foundation.Enums.IconName.VerifiedCheck,
 			size = Foundation.Enums.IconSize.Small,
 			variant = Foundation.Enums.IconVariant.Filled,
-			style = v22.Color.Extended.White.White_100
+			style = v23.Color.Extended.White.White_100
 		})
 	})
 end
-local function FallbackAttributionRow(t1: {[any]: any}) -- line: 83
-	-- upvalues: useTokens (copy), useImageLoadFade (copy), React (copy), View (copy), FoundationImage (copy), Skeleton (copy), FoundationText (copy), EnumsRadius (copy), VerifiedBadgeIcon (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), v1 (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy)
-	local v24 = useTokens()
+local function FallbackAttributionRow(t1: {[any]: any}) -- line: 84
+	-- upvalues: useTokens (copy), useImageLoadFade (copy), React (copy), View (copy), FoundationImage (copy), Skeleton (copy), FoundationText (copy), EnumsRadius (copy), VerifiedBadgeIcon (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), v1 (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy), FFlagLuaAppDemoModePlayButton (copy)
+	local v25 = useTokens()
 	local isSmallScreen = t1.isSmallScreen
-	local v26 = t1.isLoading == true
-	local v27 = if not isSmallScreen then v24.Size.Size_2500 * 2 else v24.Size.Size_1400
-	local v28 = not isSmallScreen and 256 or 150
-	local v29 = string.format("rbxthumb://type=GameIcon&id=%s&w=%d&h=%d", t1.universeId, v28, v28)
-	local v30 = useImageLoadFade()
-	local v31 = React.createElement(View, {
+	local v27 = t1.isLoading == true
+	local v28 = if not isSmallScreen then v25.Size.Size_2500 * 2 else v25.Size.Size_1400
+	local v29 = not isSmallScreen and 256 or 150
+	local v30 = string.format("rbxthumb://type=GameIcon&id=%s&w=%d&h=%d", t1.universeId, v29, v29)
+	local v31 = useImageLoadFade()
+	local v32 = React.createElement(View, {
 		LayoutOrder = 1,
-		Size = UDim2.fromOffset(v27, v27)
+		Size = UDim2.fromOffset(v28, v28)
 	}, {
 		GameIcon = React.createElement(FoundationImage, {
 			tag = "radius-medium",
-			Image = v29,
+			Image = v30,
 			Size = UDim2.fromScale(1, 1),
-			onLoaded = v30.onLoaded
+			onLoaded = v31.onLoaded
 		}),
-		SkeletonOverlay = if not v30.skeletonVisible then nil else React.createElement(View, {
+		SkeletonOverlay = if not v31.skeletonVisible then nil else React.createElement(View, {
 			tag = "radius-medium",
 			ZIndex = 2,
 			ClipsDescendants = true,
 			Size = UDim2.fromScale(1, 1),
-			GroupTransparency = v30.overlayTransparency
+			GroupTransparency = v31.overlayTransparency
 		}, {
 			Skeleton = React.createElement(Skeleton, {
 				Size = UDim2.fromScale(1, 1)
 			})
 		})
 	})
-	local v32 = if not isSmallScreen then v24.Typography.BodyMedium.LineHeight * v24.Typography.BodyMedium.FontSize else v24.Typography.CaptionLarge.LineHeight * v24.Typography.CaptionLarge.FontSize
-	local v33 = nil
+	local v33 = if not isSmallScreen then v25.Typography.BodyMedium.LineHeight * v25.Typography.BodyMedium.FontSize else v25.Typography.CaptionLarge.LineHeight * v25.Typography.CaptionLarge.FontSize
+	local v34 = nil
 
 	if t1.gameName then
-		v33 = React.createElement(FoundationText, {
+		v34 = React.createElement(FoundationText, {
 			LayoutOrder = 1,
 			tag = {
 				["auto-xy text-wrap text-align-x-left text-truncate-none"] = true,
@@ -85,20 +86,20 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 83
 			},
 			Text = t1.gameName
 		})
-	elseif v26 then
-		local v34 = if not isSmallScreen then v24.Typography.HeadingMedium.LineHeight * v24.Typography.HeadingMedium.FontSize else v32
+	elseif v27 then
+		local v35 = if not isSmallScreen then v25.Typography.HeadingMedium.LineHeight * v25.Typography.HeadingMedium.FontSize else v33
 
-		v33 = React.createElement(Skeleton, {
+		v34 = React.createElement(Skeleton, {
 			LayoutOrder = 1,
-			Size = UDim2.fromOffset(v24.Size.Size_2800 * 2, v34),
+			Size = UDim2.fromOffset(v25.Size.Size_2800 * 2, v35),
 			radius = EnumsRadius.Small
 		})
 	end
 
-	local v35 = nil
+	local v36 = nil
 
 	if t1.creatorName then
-		v35 = React.createElement(View, {
+		v36 = React.createElement(View, {
 			tag = "row align-y-center gap-xsmall auto-xy",
 			LayoutOrder = 2
 		}, {
@@ -110,34 +111,34 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 83
 			}),
 			Badge = if not t1.hasVerifiedBadge then nil else React.createElement(VerifiedBadgeIcon)
 		})
-	elseif v26 then
-		v35 = React.createElement(Skeleton, {
-			LayoutOrder = 2,
-			Size = UDim2.fromOffset(v24.Size.Size_2800 * 2, v32),
-			radius = EnumsRadius.Small
-		})
-	end
-
-	local v36 = nil
-
-	if t1.ageRecDisplayName then
-		v36 = React.createElement(FoundationText, {
-			tag = "auto-xy text-body-medium content-default",
-			LayoutOrder = 3,
-			Text = t1.ageRecDisplayName
-		})
-	elseif v26 then
+	elseif v27 then
 		v36 = React.createElement(Skeleton, {
-			LayoutOrder = 3,
-			Size = UDim2.fromOffset(if not isSmallScreen then v24.Size.Size_2800 else v24.Size.Size_2400, v32),
+			LayoutOrder = 2,
+			Size = UDim2.fromOffset(v25.Size.Size_2800 * 2, v33),
 			radius = EnumsRadius.Small
 		})
 	end
 
 	local v37 = nil
 
+	if t1.ageRecDisplayName then
+		v37 = React.createElement(FoundationText, {
+			tag = "auto-xy text-body-medium content-default",
+			LayoutOrder = 3,
+			Text = t1.ageRecDisplayName
+		})
+	elseif v27 then
+		v37 = React.createElement(Skeleton, {
+			LayoutOrder = 3,
+			Size = UDim2.fromOffset(if not isSmallScreen then v25.Size.Size_2800 else v25.Size.Size_2400, v33),
+			radius = EnumsRadius.Small
+		})
+	end
+
+	local v38 = nil
+
 	if not isSmallScreen then
-		v37 = React.createElement(View, {
+		v38 = React.createElement(View, {
 			tag = "row align-y-center gap-small auto-xy",
 			LayoutOrder = 4
 		}, {
@@ -153,16 +154,17 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 83
 				buttonSize = ButtonSize.Large,
 				width = UDim.new(0, v1),
 				launchWhenLoading = not not FFlagLuaAppLaunchWhenLoadingEdp or nil,
-				launchOnReleaseAfterUnmount = not not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp or nil
+				launchOnReleaseAfterUnmount = not not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp or nil,
+				expandWidthForSecondaryPlayButton = not not FFlagLuaAppDemoModePlayButton or nil
 			}),
-			OverflowSkeleton1 = if not v26 then nil else React.createElement(Skeleton, {
+			OverflowSkeleton1 = if not v27 then nil else React.createElement(Skeleton, {
 				LayoutOrder = 2,
-				Size = UDim2.fromOffset(v24.Size.Size_1200, v24.Size.Size_1200),
+				Size = UDim2.fromOffset(v25.Size.Size_1200, v25.Size.Size_1200),
 				radius = EnumsRadius.Medium
 			}),
-			OverflowSkeleton2 = if not v26 then nil else React.createElement(Skeleton, {
+			OverflowSkeleton2 = if not v27 then nil else React.createElement(Skeleton, {
 				LayoutOrder = 3,
-				Size = UDim2.fromOffset(v24.Size.Size_1200, v24.Size.Size_1200),
+				Size = UDim2.fromOffset(v25.Size.Size_1200, v25.Size.Size_1200),
 				radius = EnumsRadius.Medium
 			})
 		})
@@ -178,15 +180,15 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 83
 			["align-y-bottom"] = not isSmallScreen
 		}
 	}, {
-		Icon = v31,
+		Icon = v32,
 		ContentColumn = React.createElement(View, {
 			tag = "col fill gap-small auto-xy",
 			LayoutOrder = 2
 		}, {
-			Title = v33,
-			Creator = v35,
-			AgeRating = v36,
-			ActionRow = v37
+			Title = v34,
+			Creator = v36,
+			AgeRating = v37,
+			ActionRow = v38
 		})
 	})
 end

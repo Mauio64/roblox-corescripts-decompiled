@@ -50,7 +50,7 @@ return {
 						p1.onCompleted(p2)
 					end
 				end
-				local function stop() -- line: 130
+				local function stop() -- line: 132
 					-- upvalues: u11 (ref), u12 (ref), u13 (ref), u15 (ref), u14 (ref), fireCompleted (copy)
 					if u11 then
 						return
@@ -147,11 +147,13 @@ return {
 
 							u14 = t1.startPollingTurnFromHistory(v21, v24, {
 								rtnIdleFallbackSeconds = p1.rtnIdleFallbackSeconds,
+								rtnSequenceGapFallbackSeconds = p1.rtnSequenceGapFallbackSeconds,
 								pollMinIntervalSeconds = p1.pollMinIntervalSeconds,
 								pollMaxIntervalSeconds = p1.pollMaxIntervalSeconds,
-								afterSequenceId = t1.getLatestObservedHistorySequenceId()
+								afterSequenceId = t1.getLatestObservedHistorySequenceId(),
+								onDroppedChatMessage = p1.onDroppedChatMessage
 							})
-							u15 = Signals.createEffect(function(p3) -- line: 122
+							u15 = Signals.createEffect(function(p3) -- line: 124
 								-- upvalues: v24 (copy), fireCompleted (copy)
 								if v24.state(p3).isDone then
 									fireCompleted(v24.state(false))

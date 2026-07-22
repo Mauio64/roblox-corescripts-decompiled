@@ -4,12 +4,13 @@ local Rodux = require(SocialExperienceJoinParent.Rodux)
 local myRoduxNetworking = require(SocialExperienceJoin.Networking.myRoduxNetworking)
 local Games = require(SocialExperienceJoin.Rodux.Games)
 local Presence = require(SocialExperienceJoin.Rodux.Presence)
+local FFlagSocialExperienceJoinPresenceStoreMigration = require(SocialExperienceJoin.Flags.FFlagSocialExperienceJoinPresenceStoreMigration)
 
-return function() -- line: 14
-	-- upvalues: Rodux (copy), myRoduxNetworking (copy), Games (copy), Presence (copy)
+return function() -- line: 17
+	-- upvalues: Rodux (copy), myRoduxNetworking (copy), Games (copy), FFlagSocialExperienceJoinPresenceStoreMigration (copy), Presence (copy)
 	return Rodux.combineReducers({
 		NetworkStatus = myRoduxNetworking.installReducer(),
 		Games = Games.installReducer(),
-		Presence = Presence.installReducer()
+		Presence = if not FFlagSocialExperienceJoinPresenceStoreMigration then Presence.installReducer() else nil
 	})
 end

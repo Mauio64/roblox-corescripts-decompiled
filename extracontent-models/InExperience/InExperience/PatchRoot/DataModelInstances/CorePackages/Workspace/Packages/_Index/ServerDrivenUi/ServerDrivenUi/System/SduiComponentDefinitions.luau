@@ -13,6 +13,7 @@ local getSduiComponentRegistry = SduiCoreSystem.getSduiComponentRegistry
 local FFlagSduiExperienceDetailsSupport = require(ServerDrivenUiParent.SharedFlags).FFlagSduiExperienceDetailsSupport
 local FFlagLuaAppResetHoverOnSduiPlayButtonActivation = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppResetHoverOnSduiPlayButtonActivation
 local FFlagSduiGlobalRegistryFallback = require(ServerDrivenUiParent.SharedFlags).FFlagSduiGlobalRegistryFallback
+local FFlagLuaAppRespectClipAncestorImpressions = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppRespectClipAncestorImpressions
 local parseCallbackProp_ = SduiParsers.parseCallbackProp_
 local parseUiComponentProp_ = SduiParsers.parseUiComponentProp_
 local parseLazyUiComponentProp_ = SduiParsers.parseLazyUiComponentProp_
@@ -34,15 +35,13 @@ local parseFocusNavActionsProp_ = SduiParsers.parseFocusNavActionsProp_
 local getArrayMetatableParser = SduiParsers.getArrayMetatableParser
 local getEngineEnumParser = SduiParsers.getEngineEnumParser
 local getLuaTableEnumParser = SduiParsers.getLuaTableEnumParser
-local v37 = game:DefineFastFlag("SduiBadgeComponent", false)
+local v38 = game:DefineFastFlag("SduiBadgeComponent", false)
 local FFlagSduiTileDisableLegacyHover = require(ServerDrivenUi.Flags).FFlagSduiTileDisableLegacyHover
 local FFlagSduiEnableHeroUnitBottomRow = require(ServerDrivenUi.Flags).FFlagSduiEnableHeroUnitBottomRow
 local FFlagSduiEnableAssociatedItemsRow = require(ServerDrivenUiParent.SharedFlags).FFlagSduiEnableAssociatedItemsRow
-local FFlagLuaAppExpandableTextTappableText = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppExpandableTextTappableText
 local FFlagSduiAttributionRowV2 = require(ServerDrivenUiParent.SharedFlags).FFlagSduiAttributionRowV2
 local FFlagSduiExperienceDetailsSocialProof = require(ServerDrivenUiParent.SharedFlags).FFlagSduiExperienceDetailsSocialProof
 local FFlagSduiChipAccessoryProps = require(ServerDrivenUiParent.SharedFlags).FFlagSduiChipAccessoryProps
-local FFlagSduiOverflowMenuComponent = require(ServerDrivenUiParent.SharedFlags).FFlagSduiOverflowMenuComponent
 local FFlagSduiCollectionCarouselOverrides = require(ServerDrivenUiParent.SharedFlags).FFlagSduiCollectionCarouselOverrides
 local FFlagSduiChartsSupport = require(ServerDrivenUiParent.SharedFlags).FFlagSduiChartsSupport
 local FFlagLuaAppDismissUnlockUpsell = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppDismissUnlockUpsell
@@ -58,7 +57,7 @@ local t2 = {}
 t2.__index = t2
 
 function t2.new() -- line: 90
-	-- upvalues: parseVector2Prop_ (copy), getEngineEnumParser (copy), parseColor3Prop_ (copy), parseNumberProp_ (copy), parseIntegerProp_ (copy), parseUDim2Prop_ (copy), Cryo (copy), parseBooleanProp_ (copy), parseStringProp_ (copy), SduiComponentType (copy), ServerDrivenUiParent (copy), FFlagSduiAttributionRowV2 (copy), parseCallbackProp_ (copy), parseUiComponentProp_ (copy), parseTypographyTokenProp_ (copy), parseColorTokenProp_ (copy), getLuaTableEnumParser (copy), Foundation (copy), parseImageStringProp_ (copy), t (copy), parseIconProp_ (copy), parseUDimProp_ (copy), ServerDrivenUi (copy), CollectionItemSize (copy), ItemHeightMode (copy), FFlagSduiCollectionCarouselOverrides (copy), getArrayMetatableParser (copy), parseLazyUiComponentProp_ (copy), FFlagSduiVariableItemWidthCarousel (copy), FFlagLuaAppSduiPlaceholderSupport (copy), FFlagSduiCollectionCarouselPlaceholderItem (copy), FFlagSduiOptionSelectorCollection (copy), parseFocusNavActionsProp_ (copy), React (copy), parseGradientProp_ (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagLuaAppResetHoverOnSduiPlayButtonActivation (copy), parseImageSetOrImageProp_ (copy), FFlagSduiTileDisableLegacyHover (copy), FFlagSduiTileBottomButton (copy), FFlagSduiTileHoldAction (copy), FFlagSduiEnableHeroUnitBottomRow (copy), FFlagSduiChipAccessoryProps (copy), FFlagSduiEnableAssociatedItemsRow (copy), FFlagSduiExperienceDetailsSocialProof (copy), FFlagSduiChartsSupport (copy), v37 (copy), FFlagLuaAppExpandableTextTappableText (copy), FFlagSduiOverflowMenuComponent (copy), FFlagLuaAppDismissUnlockUpsell (copy), t2 (copy)
+	-- upvalues: parseVector2Prop_ (copy), getEngineEnumParser (copy), parseColor3Prop_ (copy), parseNumberProp_ (copy), parseIntegerProp_ (copy), parseUDim2Prop_ (copy), Cryo (copy), parseBooleanProp_ (copy), parseStringProp_ (copy), SduiComponentType (copy), ServerDrivenUiParent (copy), FFlagSduiAttributionRowV2 (copy), parseCallbackProp_ (copy), parseUiComponentProp_ (copy), parseTypographyTokenProp_ (copy), parseColorTokenProp_ (copy), getLuaTableEnumParser (copy), Foundation (copy), parseImageStringProp_ (copy), t (copy), parseIconProp_ (copy), parseUDimProp_ (copy), ServerDrivenUi (copy), CollectionItemSize (copy), ItemHeightMode (copy), FFlagSduiCollectionCarouselOverrides (copy), FFlagLuaAppRespectClipAncestorImpressions (copy), getArrayMetatableParser (copy), parseLazyUiComponentProp_ (copy), FFlagSduiVariableItemWidthCarousel (copy), FFlagLuaAppSduiPlaceholderSupport (copy), FFlagSduiCollectionCarouselPlaceholderItem (copy), FFlagSduiOptionSelectorCollection (copy), parseFocusNavActionsProp_ (copy), React (copy), parseGradientProp_ (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagLuaAppResetHoverOnSduiPlayButtonActivation (copy), parseImageSetOrImageProp_ (copy), FFlagSduiTileDisableLegacyHover (copy), FFlagSduiTileBottomButton (copy), FFlagSduiTileHoldAction (copy), FFlagSduiEnableHeroUnitBottomRow (copy), FFlagSduiChipAccessoryProps (copy), FFlagSduiEnableAssociatedItemsRow (copy), FFlagSduiExperienceDetailsSocialProof (copy), FFlagSduiChartsSupport (copy), v38 (copy), FFlagLuaAppDismissUnlockUpsell (copy), t2 (copy)
 	local t3 = {
 		anchorPoint = parseVector2Prop_,
 		automaticSize = getEngineEnumParser(Enum.AutomaticSize),
@@ -69,7 +68,7 @@ function t2.new() -- line: 90
 		size = parseUDim2Prop_,
 		zIndex = parseNumberProp_
 	}
-	local v59 = Cryo.Dictionary.union({
+	local v58 = Cryo.Dictionary.union({
 		richText = parseBooleanProp_,
 		text = parseStringProp_,
 		textTruncate = getEngineEnumParser(Enum.TextTruncate),
@@ -159,6 +158,7 @@ function t2.new() -- line: 90
 					scrollingEnabledOverride = parseBooleanProp_,
 					maxItemsToShow = parseNumberProp_,
 					shouldUseFrameBoundsForImpressions = parseBooleanProp_,
+					respectClipAncestors = if not FFlagLuaAppRespectClipAncestorImpressions then nil else parseBooleanProp_,
 					backgroundMuralUrl = parseImageStringProp_,
 					onScrollToEnd = parseCallbackProp_,
 					scrollThresholdFromEnd = parseNumberProp_,
@@ -471,7 +471,7 @@ function t2.new() -- line: 90
 					icon = parseIconProp_,
 					iconWidth = parseNumberProp_,
 					iconColor = parseColor3Prop_,
-					textOverrides = v59,
+					textOverrides = v58,
 					iconOverrides = t3,
 					textFlexMode = getEngineEnumParser(Enum.UIFlexMode),
 					backgroundStyle = parseColorTokenProp_,
@@ -801,7 +801,7 @@ function t2.new() -- line: 90
 		})
 	}
 
-	if v37 then
+	if v38 then
 		t5._registeredComponents[SduiComponentType.Badge] = {
 			component = require(ServerDrivenUiParent.SduiSharedContent).SduiBadge,
 			propParsers = {
@@ -858,9 +858,8 @@ function t2.new() -- line: 90
 			text = parseStringProp_,
 			compactNumberOfLines = parseIntegerProp_,
 			fontStyle = parseTypographyTokenProp_,
-			textColor = if FFlagLuaAppExpandableTextTappableText then nil else parseColor3Prop_,
-			textStyle = if not FFlagLuaAppExpandableTextTappableText then nil else parseColorTokenProp_,
-			pressedTextStyle = if not FFlagLuaAppExpandableTextTappableText then nil else parseColorTokenProp_,
+			textStyle = parseColorTokenProp_,
+			pressedTextStyle = parseColorTokenProp_,
 			expandedInitially = parseBooleanProp_,
 			avoidBlankLineClip = parseBooleanProp_,
 			onExpandChanged = parseCallbackProp_,
@@ -870,29 +869,26 @@ function t2.new() -- line: 90
 			text = t.string
 		}
 	}
-
-	if FFlagSduiOverflowMenuComponent then
-		t5._registeredComponents[SduiComponentType.OverflowMenu] = {
-			component = require(ServerDrivenUiParent.SduiSharedContent).SduiOverflowMenu,
-			propParsers = {
-				anchorPoint = parseVector2Prop_,
-				layoutOrder = parseIntegerProp_,
-				position = parseUDim2Prop_,
-				zIndex = parseNumberProp_,
-				buttonVariant = getLuaTableEnumParser(Foundation.Enums.ButtonVariant, "string"),
-				buttonSize = getLuaTableEnumParser(Foundation.Enums.InputSize, "string"),
-				buttonIcon = getLuaTableEnumParser(Foundation.Enums.IconName, "string"),
-				buttonIconBackgroundStyle = parseColorTokenProp_,
-				menuItemSize = getLuaTableEnumParser(Foundation.Enums.InputSize, "string"),
-				popoverAlign = getLuaTableEnumParser(Foundation.Enums.PopoverAlign, "string"),
-				popoverSide = getLuaTableEnumParser(Foundation.Enums.PopoverSide, "string"),
-				menuWidth = parseUDimProp_
-			},
-			propInterface = {
-				items = if not FFlagSduiExperienceDetailsSupport then t.array(t.table) else t.table
-			}
+	t5._registeredComponents[SduiComponentType.OverflowMenu] = {
+		component = require(ServerDrivenUiParent.SduiSharedContent).SduiOverflowMenu,
+		propParsers = {
+			anchorPoint = parseVector2Prop_,
+			layoutOrder = parseIntegerProp_,
+			position = parseUDim2Prop_,
+			zIndex = parseNumberProp_,
+			buttonVariant = getLuaTableEnumParser(Foundation.Enums.ButtonVariant, "string"),
+			buttonSize = getLuaTableEnumParser(Foundation.Enums.InputSize, "string"),
+			buttonIcon = getLuaTableEnumParser(Foundation.Enums.IconName, "string"),
+			buttonIconBackgroundStyle = parseColorTokenProp_,
+			menuItemSize = getLuaTableEnumParser(Foundation.Enums.InputSize, "string"),
+			popoverAlign = getLuaTableEnumParser(Foundation.Enums.PopoverAlign, "string"),
+			popoverSide = getLuaTableEnumParser(Foundation.Enums.PopoverSide, "string"),
+			menuWidth = parseUDimProp_
+		},
+		propInterface = {
+			items = if not FFlagSduiExperienceDetailsSupport then t.array(t.table) else t.table
 		}
-	end
+	}
 
 	if FFlagLuaAppDismissUnlockUpsell then
 		t5._registeredComponents[SduiComponentType.AgeCheckUpsellRow] = {
@@ -918,40 +914,40 @@ function t2.new() -- line: 90
 
 	return t5
 end
-function t2.getComponentDefinition(p1, p2) -- line: 970
+function t2.getComponentDefinition(p1, p2) -- line: 967
 	-- upvalues: FFlagSduiGlobalRegistryFallback (copy), getSduiComponentRegistry (copy)
-	local v64 = p1._registeredComponents[p2]
+	local v63 = p1._registeredComponents[p2]
 
-	if not v64 then
+	if not v63 then
 		if FFlagSduiGlobalRegistryFallback then
 			return (getSduiComponentRegistry().getComponentDefinition(p2))
 		end
 
-		v64 = nil
+		v63 = nil
 	end
 
-	return v64
+	return v63
 end
-function t2.doesComponentManageChildren(p3, p4) -- line: 982
-	local v67 = p3:getComponentDefinition(p4)
+function t2.doesComponentManageChildren(p3, p4) -- line: 979
+	local v66 = p3:getComponentDefinition(p4)
 
-	return not not v67 and (v67.doesManageChildren or false)
+	return not not v66 and (v66.doesManageChildren or false)
 end
-function t2.getComponent(p5, p6) -- line: 990
-	local v70 = p5:getComponentDefinition(p6)
+function t2.getComponent(p5, p6) -- line: 987
+	local v69 = p5:getComponentDefinition(p6)
 
-	return v70 and v70.component
+	return v69 and v69.component
 end
-function t2.getPropParsers(p7, p8) -- line: 995
+function t2.getPropParsers(p7, p8) -- line: 992
 	-- upvalues: t1 (copy)
-	local v73 = p7:getComponentDefinition(p8)
+	local v72 = p7:getComponentDefinition(p8)
 
-	return v73 and v73.propParsers or t1
+	return v72 and v72.propParsers or t1
 end
-function t2.getPropInterface(p9, p10) -- line: 1003
-	local v76 = p9:getComponentDefinition(p10)
+function t2.getPropInterface(p9, p10) -- line: 1000
+	local v75 = p9:getComponentDefinition(p10)
 
-	return v76 and v76.propInterface or nil
+	return v75 and v75.propInterface or nil
 end
 
 local t6 = {
@@ -960,7 +956,7 @@ local t6 = {
 	[parseFocusNavActionsProp_] = true
 }
 
-function t2.doesParserRequireRenderContext(_, p12) -- line: 1014
+function t2.doesParserRequireRenderContext(_, p12) -- line: 1011
 	-- upvalues: t6 (copy)
 	if p12 and t6[p12] then
 		return true
@@ -972,7 +968,7 @@ function t2.doesParserRequireRenderContext(_, p12) -- line: 1014
 
 	return false
 end
-function t2.registerComponent(p13, p14, p15) -- line: 1029
+function t2.registerComponent(p13, p14, p15) -- line: 1026
 	p13._registeredComponents[p14] = p15
 end
 

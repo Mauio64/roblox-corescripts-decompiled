@@ -12,9 +12,10 @@ local v11 = game:DefineFastFlag("ProfilePlatformFixPresenceReducer", false)
 local v12 = if not v11 then nil else require(ProfilePlatform.Rodux.PresenceReducer)
 local Profiles = require(ProfilePlatform.Rodux.Profiles)
 local FFlagAddVideoToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddVideoToCommunityProfile
+local FFlagProfilePlatformPresenceStoreMigration = require(ProfilePlatform.Flags.FFlagProfilePlatformPresenceStoreMigration)
 
-return function() -- line: 23
-	-- upvalues: Rodux (copy), Games (copy), ItemDetails (copy), BundleDetails (copy), AssetDetails (copy), FFlagAddVideoToCommunityProfile (copy), AssetData (copy), myRoduxNetworking (copy), v11 (copy), v12 (copy), Presence (copy), Profiles (copy)
+return function() -- line: 25
+	-- upvalues: Rodux (copy), Games (copy), ItemDetails (copy), BundleDetails (copy), AssetDetails (copy), FFlagAddVideoToCommunityProfile (copy), AssetData (copy), myRoduxNetworking (copy), FFlagProfilePlatformPresenceStoreMigration (copy), v11 (copy), v12 (copy), Presence (copy), Profiles (copy)
 	return Rodux.combineReducers({
 		Games = Games.installReducer(),
 		ItemAssets = ItemDetails,
@@ -22,7 +23,7 @@ return function() -- line: 23
 		AssetDetails = AssetDetails,
 		AssetData = if not FFlagAddVideoToCommunityProfile then nil else AssetData,
 		NetworkStatus = myRoduxNetworking.installReducer(),
-		Presence = if not v11 then Presence.installReducer() else v12,
+		Presence = if not FFlagProfilePlatformPresenceStoreMigration then if not v11 then Presence.installReducer() else v12 else nil,
 		Profiles = Profiles
 	})
 end

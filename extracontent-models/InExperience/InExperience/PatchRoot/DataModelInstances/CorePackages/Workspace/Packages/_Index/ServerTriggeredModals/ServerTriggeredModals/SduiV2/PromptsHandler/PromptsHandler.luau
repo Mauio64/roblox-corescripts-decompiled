@@ -31,173 +31,187 @@ local SurfaceBanner = require(script.Parent.SurfaceBanner)
 local FFlagSduiAllowNoConfigsBuilt = SharedFlags.FFlagSduiAllowNoConfigsBuilt
 local FFlagPromptsImpressionUsesTitle = SharedFlags.FFlagPromptsImpressionUsesTitle
 local FFlagPromptsHandlerCoachmarkEnabled = SharedFlags.FFlagPromptsHandlerCoachmarkEnabled
+local FFlagEdpGameLeavePromptsHandlerEnabled = SharedFlags.FFlagEdpGameLeavePromptsHandlerEnabled
 local FFlagSduiSystemBannerComponent = SharedFlags.FFlagSduiSystemBannerComponent
 local FFlagSduiSurfaceBannerScrollAwaySticky = SharedFlags.FFlagSduiSurfaceBannerScrollAwaySticky
 local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
 local FFlagSduiDismissPromptAction = SharedFlags.FFlagSduiDismissPromptAction
 local FFlagHomepagePromptsPaddingFix = SharedFlags.FFlagHomepagePromptsPaddingFix
 
-local function PromptsHandler(t1: {[any]: any}) -- line: 82
-	-- upvalues: useDispatch (copy), FFlagSduiDismissPromptAction (copy), useStore (copy), useModalSignalStore (copy), React (copy), getEntryPointSurfaceConfig (copy), SignalsReact (copy), FFlagSduiAllowNoConfigsBuilt (copy), SduiLoadTimer (copy), fetchPrompts (copy), usePromptEntries (copy), PromptStyle (copy), SetCentralOverlay (copy), CentralOverlayType (copy), FFlagPromptsImpressionUsesTitle (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy), FFlagPromptsHandlerCoachmarkEnabled (copy), FFlagSduiSurfaceBannerScrollAwaySticky (copy), FFlagAppIaScrollAway (copy), AppNavBar (copy), FFlagSduiSystemBannerComponent (copy), SurfaceBanner (copy), SduiFeatureEntryPoint (copy), FFlagHomepagePromptsPaddingFix (copy), View (copy), CoachmarkRenderer (copy)
+local function PromptsHandler(t1: {[any]: any}) -- line: 84
+	-- upvalues: useDispatch (copy), FFlagSduiDismissPromptAction (copy), useStore (copy), useModalSignalStore (copy), FFlagEdpGameLeavePromptsHandlerEnabled (copy), React (copy), getEntryPointSurfaceConfig (copy), SignalsReact (copy), FFlagSduiAllowNoConfigsBuilt (copy), SduiLoadTimer (copy), fetchPrompts (copy), usePromptEntries (copy), PromptStyle (copy), SetCentralOverlay (copy), CentralOverlayType (copy), FFlagPromptsImpressionUsesTitle (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy), FFlagPromptsHandlerCoachmarkEnabled (copy), FFlagSduiSurfaceBannerScrollAwaySticky (copy), FFlagAppIaScrollAway (copy), AppNavBar (copy), FFlagSduiSystemBannerComponent (copy), SurfaceBanner (copy), SduiFeatureEntryPoint (copy), FFlagHomepagePromptsPaddingFix (copy), View (copy), CoachmarkRenderer (copy)
 	local entryPoint = t1.entryPoint
 	local promptStyle = t1.promptStyle
-	local v40 = useDispatch()
-	local v41 = if not FFlagSduiDismissPromptAction then nil else useStore()
-	local v42 = useModalSignalStore()
-	local v43 = React.useMemo(function() -- line: 89
-		-- upvalues: getEntryPointSurfaceConfig (copy), entryPoint (copy)
+	local v41 = useDispatch()
+	local v42 = if not FFlagSduiDismissPromptAction then nil else useStore()
+	local v43 = useModalSignalStore()
+	local v44 = if not FFlagEdpGameLeavePromptsHandlerEnabled or t1.clientAttributes == nil then nil else t1.clientAttributes.universeId
+	local v45 = React.useMemo(function() -- line: 94
+		-- upvalues: FFlagEdpGameLeavePromptsHandlerEnabled (copy), getEntryPointSurfaceConfig (copy), entryPoint (copy), v44 (copy)
+		if FFlagEdpGameLeavePromptsHandlerEnabled then
+			return getEntryPointSurfaceConfig(entryPoint, v44)
+		end
+
 		return getEntryPointSurfaceConfig(entryPoint)
-	end, { entryPoint })
-	local v44 = SignalsReact.useSignalState(v42.getHasShownGetter(entryPoint))
-	local v45 = SignalsReact.useSignalState(v42.getMetadataGetter(entryPoint))
-	local v46 = React.useMemo(function() -- line: 101
-		-- upvalues: entryPoint (copy), v43 (copy), FFlagSduiAllowNoConfigsBuilt (copy), SduiLoadTimer (copy)
+	end, if not FFlagEdpGameLeavePromptsHandlerEnabled then { entryPoint } else {
+		entryPoint,
+		v44
+	})
+	local v46 = SignalsReact.useSignalState(v43.getHasShownGetter(entryPoint))
+	local v47 = SignalsReact.useSignalState(v43.getMetadataGetter(entryPoint))
+	local v48 = React.useMemo(function() -- line: 111
+		-- upvalues: entryPoint (copy), v45 (copy), FFlagSduiAllowNoConfigsBuilt (copy), SduiLoadTimer (copy), FFlagEdpGameLeavePromptsHandlerEnabled (copy), t1 (copy)
 		return {
 			clearOnEmptyResponse = true,
 			entryPoint = entryPoint,
-			surfaceKey = v43.surfaceKey,
-			configKey = v43.configKey,
+			surfaceKey = v45.surfaceKey,
+			configKey = v45.configKey,
 			allowNoConfigsBuilt = not not FFlagSduiAllowNoConfigsBuilt or nil,
-			loadTimer = SduiLoadTimer.createLoadTimer(v43.configKey)
+			loadTimer = SduiLoadTimer.createLoadTimer(v45.configKey),
+			clientAttributes = if not FFlagEdpGameLeavePromptsHandlerEnabled then nil else t1.clientAttributes
 		}
-	end, {
+	end, if not FFlagEdpGameLeavePromptsHandlerEnabled then {
 		entryPoint,
-		v43
+		v45
+	} else {
+		entryPoint,
+		v45,
+		t1.clientAttributes
 	})
 
-	React.useEffect(function() -- line: 112
-		-- upvalues: fetchPrompts (copy), v46 (copy)
-		fetchPrompts(v46)
-	end, { v46 })
+	React.useEffect(function() -- line: 127
+		-- upvalues: fetchPrompts (copy), v48 (copy)
+		fetchPrompts(v48)
+	end, { v48 })
 
-	local v47 = usePromptEntries(v43.configKey, PromptStyle.Modal)
-	local v48 = v47[1]
-	local v49 = if not FFlagSduiDismissPromptAction then nil else React.useRef(nil)
-	local v50 = if not FFlagSduiDismissPromptAction then nil else React.useRef(nil)
+	local v49 = usePromptEntries(v45.configKey, PromptStyle.Modal)
+	local v50 = v49[1]
+	local v51 = if not FFlagSduiDismissPromptAction then nil else React.useRef(nil)
+	local v52 = if not FFlagSduiDismissPromptAction then nil else React.useRef(nil)
 
-	React.useEffect(function() -- line: 135
-		-- upvalues: v44 (copy), v45 (copy), v48 (copy), v42 (copy), entryPoint (copy), v40 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), v43 (copy), FFlagPromptsImpressionUsesTitle (copy), FFlagSduiDismissPromptAction (copy), v49 (copy), v50 (copy)
-		if v44 then
+	React.useEffect(function() -- line: 150
+		-- upvalues: v46 (copy), v47 (copy), v50 (copy), v43 (copy), entryPoint (copy), v41 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), v45 (copy), FFlagPromptsImpressionUsesTitle (copy), FFlagSduiDismissPromptAction (copy), v51 (copy), v52 (copy)
+		if v46 then
 			return
 		end
 
-		if v45 then
+		if v47 then
 			return
 		end
 
-		if v48 == nil or v48.config == nil or v48.identifier == nil or v48.robloxComponentType == nil or v48.title == nil then
+		if v50 == nil or v50.config == nil or v50.identifier == nil or v50.robloxComponentType == nil or v50.title == nil then
 			return
 		end
 
-		v42.setHasShown(entryPoint, true)
-		v40(SetCentralOverlay(CentralOverlayType.SduiPromptModal, {
-			configKey = v43.configKey,
-			appPage = v43.appPage,
-			modalId = v48.identifier,
-			modalType = if not FFlagPromptsImpressionUsesTitle then v48.robloxComponentType else v48.title
+		v43.setHasShown(entryPoint, true)
+		v41(SetCentralOverlay(CentralOverlayType.SduiPromptModal, {
+			configKey = v45.configKey,
+			appPage = v45.appPage,
+			modalId = v50.identifier,
+			modalType = if not FFlagPromptsImpressionUsesTitle then v50.robloxComponentType else v50.title
 		}))
 
 		if FFlagSduiDismissPromptAction then
-			v49.current = v48.title
-			v50.current = v48.identifier
+			v51.current = v50.title
+			v52.current = v50.identifier
 		end
 	end, {
-		v44,
-		v45,
-		v40,
-		v42,
-		v48,
+		v46,
+		v47,
+		v41,
 		v43,
+		v50,
+		v45,
 		entryPoint
 	})
 
 	if FFlagSduiDismissPromptAction then
-		React.useEffect(function() -- line: 186
-			-- upvalues: v49 (copy), v47 (copy), v50 (copy), v41 (copy), CentralOverlayType (copy), v40 (copy), SetCentralOverlay (copy)
-			local current = v49.current
+		React.useEffect(function() -- line: 201
+			-- upvalues: v51 (copy), v49 (copy), v52 (copy), v42 (copy), CentralOverlayType (copy), v41 (copy), SetCentralOverlay (copy)
+			local current = v51.current
 
 			if current == nil then
 				return
 			end
 
-			for _, v71 in v47 do
-				if current == v71.title then
+			for _, v73 in v49 do
+				if current == v73.title then
 					return
 				end
 			end
 
-			local current2 = v50.current
+			local current2 = v52.current
 
-			v49.current = nil
-			v50.current = nil
+			v51.current = nil
+			v52.current = nil
 
-			local CentralOverlay2 = v41:getState().CentralOverlay
+			local CentralOverlay2 = v42:getState().CentralOverlay
 
 			if CentralOverlay2 ~= nil and CentralOverlay2.OverlayType == CentralOverlayType.SduiPromptModal and CentralOverlay2.Arguments ~= nil and current2 == CentralOverlay2.Arguments.modalId then
-				v40(SetCentralOverlay())
+				v41(SetCentralOverlay())
 			end
 		end, {
-			v47,
-			v40,
-			v41
+			v49,
+			v41,
+			v42
 		})
 	end
 
-	local v51 = promptStyle == PromptStyle.SurfaceBanner
-	local v52 = usePromptEntries(v43.configKey, PromptStyle.SurfaceBanner)
-	local v53 = if not v51 then nil else v52[1]
-	local v54 = v53 and v53.identifier or nil
-	local v55 = if not v53 then nil else if not FFlagPromptsImpressionUsesTitle then v53.robloxComponentType else v53.title
-	local v56 = promptStyle == PromptStyle.InlineBanner
-	local v57 = usePromptEntries(v43.configKey, PromptStyle.InlineBanner)
-	local v58 = if not v56 then nil else v57[1]
-	local v59 = v58 and v58.identifier or nil
-	local v60 = if not v58 then nil else if not FFlagPromptsImpressionUsesTitle then v58.robloxComponentType else v58.title
+	local v53 = promptStyle == PromptStyle.SurfaceBanner
+	local v54 = usePromptEntries(v45.configKey, PromptStyle.SurfaceBanner)
+	local v55 = if not v53 then nil else v54[1]
+	local v56 = v55 and v55.identifier or nil
+	local v57 = if not v55 then nil else if not FFlagPromptsImpressionUsesTitle then v55.robloxComponentType else v55.title
+	local v58 = promptStyle == PromptStyle.InlineBanner
+	local v59 = usePromptEntries(v45.configKey, PromptStyle.InlineBanner)
+	local v60 = if not v58 then nil else v59[1]
+	local v61 = v60 and v60.identifier or nil
+	local v62 = if not v60 then nil else if not FFlagPromptsImpressionUsesTitle then v60.robloxComponentType else v60.title
 
-	React.useEffect(function() -- line: 235
-		-- upvalues: v54 (copy), v55 (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy)
-		if v54 and v55 then
-			reportPromptImpression(v55, v54):catch(function() -- line: 237
+	React.useEffect(function() -- line: 250
+		-- upvalues: v56 (copy), v57 (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy)
+		if v56 and v57 then
+			reportPromptImpression(v57, v56):catch(function() -- line: 252
 				-- upvalues: Logger (copy)
 				Logger:warning("Failed to report prompt impression")
 			end)
-			sendModalImpressionEvent(v54, v55)
+			sendModalImpressionEvent(v56, v57)
 		end
 	end, {
-		v54,
-		v55
+		v56,
+		v57
 	})
-	React.useEffect(function() -- line: 244
-		-- upvalues: v59 (copy), v60 (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy)
-		if v59 and v60 then
-			reportPromptImpression(v60, v59):catch(function() -- line: 246
+	React.useEffect(function() -- line: 259
+		-- upvalues: v61 (copy), v62 (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy)
+		if v61 and v62 then
+			reportPromptImpression(v62, v61):catch(function() -- line: 261
 				-- upvalues: Logger (copy)
 				Logger:warning("Failed to report prompt impression")
 			end)
-			sendModalImpressionEvent(v59, v60)
+			sendModalImpressionEvent(v61, v62)
 		end
 	end, {
-		v59,
-		v60
+		v61,
+		v62
 	})
 
-	local v61 = false
+	local v63 = false
 
 	if FFlagPromptsHandlerCoachmarkEnabled then
-		for _, v63 in (usePromptEntries(v43.configKey, PromptStyle.Coachmark)) do
-			if v63.config and v63.identifier and v63.title then
-				v61 = true
+		for _, v65 in (usePromptEntries(v45.configKey, PromptStyle.Coachmark)) do
+			if v65.config and v65.identifier and v65.title then
+				v63 = true
 
 				break
 			end
 		end
 	end
 
-	local v64 = FFlagSduiSurfaceBannerScrollAwaySticky and (FFlagAppIaScrollAway and AppNavBar.getScrollAwayEnabled())
-	local v65 = nil
+	local v66 = FFlagSduiSurfaceBannerScrollAwaySticky and (FFlagAppIaScrollAway and AppNavBar.getScrollAwayEnabled())
+	local v67 = nil
 
-	if v51 then
-		v65 = if not FFlagSduiSystemBannerComponent or (not v53 or not v64) then if not FFlagSduiSystemBannerComponent or not v53 then t1.surfaceBannerContent else React.createElement("Frame", {
+	if v53 then
+		v67 = if not FFlagSduiSystemBannerComponent or (not v55 or not v66) then if not FFlagSduiSystemBannerComponent or not v55 then t1.surfaceBannerContent else React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0)
 		}, {
@@ -209,9 +223,9 @@ local function PromptsHandler(t1: {[any]: any}) -- line: 82
 				shouldDisplayLoading = false,
 				shouldDisplayError = false,
 				LayoutOrder = 1,
-				configKey = v43.configKey,
-				identifier = v53.identifier,
-				appPage = v43.appPage
+				configKey = v45.configKey,
+				identifier = v55.identifier,
+				appPage = v45.appPage
 			}),
 			ContentContainer = React.createElement("Frame", {
 				LayoutOrder = 2,
@@ -224,54 +238,54 @@ local function PromptsHandler(t1: {[any]: any}) -- line: 82
 				Content = t1.surfaceBannerContent
 			})
 		}) else React.createElement(SurfaceBanner, {
-			identifier = v53.identifier,
-			configKey = v43.configKey,
-			appPage = v43.appPage,
+			identifier = v55.identifier,
+			configKey = v45.configKey,
+			appPage = v45.appPage,
 			surfaceBannerContent = t1.surfaceBannerContent
 		})
-	elseif v56 then
-		v65 = if not v58 then t1.inlineBannerFallback else React.createElement(SduiFeatureEntryPoint, {
+	elseif v58 then
+		v67 = if not v60 then t1.inlineBannerFallback else React.createElement(SduiFeatureEntryPoint, {
 			shouldDisplayLoading = false,
 			shouldDisplayError = false,
-			configKey = v43.configKey,
-			identifier = v58.identifier,
-			appPage = v43.appPage
+			configKey = v45.configKey,
+			identifier = v60.identifier,
+			appPage = v45.appPage
 		})
 	end
 
-	if FFlagHomepagePromptsPaddingFix and v56 then
-		local v66 = v52[1] ~= nil
+	if FFlagHomepagePromptsPaddingFix and v58 then
+		local v68 = v54[1] ~= nil
 
-		if v65 ~= nil then
-			local v67 = v66 and t1.topPadding ~= nil
-			local v68 = t1.bottomPadding ~= nil
+		if v67 ~= nil then
+			local v69 = v68 and t1.topPadding ~= nil
+			local v70 = t1.bottomPadding ~= nil
 
-			v65 = React.createElement(View, {
+			v67 = React.createElement(View, {
 				Size = UDim2.new(1, 0, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
 				padding = {
-					top = if not v67 then nil else UDim.new(0, t1.topPadding),
-					bottom = if not v68 then nil else UDim.new(0, t1.bottomPadding)
+					top = if not v69 then nil else UDim.new(0, t1.topPadding),
+					bottom = if not v70 then nil else UDim.new(0, t1.bottomPadding)
 				}
 			}, {
-				InlineBanner = v65
+				InlineBanner = v67
 			})
-		elseif v66 and t1.topPadding then
-			v65 = React.createElement("Frame", {
+		elseif v68 and t1.topPadding then
+			v67 = React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 0, t1.topPadding)
 			})
 		end
 	end
 
-	if not FFlagPromptsHandlerCoachmarkEnabled or not v61 then
-		return v65
+	if not FFlagPromptsHandlerCoachmarkEnabled or not v63 then
+		return v67
 	end
 
 	return React.createElement(React.Fragment, nil, {
-		Slot = v65,
+		Slot = v67,
 		Coachmarks = React.createElement(CoachmarkRenderer, {
-			surfaceConfig = v43,
+			surfaceConfig = v45,
 			hasShownKey = entryPoint
 		})
 	})

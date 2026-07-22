@@ -9,6 +9,8 @@ local capability = require(script.capability)
 local catalog_sort_data = require(script.catalog_sort_data)
 local catalog_sort_prop_types = require(script.catalog_sort_prop_types)
 local client_capabilities = require(script.client_capabilities)
+local community_data = require(script.community_data)
+local community_user_membership_data = require(script.community_user_membership_data)
 local component_shared = require(script.component_shared)
 local creator_data = require(script.creator_data)
 local display_location = require(script.display_location)
@@ -57,6 +59,8 @@ return {
 	catalog_sort_data = catalog_sort_data,
 	catalog_sort_prop_types = catalog_sort_prop_types,
 	client_capabilities = client_capabilities,
+	community_data = community_data,
+	community_user_membership_data = community_user_membership_data,
 	component_shared = component_shared,
 	creator_data = creator_data,
 	display_location = display_location,

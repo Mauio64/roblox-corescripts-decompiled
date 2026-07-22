@@ -17,6 +17,7 @@ local useSignalState = SignalsReact.useSignalState
 local OverlayDisplay = MomentsCommon.Components.OverlayDisplay
 local TextOverlay = MomentsCommon.Components.TextOverlay
 local TextOverlayDisplay = MomentsCommon.Components.TextOverlayDisplay
+local getScale = MomentsCommon.Utils.getScale
 local GetFFlagMomentsStickerButton = MomentsCommon.Flags.GetFFlagMomentsStickerButton
 local CreationFlowState = require(MomentsCreation.Enums.CreationFlowState)
 
@@ -27,149 +28,154 @@ local useOnScreenKeyboardHeight = require(MomentsCreation.Hooks.useOnScreenKeybo
 local makeDefaultTextOverlayEdit = require(MomentsCreation.Utils.makeDefaultTextOverlayEdit)
 local makeTextOverlayEditsForEditor = require(MomentsCreation.Utils.makeTextOverlayEditsForEditor)
 local GetFFlagMomentsTextOverlayClampToBounds = require(MomentsCreation.Flags.GetFFlagMomentsTextOverlayClampToBounds)
+local GetFFlagMomentsCreationTextOverlayResolutionScale = require(MomentsCreation.Flags.GetFFlagMomentsCreationTextOverlayResolutionScale)
 
-local function TextOverlayLayer(t1: {[any]: any}) -- line: 74
-	-- upvalues: useSignalState (copy), useMemo (copy), Signals (copy), CreationFlowState (copy), useRef (copy), useBinding (copy), useOnScreenKeyboardHeight (copy), useCallback (copy), GetFFlagMomentsStickerButton (copy), Dash (copy), useEffect (copy), makeTextOverlayEditsForEditor (copy), makeDefaultTextOverlayEdit (copy), TextService (copy), React (copy), View (copy), Foundation (copy), TextOverlay (copy), OverlayDisplay (copy), GetFFlagMomentsTextOverlayClampToBounds (copy), TextOverlayDisplay (copy)
+local function TextOverlayLayer(t1: {[any]: any}) -- line: 77
+	-- upvalues: useSignalState (copy), GetFFlagMomentsCreationTextOverlayResolutionScale (copy), getScale (copy), useMemo (copy), Signals (copy), CreationFlowState (copy), useRef (copy), useBinding (copy), useOnScreenKeyboardHeight (copy), useCallback (copy), GetFFlagMomentsStickerButton (copy), Dash (copy), useEffect (copy), makeTextOverlayEditsForEditor (copy), makeDefaultTextOverlayEdit (copy), TextService (copy), React (copy), View (copy), Foundation (copy), TextOverlay (copy), OverlayDisplay (copy), GetFFlagMomentsTextOverlayClampToBounds (copy), TextOverlayDisplay (copy)
 	local controller = t1.controller
-	local v29 = useSignalState(controller.getStep)
-	local v30 = useSignalState(t1.ctx.getItemSize)
+	local v31 = useSignalState(controller.getStep)
+	local v32 = useSignalState(t1.ctx.getItemSize)
+	local v33 = useSignalState(t1.ctx.getItemResolution)
 	local textOverlays = useSignalState(controller.getComposedEdits).textOverlays
-	local v32 = useMemo(function() -- line: 83
+	local v35 = GetFFlagMomentsCreationTextOverlayResolutionScale()
+	local v36 = not v35 and 1 or getScale(v32, v33, Enum.ScaleType.Crop)
+	local v37 = useMemo(function() -- line: 94
 		-- upvalues: Signals (copy), controller (copy)
-		return Signals.createComputed(function(p1) -- line: 84
+		return Signals.createComputed(function(p1) -- line: 95
 			-- upvalues: controller (copy)
-			local v57 = controller.getActiveSession(p1)
+			local v62 = controller.getActiveSession(p1)
 
-			if v57 ~= nil then
-				return (v57.getDraft(p1))
+			if v62 ~= nil then
+				return (v62.getDraft(p1))
 			end
 
 			return nil
 		end)
 	end, { controller })
-	local v33 = useSignalState(v32)
-	local v34 = v29 == CreationFlowState.TextOverlay
-	local v35 = v33 and v33[1]
-	local v36 = useRef(nil)
-	local v37, v38 = useBinding(UDim2.fromOffset(0, 0))
-	local v39 = useOnScreenKeyboardHeight()
-	local v40 = useCallback(function() -- line: 98
-		-- upvalues: v36 (copy)
-		if v36.current then
-			v36.current:CaptureFocus()
+	local v38 = useSignalState(v37)
+	local v39 = v31 == CreationFlowState.TextOverlay
+	local v40 = v38 and v38[1]
+	local v41 = useRef(nil)
+	local v42, v43 = useBinding(UDim2.fromOffset(0, 0))
+	local v44 = useOnScreenKeyboardHeight()
+	local v45 = useCallback(function() -- line: 109
+		-- upvalues: v41 (copy)
+		if v41.current then
+			v41.current:CaptureFocus()
 		end
 	end, {})
-	local v41 = useCallback(function(p2) -- line: 104
+	local v46 = useCallback(function(p2) -- line: 115
 		-- upvalues: controller (copy), GetFFlagMomentsStickerButton (copy), Dash (copy)
-		local v47 = controller.getActiveSession(false)
+		local v52 = controller.getActiveSession(false)
 
-		if v47 == nil then
+		if v52 == nil then
 			return
 		end
 
-		local v48 = v47.getDraft(false)
-		local v49 = v48 and v48[1]
+		local v53 = v52.getDraft(false)
+		local v54 = v53 and v53[1]
 
-		if v49 == nil then
+		if v54 == nil then
 			return
 		end
 
-		local v50 = utf8.len(p2.Text)
+		local v55 = utf8.len(p2.Text)
 
-		if v50 ~= nil and v50 >= 100 then
-			local v51 = utf8.offset(p2.Text, 101)
+		if v55 ~= nil and v55 >= 100 then
+			local v56 = utf8.offset(p2.Text, 101)
 
 			if GetFFlagMomentsStickerButton() then
-				if v51 then
-					p2.Text = string.sub(p2.Text, 1, v51 - 1)
+				if v56 then
+					p2.Text = string.sub(p2.Text, 1, v56 - 1)
 				end
 			else
-				p2.Text = string.sub(p2.Text, 1, v51 - 1)
+				p2.Text = string.sub(p2.Text, 1, v56 - 1)
 			end
 		end
 
-		v47.update({ Dash.joinDeep(v49, {
+		v52.update({ Dash.joinDeep(v54, {
 			text = p2.Text
 		}) })
 	end, { controller })
-	local v42 = useCallback(function() -- line: 131
+	local v47 = useCallback(function() -- line: 142
 		-- upvalues: controller (copy)
 		controller.beginTool("text")
 	end, { controller })
-	local v43 = useCallback(function(t2: {[any]: any}?) -- line: 135
+	local v48 = useCallback(function(t2: {[any]: any}?) -- line: 146
 		-- upvalues: controller (copy)
 		controller.updateCommittedEdit("text", t2)
 	end, { controller })
 
-	useEffect(function() -- line: 141
-		-- upvalues: v34 (copy), controller (copy), makeTextOverlayEditsForEditor (copy), textOverlays (copy), makeDefaultTextOverlayEdit (copy)
-		if not v34 then
+	useEffect(function() -- line: 152
+		-- upvalues: v39 (copy), controller (copy), makeTextOverlayEditsForEditor (copy), textOverlays (copy), makeDefaultTextOverlayEdit (copy), v36 (copy)
+		if not v39 then
 			return
 		end
 
-		local v53 = controller.getActiveSession(false)
+		local v58 = controller.getActiveSession(false)
 
-		if v53 == nil or v53.getDraft(false) ~= nil then
+		if v58 == nil or v58.getDraft(false) ~= nil then
 			return
 		end
 
-		v53.update(makeTextOverlayEditsForEditor(textOverlays, makeDefaultTextOverlayEdit(), 1))
+		v58.update(makeTextOverlayEditsForEditor(textOverlays, makeDefaultTextOverlayEdit(), v36))
 	end, {
-		v34,
+		v39,
 		textOverlays,
-		controller
+		controller,
+		v36
 	})
 
-	local v44 = useRef(false)
+	local v49 = useRef(false)
 
-	useEffect(function() -- line: 157
-		-- upvalues: v34 (copy), v44 (copy), v36 (copy), v35 (copy), v40 (copy)
-		if not v34 then
-			v44.current = false
+	useEffect(function() -- line: 168
+		-- upvalues: v39 (copy), v49 (copy), v41 (copy), v40 (copy), v45 (copy)
+		if not v39 then
+			v49.current = false
 
-			if v36.current then
-				v36.current:ReleaseFocus()
+			if v41.current then
+				v41.current:ReleaseFocus()
 			end
 
 			return
 		end
 
-		if v44.current or v36.current == nil or v35 == nil then
+		if v49.current or v41.current == nil or v40 == nil then
 			return
 		end
 
-		v40()
-		v44.current = true
+		v45()
+		v49.current = true
 	end, {
-		v34,
-		v35,
-		v40
-	})
-	useEffect(function() -- line: 172
-		-- upvalues: v34 (copy), v35 (copy), v39 (copy), v38 (copy), TextService (copy), v30 (copy)
-		if not v34 or v35 == nil then
-			return
-		end
-
-		if v39 == 0 then
-			v38(UDim2.fromOffset(0, 0))
-
-			return
-		end
-
-		local textOverlayStyle = v35.textOverlayStyle
-		local TextSize = TextService:GetTextSize("W", textOverlayStyle.fontSize, textOverlayStyle.font, Vector2.new(v30.X, v30.Y))
-
-		v38(UDim2.fromOffset(math.min(TextSize.X * 30, v30.X / 2), (math.min(TextSize.Y * 5, v30.Y / 2))))
-	end, {
-		v34,
-		v35,
 		v39,
-		v30
+		v40,
+		v45
+	})
+	useEffect(function() -- line: 183
+		-- upvalues: v39 (copy), v40 (copy), v44 (copy), v43 (copy), TextService (copy), v32 (copy)
+		if not v39 or v40 == nil then
+			return
+		end
+
+		if v44 == 0 then
+			v43(UDim2.fromOffset(0, 0))
+
+			return
+		end
+
+		local textOverlayStyle = v40.textOverlayStyle
+		local TextSize = TextService:GetTextSize("W", textOverlayStyle.fontSize, textOverlayStyle.font, Vector2.new(v32.X, v32.Y))
+
+		v43(UDim2.fromOffset(math.min(TextSize.X * 30, v32.X / 2), (math.min(TextSize.Y * 5, v32.Y / 2))))
+	end, {
+		v39,
+		v40,
+		v44,
+		v32
 	})
 
-	if v34 then
-		if v35 == nil then
+	if v39 then
+		if v40 == nil then
 			return nil
 		end
 
@@ -182,14 +188,14 @@ local function TextOverlayLayer(t1: {[any]: any}) -- line: 74
 		}, {
 			TextOverlay = React.createElement(TextOverlay, {
 				editable = true,
-				onActivated = v40,
-				size = v37,
-				textOverlayEdit = Dash.joinDeep(v35, {
+				onActivated = v45,
+				size = v42,
+				textOverlayEdit = Dash.joinDeep(v40, {
 					rotation = 0,
 					position = UDim2.fromScale(0.5, 0.5)
 				}),
-				onTextChanged = v41,
-				textBoxRef = v36
+				onTextChanged = v46,
+				textBoxRef = v41
 			})
 		})
 	end
@@ -198,18 +204,18 @@ local function TextOverlayLayer(t1: {[any]: any}) -- line: 74
 		return nil
 	end
 
-	local v45 = v29 == CreationFlowState.Preview
+	local v50 = v31 == CreationFlowState.Preview
 
 	if GetFFlagMomentsStickerButton() then
 		return React.createElement(OverlayDisplay, {
 			editable = false,
-			itemResolution = nil,
 			clampToBoundsEnabled = GetFFlagMomentsTextOverlayClampToBounds(),
-			draggable = v45,
-			itemSize = v30,
+			draggable = v50,
+			itemResolution = if not v35 then nil else v33,
+			itemSize = v32,
 			scaleType = Enum.ScaleType.Crop,
-			onOverlayActivated = if not v45 then nil else v42,
-			onOverlayDragEnd = if not v45 then nil else v43,
+			onOverlayActivated = if not v50 then nil else v47,
+			onOverlayDragEnd = if not v50 then nil else v48,
 			overlayEdits = textOverlays,
 			overlayComponent = TextOverlay,
 			zIndex = t1.zIndex
@@ -218,13 +224,13 @@ local function TextOverlayLayer(t1: {[any]: any}) -- line: 74
 
 	return React.createElement(TextOverlayDisplay, {
 		editable = false,
-		itemResolution = nil,
 		clampToBoundsEnabled = GetFFlagMomentsTextOverlayClampToBounds(),
-		draggable = v45,
-		itemSize = v30,
+		draggable = v50,
+		itemResolution = if not v35 then nil else v33,
+		itemSize = v32,
 		scaleType = Enum.ScaleType.Crop,
-		onTextOverlayActivated = if not v45 then nil else v42,
-		onTextOverlayDragEnd = if not v45 then nil else v43,
+		onTextOverlayActivated = if not v50 then nil else v47,
+		onTextOverlayDragEnd = if not v50 then nil else v48,
 		textOverlayEdits = textOverlays,
 		zIndex = t1.zIndex
 	})

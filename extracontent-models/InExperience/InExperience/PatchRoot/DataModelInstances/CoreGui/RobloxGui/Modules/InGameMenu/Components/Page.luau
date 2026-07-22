@@ -4,8 +4,10 @@ local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local UIBlox = InGameMenuDependencies.UIBlox
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v9 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent
 local NavigateUp = require(ParentParent.Thunks.NavigateUp)
 local Assets = require(ParentParent.Resources.Assets)
@@ -13,13 +15,12 @@ local Constants = require(ParentParent.Resources.Constants)
 local ZonePortal = require(ParentParent.Components.ZonePortal)
 local Direction = require(ParentParent.Enums.Direction)
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
-local Image = require(CorePackages.Packages.Foundation).Image
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local FoundationImage = Foundation.Image
 local ThemedTextLabel = require(script.Parent.ThemedTextLabel)
 
-local function renderWithSelectionCursor(p1, p2) -- line: 33
-	-- upvalues: withFoundationOrUIBloxStyle (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), Assets (copy), CursorKind (copy), ImageSetButton (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
-	return withFoundationOrUIBloxStyle(function(p3) -- line: 34
+local function renderWithSelectionCursor(p1, p2) -- line: 37
+	-- upvalues: withFoundationOrUIBloxStyle (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), FoundationImage (copy), Assets (copy), v10 (copy), ImageSetButton (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 38
 		return {
 			Theme = {
 				IconEmphasis = {
@@ -32,8 +33,8 @@ local function renderWithSelectionCursor(p1, p2) -- line: 33
 				}
 			}
 		}
-	end, function(p4) -- line: 41
-		-- upvalues: p1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), Assets (copy), p2 (copy), CursorKind (copy), ImageSetButton (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
+	end, function(p4) -- line: 51
+		-- upvalues: p1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), FoundationImage (copy), Assets (copy), p2 (copy), v10 (copy), ImageSetButton (copy), ThemedTextLabel (copy), Constants (copy), ZonePortal (copy), Direction (copy)
 		local t1 = {
 			ExtraChildren = p1.titleChildren,
 			BackButton = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetButton, {
@@ -47,14 +48,17 @@ local function renderWithSelectionCursor(p1, p2) -- line: 33
 				NextSelectionDown = p1.NextSelectionDown,
 				[Roact.Event.Activated] = p1.navigateUp,
 				[Roact.Ref] = p1.buttonRef,
-				SelectionImageObject = p2(CursorKind.RoundedRect)
-			}) else Roact.createElement(Image, {
+				SelectionImageObject = p2(v10.RoundedRect)
+			}) else Roact.createElement(FoundationImage, {
 				tag = "content-emphasis anchor-center-left size-900",
 				Image = Assets.Images.NavigateBack,
+				backgroundStyle = {
+					Transparency = 1
+				},
 				Position = UDim2.new(0, 4, 0.5, 0),
 				selection = {
 					NextSelectionDown = p1.NextSelectionDown,
-					SelectionImageObject = p2(CursorKind.RoundedRect)
+					SelectionImageObject = p2(v10.RoundedRect)
 				},
 				onActivated = p1.navigateUp,
 				ref = p1.buttonRef
@@ -94,18 +98,18 @@ local function renderWithSelectionCursor(p1, p2) -- line: 33
 		})
 	end)
 end
-local function Page(p5) -- line: 106
-	-- upvalues: withSelectionCursorProvider (copy), renderWithSelectionCursor (copy)
-	return withSelectionCursorProvider(function(p6) -- line: 107
+local function Page(p5) -- line: 117
+	-- upvalues: v9 (copy), renderWithSelectionCursor (copy)
+	return v9(function(p6) -- line: 118
 		-- upvalues: renderWithSelectionCursor (copy), p5 (copy)
 		return renderWithSelectionCursor(p5, p6)
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p7) -- line: 112
+return RoactRodux.UNSTABLE_connect2(nil, function(p7) -- line: 123
 	-- upvalues: NavigateUp (copy)
 	return {
-		navigateUp = function() -- line: 114
+		navigateUp = function() -- line: 125
 			-- upvalues: p7 (copy), NavigateUp (copy)
 			p7(NavigateUp)
 		end

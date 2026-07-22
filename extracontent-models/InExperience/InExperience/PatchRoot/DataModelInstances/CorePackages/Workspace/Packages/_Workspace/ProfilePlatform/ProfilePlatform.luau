@@ -7,6 +7,7 @@ local SharedFlags = require(script.Parent.SharedFlags)
 local FFlagMoveInExperienceModeToEditProfile = SharedFlags.FFlagMoveInExperienceModeToEditProfile
 local FFlagAddIEMProfilePage = SharedFlags.FFlagAddIEMProfilePage
 local FFlagTCUpdateProfileCTAButton = SharedFlags.FFlagTCUpdateProfileCTAButton
+local FFlagProfilePlatformEnableMoments = require(script.Flags.FFlagProfilePlatformEnableMoments)
 
 return {
 	["jest.config"] = script["jest.config"],
@@ -25,6 +26,7 @@ return {
 	AvatarHeadshotComponent = if not FFlagAddIEMProfilePage then nil else require(script.Components.UserProfileHeader.AvatarHeadshotComponent),
 	SocialChipCountsRow = if not FFlagAddIEMProfilePage then nil else require(script.Components.UserProfileHeader.SocialChipCountsRow).SocialChipCountsRowContainer,
 	AboutDetailsSheet = require(script.Components.AboutDetailsSheet),
+	MomentsFeedPage = if not FFlagProfilePlatformEnableMoments then nil else require(script.Components.Moments.MomentsFeedPage),
 	useDynamicSizeMargin = if not FFlagAddIEMProfilePage then nil else require(script.Hooks.useDynamicSizeMargin),
 	useProfileJsonComponent = if not FFlagAddIEMProfilePage then nil else require(script.Hooks.useProfileJsonComponent),
 	Screens = Enums.Screens,

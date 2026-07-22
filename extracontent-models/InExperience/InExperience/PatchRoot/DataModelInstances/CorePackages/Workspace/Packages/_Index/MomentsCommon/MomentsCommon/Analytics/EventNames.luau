@@ -13,6 +13,7 @@ return {
 	FeedMinimizeButtonPressed = "FeedMinimizeButtonPressed",
 	FeedNoMomentsFetched = "FeedNoMomentsFetched",
 	FeedLoadFailed = "FeedLoadFailed",
+	FeedLoadMoreFailed = "FeedLoadMoreFailed",
 	FeedMediaLoadFailed = "FeedMediaLoadFailed",
 	FeedEmptyCreationStarted = "FeedEmptyCreationStarted",
 	FeedDraftUploaded = "FeedDraftUploaded",

@@ -13,7 +13,6 @@ local useLocalization = require(UserListParent.Localization).Hooks.useLocalizati
 local v10 = game:DefineFastFlag("UserListUseActionAddTranslation", false)
 local FFlagFriendsPageViewBtnEnabled = require(UserListParent.SharedFlags).FFlagFriendsPageViewBtnEnabled
 local FFlagEnableBlackbirdCheck = require(UserListParent.SharedFlags).FFlagEnableBlackbirdCheck
-local FFlagFriendsPageViewBtnWidth = require(UserListParent.SharedFlags).FFlagFriendsPageViewBtnWidth
 local View = Foundation.View
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
@@ -23,10 +22,10 @@ local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
 local FillBehavior = Foundation.Enums.FillBehavior
 
-local function BaseRow(t1: {[any]: any}) -- line: 69
-	-- upvalues: useTokens (copy), v10 (copy), useLocalization (copy), TextKeys (copy), Enums (copy), FFlagFriendsPageViewBtnEnabled (copy), React (copy), View (copy), Constants (copy), UserTile (copy), Foundation (copy), FFlagEnableBlackbirdCheck (copy), FFlagFriendsPageViewBtnWidth (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), IconButton (copy), IconSize (copy)
-	local v24 = useTokens()
-	local v25 = if not v10 then nil else useLocalization({
+local function BaseRow(t1: {[any]: any}) -- line: 68
+	-- upvalues: useTokens (copy), v10 (copy), useLocalization (copy), TextKeys (copy), Enums (copy), FFlagFriendsPageViewBtnEnabled (copy), React (copy), View (copy), Constants (copy), UserTile (copy), Foundation (copy), FFlagEnableBlackbirdCheck (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), IconButton (copy), IconSize (copy)
+	local v23 = useTokens()
+	local v24 = if not v10 then nil else useLocalization({
 		Accept = TextKeys.Accept,
 		Add = TextKeys.Add,
 		Chat = TextKeys.Chat,
@@ -64,7 +63,7 @@ local function BaseRow(t1: {[any]: any}) -- line: 69
 				isSubtitleLoading = t1.isSubtitleLoading,
 				contextualInfo = t1.contextualInfo and t1.contextualInfo.text,
 				isContextualInfoLoading = t1.isContextualInfoLoading,
-				avatarSize = if t1.layoutMode ~= Enums.RowLayoutMode.Compact then nil else UDim2.new(0, v24.Size.Size_1400, 0, v24.Size.Size_1400),
+				avatarSize = if t1.layoutMode ~= Enums.RowLayoutMode.Compact then nil else UDim2.new(0, v23.Size.Size_1400, 0, v23.Size.Size_1400),
 				trustedConnectionIndicatorEnabled = t1.trustedConnectionIndicatorEnabled,
 				isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else t1.isRobloxSubscriber
 			})
@@ -77,9 +76,9 @@ local function BaseRow(t1: {[any]: any}) -- line: 69
 				["col size-full-0 auto-y align-x-center"] = t1.layoutMode == Enums.RowLayoutMode.Compact
 			}
 		}, {
-			PrimaryActionCta = if not t1.primaryCta or not t1.primaryCta.onActivated then nil else if not FFlagFriendsPageViewBtnWidth or t1.layoutMode ~= Enums.RowLayoutMode.Wide then React.createElement(Button, {
+			PrimaryActionCta = if not t1.primaryCta or not t1.primaryCta.onActivated then nil else if t1.layoutMode ~= Enums.RowLayoutMode.Wide then React.createElement(Button, {
 				LayoutOrder = 1,
-				text = if not v10 then t1.primaryCta.type else v25[t1.primaryCta.type],
+				text = if not v10 then t1.primaryCta.type else v24[t1.primaryCta.type],
 				size = InputSize.Small,
 				variant = if not FFlagFriendsPageViewBtnEnabled then ButtonVariant.SoftEmphasis else t1.primaryCta.variant or ButtonVariant.SoftEmphasis,
 				onActivated = t1.primaryCta.onActivated,
@@ -95,7 +94,7 @@ local function BaseRow(t1: {[any]: any}) -- line: 69
 				}
 			}, {
 				Button = React.createElement(Button, {
-					text = if not v10 then t1.primaryCta.type else v25[t1.primaryCta.type],
+					text = if not v10 then t1.primaryCta.type else v24[t1.primaryCta.type],
 					size = InputSize.Small,
 					variant = if not FFlagFriendsPageViewBtnEnabled then ButtonVariant.SoftEmphasis else t1.primaryCta.variant or ButtonVariant.SoftEmphasis,
 					onActivated = t1.primaryCta.onActivated,

@@ -59,10 +59,10 @@ return {
 		local v20 = t5.getActiveTurnInternals(s1)
 
 		if v20 == nil then
-			return false
+			return {}
 		end
 
-		local v21 = false
+		local t7 = {}
 
 		for _, v23 in orderHistoryItems(t6) do
 			local sequenceId = v23.sequenceId
@@ -73,32 +73,28 @@ return {
 
 			local sessionUpdate = v23.update.sessionUpdate
 
-			if typeof(sessionUpdate) == "string" and t1[sessionUpdate] == true then
-				local v26 = v20.dispatchFrame({
-					kind = "notification",
-					notification = {
-						method = AcpProtocol.Notifications.SessionUpdate,
-						params = {
-							sessionId = s1,
-							update = v23.update
-						}
+			if if not (typeof(sessionUpdate) == "string" and t1[sessionUpdate] == true) then v20.noteProcessedSequenceNumber(sequenceId) else v20.dispatchFrame({
+				kind = "notification",
+				notification = {
+					method = AcpProtocol.Notifications.SessionUpdate,
+					params = {
+						sessionId = s1,
+						update = v23.update
 					}
-				}, {
-					sequenceNumber = sequenceId
-				}, false)
+				}
+			}, {
+				sequenceNumber = sequenceId
+			}, false) then
+				table.insert(t7, sequenceId)
+			end
 
-				v21 = v21 or v26
-
-				if not v20.isDone() then
-					continue
-				end
-
+			if v20.isDone() then
 				t5.onTurnDone(v20)
 
-				return v21
+				return t7
 			end
 		end
 
-		return v21
+		return t7
 	end
 }

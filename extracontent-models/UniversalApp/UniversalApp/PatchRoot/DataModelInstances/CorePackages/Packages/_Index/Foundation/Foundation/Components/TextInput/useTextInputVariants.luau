@@ -39,11 +39,10 @@ local function computeProps(t1: {[any]: any}) -- line: 62
 	}
 end
 local function variantsFactory(p1) -- line: 92
-	-- upvalues: Flags (copy), InputSize (copy), computeProps (copy), IconSize (copy), BuilderIcons (copy)
+	-- upvalues: InputSize (copy), computeProps (copy), IconSize (copy), BuilderIcons (copy), Flags (copy)
 	local t2 = {
 		container = {
 			tag = "row",
-			bgStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then p1.Color.Shift.Shift_100 else nil,
 			strokeStyle = p1.Color.Stroke.Emphasis,
 			strokeThickness = p1.Stroke.Standard
 		},
@@ -106,7 +105,7 @@ local function variantsFactory(p1) -- line: 92
 	}
 end
 
-return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?, b3: boolean?) -- line: 160
+return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?, b3: boolean?) -- line: 159
 	-- upvalues: VariantsContext (copy), variantsFactory (copy), getInputVariantsFactory (copy), InputVariant (copy), composeStyleVariant (copy), Flags (copy)
 	local v24 = VariantsContext.useVariants("TextInput", variantsFactory, p2)
 	local v25 = VariantsContext.useVariants("InputField", getInputVariantsFactory, p2)

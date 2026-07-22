@@ -4,15 +4,15 @@ local t = InGameMenuDependencies.t
 local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v9 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent.Parent
 local Assets = require(ParentParent.Resources.Assets)
 local GlobalConfig = require(ParentParent.GlobalConfig)
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
-local Foundation = require(CorePackages.Packages.Foundation)
 local FoundationImage = Foundation.Image
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 local ControlState = Foundation.Enums.ControlState
 local v17 = t.strictInterface({
 	AnchorPoint = t.optional(t.Vector2),
@@ -24,7 +24,7 @@ local v17 = t.strictInterface({
 	forwardRef = t.optional(t.table)
 })
 
-local function isSelectedState(p1) -- line: 35
+local function isSelectedState(p1) -- line: 39
 	-- upvalues: ControlState (copy)
 	return p1 == ControlState.Selected or p1 == ControlState.SelectedPressed
 end
@@ -34,15 +34,15 @@ local u19
 if FFlagCoreUiMigrateUIBloxToFoundation then
 	u19 = Roact.Component:extend("CloseMenuButton")
 
-	function u19.init(p2) -- line: 44
+	function u19.init(p2) -- line: 48
 		p2.wasSelected = false
 	end
-	function u19.render(p3) -- line: 48
-		-- upvalues: withSelectionCursorProvider (copy), GlobalConfig (copy), v17 (copy), Roact (copy), FoundationImage (copy), Assets (copy), CursorKind (copy), ControlState (copy)
+	function u19.render(p3) -- line: 52
+		-- upvalues: v9 (copy), GlobalConfig (copy), v17 (copy), Roact (copy), FoundationImage (copy), Assets (copy), v10 (copy), ControlState (copy)
 		local props = p3.props
 
-		return withSelectionCursorProvider(function(p4) -- line: 50
-			-- upvalues: GlobalConfig (copy), v17 (copy), props (copy), Roact (copy), FoundationImage (copy), Assets (copy), CursorKind (copy), ControlState (copy), p3 (copy)
+		return v9(function(p4) -- line: 54
+			-- upvalues: GlobalConfig (copy), v17 (copy), props (copy), Roact (copy), FoundationImage (copy), Assets (copy), v10 (copy), ControlState (copy), p3 (copy)
 			if GlobalConfig.propValidation then
 				assert(v17(props))
 			end
@@ -51,13 +51,16 @@ if FFlagCoreUiMigrateUIBloxToFoundation then
 				AnchorPoint = props.AnchorPoint,
 				Position = props.Position,
 				Size = UDim2.new(0, 32, 0, 32),
+				backgroundStyle = {
+					Transparency = 1
+				},
 				LayoutOrder = props.layoutOrder,
 				Image = Assets.Images.CloseButton,
 				selection = {
-					SelectionImageObject = p4(CursorKind.RoundedRect)
+					SelectionImageObject = p4(v10.RoundedRect)
 				},
 				onActivated = props.onActivated,
-				onStateChanged = function(p5) -- line: 63
+				onStateChanged = function(p5) -- line: 68
 					-- upvalues: ControlState (copy), p3 (copy), props (copy)
 					local v30 = p5 == ControlState.Selected or p5 == ControlState.SelectedPressed
 
@@ -76,10 +79,10 @@ if FFlagCoreUiMigrateUIBloxToFoundation then
 		end)
 	end
 else
-	function u19(p6) -- line: 81
-		-- upvalues: withSelectionCursorProvider (copy), GlobalConfig (copy), v17 (copy), Roact (copy), ImageSetButton (copy), Assets (copy), CursorKind (copy)
-		return withSelectionCursorProvider(function(p7) -- line: 82
-			-- upvalues: GlobalConfig (copy), v17 (copy), p6 (copy), Roact (copy), ImageSetButton (copy), Assets (copy), CursorKind (copy)
+	function u19(p6) -- line: 86
+		-- upvalues: v9 (copy), GlobalConfig (copy), v17 (copy), Roact (copy), ImageSetButton (copy), Assets (copy), v10 (copy)
+		return v9(function(p7) -- line: 87
+			-- upvalues: GlobalConfig (copy), v17 (copy), p6 (copy), Roact (copy), ImageSetButton (copy), Assets (copy), v10 (copy)
 			if GlobalConfig.propValidation then
 				assert(v17(p6))
 			end
@@ -91,7 +94,7 @@ else
 				Position = p6.Position,
 				Size = UDim2.new(0, 32, 0, 32),
 				LayoutOrder = p6.layoutOrder,
-				SelectionImageObject = p7(CursorKind.RoundedRect),
+				SelectionImageObject = p7(v10.RoundedRect),
 				[Roact.Event.Activated] = p6.onActivated,
 				[Roact.Event.SelectionGained] = p6.onSelectionGained,
 				[Roact.Event.SelectionLost] = p6.onSelectionLost,
@@ -101,7 +104,7 @@ else
 	end
 end
 
-return Roact.forwardRef(function(p8, p9) -- line: 105
+return Roact.forwardRef(function(p8, p9) -- line: 110
 	-- upvalues: Roact (copy), u19 (ref), Cryo (copy)
 	return Roact.createElement(u19, Cryo.Dictionary.join(p8, {
 		forwardRef = p9

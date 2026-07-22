@@ -31,102 +31,123 @@ local ProfilePeekView = require(script.Parent.ProfilePeekView)
 local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
 local FFlagSwitchProfileWidthHookToSocialCommon = require(ProfilePlatformParent.SharedFlags).FFlagSwitchProfileWidthHookToSocialCommon
 local FFlagEnableMobileGameJoinCard = require(ProfilePlatformParent.SharedFlags).FFlagEnableMobileGameJoinCard
+local FFlagProfilePlatformPresenceStoreMigration = require(ProfilePlatform.Flags.FFlagProfilePlatformPresenceStoreMigration)
+local v35 = if not FFlagProfilePlatformPresenceStoreMigration then nil else require(ProfilePlatformParent.FriendsCommon).Hooks.useGetPresenceByUserId
+local v36 = if not FFlagProfilePlatformPresenceStoreMigration then nil else require(ProfilePlatformParent.DataHydration).Presence.PresenceStore.get()
+local t1 = {
+	skipFetch = true
+}
 
-return function(_: {[any]: any}) -- line: 43
-	-- upvalues: useProfileWrapperContext (copy), useProfileScrollContext (copy), useScreenSize (copy), useTopBarHeight (copy), FFlagEnableMobileGameJoinCard (copy), React (copy), useSelector (copy), useProfileFormFactor (copy), Enums (copy), ProfilePlatformPage (copy), ProfileTopBar (copy), getSafeAreaSize (copy), FFlagProfilePlatformNewProfileHeader (copy), FFlagSwitchProfileWidthHookToSocialCommon (copy), useProfileCardWidth2 (copy), useProfileCardWidth (copy), Constants (copy), useDispatch (copy), useEffectOnMount (copy), NetworkingPresence (copy), Presence (copy), convertPresenceEnum (copy), useShouldShowContextualInformation (copy), useProfilePeekViewHeight (copy), getPeekViewOpenHeightByProfileType (copy), ProfileFullView (copy), ProfileModalView (copy), ProfilePeekView (copy)
-	local v35 = useProfileWrapperContext()
-	local v36 = useProfileScrollContext()
-	local profileType = v35.profileType
-	local previousView = v35.navigateTo.previousView
-	local v39 = useScreenSize()
-	local v40 = useTopBarHeight()
-	local v41 = not not FFlagEnableMobileGameJoinCard and (v35.mountAsFullView or false)
-	local v42 = React.useCallback(function() -- line: 54
+return function(_: {[any]: any}) -- line: 53
+	-- upvalues: useProfileWrapperContext (copy), useProfileScrollContext (copy), useScreenSize (copy), useTopBarHeight (copy), FFlagEnableMobileGameJoinCard (copy), React (copy), useSelector (copy), useProfileFormFactor (copy), Enums (copy), ProfilePlatformPage (copy), ProfileTopBar (copy), getSafeAreaSize (copy), FFlagProfilePlatformNewProfileHeader (copy), FFlagSwitchProfileWidthHookToSocialCommon (copy), useProfileCardWidth2 (copy), useProfileCardWidth (copy), Constants (copy), FFlagProfilePlatformPresenceStoreMigration (copy), useEffectOnMount (copy), v36 (copy), v35 (copy), t1 (copy), convertPresenceEnum (copy), Presence (copy), useDispatch (copy), NetworkingPresence (copy), useShouldShowContextualInformation (copy), useProfilePeekViewHeight (copy), getPeekViewOpenHeightByProfileType (copy), ProfileFullView (copy), ProfileModalView (copy), ProfilePeekView (copy)
+	local v39 = useProfileWrapperContext()
+	local v40 = useProfileScrollContext()
+	local profileType = v39.profileType
+	local previousView = v39.navigateTo.previousView
+	local v43 = useScreenSize()
+	local v44 = useTopBarHeight()
+	local v45 = not not FFlagEnableMobileGameJoinCard and (v39.mountAsFullView or false)
+	local v46 = React.useCallback(function() -- line: 64
 		-- upvalues: previousView (copy)
 		previousView(false)
 	end, { previousView })
-	local v43 = React.useCallback(function() -- line: 59
+	local v47 = React.useCallback(function() -- line: 69
 		-- upvalues: previousView (copy)
 		previousView(true)
 	end, { previousView })
-	local v44 = useSelector(function(p1) -- line: 64
+	local v48 = useSelector(function(p1) -- line: 74
 		return p1.GlobalGuiInset
 	end)
-	local v45 = useProfileFormFactor()
-	local v46 = v45.formFactor == Enums.ProfileFormFactor.Wide
-	local v47 = React.useCallback(function() -- line: 71
+	local v49 = useProfileFormFactor()
+	local v50 = v49.formFactor == Enums.ProfileFormFactor.Wide
+	local v51 = React.useCallback(function() -- line: 81
 		-- upvalues: React (copy), ProfilePlatformPage (copy)
 		return React.createElement(ProfilePlatformPage, {})
 	end, {})
-	local v48 = React.useCallback(function() -- line: 75
-		-- upvalues: React (copy), ProfileTopBar (copy), v42 (copy)
+	local v52 = React.useCallback(function() -- line: 85
+		-- upvalues: React (copy), ProfileTopBar (copy), v46 (copy)
 		return React.createElement(ProfileTopBar, {
 			transparentBackground = true,
 			backgroundTransparency = nil,
-			navigateBack = v42
+			navigateBack = v46
 		})
 	end, {})
-	local v49 = getSafeAreaSize(v39, v44)
-	local v50 = if not FFlagProfilePlatformNewProfileHeader then math.min(v49.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH) else if not FFlagSwitchProfileWidthHookToSocialCommon then useProfileCardWidth(v46) else useProfileCardWidth2()
-	local v51 = nil
+	local v53 = getSafeAreaSize(v43, v48)
+	local v54 = if not FFlagProfilePlatformNewProfileHeader then math.min(v53.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH) else if not FFlagSwitchProfileWidthHookToSocialCommon then useProfileCardWidth(v50) else useProfileCardWidth2()
+	local v55 = nil
 
 	if FFlagProfilePlatformNewProfileHeader then
-		local profileId = v35.profileId
-		local v53 = useDispatch()
+		local profileId = v39.profileId
+		local v58
 
-		useEffectOnMount(function() -- line: 95
-			-- upvalues: v53 (copy), NetworkingPresence (copy), profileId (copy)
-			v53(NetworkingPresence.GetPresencesFromUserIds.API({ profileId })):catch(function(_) -- line: 96
+		if FFlagProfilePlatformPresenceStoreMigration then
+			useEffectOnMount(function() -- line: 106
+				-- upvalues: v36 (copy), profileId (copy)
+				v36.RefreshPresenceByUserId((tostring(profileId)))
 			end)
-		end)
 
-		local v54 = useSelector(function(p3) -- line: 99
-			-- upvalues: Presence (copy), profileId (copy)
-			return Presence.Selectors.getUserPresenceByUserId(p3, profileId) or {
-				lastLocation = "",
-				userPresenceType = Presence.Enums.PresenceType.Offline
-			}
-		end)
-		local v55 = convertPresenceEnum(v54.userPresenceType, v54.universeId)
-		local v56 = useShouldShowContextualInformation(v55)
+			local v57 = v35(profileId, t1)
 
-		v51 = useProfilePeekViewHeight(v50, v56)
+			v58 = convertPresenceEnum(v57 and v57.userPresenceType or Presence.Enums.PresenceType.Offline, v57 and (v57.universeId ~= "" and tonumber(v57.universeId)) or nil)
+		else
+			local v59 = useDispatch()
+
+			useEffectOnMount(function() -- line: 117
+				-- upvalues: v59 (copy), NetworkingPresence (copy), profileId (copy)
+				v59(NetworkingPresence.GetPresencesFromUserIds.API({ profileId })):catch(function(_) -- line: 118
+				end)
+			end)
+
+			local v60 = useSelector(function(p3) -- line: 121
+				-- upvalues: Presence (copy), profileId (copy)
+				return Presence.Selectors.getUserPresenceByUserId(p3, profileId) or {
+					lastLocation = "",
+					userPresenceType = Presence.Enums.PresenceType.Offline
+				}
+			end)
+
+			v58 = convertPresenceEnum(v60.userPresenceType, v60.universeId)
+		end
+
+		local v61 = useShouldShowContextualInformation(v58)
+
+		v55 = useProfilePeekViewHeight(v54, v61)
 	end
 
-	local v57 = if not FFlagProfilePlatformNewProfileHeader or profileType ~= Enums.ProfileTypes.User then getPeekViewOpenHeightByProfileType(profileType) else v51
-	local v58 = if not (v57 > v49.Y.Offset - v40) then UDim.new(0, v57) else UDim.new(1, 0)
+	local v62 = if not FFlagProfilePlatformNewProfileHeader or profileType ~= Enums.ProfileTypes.User then getPeekViewOpenHeightByProfileType(profileType) else v55
+	local v63 = if not (v62 > v53.Y.Offset - v44) then UDim.new(0, v62) else UDim.new(1, 0)
 
-	if v45.isFullView then
+	if v49.isFullView then
 		return React.createElement(ProfileFullView, {
-			renderContent = v47,
-			navigateBack = v42
+			renderContent = v51,
+			navigateBack = v46
 		})
 	end
 
-	if v46 then
+	if v50 then
 		return React.createElement(ProfileModalView, {
-			renderContent = v47,
-			renderTopBar = v48,
-			topBarHeight = v40,
-			viewWidth = v50,
-			navigateBack = v42
+			renderContent = v51,
+			renderTopBar = v52,
+			topBarHeight = v44,
+			viewWidth = v54,
+			navigateBack = v46
 		})
 	end
 
 	return React.createElement(ProfilePeekView, {
 		bottomDockedContainerHeight = 0,
 		onViewStateChanged = nil,
-		briefViewContentHeight = v58,
-		contentSlot = v47(),
+		briefViewContentHeight = v63,
+		contentSlot = v51(),
 		fullViewContentHeight = UDim.new(1, 0),
-		mountAsFullView = v41,
-		onClosed = v43,
-		topBarHeight = v40,
-		topBarSlot = v48(),
-		viewWidth = UDim.new(0, v49.X.Offset),
-		transitionPercentCallback = function(n1: number) -- line: 155
-			-- upvalues: v36 (copy)
-			v36.setPeekViewOpenPercent(n1)
+		mountAsFullView = v45,
+		onClosed = v47,
+		topBarHeight = v44,
+		topBarSlot = v52(),
+		viewWidth = UDim.new(0, v53.X.Offset),
+		transitionPercentCallback = function(n1: number) -- line: 178
+			-- upvalues: v40 (copy)
+			v40.setPeekViewOpenPercent(n1)
 		end,
 		profileType = if not FFlagProfilePlatformNewProfileHeader then nil else profileType
 	})

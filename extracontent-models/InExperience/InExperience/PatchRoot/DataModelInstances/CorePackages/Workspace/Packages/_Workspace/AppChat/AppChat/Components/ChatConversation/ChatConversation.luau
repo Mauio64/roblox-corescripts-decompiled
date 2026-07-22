@@ -1,4 +1,3 @@
-local AppStorageService = game:GetService("AppStorageService")
 local AppChat = script:FindFirstAncestor("AppChat")
 local AppChatParent = AppChat.Parent
 local Foundation = require(AppChatParent.Foundation)
@@ -15,16 +14,15 @@ local IXPService = game:GetService("IXPService")
 local RoactNavigation = require(AppChatParent.RoactNavigation)
 local MessageList = require(script.Parent.MessageList)
 local ReplyComposeBarContainer = require(script.Parent.ReplyComposeBarContainer)
-local v18 = if not require(AppChat.Flags.FFlagAppChatNewChatInputBar) then require(script.Parent.ChatInputBarDeprecated) else require(script.Parent.ChatInputBar)
+local v17 = if not require(AppChat.Flags.FFlagAppChatNewChatInputBar) then require(script.Parent.ChatInputBarDeprecated) else require(script.Parent.ChatInputBar)
 local UserTypingIndicator = require(script.Parent.UserTypingIndicator)
-local v20 = require(AppChat.Logger):new(script.Name)
+local v19 = require(AppChat.Logger):new(script.Name)
 local withChatPagePadding = require(AppChat.Contexts.ChatPagePadding.withChatPagePadding)
 
 require(AppChat.Models.ConversationChannels)
 
 local StatusCodes = require(AppChatParent.Http).StatusCodes
 local DateTime = require(AppChatParent.Time).DateTime
-local LocalStorageKey = require(AppChatParent.LocalStorage).Enums.LocalStorageKey
 local ChatConversationMoreMenu = require(script.Parent.ChatConversationMoreMenu)
 local KeyboardOffsetEventHandler = require(script.Parent.KeyboardOffsetEventHandler)
 local GlobalLongPressSignal = require(script.Parent.Utils.GlobalLongPressSignal)
@@ -39,51 +37,48 @@ local withRoactChatAnalytics = require(AppChat.LegacyAnalytics.withRoactChatAnal
 local connectTelemetry = require(AppChat.Telemetry.connectTelemetry)
 local ChatConversationTelemetryEvents = require(script.Parent.ChatConversationTelemetryEvents)
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
-local v39 = game:DefineFastFlag("AppChatNewChatInputBarIxpEnabled", false)
-local v40 = game:DefineFastString("AppChatNewChatInputBarIxpLayer", "")
+local v37 = game:DefineFastFlag("AppChatNewChatInputBarIxpEnabled", false)
+local v38 = game:DefineFastString("AppChatNewChatInputBarIxpLayer", "")
 local FFlagAppChatEnableDoubleOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableDoubleOptIn
 local FFlagAppChatUseSwipeForReplies = require(AppChat.Flags.FFlagAppChatUseSwipeForReplies)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
-local EngineFeature = game:GetEngineFeature("ScheduledSquadTooltipSeen")
-local FFlagEnableScheduledSquads = require(AppChatParent.SharedFlags).FFlagEnableScheduledSquads
-local ScheduledPartiesExperimentation = require(AppChatParent.SocialExperiments).ScheduledPartiesExperimentation
-local v49 = if not FFlagAppChatEnableDoubleOptIn then require(script.Parent.ConversationTopModalContainerDeprecated) else require(script.Parent.ConversationTopModalContainer)
+local v44 = if not FFlagAppChatEnableDoubleOptIn then require(script.Parent.ConversationTopModalContainerDeprecated) else require(script.Parent.ConversationTopModalContainer)
 local ConversationBottomModalContainer = require(script.Parent.ConversationModal.ConversationBottomModalContainer)
-local v51 = Roact.PureComponent:extend("ChatConversation")
+local v46 = Roact.PureComponent:extend("ChatConversation")
 
-v51.defaultProps = {
+v46.defaultProps = {
 	topBarHeight = 0,
 	conversationId = nil,
 	conversationTitle = nil,
 	itemList = {},
 	inputBoxRef = nil,
 	wideMode = false,
-	getOlderMessages = function() -- line: 77
+	getOlderMessages = function() -- line: 72
 	end,
 	isDebugEnabled = false,
-	sendMessage = function() -- line: 79
+	sendMessage = function() -- line: 74
 	end,
-	navigateToToast = function() -- line: 80
+	navigateToToast = function() -- line: 75
 	end,
-	markConversationAsRead = function() -- line: 81
+	markConversationAsRead = function() -- line: 76
 	end,
-	postTypingStatus = function() -- line: 82
+	postTypingStatus = function() -- line: 77
 	end,
-	navigateBack = function() -- line: 83
+	navigateBack = function() -- line: 78
 	end,
-	openViewProfile = function() -- line: 84
+	openViewProfile = function() -- line: 79
 	end,
-	updateConversationTitle = function() -- line: 85
+	updateConversationTitle = function() -- line: 80
 	end,
-	openGameDetailsPage = function() -- line: 86
+	openGameDetailsPage = function() -- line: 81
 	end,
-	navigateToScreen = function() -- line: 87
+	navigateToScreen = function() -- line: 82
 	end,
-	navigateToSquadLobby = function() -- line: 88
+	navigateToSquadLobby = function() -- line: 83
 	end,
-	onChatInputBarReady = function() -- line: 89
+	onChatInputBarReady = function() -- line: 84
 	end,
 	viewProfileOnAvatarPressed = true,
 	chatInputPlaceholder = "Say something",
@@ -91,8 +86,7 @@ v51.defaultProps = {
 	invalidMessageTypeText = "PLACEHOLDER This message could not be displayed",
 	messageDefaultNoticeText = "PLACEHOLDER Not everyone in this chat can see your message.",
 	messageModeratedNoticeText = "PLACEHOLDER Your message was moderated and not sent.",
-	newText = not ScheduledPartiesExperimentation.getScheduledPartiesTooltipEnabled() and "" or "New",
-	schedulePartyText = not ScheduledPartiesExperimentation.getScheduledPartiesTooltipEnabled() and "" or "Schedule Party",
+	newText = "New",
 	networkErrorText = "PLACEHOLDER There was a network error, please try again later",
 	unknownUserText = "PLACEHOLDER unknown user",
 	oneUserTyping = "PLACEHOLDER {DISPLAY_NAME} is typing...",
@@ -100,20 +94,20 @@ v51.defaultProps = {
 	severalUsersTyping = "PLACEHOLDER Several users are typing...",
 	bottomModalText = "PLACEHOLDER At this time, Chat is not available with this user.",
 	readingMessagesIsEnabled = true,
-	onConversationUnmount = function() -- line: 107
+	onConversationUnmount = function() -- line: 99
 	end,
 	chatIsVisible = true,
 	moreMenuEnabled = false,
 	keyboardOffset = nil,
 	replyingToMessageId = nil,
 	replyingToMessage = nil,
-	replyingToMessageDispatch = function() -- line: 114
+	replyingToMessageDispatch = function() -- line: 106
 	end,
 	shouldShowChatInputBar = true,
 	shouldDisableChatInputBar = false,
 	shouldShowLegacyBottomModal = false,
 	telemetry = {
-		emit = function() -- line: 119
+		emit = function() -- line: 111
 		end
 	},
 	scrollToTopOnInitialOsaLoad = false,
@@ -122,27 +116,8 @@ v51.defaultProps = {
 	shouldHideMoreMenuButton = false
 }
 
-function v51.init(p1) -- line: 127
-	-- upvalues: EngineFeature (copy), FFlagEnableScheduledSquads (copy), AppStorageService (copy), LocalStorageKey (copy), ScheduledPartiesExperimentation (copy), Roact (copy), UserInputService (copy), memoize (copy), v20 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), FFlagAppChatSignalsReplyStore (copy), StatusCodes (copy), SendMessageError (copy), ChatConversationTelemetryEvents (copy), DateTime (copy), FFlagAppChatReplyComposeBarContainer (copy), ConversationExitType (copy), FFlagAppChatUseSwipeForReplies (copy), GetReplyingToStore (copy), GlobalLongPressSignal (copy), FocusNavigationService (copy), CoreGui (copy)
-	local v53 = nil
-
-	if EngineFeature and (FFlagEnableScheduledSquads and not p1.props.shouldHideMoreMenuButton) then
-		local ok, result = pcall(function() -- line: 131
-			-- upvalues: AppStorageService (copy), LocalStorageKey (copy)
-			return AppStorageService:GetItem(LocalStorageKey.ScheduledSquadTooltipSeen)
-		end)
-
-		if ok and result == "false" then
-			if ScheduledPartiesExperimentation.getScheduledPartiesTooltipEnabled() then
-				v53 = `{ p1.props.newText }: { p1.props.schedulePartyText }`
-			end
-
-			AppStorageService:SetItem(LocalStorageKey.ScheduledSquadTooltipSeen, "true")
-			AppStorageService:Flush()
-			ScheduledPartiesExperimentation.logExposure()
-		end
-	end
-
+function v46.init(p1) -- line: 119
+	-- upvalues: Roact (copy), UserInputService (copy), memoize (copy), v19 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), FFlagAppChatSignalsReplyStore (copy), StatusCodes (copy), SendMessageError (copy), ChatConversationTelemetryEvents (copy), DateTime (copy), FFlagAppChatReplyComposeBarContainer (copy), ConversationExitType (copy), FFlagAppChatUseSwipeForReplies (copy), GetReplyingToStore (copy), GlobalLongPressSignal (copy), FocusNavigationService (copy), CoreGui (copy)
 	p1.state = {
 		inputBarHeight = 0,
 		keyboardOffset = 0,
@@ -150,44 +125,44 @@ function v51.init(p1) -- line: 127
 		conversationBannerHeight = 0,
 		messageListHeight = 0,
 		bottomModalHeight = 0,
-		tooltipText = if not FFlagEnableScheduledSquads then nil else v53
+		tooltipText = ""
 	}
 	p1.inputBoxRef = p1.props.inputBoxRef or Roact.createRef()
 	p1.inputBarRef = Roact.createRef()
 	p1.conversationViewRef = Roact.createRef()
 	p1.messageListRef = Roact.createRef()
 
-	function p1.getKeyboardOffset() -- line: 162
+	function p1.getKeyboardOffset() -- line: 135
 		-- upvalues: UserInputService (copy), p1 (copy)
 		if UserInputService.OnScreenKeyboardVisible and (p1.inputBoxRef:getValue() and p1.inputBoxRef:getValue():IsFocused()) then
 			if p1.props.keyboardOffset ~= nil then
 				return p1.props.keyboardOffset
 			end
 
-			local v75 = p1.conversationViewRef:getValue()
+			local v67 = p1.conversationViewRef:getValue()
 
-			if v75 then
-				return v75.AbsolutePosition.Y + v75.AbsoluteSize.Y - UserInputService.OnScreenKeyboardPosition.Y
+			if v67 then
+				return v67.AbsolutePosition.Y + v67.AbsoluteSize.Y - UserInputService.OnScreenKeyboardPosition.Y
 			end
 		end
 
 		return 0
 	end
-	function p1.updateKeyboardOffset() -- line: 185
+	function p1.updateKeyboardOffset() -- line: 158
 		-- upvalues: p1 (copy)
 		if not p1.isMounted then
 			return
 		end
 
-		local v76 = p1.getKeyboardOffset()
+		local v68 = p1.getKeyboardOffset()
 
-		if v76 ~= p1.state.keyboardOffset then
+		if v68 ~= p1.state.keyboardOffset then
 			p1:setState({
-				keyboardOffset = v76
+				keyboardOffset = v68
 			})
 		end
 	end
-	function p1.onKeyboardOffsetChanged(p2) -- line: 197
+	function p1.onKeyboardOffsetChanged(p2) -- line: 170
 		-- upvalues: p1 (copy)
 		if not p1.isMounted then
 			return
@@ -203,30 +178,30 @@ function v51.init(p1) -- line: 127
 			})
 		end
 	end
-	function p1.clearKeyboardOffset() -- line: 214
+	function p1.clearKeyboardOffset() -- line: 187
 		-- upvalues: p1 (copy)
 		p1:setState({
 			keyboardOffset = 0
 		})
 	end
 
-	p1.loadNext = memoize(function(p3, p4) -- line: 220
+	p1.loadNext = memoize(function(p3, p4) -- line: 193
 		-- upvalues: p1 (copy)
-		return function() -- line: 221
+		return function() -- line: 194
 			-- upvalues: p3 (copy), p4 (copy), p1 (copy)
-			local v108 = p3(p4)
+			local v100 = p3(p4)
 
-			if v108 then
-				v108:catch(function() -- line: 224
+			if v100 then
+				v100:catch(function() -- line: 197
 					-- upvalues: p1 (copy)
 					p1.showNetworkErrorToast()
 				end)
 			end
 		end
 	end)
-	p1.markAsRead = memoize(function(p5, p6) -- line: 231
+	p1.markAsRead = memoize(function(p5, p6) -- line: 204
 		-- upvalues: p1 (copy)
-		return function() -- line: 232
+		return function() -- line: 205
 			-- upvalues: p1 (copy), p5 (copy), p6 (copy)
 			if p1.props.readingMessagesIsEnabled then
 				p5(p6)
@@ -234,7 +209,7 @@ function v51.init(p1) -- line: 127
 		end
 	end)
 
-	function p1.showNetworkErrorToast() -- line: 239
+	function p1.showNetworkErrorToast() -- line: 212
 		-- upvalues: p1 (copy)
 		p1.props.navigateToToast({
 			toastProps = {
@@ -245,27 +220,27 @@ function v51.init(p1) -- line: 127
 		})
 	end
 
-	p1.onSendChat = memoize(function(p7, p8, p9, p10, p11, p12, p13, p14) -- line: 250
-		-- upvalues: v20 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), FFlagAppChatSignalsReplyStore (copy), p1 (copy), StatusCodes (copy), SendMessageError (copy), ChatConversationTelemetryEvents (copy), DateTime (copy)
-		return function(p15) -- line: 260
-			-- upvalues: p11 (copy), v20 (copy), p8 (ref), p12 (copy), p10 (copy), p13 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), FFlagAppChatSignalsReplyStore (copy), p1 (copy), p7 (copy), StatusCodes (copy), p9 (copy), SendMessageError (copy), p14 (copy), ChatConversationTelemetryEvents (copy), DateTime (copy)
+	p1.onSendChat = memoize(function(p7, p8, p9, p10, p11, p12, p13, p14) -- line: 223
+		-- upvalues: v19 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), FFlagAppChatSignalsReplyStore (copy), p1 (copy), StatusCodes (copy), SendMessageError (copy), ChatConversationTelemetryEvents (copy), DateTime (copy)
+		return function(p15) -- line: 233
+			-- upvalues: p11 (copy), v19 (copy), p8 (ref), p12 (copy), p10 (copy), p13 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), FFlagAppChatSignalsReplyStore (copy), p1 (copy), p7 (copy), StatusCodes (copy), p9 (copy), SendMessageError (copy), p14 (copy), ChatConversationTelemetryEvents (copy), DateTime (copy)
 			if p11 and p11.source == "friends" then
-				v20:info("Creating a conversation for friend conversation {} via onSendChat", p8)
+				v19:info("Creating a conversation for friend conversation {} via onSendChat", p8)
 
-				local v110, v111 = p12(p8, p10):await()
+				local v102, v103 = p12(p8, p10):await()
 
-				if not v110 or not v111 then
-					v20:error("Could not create conversation. Error: {}", (tostring(v111)))
+				if not v102 or not v103 then
+					v19:error("Could not create conversation. Error: {}", (tostring(v103)))
 
 					return
 				end
 
-				v20:debug("Created conversation {} for friend conversation {} via onSendChat", v111.id, p8)
-				p8 = v111.id
-				p13(v111.id)
+				v19:debug("Created conversation {} for friend conversation {} via onSendChat", v103.id, p8)
+				p8 = v103.id
+				p13(v103.id)
 			end
 
-			v20:info("Sending message '{}' to conversationId {} via onSendChat", p15, p8)
+			v19:info("Sending message '{}' to conversationId {} via onSendChat", p15, p8)
 
 			if FFlagAppChatPerfTracking then
 				if FFlagAppChatMessageTTIMilestones then
@@ -292,10 +267,10 @@ function v51.init(p1) -- line: 127
 				t1 = p1.props.replyingToMessage
 			end
 
-			local v113 = p7(p8, p15, t1)
+			local v105 = p7(p8, p15, t1)
 
-			if v113 then
-				v113:andThen(function(p16) -- line: 305
+			if v105 then
+				v105:andThen(function(p16) -- line: 278
 					-- upvalues: StatusCodes (copy), p1 (copy), p9 (copy), p8 (ref)
 					if p16 and p16.StatusCode == StatusCodes.CONFLICT then
 						p1.showNetworkErrorToast()
@@ -318,25 +293,25 @@ function v51.init(p1) -- line: 127
 				recipientIds = p1.props.recipientIdsSerialized
 			}
 
-			if not v113 then
+			if not v105 then
 				p14.emit(ChatConversationTelemetryEvents.ConversationMessageSent, t2)
 
 				return
 			end
 
-			v113:andThen(function(p17) -- line: 329
+			v105:andThen(function(p17) -- line: 302
 				-- upvalues: SendMessageError (copy), StatusCodes (copy), DateTime (copy), p14 (copy), ChatConversationTelemetryEvents (copy), p1 (copy)
 				local id = nil
 				local id2 = nil
 				local sender_user_id = nil
 				local str = nil
-				local v127 = nil
-				local v128 = p17 and p17.StatusCode
+				local v119 = nil
+				local v120 = p17 and p17.StatusCode
 				local NoResponse
 
 				if not p17 then
 					NoResponse = SendMessageError.NoResponse
-				elseif v128 == StatusCodes.CONFLICT then
+				elseif v120 == StatusCodes.CONFLICT then
 					NoResponse = SendMessageError.Conflict
 				elseif not p17.responseBody then
 					NoResponse = SendMessageError.NoResponseBody
@@ -354,7 +329,7 @@ function v51.init(p1) -- line: 127
 						id2 = replies_to.id
 						sender_user_id = replies_to.sender_user_id
 						str = tostring(DateTime.fromIsoDate(replies_to.created_at).dateTime)
-						v127 = if not replies_to.content then nil else #replies_to.content
+						v119 = if not replies_to.content then nil else #replies_to.content
 					end
 				end
 
@@ -365,17 +340,17 @@ function v51.init(p1) -- line: 127
 					targetMessageId = id2,
 					targetMessageSenderId = sender_user_id,
 					targetMessageSentAt = str,
-					targetMessageLength = v127
+					targetMessageLength = v119
 				})
-			end):catch(function() -- line: 379
+			end):catch(function() -- line: 352
 				-- upvalues: p14 (copy), ChatConversationTelemetryEvents (copy), t2 (copy)
 				p14.emit(ChatConversationTelemetryEvents.ConversationMessageSent, t2)
 			end)
 		end
 	end)
-	p1.onSendBtnClicked = memoize(function(p18) -- line: 386
+	p1.onSendBtnClicked = memoize(function(p18) -- line: 359
 		-- upvalues: ChatConversationTelemetryEvents (copy)
-		return function(s1: string?) -- line: 389
+		return function(s1: string?) -- line: 362
 			-- upvalues: p18 (copy), ChatConversationTelemetryEvents (copy)
 			p18.emit(ChatConversationTelemetryEvents.ConversationSendBtnClicked, {
 				sendBtnClickResult = s1
@@ -383,12 +358,12 @@ function v51.init(p1) -- line: 127
 		end
 	end)
 
-	function p1.isMoreMenuEnabled() -- line: 396
+	function p1.isMoreMenuEnabled() -- line: 369
 		-- upvalues: p1 (copy)
 		return p1.props.moreMenuEnabled
 	end
 
-	p1.reportInputBarReady = if not FFlagAppChatPerfTracking then nil else function(n1: number) -- line: 401
+	p1.reportInputBarReady = if not FFlagAppChatPerfTracking then nil else function(n1: number) -- line: 374
 		-- upvalues: p1 (copy)
 		if p1.props.onChatInputBarReady and (p1.props.shouldShowChatInputBar and n1 > 0) then
 			p1.props.onChatInputBarReady()
@@ -396,13 +371,13 @@ function v51.init(p1) -- line: 127
 	end
 
 	if p1.isMoreMenuEnabled() or FFlagAppChatReplyComposeBarContainer then
-		function p1.onHeightChanged(p19) -- line: 409
+		function p1.onHeightChanged(p19) -- line: 382
 			-- upvalues: FFlagAppChatPerfTracking (copy), p1 (copy)
 			if FFlagAppChatPerfTracking then
 				p1.reportInputBarReady(p19.AbsoluteSize.Y)
 			end
 
-			p1:setState(function(p20, _) -- line: 414
+			p1:setState(function(p20, _) -- line: 387
 				-- upvalues: p19 (copy)
 				if p19.AbsoluteSize.Y ~= p20.inputBarHeight then
 					return {
@@ -414,13 +389,13 @@ function v51.init(p1) -- line: 127
 			end)
 		end
 	else
-		function p1.onHeightChanged(p22) -- line: 423
+		function p1.onHeightChanged(p22) -- line: 396
 			-- upvalues: FFlagAppChatPerfTracking (copy), p1 (copy)
 			if FFlagAppChatPerfTracking then
 				p1.reportInputBarReady(p22)
 			end
 
-			p1:setState(function(p23, _) -- line: 428
+			p1:setState(function(p23, _) -- line: 401
 				-- upvalues: p22 (copy)
 				if p22 ~= p23.inputBarHeight then
 					return {
@@ -435,7 +410,7 @@ function v51.init(p1) -- line: 127
 
 	p1.lastTypingRequest = 0
 
-	function p1.chatInputTextChanged() -- line: 439
+	function p1.chatInputTextChanged() -- line: 412
 		-- upvalues: p1 (copy)
 		if p1.props.conversation and p1.props.conversation.source == "friends" then
 			return
@@ -452,7 +427,7 @@ function v51.init(p1) -- line: 127
 	p1.exitTypeForAnalytics = ConversationExitType.Default
 
 	if not FFlagAppChatUseSwipeForReplies then
-		function p1.onTouchSwipe(_, p26, p27) -- line: 455
+		function p1.onTouchSwipe(_, p26, p27) -- line: 428
 			-- upvalues: p1 (copy), ConversationExitType (copy)
 			if not p1.props.wideMode and (p26 == Enum.SwipeDirection.Right and p27 == 1) then
 				p1.exitTypeForAnalytics = ConversationExitType.SwipedRight
@@ -461,18 +436,18 @@ function v51.init(p1) -- line: 127
 		end
 	end
 
-	function p1.fireAnalyticsEventOnUnmount() -- line: 463
+	function p1.fireAnalyticsEventOnUnmount() -- line: 436
 		-- upvalues: p1 (copy), ConversationExitType (copy)
 		p1.props.onConversationUnmount(p1.exitTypeForAnalytics)
 		p1.exitTypeForAnalytics = ConversationExitType.Default
 	end
-	function p1.closeKeyboard() -- line: 470
+	function p1.closeKeyboard() -- line: 443
 		-- upvalues: p1 (copy)
 		if p1.inputBoxRef:getValue() then
 			p1.inputBoxRef:getValue():ReleaseFocus()
 		end
 	end
-	function p1.closeReplying() -- line: 476
+	function p1.closeReplying() -- line: 449
 		-- upvalues: FFlagAppChatSignalsReplyStore (copy), GetReplyingToStore (copy), p1 (copy)
 		if FFlagAppChatSignalsReplyStore then
 			GetReplyingToStore(false).clear()
@@ -482,29 +457,29 @@ function v51.init(p1) -- line: 127
 
 		p1.props.replyingToMessageDispatch(nil)
 	end
-	function p1.onPointerInput() -- line: 483
+	function p1.onPointerInput() -- line: 456
 		-- upvalues: GlobalLongPressSignal (copy), p1 (copy)
 		GlobalLongPressSignal.dismiss()
 		p1.closeKeyboard()
 	end
-	function p1.onSizeChange() -- line: 488
+	function p1.onSizeChange() -- line: 461
 		-- upvalues: p1 (copy)
 		p1.updateKeyboardOffset()
 	end
-	function p1.calculateScrollOffset(p28) -- line: 492
+	function p1.calculateScrollOffset(p28) -- line: 465
 		local CanvasPositionY = p28.CanvasPosition.Y
 		local AbsoluteCanvasSizeY = p28.AbsoluteCanvasSize.Y
 		local AbsoluteWindowSizeY = p28.AbsoluteWindowSize.Y
 
 		return AbsoluteCanvasSizeY - CanvasPositionY - AbsoluteWindowSizeY
 	end
-	function p1.setBannerHeight(p29) -- line: 499
+	function p1.setBannerHeight(p29) -- line: 472
 		-- upvalues: p1 (copy)
 		p1:setState({
 			conversationBannerHeight = p29
 		})
 	end
-	function p1.setBottomModalHeight(p30) -- line: 505
+	function p1.setBottomModalHeight(p30) -- line: 478
 		-- upvalues: p1 (copy)
 		p1:setState({
 			bottomModalHeight = p30
@@ -512,7 +487,7 @@ function v51.init(p1) -- line: 127
 	end
 
 	if not FFlagAppChatReplyComposeBarContainer then
-		function p1.setReplyComposeBarHeight(p31) -- line: 512
+		function p1.setReplyComposeBarHeight(p31) -- line: 485
 			-- upvalues: p1 (copy)
 			p1:setState({
 				replyComposeBarHeight = p31
@@ -520,7 +495,7 @@ function v51.init(p1) -- line: 127
 		end
 	end
 
-	function p1.onMessageListSizeChange(p32) -- line: 519
+	function p1.onMessageListSizeChange(p32) -- line: 492
 		-- upvalues: p1 (copy)
 		p1:setState({
 			messageListHeight = p32.AbsoluteSize.Y
@@ -529,38 +504,38 @@ function v51.init(p1) -- line: 127
 
 	p1.focusNavigationService = FocusNavigationService.new(CoreGui)
 end
-function v51.didMount(p33) -- line: 527
-	-- upvalues: FocusBehaviors (copy), v39 (copy), IXPService (copy), v40 (copy)
+function v46.didMount(p33) -- line: 500
+	-- upvalues: FocusBehaviors (copy), v37 (copy), IXPService (copy), v38 (copy)
 	p33.isMounted = true
 	p33.markAsRead(p33.props.markConversationAsRead, p33.props.conversationId)()
 
-	local v57 = p33.conversationViewRef:getValue()
-	local v58 = p33.inputBarRef:getValue()
+	local v49 = p33.conversationViewRef:getValue()
+	local v50 = p33.inputBarRef:getValue()
 
-	p33.focusNavigationService:registerFocusBehavior(v57, FocusBehaviors.mostRecentOrDefault(v58))
+	p33.focusNavigationService:registerFocusBehavior(v49, FocusBehaviors.mostRecentOrDefault(v50))
 
 	if not p33.props.wideMode and p33.focusNavigationService.focusedGuiObject:getValue() ~= nil then
-		p33.focusNavigationService:focusGuiObject(v58)
+		p33.focusNavigationService:focusGuiObject(v50)
 	end
 
-	if v39 and p33.props.shouldShowChatInputBar then
-		IXPService:LogFlagLinkedUserLayerExposure(v40)
+	if v37 and p33.props.shouldShowChatInputBar then
+		IXPService:LogFlagLinkedUserLayerExposure(v38)
 	end
 end
-function v51.willUpdate(p34, p35, _) -- line: 543
+function v46.willUpdate(p34, p35, _) -- line: 516
 	if p35.chatIsVisible ~= p34.props.chatIsVisible and not p35.chatIsVisible then
 		p34.closeKeyboard()
 	end
 end
-function v51.didUpdate(p37, p38, p39) -- line: 549
+function v46.didUpdate(p37, p38, p39) -- line: 522
 	-- upvalues: FFlagAppChatPerfTracking (copy)
 	if p37.props.wideMode and p37.props.navigation.getParam("navigatedWithFocus") then
-		local v65 = p37.inputBarRef:getValue()
+		local v57 = p37.inputBarRef:getValue()
 
 		p37.props.navigation.setParams({
 			navigatedWithFocus = false
 		})
-		p37.focusNavigationService:focusGuiObject(v65)
+		p37.focusNavigationService:focusGuiObject(v57)
 	end
 
 	if p38.conversationId ~= p37.props.conversationId then
@@ -581,41 +556,41 @@ function v51.didUpdate(p37, p38, p39) -- line: 549
 		p37.reportInputBarReady(p37.state.inputBarHeight)
 	end
 
-	local v66 = p37.messageListRef and (p37.messageListRef.current and p37.messageListRef.current._listRef)
-	local v67 = v66 and (v66._scrollRef and v66._scrollRef.getNativeScrollRef())
-	local v68 = p37.state.messageListHeight - p39.messageListHeight
+	local v58 = p37.messageListRef and (p37.messageListRef.current and p37.messageListRef.current._listRef)
+	local v59 = v58 and (v58._scrollRef and v58._scrollRef.getNativeScrollRef())
+	local v60 = p37.state.messageListHeight - p39.messageListHeight
 
-	if v66 and v67 and p39.messageListHeight ~= 0 and v68 ~= 0 then
-		local v69 = p37.calculateScrollOffset(v67._nativeRef.current)
+	if v58 and v59 and p39.messageListHeight ~= 0 and v60 ~= 0 then
+		local v61 = p37.calculateScrollOffset(v59._nativeRef.current)
 
-		if v69 <= 0 then
+		if v61 <= 0 then
 			return
 		end
 
-		v66:scrollToOffset({
-			offset = v69 + v68
+		v58:scrollToOffset({
+			offset = v61 + v60
 		})
 	end
 end
-function v51.willUnmount(p40) -- line: 607
+function v46.willUnmount(p40) -- line: 580
 	p40.fireAnalyticsEventOnUnmount()
 	p40.closeReplying()
 	p40.keyboardConnections = {}
 	p40.isMounted = false
 	p40.focusNavigationService:teardown()
 end
-function v51.render(p41) -- line: 615
-	-- upvalues: withRoactChatAnalytics (copy), withStyle (copy), withChatPagePadding (copy), Roact (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v49 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), MessageList (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), FFlagEnableScheduledSquads (copy), v18 (copy), ConversationBottomModalContainer (copy)
-	local v72 = #p41.props.usersTyping > 0 and p41.props.displayNamesAvailable
-	local v73 = not not p41.props.conversation and p41.props.conversation.source == "friends"
-	local v74 = "MessageList" .. tostring(p41.props.conversationId)
+function v46.render(p41) -- line: 588
+	-- upvalues: withRoactChatAnalytics (copy), withStyle (copy), withChatPagePadding (copy), Roact (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v44 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), MessageList (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), v17 (copy), ConversationBottomModalContainer (copy)
+	local v64 = #p41.props.usersTyping > 0 and p41.props.displayNamesAvailable
+	local v65 = not not p41.props.conversation and p41.props.conversation.source == "friends"
+	local v66 = "MessageList" .. tostring(p41.props.conversationId)
 
-	return withRoactChatAnalytics(function(p42) -- line: 626
-		-- upvalues: withStyle (copy), withChatPagePadding (copy), p41 (copy), Roact (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v49 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), v74 (copy), MessageList (copy), v73 (copy), v72 (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), FFlagEnableScheduledSquads (copy), v18 (copy), ConversationBottomModalContainer (copy)
-		return withStyle(function(p43) -- line: 627
-			-- upvalues: withChatPagePadding (copy), p41 (copy), Roact (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v49 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), v74 (copy), MessageList (copy), v73 (copy), v72 (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), FFlagEnableScheduledSquads (copy), v18 (copy), p42 (copy), ConversationBottomModalContainer (copy)
-			return withChatPagePadding(function(p44) -- line: 628
-				-- upvalues: p41 (copy), Roact (copy), p43 (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v49 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), v74 (copy), MessageList (copy), v73 (copy), v72 (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), FFlagEnableScheduledSquads (copy), v18 (copy), p42 (copy), ConversationBottomModalContainer (copy)
+	return withRoactChatAnalytics(function(p42) -- line: 599
+		-- upvalues: withStyle (copy), withChatPagePadding (copy), p41 (copy), Roact (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v44 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), v66 (copy), MessageList (copy), v65 (copy), v64 (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), v17 (copy), ConversationBottomModalContainer (copy)
+		return withStyle(function(p43) -- line: 600
+			-- upvalues: withChatPagePadding (copy), p41 (copy), Roact (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v44 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), v66 (copy), MessageList (copy), v65 (copy), v64 (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), v17 (copy), p42 (copy), ConversationBottomModalContainer (copy)
+			return withChatPagePadding(function(p44) -- line: 601
+				-- upvalues: p41 (copy), Roact (copy), p43 (copy), FFlagAppChatUseSwipeForReplies (copy), KeyboardOffsetEventHandler (copy), v44 (copy), FFlagAppChatEnableDoubleOptIn (copy), FFlagAppChatReplyComposeBarContainer (copy), v66 (copy), MessageList (copy), v65 (copy), v64 (copy), UserTypingIndicator (copy), React (copy), Foundation (copy), FFlagAppChatSignalsReplyStore (copy), FFlagAppChatSmartSuggestions (copy), SmartSuggestionsChipRow (copy), ReplyComposeBarContainer (copy), ChatConversationMoreMenu (copy), v17 (copy), p42 (copy), ConversationBottomModalContainer (copy)
 				local uDim = nil
 
 				if p41.isMoreMenuEnabled() then
@@ -647,7 +622,7 @@ function v51.render(p41) -- line: 615
 						HorizontalAlignment = if not p41.isMoreMenuEnabled() then Enum.HorizontalAlignment.Right else nil,
 						SortOrder = Enum.SortOrder.LayoutOrder
 					}),
-					ConversationTopModal = Roact.createElement(v49, {
+					ConversationTopModal = Roact.createElement(v44, {
 						layoutOrder = 1,
 						conversationId = if not FFlagAppChatEnableDoubleOptIn then nil else p41.props.conversationId,
 						conversation = if not FFlagAppChatEnableDoubleOptIn then p41.props.conversation else nil,
@@ -661,13 +636,13 @@ function v51.render(p41) -- line: 615
 						[Roact.Change.AbsoluteSize] = p41.onMessageListSizeChange,
 						Size = UDim2.new(1, 0, 1, -p41.state.inputBarHeight - p41.state.keyboardOffset - (FFlagAppChatReplyComposeBarContainer and 0 or p41.state.replyComposeBarHeight) - p41.state.conversationBannerHeight - p41.state.bottomModalHeight)
 					}, {
-						[v74] = Roact.createElement(MessageList, {
+						[v66] = Roact.createElement(MessageList, {
 							bottomMargin = 28,
 							Size = UDim2.new(1, 0, 1, 0),
 							conversationId = p41.props.conversationId,
 							isDebugEnabled = p41.props.isDebugEnabled,
 							itemList = p41.props.itemList,
-							loadNext = if not v73 then p41.loadNext(p41.props.getOlderMessages, p41.props.conversationId) else nil,
+							loadNext = if not v65 then p41.loadNext(p41.props.getOlderMessages, p41.props.conversationId) else nil,
 							localUserId = p41.props.localUserId,
 							markAsRead = p41.markAsRead(p41.props.markConversationAsRead, p41.props.conversationId),
 							messageListRef = p41.messageListRef,
@@ -687,7 +662,7 @@ function v51.render(p41) -- line: 615
 							scrollToTopOnInitialOsaLoad = p41.props.scrollToTopOnInitialOsaLoad,
 							isInitialMessageLoading = p41.props.isInitialMessageLoading
 						}),
-						UserTypingIndicator = v72 and Roact.createElement(UserTypingIndicator, {
+						UserTypingIndicator = v64 and Roact.createElement(UserTypingIndicator, {
 							ZIndex = 2,
 							height = 28,
 							AnchorPoint = Vector2.new(0, 1),
@@ -736,9 +711,9 @@ function v51.render(p41) -- line: 615
 								conversationId = p41.props.conversationId,
 								navigateToSquadLobby = p41.props.navigateToSquadLobby,
 								showButtonText = not p41.props.shouldShowChatInputBar,
-								tooltipText = not FFlagEnableScheduledSquads and "" or p41.state.tooltipText
+								tooltipText = p41.state.tooltipText
 							}),
-							ChatInputBar = if not p41.props.shouldShowChatInputBar then nil else Roact.createElement(v18, {
+							ChatInputBar = if not p41.props.shouldShowChatInputBar then nil else Roact.createElement(v17, {
 								LayoutOrder = 2,
 								onFocusLost = p41.clearKeyboardOffset,
 								conversationId = p41.props.conversationId,
@@ -757,7 +732,7 @@ function v51.render(p41) -- line: 615
 								moreMenuEnabled = p41.isMoreMenuEnabled()
 							})
 						}),
-						ChatInputBar = if p41.isMoreMenuEnabled() or not p41.props.shouldShowChatInputBar then nil else Roact.createElement(v18, {
+						ChatInputBar = if p41.isMoreMenuEnabled() or not p41.props.shouldShowChatInputBar then nil else Roact.createElement(v17, {
 							LayoutOrder = 4,
 							onFocusLost = p41.clearKeyboardOffset,
 							conversationId = p41.props.conversationId,
@@ -802,9 +777,9 @@ function v51.render(p41) -- line: 615
 							conversationId = p41.props.conversationId,
 							navigateToSquadLobby = p41.props.navigateToSquadLobby,
 							showButtonText = not p41.props.shouldShowChatInputBar,
-							tooltipText = not FFlagEnableScheduledSquads and "" or p41.state.tooltipText
+							tooltipText = p41.state.tooltipText
 						}),
-						ChatInputBar = if not p41.props.shouldShowChatInputBar then nil else Roact.createElement(v18, {
+						ChatInputBar = if not p41.props.shouldShowChatInputBar then nil else Roact.createElement(v17, {
 							LayoutOrder = 2,
 							onFocusLost = p41.clearKeyboardOffset,
 							conversationId = p41.props.conversationId,
@@ -823,7 +798,7 @@ function v51.render(p41) -- line: 615
 							moreMenuEnabled = p41.props.moreMenuEnabled
 						})
 					}),
-					ChatInputBar = if FFlagAppChatReplyComposeBarContainer or (p41.isMoreMenuEnabled() or not p41.props.shouldShowChatInputBar) then nil else Roact.createElement(v18, {
+					ChatInputBar = if FFlagAppChatReplyComposeBarContainer or (p41.isMoreMenuEnabled() or not p41.props.shouldShowChatInputBar) then nil else Roact.createElement(v17, {
 						LayoutOrder = 4,
 						onFocusLost = p41.clearKeyboardOffset,
 						conversationId = p41.props.conversationId,
@@ -856,4 +831,4 @@ function v51.render(p41) -- line: 615
 	end)
 end
 
-return connectTelemetry(ChatConversationTelemetryLayer.Context)(RoactNavigation.withNavigation(v51))
+return connectTelemetry(ChatConversationTelemetryLayer.Context)(RoactNavigation.withNavigation(v46))

@@ -73,7 +73,7 @@ local function InsufficientBalanceSheet(_: {[any]: any}) -- line: 46
 
 					local current = v37.current
 
-					getBalanceAfterPurchaseWebview():andThen(function(p1) -- line: 82
+					getBalanceAfterPurchaseWebview(nil, v33.getNetworkImpl()):andThen(function(p1) -- line: 82
 						-- upvalues: v37 (copy), current (copy), v33 (copy), v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy)
 						if v37.current ~= current then
 							return
@@ -107,7 +107,7 @@ local function InsufficientBalanceSheet(_: {[any]: any}) -- line: 46
 					return
 				end
 
-				getBalanceRequest():andThen(function(p3) -- line: 98
+				getBalanceRequest(nil, v33.getNetworkImpl()):andThen(function(p3) -- line: 98
 					-- upvalues: v33 (copy), v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy)
 					v33.setRobuxBalanceAmount(p3)
 					v33.setBalanceReceivedFromApi(true)

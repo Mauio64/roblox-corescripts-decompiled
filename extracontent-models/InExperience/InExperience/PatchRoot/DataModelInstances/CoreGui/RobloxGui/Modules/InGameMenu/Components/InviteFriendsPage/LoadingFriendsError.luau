@@ -15,22 +15,24 @@ local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
 local FocusHandler = require(ParentParent.Components.Connection.FocusHandler)
 local RootedConnection = require(ParentParent.Components.Connection.RootedConnection)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v18 = Roact.PureComponent:extend("LoadingFriendsError")
+local Image = require(CorePackages.Packages.Foundation).Image
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v20 = Roact.PureComponent:extend("LoadingFriendsError")
 
-v18.validateProps = t.strictInterface({
+v20.validateProps = t.strictInterface({
 	onRetry = t.callback,
 	canCaptureFocus = t.boolean
 })
 
-function v18.init(p1) -- line: 38
+function v20.init(p1) -- line: 43
 	-- upvalues: Roact (copy)
 	p1.buttonRef = Roact.createRef()
 end
-function v18.render(p2) -- line: 42
-	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), GuiService (copy), Button (copy), ButtonType (copy)
+function v20.render(p2) -- line: 47
+	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), TextService (copy), Roact (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), Assets (copy), ImageSetLabel (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), GuiService (copy), Button (copy), ButtonType (copy)
 	local props = p2.props
 
-	return withFoundationOrUIBloxStyle(function(p3) -- line: 45
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 50
 		return {
 			Font = {
 				BaseSize = 1,
@@ -40,15 +42,15 @@ function v18.render(p2) -- line: 42
 				}
 			}
 		}
-	end, function(p4) -- line: 52
-		-- upvalues: withLocalization (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
+	end, function(p4) -- line: 57
+		-- upvalues: withLocalization (copy), TextService (copy), Roact (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), Assets (copy), ImageSetLabel (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
 		return withLocalization({
 			errorOccured = "CoreScripts.InGameMenu.InviteFriends.ErrorOccured"
-		})(function(p5) -- line: 55
-			-- upvalues: p4 (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
+		})(function(p5) -- line: 60
+			-- upvalues: p4 (copy), TextService (copy), Roact (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), Assets (copy), ImageSetLabel (copy), ThemedTextLabel (copy), RootedConnection (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy)
 			local BodyFont = p4.Font.Body.Font
-			local v26 = p4.Font.Body.RelativeSize * p4.Font.BaseSize
-			local Y = TextService:GetTextSize(p5.errorOccured, v26, BodyFont, Vector2.new(304, 1e999)).Y
+			local v28 = p4.Font.Body.RelativeSize * p4.Font.BaseSize
+			local Y = TextService:GetTextSize(p5.errorOccured, v28, BodyFont, Vector2.new(304, 1e999)).Y
 
 			return Roact.createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -62,12 +64,24 @@ function v18.render(p2) -- line: 42
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					SortOrder = Enum.SortOrder.LayoutOrder
 				}),
-				Icon = Roact.createElement(ImageSetLabel, {
+				Icon = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
 					BackgroundTransparency = 1,
 					ImageTransparency = 0.5,
 					LayoutOrder = 1,
 					Image = Assets.Images.Friends,
 					Size = UDim2.new(0, 64, 0, 64)
+				}) else Roact.createElement(Image, {
+					LayoutOrder = 1,
+					Image = Assets.Images.Friends.Image,
+					imageRect = {
+						offset = Assets.Images.Friends.ImageRectOffset,
+						size = Assets.Images.Friends.ImageRectSize
+					},
+					Size = UDim2.new(0, 64, 0, 64),
+					imageStyle = {
+						Transparency = 0.5,
+						Color3 = Color3.new(1, 1, 1)
+					}
 				}),
 				TextContainer = Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
@@ -85,11 +99,11 @@ function v18.render(p2) -- line: 42
 					})
 				}),
 				RootedConnection = Roact.createElement(RootedConnection, {
-					render = function(p6) -- line: 105
+					render = function(p6) -- line: 118
 						-- upvalues: Roact (copy), FocusHandler (copy), props (copy), GuiService (copy), p2 (copy), Button (copy), ButtonType (copy), Assets (copy)
 						return Roact.createElement(FocusHandler, {
 							isFocused = props.canCaptureFocus and p6,
-							didFocus = function() -- line: 109
+							didFocus = function() -- line: 122
 								-- upvalues: GuiService (copy), p2 (copy)
 								GuiService.SelectedCoreObject = p2.buttonRef:getValue()
 							end
@@ -110,4 +124,4 @@ function v18.render(p2) -- line: 42
 	end)
 end
 
-return v18
+return v20

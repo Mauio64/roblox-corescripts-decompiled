@@ -53,7 +53,7 @@ local function ReceiveErrorSheet(_: {[any]: any}) -- line: 64
 	local v38 = if not v33 then nil else v33.failureReason
 	local v39 = v38 == FailureReason.TransferExpired
 
-	React.useEffect(function() -- line: 76
+	React.useEffect(function() -- line: 81
 		-- upvalues: v39 (copy), v34 (copy), v35 (copy), v36 (copy), getTransferRequestByIdRequest (copy), v31 (copy)
 		if not v39 or v34 or (v35 and v35.sender or not v36) then
 			return
@@ -61,12 +61,12 @@ local function ReceiveErrorSheet(_: {[any]: any}) -- line: 64
 
 		getTransferRequestByIdRequest({
 			transferRequestId = v36
-		}):andThen(function(p2) -- line: 86
+		}, nil, v31.getNetworkImpl()):andThen(function(p2) -- line: 91
 			-- upvalues: v31 (copy)
 			if p2 and (p2.transfer and p2.transfer.sender) then
 				v31.setSender(p2.transfer.sender)
 			end
-		end):catch(function() -- line: 91
+		end):catch(function() -- line: 96
 		end)
 	end, {
 		v39,

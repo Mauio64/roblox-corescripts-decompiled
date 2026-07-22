@@ -3,4 +3,4 @@ local ok = pcall(function() -- line: 3
 	return Enum.AvatarAssetType.AvatarBackground
 end)
 
-return game:DefineFastFlag("AXCatalogBackgroundsSupportDev", false) and (FFlagAXBackgroundsRoot and ok)
+return game:DefineFastFlag("AXCatalogBackgroundsSupport", false) and (FFlagAXBackgroundsRoot and ok)

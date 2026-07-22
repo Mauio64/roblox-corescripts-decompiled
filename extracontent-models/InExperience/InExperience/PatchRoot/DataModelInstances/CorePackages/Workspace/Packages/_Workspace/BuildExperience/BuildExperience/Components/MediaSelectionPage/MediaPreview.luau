@@ -3,6 +3,7 @@ local Parent = script:FindFirstAncestor("BuildExperience").Parent
 local React = require(Parent.React)
 local Foundation = require(Parent.Foundation)
 local FoundationImage = Foundation.Image
+local Skeleton = Foundation.Skeleton
 local View = Foundation.View
 local Icon = Foundation.Icon
 local IconButton = Foundation.IconButton
@@ -16,50 +17,67 @@ local useTokens = Foundation.Hooks.useTokens
 
 require(script.Parent.types)
 
-local function MediaPreview(t1: {[any]: any}) -- line: 34
-	-- upvalues: useTokens (copy), React (copy), RunService (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), IconButton (copy), InputSize (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), FoundationImage (copy)
-	local v18 = useTokens()
-	local v19, v20 = React.useState(true)
-	local v21 = React.useRef(nil)
-	local v22, v23 = React.useBinding(0)
-	local v24 = not t1.isIcon and 1.7777777777777777 or 1
-	local v25 = React.useCallback(function() -- line: 42
-		-- upvalues: v20 (copy), v19 (copy)
-		v20(not v19)
-	end, { v19 })
+local function MediaPreview(t1: {[any]: any}) -- line: 37
+	-- upvalues: useTokens (copy), React (copy), RunService (copy), View (copy), Skeleton (copy), Foundation (copy), Icon (copy), IconName (copy), IconSize (copy), IconButton (copy), InputSize (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), FoundationImage (copy)
+	local v19 = useTokens()
+	local v20, v21 = React.useState(true)
+	local v22 = React.useRef(nil)
+	local v23, v24 = React.useBinding(0)
+	local v25 = not t1.isIcon and 1.7777777777777777 or 1
+	local v26 = React.useCallback(function() -- line: 45
+		-- upvalues: v21 (copy), v20 (copy)
+		v21(not v20)
+	end, { v20 })
 
-	React.useEffect(function() -- line: 46
-		-- upvalues: t1 (copy), v21 (copy), RunService (copy), v23 (copy)
+	React.useEffect(function() -- line: 49
+		-- upvalues: t1 (copy), v22 (copy), RunService (copy), v24 (copy)
 		if t1.mediaType ~= "video" then
 			return nil
 		end
 
-		if not v21.current then
+		if not v22.current then
 			return nil
 		end
 
-		local connection = RunService.RenderStepped:Connect(function() -- line: 56
-			-- upvalues: v21 (copy), v23 (copy)
-			local current = v21.current
+		local connection = RunService.RenderStepped:Connect(function() -- line: 59
+			-- upvalues: v22 (copy), v24 (copy)
+			local current = v22.current
 
 			if current and current.TimeLength > 0 then
-				v23(100 * current.TimePosition / current.TimeLength)
+				v24(100 * current.TimePosition / current.TimeLength)
 			end
 		end)
 
-		return function() -- line: 63
+		return function() -- line: 66
 			-- upvalues: connection (copy)
 			connection:Disconnect()
 		end
 	end, { t1.mediaType })
 
-	if not t1.assetSource then
+	if t1.isLoading then
+		return React.createElement(View, {
+			Size = UDim2.fromScale(1, 1),
+			LayoutOrder = t1.LayoutOrder,
+			aspectRatio = {
+				AspectRatio = v25,
+				AspectType = Enum.AspectType.FitWithinMaxSize,
+				DominantAxis = Enum.DominantAxis.Width
+			}
+		}, {
+			LoadingSkeleton = React.createElement(Skeleton, {
+				radius = Foundation.Enums.Radius.Medium,
+				Size = UDim2.fromScale(1, 1)
+			})
+		})
+	end
+
+	if not t1.assetSource and not t1.imageContent then
 		return React.createElement(View, {
 			tag = "align-x-center align-y-center radius-large clip bg-surface-200",
 			Size = UDim2.fromScale(1, 1),
 			LayoutOrder = t1.LayoutOrder,
 			aspectRatio = {
-				AspectRatio = v24,
+				AspectRatio = v25,
 				AspectType = Enum.AspectType.FitWithinMaxSize,
 				DominantAxis = Enum.DominantAxis.Width
 			}
@@ -76,7 +94,7 @@ local function MediaPreview(t1: {[any]: any}) -- line: 34
 		return React.createElement(View, {
 			Size = UDim2.fromScale(1, 1),
 			aspectRatio = {
-				AspectRatio = v24,
+				AspectRatio = v25,
 				AspectType = Enum.AspectType.FitWithinMaxSize,
 				DominantAxis = Enum.DominantAxis.Width
 			},
@@ -89,23 +107,24 @@ local function MediaPreview(t1: {[any]: any}) -- line: 34
 				BorderSizePixel = 0,
 				Size = UDim2.fromScale(1, 1),
 				Video = t1.assetSource,
-				Playing = v19,
-				ref = v21
+				VideoContent = t1.imageContent,
+				Playing = v20,
+				ref = v22
 			}, {
 				UICorner = React.createElement("UICorner", {
 					CornerRadius = UDim.new(0, 12)
 				}),
 				PlayPauseButton = React.createElement(IconButton, {
-					Position = UDim2.new(0, 0, 1, -v18.Gap.XSmall),
+					Position = UDim2.new(0, 0, 1, -v19.Gap.XSmall),
 					AnchorPoint = Vector2.new(0, 1),
-					icon = if not v19 then IconName.PlaySmall else IconName.PauseSmall,
+					icon = if not v20 then IconName.PlaySmall else IconName.PauseSmall,
 					size = InputSize.Small,
-					onActivated = v25
+					onActivated = v26
 				})
 			}),
 			ProgressBar = React.createElement(Progress, {
-				Position = UDim2.new(0, 0, 1, v18.Gap.Medium),
-				value = v22,
+				Position = UDim2.new(0, 0, 1, v19.Gap.Medium),
+				value = v23,
 				shape = ProgressShape.Bar,
 				size = ProgressSize.Medium
 			})
@@ -117,15 +136,24 @@ local function MediaPreview(t1: {[any]: any}) -- line: 34
 		Size = UDim2.fromScale(1, 1),
 		LayoutOrder = t1.LayoutOrder,
 		aspectRatio = {
-			AspectRatio = v24,
+			AspectRatio = v25,
 			AspectType = Enum.AspectType.FitWithinMaxSize,
 			DominantAxis = Enum.DominantAxis.Width
 		}
 	}, {
-		PreviewImage = React.createElement(FoundationImage, {
+		PreviewImage = if not t1.imageContent then React.createElement(FoundationImage, {
 			tag = "size-full radius-large",
 			Image = t1.assetSource,
-			ScaleType = Enum.ScaleType.Fit
+			ScaleType = Enum.ScaleType.Crop
+		}) else React.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			ImageContent = t1.imageContent,
+			ScaleType = Enum.ScaleType.Crop,
+			Size = UDim2.fromScale(1, 1)
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, 12)
+			})
 		})
 	})
 end

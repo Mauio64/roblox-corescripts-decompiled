@@ -14,7 +14,6 @@ require(Foundation.Components.Types)
 
 local View = require(Components.View)
 local blendTransparencies = require(Foundation.Utility.blendTransparencies)
-local getDisabledStyle = require(Foundation.Utility.getDisabledStyle)
 local mapBindable = require(Foundation.Utility.mapBindable)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local useNumberInputVariants = require(Components.NumberInput.useNumberInputVariants)
@@ -27,54 +26,46 @@ require(Foundation.Enums.InputVariant)
 local NumberInputControlsVariant = require(Foundation.Enums.NumberInputControlsVariant)
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
 
-local function v21(p1) -- line: 70
+local function v20(p1) -- line: 69
 	-- upvalues: useTokens (copy), React (copy), View (copy), withCommonProps (copy), ReactIs (copy), mapBindable (copy)
-	local v28 = useTokens()
-	local uDim = UDim.new(0, v28.Radius.Medium)
-	local v30 = React.useMemo(function() -- line: 74
-		-- upvalues: uDim (copy), v28 (copy)
+	local v27 = useTokens()
+	local uDim = UDim.new(0, v27.Radius.Medium)
+	local v29 = React.useMemo(function() -- line: 73
+		-- upvalues: uDim (copy), v27 (copy)
 		return {
 			radius = uDim,
-			offset = v28.Size.Size_150,
-			borderWidth = v28.Stroke.Thicker
+			offset = v27.Size.Size_150,
+			borderWidth = v27.Stroke.Thicker
 		}
-	end, { v28 })
+	end, { v27 })
 
 	return React.createElement(View, withCommonProps(p1, {
 		onActivated = p1.onActivated,
 		isDisabled = not ReactIs.isBinding(p1.isDisabled) and p1.isDisabled,
 		selection = {
-			Selectable = mapBindable(p1.isDisabled, function(p2) -- line: 88
+			Selectable = mapBindable(p1.isDisabled, function(p2) -- line: 87
 				return not p2
 			end)
 		},
-		cursor = v30,
+		cursor = v29,
 		padding = p1.padding,
 		cornerRadius = uDim,
 		tag = p1.tag
 	}), p1.children)
 end
-local function SplitControls(t1: {[any]: any}) -- line: 102
-	-- upvalues: useTokens (copy), useNumberInputVariants (copy), useTextInputVariants (copy), React (copy), getDisabledStyle (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy), View (copy), ReactIs (copy), StateLayerAffordance (copy), Flags (copy), Icon (copy), BuilderIcons (copy)
-	local v32 = useTokens()
-	local v33 = useNumberInputVariants(v32, t1.size, t1.controlsVariant)
-	local container = useTextInputVariants(v32, t1.size, t1.variant).container
-	local v35 = math.ceil(v32.Stroke.Standard) * 2
-	local uDim2 = UDim2.fromOffset(v33.splitButton.size - v35, v33.splitButton.size - v35)
-	local v37 = React.useCallback(function(b1: boolean) -- line: 115
-		-- upvalues: container (copy), getDisabledStyle (copy)
-		if container.bgStyle then
-			return (getDisabledStyle(container.bgStyle, b1))
-		end
-
-		return nil
-	end, { container.bgStyle })
-	local v38 = React.useCallback(function(p3) -- line: 121
+local function SplitControls(t1: {[any]: any}) -- line: 101
+	-- upvalues: useTokens (copy), useNumberInputVariants (copy), useTextInputVariants (copy), React (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy), View (copy), ReactIs (copy), StateLayerAffordance (copy), Icon (copy), BuilderIcons (copy)
+	local v31 = useTokens()
+	local v32 = useNumberInputVariants(v31, t1.size, t1.controlsVariant)
+	local container = useTextInputVariants(v31, t1.size, t1.variant).container
+	local v34 = math.ceil(v31.Stroke.Standard) * 2
+	local uDim2 = UDim2.fromOffset(v32.splitButton.size - v34, v32.splitButton.size - v34)
+	local v36 = React.useCallback(function(p3) -- line: 114
 		-- upvalues: container (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy)
 		if container.strokeStyle and container.strokeThickness then
 			return {
 				Color = container.strokeStyle.Color3,
-				Transparency = mapBindable(p3, function(p4) -- line: 125
+				Transparency = mapBindable(p3, function(p4) -- line: 118
 					-- upvalues: blendTransparencies (copy), container (copy), Constants (copy)
 					if p4 then
 						return (blendTransparencies(container.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY))
@@ -99,7 +90,7 @@ local function SplitControls(t1: {[any]: any}) -- line: 102
 			onActivated = t1.increment.onClick,
 			isDisabled = not ReactIs.isBinding(t1.increment.isDisabled) and t1.increment.isDisabled,
 			stateLayer = {
-				affordance = mapBindable(t1.increment.isDisabled, function(p5) -- line: 146
+				affordance = mapBindable(t1.increment.isDisabled, function(p5) -- line: 139
 					-- upvalues: StateLayerAffordance (copy)
 					if p5 then
 						return StateLayerAffordance.None
@@ -108,24 +99,20 @@ local function SplitControls(t1: {[any]: any}) -- line: 102
 					return StateLayerAffordance.Background
 				end)
 			},
-			padding = v33.button.padding,
+			padding = v32.button.padding,
 			Size = uDim2,
-			backgroundStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then mapBindable(t1.increment.isDisabled, function(p6) -- line: 154
-				-- upvalues: v37 (copy)
-				return v37(p6)
-			end) else nil,
-			stroke = v38(t1.increment.isDisabled),
-			tag = v33.splitButton.tag,
+			stroke = v36(t1.increment.isDisabled),
+			tag = v32.splitButton.tag,
 			testId = `{ t1.testId }--increment`
 		}, {
 			Icon = React.createElement(Icon, {
 				name = BuilderIcons.Icon.PlusSmall,
 				size = t1.size,
-				style = mapBindable(t1.increment.isDisabled, function(p7) -- line: 165
+				style = mapBindable(t1.increment.isDisabled, function(p6) -- line: 153
 					-- upvalues: Constants (copy)
 					return {
 						Color3 = nil,
-						Transparency = if not p7 then nil else Constants.DISABLED_TRANSPARENCY
+						Transparency = if not p6 then nil else Constants.DISABLED_TRANSPARENCY
 					}
 				end),
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -138,33 +125,29 @@ local function SplitControls(t1: {[any]: any}) -- line: 102
 			onActivated = t1.decrement.onClick,
 			isDisabled = not ReactIs.isBinding(t1.decrement.isDisabled) and t1.decrement.isDisabled,
 			stateLayer = {
-				affordance = mapBindable(t1.decrement.isDisabled, function(p8) -- line: 182
+				affordance = mapBindable(t1.decrement.isDisabled, function(p7) -- line: 170
 					-- upvalues: StateLayerAffordance (copy)
-					if p8 then
+					if p7 then
 						return StateLayerAffordance.None
 					end
 
 					return StateLayerAffordance.Background
 				end)
 			},
-			padding = v33.button.padding,
+			padding = v32.button.padding,
 			Size = uDim2,
-			backgroundStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then mapBindable(t1.decrement.isDisabled, function(p9) -- line: 190
-				-- upvalues: v37 (copy)
-				return v37(p9)
-			end) else nil,
-			stroke = v38(t1.decrement.isDisabled),
-			tag = v33.splitButton.tag,
+			stroke = v36(t1.decrement.isDisabled),
+			tag = v32.splitButton.tag,
 			testId = `{ t1.testId }--decrement`
 		}, {
 			Icon = React.createElement(Icon, {
 				name = BuilderIcons.Icon.MinusSmall,
 				size = t1.size,
-				style = mapBindable(t1.decrement.isDisabled, function(p10) -- line: 201
+				style = mapBindable(t1.decrement.isDisabled, function(p8) -- line: 184
 					-- upvalues: Constants (copy)
 					return {
 						Color3 = nil,
-						Transparency = if not p10 then nil else Constants.DISABLED_TRANSPARENCY
+						Transparency = if not p8 then nil else Constants.DISABLED_TRANSPARENCY
 					}
 				end),
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -174,107 +157,107 @@ local function SplitControls(t1: {[any]: any}) -- line: 102
 		})
 	})
 end
-local function StackedControls(t2: {[any]: any}) -- line: 216
-	-- upvalues: useTokens (copy), useNumberInputVariants (copy), React (copy), mapBindable (copy), Constants (copy), View (copy), v21 (copy), ReactIs (copy), Image (copy)
-	local v40 = useTokens()
-	local v41 = useNumberInputVariants(v40, t2.size, t2.controlsVariant)
-	local v42 = React.useMemo(function() -- line: 220
-		-- upvalues: mapBindable (copy), t2 (copy), v40 (copy), Constants (copy)
-		return mapBindable(t2.increment.isDisabled, function(p11) -- line: 221
-			-- upvalues: v40 (copy), Constants (copy)
+local function StackedControls(t2: {[any]: any}) -- line: 199
+	-- upvalues: useTokens (copy), useNumberInputVariants (copy), React (copy), mapBindable (copy), Constants (copy), View (copy), v20 (copy), ReactIs (copy), Image (copy)
+	local v38 = useTokens()
+	local v39 = useNumberInputVariants(v38, t2.size, t2.controlsVariant)
+	local v40 = React.useMemo(function() -- line: 203
+		-- upvalues: mapBindable (copy), t2 (copy), v38 (copy), Constants (copy)
+		return mapBindable(t2.increment.isDisabled, function(p9) -- line: 204
+			-- upvalues: v38 (copy), Constants (copy)
 			return {
-				Color3 = v40.Color.Stroke.Emphasis.Color3,
-				Transparency = not p11 and 0 or Constants.DISABLED_TRANSPARENCY
+				Color3 = v38.Color.Stroke.Emphasis.Color3,
+				Transparency = not p9 and 0 or Constants.DISABLED_TRANSPARENCY
 			}
 		end)
 	end, {
-		v40,
+		v38,
 		t2.increment.isDisabled
 	})
-	local v43 = React.useMemo(function() -- line: 229
-		-- upvalues: mapBindable (copy), t2 (copy), v40 (copy), Constants (copy)
-		return mapBindable(t2.decrement.isDisabled, function(p12) -- line: 230
-			-- upvalues: v40 (copy), Constants (copy)
+	local v41 = React.useMemo(function() -- line: 212
+		-- upvalues: mapBindable (copy), t2 (copy), v38 (copy), Constants (copy)
+		return mapBindable(t2.decrement.isDisabled, function(p10) -- line: 213
+			-- upvalues: v38 (copy), Constants (copy)
 			return {
-				Color3 = v40.Color.Stroke.Emphasis.Color3,
-				Transparency = not p12 and 0 or Constants.DISABLED_TRANSPARENCY
+				Color3 = v38.Color.Stroke.Emphasis.Color3,
+				Transparency = not p10 and 0 or Constants.DISABLED_TRANSPARENCY
 			}
 		end)
 	end, {
-		v40,
+		v38,
 		t2.decrement.isDisabled
 	})
 
 	return React.createElement(View, {
 		tag = "col",
-		Size = UDim2.new(0, v41.button.width, 1, 0),
+		Size = UDim2.new(0, v39.button.width, 1, 0),
 		LayoutOrder = t2.LayoutOrder
 	}, {
-		ControlIncrement = React.createElement(v21, {
+		ControlIncrement = React.createElement(v20, {
 			onActivated = t2.increment.onClick,
 			isDisabled = not ReactIs.isBinding(t2.increment.isDisabled) and t2.increment.isDisabled,
-			padding = v41.button.padding,
-			tag = v41.upButton.tag,
+			padding = v39.button.padding,
+			tag = v39.upButton.tag,
 			testId = `{ t2.testId }--increment`
 		}, {
 			Icon = React.createElement(Image, {
 				Image = "component_assets/triangleUp_16",
-				imageStyle = v42,
-				tag = v41.icon.tag,
+				imageStyle = v40,
+				tag = v39.icon.tag,
 				testId = `{ t2.testId }--increment-icon`
 			})
 		}),
-		ControlDecrement = React.createElement(v21, {
-			tag = v41.downButton.tag,
+		ControlDecrement = React.createElement(v20, {
+			tag = v39.downButton.tag,
 			onActivated = t2.decrement.onClick,
 			isDisabled = not ReactIs.isBinding(t2.decrement.isDisabled) and t2.decrement.isDisabled,
-			padding = v41.button.padding,
+			padding = v39.button.padding,
 			testId = `{ t2.testId }--decrement`
 		}, {
 			Icon = React.createElement(Image, {
 				Image = "component_assets/triangleDown_16",
-				imageStyle = v43,
-				tag = v41.icon.tag,
+				imageStyle = v41,
+				tag = v39.icon.tag,
 				testId = `{ t2.testId }--decrement-icon`
 			})
 		})
 	})
 end
-local function IncrementButton(t3: {[any]: any}) -- line: 278
+local function IncrementButton(t3: {[any]: any}) -- line: 261
 	-- upvalues: useTokens (copy), React (copy), View (copy), ReactIs (copy), mapBindable (copy), StateLayerAffordance (copy), Icon (copy), blendTransparencies (copy), Constants (copy)
-	local v45 = useTokens()
-	local v46 = React.useMemo(function() -- line: 291
-		-- upvalues: t3 (copy), v45 (copy)
+	local v43 = useTokens()
+	local v44 = React.useMemo(function() -- line: 274
+		-- upvalues: t3 (copy), v43 (copy)
 		return {
 			radius = UDim.new(0, t3.radius),
-			offset = v45.Size.Size_150,
-			borderWidth = v45.Stroke.Thicker
+			offset = v43.Size.Size_150,
+			borderWidth = v43.Stroke.Thicker
 		}
 	end, {
 		t3.radius,
-		v45.Size.Size_150,
-		v45.Stroke.Thicker
+		v43.Size.Size_150,
+		v43.Stroke.Thicker
 	})
 
 	return React.createElement(View, {
 		onActivated = t3.onActivated,
 		isDisabled = not ReactIs.isBinding(t3.isDisabled) and t3.isDisabled,
 		selection = {
-			Selectable = mapBindable(t3.isDisabled, function(p13) -- line: 299
-				return not p13
+			Selectable = mapBindable(t3.isDisabled, function(p11) -- line: 282
+				return not p11
 			end)
 		},
 		stateLayer = {
-			affordance = mapBindable(t3.isDisabled, function(p14) -- line: 304
+			affordance = mapBindable(t3.isDisabled, function(p12) -- line: 287
 				-- upvalues: StateLayerAffordance (copy)
-				if p14 then
+				if p12 then
 					return StateLayerAffordance.None
 				end
 
 				return StateLayerAffordance.Background
 			end)
 		},
-		cursor = v46,
+		cursor = v44,
 		cornerRadius = UDim.new(0, t3.radius),
 		Size = UDim2.fromOffset(t3.size, t3.size),
 		LayoutOrder = t3.LayoutOrder,
@@ -283,18 +266,18 @@ local function IncrementButton(t3: {[any]: any}) -- line: 278
 		Divider = if not t3.hasDivider then nil else React.createElement(View, {
 			AnchorPoint = Vector2.new(0, 0.5),
 			Position = UDim2.fromScale(0, 0.5),
-			Size = UDim2.new(0, v45.Stroke.Standard, 1, 0),
-			backgroundStyle = v45.Color.Stroke.Default,
+			Size = UDim2.new(0, v43.Stroke.Standard, 1, 0),
+			backgroundStyle = v43.Color.Stroke.Default,
 			testId = `{ t3.testId }--divider`
 		}),
 		Icon = React.createElement(Icon, {
 			name = t3.icon,
 			size = t3.iconSize,
-			style = mapBindable(t3.isDisabled, function(p15) -- line: 326
-				-- upvalues: v45 (copy), blendTransparencies (copy), Constants (copy)
+			style = mapBindable(t3.isDisabled, function(p13) -- line: 309
+				-- upvalues: v43 (copy), blendTransparencies (copy), Constants (copy)
 				return {
-					Color3 = v45.Color.ActionUtility.Foreground.Color3,
-					Transparency = if not p15 then v45.Color.ActionUtility.Foreground.Transparency else blendTransparencies(v45.Color.ActionUtility.Foreground.Transparency, Constants.DISABLED_TRANSPARENCY)
+					Color3 = v43.Color.ActionUtility.Foreground.Color3,
+					Transparency = if not p13 then v43.Color.ActionUtility.Foreground.Transparency else blendTransparencies(v43.Color.ActionUtility.Foreground.Transparency, Constants.DISABLED_TRANSPARENCY)
 				}
 			end),
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -303,10 +286,10 @@ local function IncrementButton(t3: {[any]: any}) -- line: 278
 		})
 	})
 end
-local function IncrementControls(t4: {[any]: any}) -- line: 344
+local function IncrementControls(t4: {[any]: any}) -- line: 327
 	-- upvalues: useTokens (copy), useNumberInputVariants (copy), React (copy), View (copy), IncrementButton (copy), BuilderIcons (copy)
-	local v48 = useTokens()
-	local controls = useNumberInputVariants(v48, t4.size, nil).controls
+	local v46 = useTokens()
+	local controls = useNumberInputVariants(v46, t4.size, nil).controls
 
 	return React.createElement(View, {
 		LayoutOrder = 1,
@@ -337,7 +320,7 @@ local function IncrementControls(t4: {[any]: any}) -- line: 344
 		})
 	})
 end
-local function NumberInputControls(t5: {[any]: any}) -- line: 379
+local function NumberInputControls(t5: {[any]: any}) -- line: 362
 	-- upvalues: Flags (copy), React (copy), IncrementControls (copy), NumberInputControlsVariant (copy), StackedControls (copy), SplitControls (copy)
 	if Flags.FoundationNumberInputBeta then
 		return React.createElement(IncrementControls, t5)

@@ -89,6 +89,7 @@ t1.ValidationModule = {
 	AssetBoundsValid = "AssetBoundsValid",
 	BodyMeshSizesConsistent = "BodyMeshSizesConsistent",
 	ExtentsWithinParent = "ExtentsWithinParent",
+	IndividualMeshPartBoundsValid = "IndividualMeshPartBoundsValid",
 	MeshSizePropertyCorrect = "MeshSizePropertyCorrect",
 	LCDeformationWithinBounds = "LCDeformationWithinBounds",
 	VerticesNotCoincident = "VerticesNotCoincident",

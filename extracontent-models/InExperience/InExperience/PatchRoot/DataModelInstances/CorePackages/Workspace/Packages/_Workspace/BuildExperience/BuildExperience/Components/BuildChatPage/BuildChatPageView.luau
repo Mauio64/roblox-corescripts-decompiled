@@ -3,6 +3,7 @@ local BuildExperienceParent = BuildExperience.Parent
 local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local chatConstants = require(BuildExperience.Chat.chatConstants)
 
 require(BuildExperience.Chat.chatTypes)
@@ -13,12 +14,16 @@ local AgentDetailMenu = require(BuildExperience.Components.BuildPillMenu.AgentDe
 local PlayButton = require(BuildExperience.Components.PlayButton.PlayButton)
 local ChatActions = require(BuildExperience.Components.Chat.ChatActions)
 local ChatMessageList = require(BuildExperience.Components.Chat.ChatMessageList)
+local PushNotificationsUpsellCard = require(BuildExperience.Components.Chat.PushNotificationsUpsellCard)
 local SubagentStatus = require(BuildExperience.Components.SubagentStatus)
 
 require(BuildExperience.Stores.GetBuildOverflowMenuStore)
 require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenuStore)
 require(BuildExperience.Chat.useChatSessionCore)
 
+local FFlagEnableBuildExperienceScrollPerformanceTracking = require(BuildExperience.Flags.FFlagEnableBuildExperienceScrollPerformanceTracking)
+local v17 = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil else require(BuildExperience.Telemetry.useScrollPerformanceTracker)
+local Divider = Foundation.Divider
 local IconButton = Foundation.IconButton
 local ScrollView = Foundation.ScrollView
 local FoundationText = Foundation.Text
@@ -26,22 +31,23 @@ local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
+local useTokens = Foundation.Hooks.useTokens
 local SubagentTaskStatus = CreatorAgentChat.SubagentTaskStatus
 
-local function findGroup(p1, s1: string?) -- line: 79
+local function findGroup(p1, s1: string?) -- line: 97
 	if p1 == nil or s1 == nil then
 		return nil
 	end
 
-	for _, v29 in p1.groups do
-		if s1 == v29.name then
-			return v29
+	for _, v35 in p1.groups do
+		if s1 == v35.name then
+			return v35
 		end
 	end
 
 	return nil
 end
-local function getGroupStatus(p2) -- line: 91
+local function getGroupStatus(p2) -- line: 109
 	-- upvalues: SubagentTaskStatus (copy)
 	if p2.isLoading then
 		return SubagentTaskStatus.InProgress
@@ -53,55 +59,65 @@ local function getGroupStatus(p2) -- line: 91
 
 	return SubagentTaskStatus.Pending
 end
-local function toTodoItems(p3) -- line: 101
+local function toTodoItems(p3) -- line: 119
 	local t1 = {}
 
 	if p3 == nil then
 		return t1
 	end
 
-	for v33, v34 in p3.tasks do
-		t1[v33] = {
-			title = v34.text,
-			description = v34.description,
-			status = v34.status,
-			testId = `BuildChatPage.TodoBottomSheet.{ p3.name }.{ v33 }`
+	for v39, v40 in p3.tasks do
+		t1[v39] = {
+			title = v40.text,
+			description = v40.description,
+			status = v40.status,
+			testId = `BuildChatPage.TodoBottomSheet.{ p3.name }.{ v39 }`
 		}
 	end
 
 	return t1
 end
-local function BuildChatPageView(t2: {[any]: any}) -- line: 117
-	-- upvalues: ChatMessageList (copy), React (copy), BuildEmptyState (copy), SubagentTaskStatus (copy), SubagentStatus (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), FoundationText (copy), chatConstants (copy), PlayButton (copy), ButtonVariant (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), ScrollView (copy), Foundation (copy), ChatActions (copy), toTodoItems (copy)
+local function BuildChatPageView(t2: {[any]: any}) -- line: 135
+	-- upvalues: useTokens (copy), React (copy), FFlagEnableBuildExperienceScrollPerformanceTracking (copy), v17 (copy), ChatMessageList (copy), BuildEmptyState (copy), PushNotificationsUpsellCard (copy), SubagentTaskStatus (copy), SubagentStatus (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), FoundationText (copy), chatConstants (copy), PlayButton (copy), ButtonVariant (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), ScrollView (copy), Foundation (copy), Divider (copy), ChatActions (copy), LocalizationStrings (copy), toTodoItems (copy)
+	local v42 = useTokens()
+	local v43 = React.useRef(nil)
+	local g50 = nil
+	local v47 = nil
+
+	if FFlagEnableBuildExperienceScrollPerformanceTracking then
+		v17("LuaApp_Build_Chat_Scroll", v43)
+	end
+
+	local v44 = React.useCallback(function(p4) -- line: 143
+		-- upvalues: v43 (copy), t2 (copy)
+		v43.current = p4
+		t2.scrollingFrameRef(p4)
+	end, { t2.scrollingFrameRef })
 	local taskState = t2.taskState
 	local selectedChipGroupName = t2.selectedChipGroupName
-	local v38, g41
 
 	if taskState == nil or selectedChipGroupName == nil then
-		v38 = nil
+		v47 = nil
 	else
-		g41 = nil
-		v38 = nil
-
-		for _, v40 in taskState.groups do
-			if selectedChipGroupName == v40.name then
-				v38 = v40
-				g41 = true
+		for _, v49 in taskState.groups do
+			if selectedChipGroupName == v49.name then
+				v47 = v49
+				g50 = true
 			end
 
-			if g41 then
+			if g50 then
 				break
 			end
 		end
 
-		if not g41 then
-			v38 = nil
+		if not g50 then
+			v47 = nil
 		end
 	end
 
-	g41 = false
+	g50 = false
 
-	local v42 = ChatMessageList({
+	local v51 = ChatMessageList({
 		messages = t2.messages,
 		clockBinding = t2.clockBinding,
 		localToolActions = t2.localToolActions,
@@ -109,25 +125,46 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 		onPlaytest = t2.onPlaytest,
 		isPlaytestLoading = t2.isPlaytestLoading
 	})
+	local v52 = false
+
+	for _, v54 in t2.messages do
+		if v54.kind == "user_message" then
+			v52 = true
+
+			break
+		end
+	end
+
+	if t2.showPushNotificationsUpsell and v52 and t2.isAssistantResponding then
+		v51.PushNotificationsUpsell = React.createElement(PushNotificationsUpsellCard, {
+			LayoutOrder = #t2.messages + 1,
+			isRequestPending = t2.isPushNotificationsRequestPending,
+			shouldOpenSettings = t2.shouldOpenPushNotificationsSettings,
+			onNotifyMe = t2.onNotifyMe,
+			onOpenSettings = t2.onOpenPushNotificationsSettings,
+			onNotNow = t2.onNotNow
+		})
+	end
+
 	local t3 = {}
 
 	if t2.taskState ~= nil then
-		for v44, v45 in t2.taskState.groups do
-			local v46 = if not v45.isLoading then if not v45.isComplete then SubagentTaskStatus.Pending else SubagentTaskStatus.Done else SubagentTaskStatus.InProgress
+		for v56, v57 in t2.taskState.groups do
+			local v58 = if not v57.isLoading then if not v57.isComplete then SubagentTaskStatus.Pending else SubagentTaskStatus.Done else SubagentTaskStatus.InProgress
 
-			t3[`Group{ v44 }`] = React.createElement(SubagentStatus.Root, {
-				layoutOrder = v44,
-				text = v45.name,
-				isChecked = v45.isComplete,
-				onActivated = function() -- line: 136
-					-- upvalues: t2 (copy), v45 (copy)
-					t2.onChipActivated(v45.name)
+			t3[`Group{ v56 }`] = React.createElement(SubagentStatus.Root, {
+				layoutOrder = v56,
+				text = v57.name,
+				isChecked = v57.isComplete,
+				onActivated = function() -- line: 183
+					-- upvalues: t2 (copy), v57 (copy)
+					t2.onChipActivated(v57.name)
 				end,
-				testId = `BuildChatPage.SubagentStatus.{ v45.name }`
+				testId = `BuildChatPage.SubagentStatus.{ v57.name }`
 			}, {
-				Indicator = if v46 == SubagentTaskStatus.Pending then nil else React.createElement(SubagentStatus.LoadingIndicator, {
-					status = v46,
-					testId = `BuildChatPage.SubagentStatus.{ v45.name }.Indicator`
+				Indicator = if v58 == SubagentTaskStatus.Pending then nil else React.createElement(SubagentStatus.LoadingIndicator, {
+					status = v58,
+					testId = `BuildChatPage.SubagentStatus.{ v57.name }.Indicator`
 				})
 			})
 		end
@@ -174,7 +211,6 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 				}),
 				AgentDetail = React.createElement(AgentDetailMenu, {
 					layoutOrder = 4,
-					isDisabled = not t2.hasTaskGroups,
 					onActivated = t2.onOpenAgentsPage
 				}),
 				Overflow = React.createElement(BuildOverflowMenuButton, {
@@ -182,6 +218,7 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 					icon = IconName.ThreeDotsHorizontal,
 					isDisabled = t2.target.universeId == nil,
 					hasPublishedTurn = t2.hasPublishedTurn,
+					hasPublishedVersion = t2.hasPublishedVersion,
 					target = {
 						universeId = t2.target.universeId,
 						placeId = t2.target.placeId,
@@ -208,12 +245,19 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 					ScrollingDirection = Enum.ScrollingDirection.X,
 					scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.None
 				}
-			}, t3)
+			}, t3),
+			Divider = React.createElement(Divider, {
+				LayoutOrder = 3,
+				testId = "BuildChatPage.HeaderDivider",
+				Visible = t2.isChatScrollable
+			})
 		}),
 		Messages = React.createElement(ScrollView, {
 			LayoutOrder = 2,
 			tag = "fill size-full-0",
-			scrollingFrameRef = t2.scrollingFrameRef,
+			scrollingFrameRef = if not FFlagEnableBuildExperienceScrollPerformanceTracking then t2.scrollingFrameRef else v44,
+			onAbsoluteCanvasSizeChanged = t2.onChatViewportChanged,
+			onAbsoluteWindowSizeChanged = t2.onChatViewportChanged,
 			scroll = {
 				AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				CanvasSize = UDim2.new(1, 0, 0, 0),
@@ -222,12 +266,16 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 		}, {
 			MessageColumn = React.createElement(View, {
 				testId = "BuildChatPage.MessageBody",
-				Size = if not t2.isChatEmpty then nil else UDim2.fromScale(1, 1),
+				layout = {
+					FillDirection = Enum.FillDirection.Vertical,
+					Padding = UDim.new(0, v42.Size.Size_800)
+				},
 				tag = {
-					["composition-content-body col size-full"] = t2.isChatEmpty,
-					["composition-content-body col gap-medium size-full-0 auto-y padding-y-large"] = not t2.isChatEmpty
+					["composition-content-body"] = true,
+					["size-full"] = t2.isChatEmpty,
+					["size-full-0 auto-y padding-y-large"] = not t2.isChatEmpty
 				}
-			}, v42)
+			}, v51)
 		}),
 		Actions = React.createElement(View, {
 			LayoutOrder = 3,
@@ -235,10 +283,10 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 			testId = "BuildChatPage.ActionBody"
 		}, {
 			Footer = React.createElement(ChatActions, {
-				placeholder = "Describe an idea",
 				composerText = t2.composerText,
 				composerErrorText = t2.composerErrorText,
 				onComposerChanged = t2.onComposerChanged,
+				placeholder = LocalizationStrings.CHAT_COMPOSER_PLACEHOLDER,
 				textBoxRef = t2.textBoxRef,
 				isAssistantResponding = t2.isAssistantResponding,
 				canStopAssistantResponse = t2.canStopAssistantResponse,
@@ -247,9 +295,9 @@ local function BuildChatPageView(t2: {[any]: any}) -- line: 117
 			})
 		}),
 		TodoBottomSheet = React.createElement(SubagentStatus.TodoBottomSheet, {
-			title = v38 == nil and "" or v38.name,
-			items = toTodoItems(v38),
-			isOpen = v38 ~= nil,
+			title = v47 == nil and "" or v47.name,
+			items = toTodoItems(v47),
+			isOpen = v47 ~= nil,
 			onClose = t2.onChipBottomSheetClose
 		})
 	})

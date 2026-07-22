@@ -11,6 +11,8 @@ local Controls = require(InGameMenu.Resources.Controls)
 local React = require(CorePackages.Packages.React)
 local withLocalization = require(InGameMenu.Localization.withLocalization)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Image = require(CorePackages.Packages.Foundation).Image
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 local t1 = {
 	ResetCameraLabel = "CoreScripts.InGameMenu.Controls.ResetCameraLabel",
 	MenuLabel = "CoreScripts.InGameMenu.Controls.MenuLabel",
@@ -20,24 +22,25 @@ local t1 = {
 	JumpSelectLabel = "CoreScripts.InGameMenu.Controls.JumpSelectLabel"
 }
 
-local function GamepadControls(_) -- line: 38
-	-- upvalues: Roact (copy), ControlLayoutContainer (copy), ImageSetLabel (copy), Assets (copy), React (copy), Array (copy), Controls (copy), t1 (copy), withLocalization (copy), ThemedTextLabel (copy)
+local function GamepadControls(_) -- line: 43
+	-- upvalues: Roact (copy), ControlLayoutContainer (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), ImageSetLabel (copy), Assets (copy), React (copy), Array (copy), Controls (copy), t1 (copy), withLocalization (copy), ThemedTextLabel (copy)
 	return Roact.createElement(ControlLayoutContainer, {
 		titleText = "CoreScripts.InGameMenu.Controls.GamepadTitle"
 	}, {
-		GamepadImage = Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
+		GamepadImage = Roact.createElement(if not FFlagCoreUiMigrateUIBloxToFoundation then ImageSetLabel else Image, {
+			BackgroundTransparency = not FFlagCoreUiMigrateUIBloxToFoundation and 1 or nil,
 			Image = Assets.Images.GamepadQuest,
 			Size = UDim2.new(1, 0, 0.6, 0),
 			Position = UDim2.new(0.5, 16.5, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			SizeConstraint = Enum.SizeConstraint.RelativeXX,
-			[React.Tag] = "data-testid=VRGamepadInstructions"
-		}, { Array.map(Controls.questGamepadLabels, function(p2, p3) -- line: 51
+			testId = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else "VRGamepadInstructions",
+			[React.Tag] = not FFlagCoreUiMigrateUIBloxToFoundation and "data-testid=VRGamepadInstructions" or nil
+		}, { Array.map(Controls.questGamepadLabels, function(p2, p3) -- line: 57
 			-- upvalues: t1 (copy), withLocalization (copy), Roact (copy), ThemedTextLabel (copy)
-			local v19 = t1[p2.labelKey]
+			local v21 = t1[p2.labelKey]
 
-			return withLocalization({ v19 })(function(p4) -- line: 54
+			return withLocalization({ v21 })(function(p4) -- line: 60
 				-- upvalues: Roact (copy), ThemedTextLabel (copy), p2 (copy), p3 (copy)
 				return Roact.createElement(ThemedTextLabel, {
 					fontKey = "Header2",

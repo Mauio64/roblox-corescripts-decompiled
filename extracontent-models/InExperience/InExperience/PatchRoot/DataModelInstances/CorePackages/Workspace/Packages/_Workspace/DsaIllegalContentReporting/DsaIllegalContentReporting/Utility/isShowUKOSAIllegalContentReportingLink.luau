@@ -1,33 +1,30 @@
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
-local v3 = game:DefineFastFlag("EnableOSAIllegalContentReporting", false)
-local u4 = false
+local u3 = false
 
-if v3 then
-	task.spawn(function() -- line: 16
-		-- upvalues: Players (copy), LocalizationService (copy), u4 (ref)
-		local LocalPlayer = Players.LocalPlayer
+task.spawn(function() -- line: 12
+	-- upvalues: Players (copy), LocalizationService (copy), u3 (ref)
+	local LocalPlayer = Players.LocalPlayer
 
-		while not LocalPlayer do
-			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-			LocalPlayer = Players.LocalPlayer
-		end
+	while not LocalPlayer do
+		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+		LocalPlayer = Players.LocalPlayer
+	end
 
-		local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
+	local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
 
-		if not ok then
-			return
-		end
+	if not ok then
+		return
+	end
 
-		if result == "GB" then
-			u4 = true
-		end
-	end)
-end
+	if result == "GB" then
+		u3 = true
+	end
+end)
 
-local function isShowUKOSAIllegalContentReportingLink() -- line: 36
-	-- upvalues: v3 (copy), u4 (ref)
-	return v3 and u4
+local function isShowUKOSAIllegalContentReportingLink() -- line: 31
+	-- upvalues: u3 (ref)
+	return u3
 end
 
 return isShowUKOSAIllegalContentReportingLink

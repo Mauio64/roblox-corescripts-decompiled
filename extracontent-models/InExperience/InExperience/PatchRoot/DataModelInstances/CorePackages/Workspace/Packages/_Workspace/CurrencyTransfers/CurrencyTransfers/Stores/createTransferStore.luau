@@ -9,7 +9,7 @@ require(CurrencyTransfers.Enums.TransferOrigination)
 require(CurrencyTransfers.Models.ErrorTransferModel)
 require(CurrencyTransfers.Enums.TransferRetryOrigin)
 
-return function() -- line: 69
+return function() -- line: 72
 	-- upvalues: Signals (copy), PromptState (copy)
 	local v5, v6 = Signals.createSignal(PromptState.Unspecified)
 	local v7, v8 = Signals.createSignal(nil)
@@ -33,6 +33,7 @@ return function() -- line: 69
 	local v43, v44 = Signals.createSignal(nil)
 	local v45, v46 = Signals.createSignal(nil)
 	local u47 = nil
+	local u48 = nil
 
 	return {
 		getPromptState = v5,
@@ -77,15 +78,23 @@ return function() -- line: 69
 		setMinimumTransferAmount = v44,
 		getMaximumTransferAmount = v45,
 		setMaximumTransferAmount = v46,
-		setOnClose = function(p1: ((...any) -> ...any)?) -- line: 95
+		setOnClose = function(p1: ((...any) -> ...any)?) -- line: 98
 			-- upvalues: u47 (ref)
 			u47 = p1
 		end,
-		triggerOnClose = function() -- line: 99
+		triggerOnClose = function() -- line: 102
 			-- upvalues: u47 (ref)
 			if u47 then
 				u47()
 			end
+		end,
+		getNetworkImpl = function() -- line: 114
+			-- upvalues: u48 (ref)
+			return u48
+		end,
+		setNetworkImpl = function(p2) -- line: 111
+			-- upvalues: u48 (ref)
+			u48 = p2
 		end
 	}
 end

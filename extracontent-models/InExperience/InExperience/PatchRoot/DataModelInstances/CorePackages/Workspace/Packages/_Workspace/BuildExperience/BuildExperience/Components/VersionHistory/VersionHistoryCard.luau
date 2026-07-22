@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local BuildExperienceParent = BuildExperience.Parent
+local Foundation = require(BuildExperienceParent.Foundation)
+local React = require(BuildExperienceParent.React)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local Badge = Foundation.Badge
 local Button = Foundation.Button
 local FoundationText = Foundation.Text
@@ -11,10 +13,10 @@ local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
 
-local function VersionHistoryCard(t1: {[any]: any}) -- line: 29
-	-- upvalues: React (copy), View (copy), FoundationText (copy), Badge (copy), BadgeShape (copy), BadgeVariant (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v15 = t1.testId or "version-history-card"
-	local v16 = React.useCallback(function() -- line: 31
+local function VersionHistoryCard(t1: {[any]: any}) -- line: 30
+	-- upvalues: React (copy), View (copy), FoundationText (copy), Badge (copy), BadgeShape (copy), BadgeVariant (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy)
+	local v17 = t1.testId or "version-history-card"
+	local v18 = React.useCallback(function() -- line: 32
 		-- upvalues: t1 (copy)
 		t1.onRestore()
 	end, { t1.onRestore })
@@ -22,7 +24,7 @@ local function VersionHistoryCard(t1: {[any]: any}) -- line: 29
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y stroke-standard stroke-default radius-large clip bg-surface-100",
 		LayoutOrder = t1.layoutOrder,
-		testId = v15
+		testId = v17
 	}, {
 		Content = React.createElement(View, {
 			LayoutOrder = 1,
@@ -62,20 +64,20 @@ local function VersionHistoryCard(t1: {[any]: any}) -- line: 29
 					LayoutOrder = 1,
 					tag = "size-full-0 auto-y text-body-small text-wrap text-align-x-left content-emphasis",
 					Text = t1.description,
-					testId = `{ v15 }-description`
+					testId = `{ v17 }-description`
 				}),
 				RestoreRow = React.createElement(View, {
 					tag = "row size-full-0 auto-y",
 					LayoutOrder = 2
 				}, {
 					Restore = React.createElement(Button, {
-						text = "Restore",
+						text = LocalizationStrings.VERSION_HISTORY_RESTORE,
 						size = InputSize.Small,
 						variant = ButtonVariant.Standard,
 						fillBehavior = FillBehavior.Fill,
 						isDisabled = t1.isRestoreDisabled,
-						onActivated = v16,
-						testId = `{ v15 }-restore`
+						onActivated = v18,
+						testId = `{ v17 }-restore`
 					})
 				})
 			})

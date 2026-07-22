@@ -60,18 +60,6 @@ return {
 			14
 		}
 	},
-	EngagementScreenMountTelemetryConfig = {
-		eventName = "luaEngagementScreenMount",
-		description = "Report when the engagement screen is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		throttlingPercentage = v3,
-		lastUpdated = {
-			25,
-			4,
-			17
-		}
-	},
 	ConsoleSSOAttemptedTelemetryConfig = {
 		eventName = "luaConsoleSSOAttempted",
 		description = "Report when a console SSO attempt is made.",
@@ -166,18 +154,6 @@ return {
 			25,
 			4,
 			14
-		}
-	},
-	EngagementScreenContinueButtonClickedConfig = {
-		eventName = "luaEngagementScreenContinueButtonClicked",
-		description = "Report when the continue button is clicked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			25,
-			4,
-			17
 		}
 	},
 	SilentPasskeyUpgradeAvailableConfig = {

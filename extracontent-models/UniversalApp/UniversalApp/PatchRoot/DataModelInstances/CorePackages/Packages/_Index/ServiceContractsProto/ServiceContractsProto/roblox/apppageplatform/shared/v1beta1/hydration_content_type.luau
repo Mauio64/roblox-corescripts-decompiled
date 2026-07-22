@@ -4,7 +4,7 @@ require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
 return {
 	HydrationContentType = ({
 		HydrationContentType = {
-			fromNumber = function(n1: number) -- line: 44
+			fromNumber = function(n1: number) -- line: 46
 				if n1 == 0 then
 					return "HYDRATION_CONTENT_TYPE_INVALID"
 				end
@@ -105,9 +105,17 @@ return {
 					return "HYDRATION_CONTENT_TYPE_MOMENT"
 				end
 
+				if n1 == 25 then
+					return "HYDRATION_CONTENT_TYPE_COMMUNITY"
+				end
+
+				if n1 == 26 then
+					return "HYDRATION_CONTENT_TYPE_COMMUNITY_USER_MEMBERSHIP"
+				end
+
 				return nil
 			end,
-			toNumber = function(p1) -- line: 100
+			toNumber = function(p1) -- line: 106
 				if p1 == "HYDRATION_CONTENT_TYPE_INVALID" then
 					return 0
 				end
@@ -208,9 +216,17 @@ return {
 					return 24
 				end
 
+				if p1 == "HYDRATION_CONTENT_TYPE_COMMUNITY" then
+					return 25
+				end
+
+				if p1 == "HYDRATION_CONTENT_TYPE_COMMUNITY_USER_MEMBERSHIP" then
+					return 26
+				end
+
 				return p1
 			end,
-			fromName = function(s1: string) -- line: 156
+			fromName = function(s1: string) -- line: 166
 				if s1 == "HYDRATION_CONTENT_TYPE_INVALID" then
 					return "HYDRATION_CONTENT_TYPE_INVALID"
 				end
@@ -309,6 +325,14 @@ return {
 
 				if s1 == "HYDRATION_CONTENT_TYPE_MOMENT" then
 					return "HYDRATION_CONTENT_TYPE_MOMENT"
+				end
+
+				if s1 == "HYDRATION_CONTENT_TYPE_COMMUNITY" then
+					return "HYDRATION_CONTENT_TYPE_COMMUNITY"
+				end
+
+				if s1 == "HYDRATION_CONTENT_TYPE_COMMUNITY_USER_MEMBERSHIP" then
+					return "HYDRATION_CONTENT_TYPE_COMMUNITY_USER_MEMBERSHIP"
 				end
 
 				return nil

@@ -63,7 +63,7 @@ local function handleTransferBlock(p1, t1: {[any]: any}?, s1: string?, p2) -- li
 
 	getTransferRequestByIdRequest({
 		transferRequestId = v23
-	}):andThen(function(p3) -- line: 60
+	}, nil, p1.getNetworkImpl()):andThen(function(p3) -- line: 60
 		-- upvalues: setRecipient (copy), applyBlockState (copy)
 		if p3 and (p3.transfer and p3.transfer.recipient) then
 			setRecipient(p3.transfer.recipient)

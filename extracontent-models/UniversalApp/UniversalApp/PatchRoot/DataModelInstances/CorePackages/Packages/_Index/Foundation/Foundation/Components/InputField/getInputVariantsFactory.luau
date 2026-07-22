@@ -1,7 +1,6 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local Dash = require(FoundationParent.Dash)
-local Flags = require(Foundation.Utility.Flags)
 
 require(Foundation.Components.Types)
 
@@ -15,11 +14,10 @@ local Radius = require(Foundation.Enums.Radius)
 require(Foundation.Utility.composeStyleVariant)
 require(Foundation.Providers.Style.Tokens)
 
-local function getInputVariantsFactory(p1) -- line: 40
-	-- upvalues: Flags (copy), InputSize (copy), InputVariant (copy), Dash (copy), Radius (copy)
+local function getInputVariantsFactory(p1) -- line: 39
+	-- upvalues: InputSize (copy), InputVariant (copy), Dash (copy), Radius (copy)
 	local t1 = {
 		container = {
-			bgStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then p1.Color.Shift.Shift_100 else nil,
 			strokeStyle = p1.Color.Stroke.Emphasis,
 			strokeThickness = p1.Stroke.Standard
 		}
@@ -47,11 +45,7 @@ local function getInputVariantsFactory(p1) -- line: 40
 		}
 	}
 	local t3 = {
-		[InputVariant.Standard] = if not Flags.FoundationTextInputRemoveBackgroundStyle then {
-			container = {
-				bgStyle = p1.Color.Shift.Shift_100
-			}
-		} else {},
+		[InputVariant.Standard] = {},
 		[InputVariant.Contrast] = {
 			container = {
 				bgStyle = p1.Color.Shift.Shift_200,

@@ -4,7 +4,7 @@ require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
 return {
 	UiComponentType = ({
 		UiComponentType = {
-			fromNumber = function(n1: number) -- line: 101
+			fromNumber = function(n1: number) -- line: 102
 				if n1 == 0 then
 					return "UI_COMPONENT_TYPE_INVALID"
 				end
@@ -277,6 +277,10 @@ return {
 					return "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON"
 				end
 
+				if n1 == 253 then
+					return "UI_COMPONENT_TYPE_LOGO"
+				end
+
 				if n1 == 300 then
 					return "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS"
 				end
@@ -335,7 +339,7 @@ return {
 
 				return nil
 			end,
-			toNumber = function(p1) -- line: 271
+			toNumber = function(p1) -- line: 274
 				if p1 == "UI_COMPONENT_TYPE_INVALID" then
 					return 0
 				end
@@ -608,6 +612,10 @@ return {
 					return 252
 				end
 
+				if p1 == "UI_COMPONENT_TYPE_LOGO" then
+					return 253
+				end
+
 				if p1 == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then
 					return 300
 				end
@@ -666,7 +674,7 @@ return {
 
 				return p1
 			end,
-			fromName = function(s1: string) -- line: 441
+			fromName = function(s1: string) -- line: 446
 				if s1 == "UI_COMPONENT_TYPE_INVALID" then
 					return "UI_COMPONENT_TYPE_INVALID"
 				end
@@ -937,6 +945,10 @@ return {
 
 				if s1 == "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON" then
 					return "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_LOGO" then
+					return "UI_COMPONENT_TYPE_LOGO"
 				end
 
 				if s1 == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then

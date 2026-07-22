@@ -2,13 +2,15 @@ local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local React = require(FoundationParent.React)
 local AspectRatio = require(Foundation.Components.AspectRatio)
+local CornerRadius = require(Foundation.Components.CornerRadius)
 local Padding = require(Foundation.Components.Padding)
+local Flags = require(Foundation.Utility.Flags)
 local getTestIdTag = require(Foundation.Utility.getTestIdTag)
 
 require(Foundation.Components.Types)
 
-local function GuiObjectChildren(p1) -- line: 15
-	-- upvalues: React (copy), AspectRatio (copy), getTestIdTag (copy), Padding (copy)
+local function GuiObjectChildren(p1) -- line: 17
+	-- upvalues: React (copy), AspectRatio (copy), Flags (copy), CornerRadius (copy), getTestIdTag (copy), Padding (copy)
 	local testId = p1.testId
 
 	return {
@@ -17,9 +19,12 @@ local function GuiObjectChildren(p1) -- line: 15
 			value = p1.aspectRatio,
 			testId = if not testId then nil else `{ testId }--aspect-ratio`
 		}),
-		CornerRadius = if p1.cornerRadius == nil then nil else React.createElement("UICorner", {
+		CornerRadius = if p1.cornerRadius == nil then nil else if not Flags.FoundationCornerRadiusPerCorner then React.createElement("UICorner", {
 			CornerRadius = p1.cornerRadius,
 			[React.Tag] = getTestIdTag(testId, "corner-radius")
+		}) else React.createElement(CornerRadius, {
+			value = p1.cornerRadius,
+			testId = if not testId then nil else `{ testId }--corner-radius`
 		}),
 		FlexItem = if p1.flexItem == nil then nil else React.createElement("UIFlexItem", {
 			FlexMode = p1.flexItem.FlexMode,

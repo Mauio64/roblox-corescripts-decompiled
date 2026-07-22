@@ -5,6 +5,7 @@ local FocusBehaviors = require(GenericAbuseReportingParent.FocusBehaviors)
 local Foundation = require(GenericAbuseReportingParent.Foundation)
 local React = require(GenericAbuseReportingParent.React)
 local ReactFocusNavigation = require(GenericAbuseReportingParent.ReactFocusNavigation)
+local FFlagAbuseReportSelectItemAddId = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportSelectItemAddId
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Empty = Foundation.Empty
@@ -34,6 +35,7 @@ local useListLoader = require(GenericAbuseReporting.BeduiV2.Loaders.useLoader).u
 local TelemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useLayoutSlots = LayoutSlots.useLayoutSlots
+local FFlagAbuseReportVoiceSpeakingIcon = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportVoiceSpeakingIcon
 local t1 = {
 	chevron = nil,
 	radio = ListItemInputType.Radio,
@@ -41,7 +43,7 @@ local t1 = {
 	checkbox = ListItemInputType.Checkbox
 }
 
-local function ListNodeLoading(t2: {[any]: any}) -- line: 71
+local function ListNodeLoading(t2: {[any]: any}) -- line: 76
 	-- upvalues: React (copy), Eyebrow (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
 	local title = t2.title
 	local eyebrow = t2.eyebrow
@@ -85,7 +87,7 @@ local function ListNodeLoading(t2: {[any]: any}) -- line: 71
 		})
 	})
 end
-local function ListNodeError(t3: {[any]: any}) -- line: 120
+local function ListNodeError(t3: {[any]: any}) -- line: 125
 	-- upvalues: useArTranslation (copy), React (copy), Eyebrow (copy), TextWithTranslation (copy), Button (copy), ButtonVariant (copy), Foundation (copy)
 	local translateIntoString = useArTranslation().translateIntoString
 
@@ -114,32 +116,32 @@ local function ListNodeError(t3: {[any]: any}) -- line: 120
 		})
 	})
 end
-local function ListNode(t4: {[any]: any}) -- line: 161
-	-- upvalues: useTokens (copy), React (copy), useArTranslation (copy), useAbuseReportAnalytics (copy), useListLoader (copy), useLayoutSlots (copy), ReactFocusNavigation (copy), FocusBehaviors (copy), scrollToItem (copy), TelemetryEventType (copy), Dash (copy), ListNodeLoading (copy), ListNodeError (copy), Empty (copy), Eyebrow (copy), View (copy), List (copy), IconName (copy), t1 (copy), Footer (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v42 = useTokens()
-	local v43, v44 = React.useState(t4.initialValue or nil)
+local function ListNode(t4: {[any]: any}) -- line: 166
+	-- upvalues: useTokens (copy), React (copy), useArTranslation (copy), useAbuseReportAnalytics (copy), useListLoader (copy), useLayoutSlots (copy), ReactFocusNavigation (copy), FocusBehaviors (copy), scrollToItem (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), Dash (copy), ListNodeLoading (copy), ListNodeError (copy), Empty (copy), Eyebrow (copy), View (copy), List (copy), IconName (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), t1 (copy), Footer (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
+	local v44 = useTokens()
+	local v45, v46 = React.useState(t4.initialValue or nil)
 	local translateIntoString = useArTranslation().translateIntoString
 	local sendEvent = useAbuseReportAnalytics().sendEvent
-	local v47 = React.useRef(nil)
-	local v48, v49 = React.useState(false)
+	local v49 = React.useRef(nil)
 	local v50, v51 = React.useState(false)
-	local v52 = React.useRef(false)
-	local v53 = React.useRef(false)
-	local v54 = useListLoader(t4.items)
-	local loading = v54.loading
-	local error = v54.error
-	local retry = v54.retry
-	local data = v54.data
-	local v59 = useLayoutSlots()
-	local Layout = v59.Layout
-	local v61 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
-	local v62 = React.useRef(nil)
+	local v52, v53 = React.useState(false)
+	local v54 = React.useRef(false)
+	local v55 = React.useRef(false)
+	local v56 = useListLoader(t4.items)
+	local loading = v56.loading
+	local error = v56.error
+	local retry = v56.retry
+	local data = v56.data
+	local v61 = useLayoutSlots()
+	local Layout = v61.Layout
+	local v63 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+	local v64 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 183
-		-- upvalues: v47 (copy), v61 (copy), data (copy), FocusBehaviors (copy), v62 (copy)
-		local current = v47.current
+	React.useEffect(function() -- line: 188
+		-- upvalues: v49 (copy), v63 (copy), data (copy), FocusBehaviors (copy), v64 (copy)
+		local current = v49.current
 
-		if not current or not v61 then
+		if not current or not v63 then
 			return
 		end
 
@@ -147,22 +149,22 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 			return
 		end
 
-		local v74 = FocusBehaviors.mostRecentOrDefault(v62.current)
+		local v76 = FocusBehaviors.mostRecentOrDefault(v64.current)
 
-		v61:registerFocusBehavior(current, v74)
+		v63:registerFocusBehavior(current, v76)
 
-		return function() -- line: 195
-			-- upvalues: v61 (copy), current (copy), v74 (copy)
-			v61:deregisterFocusBehavior(current, v74)
+		return function() -- line: 200
+			-- upvalues: v63 (copy), current (copy), v76 (copy)
+			v63:deregisterFocusBehavior(current, v76)
 		end
 	end, {
-		v61,
+		v63,
 		data,
-		v62
+		v64
 	})
-	React.useEffect(function() -- line: 201
-		-- upvalues: v47 (copy), v49 (copy), v51 (copy)
-		local current = v47.current
+	React.useEffect(function() -- line: 206
+		-- upvalues: v49 (copy), v51 (copy), v53 (copy)
+		local current = v49.current
 
 		if not current then
 			return
@@ -174,28 +176,28 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 			return
 		end
 
-		local function checkScrollbar() -- line: 214
-			-- upvalues: ScrollingFrame (copy), v49 (copy)
-			local v89 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
-
-			v49(v89)
-		end
-		local function onScroll() -- line: 219
+		local function checkScrollbar() -- line: 219
 			-- upvalues: ScrollingFrame (copy), v51 (copy)
+			local v92 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
+
+			v51(v92)
+		end
+		local function onScroll() -- line: 224
+			-- upvalues: ScrollingFrame (copy), v53 (copy)
 			if ScrollingFrame.CanvasPosition.Y > 0 then
-				v51(true)
+				v53(true)
 			end
 		end
 
-		local v79 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
+		local v81 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
 
-		v49(v79)
+		v51(v81)
 
 		local connection = ScrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(checkScrollbar)
 		local connection2 = ScrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(checkScrollbar)
 		local connection3 = ScrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(onScroll)
 
-		return function() -- line: 232
+		return function() -- line: 237
 			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()
@@ -203,24 +205,24 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 		end
 	end, { loading })
 
-	local v63 = React.useRef({})
-	local v64 = React.useRef(nil)
+	local v65 = React.useRef({})
+	local v66 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 242
-		-- upvalues: v43 (copy), v64 (copy), v63 (copy), scrollToItem (copy), v47 (copy)
-		if v43 then
-			v64.current = v63.current[v43]
-			scrollToItem(v47, v64)
+	React.useEffect(function() -- line: 247
+		-- upvalues: v45 (copy), v66 (copy), v65 (copy), scrollToItem (copy), v49 (copy)
+		if v45 then
+			v66.current = v65.current[v45]
+			scrollToItem(v49, v66)
 
 			return
 		end
 
-		v64.current = nil
-	end, { v43 })
-	React.useEffect(function() -- line: 251
-		-- upvalues: error (copy), v52 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if error and not v52.current then
-			v52.current = true
+		v66.current = nil
+	end, { v45 })
+	React.useEffect(function() -- line: 256
+		-- upvalues: error (copy), v54 (copy), sendEvent (copy), TelemetryEventType (copy)
+		if error and not v54.current then
+			v54.current = true
 			sendEvent({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
@@ -232,10 +234,10 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 		error,
 		sendEvent
 	})
-	React.useEffect(function() -- line: 261
-		-- upvalues: loading (copy), error (copy), data (copy), v53 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if not loading and not error and ((data == nil or #data == 0) and not v53.current) then
-			v53.current = true
+	React.useEffect(function() -- line: 266
+		-- upvalues: loading (copy), error (copy), data (copy), v55 (copy), sendEvent (copy), TelemetryEventType (copy)
+		if not loading and not error and ((data == nil or #data == 0) and not v55.current) then
+			v55.current = true
 			sendEvent({
 				sub_event_type = TelemetryEventType.EmptyState
 			})
@@ -247,10 +249,10 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 		sendEvent
 	})
 
-	local v65 = t4.variant or "radio"
-	local v66 = v65 == "chevron"
-	local v67 = React.useCallback(function(n1: number) -- line: 278
-		-- upvalues: data (copy), sendEvent (copy), TelemetryEventType (copy), v48 (copy), v50 (copy)
+	local v67 = t4.variant or "radio"
+	local v68 = v67 == "chevron"
+	local v69 = React.useCallback(function(n1: number, s1: string?) -- line: 283
+		-- upvalues: data (copy), sendEvent (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), v50 (copy), v52 (copy)
 		if not data then
 			return
 		end
@@ -259,60 +261,61 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 			sub_event_type = TelemetryEventType.SelectItem,
 			select_item_detail = {
 				selected_index = n1,
+				selected_id = if not FFlagAbuseReportSelectItemAddId then nil else s1,
 				list_length = #data,
-				has_scroll = v48,
-				did_scroll = v50
+				has_scroll = v50,
+				did_scroll = v52
 			}
 		})
 	end, {
 		sendEvent,
-		v48,
 		v50,
+		v52,
 		data
 	})
-	local v68 = React.useCallback(function(s1: string) -- line: 293
-		-- upvalues: data (copy), v44 (copy), Dash (copy), v67 (copy)
+	local v70 = React.useCallback(function(s2: string) -- line: 299
+		-- upvalues: data (copy), v46 (copy), Dash (copy), v69 (copy), FFlagAbuseReportSelectItemAddId (copy)
 		if not data then
 			return
 		end
 
-		v44(s1)
+		v46(s2)
 
 		local n2 = 0
 
-		Dash.forEach(data, function(p1, p2) -- line: 300
-			-- upvalues: s1 (copy), n2 (ref)
-			if p1.id == s1 then
+		Dash.forEach(data, function(p1, p2) -- line: 306
+			-- upvalues: s2 (copy), n2 (ref)
+			if p1.id == s2 then
 				n2 = p2
 
 				return
 			end
 		end)
-		v67(n2)
+		v69(n2, if not FFlagAbuseReportSelectItemAddId then nil else s2)
 	end, {
-		v67,
+		v69,
 		data
 	})
-	local v69 = React.useCallback(function() -- line: 309
-		-- upvalues: data (copy), Dash (copy), v43 (copy), t4 (copy)
+	local v71 = React.useCallback(function() -- line: 315
+		-- upvalues: data (copy), Dash (copy), v45 (copy), t4 (copy)
 		if not data then
 			return
 		end
 
-		local v86 = Dash.find(data, function(p3) -- line: 314
-			-- upvalues: v43 (copy)
-			return p3.id == v43
+		local v89 = Dash.find(data, function(p3) -- line: 320
+			-- upvalues: v45 (copy)
+			return p3.id == v45
 		end)
 
 		if t4.onNext then
-			t4.onNext(v43, v86)
+			t4.onNext(v45, v89)
 		end
 	end, {
 		data,
 		t4.onNext,
-		v43
+		v45
 	})
-	local Title = v59.Title
+	local Title = v61.Title
 
 	if loading then
 		return React.createElement(ListNodeLoading, {
@@ -320,7 +323,7 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 			titleSlot = Title,
 			title = t4.title,
 			eyebrow = t4.eyebrow,
-			tokens = v42
+			tokens = v44
 		})
 	end
 
@@ -332,12 +335,12 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 			eyebrow = t4.eyebrow,
 			errorText = t4.errorText,
 			retryButtonText = t4.retryButtonText,
-			tokens = v42,
+			tokens = v44,
 			retry = retry
 		})
 	end
 
-	local v71 = React.createElement(React.Fragment, nil, if data ~= nil and #data ~= 0 then {
+	local v73 = React.createElement(React.Fragment, nil, if data ~= nil and #data ~= 0 then {
 		Eyebrow = React.createElement(Eyebrow, {
 			layoutOrder = 0,
 			eyebrow = t4.eyebrow
@@ -360,34 +363,35 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 					isContained = false,
 					hasMargin = true
 				}
-			}, { Dash.map(data, function(p4, n3: number) -- line: 381
-				-- upvalues: React (copy), List (copy), IconName (copy), translateIntoString (copy), v66 (copy), v67 (copy), t4 (copy), v68 (copy), t1 (copy), v65 (copy), v43 (copy), v63 (copy), v62 (copy)
+			}, { Dash.map(data, function(p4, n3: number) -- line: 387
+				-- upvalues: React (copy), List (copy), IconName (copy), translateIntoString (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), t4 (copy), v68 (copy), v69 (copy), FFlagAbuseReportSelectItemAddId (copy), v70 (copy), t1 (copy), v67 (copy), v45 (copy), v65 (copy), v64 (copy)
 				return React.createElement(List.Item, {
 					leading = if type(p4.leading) ~= "string" then p4.leading else IconName[p4.leading],
 					title = translateIntoString(p4.label),
 					description = if not p4.description then nil else translateIntoString(p4.description),
+					trailing = if not FFlagAbuseReportVoiceSpeakingIcon or not t4.renderTrailingAccessory then nil else t4.renderTrailingAccessory(p4),
 					onActivated = {
-						onActivated = not v66 and function() -- line: 396
-							-- upvalues: v68 (copy), p4 (copy)
-							v68(p4.id)
-						end or function() -- line: 390
-							-- upvalues: v67 (copy), n3 (copy), t4 (copy), p4 (copy)
-							v67(n3)
+						onActivated = not v68 and function() -- line: 408
+							-- upvalues: v70 (copy), p4 (copy)
+							v70(p4.id)
+						end or function() -- line: 399
+							-- upvalues: v69 (copy), n3 (copy), FFlagAbuseReportSelectItemAddId (copy), p4 (copy), t4 (copy)
+							v69(n3, if not FFlagAbuseReportSelectItemAddId then nil else p4.id)
 
 							if t4.onNext then
 								t4.onNext(p4.id, p4)
 							end
 						end,
-						inputType = t1[v65],
-						isChecked = v43 == p4.id
+						inputType = t1[v67],
+						isChecked = v45 == p4.id
 					},
 					LayoutOrder = n3,
-					ref = function(p5) -- line: 403
-						-- upvalues: v63 (copy), p4 (copy), n3 (copy), v62 (copy)
-						v63.current[p4.id] = p5
+					ref = function(p5) -- line: 415
+						-- upvalues: v65 (copy), p4 (copy), n3 (copy), v64 (copy)
+						v65.current[p4.id] = p5
 
 						if n3 == 1 then
-							v62.current = p5
+							v64.current = p5
 						end
 					end
 				})
@@ -403,19 +407,19 @@ local function ListNode(t4: {[any]: any}) -- line: 161
 			text = if not t4.emptyText then nil else translateIntoString(t4.emptyText)
 		})
 	})
-	local v72 = if not t4.onNext or (v66 or v43 == nil) then nil else React.createElement(Button, {
+	local v74 = if not t4.onNext or (v68 or v45 == nil) then nil else React.createElement(Button, {
 		text = translateIntoString(t4.nextButtonText),
 		variant = ButtonVariant.Emphasis,
 		fillBehavior = FillBehavior.Fill,
 		isLoading = t4.isSubmitting,
 		isDisabled = t4.isSubmitting,
-		onActivated = v69
+		onActivated = v71
 	})
 
 	return React.createElement(Layout, {
-		ref = v47,
-		body = v71,
-		actions = v72
+		ref = v49,
+		body = v73,
+		actions = v74
 	})
 end
 

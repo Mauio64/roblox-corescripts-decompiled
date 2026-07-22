@@ -28,13 +28,14 @@ local FFlagEnableBlackbirdOnFlyoutMenu = SharedFlags.FFlagEnableBlackbirdOnFlyou
 local v28 = game:DefineFastFlag("EnableBlackbirdUpsellOnFlyoutMenu", false)
 local FFlagEnableFlyoutMenuRobuxCardRefactor = SharedFlags.FFlagEnableFlyoutMenuRobuxCardRefactor
 local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
-local v31 = if not FFlagEnableBlackbirdCheck then nil else require(script.Parent.Parent.Hooks.useHasRobloxSubscription)
-local v32 = if not FFlagEnableBlackbird or (not FFlagEnableBlackbirdOnFlyoutMenu or not v28) then nil else require(script.Parent.BlackbirdUpsellBanner)
+local FFlagEnableFlyoutOnNavRail = SharedFlags.FFlagEnableFlyoutOnNavRail
+local v32 = if not FFlagEnableBlackbirdCheck then nil else require(script.Parent.Parent.Hooks.useHasRobloxSubscription)
+local v33 = if not FFlagEnableBlackbird or (not FFlagEnableBlackbirdOnFlyoutMenu or not v28) then nil else require(script.Parent.BlackbirdUpsellBanner)
 
-local function selectStatusBarHeight(p1) -- line: 64
+local function selectStatusBarHeight(p1) -- line: 65
 	return p1.TopBar.statusBarHeight or 0
 end
-local function selectGlobalGuiInset(p2) -- line: 68
+local function selectGlobalGuiInset(p2) -- line: 69
 	return p2.GlobalGuiInset or {
 		left = 0,
 		top = 0,
@@ -43,118 +44,118 @@ local function selectGlobalGuiInset(p2) -- line: 68
 	}
 end
 
-return React.memo(function(t1: {[any]: any}, _) -- line: 72
-	-- upvalues: useTokens (copy), useLocalRobuxBalance (copy), useSelector (copy), selectStatusBarHeight (copy), selectGlobalGuiInset (copy), useScreenSize (copy), Constants (copy), useAppPolicy (copy), FFlagEnableBlackbirdCheck (copy), v31 (copy), v32 (copy), useFlyoutNavigationItems (copy), createNextOrder (copy), useSetDrawerVisible (copy), React (copy), FlyoutAnalytics (copy), FlyoutProfileCard (copy), FFlagEnableFlyoutMenuRobuxCardRefactor (copy), RobuxPill (copy), Foundation (copy), Divider (copy), FlyoutNavigationList (copy), FlyoutSwitchAccountButton (copy), FlyoutQuickSigninButton (copy), FlyoutReportLogs (copy), FFlagFlyoutTermsPrivacyFooter (copy), TermsPrivacyFooter (copy), useDismissFlyoutOnPartyTopBanner (copy), DrawerContainer (copy)
-	local v39 = useTokens()
-	local v40 = useLocalRobuxBalance()
-	local v41 = useSelector(selectStatusBarHeight)
-	local v42 = useSelector(selectGlobalGuiInset)
-	local v43 = v42.top + v41
-	local bottom = v42.bottom
-	local left = v42.left
-	local v46 = useScreenSize()
-	local v47 = if not (v46.X - Constants.FLYOUT_SIDE_PADDING < Constants.FLYOUT_SIDE_PANEL_WIDTH) then Constants.FLYOUT_SIDE_PANEL_WIDTH else v46.X - Constants.FLYOUT_SIDE_PADDING
-	local v48 = useAppPolicy(function(p4) -- line: 87
+return React.memo(function(t1: {[any]: any}, _) -- line: 73
+	-- upvalues: useTokens (copy), useLocalRobuxBalance (copy), useSelector (copy), selectStatusBarHeight (copy), selectGlobalGuiInset (copy), FFlagEnableFlyoutOnNavRail (copy), useScreenSize (copy), Constants (copy), useAppPolicy (copy), FFlagEnableBlackbirdCheck (copy), v32 (copy), v33 (copy), useFlyoutNavigationItems (copy), createNextOrder (copy), useSetDrawerVisible (copy), React (copy), FlyoutAnalytics (copy), FlyoutProfileCard (copy), FFlagEnableFlyoutMenuRobuxCardRefactor (copy), RobuxPill (copy), Foundation (copy), Divider (copy), FlyoutNavigationList (copy), FlyoutSwitchAccountButton (copy), FlyoutQuickSigninButton (copy), FlyoutReportLogs (copy), FFlagFlyoutTermsPrivacyFooter (copy), TermsPrivacyFooter (copy), useDismissFlyoutOnPartyTopBanner (copy), DrawerContainer (copy)
+	local v40 = useTokens()
+	local v41 = useLocalRobuxBalance()
+	local v42 = useSelector(selectStatusBarHeight)
+	local v43 = useSelector(selectGlobalGuiInset)
+	local v44 = v43.top + v42
+	local bottom = v43.bottom
+	local v46 = if not FFlagEnableFlyoutOnNavRail then v43.left else nil
+	local v47 = useScreenSize()
+	local v48 = if not (v47.X - Constants.FLYOUT_SIDE_PADDING < Constants.FLYOUT_SIDE_PANEL_WIDTH) then Constants.FLYOUT_SIDE_PANEL_WIDTH else v47.X - Constants.FLYOUT_SIDE_PADDING
+	local v49 = useAppPolicy(function(p4) -- line: 88
 		return p4.getDisableBlackbirdEntrypoints() or false
 	end)
-	local v49 = not not FFlagEnableBlackbirdCheck and v31()
-	local v50 = not v48 and (v32 ~= nil and not v49)
-	local v51 = v40 and v40 >= 0
-	local v52 = v51 or v50
-	local v53 = useFlyoutNavigationItems()
-	local v54 = createNextOrder()
-	local v55 = useSetDrawerVisible()
-	local v56 = React.useCallback(function() -- line: 99
-		-- upvalues: v55 (copy)
-		v55(false)
-	end, { v55 })
-	local v57 = React.useCallback(function(p5) -- line: 102
+	local v50 = not not FFlagEnableBlackbirdCheck and v32()
+	local v51 = not v49 and (v33 ~= nil and not v50)
+	local v52 = v41 and v41 >= 0
+	local v53 = v52 or v51
+	local v54 = useFlyoutNavigationItems()
+	local v55 = createNextOrder()
+	local v56 = useSetDrawerVisible()
+	local v57 = React.useCallback(function() -- line: 100
+		-- upvalues: v56 (copy)
+		v56(false)
+	end, { v56 })
+	local v58 = React.useCallback(function(p5) -- line: 103
 		-- upvalues: FlyoutAnalytics (copy)
 		FlyoutAnalytics.onFlyoutSidePanelClosed(p5)
 	end, {})
-	local v58 = React.createElement(React.Fragment, nil, {
+	local v59 = React.createElement(React.Fragment, nil, {
 		UIPadding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v39.Padding.XLarge),
-			PaddingBottom = UDim.new(0, v39.Padding.XLarge),
-			PaddingLeft = UDim.new(0, v39.Padding.XLarge),
-			PaddingRight = UDim.new(0, v39.Padding.XLarge)
+			PaddingTop = UDim.new(0, v40.Padding.XLarge),
+			PaddingBottom = UDim.new(0, v40.Padding.XLarge),
+			PaddingLeft = UDim.new(0, v40.Padding.XLarge),
+			PaddingRight = UDim.new(0, v40.Padding.XLarge)
 		}),
 		UIListLayout = React.createElement("UIListLayout", {
-			Padding = UDim.new(0, v39.Gap.Large),
+			Padding = UDim.new(0, v40.Gap.Large),
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Top
 		}),
 		ProfileCard = React.createElement(FlyoutProfileCard, {
-			layoutOrder = v54(),
+			layoutOrder = v55(),
 			localUserModel = t1.localUserModel,
-			isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v49,
+			isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v50,
 			onProfileActivated = t1.onProfileActivated,
-			closeDrawer = v56
+			closeDrawer = v57
 		}),
-		RobuxPill = if FFlagEnableFlyoutMenuRobuxCardRefactor or not v51 then nil else React.createElement(RobuxPill, {
-			layoutOrder = v54(),
+		RobuxPill = if FFlagEnableFlyoutMenuRobuxCardRefactor or not v52 then nil else React.createElement(RobuxPill, {
+			layoutOrder = v55(),
 			openPurchaseRobuxPage = t1.openPurchaseRobuxPage,
-			robuxBalance = v40,
-			closeDrawer = v56
+			robuxBalance = v41,
+			closeDrawer = v57
 		}),
-		RobuxCard = if not FFlagEnableFlyoutMenuRobuxCardRefactor or not v52 then nil else React.createElement(Foundation.View, {
+		RobuxCard = if not FFlagEnableFlyoutMenuRobuxCardRefactor or not v53 then nil else React.createElement(Foundation.View, {
 			tag = "col size-full-0 auto-y",
-			LayoutOrder = v54(),
+			LayoutOrder = v55(),
 			stroke = {
-				Color = v39.Color.Stroke.Default.Color3,
-				Transparency = v39.Color.Stroke.Default.Transparency,
-				Thickness = v39.Stroke.Standard
+				Color = v40.Color.Stroke.Default.Color3,
+				Transparency = v40.Color.Stroke.Default.Transparency,
+				Thickness = v40.Stroke.Standard
 			},
-			cornerRadius = UDim.new(0, v39.Radius.Medium)
+			cornerRadius = UDim.new(0, v40.Radius.Medium)
 		}, {
-			RobuxPill = if not v51 then nil else React.createElement(RobuxPill, {
+			RobuxPill = if not v52 then nil else React.createElement(RobuxPill, {
 				layoutOrder = 1,
 				openPurchaseRobuxPage = t1.openPurchaseRobuxPage,
-				robuxBalance = v40,
-				closeDrawer = v56
+				robuxBalance = v41,
+				closeDrawer = v57
 			}),
-			UpsellDivider = if not v51 or not v50 then nil else React.createElement(Divider, {
+			UpsellDivider = if not v52 or not v51 then nil else React.createElement(Divider, {
 				LayoutOrder = 2
 			}),
-			BlackbirdUpsellBanner = if not v50 then nil else React.createElement(v32, {
+			BlackbirdUpsellBanner = if not v51 then nil else React.createElement(v33, {
 				layoutOrder = 3,
-				closeDrawer = v56
+				closeDrawer = v57
 			})
 		}),
 		MyLibrary = React.createElement(FlyoutNavigationList, {
-			layoutOrder = v54(),
-			navigationItems = v53.myLibraryItems,
-			closeDrawer = v56,
+			layoutOrder = v55(),
+			navigationItems = v54.myLibraryItems,
+			closeDrawer = v57,
 			buildCreatorWebNavUrl = t1.buildCreatorWebNavUrl
 		}),
 		Divider = React.createElement(Divider, {
-			LayoutOrder = v54()
+			LayoutOrder = v55()
 		}),
 		AdditionalNavigation = React.createElement(FlyoutNavigationList, {
-			layoutOrder = v54(),
-			navigationItems = v53.additionalNavigationItems,
-			closeDrawer = v56,
+			layoutOrder = v55(),
+			navigationItems = v54.additionalNavigationItems,
+			closeDrawer = v57,
 			buildCreatorWebNavUrl = t1.buildCreatorWebNavUrl
 		}),
 		SwitchAccountButton = if not t1.onSwitchAccountActivated then nil else React.createElement(FlyoutSwitchAccountButton, {
-			layoutOrder = v54(),
+			layoutOrder = v55(),
 			onSwitchAccountActivated = t1.onSwitchAccountActivated,
-			closeDrawer = v56
+			closeDrawer = v57
 		}),
 		QuickSigninButton = React.createElement(FlyoutQuickSigninButton, {
-			layoutOrder = v54(),
-			closeDrawer = v56
+			layoutOrder = v55(),
+			closeDrawer = v57
 		}),
-		LogOut = t1.renderLogOut(v54()),
+		LogOut = t1.renderLogOut(v55()),
 		ReportLogs = if not t1.openReportLogConfirmation then nil else React.createElement(FlyoutReportLogs, {
-			layoutOrder = v54(),
+			layoutOrder = v55(),
 			openReportLogConfirmation = t1.openReportLogConfirmation,
-			closeDrawer = v56
+			closeDrawer = v57
 		}),
 		TermsPrivacyFooter = if not FFlagFlyoutTermsPrivacyFooter then nil else React.createElement(TermsPrivacyFooter, {
-			layoutOrder = v54(),
-			closeDrawer = v56
+			layoutOrder = v55(),
+			closeDrawer = v57
 		})
 	})
 
@@ -162,12 +163,12 @@ return React.memo(function(t1: {[any]: any}, _) -- line: 72
 
 	return React.createElement(DrawerContainer, {
 		displayOrder = t1.displayOrder,
-		menuWidth = v47,
-		children = v58,
-		leftOffset = left,
-		topOffset = v43,
+		menuWidth = v48,
+		children = v59,
+		leftOffset = v46,
+		topOffset = v44,
 		bottomOffset = bottom,
-		backgroundStyle = v39.Color.Surface.Surface_0,
-		onDrawerClosedAnalytics = v57
+		backgroundStyle = v40.Color.Surface.Surface_0,
+		onDrawerClosedAnalytics = v58
 	})
 end)

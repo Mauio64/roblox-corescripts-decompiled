@@ -15,7 +15,7 @@ local t1 = {
 	}
 }
 
-local function sendBuildExperienceEvent(s1: string, t2: {[any]: any}, t3: {[any]: any}?) -- line: 20
+local function sendBuildExperienceEvent(s1: string, t2: {[any]: any}, t3: {[any]: any}?) -- line: 28
 	-- upvalues: HttpService (copy), TelemetryService (copy), t1 (copy)
 	local t4 = {
 		eventType = s1,

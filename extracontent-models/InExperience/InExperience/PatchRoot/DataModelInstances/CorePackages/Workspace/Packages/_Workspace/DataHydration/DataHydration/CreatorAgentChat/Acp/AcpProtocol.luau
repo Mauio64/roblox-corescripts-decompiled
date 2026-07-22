@@ -11,7 +11,8 @@ local t1 = {
 	SessionFindByUniverse = "_roblox/session/find_by_universe",
 	SessionDelete = "_roblox/session/delete",
 	SessionUpdateInfo = "_roblox/session/update_info",
-	SessionReadTasks = "_roblox/session/read_tasks"
+	SessionReadTasks = "_roblox/session/read_tasks",
+	SessionSaveAndPublish = "_roblox/session/save_and_publish"
 }
 local t2 = {
 	Name = "ask_tool"
@@ -45,7 +46,7 @@ return {
 	Notifications = t3,
 	ErrorCodes = t4,
 	AskTool = t2,
-	extractSessionNewProject = function(p1) -- line: 52
+	extractSessionNewProject = function(p1) -- line: 53
 		if typeof(p1) ~= "table" then
 			return nil
 		end
@@ -58,7 +59,7 @@ return {
 
 		return nil
 	end,
-	buildSessionNewWireParams = function(t5: {[any]: any}) -- line: 63
+	buildSessionNewWireParams = function(t5: {[any]: any}) -- line: 64
 		local t6 = {
 			universeId = t5.project.universeId,
 			placeId = t5.project.placeId

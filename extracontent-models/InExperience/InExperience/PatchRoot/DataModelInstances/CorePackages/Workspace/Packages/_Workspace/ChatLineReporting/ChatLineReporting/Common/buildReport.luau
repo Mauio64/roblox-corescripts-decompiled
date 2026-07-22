@@ -2,14 +2,15 @@ local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
 local ChatLineReportingParent = ChatLineReporting.Parent
 local FFlagExpChatPresetChatEnabled = require(ChatLineReportingParent.ExpChatShared).Flags.FFlagExpChatPresetChatEnabled
 local FFlagChatLineReportingMessageIdEnabled = require(ChatLineReporting.Flags.FFlagChatLineReportingMessageIdEnabled)
+local FFlagEnableChatReportingTextChannelTag = require(ChatLineReportingParent.SharedFlags).FFlagEnableChatReportingTextChannelTag
 local t1 = {
 	Variant = {
 		CLRv1 = "CLRv1"
 	}
 }
 
-function buildReport(n1: number, s1: string, s2: string, s3: string, s4: string?, s5: string?, s6: string?) -- line: 13
-	-- upvalues: t1 (copy), FFlagChatLineReportingMessageIdEnabled (copy), FFlagExpChatPresetChatEnabled (copy)
+function buildReport(n1: number, s1: string, s2: string, s3: string, s4: string?, s5: string?, s6: string?, s7: string?) -- line: 14
+	-- upvalues: t1 (copy), FFlagChatLineReportingMessageIdEnabled (copy), FFlagExpChatPresetChatEnabled (copy), FFlagEnableChatReportingTextChannelTag (copy)
 	local t2 = {
 		tags = {
 			ENTRY_POINT = {
@@ -72,6 +73,14 @@ function buildReport(n1: number, s1: string, s2: string, s3: string, s4: string?
 				}}
 			}
 		end
+	end
+
+	if FFlagEnableChatReportingTextChannelTag then
+		t2.tags.IN_GAME_CHAT_TEXT_CHANNEL = {
+			valueList = {{
+				data = s7 or "RBXGlobal"
+			}}
+		}
 	end
 
 	return t2

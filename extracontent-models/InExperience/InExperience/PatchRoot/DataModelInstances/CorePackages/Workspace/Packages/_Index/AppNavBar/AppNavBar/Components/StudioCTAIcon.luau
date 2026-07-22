@@ -14,66 +14,82 @@ local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
 local withTooltip = UIBlox.App.Dialog.TooltipV2.withTooltip
 local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
+local Image = require(ParentParentParent.Foundation).Image
+local FFlagCoreUiMigrateUIBloxToFoundation = require(ParentParentParent.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 local useLocalization = Localization.Hooks.useLocalization
 local useRoactService = RobloxAppHooks.useRoactService
 local useEffectOnce = RoactUtils.Hooks.useEffectOnce
 local AppEventIngestService = RoactServiceTags.AppEventIngestService
 local Constants = require(ParentParent.Constants)
-local v22 = Images["icons/logo/studiologo"]
+local v24 = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/logo/studiologo"] else "icons/logo/studiologo"
 local EngineFeature = game:GetEngineFeature("WebViewRedesignEnabled")
 
-local function StudioCTAIcon(t1: {[any]: any}) -- line: 41
-	-- upvalues: useStyle (copy), React (copy), useRoactService (copy), AppEventIngestService (copy), useLocalization (copy), useEffectOnce (copy), Constants (copy), ControlState (copy), Promise (copy), TooltipOrientation (copy), CoreGui (copy), EngineFeature (copy), withTooltip (copy), ImageSetLabel (copy), v22 (copy)
+local function StudioCTAIcon(t1: {[any]: any}) -- line: 48
+	-- upvalues: useStyle (copy), React (copy), useRoactService (copy), AppEventIngestService (copy), useLocalization (copy), useEffectOnce (copy), Constants (copy), ControlState (copy), Promise (copy), TooltipOrientation (copy), CoreGui (copy), EngineFeature (copy), withTooltip (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), v24 (copy), ImageSetLabel (copy)
 	local Theme = useStyle().Theme
-	local v27, v28 = React.useState(false)
-	local v29 = useRoactService(AppEventIngestService)
-	local v30 = useLocalization({
+	local v29, v30 = React.useState(false)
+	local v31 = useRoactService(AppEventIngestService)
+	local v32 = useLocalization({
 		titleText = "CommonUI.Features.StudioCTA.Tooltip.Title",
 		bodyText = "CommonUI.Features.StudioCTA.Tooltip.Body"
 	})
-	local v31 = React.useRef(nil)
+	local v33 = React.useRef(nil)
 
-	useEffectOnce(function() -- line: 56
-		-- upvalues: v29 (copy), Constants (copy)
-		v29:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_MOUNT)
+	useEffectOnce(function() -- line: 63
+		-- upvalues: v31 (copy), Constants (copy)
+		v31:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_MOUNT)
 	end, {})
 
 	if t1.controlState == ControlState.Hover or t1.controlState == ControlState.Selected then
-		if not v31.current then
-			v31.current = Promise.delay(0.4):andThenCall(function() -- line: 64
-				-- upvalues: v31 (copy), v28 (copy)
-				v31.current = nil
-				v28(true)
+		if not v33.current then
+			v33.current = Promise.delay(0.4):andThenCall(function() -- line: 71
+				-- upvalues: v33 (copy), v30 (copy)
+				v33.current = nil
+				v30(true)
 			end)
 		end
 	else
-		if v31.current then
-			v31.current:cancel()
-			v31.current = nil
+		if v33.current then
+			v33.current:cancel()
+			v33.current = nil
 		end
 
-		if v27 then
-			v28(false)
+		if v29 then
+			v30(false)
 		end
 	end
 
 	local t2 = {
-		headerText = v30.titleText,
-		bodyText = v30.bodyText
+		headerText = v32.titleText,
+		bodyText = v32.bodyText
 	}
 	local t3 = {
 		DisplayOrder = 10,
 		preferredOrientation = TooltipOrientation.Top,
 		guiTarget = CoreGui,
-		active = if not EngineFeature then v27 else t1.showTooltip and v27
+		active = if not EngineFeature then v29 else t1.showTooltip and v29
 	}
 
-	return withTooltip(t2, t3, function(p1) -- line: 92
-		-- upvalues: React (copy), ImageSetLabel (copy), v22 (copy), Theme (ref)
+	return withTooltip(t2, t3, function(p1) -- line: 99
+		-- upvalues: FFlagCoreUiMigrateUIBloxToFoundation (copy), React (copy), Image (copy), v24 (copy), Theme (ref), ImageSetLabel (copy)
+		if FFlagCoreUiMigrateUIBloxToFoundation then
+			return React.createElement(Image, {
+				Size = UDim2.fromScale(1, 1),
+				Image = v24,
+				ScaleType = Enum.ScaleType.Fit,
+				imageStyle = {
+					Transparency = 0,
+					Color3 = Theme.IconEmphasis.Color
+				},
+				onAbsoluteSizeChanged = p1,
+				onAbsolutePositionChanged = p1
+			})
+		end
+
 		return React.createElement(ImageSetLabel, {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
-			Image = v22,
+			Image = v24,
 			ScaleType = Enum.ScaleType.Fit,
 			ImageColor3 = Theme.IconEmphasis.Color,
 			[React.Change.AbsoluteSize] = p1,

@@ -7,17 +7,20 @@ local t = InGameMenuDependencies.t
 local Cryo = InGameMenuDependencies.Cryo
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local Images = UIBlox.App.ImageSet.Images
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v12 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v13 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent.Parent
 local Assets = require(ParentParent.Resources.Assets)
 local FillCircle = require(script.Parent.FillCircle)
 local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v17 = Roact.PureComponent:extend("TextEntryField")
-local v18 = Images["component_assets/circle_17"]
+local FoundationImage = Foundation.Image
+local v20 = Roact.PureComponent:extend("TextEntryField")
+local v21 = Images["component_assets/circle_17"]
 
-v17.validateProps = t.strictInterface({
+v20.validateProps = t.strictInterface({
 	enabled = t.boolean,
 	text = t.string,
 	textChanged = t.callback,
@@ -30,7 +33,7 @@ v17.validateProps = t.strictInterface({
 	textBoxRef = t.optional(t.table)
 })
 
-function v17.init(p1) -- line: 53
+function v20.init(p1) -- line: 63
 	-- upvalues: Roact (copy)
 	p1.textBoxRef = p1.props.textBoxRef or Roact.createRef()
 	p1.state = {
@@ -40,18 +43,18 @@ function v17.init(p1) -- line: 53
 		cursorPosition = 0
 	}
 end
-function v17.calculateNeedsRescroll(p2, p3, p4) -- line: 64
+function v20.calculateNeedsRescroll(p2, p3, p4) -- line: 74
 	-- upvalues: TextService (copy)
-	p2:setState(function(p5, p6) -- line: 65
+	p2:setState(function(p5, p6) -- line: 75
 		-- upvalues: p4 (copy), p3 (copy), TextService (copy)
 		if p5.cursorPosition == -1 then
 			return nil
 		end
 
-		local v33 = p6.text:sub(1, p5.cursorPosition - 1)
-		local v34 = p4.RelativeSize * p3.Font.BaseSize
+		local v36 = p6.text:sub(1, p5.cursorPosition - 1)
+		local v37 = p4.RelativeSize * p3.Font.BaseSize
 		local vector2 = Vector2.new(p6.textBoxWidth, 10000)
-		local TextSize = TextService:GetTextSize(v33, v34, p4.Font, vector2)
+		local TextSize = TextService:GetTextSize(v36, v37, p4.Font, vector2)
 
 		if TextSize.Y > p5.scrollingFrameHeight + p5.canvasPosition then
 			return {
@@ -59,18 +62,18 @@ function v17.calculateNeedsRescroll(p2, p3, p4) -- line: 64
 			}
 		end
 
-		if TextSize.Y - v34 < p5.canvasPosition then
+		if TextSize.Y - v37 < p5.canvasPosition then
 			return {
-				canvasPosition = TextSize.Y - v34
+				canvasPosition = TextSize.Y - v37
 			}
 		end
 
 		return nil
 	end)
 end
-function v17.renderWithSelectionCursor(p7, p8) -- line: 87
-	-- upvalues: withFoundationOrUIBloxStyle (copy), TextService (copy), v18 (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), CursorKind (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy)
-	return withFoundationOrUIBloxStyle(function(p9) -- line: 88
+function v20.renderWithSelectionCursor(p7, p8) -- line: 97
+	-- upvalues: withFoundationOrUIBloxStyle (copy), TextService (copy), v21 (copy), Roact (copy), v13 (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), ImageSetLabel (copy)
+	return withFoundationOrUIBloxStyle(function(p9) -- line: 98
 		return {
 			Theme = {
 				TextDefault = {
@@ -90,27 +93,16 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 				}
 			}
 		}
-	end, function(p10) -- line: 99
-		-- upvalues: TextService (copy), p7 (copy), v18 (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), p8 (copy), CursorKind (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy)
+	end, function(p10) -- line: 109
+		-- upvalues: TextService (copy), p7 (copy), v21 (copy), Roact (copy), p8 (copy), v13 (copy), ThemedTextLabel (copy), Images (copy), FillCircle (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), ImageSetLabel (copy)
 		local TextDefault = p10.Theme.TextDefault
 		local Body = p10.Font.Body
 		local TextSize = TextService:GetTextSize(p7.props.text, Body.RelativeSize * p10.Font.BaseSize, Body.Font, Vector2.new(p7.state.textBoxWidth, 10000))
-		local ImageRectSize = v18.ImageRectSize
-		local ImageRectOffset = v18.ImageRectOffset
+		local ImageRectSize = v21.ImageRectSize
+		local ImageRectOffset = v21.ImageRectOffset
 		local ImageRectSizeX = ImageRectSize.X
-		local v45 = ImageRectSizeX / 2
-
-		return Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			Image = Assets.Images.RoundedRect.Image,
-			ImageColor3 = p10.Theme.BackgroundMuted.Color,
-			ImageTransparency = p10.Theme.BackgroundMuted.Transparency,
-			Position = p7.props.Position,
-			ScaleType = Assets.Images.RoundedRect.ScaleType,
-			Size = p7.props.Size,
-			SliceCenter = Assets.Images.RoundedRect.SliceCenter,
-			LayoutOrder = p7.props.LayoutOrder
-		}, {
+		local v48 = ImageRectSizeX / 2
+		local t1 = {
 			ScrollingFrame = Roact.createElement("ScrollingFrame", {
 				Size = UDim2.new(1, -24, 1, -44),
 				AnchorPoint = Vector2.new(0.5, 0),
@@ -153,14 +145,14 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 					Font = Body.Font,
 					TextSize = Body.RelativeSize * p10.Font.BaseSize,
 					TextWrapped = true,
-					SelectionImageObject = p8(CursorKind.InputFields),
+					SelectionImageObject = p8(v13.InputFields),
 					[Roact.Ref] = p7.textBoxRef,
 					[Roact.Change.Text] = function(p13) -- line: 170
 						-- upvalues: p7 (copy), p10 (copy), Body (copy)
 						if utf8.len(utf8.nfcnormalize(p13.Text)) > p7.props.maxTextLength then
-							local v50 = utf8.offset(p13.Text, p7.props.maxTextLength + 1) - 1
+							local v54 = utf8.offset(p13.Text, p7.props.maxTextLength + 1) - 1
 
-							p13.Text = string.sub(p13.Text, 1, v50)
+							p13.Text = string.sub(p13.Text, 1, v54)
 
 							return
 						end
@@ -208,16 +200,16 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 			BottomBar = Roact.createElement("ImageLabel", {
 				BackgroundTransparency = 1,
 				ImageTransparency = 0,
-				Image = v18.Image,
+				Image = v21.Image,
 				ImageColor3 = p10.Theme.BackgroundMuted.Color,
 				ScaleType = Enum.ScaleType.Slice,
 				AnchorPoint = Vector2.new(0, 1),
 				Position = UDim2.new(0, 0, 1, 0),
 				Size = UDim2.new(1, 0, 0, 32),
-				SliceCenter = Rect.new(v45 - 1, 0, v45 + 1, 1),
+				SliceCenter = Rect.new(v48 - 1, 0, v48 + 1, 1),
 				SliceScale = 1 / Images.ImagesResolutionScale,
-				ImageRectSize = Vector2.new(ImageRectSizeX, v45),
-				ImageRectOffset = ImageRectOffset + Vector2.new(0, v45)
+				ImageRectSize = Vector2.new(ImageRectSizeX, v48),
+				ImageRectOffset = ImageRectOffset + Vector2.new(0, v48)
 			}, {
 				TextAmmountIndicator = Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
@@ -234,17 +226,45 @@ function v17.renderWithSelectionCursor(p7, p8) -- line: 87
 					BackgroundColor = p10.Theme.BackgroundMuted.Color
 				}) })
 			})
-		})
+		}
+
+		if FFlagCoreUiMigrateUIBloxToFoundation then
+			return Roact.createElement(FoundationImage, {
+				Image = Assets.Images.RoundedRectImageKey,
+				imageStyle = {
+					Color3 = p10.Theme.BackgroundMuted.Color,
+					Transparency = p10.Theme.BackgroundMuted.Transparency
+				},
+				Position = p7.props.Position,
+				Size = p7.props.Size,
+				LayoutOrder = p7.props.LayoutOrder,
+				slice = {
+					center = Rect.new(8, 8, 9, 9)
+				}
+			}, t1)
+		end
+
+		return Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Image = Assets.Images.RoundedRect.Image,
+			ImageColor3 = p10.Theme.BackgroundMuted.Color,
+			ImageTransparency = p10.Theme.BackgroundMuted.Transparency,
+			Position = p7.props.Position,
+			ScaleType = Assets.Images.RoundedRect.ScaleType,
+			Size = p7.props.Size,
+			SliceCenter = Assets.Images.RoundedRect.SliceCenter,
+			LayoutOrder = p7.props.LayoutOrder
+		}, t1)
 	end)
 end
-function v17.render(p16) -- line: 247
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p17) -- line: 248
+function v20.render(p16) -- line: 273
+	-- upvalues: v12 (copy)
+	return v12(function(p17) -- line: 274
 		-- upvalues: p16 (copy)
 		return p16:renderWithSelectionCursor(p17)
 	end)
 end
-function v17.didUpdate(p18, p19, _) -- line: 253
+function v20.didUpdate(p18, p19, _) -- line: 279
 	if not p18.props.enabled and p19.enabled then
 		if p18.textBoxRef.current and p18.textBoxRef.current:IsFocused() then
 			p18.textBoxRef.current:ReleaseFocus()
@@ -256,9 +276,9 @@ function v17.didUpdate(p18, p19, _) -- line: 253
 	end
 end
 
-return Roact.forwardRef(function(p21, p22) -- line: 266
-	-- upvalues: Roact (copy), v17 (copy), Cryo (copy)
-	return Roact.createElement(v17, Cryo.Dictionary.join(p21, {
+return Roact.forwardRef(function(p21, p22) -- line: 292
+	-- upvalues: Roact (copy), v20 (copy), Cryo (copy)
+	return Roact.createElement(v20, Cryo.Dictionary.join(p21, {
 		textBoxRef = p22
 	}))
 end)

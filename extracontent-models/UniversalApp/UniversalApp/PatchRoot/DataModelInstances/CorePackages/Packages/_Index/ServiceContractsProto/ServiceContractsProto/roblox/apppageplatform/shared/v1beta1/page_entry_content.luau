@@ -7,30 +7,30 @@ local t2 = {}
 
 t2.__index = t2
 
-function t2.new(t3: {[any]: any}?) -- line: 3409
+function t2.new(t3: {[any]: any}?) -- line: 3578
 	-- upvalues: t2 (copy)
 	return (setmetatable({
 		page_entry = if t3 ~= nil and t3.page_entry ~= nil then t3.page_entry else nil,
 		input_data = if t3 ~= nil and t3.input_data ~= nil then t3.input_data else nil
 	}, t2))
 end
-function t2.encode(p1) -- line: 3416
+function t2.encode(p1) -- line: 3585
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n1 = 0
 
 	if p1.page_entry ~= nil then
-		local v117 = p1.page_entry:encode()
-		local v118, v119 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+		local v122 = p1.page_entry:encode()
+		local v123, v124 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeBuffer(v118, v119, v117, buffer.len(v117))
+		buf, n1 = proto.writeBuffer(v123, v124, v122, buffer.len(v122))
 	end
 
 	if p1.input_data ~= nil then
-		local v120 = p1.input_data:encode()
-		local v121, v122 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+		local v125 = p1.input_data:encode()
+		local v126, v127 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeBuffer(v121, v122, v120, buffer.len(v120))
+		buf, n1 = proto.writeBuffer(v126, v127, v125, buffer.len(v125))
 	end
 
 	local buf2 = buffer.create(n1)
@@ -39,52 +39,52 @@ function t2.encode(p1) -- line: 3416
 
 	return buf2
 end
-function t2.decode(p2: buffer) -- line: 3437
+function t2.decode(p2: buffer) -- line: 3606
 	-- upvalues: t2 (copy), proto (copy), page_entry (copy), t1 (copy)
-	local v125 = t2.new()
+	local v130 = t2.new()
 	local n2 = 0
 
 	while n2 < buffer.len(p2) do
-		local v127, v128
+		local v132, v133
 
-		v127, v128, n2 = proto.readTag(p2, n2)
+		v132, v133, n2 = proto.readTag(p2, n2)
 
-		if v128 == proto.wireTypes.varint then
-			local v129
-
-			v129, n2 = proto.readVarInt(p2, n2)
-		elseif v128 == proto.wireTypes.lengthDelimited then
-			if v127 == 1 then
-				local v130
-
-				v130, n2 = proto.readBuffer(p2, n2)
-				v125.page_entry = page_entry.PageEntry.decode(v130)
-			elseif v127 == 2 then
-				local v131
-
-				v131, n2 = proto.readBuffer(p2, n2)
-				v125.input_data = t1.PageEntryInputData.decode(v131)
-			else
-				local v132, v133 = proto.readVarInt(p2, n2)
-
-				n2 = v133 + v132
-			end
-		elseif v128 == proto.wireTypes.i32 then
+		if v133 == proto.wireTypes.varint then
 			local v134
 
-			v134, n2 = proto.readFixed32(p2, n2)
-		elseif v128 == proto.wireTypes.i64 then
-			local v135
+			v134, n2 = proto.readVarInt(p2, n2)
+		elseif v133 == proto.wireTypes.lengthDelimited then
+			if v132 == 1 then
+				local v135
 
-			v135, n2 = proto.readFixed64(p2, n2)
+				v135, n2 = proto.readBuffer(p2, n2)
+				v130.page_entry = page_entry.PageEntry.decode(v135)
+			elseif v132 == 2 then
+				local v136
+
+				v136, n2 = proto.readBuffer(p2, n2)
+				v130.input_data = t1.PageEntryInputData.decode(v136)
+			else
+				local v137, v138 = proto.readVarInt(p2, n2)
+
+				n2 = v138 + v137
+			end
+		elseif v133 == proto.wireTypes.i32 then
+			local v139
+
+			v139, n2 = proto.readFixed32(p2, n2)
+		elseif v133 == proto.wireTypes.i64 then
+			local v140
+
+			v140, n2 = proto.readFixed64(p2, n2)
 		else
-			error("Unsupported wire type: " .. v128)
+			error("Unsupported wire type: " .. v133)
 		end
 	end
 
-	return v125
+	return v130
 end
-function t2.jsonEncode(p3) -- line: 3485
+function t2.jsonEncode(p3) -- line: 3654
 	local t4 = {}
 
 	if p3.page_entry ~= nil then
@@ -97,27 +97,27 @@ function t2.jsonEncode(p3) -- line: 3485
 
 	return t4
 end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 3499
+function t2.jsonDecode(t5: {[any]: any}) -- line: 3668
 	-- upvalues: t2 (copy), page_entry (copy), t1 (copy)
-	local v139 = t2.new()
+	local v144 = t2.new()
 
 	if t5.page_entry ~= nil then
-		v139.page_entry = page_entry.PageEntry.jsonDecode(t5.page_entry)
+		v144.page_entry = page_entry.PageEntry.jsonDecode(t5.page_entry)
 	end
 
 	if t5.pageEntry ~= nil then
-		v139.page_entry = page_entry.PageEntry.jsonDecode(t5.pageEntry)
+		v144.page_entry = page_entry.PageEntry.jsonDecode(t5.pageEntry)
 	end
 
 	if t5.input_data ~= nil then
-		v139.input_data = t1.PageEntryInputData.jsonDecode(t5.input_data)
+		v144.input_data = t1.PageEntryInputData.jsonDecode(t5.input_data)
 	end
 
 	if t5.inputData ~= nil then
-		v139.input_data = t1.PageEntryInputData.jsonDecode(t5.inputData)
+		v144.input_data = t1.PageEntryInputData.jsonDecode(t5.inputData)
 	end
 
-	return v139
+	return v144
 end
 
 t2.descriptor = {
@@ -131,29 +131,29 @@ local t6 = {}
 
 t6.__index = t6
 
-function t6.new(t7: {[any]: any}?) -- line: 3535
+function t6.new(t7: {[any]: any}?) -- line: 3704
 	-- upvalues: t6 (copy)
 	return (setmetatable({
 		input_data = if t7 ~= nil and t7.input_data ~= nil then t7.input_data else nil,
 		roblox_component = if t7 ~= nil and t7.roblox_component ~= nil then t7.roblox_component else ""
 	}, t6))
 end
-function t6.encode(p4) -- line: 3542
+function t6.encode(p4) -- line: 3711
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n3 = 0
 
 	if p4.input_data ~= nil then
-		local v144 = p4.input_data:encode()
-		local v145, v146 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+		local v149 = p4.input_data:encode()
+		local v150, v151 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n3 = proto.writeBuffer(v145, v146, v144, buffer.len(v144))
+		buf, n3 = proto.writeBuffer(v150, v151, v149, buffer.len(v149))
 	end
 
 	if p4.roblox_component ~= nil and p4.roblox_component ~= "" then
-		local v147, v148 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
+		local v152, v153 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n3 = proto.writeString(v147, v148, p4.roblox_component)
+		buf, n3 = proto.writeString(v152, v153, p4.roblox_component)
 	end
 
 	local buf3 = buffer.create(n3)
@@ -162,52 +162,52 @@ function t6.encode(p4) -- line: 3542
 
 	return buf3
 end
-function t6.decode(p5: buffer) -- line: 3562
+function t6.decode(p5: buffer) -- line: 3731
 	-- upvalues: t6 (copy), proto (copy), t1 (copy)
-	local v151 = t6.new()
+	local v156 = t6.new()
 	local n4 = 0
 
 	while n4 < buffer.len(p5) do
-		local v153, v154
+		local v158, v159
 
-		v153, v154, n4 = proto.readTag(p5, n4)
+		v158, v159, n4 = proto.readTag(p5, n4)
 
-		if v154 == proto.wireTypes.varint then
-			local v155
-
-			v155, n4 = proto.readVarInt(p5, n4)
-		elseif v154 == proto.wireTypes.lengthDelimited then
-			if v153 == 1 then
-				local v156
-
-				v156, n4 = proto.readBuffer(p5, n4)
-				v151.input_data = t1.PageEntryInputData.decode(v156)
-			elseif v153 == 2 then
-				local v157
-
-				v157, n4 = proto.readBuffer(p5, n4)
-				v151.roblox_component = buffer.tostring(v157)
-			else
-				local v158, v159 = proto.readVarInt(p5, n4)
-
-				n4 = v159 + v158
-			end
-		elseif v154 == proto.wireTypes.i32 then
+		if v159 == proto.wireTypes.varint then
 			local v160
 
-			v160, n4 = proto.readFixed32(p5, n4)
-		elseif v154 == proto.wireTypes.i64 then
-			local v161
+			v160, n4 = proto.readVarInt(p5, n4)
+		elseif v159 == proto.wireTypes.lengthDelimited then
+			if v158 == 1 then
+				local v161
 
-			v161, n4 = proto.readFixed64(p5, n4)
+				v161, n4 = proto.readBuffer(p5, n4)
+				v156.input_data = t1.PageEntryInputData.decode(v161)
+			elseif v158 == 2 then
+				local v162
+
+				v162, n4 = proto.readBuffer(p5, n4)
+				v156.roblox_component = buffer.tostring(v162)
+			else
+				local v163, v164 = proto.readVarInt(p5, n4)
+
+				n4 = v164 + v163
+			end
+		elseif v159 == proto.wireTypes.i32 then
+			local v165
+
+			v165, n4 = proto.readFixed32(p5, n4)
+		elseif v159 == proto.wireTypes.i64 then
+			local v166
+
+			v166, n4 = proto.readFixed64(p5, n4)
 		else
-			error("Unsupported wire type: " .. v154)
+			error("Unsupported wire type: " .. v159)
 		end
 	end
 
-	return v151
+	return v156
 end
-function t6.jsonEncode(p6) -- line: 3610
+function t6.jsonEncode(p6) -- line: 3779
 	local t8 = {}
 
 	if p6.input_data ~= nil then
@@ -220,27 +220,27 @@ function t6.jsonEncode(p6) -- line: 3610
 
 	return t8
 end
-function t6.jsonDecode(t9: {[any]: any}) -- line: 3624
+function t6.jsonDecode(t9: {[any]: any}) -- line: 3793
 	-- upvalues: t6 (copy), t1 (copy)
-	local v165 = t6.new()
+	local v170 = t6.new()
 
 	if t9.input_data ~= nil then
-		v165.input_data = t1.PageEntryInputData.jsonDecode(t9.input_data)
+		v170.input_data = t1.PageEntryInputData.jsonDecode(t9.input_data)
 	end
 
 	if t9.inputData ~= nil then
-		v165.input_data = t1.PageEntryInputData.jsonDecode(t9.inputData)
+		v170.input_data = t1.PageEntryInputData.jsonDecode(t9.inputData)
 	end
 
 	if t9.roblox_component ~= nil then
-		v165.roblox_component = t9.roblox_component
+		v170.roblox_component = t9.roblox_component
 	end
 
 	if t9.robloxComponent ~= nil then
-		v165.roblox_component = t9.robloxComponent
+		v170.roblox_component = t9.robloxComponent
 	end
 
-	return v165
+	return v170
 end
 
 t6.descriptor = {
@@ -254,29 +254,29 @@ local t10 = {}
 
 t10.__index = t10
 
-function t10.new(t11: {[any]: any}?) -- line: 3660
+function t10.new(t11: {[any]: any}?) -- line: 3829
 	-- upvalues: t10 (copy)
 	return (setmetatable({
 		roblox_component = if t11 ~= nil and t11.roblox_component ~= nil then t11.roblox_component else "",
 		input_data = if t11 ~= nil and t11.input_data ~= nil then t11.input_data else nil
 	}, t10))
 end
-function t10.encode(p7) -- line: 3667
+function t10.encode(p7) -- line: 3836
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n5 = 0
 
 	if p7.roblox_component ~= nil and p7.roblox_component ~= "" then
-		local v170, v171 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+		local v175, v176 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n5 = proto.writeString(v170, v171, p7.roblox_component)
+		buf, n5 = proto.writeString(v175, v176, p7.roblox_component)
 	end
 
 	if p7.input_data ~= nil and p7.input_data.type == "attribution_row" then
-		local v172 = p7.input_data.value:encode()
-		local v173, v174 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
+		local v177 = p7.input_data.value:encode()
+		local v178, v179 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n5 = proto.writeBuffer(v173, v174, v172, buffer.len(v172))
+		buf, n5 = proto.writeBuffer(v178, v179, v177, buffer.len(v177))
 	end
 
 	local buf4 = buffer.create(n5)
@@ -285,55 +285,55 @@ function t10.encode(p7) -- line: 3667
 
 	return buf4
 end
-function t10.decode(p8: buffer) -- line: 3689
+function t10.decode(p8: buffer) -- line: 3858
 	-- upvalues: t10 (copy), proto (copy), t1 (copy)
-	local v177 = t10.new()
+	local v182 = t10.new()
 	local n6 = 0
 
 	while n6 < buffer.len(p8) do
-		local v179, v180
+		local v184, v185
 
-		v179, v180, n6 = proto.readTag(p8, n6)
+		v184, v185, n6 = proto.readTag(p8, n6)
 
-		if v180 == proto.wireTypes.varint then
-			local v181
-
-			v181, n6 = proto.readVarInt(p8, n6)
-		elseif v180 == proto.wireTypes.lengthDelimited then
-			if v179 == 1 then
-				local v182
-
-				v182, n6 = proto.readBuffer(p8, n6)
-				v177.roblox_component = buffer.tostring(v182)
-			elseif v179 == 2 then
-				local v183
-
-				v183, n6 = proto.readBuffer(p8, n6)
-				v177.input_data = {
-					type = "attribution_row",
-					value = t1.AttributionRowInputData.decode(v183)
-				}
-			else
-				local v184, v185 = proto.readVarInt(p8, n6)
-
-				n6 = v185 + v184
-			end
-		elseif v180 == proto.wireTypes.i32 then
+		if v185 == proto.wireTypes.varint then
 			local v186
 
-			v186, n6 = proto.readFixed32(p8, n6)
-		elseif v180 == proto.wireTypes.i64 then
-			local v187
+			v186, n6 = proto.readVarInt(p8, n6)
+		elseif v185 == proto.wireTypes.lengthDelimited then
+			if v184 == 1 then
+				local v187
 
-			v187, n6 = proto.readFixed64(p8, n6)
+				v187, n6 = proto.readBuffer(p8, n6)
+				v182.roblox_component = buffer.tostring(v187)
+			elseif v184 == 2 then
+				local v188
+
+				v188, n6 = proto.readBuffer(p8, n6)
+				v182.input_data = {
+					type = "attribution_row",
+					value = t1.AttributionRowInputData.decode(v188)
+				}
+			else
+				local v189, v190 = proto.readVarInt(p8, n6)
+
+				n6 = v190 + v189
+			end
+		elseif v185 == proto.wireTypes.i32 then
+			local v191
+
+			v191, n6 = proto.readFixed32(p8, n6)
+		elseif v185 == proto.wireTypes.i64 then
+			local v192
+
+			v192, n6 = proto.readFixed64(p8, n6)
 		else
-			error("Unsupported wire type: " .. v180)
+			error("Unsupported wire type: " .. v185)
 		end
 	end
 
-	return v177
+	return v182
 end
-function t10.jsonEncode(p9) -- line: 3738
+function t10.jsonEncode(p9) -- line: 3907
 	local t12 = {}
 
 	if p9.roblox_component ~= nil and p9.roblox_component ~= "" then
@@ -346,33 +346,33 @@ function t10.jsonEncode(p9) -- line: 3738
 
 	return t12
 end
-function t10.jsonDecode(t13: {[any]: any}) -- line: 3754
+function t10.jsonDecode(t13: {[any]: any}) -- line: 3923
 	-- upvalues: t10 (copy), t1 (copy)
-	local v191 = t10.new()
+	local v196 = t10.new()
 
 	if t13.roblox_component ~= nil then
-		v191.roblox_component = t13.roblox_component
+		v196.roblox_component = t13.roblox_component
 	end
 
 	if t13.robloxComponent ~= nil then
-		v191.roblox_component = t13.robloxComponent
+		v196.roblox_component = t13.robloxComponent
 	end
 
 	if t13.attribution_row ~= nil then
-		v191.input_data = {
+		v196.input_data = {
 			type = "attribution_row",
 			value = t1.AttributionRowInputData.jsonDecode(t13.attribution_row)
 		}
 	end
 
 	if t13.attributionRow ~= nil then
-		v191.input_data = {
+		v196.input_data = {
 			type = "attribution_row",
 			value = t1.AttributionRowInputData.jsonDecode(t13.attributionRow)
 		}
 	end
 
-	return v191
+	return v196
 end
 
 t10.descriptor = {
@@ -386,29 +386,29 @@ local t14 = {}
 
 t14.__index = t14
 
-function t14.new(t15: {[any]: any}?) -- line: 3792
+function t14.new(t15: {[any]: any}?) -- line: 3961
 	-- upvalues: t14 (copy)
 	return (setmetatable({
 		roblox_component = if t15 ~= nil and t15.roblox_component ~= nil then t15.roblox_component else "",
 		input_data = if t15 ~= nil and t15.input_data ~= nil then t15.input_data else nil
 	}, t14))
 end
-function t14.encode(p10) -- line: 3799
+function t14.encode(p10) -- line: 3968
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n7 = 0
 
 	if p10.roblox_component ~= nil and p10.roblox_component ~= "" then
-		local v196, v197 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+		local v201, v202 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n7 = proto.writeString(v196, v197, p10.roblox_component)
+		buf, n7 = proto.writeString(v201, v202, p10.roblox_component)
 	end
 
 	if p10.input_data ~= nil and p10.input_data.type == "image" then
-		local v198 = p10.input_data.value:encode()
-		local v199, v200 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
+		local v203 = p10.input_data.value:encode()
+		local v204, v205 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n7 = proto.writeBuffer(v199, v200, v198, buffer.len(v198))
+		buf, n7 = proto.writeBuffer(v204, v205, v203, buffer.len(v203))
 	end
 
 	local buf5 = buffer.create(n7)
@@ -417,55 +417,55 @@ function t14.encode(p10) -- line: 3799
 
 	return buf5
 end
-function t14.decode(p11: buffer) -- line: 3821
+function t14.decode(p11: buffer) -- line: 3990
 	-- upvalues: t14 (copy), proto (copy), t1 (copy)
-	local v203 = t14.new()
+	local v208 = t14.new()
 	local n8 = 0
 
 	while n8 < buffer.len(p11) do
-		local v205, v206
+		local v210, v211
 
-		v205, v206, n8 = proto.readTag(p11, n8)
+		v210, v211, n8 = proto.readTag(p11, n8)
 
-		if v206 == proto.wireTypes.varint then
-			local v207
-
-			v207, n8 = proto.readVarInt(p11, n8)
-		elseif v206 == proto.wireTypes.lengthDelimited then
-			if v205 == 1 then
-				local v208
-
-				v208, n8 = proto.readBuffer(p11, n8)
-				v203.roblox_component = buffer.tostring(v208)
-			elseif v205 == 2 then
-				local v209
-
-				v209, n8 = proto.readBuffer(p11, n8)
-				v203.input_data = {
-					type = "image",
-					value = t1.ImageInputData.decode(v209)
-				}
-			else
-				local v210, v211 = proto.readVarInt(p11, n8)
-
-				n8 = v211 + v210
-			end
-		elseif v206 == proto.wireTypes.i32 then
+		if v211 == proto.wireTypes.varint then
 			local v212
 
-			v212, n8 = proto.readFixed32(p11, n8)
-		elseif v206 == proto.wireTypes.i64 then
-			local v213
+			v212, n8 = proto.readVarInt(p11, n8)
+		elseif v211 == proto.wireTypes.lengthDelimited then
+			if v210 == 1 then
+				local v213
 
-			v213, n8 = proto.readFixed64(p11, n8)
+				v213, n8 = proto.readBuffer(p11, n8)
+				v208.roblox_component = buffer.tostring(v213)
+			elseif v210 == 2 then
+				local v214
+
+				v214, n8 = proto.readBuffer(p11, n8)
+				v208.input_data = {
+					type = "image",
+					value = t1.ImageInputData.decode(v214)
+				}
+			else
+				local v215, v216 = proto.readVarInt(p11, n8)
+
+				n8 = v216 + v215
+			end
+		elseif v211 == proto.wireTypes.i32 then
+			local v217
+
+			v217, n8 = proto.readFixed32(p11, n8)
+		elseif v211 == proto.wireTypes.i64 then
+			local v218
+
+			v218, n8 = proto.readFixed64(p11, n8)
 		else
-			error("Unsupported wire type: " .. v206)
+			error("Unsupported wire type: " .. v211)
 		end
 	end
 
-	return v203
+	return v208
 end
-function t14.jsonEncode(p12) -- line: 3869
+function t14.jsonEncode(p12) -- line: 4038
 	local t16 = {}
 
 	if p12.roblox_component ~= nil and p12.roblox_component ~= "" then
@@ -478,26 +478,26 @@ function t14.jsonEncode(p12) -- line: 3869
 
 	return t16
 end
-function t14.jsonDecode(t17: {[any]: any}) -- line: 3885
+function t14.jsonDecode(t17: {[any]: any}) -- line: 4054
 	-- upvalues: t14 (copy), t1 (copy)
-	local v217 = t14.new()
+	local v222 = t14.new()
 
 	if t17.roblox_component ~= nil then
-		v217.roblox_component = t17.roblox_component
+		v222.roblox_component = t17.roblox_component
 	end
 
 	if t17.robloxComponent ~= nil then
-		v217.roblox_component = t17.robloxComponent
+		v222.roblox_component = t17.robloxComponent
 	end
 
 	if t17.image ~= nil then
-		v217.input_data = {
+		v222.input_data = {
 			type = "image",
 			value = t1.ImageInputData.jsonDecode(t17.image)
 		}
 	end
 
-	return v217
+	return v222
 end
 
 t14.descriptor = {
@@ -511,318 +511,333 @@ local t18 = {}
 
 t18.__index = t18
 
-function t18.new(t19: {[any]: any}?) -- line: 3917
+function t18.new(t19: {[any]: any}?) -- line: 4086
 	-- upvalues: t18 (copy)
 	return (setmetatable({
 		kind = if t19 ~= nil and t19.kind ~= nil then t19.kind else nil
 	}, t18))
 end
-function t18.encode(p13) -- line: 3923
+function t18.encode(p13) -- line: 4092
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n9 = 0
 
 	if p13.kind ~= nil then
 		if p13.kind.type == "badges_grid" then
-			local v222 = p13.kind.value:encode()
-			local v223, v224 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
+			local v227 = p13.kind.value:encode()
+			local v228, v229 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v223, v224, v222, buffer.len(v222))
+			buf, n9 = proto.writeBuffer(v228, v229, v227, buffer.len(v227))
 		elseif p13.kind.type == "badge_details" then
-			local v225 = p13.kind.value:encode()
-			local v226, v227 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
+			local v230 = p13.kind.value:encode()
+			local v231, v232 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v226, v227, v225, buffer.len(v225))
+			buf, n9 = proto.writeBuffer(v231, v232, v230, buffer.len(v230))
 		elseif p13.kind.type == "static_content" then
-			local v228 = p13.kind.value:encode()
-			local v229, v230 = proto.writeTag(buf, n9, 3, proto.wireTypes.lengthDelimited)
+			local v233 = p13.kind.value:encode()
+			local v234, v235 = proto.writeTag(buf, n9, 3, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v229, v230, v228, buffer.len(v228))
+			buf, n9 = proto.writeBuffer(v234, v235, v233, buffer.len(v233))
 		elseif p13.kind.type == "experience_attribution_row" then
-			local v231 = p13.kind.value:encode()
-			local v232, v233 = proto.writeTag(buf, n9, 4, proto.wireTypes.lengthDelimited)
+			local v236 = p13.kind.value:encode()
+			local v237, v238 = proto.writeTag(buf, n9, 4, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v232, v233, v231, buffer.len(v231))
+			buf, n9 = proto.writeBuffer(v237, v238, v236, buffer.len(v236))
 		elseif p13.kind.type == "experience_action_module" then
-			local v234 = p13.kind.value:encode()
-			local v235, v236 = proto.writeTag(buf, n9, 5, proto.wireTypes.lengthDelimited)
+			local v239 = p13.kind.value:encode()
+			local v240, v241 = proto.writeTag(buf, n9, 5, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v235, v236, v234, buffer.len(v234))
+			buf, n9 = proto.writeBuffer(v240, v241, v239, buffer.len(v239))
 		elseif p13.kind.type == "experience_media_gallery" then
-			local v237 = p13.kind.value:encode()
-			local v238, v239 = proto.writeTag(buf, n9, 6, proto.wireTypes.lengthDelimited)
+			local v242 = p13.kind.value:encode()
+			local v243, v244 = proto.writeTag(buf, n9, 6, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v238, v239, v237, buffer.len(v237))
+			buf, n9 = proto.writeBuffer(v243, v244, v242, buffer.len(v242))
 		elseif p13.kind.type == "experience_description" then
-			local v240 = p13.kind.value:encode()
-			local v241, v242 = proto.writeTag(buf, n9, 7, proto.wireTypes.lengthDelimited)
+			local v245 = p13.kind.value:encode()
+			local v246, v247 = proto.writeTag(buf, n9, 7, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v241, v242, v240, buffer.len(v240))
+			buf, n9 = proto.writeBuffer(v246, v247, v245, buffer.len(v245))
 		elseif p13.kind.type == "experience_stat_row" then
-			local v243 = p13.kind.value:encode()
-			local v244, v245 = proto.writeTag(buf, n9, 8, proto.wireTypes.lengthDelimited)
+			local v248 = p13.kind.value:encode()
+			local v249, v250 = proto.writeTag(buf, n9, 8, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v244, v245, v243, buffer.len(v243))
+			buf, n9 = proto.writeBuffer(v249, v250, v248, buffer.len(v248))
 		elseif p13.kind.type == "experience_info_table" then
-			local v246 = p13.kind.value:encode()
-			local v247, v248 = proto.writeTag(buf, n9, 9, proto.wireTypes.lengthDelimited)
+			local v251 = p13.kind.value:encode()
+			local v252, v253 = proto.writeTag(buf, n9, 9, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v247, v248, v246, buffer.len(v246))
+			buf, n9 = proto.writeBuffer(v252, v253, v251, buffer.len(v251))
 		elseif p13.kind.type == "social_link_row" then
-			local v249 = p13.kind.value:encode()
-			local v250, v251 = proto.writeTag(buf, n9, 10, proto.wireTypes.lengthDelimited)
+			local v254 = p13.kind.value:encode()
+			local v255, v256 = proto.writeTag(buf, n9, 10, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v250, v251, v249, buffer.len(v249))
+			buf, n9 = proto.writeBuffer(v255, v256, v254, buffer.len(v254))
 		elseif p13.kind.type == "experience_carousel" then
-			local v252 = p13.kind.value:encode()
-			local v253, v254 = proto.writeTag(buf, n9, 11, proto.wireTypes.lengthDelimited)
+			local v257 = p13.kind.value:encode()
+			local v258, v259 = proto.writeTag(buf, n9, 11, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v253, v254, v252, buffer.len(v252))
+			buf, n9 = proto.writeBuffer(v258, v259, v257, buffer.len(v257))
 		elseif p13.kind.type == "song_carousel" then
-			local v255 = p13.kind.value:encode()
-			local v256, v257 = proto.writeTag(buf, n9, 12, proto.wireTypes.lengthDelimited)
+			local v260 = p13.kind.value:encode()
+			local v261, v262 = proto.writeTag(buf, n9, 12, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v256, v257, v255, buffer.len(v255))
+			buf, n9 = proto.writeBuffer(v261, v262, v260, buffer.len(v260))
 		elseif p13.kind.type == "events_carousel" then
-			local v258 = p13.kind.value:encode()
-			local v259, v260 = proto.writeTag(buf, n9, 13, proto.wireTypes.lengthDelimited)
+			local v263 = p13.kind.value:encode()
+			local v264, v265 = proto.writeTag(buf, n9, 13, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v259, v260, v258, buffer.len(v258))
+			buf, n9 = proto.writeBuffer(v264, v265, v263, buffer.len(v263))
 		elseif p13.kind.type == "game_pass_collection" then
-			local v261 = p13.kind.value:encode()
-			local v262, v263 = proto.writeTag(buf, n9, 14, proto.wireTypes.lengthDelimited)
+			local v266 = p13.kind.value:encode()
+			local v267, v268 = proto.writeTag(buf, n9, 14, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v262, v263, v261, buffer.len(v261))
+			buf, n9 = proto.writeBuffer(v267, v268, v266, buffer.len(v266))
 		elseif p13.kind.type == "developer_product_collection" then
-			local v264 = p13.kind.value:encode()
-			local v265, v266 = proto.writeTag(buf, n9, 15, proto.wireTypes.lengthDelimited)
+			local v269 = p13.kind.value:encode()
+			local v270, v271 = proto.writeTag(buf, n9, 15, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v265, v266, v264, buffer.len(v264))
+			buf, n9 = proto.writeBuffer(v270, v271, v269, buffer.len(v269))
 		elseif p13.kind.type == "subscription_collection" then
-			local v267 = p13.kind.value:encode()
-			local v268, v269 = proto.writeTag(buf, n9, 16, proto.wireTypes.lengthDelimited)
+			local v272 = p13.kind.value:encode()
+			local v273, v274 = proto.writeTag(buf, n9, 16, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v268, v269, v267, buffer.len(v267))
+			buf, n9 = proto.writeBuffer(v273, v274, v272, buffer.len(v272))
+		elseif p13.kind.type == "dynamic_store_category" then
+			local v275 = p13.kind.value:encode()
+			local v276, v277 = proto.writeTag(buf, n9, 17, proto.wireTypes.lengthDelimited)
+
+			buf, n9 = proto.writeBuffer(v276, v277, v275, buffer.len(v275))
 		elseif p13.kind.type == "card_container" then
-			local v270 = p13.kind.value:encode()
-			local v271, v272 = proto.writeTag(buf, n9, 20, proto.wireTypes.lengthDelimited)
+			local v278 = p13.kind.value:encode()
+			local v279, v280 = proto.writeTag(buf, n9, 20, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v271, v272, v270, buffer.len(v270))
+			buf, n9 = proto.writeBuffer(v279, v280, v278, buffer.len(v278))
 		elseif p13.kind.type == "card" then
-			local v273 = p13.kind.value:encode()
-			local v274, v275 = proto.writeTag(buf, n9, 21, proto.wireTypes.lengthDelimited)
+			local v281 = p13.kind.value:encode()
+			local v282, v283 = proto.writeTag(buf, n9, 21, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v274, v275, v273, buffer.len(v273))
+			buf, n9 = proto.writeBuffer(v282, v283, v281, buffer.len(v281))
 		elseif p13.kind.type == "dialog" then
-			local v276 = p13.kind.value:encode()
-			local v277, v278 = proto.writeTag(buf, n9, 22, proto.wireTypes.lengthDelimited)
+			local v284 = p13.kind.value:encode()
+			local v285, v286 = proto.writeTag(buf, n9, 22, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v277, v278, v276, buffer.len(v276))
+			buf, n9 = proto.writeBuffer(v285, v286, v284, buffer.len(v284))
 		elseif p13.kind.type == "banner" then
-			local v279 = p13.kind.value:encode()
-			local v280, v281 = proto.writeTag(buf, n9, 23, proto.wireTypes.lengthDelimited)
+			local v287 = p13.kind.value:encode()
+			local v288, v289 = proto.writeTag(buf, n9, 23, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v280, v281, v279, buffer.len(v279))
+			buf, n9 = proto.writeBuffer(v288, v289, v287, buffer.len(v287))
 		elseif p13.kind.type == "tooltip" then
-			local v282 = p13.kind.value:encode()
-			local v283, v284 = proto.writeTag(buf, n9, 24, proto.wireTypes.lengthDelimited)
+			local v290 = p13.kind.value:encode()
+			local v291, v292 = proto.writeTag(buf, n9, 24, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v283, v284, v282, buffer.len(v282))
+			buf, n9 = proto.writeBuffer(v291, v292, v290, buffer.len(v290))
 		elseif p13.kind.type == "coachmark" then
-			local v285 = p13.kind.value:encode()
-			local v286, v287 = proto.writeTag(buf, n9, 25, proto.wireTypes.lengthDelimited)
+			local v293 = p13.kind.value:encode()
+			local v294, v295 = proto.writeTag(buf, n9, 25, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v286, v287, v285, buffer.len(v285))
+			buf, n9 = proto.writeBuffer(v294, v295, v293, buffer.len(v293))
 		elseif p13.kind.type == "system_banner_prompt" then
-			local v288 = p13.kind.value:encode()
-			local v289, v290 = proto.writeTag(buf, n9, 28, proto.wireTypes.lengthDelimited)
+			local v296 = p13.kind.value:encode()
+			local v297, v298 = proto.writeTag(buf, n9, 28, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v289, v290, v288, buffer.len(v288))
+			buf, n9 = proto.writeBuffer(v297, v298, v296, buffer.len(v296))
 		elseif p13.kind.type == "age_check_upsell" then
-			local v291 = p13.kind.value:encode()
-			local v292, v293 = proto.writeTag(buf, n9, 29, proto.wireTypes.lengthDelimited)
+			local v299 = p13.kind.value:encode()
+			local v300, v301 = proto.writeTag(buf, n9, 29, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v292, v293, v291, buffer.len(v291))
+			buf, n9 = proto.writeBuffer(v300, v301, v299, buffer.len(v299))
 		elseif p13.kind.type == "catalog_item_list" then
-			local v294 = p13.kind.value:encode()
-			local v295, v296 = proto.writeTag(buf, n9, 26, proto.wireTypes.lengthDelimited)
+			local v302 = p13.kind.value:encode()
+			local v303, v304 = proto.writeTag(buf, n9, 26, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v295, v296, v294, buffer.len(v294))
+			buf, n9 = proto.writeBuffer(v303, v304, v302, buffer.len(v302))
 		elseif p13.kind.type == "user_list" then
-			local v297 = p13.kind.value:encode()
-			local v298, v299 = proto.writeTag(buf, n9, 27, proto.wireTypes.lengthDelimited)
+			local v305 = p13.kind.value:encode()
+			local v306, v307 = proto.writeTag(buf, n9, 27, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v298, v299, v297, buffer.len(v297))
+			buf, n9 = proto.writeBuffer(v306, v307, v305, buffer.len(v305))
 		elseif p13.kind.type == "experience_content_rating_label" then
-			local v300 = p13.kind.value:encode()
-			local v301, v302 = proto.writeTag(buf, n9, 30, proto.wireTypes.lengthDelimited)
+			local v308 = p13.kind.value:encode()
+			local v309, v310 = proto.writeTag(buf, n9, 30, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v301, v302, v300, buffer.len(v300))
+			buf, n9 = proto.writeBuffer(v309, v310, v308, buffer.len(v308))
 		elseif p13.kind.type == "experience_refund_policy" then
-			local v303 = p13.kind.value:encode()
-			local v304, v305 = proto.writeTag(buf, n9, 31, proto.wireTypes.lengthDelimited)
+			local v311 = p13.kind.value:encode()
+			local v312, v313 = proto.writeTag(buf, n9, 31, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v304, v305, v303, buffer.len(v303))
+			buf, n9 = proto.writeBuffer(v312, v313, v311, buffer.len(v311))
 		elseif p13.kind.type == "experience_play_with_reward" then
-			local v306 = p13.kind.value:encode()
-			local v307, v308 = proto.writeTag(buf, n9, 32, proto.wireTypes.lengthDelimited)
+			local v314 = p13.kind.value:encode()
+			local v315, v316 = proto.writeTag(buf, n9, 32, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v307, v308, v306, buffer.len(v306))
+			buf, n9 = proto.writeBuffer(v315, v316, v314, buffer.len(v314))
 		elseif p13.kind.type == "experience_guidelines_dialog" then
-			local v309 = p13.kind.value:encode()
-			local v310, v311 = proto.writeTag(buf, n9, 33, proto.wireTypes.lengthDelimited)
+			local v317 = p13.kind.value:encode()
+			local v318, v319 = proto.writeTag(buf, n9, 33, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v310, v311, v309, buffer.len(v309))
+			buf, n9 = proto.writeBuffer(v318, v319, v317, buffer.len(v317))
+		elseif p13.kind.type == "community_section" then
+			local v320 = p13.kind.value:encode()
+			local v321, v322 = proto.writeTag(buf, n9, 35, proto.wireTypes.lengthDelimited)
+
+			buf, n9 = proto.writeBuffer(v321, v322, v320, buffer.len(v320))
 		elseif p13.kind.type == "moments_carousel" then
-			local v312 = p13.kind.value:encode()
-			local v313, v314 = proto.writeTag(buf, n9, 34, proto.wireTypes.lengthDelimited)
+			local v323 = p13.kind.value:encode()
+			local v324, v325 = proto.writeTag(buf, n9, 34, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v313, v314, v312, buffer.len(v312))
+			buf, n9 = proto.writeBuffer(v324, v325, v323, buffer.len(v323))
 		elseif p13.kind.type == "text" then
-			local v315 = p13.kind.value:encode()
-			local v316, v317 = proto.writeTag(buf, n9, 40, proto.wireTypes.lengthDelimited)
+			local v326 = p13.kind.value:encode()
+			local v327, v328 = proto.writeTag(buf, n9, 40, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v316, v317, v315, buffer.len(v315))
+			buf, n9 = proto.writeBuffer(v327, v328, v326, buffer.len(v326))
 		elseif p13.kind.type == "vertical_feed" then
-			local v318 = p13.kind.value:encode()
-			local v319, v320 = proto.writeTag(buf, n9, 41, proto.wireTypes.lengthDelimited)
+			local v329 = p13.kind.value:encode()
+			local v330, v331 = proto.writeTag(buf, n9, 41, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v319, v320, v318, buffer.len(v318))
+			buf, n9 = proto.writeBuffer(v330, v331, v329, buffer.len(v329))
 		elseif p13.kind.type == "page_header" then
-			local v321 = p13.kind.value:encode()
-			local v322, v323 = proto.writeTag(buf, n9, 42, proto.wireTypes.lengthDelimited)
+			local v332 = p13.kind.value:encode()
+			local v333, v334 = proto.writeTag(buf, n9, 42, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v322, v323, v321, buffer.len(v321))
+			buf, n9 = proto.writeBuffer(v333, v334, v332, buffer.len(v332))
 		elseif p13.kind.type == "experience_details_feed" then
-			local v324 = p13.kind.value:encode()
-			local v325, v326 = proto.writeTag(buf, n9, 500, proto.wireTypes.lengthDelimited)
+			local v335 = p13.kind.value:encode()
+			local v336, v337 = proto.writeTag(buf, n9, 500, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v325, v326, v324, buffer.len(v324))
+			buf, n9 = proto.writeBuffer(v336, v337, v335, buffer.len(v335))
 		elseif p13.kind.type == "experience_details_action_bar" then
-			local v327 = p13.kind.value:encode()
-			local v328, v329 = proto.writeTag(buf, n9, 501, proto.wireTypes.lengthDelimited)
+			local v338 = p13.kind.value:encode()
+			local v339, v340 = proto.writeTag(buf, n9, 501, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v328, v329, v327, buffer.len(v327))
+			buf, n9 = proto.writeBuffer(v339, v340, v338, buffer.len(v338))
 		elseif p13.kind.type == "experience_details_banner_image" then
-			local v330 = p13.kind.value:encode()
-			local v331, v332 = proto.writeTag(buf, n9, 502, proto.wireTypes.lengthDelimited)
+			local v341 = p13.kind.value:encode()
+			local v342, v343 = proto.writeTag(buf, n9, 502, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v331, v332, v330, buffer.len(v330))
+			buf, n9 = proto.writeBuffer(v342, v343, v341, buffer.len(v341))
 		elseif p13.kind.type == "experience_details_sticky_header" then
-			local v333 = p13.kind.value:encode()
-			local v334, v335 = proto.writeTag(buf, n9, 503, proto.wireTypes.lengthDelimited)
+			local v344 = p13.kind.value:encode()
+			local v345, v346 = proto.writeTag(buf, n9, 503, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v334, v335, v333, buffer.len(v333))
+			buf, n9 = proto.writeBuffer(v345, v346, v344, buffer.len(v344))
 		elseif p13.kind.type == "event_details_feed" then
-			local v336 = p13.kind.value:encode()
-			local v337, v338 = proto.writeTag(buf, n9, 600, proto.wireTypes.lengthDelimited)
+			local v347 = p13.kind.value:encode()
+			local v348, v349 = proto.writeTag(buf, n9, 600, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v337, v338, v336, buffer.len(v336))
+			buf, n9 = proto.writeBuffer(v348, v349, v347, buffer.len(v347))
 		elseif p13.kind.type == "event_details_action_bar" then
-			local v339 = p13.kind.value:encode()
-			local v340, v341 = proto.writeTag(buf, n9, 601, proto.wireTypes.lengthDelimited)
+			local v350 = p13.kind.value:encode()
+			local v351, v352 = proto.writeTag(buf, n9, 601, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v340, v341, v339, buffer.len(v339))
+			buf, n9 = proto.writeBuffer(v351, v352, v350, buffer.len(v350))
 		elseif p13.kind.type == "event_attribution_row" then
-			local v342 = p13.kind.value:encode()
-			local v343, v344 = proto.writeTag(buf, n9, 602, proto.wireTypes.lengthDelimited)
+			local v353 = p13.kind.value:encode()
+			local v354, v355 = proto.writeTag(buf, n9, 602, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v343, v344, v342, buffer.len(v342))
+			buf, n9 = proto.writeBuffer(v354, v355, v353, buffer.len(v353))
 		elseif p13.kind.type == "event_description" then
-			local v345 = p13.kind.value:encode()
-			local v346, v347 = proto.writeTag(buf, n9, 603, proto.wireTypes.lengthDelimited)
+			local v356 = p13.kind.value:encode()
+			local v357, v358 = proto.writeTag(buf, n9, 603, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v346, v347, v345, buffer.len(v345))
+			buf, n9 = proto.writeBuffer(v357, v358, v356, buffer.len(v356))
 		elseif p13.kind.type == "event_info_table" then
-			local v348 = p13.kind.value:encode()
-			local v349, v350 = proto.writeTag(buf, n9, 604, proto.wireTypes.lengthDelimited)
+			local v359 = p13.kind.value:encode()
+			local v360, v361 = proto.writeTag(buf, n9, 604, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v349, v350, v348, buffer.len(v348))
+			buf, n9 = proto.writeBuffer(v360, v361, v359, buffer.len(v359))
 		elseif p13.kind.type == "event_details_sheet_full_bleed" then
-			local v351 = p13.kind.value:encode()
-			local v352, v353 = proto.writeTag(buf, n9, 605, proto.wireTypes.lengthDelimited)
+			local v362 = p13.kind.value:encode()
+			local v363, v364 = proto.writeTag(buf, n9, 605, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v352, v353, v351, buffer.len(v351))
+			buf, n9 = proto.writeBuffer(v363, v364, v362, buffer.len(v362))
 		elseif p13.kind.type == "event_notifications_modal" then
-			local v354 = p13.kind.value:encode()
-			local v355, v356 = proto.writeTag(buf, n9, 606, proto.wireTypes.lengthDelimited)
+			local v365 = p13.kind.value:encode()
+			local v366, v367 = proto.writeTag(buf, n9, 606, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v355, v356, v354, buffer.len(v354))
+			buf, n9 = proto.writeBuffer(v366, v367, v365, buffer.len(v365))
 		elseif p13.kind.type == "dev_store_feed" then
-			local v357 = p13.kind.value:encode()
-			local v358, v359 = proto.writeTag(buf, n9, 700, proto.wireTypes.lengthDelimited)
+			local v368 = p13.kind.value:encode()
+			local v369, v370 = proto.writeTag(buf, n9, 700, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v358, v359, v357, buffer.len(v357))
+			buf, n9 = proto.writeBuffer(v369, v370, v368, buffer.len(v368))
 		elseif p13.kind.type == "charts_feed" then
-			local v360 = p13.kind.value:encode()
-			local v361, v362 = proto.writeTag(buf, n9, 800, proto.wireTypes.lengthDelimited)
+			local v371 = p13.kind.value:encode()
+			local v372, v373 = proto.writeTag(buf, n9, 800, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v361, v362, v360, buffer.len(v360))
+			buf, n9 = proto.writeBuffer(v372, v373, v371, buffer.len(v371))
 		elseif p13.kind.type == "filter_pills" then
-			local v363 = p13.kind.value:encode()
-			local v364, v365 = proto.writeTag(buf, n9, 801, proto.wireTypes.lengthDelimited)
+			local v374 = p13.kind.value:encode()
+			local v375, v376 = proto.writeTag(buf, n9, 801, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v364, v365, v363, buffer.len(v363))
+			buf, n9 = proto.writeBuffer(v375, v376, v374, buffer.len(v374))
 		elseif p13.kind.type == "sort_selector" then
-			local v366 = p13.kind.value:encode()
-			local v367, v368 = proto.writeTag(buf, n9, 802, proto.wireTypes.lengthDelimited)
+			local v377 = p13.kind.value:encode()
+			local v378, v379 = proto.writeTag(buf, n9, 802, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v367, v368, v366, buffer.len(v366))
+			buf, n9 = proto.writeBuffer(v378, v379, v377, buffer.len(v377))
+		elseif p13.kind.type == "genre_selector" then
+			local v380 = p13.kind.value:encode()
+			local v381, v382 = proto.writeTag(buf, n9, 803, proto.wireTypes.lengthDelimited)
+
+			buf, n9 = proto.writeBuffer(v381, v382, v380, buffer.len(v380))
 		elseif p13.kind.type == "marketplace_catalog_feed" then
-			local v369 = p13.kind.value:encode()
-			local v370, v371 = proto.writeTag(buf, n9, 900, proto.wireTypes.lengthDelimited)
+			local v383 = p13.kind.value:encode()
+			local v384, v385 = proto.writeTag(buf, n9, 900, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v370, v371, v369, buffer.len(v369))
+			buf, n9 = proto.writeBuffer(v384, v385, v383, buffer.len(v383))
 		elseif p13.kind.type == "marketplace_catalog_category_menu" then
-			local v372 = p13.kind.value:encode()
-			local v373, v374 = proto.writeTag(buf, n9, 901, proto.wireTypes.lengthDelimited)
+			local v386 = p13.kind.value:encode()
+			local v387, v388 = proto.writeTag(buf, n9, 901, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v373, v374, v372, buffer.len(v372))
+			buf, n9 = proto.writeBuffer(v387, v388, v386, buffer.len(v386))
 		elseif p13.kind.type == "marketplace_catalog_item_group" then
-			local v375 = p13.kind.value:encode()
-			local v376, v377 = proto.writeTag(buf, n9, 902, proto.wireTypes.lengthDelimited)
+			local v389 = p13.kind.value:encode()
+			local v390, v391 = proto.writeTag(buf, n9, 902, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v376, v377, v375, buffer.len(v375))
+			buf, n9 = proto.writeBuffer(v390, v391, v389, buffer.len(v389))
 		elseif p13.kind.type == "marketplace_catalog_item_carousel" then
-			local v378 = p13.kind.value:encode()
-			local v379, v380 = proto.writeTag(buf, n9, 903, proto.wireTypes.lengthDelimited)
+			local v392 = p13.kind.value:encode()
+			local v393, v394 = proto.writeTag(buf, n9, 903, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v379, v380, v378, buffer.len(v378))
+			buf, n9 = proto.writeBuffer(v393, v394, v392, buffer.len(v392))
 		elseif p13.kind.type == "marketplace_catalog_hero_unit" then
-			local v381 = p13.kind.value:encode()
-			local v382, v383 = proto.writeTag(buf, n9, 904, proto.wireTypes.lengthDelimited)
+			local v395 = p13.kind.value:encode()
+			local v396, v397 = proto.writeTag(buf, n9, 904, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v382, v383, v381, buffer.len(v381))
+			buf, n9 = proto.writeBuffer(v396, v397, v395, buffer.len(v395))
 		elseif p13.kind.type == "catalog_item_grid" then
-			local v384 = p13.kind.value:encode()
-			local v385, v386 = proto.writeTag(buf, n9, 905, proto.wireTypes.lengthDelimited)
+			local v398 = p13.kind.value:encode()
+			local v399, v400 = proto.writeTag(buf, n9, 905, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v385, v386, v384, buffer.len(v384))
+			buf, n9 = proto.writeBuffer(v399, v400, v398, buffer.len(v398))
 		elseif p13.kind.type == "search_results_feed" then
-			local v387 = p13.kind.value:encode()
-			local v388, v389 = proto.writeTag(buf, n9, 1000, proto.wireTypes.lengthDelimited)
+			local v401 = p13.kind.value:encode()
+			local v402, v403 = proto.writeTag(buf, n9, 1000, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v388, v389, v387, buffer.len(v387))
+			buf, n9 = proto.writeBuffer(v402, v403, v401, buffer.len(v401))
 		elseif p13.kind.type == "power_search_ai_overview" then
-			local v390 = p13.kind.value:encode()
-			local v391, v392 = proto.writeTag(buf, n9, 1001, proto.wireTypes.lengthDelimited)
+			local v404 = p13.kind.value:encode()
+			local v405, v406 = proto.writeTag(buf, n9, 1001, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v391, v392, v390, buffer.len(v390))
+			buf, n9 = proto.writeBuffer(v405, v406, v404, buffer.len(v404))
 		elseif p13.kind.type == "experience_emphasis_tile" then
-			local v393 = p13.kind.value:encode()
-			local v394, v395 = proto.writeTag(buf, n9, 1002, proto.wireTypes.lengthDelimited)
+			local v407 = p13.kind.value:encode()
+			local v408, v409 = proto.writeTag(buf, n9, 1002, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v394, v395, v393, buffer.len(v393))
+			buf, n9 = proto.writeBuffer(v408, v409, v407, buffer.len(v407))
 		elseif p13.kind.type == "option_selector_carousel" then
-			local v396 = p13.kind.value:encode()
-			local v397, v398 = proto.writeTag(buf, n9, 1100, proto.wireTypes.lengthDelimited)
+			local v410 = p13.kind.value:encode()
+			local v411, v412 = proto.writeTag(buf, n9, 1100, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v397, v398, v396, buffer.len(v396))
+			buf, n9 = proto.writeBuffer(v411, v412, v410, buffer.len(v410))
 		elseif p13.kind.type == "party_chat_conversation_upsell" then
-			local v399 = p13.kind.value:encode()
-			local v400, v401 = proto.writeTag(buf, n9, 1200, proto.wireTypes.lengthDelimited)
+			local v413 = p13.kind.value:encode()
+			local v414, v415 = proto.writeTag(buf, n9, 1200, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v400, v401, v399, buffer.len(v399))
+			buf, n9 = proto.writeBuffer(v414, v415, v413, buffer.len(v413))
 		end
 	end
 
@@ -832,522 +847,546 @@ function t18.encode(p13) -- line: 3923
 
 	return buf6
 end
-function t18.decode(p14: buffer) -- line: 4176
+function t18.decode(p14: buffer) -- line: 4357
 	-- upvalues: t18 (copy), proto (copy), t1 (copy)
-	local v404 = t18.new()
+	local v418 = t18.new()
 	local n10 = 0
 
 	while n10 < buffer.len(p14) do
-		local v406, v407
+		local v420, v421
 
-		v406, v407, n10 = proto.readTag(p14, n10)
+		v420, v421, n10 = proto.readTag(p14, n10)
 
-		if v407 == proto.wireTypes.varint then
-			local v408
+		if v421 == proto.wireTypes.varint then
+			local v422
 
-			v408, n10 = proto.readVarInt(p14, n10)
-		elseif v407 == proto.wireTypes.lengthDelimited then
-			if v406 == 1 then
-				local v409
-
-				v409, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "badges_grid",
-					value = t1.BadgesGridInputData.decode(v409)
-				}
-			elseif v406 == 2 then
-				local v410
-
-				v410, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "badge_details",
-					value = t1.BadgeDetailsInputData.decode(v410)
-				}
-			elseif v406 == 3 then
-				local v411
-
-				v411, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "static_content",
-					value = t1.StaticInputData.decode(v411)
-				}
-			elseif v406 == 4 then
-				local v412
-
-				v412, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_attribution_row",
-					value = t1.ExperienceAttributionRowInputData.decode(v412)
-				}
-			elseif v406 == 5 then
-				local v413
-
-				v413, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_action_module",
-					value = t1.ExperienceActionModuleInputData.decode(v413)
-				}
-			elseif v406 == 6 then
-				local v414
-
-				v414, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_media_gallery",
-					value = t1.ExperienceMediaGalleryInputData.decode(v414)
-				}
-			elseif v406 == 7 then
-				local v415
-
-				v415, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_description",
-					value = t1.ExperienceDescriptionInputData.decode(v415)
-				}
-			elseif v406 == 8 then
-				local v416
-
-				v416, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_stat_row",
-					value = t1.ExperienceStatRowInputData.decode(v416)
-				}
-			elseif v406 == 9 then
-				local v417
-
-				v417, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_info_table",
-					value = t1.ExperienceInfoTableInputData.decode(v417)
-				}
-			elseif v406 == 10 then
-				local v418
-
-				v418, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "social_link_row",
-					value = t1.SocialLinkRowInputData.decode(v418)
-				}
-			elseif v406 == 11 then
-				local v419
-
-				v419, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_carousel",
-					value = t1.ExperienceCarouselInputData.decode(v419)
-				}
-			elseif v406 == 12 then
-				local v420
-
-				v420, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "song_carousel",
-					value = t1.SongCarouselInputData.decode(v420)
-				}
-			elseif v406 == 13 then
-				local v421
-
-				v421, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "events_carousel",
-					value = t1.EventsCarouselInputData.decode(v421)
-				}
-			elseif v406 == 14 then
-				local v422
-
-				v422, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "game_pass_collection",
-					value = t1.GamePassCollectionInputData.decode(v422)
-				}
-			elseif v406 == 15 then
+			v422, n10 = proto.readVarInt(p14, n10)
+		elseif v421 == proto.wireTypes.lengthDelimited then
+			if v420 == 1 then
 				local v423
 
 				v423, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "developer_product_collection",
-					value = t1.DeveloperProductCollectionInputData.decode(v423)
+				v418.kind = {
+					type = "badges_grid",
+					value = t1.BadgesGridInputData.decode(v423)
 				}
-			elseif v406 == 16 then
+			elseif v420 == 2 then
 				local v424
 
 				v424, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "subscription_collection",
-					value = t1.SubscriptionCollectionInputData.decode(v424)
+				v418.kind = {
+					type = "badge_details",
+					value = t1.BadgeDetailsInputData.decode(v424)
 				}
-			elseif v406 == 20 then
+			elseif v420 == 3 then
 				local v425
 
 				v425, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "card_container",
-					value = t1.CardContainerInputData.decode(v425)
+				v418.kind = {
+					type = "static_content",
+					value = t1.StaticInputData.decode(v425)
 				}
-			elseif v406 == 21 then
+			elseif v420 == 4 then
 				local v426
 
 				v426, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "card",
-					value = t1.CardInputData.decode(v426)
+				v418.kind = {
+					type = "experience_attribution_row",
+					value = t1.ExperienceAttributionRowInputData.decode(v426)
 				}
-			elseif v406 == 22 then
+			elseif v420 == 5 then
 				local v427
 
 				v427, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "dialog",
-					value = t1.DialogInputData.decode(v427)
+				v418.kind = {
+					type = "experience_action_module",
+					value = t1.ExperienceActionModuleInputData.decode(v427)
 				}
-			elseif v406 == 23 then
+			elseif v420 == 6 then
 				local v428
 
 				v428, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "banner",
-					value = t1.BannerInputData.decode(v428)
+				v418.kind = {
+					type = "experience_media_gallery",
+					value = t1.ExperienceMediaGalleryInputData.decode(v428)
 				}
-			elseif v406 == 24 then
+			elseif v420 == 7 then
 				local v429
 
 				v429, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "tooltip",
-					value = t1.TooltipInputData.decode(v429)
+				v418.kind = {
+					type = "experience_description",
+					value = t1.ExperienceDescriptionInputData.decode(v429)
 				}
-			elseif v406 == 25 then
+			elseif v420 == 8 then
 				local v430
 
 				v430, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "coachmark",
-					value = t1.CoachmarkInputData.decode(v430)
+				v418.kind = {
+					type = "experience_stat_row",
+					value = t1.ExperienceStatRowInputData.decode(v430)
 				}
-			elseif v406 == 26 then
+			elseif v420 == 9 then
 				local v431
 
 				v431, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "catalog_item_list",
-					value = t1.CatalogItemListInputData.decode(v431)
+				v418.kind = {
+					type = "experience_info_table",
+					value = t1.ExperienceInfoTableInputData.decode(v431)
 				}
-			elseif v406 == 27 then
+			elseif v420 == 10 then
 				local v432
 
 				v432, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "user_list",
-					value = t1.UserListInputData.decode(v432)
+				v418.kind = {
+					type = "social_link_row",
+					value = t1.SocialLinkRowInputData.decode(v432)
 				}
-			elseif v406 == 28 then
+			elseif v420 == 11 then
 				local v433
 
 				v433, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "system_banner_prompt",
-					value = t1.SystemBannerInputData.decode(v433)
+				v418.kind = {
+					type = "experience_carousel",
+					value = t1.ExperienceCarouselInputData.decode(v433)
 				}
-			elseif v406 == 29 then
+			elseif v420 == 12 then
 				local v434
 
 				v434, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "age_check_upsell",
-					value = t1.AgeCheckUpsellInputData.decode(v434)
+				v418.kind = {
+					type = "song_carousel",
+					value = t1.SongCarouselInputData.decode(v434)
 				}
-			elseif v406 == 30 then
+			elseif v420 == 13 then
 				local v435
 
 				v435, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_content_rating_label",
-					value = t1.ExperienceContentRatingLabelInputData.decode(v435)
+				v418.kind = {
+					type = "events_carousel",
+					value = t1.EventsCarouselInputData.decode(v435)
 				}
-			elseif v406 == 31 then
+			elseif v420 == 14 then
 				local v436
 
 				v436, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_refund_policy",
-					value = t1.ExperienceRefundPolicyInputData.decode(v436)
+				v418.kind = {
+					type = "game_pass_collection",
+					value = t1.GamePassCollectionInputData.decode(v436)
 				}
-			elseif v406 == 32 then
+			elseif v420 == 15 then
 				local v437
 
 				v437, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_play_with_reward",
-					value = t1.ExperiencePlayWithRewardInputData.decode(v437)
+				v418.kind = {
+					type = "developer_product_collection",
+					value = t1.DeveloperProductCollectionInputData.decode(v437)
 				}
-			elseif v406 == 33 then
+			elseif v420 == 16 then
 				local v438
 
 				v438, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_guidelines_dialog",
-					value = t1.ExperienceGuidelinesDialogInputData.decode(v438)
+				v418.kind = {
+					type = "subscription_collection",
+					value = t1.SubscriptionCollectionInputData.decode(v438)
 				}
-			elseif v406 == 34 then
+			elseif v420 == 17 then
 				local v439
 
 				v439, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "moments_carousel",
-					value = t1.MomentsCarouselInputData.decode(v439)
+				v418.kind = {
+					type = "dynamic_store_category",
+					value = t1.DynamicStoreCategoryInputData.decode(v439)
 				}
-			elseif v406 == 40 then
+			elseif v420 == 20 then
 				local v440
 
 				v440, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "text",
-					value = t1.TextInputData.decode(v440)
+				v418.kind = {
+					type = "card_container",
+					value = t1.CardContainerInputData.decode(v440)
 				}
-			elseif v406 == 41 then
+			elseif v420 == 21 then
 				local v441
 
 				v441, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "vertical_feed",
-					value = t1.VerticalFeedInputData.decode(v441)
+				v418.kind = {
+					type = "card",
+					value = t1.CardInputData.decode(v441)
 				}
-			elseif v406 == 42 then
+			elseif v420 == 22 then
 				local v442
 
 				v442, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "page_header",
-					value = t1.PageHeaderInputData.decode(v442)
+				v418.kind = {
+					type = "dialog",
+					value = t1.DialogInputData.decode(v442)
 				}
-			elseif v406 == 500 then
+			elseif v420 == 23 then
 				local v443
 
 				v443, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_details_feed",
-					value = t1.ExperienceDetailsFeedInputData.decode(v443)
+				v418.kind = {
+					type = "banner",
+					value = t1.BannerInputData.decode(v443)
 				}
-			elseif v406 == 501 then
+			elseif v420 == 24 then
 				local v444
 
 				v444, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_details_action_bar",
-					value = t1.ExperienceDetailsActionBarInputData.decode(v444)
+				v418.kind = {
+					type = "tooltip",
+					value = t1.TooltipInputData.decode(v444)
 				}
-			elseif v406 == 502 then
+			elseif v420 == 25 then
 				local v445
 
 				v445, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_details_banner_image",
-					value = t1.ExperienceDetailsBannerImageInputData.decode(v445)
+				v418.kind = {
+					type = "coachmark",
+					value = t1.CoachmarkInputData.decode(v445)
 				}
-			elseif v406 == 503 then
+			elseif v420 == 26 then
 				local v446
 
 				v446, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_details_sticky_header",
-					value = t1.ExperienceDetailsStickyHeaderInputData.decode(v446)
+				v418.kind = {
+					type = "catalog_item_list",
+					value = t1.CatalogItemListInputData.decode(v446)
 				}
-			elseif v406 == 600 then
+			elseif v420 == 27 then
 				local v447
 
 				v447, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_details_feed",
-					value = t1.EventDetailsFeedInputData.decode(v447)
+				v418.kind = {
+					type = "user_list",
+					value = t1.UserListInputData.decode(v447)
 				}
-			elseif v406 == 601 then
+			elseif v420 == 28 then
 				local v448
 
 				v448, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_details_action_bar",
-					value = t1.EventDetailsActionBarInputData.decode(v448)
+				v418.kind = {
+					type = "system_banner_prompt",
+					value = t1.SystemBannerInputData.decode(v448)
 				}
-			elseif v406 == 602 then
+			elseif v420 == 29 then
 				local v449
 
 				v449, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_attribution_row",
-					value = t1.EventAttributionRowInputData.decode(v449)
+				v418.kind = {
+					type = "age_check_upsell",
+					value = t1.AgeCheckUpsellInputData.decode(v449)
 				}
-			elseif v406 == 603 then
+			elseif v420 == 30 then
 				local v450
 
 				v450, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_description",
-					value = t1.EventDescriptionInputData.decode(v450)
+				v418.kind = {
+					type = "experience_content_rating_label",
+					value = t1.ExperienceContentRatingLabelInputData.decode(v450)
 				}
-			elseif v406 == 604 then
+			elseif v420 == 31 then
 				local v451
 
 				v451, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_info_table",
-					value = t1.EventInfoTableInputData.decode(v451)
+				v418.kind = {
+					type = "experience_refund_policy",
+					value = t1.ExperienceRefundPolicyInputData.decode(v451)
 				}
-			elseif v406 == 605 then
+			elseif v420 == 32 then
 				local v452
 
 				v452, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_details_sheet_full_bleed",
-					value = t1.EventDetailsSheetFullBleedInputData.decode(v452)
+				v418.kind = {
+					type = "experience_play_with_reward",
+					value = t1.ExperiencePlayWithRewardInputData.decode(v452)
 				}
-			elseif v406 == 606 then
+			elseif v420 == 33 then
 				local v453
 
 				v453, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "event_notifications_modal",
-					value = t1.EventNotificationsModalInputData.decode(v453)
+				v418.kind = {
+					type = "experience_guidelines_dialog",
+					value = t1.ExperienceGuidelinesDialogInputData.decode(v453)
 				}
-			elseif v406 == 700 then
+			elseif v420 == 34 then
 				local v454
 
 				v454, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "dev_store_feed",
-					value = t1.DevStoreFeedInputData.decode(v454)
+				v418.kind = {
+					type = "moments_carousel",
+					value = t1.MomentsCarouselInputData.decode(v454)
 				}
-			elseif v406 == 800 then
+			elseif v420 == 35 then
 				local v455
 
 				v455, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "charts_feed",
-					value = t1.ChartsFeedInputData.decode(v455)
+				v418.kind = {
+					type = "community_section",
+					value = t1.CommunitySectionInputData.decode(v455)
 				}
-			elseif v406 == 801 then
+			elseif v420 == 40 then
 				local v456
 
 				v456, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "filter_pills",
-					value = t1.FilterPillsInputData.decode(v456)
+				v418.kind = {
+					type = "text",
+					value = t1.TextInputData.decode(v456)
 				}
-			elseif v406 == 802 then
+			elseif v420 == 41 then
 				local v457
 
 				v457, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "sort_selector",
-					value = t1.SortSelectorInputData.decode(v457)
+				v418.kind = {
+					type = "vertical_feed",
+					value = t1.VerticalFeedInputData.decode(v457)
 				}
-			elseif v406 == 900 then
+			elseif v420 == 42 then
 				local v458
 
 				v458, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "marketplace_catalog_feed",
-					value = t1.UAMarketplaceCatalogFeedInputData.decode(v458)
+				v418.kind = {
+					type = "page_header",
+					value = t1.PageHeaderInputData.decode(v458)
 				}
-			elseif v406 == 901 then
+			elseif v420 == 500 then
 				local v459
 
 				v459, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "marketplace_catalog_category_menu",
-					value = t1.UAMarketplaceCatalogCategoryMenuInputData.decode(v459)
+				v418.kind = {
+					type = "experience_details_feed",
+					value = t1.ExperienceDetailsFeedInputData.decode(v459)
 				}
-			elseif v406 == 902 then
+			elseif v420 == 501 then
 				local v460
 
 				v460, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "marketplace_catalog_item_group",
-					value = t1.UAMarketplaceCatalogItemGroupInputData.decode(v460)
+				v418.kind = {
+					type = "experience_details_action_bar",
+					value = t1.ExperienceDetailsActionBarInputData.decode(v460)
 				}
-			elseif v406 == 903 then
+			elseif v420 == 502 then
 				local v461
 
 				v461, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "marketplace_catalog_item_carousel",
-					value = t1.UAMarketplaceCatalogItemCarouselInputData.decode(v461)
+				v418.kind = {
+					type = "experience_details_banner_image",
+					value = t1.ExperienceDetailsBannerImageInputData.decode(v461)
 				}
-			elseif v406 == 904 then
+			elseif v420 == 503 then
 				local v462
 
 				v462, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "marketplace_catalog_hero_unit",
-					value = t1.UAMarketplaceCatalogHeroUnitInputData.decode(v462)
+				v418.kind = {
+					type = "experience_details_sticky_header",
+					value = t1.ExperienceDetailsStickyHeaderInputData.decode(v462)
 				}
-			elseif v406 == 905 then
+			elseif v420 == 600 then
 				local v463
 
 				v463, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "catalog_item_grid",
-					value = t1.CatalogItemGridInputData.decode(v463)
+				v418.kind = {
+					type = "event_details_feed",
+					value = t1.EventDetailsFeedInputData.decode(v463)
 				}
-			elseif v406 == 1000 then
+			elseif v420 == 601 then
 				local v464
 
 				v464, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "search_results_feed",
-					value = t1.SearchResultsFeedInputData.decode(v464)
+				v418.kind = {
+					type = "event_details_action_bar",
+					value = t1.EventDetailsActionBarInputData.decode(v464)
 				}
-			elseif v406 == 1001 then
+			elseif v420 == 602 then
 				local v465
 
 				v465, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "power_search_ai_overview",
-					value = t1.PowerSearchAIOverviewInputData.decode(v465)
+				v418.kind = {
+					type = "event_attribution_row",
+					value = t1.EventAttributionRowInputData.decode(v465)
 				}
-			elseif v406 == 1002 then
+			elseif v420 == 603 then
 				local v466
 
 				v466, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "experience_emphasis_tile",
-					value = t1.ExperienceEmphasisTileInputData.decode(v466)
+				v418.kind = {
+					type = "event_description",
+					value = t1.EventDescriptionInputData.decode(v466)
 				}
-			elseif v406 == 1100 then
+			elseif v420 == 604 then
 				local v467
 
 				v467, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
-					type = "option_selector_carousel",
-					value = t1.OptionSelectorCarouselInputData.decode(v467)
+				v418.kind = {
+					type = "event_info_table",
+					value = t1.EventInfoTableInputData.decode(v467)
 				}
-			elseif v406 == 1200 then
+			elseif v420 == 605 then
 				local v468
 
 				v468, n10 = proto.readBuffer(p14, n10)
-				v404.kind = {
+				v418.kind = {
+					type = "event_details_sheet_full_bleed",
+					value = t1.EventDetailsSheetFullBleedInputData.decode(v468)
+				}
+			elseif v420 == 606 then
+				local v469
+
+				v469, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "event_notifications_modal",
+					value = t1.EventNotificationsModalInputData.decode(v469)
+				}
+			elseif v420 == 700 then
+				local v470
+
+				v470, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "dev_store_feed",
+					value = t1.DevStoreFeedInputData.decode(v470)
+				}
+			elseif v420 == 800 then
+				local v471
+
+				v471, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "charts_feed",
+					value = t1.ChartsFeedInputData.decode(v471)
+				}
+			elseif v420 == 801 then
+				local v472
+
+				v472, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "filter_pills",
+					value = t1.FilterPillsInputData.decode(v472)
+				}
+			elseif v420 == 802 then
+				local v473
+
+				v473, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "sort_selector",
+					value = t1.SortSelectorInputData.decode(v473)
+				}
+			elseif v420 == 803 then
+				local v474
+
+				v474, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "genre_selector",
+					value = t1.ChartsGenreSelectorInputData.decode(v474)
+				}
+			elseif v420 == 900 then
+				local v475
+
+				v475, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "marketplace_catalog_feed",
+					value = t1.UAMarketplaceCatalogFeedInputData.decode(v475)
+				}
+			elseif v420 == 901 then
+				local v476
+
+				v476, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "marketplace_catalog_category_menu",
+					value = t1.UAMarketplaceCatalogCategoryMenuInputData.decode(v476)
+				}
+			elseif v420 == 902 then
+				local v477
+
+				v477, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "marketplace_catalog_item_group",
+					value = t1.UAMarketplaceCatalogItemGroupInputData.decode(v477)
+				}
+			elseif v420 == 903 then
+				local v478
+
+				v478, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "marketplace_catalog_item_carousel",
+					value = t1.UAMarketplaceCatalogItemCarouselInputData.decode(v478)
+				}
+			elseif v420 == 904 then
+				local v479
+
+				v479, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "marketplace_catalog_hero_unit",
+					value = t1.UAMarketplaceCatalogHeroUnitInputData.decode(v479)
+				}
+			elseif v420 == 905 then
+				local v480
+
+				v480, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "catalog_item_grid",
+					value = t1.CatalogItemGridInputData.decode(v480)
+				}
+			elseif v420 == 1000 then
+				local v481
+
+				v481, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "search_results_feed",
+					value = t1.SearchResultsFeedInputData.decode(v481)
+				}
+			elseif v420 == 1001 then
+				local v482
+
+				v482, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "power_search_ai_overview",
+					value = t1.PowerSearchAIOverviewInputData.decode(v482)
+				}
+			elseif v420 == 1002 then
+				local v483
+
+				v483, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "experience_emphasis_tile",
+					value = t1.ExperienceEmphasisTileInputData.decode(v483)
+				}
+			elseif v420 == 1100 then
+				local v484
+
+				v484, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
+					type = "option_selector_carousel",
+					value = t1.OptionSelectorCarouselInputData.decode(v484)
+				}
+			elseif v420 == 1200 then
+				local v485
+
+				v485, n10 = proto.readBuffer(p14, n10)
+				v418.kind = {
 					type = "party_chat_conversation_upsell",
-					value = t1.PartyChatConversationUpsellInputData.decode(v468)
+					value = t1.PartyChatConversationUpsellInputData.decode(v485)
 				}
 			else
-				local v469, v470 = proto.readVarInt(p14, n10)
+				local v486, v487 = proto.readVarInt(p14, n10)
 
-				n10 = v470 + v469
+				n10 = v487 + v486
 			end
-		elseif v407 == proto.wireTypes.i32 then
-			local v471
+		elseif v421 == proto.wireTypes.i32 then
+			local v488
 
-			v471, n10 = proto.readFixed32(p14, n10)
-		elseif v407 == proto.wireTypes.i64 then
-			local v472
+			v488, n10 = proto.readFixed32(p14, n10)
+		elseif v421 == proto.wireTypes.i64 then
+			local v489
 
-			v472, n10 = proto.readFixed64(p14, n10)
+			v489, n10 = proto.readFixed64(p14, n10)
 		else
-			error("Unsupported wire type: " .. v407)
+			error("Unsupported wire type: " .. v421)
 		end
 	end
 
-	return v404
+	return v418
 end
-function t18.jsonEncode(p15) -- line: 4599
+function t18.jsonEncode(p15) -- line: 4798
 	local t20 = {}
 
 	if p15.kind ~= nil then
@@ -1447,6 +1486,12 @@ function t18.jsonEncode(p15) -- line: 4599
 			return t20
 		end
 
+		if p15.kind.type == "dynamic_store_category" then
+			t20.dynamicStoreCategory = p15.kind.value:jsonEncode()
+
+			return t20
+		end
+
 		if p15.kind.type == "card_container" then
 			t20.cardContainer = p15.kind.value:jsonEncode()
 
@@ -1527,6 +1572,12 @@ function t18.jsonEncode(p15) -- line: 4599
 
 		if p15.kind.type == "experience_guidelines_dialog" then
 			t20.experienceGuidelinesDialog = p15.kind.value:jsonEncode()
+
+			return t20
+		end
+
+		if p15.kind.type == "community_section" then
+			t20.communitySection = p15.kind.value:jsonEncode()
 
 			return t20
 		end
@@ -1645,6 +1696,12 @@ function t18.jsonEncode(p15) -- line: 4599
 			return t20
 		end
 
+		if p15.kind.type == "genre_selector" then
+			t20.genreSelector = p15.kind.value:jsonEncode()
+
+			return t20
+		end
+
 		if p15.kind.type == "marketplace_catalog_feed" then
 			t20.marketplaceCatalogFeed = p15.kind.value:jsonEncode()
 
@@ -1712,809 +1769,851 @@ function t18.jsonEncode(p15) -- line: 4599
 
 	return t20
 end
-function t18.jsonDecode(t21: {[any]: any}) -- line: 4729
+function t18.jsonDecode(t21: {[any]: any}) -- line: 4934
 	-- upvalues: t18 (copy), t1 (copy)
-	local v476 = t18.new()
+	local v493 = t18.new()
 
 	if t21.badges_grid ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "badges_grid",
 			value = t1.BadgesGridInputData.jsonDecode(t21.badges_grid)
 		}
 	end
 
 	if t21.badgesGrid ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "badges_grid",
 			value = t1.BadgesGridInputData.jsonDecode(t21.badgesGrid)
 		}
 	end
 
 	if t21.badge_details ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "badge_details",
 			value = t1.BadgeDetailsInputData.jsonDecode(t21.badge_details)
 		}
 	end
 
 	if t21.badgeDetails ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "badge_details",
 			value = t1.BadgeDetailsInputData.jsonDecode(t21.badgeDetails)
 		}
 	end
 
 	if t21.static_content ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "static_content",
 			value = t1.StaticInputData.jsonDecode(t21.static_content)
 		}
 	end
 
 	if t21.staticContent ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "static_content",
 			value = t1.StaticInputData.jsonDecode(t21.staticContent)
 		}
 	end
 
 	if t21.experience_attribution_row ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_attribution_row",
 			value = t1.ExperienceAttributionRowInputData.jsonDecode(t21.experience_attribution_row)
 		}
 	end
 
 	if t21.experienceAttributionRow ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_attribution_row",
 			value = t1.ExperienceAttributionRowInputData.jsonDecode(t21.experienceAttributionRow)
 		}
 	end
 
 	if t21.experience_action_module ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_action_module",
 			value = t1.ExperienceActionModuleInputData.jsonDecode(t21.experience_action_module)
 		}
 	end
 
 	if t21.experienceActionModule ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_action_module",
 			value = t1.ExperienceActionModuleInputData.jsonDecode(t21.experienceActionModule)
 		}
 	end
 
 	if t21.experience_media_gallery ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_media_gallery",
 			value = t1.ExperienceMediaGalleryInputData.jsonDecode(t21.experience_media_gallery)
 		}
 	end
 
 	if t21.experienceMediaGallery ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_media_gallery",
 			value = t1.ExperienceMediaGalleryInputData.jsonDecode(t21.experienceMediaGallery)
 		}
 	end
 
 	if t21.experience_description ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_description",
 			value = t1.ExperienceDescriptionInputData.jsonDecode(t21.experience_description)
 		}
 	end
 
 	if t21.experienceDescription ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_description",
 			value = t1.ExperienceDescriptionInputData.jsonDecode(t21.experienceDescription)
 		}
 	end
 
 	if t21.experience_stat_row ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_stat_row",
 			value = t1.ExperienceStatRowInputData.jsonDecode(t21.experience_stat_row)
 		}
 	end
 
 	if t21.experienceStatRow ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_stat_row",
 			value = t1.ExperienceStatRowInputData.jsonDecode(t21.experienceStatRow)
 		}
 	end
 
 	if t21.experience_info_table ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_info_table",
 			value = t1.ExperienceInfoTableInputData.jsonDecode(t21.experience_info_table)
 		}
 	end
 
 	if t21.experienceInfoTable ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_info_table",
 			value = t1.ExperienceInfoTableInputData.jsonDecode(t21.experienceInfoTable)
 		}
 	end
 
 	if t21.social_link_row ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "social_link_row",
 			value = t1.SocialLinkRowInputData.jsonDecode(t21.social_link_row)
 		}
 	end
 
 	if t21.socialLinkRow ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "social_link_row",
 			value = t1.SocialLinkRowInputData.jsonDecode(t21.socialLinkRow)
 		}
 	end
 
 	if t21.experience_carousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_carousel",
 			value = t1.ExperienceCarouselInputData.jsonDecode(t21.experience_carousel)
 		}
 	end
 
 	if t21.experienceCarousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_carousel",
 			value = t1.ExperienceCarouselInputData.jsonDecode(t21.experienceCarousel)
 		}
 	end
 
 	if t21.song_carousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "song_carousel",
 			value = t1.SongCarouselInputData.jsonDecode(t21.song_carousel)
 		}
 	end
 
 	if t21.songCarousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "song_carousel",
 			value = t1.SongCarouselInputData.jsonDecode(t21.songCarousel)
 		}
 	end
 
 	if t21.events_carousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "events_carousel",
 			value = t1.EventsCarouselInputData.jsonDecode(t21.events_carousel)
 		}
 	end
 
 	if t21.eventsCarousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "events_carousel",
 			value = t1.EventsCarouselInputData.jsonDecode(t21.eventsCarousel)
 		}
 	end
 
 	if t21.game_pass_collection ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "game_pass_collection",
 			value = t1.GamePassCollectionInputData.jsonDecode(t21.game_pass_collection)
 		}
 	end
 
 	if t21.gamePassCollection ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "game_pass_collection",
 			value = t1.GamePassCollectionInputData.jsonDecode(t21.gamePassCollection)
 		}
 	end
 
 	if t21.developer_product_collection ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "developer_product_collection",
 			value = t1.DeveloperProductCollectionInputData.jsonDecode(t21.developer_product_collection)
 		}
 	end
 
 	if t21.developerProductCollection ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "developer_product_collection",
 			value = t1.DeveloperProductCollectionInputData.jsonDecode(t21.developerProductCollection)
 		}
 	end
 
 	if t21.subscription_collection ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "subscription_collection",
 			value = t1.SubscriptionCollectionInputData.jsonDecode(t21.subscription_collection)
 		}
 	end
 
 	if t21.subscriptionCollection ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "subscription_collection",
 			value = t1.SubscriptionCollectionInputData.jsonDecode(t21.subscriptionCollection)
 		}
 	end
 
+	if t21.dynamic_store_category ~= nil then
+		v493.kind = {
+			type = "dynamic_store_category",
+			value = t1.DynamicStoreCategoryInputData.jsonDecode(t21.dynamic_store_category)
+		}
+	end
+
+	if t21.dynamicStoreCategory ~= nil then
+		v493.kind = {
+			type = "dynamic_store_category",
+			value = t1.DynamicStoreCategoryInputData.jsonDecode(t21.dynamicStoreCategory)
+		}
+	end
+
 	if t21.card_container ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "card_container",
 			value = t1.CardContainerInputData.jsonDecode(t21.card_container)
 		}
 	end
 
 	if t21.cardContainer ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "card_container",
 			value = t1.CardContainerInputData.jsonDecode(t21.cardContainer)
 		}
 	end
 
 	if t21.card ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "card",
 			value = t1.CardInputData.jsonDecode(t21.card)
 		}
 	end
 
 	if t21.dialog ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "dialog",
 			value = t1.DialogInputData.jsonDecode(t21.dialog)
 		}
 	end
 
 	if t21.banner ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "banner",
 			value = t1.BannerInputData.jsonDecode(t21.banner)
 		}
 	end
 
 	if t21.tooltip ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "tooltip",
 			value = t1.TooltipInputData.jsonDecode(t21.tooltip)
 		}
 	end
 
 	if t21.coachmark ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "coachmark",
 			value = t1.CoachmarkInputData.jsonDecode(t21.coachmark)
 		}
 	end
 
 	if t21.system_banner_prompt ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "system_banner_prompt",
 			value = t1.SystemBannerInputData.jsonDecode(t21.system_banner_prompt)
 		}
 	end
 
 	if t21.systemBannerPrompt ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "system_banner_prompt",
 			value = t1.SystemBannerInputData.jsonDecode(t21.systemBannerPrompt)
 		}
 	end
 
 	if t21.age_check_upsell ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "age_check_upsell",
 			value = t1.AgeCheckUpsellInputData.jsonDecode(t21.age_check_upsell)
 		}
 	end
 
 	if t21.ageCheckUpsell ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "age_check_upsell",
 			value = t1.AgeCheckUpsellInputData.jsonDecode(t21.ageCheckUpsell)
 		}
 	end
 
 	if t21.catalog_item_list ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "catalog_item_list",
 			value = t1.CatalogItemListInputData.jsonDecode(t21.catalog_item_list)
 		}
 	end
 
 	if t21.catalogItemList ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "catalog_item_list",
 			value = t1.CatalogItemListInputData.jsonDecode(t21.catalogItemList)
 		}
 	end
 
 	if t21.user_list ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "user_list",
 			value = t1.UserListInputData.jsonDecode(t21.user_list)
 		}
 	end
 
 	if t21.userList ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "user_list",
 			value = t1.UserListInputData.jsonDecode(t21.userList)
 		}
 	end
 
 	if t21.experience_content_rating_label ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_content_rating_label",
 			value = t1.ExperienceContentRatingLabelInputData.jsonDecode(t21.experience_content_rating_label)
 		}
 	end
 
 	if t21.experienceContentRatingLabel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_content_rating_label",
 			value = t1.ExperienceContentRatingLabelInputData.jsonDecode(t21.experienceContentRatingLabel)
 		}
 	end
 
 	if t21.experience_refund_policy ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_refund_policy",
 			value = t1.ExperienceRefundPolicyInputData.jsonDecode(t21.experience_refund_policy)
 		}
 	end
 
 	if t21.experienceRefundPolicy ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_refund_policy",
 			value = t1.ExperienceRefundPolicyInputData.jsonDecode(t21.experienceRefundPolicy)
 		}
 	end
 
 	if t21.experience_play_with_reward ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_play_with_reward",
 			value = t1.ExperiencePlayWithRewardInputData.jsonDecode(t21.experience_play_with_reward)
 		}
 	end
 
 	if t21.experiencePlayWithReward ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_play_with_reward",
 			value = t1.ExperiencePlayWithRewardInputData.jsonDecode(t21.experiencePlayWithReward)
 		}
 	end
 
 	if t21.experience_guidelines_dialog ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_guidelines_dialog",
 			value = t1.ExperienceGuidelinesDialogInputData.jsonDecode(t21.experience_guidelines_dialog)
 		}
 	end
 
 	if t21.experienceGuidelinesDialog ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_guidelines_dialog",
 			value = t1.ExperienceGuidelinesDialogInputData.jsonDecode(t21.experienceGuidelinesDialog)
 		}
 	end
 
+	if t21.community_section ~= nil then
+		v493.kind = {
+			type = "community_section",
+			value = t1.CommunitySectionInputData.jsonDecode(t21.community_section)
+		}
+	end
+
+	if t21.communitySection ~= nil then
+		v493.kind = {
+			type = "community_section",
+			value = t1.CommunitySectionInputData.jsonDecode(t21.communitySection)
+		}
+	end
+
 	if t21.moments_carousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "moments_carousel",
 			value = t1.MomentsCarouselInputData.jsonDecode(t21.moments_carousel)
 		}
 	end
 
 	if t21.momentsCarousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "moments_carousel",
 			value = t1.MomentsCarouselInputData.jsonDecode(t21.momentsCarousel)
 		}
 	end
 
 	if t21.text ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "text",
 			value = t1.TextInputData.jsonDecode(t21.text)
 		}
 	end
 
 	if t21.vertical_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "vertical_feed",
 			value = t1.VerticalFeedInputData.jsonDecode(t21.vertical_feed)
 		}
 	end
 
 	if t21.verticalFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "vertical_feed",
 			value = t1.VerticalFeedInputData.jsonDecode(t21.verticalFeed)
 		}
 	end
 
 	if t21.page_header ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "page_header",
 			value = t1.PageHeaderInputData.jsonDecode(t21.page_header)
 		}
 	end
 
 	if t21.pageHeader ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "page_header",
 			value = t1.PageHeaderInputData.jsonDecode(t21.pageHeader)
 		}
 	end
 
 	if t21.experience_details_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_feed",
 			value = t1.ExperienceDetailsFeedInputData.jsonDecode(t21.experience_details_feed)
 		}
 	end
 
 	if t21.experienceDetailsFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_feed",
 			value = t1.ExperienceDetailsFeedInputData.jsonDecode(t21.experienceDetailsFeed)
 		}
 	end
 
 	if t21.experience_details_action_bar ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_action_bar",
 			value = t1.ExperienceDetailsActionBarInputData.jsonDecode(t21.experience_details_action_bar)
 		}
 	end
 
 	if t21.experienceDetailsActionBar ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_action_bar",
 			value = t1.ExperienceDetailsActionBarInputData.jsonDecode(t21.experienceDetailsActionBar)
 		}
 	end
 
 	if t21.experience_details_banner_image ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_banner_image",
 			value = t1.ExperienceDetailsBannerImageInputData.jsonDecode(t21.experience_details_banner_image)
 		}
 	end
 
 	if t21.experienceDetailsBannerImage ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_banner_image",
 			value = t1.ExperienceDetailsBannerImageInputData.jsonDecode(t21.experienceDetailsBannerImage)
 		}
 	end
 
 	if t21.experience_details_sticky_header ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_sticky_header",
 			value = t1.ExperienceDetailsStickyHeaderInputData.jsonDecode(t21.experience_details_sticky_header)
 		}
 	end
 
 	if t21.experienceDetailsStickyHeader ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_details_sticky_header",
 			value = t1.ExperienceDetailsStickyHeaderInputData.jsonDecode(t21.experienceDetailsStickyHeader)
 		}
 	end
 
 	if t21.event_details_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_details_feed",
 			value = t1.EventDetailsFeedInputData.jsonDecode(t21.event_details_feed)
 		}
 	end
 
 	if t21.eventDetailsFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_details_feed",
 			value = t1.EventDetailsFeedInputData.jsonDecode(t21.eventDetailsFeed)
 		}
 	end
 
 	if t21.event_details_action_bar ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_details_action_bar",
 			value = t1.EventDetailsActionBarInputData.jsonDecode(t21.event_details_action_bar)
 		}
 	end
 
 	if t21.eventDetailsActionBar ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_details_action_bar",
 			value = t1.EventDetailsActionBarInputData.jsonDecode(t21.eventDetailsActionBar)
 		}
 	end
 
 	if t21.event_attribution_row ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_attribution_row",
 			value = t1.EventAttributionRowInputData.jsonDecode(t21.event_attribution_row)
 		}
 	end
 
 	if t21.eventAttributionRow ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_attribution_row",
 			value = t1.EventAttributionRowInputData.jsonDecode(t21.eventAttributionRow)
 		}
 	end
 
 	if t21.event_description ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_description",
 			value = t1.EventDescriptionInputData.jsonDecode(t21.event_description)
 		}
 	end
 
 	if t21.eventDescription ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_description",
 			value = t1.EventDescriptionInputData.jsonDecode(t21.eventDescription)
 		}
 	end
 
 	if t21.event_info_table ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_info_table",
 			value = t1.EventInfoTableInputData.jsonDecode(t21.event_info_table)
 		}
 	end
 
 	if t21.eventInfoTable ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_info_table",
 			value = t1.EventInfoTableInputData.jsonDecode(t21.eventInfoTable)
 		}
 	end
 
 	if t21.event_details_sheet_full_bleed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_details_sheet_full_bleed",
 			value = t1.EventDetailsSheetFullBleedInputData.jsonDecode(t21.event_details_sheet_full_bleed)
 		}
 	end
 
 	if t21.eventDetailsSheetFullBleed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_details_sheet_full_bleed",
 			value = t1.EventDetailsSheetFullBleedInputData.jsonDecode(t21.eventDetailsSheetFullBleed)
 		}
 	end
 
 	if t21.event_notifications_modal ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_notifications_modal",
 			value = t1.EventNotificationsModalInputData.jsonDecode(t21.event_notifications_modal)
 		}
 	end
 
 	if t21.eventNotificationsModal ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "event_notifications_modal",
 			value = t1.EventNotificationsModalInputData.jsonDecode(t21.eventNotificationsModal)
 		}
 	end
 
 	if t21.dev_store_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "dev_store_feed",
 			value = t1.DevStoreFeedInputData.jsonDecode(t21.dev_store_feed)
 		}
 	end
 
 	if t21.devStoreFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "dev_store_feed",
 			value = t1.DevStoreFeedInputData.jsonDecode(t21.devStoreFeed)
 		}
 	end
 
 	if t21.charts_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "charts_feed",
 			value = t1.ChartsFeedInputData.jsonDecode(t21.charts_feed)
 		}
 	end
 
 	if t21.chartsFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "charts_feed",
 			value = t1.ChartsFeedInputData.jsonDecode(t21.chartsFeed)
 		}
 	end
 
 	if t21.filter_pills ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "filter_pills",
 			value = t1.FilterPillsInputData.jsonDecode(t21.filter_pills)
 		}
 	end
 
 	if t21.filterPills ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "filter_pills",
 			value = t1.FilterPillsInputData.jsonDecode(t21.filterPills)
 		}
 	end
 
 	if t21.sort_selector ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "sort_selector",
 			value = t1.SortSelectorInputData.jsonDecode(t21.sort_selector)
 		}
 	end
 
 	if t21.sortSelector ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "sort_selector",
 			value = t1.SortSelectorInputData.jsonDecode(t21.sortSelector)
 		}
 	end
 
+	if t21.genre_selector ~= nil then
+		v493.kind = {
+			type = "genre_selector",
+			value = t1.ChartsGenreSelectorInputData.jsonDecode(t21.genre_selector)
+		}
+	end
+
+	if t21.genreSelector ~= nil then
+		v493.kind = {
+			type = "genre_selector",
+			value = t1.ChartsGenreSelectorInputData.jsonDecode(t21.genreSelector)
+		}
+	end
+
 	if t21.marketplace_catalog_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_feed",
 			value = t1.UAMarketplaceCatalogFeedInputData.jsonDecode(t21.marketplace_catalog_feed)
 		}
 	end
 
 	if t21.marketplaceCatalogFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_feed",
 			value = t1.UAMarketplaceCatalogFeedInputData.jsonDecode(t21.marketplaceCatalogFeed)
 		}
 	end
 
 	if t21.marketplace_catalog_category_menu ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_category_menu",
 			value = t1.UAMarketplaceCatalogCategoryMenuInputData.jsonDecode(t21.marketplace_catalog_category_menu)
 		}
 	end
 
 	if t21.marketplaceCatalogCategoryMenu ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_category_menu",
 			value = t1.UAMarketplaceCatalogCategoryMenuInputData.jsonDecode(t21.marketplaceCatalogCategoryMenu)
 		}
 	end
 
 	if t21.marketplace_catalog_item_group ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_item_group",
 			value = t1.UAMarketplaceCatalogItemGroupInputData.jsonDecode(t21.marketplace_catalog_item_group)
 		}
 	end
 
 	if t21.marketplaceCatalogItemGroup ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_item_group",
 			value = t1.UAMarketplaceCatalogItemGroupInputData.jsonDecode(t21.marketplaceCatalogItemGroup)
 		}
 	end
 
 	if t21.marketplace_catalog_item_carousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_item_carousel",
 			value = t1.UAMarketplaceCatalogItemCarouselInputData.jsonDecode(t21.marketplace_catalog_item_carousel)
 		}
 	end
 
 	if t21.marketplaceCatalogItemCarousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_item_carousel",
 			value = t1.UAMarketplaceCatalogItemCarouselInputData.jsonDecode(t21.marketplaceCatalogItemCarousel)
 		}
 	end
 
 	if t21.marketplace_catalog_hero_unit ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_hero_unit",
 			value = t1.UAMarketplaceCatalogHeroUnitInputData.jsonDecode(t21.marketplace_catalog_hero_unit)
 		}
 	end
 
 	if t21.marketplaceCatalogHeroUnit ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "marketplace_catalog_hero_unit",
 			value = t1.UAMarketplaceCatalogHeroUnitInputData.jsonDecode(t21.marketplaceCatalogHeroUnit)
 		}
 	end
 
 	if t21.catalog_item_grid ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "catalog_item_grid",
 			value = t1.CatalogItemGridInputData.jsonDecode(t21.catalog_item_grid)
 		}
 	end
 
 	if t21.catalogItemGrid ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "catalog_item_grid",
 			value = t1.CatalogItemGridInputData.jsonDecode(t21.catalogItemGrid)
 		}
 	end
 
 	if t21.search_results_feed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "search_results_feed",
 			value = t1.SearchResultsFeedInputData.jsonDecode(t21.search_results_feed)
 		}
 	end
 
 	if t21.searchResultsFeed ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "search_results_feed",
 			value = t1.SearchResultsFeedInputData.jsonDecode(t21.searchResultsFeed)
 		}
 	end
 
 	if t21.power_search_ai_overview ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "power_search_ai_overview",
 			value = t1.PowerSearchAIOverviewInputData.jsonDecode(t21.power_search_ai_overview)
 		}
 	end
 
 	if t21.powerSearchAiOverview ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "power_search_ai_overview",
 			value = t1.PowerSearchAIOverviewInputData.jsonDecode(t21.powerSearchAiOverview)
 		}
 	end
 
 	if t21.experience_emphasis_tile ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_emphasis_tile",
 			value = t1.ExperienceEmphasisTileInputData.jsonDecode(t21.experience_emphasis_tile)
 		}
 	end
 
 	if t21.experienceEmphasisTile ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "experience_emphasis_tile",
 			value = t1.ExperienceEmphasisTileInputData.jsonDecode(t21.experienceEmphasisTile)
 		}
 	end
 
 	if t21.option_selector_carousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "option_selector_carousel",
 			value = t1.OptionSelectorCarouselInputData.jsonDecode(t21.option_selector_carousel)
 		}
 	end
 
 	if t21.optionSelectorCarousel ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "option_selector_carousel",
 			value = t1.OptionSelectorCarouselInputData.jsonDecode(t21.optionSelectorCarousel)
 		}
 	end
 
 	if t21.party_chat_conversation_upsell ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "party_chat_conversation_upsell",
 			value = t1.PartyChatConversationUpsellInputData.jsonDecode(t21.party_chat_conversation_upsell)
 		}
 	end
 
 	if t21.partyChatConversationUpsell ~= nil then
-		v476.kind = {
+		v493.kind = {
 			type = "party_chat_conversation_upsell",
 			value = t1.PartyChatConversationUpsellInputData.jsonDecode(t21.partyChatConversationUpsell)
 		}
 	end
 
-	return v476
+	return v493
 end
 
 t18.descriptor = {
@@ -2528,7 +2627,7 @@ local t22 = {}
 
 t22.__index = t22
 
-function t22.new(t23: {[any]: any}?) -- line: 5473
+function t22.new(t23: {[any]: any}?) -- line: 5720
 	-- upvalues: t22 (copy)
 	return (setmetatable({
 		section_title = if t23 ~= nil and t23.section_title ~= nil then t23.section_title else "",
@@ -2538,42 +2637,42 @@ function t22.new(t23: {[any]: any}?) -- line: 5473
 		universe_id = if t23 ~= nil and t23.universe_id ~= nil then t23.universe_id else ""
 	}, t22))
 end
-function t22.encode(p16) -- line: 5485
+function t22.encode(p16) -- line: 5732
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n11 = 0
 
 	if p16.section_title ~= nil and p16.section_title ~= "" then
-		local v481, v482 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
+		local v498, v499 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n11 = proto.writeString(v481, v482, p16.section_title)
+		buf, n11 = proto.writeString(v498, v499, p16.section_title)
 	end
 
 	if p16.badges ~= nil and #p16.badges > 0 then
-		for _, v484 in p16.badges do
-			local v485 = v484:encode()
-			local v486, v487 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
+		for _, v501 in p16.badges do
+			local v502 = v501:encode()
+			local v503, v504 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
 
-			buf, n11 = proto.writeBuffer(v486, v487, v485, buffer.len(v485))
+			buf, n11 = proto.writeBuffer(v503, v504, v502, buffer.len(v502))
 		end
 	end
 
 	if p16.collection_id ~= nil and p16.collection_id ~= "" then
-		local v488, v489 = proto.writeTag(buf, n11, 3, proto.wireTypes.lengthDelimited)
+		local v505, v506 = proto.writeTag(buf, n11, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n11 = proto.writeString(v488, v489, p16.collection_id)
+		buf, n11 = proto.writeString(v505, v506, p16.collection_id)
 	end
 
 	if p16.collection_position ~= nil and p16.collection_position ~= "" then
-		local v490, v491 = proto.writeTag(buf, n11, 4, proto.wireTypes.lengthDelimited)
+		local v507, v508 = proto.writeTag(buf, n11, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n11 = proto.writeString(v490, v491, p16.collection_position)
+		buf, n11 = proto.writeString(v507, v508, p16.collection_position)
 	end
 
 	if p16.universe_id ~= nil and p16.universe_id ~= "" then
-		local v492, v493 = proto.writeTag(buf, n11, 5, proto.wireTypes.lengthDelimited)
+		local v509, v510 = proto.writeTag(buf, n11, 5, proto.wireTypes.lengthDelimited)
 
-		buf, n11 = proto.writeString(v492, v493, p16.universe_id)
+		buf, n11 = proto.writeString(v509, v510, p16.universe_id)
 	end
 
 	local buf7 = buffer.create(n11)
@@ -2582,67 +2681,67 @@ function t22.encode(p16) -- line: 5485
 
 	return buf7
 end
-function t22.decode(p17: buffer) -- line: 5522
+function t22.decode(p17: buffer) -- line: 5769
 	-- upvalues: t22 (copy), proto (copy), t1 (copy)
-	local v496 = t22.new()
+	local v513 = t22.new()
 	local n12 = 0
 
 	while n12 < buffer.len(p17) do
-		local v498, v499
+		local v515, v516
 
-		v498, v499, n12 = proto.readTag(p17, n12)
+		v515, v516, n12 = proto.readTag(p17, n12)
 
-		if v499 == proto.wireTypes.varint then
-			local v500
+		if v516 == proto.wireTypes.varint then
+			local v517
 
-			v500, n12 = proto.readVarInt(p17, n12)
-		elseif v499 == proto.wireTypes.lengthDelimited then
-			if v498 == 1 then
-				local v501
+			v517, n12 = proto.readVarInt(p17, n12)
+		elseif v516 == proto.wireTypes.lengthDelimited then
+			if v515 == 1 then
+				local v518
 
-				v501, n12 = proto.readBuffer(p17, n12)
-				v496.section_title = buffer.tostring(v501)
-			elseif v498 == 2 then
-				local v502
+				v518, n12 = proto.readBuffer(p17, n12)
+				v513.section_title = buffer.tostring(v518)
+			elseif v515 == 2 then
+				local v519
 
-				v502, n12 = proto.readBuffer(p17, n12)
-				table.insert(v496.badges, t1.BadgesGridInputData_BadgeInputData.decode(v502))
-			elseif v498 == 3 then
-				local v503
+				v519, n12 = proto.readBuffer(p17, n12)
+				table.insert(v513.badges, t1.BadgesGridInputData_BadgeInputData.decode(v519))
+			elseif v515 == 3 then
+				local v520
 
-				v503, n12 = proto.readBuffer(p17, n12)
-				v496.collection_id = buffer.tostring(v503)
-			elseif v498 == 4 then
-				local v504
+				v520, n12 = proto.readBuffer(p17, n12)
+				v513.collection_id = buffer.tostring(v520)
+			elseif v515 == 4 then
+				local v521
 
-				v504, n12 = proto.readBuffer(p17, n12)
-				v496.collection_position = buffer.tostring(v504)
-			elseif v498 == 5 then
-				local v505
+				v521, n12 = proto.readBuffer(p17, n12)
+				v513.collection_position = buffer.tostring(v521)
+			elseif v515 == 5 then
+				local v522
 
-				v505, n12 = proto.readBuffer(p17, n12)
-				v496.universe_id = buffer.tostring(v505)
+				v522, n12 = proto.readBuffer(p17, n12)
+				v513.universe_id = buffer.tostring(v522)
 			else
-				local v506, v507 = proto.readVarInt(p17, n12)
+				local v523, v524 = proto.readVarInt(p17, n12)
 
-				n12 = v507 + v506
+				n12 = v524 + v523
 			end
-		elseif v499 == proto.wireTypes.i32 then
-			local v508
+		elseif v516 == proto.wireTypes.i32 then
+			local v525
 
-			v508, n12 = proto.readFixed32(p17, n12)
-		elseif v499 == proto.wireTypes.i64 then
-			local v509
+			v525, n12 = proto.readFixed32(p17, n12)
+		elseif v516 == proto.wireTypes.i64 then
+			local v526
 
-			v509, n12 = proto.readFixed64(p17, n12)
+			v526, n12 = proto.readFixed64(p17, n12)
 		else
-			error("Unsupported wire type: " .. v499)
+			error("Unsupported wire type: " .. v516)
 		end
 	end
 
-	return v496
+	return v513
 end
-function t22.jsonEncode(p18) -- line: 5585
+function t22.jsonEncode(p18) -- line: 5832
 	local t24 = {}
 
 	if p18.section_title ~= nil and p18.section_title ~= "" then
@@ -2652,8 +2751,8 @@ function t22.jsonEncode(p18) -- line: 5585
 	if p18.badges ~= nil and #p18.badges > 0 then
 		local t25 = {}
 
-		for _, v514 in p18.badges do
-			table.insert(t25, v514:jsonEncode())
+		for _, v531 in p18.badges do
+			table.insert(t25, v531:jsonEncode())
 		end
 
 		t24.badges = t25
@@ -2673,53 +2772,53 @@ function t22.jsonEncode(p18) -- line: 5585
 
 	return t24
 end
-function t22.jsonDecode(t26: {[any]: any}) -- line: 5615
+function t22.jsonDecode(t26: {[any]: any}) -- line: 5862
 	-- upvalues: t22 (copy), t1 (copy)
-	local v516 = t22.new()
+	local v533 = t22.new()
 
 	if t26.section_title ~= nil then
-		v516.section_title = t26.section_title
+		v533.section_title = t26.section_title
 	end
 
 	if t26.sectionTitle ~= nil then
-		v516.section_title = t26.sectionTitle
+		v533.section_title = t26.sectionTitle
 	end
 
 	if t26.badges ~= nil then
 		local t27 = {}
 
-		for _, v519 in t26.badges do
-			table.insert(t27, t1.BadgesGridInputData_BadgeInputData.jsonDecode(v519))
+		for _, v536 in t26.badges do
+			table.insert(t27, t1.BadgesGridInputData_BadgeInputData.jsonDecode(v536))
 		end
 
-		v516.badges = t27
+		v533.badges = t27
 	end
 
 	if t26.collection_id ~= nil then
-		v516.collection_id = t26.collection_id
+		v533.collection_id = t26.collection_id
 	end
 
 	if t26.collectionId ~= nil then
-		v516.collection_id = t26.collectionId
+		v533.collection_id = t26.collectionId
 	end
 
 	if t26.collection_position ~= nil then
-		v516.collection_position = t26.collection_position
+		v533.collection_position = t26.collection_position
 	end
 
 	if t26.collectionPosition ~= nil then
-		v516.collection_position = t26.collectionPosition
+		v533.collection_position = t26.collectionPosition
 	end
 
 	if t26.universe_id ~= nil then
-		v516.universe_id = t26.universe_id
+		v533.universe_id = t26.universe_id
 	end
 
 	if t26.universeId ~= nil then
-		v516.universe_id = t26.universeId
+		v533.universe_id = t26.universeId
 	end
 
-	return v516
+	return v533
 end
 
 t22.descriptor = {
@@ -2733,21 +2832,21 @@ local t28 = {}
 
 t28.__index = t28
 
-function t28.new(t29: {[any]: any}?) -- line: 5676
+function t28.new(t29: {[any]: any}?) -- line: 5923
 	-- upvalues: t28 (copy)
 	return (setmetatable({
 		badge_id = if t29 ~= nil and t29.badge_id ~= nil then t29.badge_id else ""
 	}, t28))
 end
-function t28.encode(p19) -- line: 5684
+function t28.encode(p19) -- line: 5931
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n13 = 0
 
 	if p19.badge_id ~= nil and p19.badge_id ~= "" then
-		local v524, v525 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
+		local v541, v542 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n13 = proto.writeString(v524, v525, p19.badge_id)
+		buf, n13 = proto.writeString(v541, v542, p19.badge_id)
 	end
 
 	local buf8 = buffer.create(n13)
@@ -2756,47 +2855,47 @@ function t28.encode(p19) -- line: 5684
 
 	return buf8
 end
-function t28.decode(p20: buffer) -- line: 5698
+function t28.decode(p20: buffer) -- line: 5945
 	-- upvalues: t28 (copy), proto (copy)
-	local v528 = t28.new()
+	local v545 = t28.new()
 	local n14 = 0
 
 	while n14 < buffer.len(p20) do
-		local v530, v531
+		local v547, v548
 
-		v530, v531, n14 = proto.readTag(p20, n14)
+		v547, v548, n14 = proto.readTag(p20, n14)
 
-		if v531 == proto.wireTypes.varint then
-			local v532
+		if v548 == proto.wireTypes.varint then
+			local v549
 
-			v532, n14 = proto.readVarInt(p20, n14)
-		elseif v531 == proto.wireTypes.lengthDelimited then
-			if v530 == 1 then
-				local v533
+			v549, n14 = proto.readVarInt(p20, n14)
+		elseif v548 == proto.wireTypes.lengthDelimited then
+			if v547 == 1 then
+				local v550
 
-				v533, n14 = proto.readBuffer(p20, n14)
-				v528.badge_id = buffer.tostring(v533)
+				v550, n14 = proto.readBuffer(p20, n14)
+				v545.badge_id = buffer.tostring(v550)
 			else
-				local v534, v535 = proto.readVarInt(p20, n14)
+				local v551, v552 = proto.readVarInt(p20, n14)
 
-				n14 = v535 + v534
+				n14 = v552 + v551
 			end
-		elseif v531 == proto.wireTypes.i32 then
-			local v536
+		elseif v548 == proto.wireTypes.i32 then
+			local v553
 
-			v536, n14 = proto.readFixed32(p20, n14)
-		elseif v531 == proto.wireTypes.i64 then
-			local v537
+			v553, n14 = proto.readFixed32(p20, n14)
+		elseif v548 == proto.wireTypes.i64 then
+			local v554
 
-			v537, n14 = proto.readFixed64(p20, n14)
+			v554, n14 = proto.readFixed64(p20, n14)
 		else
-			error("Unsupported wire type: " .. v531)
+			error("Unsupported wire type: " .. v548)
 		end
 	end
 
-	return v528
+	return v545
 end
-function t28.jsonEncode(p21) -- line: 5741
+function t28.jsonEncode(p21) -- line: 5988
 	local t30 = {}
 
 	if p21.badge_id ~= nil and p21.badge_id ~= "" then
@@ -2805,19 +2904,19 @@ function t28.jsonEncode(p21) -- line: 5741
 
 	return t30
 end
-function t28.jsonDecode(t31: {[any]: any}) -- line: 5751
+function t28.jsonDecode(t31: {[any]: any}) -- line: 5998
 	-- upvalues: t28 (copy)
-	local v541 = t28.new()
+	local v558 = t28.new()
 
 	if t31.badge_id ~= nil then
-		v541.badge_id = t31.badge_id
+		v558.badge_id = t31.badge_id
 	end
 
 	if t31.badgeId ~= nil then
-		v541.badge_id = t31.badgeId
+		v558.badge_id = t31.badgeId
 	end
 
-	return v541
+	return v558
 end
 
 t28.descriptor = {
@@ -2831,7 +2930,7 @@ local t32 = {}
 
 t32.__index = t32
 
-function t32.new(t33: {[any]: any}?) -- line: 5781
+function t32.new(t33: {[any]: any}?) -- line: 6028
 	-- upvalues: t32 (copy)
 	return (setmetatable({
 		badge_id = if t33 ~= nil and t33.badge_id ~= nil then t33.badge_id else "",
@@ -2840,34 +2939,34 @@ function t32.new(t33: {[any]: any}?) -- line: 5781
 		creator_key = if t33 ~= nil and t33.creator_key ~= nil then t33.creator_key else ""
 	}, t32))
 end
-function t32.encode(p22) -- line: 5790
+function t32.encode(p22) -- line: 6037
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n15 = 0
 
 	if p22.badge_id ~= nil and p22.badge_id ~= "" then
-		local v546, v547 = proto.writeTag(buf, n15, 1, proto.wireTypes.lengthDelimited)
+		local v563, v564 = proto.writeTag(buf, n15, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v546, v547, p22.badge_id)
+		buf, n15 = proto.writeString(v563, v564, p22.badge_id)
 	end
 
 	if p22.universe_id ~= nil and p22.universe_id ~= "" then
-		local v548, v549 = proto.writeTag(buf, n15, 2, proto.wireTypes.lengthDelimited)
+		local v565, v566 = proto.writeTag(buf, n15, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v548, v549, p22.universe_id)
+		buf, n15 = proto.writeString(v565, v566, p22.universe_id)
 	end
 
 	if p22.localized_literals ~= nil then
-		local v550 = p22.localized_literals:encode()
-		local v551, v552 = proto.writeTag(buf, n15, 3, proto.wireTypes.lengthDelimited)
+		local v567 = p22.localized_literals:encode()
+		local v568, v569 = proto.writeTag(buf, n15, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeBuffer(v551, v552, v550, buffer.len(v550))
+		buf, n15 = proto.writeBuffer(v568, v569, v567, buffer.len(v567))
 	end
 
 	if p22.creator_key ~= nil and p22.creator_key ~= "" then
-		local v553, v554 = proto.writeTag(buf, n15, 4, proto.wireTypes.lengthDelimited)
+		local v570, v571 = proto.writeTag(buf, n15, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v553, v554, p22.creator_key)
+		buf, n15 = proto.writeString(v570, v571, p22.creator_key)
 	end
 
 	local buf9 = buffer.create(n15)
@@ -2876,62 +2975,62 @@ function t32.encode(p22) -- line: 5790
 
 	return buf9
 end
-function t32.decode(p23: buffer) -- line: 5820
+function t32.decode(p23: buffer) -- line: 6067
 	-- upvalues: t32 (copy), proto (copy), t1 (copy)
-	local v557 = t32.new()
+	local v574 = t32.new()
 	local n16 = 0
 
 	while n16 < buffer.len(p23) do
-		local v559, v560
+		local v576, v577
 
-		v559, v560, n16 = proto.readTag(p23, n16)
+		v576, v577, n16 = proto.readTag(p23, n16)
 
-		if v560 == proto.wireTypes.varint then
-			local v561
+		if v577 == proto.wireTypes.varint then
+			local v578
 
-			v561, n16 = proto.readVarInt(p23, n16)
-		elseif v560 == proto.wireTypes.lengthDelimited then
-			if v559 == 1 then
-				local v562
+			v578, n16 = proto.readVarInt(p23, n16)
+		elseif v577 == proto.wireTypes.lengthDelimited then
+			if v576 == 1 then
+				local v579
 
-				v562, n16 = proto.readBuffer(p23, n16)
-				v557.badge_id = buffer.tostring(v562)
-			elseif v559 == 2 then
-				local v563
+				v579, n16 = proto.readBuffer(p23, n16)
+				v574.badge_id = buffer.tostring(v579)
+			elseif v576 == 2 then
+				local v580
 
-				v563, n16 = proto.readBuffer(p23, n16)
-				v557.universe_id = buffer.tostring(v563)
-			elseif v559 == 3 then
-				local v564
+				v580, n16 = proto.readBuffer(p23, n16)
+				v574.universe_id = buffer.tostring(v580)
+			elseif v576 == 3 then
+				local v581
 
-				v564, n16 = proto.readBuffer(p23, n16)
-				v557.localized_literals = t1.BadgeDetailsInputData_LocalizedLiterals.decode(v564)
-			elseif v559 == 4 then
-				local v565
+				v581, n16 = proto.readBuffer(p23, n16)
+				v574.localized_literals = t1.BadgeDetailsInputData_LocalizedLiterals.decode(v581)
+			elseif v576 == 4 then
+				local v582
 
-				v565, n16 = proto.readBuffer(p23, n16)
-				v557.creator_key = buffer.tostring(v565)
+				v582, n16 = proto.readBuffer(p23, n16)
+				v574.creator_key = buffer.tostring(v582)
 			else
-				local v566, v567 = proto.readVarInt(p23, n16)
+				local v583, v584 = proto.readVarInt(p23, n16)
 
-				n16 = v567 + v566
+				n16 = v584 + v583
 			end
-		elseif v560 == proto.wireTypes.i32 then
-			local v568
+		elseif v577 == proto.wireTypes.i32 then
+			local v585
 
-			v568, n16 = proto.readFixed32(p23, n16)
-		elseif v560 == proto.wireTypes.i64 then
-			local v569
+			v585, n16 = proto.readFixed32(p23, n16)
+		elseif v577 == proto.wireTypes.i64 then
+			local v586
 
-			v569, n16 = proto.readFixed64(p23, n16)
+			v586, n16 = proto.readFixed64(p23, n16)
 		else
-			error("Unsupported wire type: " .. v560)
+			error("Unsupported wire type: " .. v577)
 		end
 	end
 
-	return v557
+	return v574
 end
-function t32.jsonEncode(p24) -- line: 5878
+function t32.jsonEncode(p24) -- line: 6125
 	local t34 = {}
 
 	if p24.badge_id ~= nil and p24.badge_id ~= "" then
@@ -2952,43 +3051,43 @@ function t32.jsonEncode(p24) -- line: 5878
 
 	return t34
 end
-function t32.jsonDecode(t35: {[any]: any}) -- line: 5900
+function t32.jsonDecode(t35: {[any]: any}) -- line: 6147
 	-- upvalues: t32 (copy), t1 (copy)
-	local v573 = t32.new()
+	local v590 = t32.new()
 
 	if t35.badge_id ~= nil then
-		v573.badge_id = t35.badge_id
+		v590.badge_id = t35.badge_id
 	end
 
 	if t35.badgeId ~= nil then
-		v573.badge_id = t35.badgeId
+		v590.badge_id = t35.badgeId
 	end
 
 	if t35.universe_id ~= nil then
-		v573.universe_id = t35.universe_id
+		v590.universe_id = t35.universe_id
 	end
 
 	if t35.universeId ~= nil then
-		v573.universe_id = t35.universeId
+		v590.universe_id = t35.universeId
 	end
 
 	if t35.localized_literals ~= nil then
-		v573.localized_literals = t1.BadgeDetailsInputData_LocalizedLiterals.jsonDecode(t35.localized_literals)
+		v590.localized_literals = t1.BadgeDetailsInputData_LocalizedLiterals.jsonDecode(t35.localized_literals)
 	end
 
 	if t35.localizedLiterals ~= nil then
-		v573.localized_literals = t1.BadgeDetailsInputData_LocalizedLiterals.jsonDecode(t35.localizedLiterals)
+		v590.localized_literals = t1.BadgeDetailsInputData_LocalizedLiterals.jsonDecode(t35.localizedLiterals)
 	end
 
 	if t35.creator_key ~= nil then
-		v573.creator_key = t35.creator_key
+		v590.creator_key = t35.creator_key
 	end
 
 	if t35.creatorKey ~= nil then
-		v573.creator_key = t35.creatorKey
+		v590.creator_key = t35.creatorKey
 	end
 
-	return v573
+	return v590
 end
 
 t32.descriptor = {
@@ -3002,7 +3101,7 @@ local t36 = {}
 
 t36.__index = t36
 
-function t36.new(t37: {[any]: any}?) -- line: 5954
+function t36.new(t37: {[any]: any}?) -- line: 6201
 	-- upvalues: t36 (copy)
 	return (setmetatable({
 		info_table = if t37 ~= nil and t37.info_table ~= nil then t37.info_table else nil,
@@ -3010,30 +3109,30 @@ function t36.new(t37: {[any]: any}?) -- line: 5954
 		overflow_menu = if t37 ~= nil and t37.overflow_menu ~= nil then t37.overflow_menu else nil
 	}, t36))
 end
-function t36.encode(p25) -- line: 5964
+function t36.encode(p25) -- line: 6211
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n17 = 0
 
 	if p25.info_table ~= nil then
-		local v578 = p25.info_table:encode()
-		local v579, v580 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
+		local v595 = p25.info_table:encode()
+		local v596, v597 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n17 = proto.writeBuffer(v579, v580, v578, buffer.len(v578))
+		buf, n17 = proto.writeBuffer(v596, v597, v595, buffer.len(v595))
 	end
 
 	if p25.action_module ~= nil then
-		local v581 = p25.action_module:encode()
-		local v582, v583 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
+		local v598 = p25.action_module:encode()
+		local v599, v600 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n17 = proto.writeBuffer(v582, v583, v581, buffer.len(v581))
+		buf, n17 = proto.writeBuffer(v599, v600, v598, buffer.len(v598))
 	end
 
 	if p25.overflow_menu ~= nil then
-		local v584 = p25.overflow_menu:encode()
-		local v585, v586 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
+		local v601 = p25.overflow_menu:encode()
+		local v602, v603 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n17 = proto.writeBuffer(v585, v586, v584, buffer.len(v584))
+		buf, n17 = proto.writeBuffer(v602, v603, v601, buffer.len(v601))
 	end
 
 	local buf10 = buffer.create(n17)
@@ -3042,57 +3141,57 @@ function t36.encode(p25) -- line: 5964
 
 	return buf10
 end
-function t36.decode(p26: buffer) -- line: 5991
+function t36.decode(p26: buffer) -- line: 6238
 	-- upvalues: t36 (copy), proto (copy), t1 (copy)
-	local v589 = t36.new()
+	local v606 = t36.new()
 	local n18 = 0
 
 	while n18 < buffer.len(p26) do
-		local v591, v592
+		local v608, v609
 
-		v591, v592, n18 = proto.readTag(p26, n18)
+		v608, v609, n18 = proto.readTag(p26, n18)
 
-		if v592 == proto.wireTypes.varint then
-			local v593
+		if v609 == proto.wireTypes.varint then
+			local v610
 
-			v593, n18 = proto.readVarInt(p26, n18)
-		elseif v592 == proto.wireTypes.lengthDelimited then
-			if v591 == 1 then
-				local v594
+			v610, n18 = proto.readVarInt(p26, n18)
+		elseif v609 == proto.wireTypes.lengthDelimited then
+			if v608 == 1 then
+				local v611
 
-				v594, n18 = proto.readBuffer(p26, n18)
-				v589.info_table = t1.BadgeDetailsInputData_LocalizedLiterals_InfoTable.decode(v594)
-			elseif v591 == 2 then
-				local v595
+				v611, n18 = proto.readBuffer(p26, n18)
+				v606.info_table = t1.BadgeDetailsInputData_LocalizedLiterals_InfoTable.decode(v611)
+			elseif v608 == 2 then
+				local v612
 
-				v595, n18 = proto.readBuffer(p26, n18)
-				v589.action_module = t1.BadgeDetailsInputData_LocalizedLiterals_ActionModule.decode(v595)
-			elseif v591 == 3 then
-				local v596
+				v612, n18 = proto.readBuffer(p26, n18)
+				v606.action_module = t1.BadgeDetailsInputData_LocalizedLiterals_ActionModule.decode(v612)
+			elseif v608 == 3 then
+				local v613
 
-				v596, n18 = proto.readBuffer(p26, n18)
-				v589.overflow_menu = t1.BadgeDetailsInputData_LocalizedLiterals_OverflowMenu.decode(v596)
+				v613, n18 = proto.readBuffer(p26, n18)
+				v606.overflow_menu = t1.BadgeDetailsInputData_LocalizedLiterals_OverflowMenu.decode(v613)
 			else
-				local v597, v598 = proto.readVarInt(p26, n18)
+				local v614, v615 = proto.readVarInt(p26, n18)
 
-				n18 = v598 + v597
+				n18 = v615 + v614
 			end
-		elseif v592 == proto.wireTypes.i32 then
-			local v599
+		elseif v609 == proto.wireTypes.i32 then
+			local v616
 
-			v599, n18 = proto.readFixed32(p26, n18)
-		elseif v592 == proto.wireTypes.i64 then
-			local v600
+			v616, n18 = proto.readFixed32(p26, n18)
+		elseif v609 == proto.wireTypes.i64 then
+			local v617
 
-			v600, n18 = proto.readFixed64(p26, n18)
+			v617, n18 = proto.readFixed64(p26, n18)
 		else
-			error("Unsupported wire type: " .. v592)
+			error("Unsupported wire type: " .. v609)
 		end
 	end
 
-	return v589
+	return v606
 end
-function t36.jsonEncode(p27) -- line: 6044
+function t36.jsonEncode(p27) -- line: 6291
 	local t38 = {}
 
 	if p27.info_table ~= nil then
@@ -3109,35 +3208,35 @@ function t36.jsonEncode(p27) -- line: 6044
 
 	return t38
 end
-function t36.jsonDecode(t39: {[any]: any}) -- line: 6062
+function t36.jsonDecode(t39: {[any]: any}) -- line: 6309
 	-- upvalues: t36 (copy), t1 (copy)
-	local v604 = t36.new()
+	local v621 = t36.new()
 
 	if t39.info_table ~= nil then
-		v604.info_table = t1.BadgeDetailsInputData_LocalizedLiterals_InfoTable.jsonDecode(t39.info_table)
+		v621.info_table = t1.BadgeDetailsInputData_LocalizedLiterals_InfoTable.jsonDecode(t39.info_table)
 	end
 
 	if t39.infoTable ~= nil then
-		v604.info_table = t1.BadgeDetailsInputData_LocalizedLiterals_InfoTable.jsonDecode(t39.infoTable)
+		v621.info_table = t1.BadgeDetailsInputData_LocalizedLiterals_InfoTable.jsonDecode(t39.infoTable)
 	end
 
 	if t39.action_module ~= nil then
-		v604.action_module = t1.BadgeDetailsInputData_LocalizedLiterals_ActionModule.jsonDecode(t39.action_module)
+		v621.action_module = t1.BadgeDetailsInputData_LocalizedLiterals_ActionModule.jsonDecode(t39.action_module)
 	end
 
 	if t39.actionModule ~= nil then
-		v604.action_module = t1.BadgeDetailsInputData_LocalizedLiterals_ActionModule.jsonDecode(t39.actionModule)
+		v621.action_module = t1.BadgeDetailsInputData_LocalizedLiterals_ActionModule.jsonDecode(t39.actionModule)
 	end
 
 	if t39.overflow_menu ~= nil then
-		v604.overflow_menu = t1.BadgeDetailsInputData_LocalizedLiterals_OverflowMenu.jsonDecode(t39.overflow_menu)
+		v621.overflow_menu = t1.BadgeDetailsInputData_LocalizedLiterals_OverflowMenu.jsonDecode(t39.overflow_menu)
 	end
 
 	if t39.overflowMenu ~= nil then
-		v604.overflow_menu = t1.BadgeDetailsInputData_LocalizedLiterals_OverflowMenu.jsonDecode(t39.overflowMenu)
+		v621.overflow_menu = t1.BadgeDetailsInputData_LocalizedLiterals_OverflowMenu.jsonDecode(t39.overflowMenu)
 	end
 
-	return v604
+	return v621
 end
 
 t36.descriptor = {
@@ -3151,7 +3250,7 @@ local t40 = {}
 
 t40.__index = t40
 
-function t40.new(t41: {[any]: any}?) -- line: 6113
+function t40.new(t41: {[any]: any}?) -- line: 6360
 	-- upvalues: t40 (copy)
 	return (setmetatable({
 		type_label = if t41 ~= nil and t41.type_label ~= nil then t41.type_label else "",
@@ -3163,51 +3262,51 @@ function t40.new(t41: {[any]: any}?) -- line: 6113
 		won_ever_label = if t41 ~= nil and t41.won_ever_label ~= nil then t41.won_ever_label else ""
 	}, t40))
 end
-function t40.encode(p28) -- line: 6132
+function t40.encode(p28) -- line: 6379
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n19 = 0
 
 	if p28.type_label ~= nil and p28.type_label ~= "" then
-		local v609, v610 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
+		local v626, v627 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v609, v610, p28.type_label)
+		buf, n19 = proto.writeString(v626, v627, p28.type_label)
 	end
 
 	if p28.earned_label ~= nil and p28.earned_label ~= "" then
-		local v611, v612 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
+		local v628, v629 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v611, v612, p28.earned_label)
+		buf, n19 = proto.writeString(v628, v629, p28.earned_label)
 	end
 
 	if p28.updated_label ~= nil and p28.updated_label ~= "" then
-		local v613, v614 = proto.writeTag(buf, n19, 3, proto.wireTypes.lengthDelimited)
+		local v630, v631 = proto.writeTag(buf, n19, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v613, v614, p28.updated_label)
+		buf, n19 = proto.writeString(v630, v631, p28.updated_label)
 	end
 
 	if p28.experience_label ~= nil and p28.experience_label ~= "" then
-		local v615, v616 = proto.writeTag(buf, n19, 4, proto.wireTypes.lengthDelimited)
+		local v632, v633 = proto.writeTag(buf, n19, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v615, v616, p28.experience_label)
+		buf, n19 = proto.writeString(v632, v633, p28.experience_label)
 	end
 
 	if p28.rarity_label ~= nil and p28.rarity_label ~= "" then
-		local v617, v618 = proto.writeTag(buf, n19, 5, proto.wireTypes.lengthDelimited)
+		local v634, v635 = proto.writeTag(buf, n19, 5, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v617, v618, p28.rarity_label)
+		buf, n19 = proto.writeString(v634, v635, p28.rarity_label)
 	end
 
 	if p28.won_yesterday_label ~= nil and p28.won_yesterday_label ~= "" then
-		local v619, v620 = proto.writeTag(buf, n19, 6, proto.wireTypes.lengthDelimited)
+		local v636, v637 = proto.writeTag(buf, n19, 6, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v619, v620, p28.won_yesterday_label)
+		buf, n19 = proto.writeString(v636, v637, p28.won_yesterday_label)
 	end
 
 	if p28.won_ever_label ~= nil and p28.won_ever_label ~= "" then
-		local v621, v622 = proto.writeTag(buf, n19, 7, proto.wireTypes.lengthDelimited)
+		local v638, v639 = proto.writeTag(buf, n19, 7, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v621, v622, p28.won_ever_label)
+		buf, n19 = proto.writeString(v638, v639, p28.won_ever_label)
 	end
 
 	local buf11 = buffer.create(n19)
@@ -3216,77 +3315,77 @@ function t40.encode(p28) -- line: 6132
 
 	return buf11
 end
-function t40.decode(p29: buffer) -- line: 6178
+function t40.decode(p29: buffer) -- line: 6425
 	-- upvalues: t40 (copy), proto (copy)
-	local v625 = t40.new()
+	local v642 = t40.new()
 	local n20 = 0
 
 	while n20 < buffer.len(p29) do
-		local v627, v628
+		local v644, v645
 
-		v627, v628, n20 = proto.readTag(p29, n20)
+		v644, v645, n20 = proto.readTag(p29, n20)
 
-		if v628 == proto.wireTypes.varint then
-			local v629
+		if v645 == proto.wireTypes.varint then
+			local v646
 
-			v629, n20 = proto.readVarInt(p29, n20)
-		elseif v628 == proto.wireTypes.lengthDelimited then
-			if v627 == 1 then
-				local v630
+			v646, n20 = proto.readVarInt(p29, n20)
+		elseif v645 == proto.wireTypes.lengthDelimited then
+			if v644 == 1 then
+				local v647
 
-				v630, n20 = proto.readBuffer(p29, n20)
-				v625.type_label = buffer.tostring(v630)
-			elseif v627 == 2 then
-				local v631
+				v647, n20 = proto.readBuffer(p29, n20)
+				v642.type_label = buffer.tostring(v647)
+			elseif v644 == 2 then
+				local v648
 
-				v631, n20 = proto.readBuffer(p29, n20)
-				v625.earned_label = buffer.tostring(v631)
-			elseif v627 == 3 then
-				local v632
+				v648, n20 = proto.readBuffer(p29, n20)
+				v642.earned_label = buffer.tostring(v648)
+			elseif v644 == 3 then
+				local v649
 
-				v632, n20 = proto.readBuffer(p29, n20)
-				v625.updated_label = buffer.tostring(v632)
-			elseif v627 == 4 then
-				local v633
+				v649, n20 = proto.readBuffer(p29, n20)
+				v642.updated_label = buffer.tostring(v649)
+			elseif v644 == 4 then
+				local v650
 
-				v633, n20 = proto.readBuffer(p29, n20)
-				v625.experience_label = buffer.tostring(v633)
-			elseif v627 == 5 then
-				local v634
+				v650, n20 = proto.readBuffer(p29, n20)
+				v642.experience_label = buffer.tostring(v650)
+			elseif v644 == 5 then
+				local v651
 
-				v634, n20 = proto.readBuffer(p29, n20)
-				v625.rarity_label = buffer.tostring(v634)
-			elseif v627 == 6 then
-				local v635
+				v651, n20 = proto.readBuffer(p29, n20)
+				v642.rarity_label = buffer.tostring(v651)
+			elseif v644 == 6 then
+				local v652
 
-				v635, n20 = proto.readBuffer(p29, n20)
-				v625.won_yesterday_label = buffer.tostring(v635)
-			elseif v627 == 7 then
-				local v636
+				v652, n20 = proto.readBuffer(p29, n20)
+				v642.won_yesterday_label = buffer.tostring(v652)
+			elseif v644 == 7 then
+				local v653
 
-				v636, n20 = proto.readBuffer(p29, n20)
-				v625.won_ever_label = buffer.tostring(v636)
+				v653, n20 = proto.readBuffer(p29, n20)
+				v642.won_ever_label = buffer.tostring(v653)
 			else
-				local v637, v638 = proto.readVarInt(p29, n20)
+				local v654, v655 = proto.readVarInt(p29, n20)
 
-				n20 = v638 + v637
+				n20 = v655 + v654
 			end
-		elseif v628 == proto.wireTypes.i32 then
-			local v639
+		elseif v645 == proto.wireTypes.i32 then
+			local v656
 
-			v639, n20 = proto.readFixed32(p29, n20)
-		elseif v628 == proto.wireTypes.i64 then
-			local v640
+			v656, n20 = proto.readFixed32(p29, n20)
+		elseif v645 == proto.wireTypes.i64 then
+			local v657
 
-			v640, n20 = proto.readFixed64(p29, n20)
+			v657, n20 = proto.readFixed64(p29, n20)
 		else
-			error("Unsupported wire type: " .. v628)
+			error("Unsupported wire type: " .. v645)
 		end
 	end
 
-	return v625
+	return v642
 end
-function t40.jsonEncode(p30) -- line: 6253
+function t40.jsonEncode(p30) -- line: 6500
 	local t42 = {}
 
 	if p30.type_label ~= nil and p30.type_label ~= "" then
@@ -3319,67 +3418,67 @@ function t40.jsonEncode(p30) -- line: 6253
 
 	return t42
 end
-function t40.jsonDecode(t43: {[any]: any}) -- line: 6289
+function t40.jsonDecode(t43: {[any]: any}) -- line: 6536
 	-- upvalues: t40 (copy)
-	local v644 = t40.new()
+	local v661 = t40.new()
 
 	if t43.type_label ~= nil then
-		v644.type_label = t43.type_label
+		v661.type_label = t43.type_label
 	end
 
 	if t43.typeLabel ~= nil then
-		v644.type_label = t43.typeLabel
+		v661.type_label = t43.typeLabel
 	end
 
 	if t43.earned_label ~= nil then
-		v644.earned_label = t43.earned_label
+		v661.earned_label = t43.earned_label
 	end
 
 	if t43.earnedLabel ~= nil then
-		v644.earned_label = t43.earnedLabel
+		v661.earned_label = t43.earnedLabel
 	end
 
 	if t43.updated_label ~= nil then
-		v644.updated_label = t43.updated_label
+		v661.updated_label = t43.updated_label
 	end
 
 	if t43.updatedLabel ~= nil then
-		v644.updated_label = t43.updatedLabel
+		v661.updated_label = t43.updatedLabel
 	end
 
 	if t43.experience_label ~= nil then
-		v644.experience_label = t43.experience_label
+		v661.experience_label = t43.experience_label
 	end
 
 	if t43.experienceLabel ~= nil then
-		v644.experience_label = t43.experienceLabel
+		v661.experience_label = t43.experienceLabel
 	end
 
 	if t43.rarity_label ~= nil then
-		v644.rarity_label = t43.rarity_label
+		v661.rarity_label = t43.rarity_label
 	end
 
 	if t43.rarityLabel ~= nil then
-		v644.rarity_label = t43.rarityLabel
+		v661.rarity_label = t43.rarityLabel
 	end
 
 	if t43.won_yesterday_label ~= nil then
-		v644.won_yesterday_label = t43.won_yesterday_label
+		v661.won_yesterday_label = t43.won_yesterday_label
 	end
 
 	if t43.wonYesterdayLabel ~= nil then
-		v644.won_yesterday_label = t43.wonYesterdayLabel
+		v661.won_yesterday_label = t43.wonYesterdayLabel
 	end
 
 	if t43.won_ever_label ~= nil then
-		v644.won_ever_label = t43.won_ever_label
+		v661.won_ever_label = t43.won_ever_label
 	end
 
 	if t43.wonEverLabel ~= nil then
-		v644.won_ever_label = t43.wonEverLabel
+		v661.won_ever_label = t43.wonEverLabel
 	end
 
-	return v644
+	return v661
 end
 
 t40.descriptor = {
@@ -3393,28 +3492,28 @@ local t44 = {}
 
 t44.__index = t44
 
-function t44.new(t45: {[any]: any}?) -- line: 6369
+function t44.new(t45: {[any]: any}?) -- line: 6616
 	-- upvalues: t44 (copy)
 	return (setmetatable({
 		share = if t45 ~= nil and t45.share ~= nil then t45.share else "",
 		report = if t45 ~= nil and t45.report ~= nil then t45.report else ""
 	}, t44))
 end
-function t44.encode(p31) -- line: 6381
+function t44.encode(p31) -- line: 6628
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n21 = 0
 
 	if p31.share ~= nil and p31.share ~= "" then
-		local v649, v650 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
+		local v666, v667 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n21 = proto.writeString(v649, v650, p31.share)
+		buf, n21 = proto.writeString(v666, v667, p31.share)
 	end
 
 	if p31.report ~= nil and p31.report ~= "" then
-		local v651, v652 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
+		local v668, v669 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n21 = proto.writeString(v651, v652, p31.report)
+		buf, n21 = proto.writeString(v668, v669, p31.report)
 	end
 
 	local buf12 = buffer.create(n21)
@@ -3423,52 +3522,52 @@ function t44.encode(p31) -- line: 6381
 
 	return buf12
 end
-function t44.decode(p32: buffer) -- line: 6402
+function t44.decode(p32: buffer) -- line: 6649
 	-- upvalues: t44 (copy), proto (copy)
-	local v655 = t44.new()
+	local v672 = t44.new()
 	local n22 = 0
 
 	while n22 < buffer.len(p32) do
-		local v657, v658
+		local v674, v675
 
-		v657, v658, n22 = proto.readTag(p32, n22)
+		v674, v675, n22 = proto.readTag(p32, n22)
 
-		if v658 == proto.wireTypes.varint then
-			local v659
+		if v675 == proto.wireTypes.varint then
+			local v676
 
-			v659, n22 = proto.readVarInt(p32, n22)
-		elseif v658 == proto.wireTypes.lengthDelimited then
-			if v657 == 1 then
-				local v660
+			v676, n22 = proto.readVarInt(p32, n22)
+		elseif v675 == proto.wireTypes.lengthDelimited then
+			if v674 == 1 then
+				local v677
 
-				v660, n22 = proto.readBuffer(p32, n22)
-				v655.share = buffer.tostring(v660)
-			elseif v657 == 2 then
-				local v661
+				v677, n22 = proto.readBuffer(p32, n22)
+				v672.share = buffer.tostring(v677)
+			elseif v674 == 2 then
+				local v678
 
-				v661, n22 = proto.readBuffer(p32, n22)
-				v655.report = buffer.tostring(v661)
+				v678, n22 = proto.readBuffer(p32, n22)
+				v672.report = buffer.tostring(v678)
 			else
-				local v662, v663 = proto.readVarInt(p32, n22)
+				local v679, v680 = proto.readVarInt(p32, n22)
 
-				n22 = v663 + v662
+				n22 = v680 + v679
 			end
-		elseif v658 == proto.wireTypes.i32 then
-			local v664
+		elseif v675 == proto.wireTypes.i32 then
+			local v681
 
-			v664, n22 = proto.readFixed32(p32, n22)
-		elseif v658 == proto.wireTypes.i64 then
-			local v665
+			v681, n22 = proto.readFixed32(p32, n22)
+		elseif v675 == proto.wireTypes.i64 then
+			local v682
 
-			v665, n22 = proto.readFixed64(p32, n22)
+			v682, n22 = proto.readFixed64(p32, n22)
 		else
-			error("Unsupported wire type: " .. v658)
+			error("Unsupported wire type: " .. v675)
 		end
 	end
 
-	return v655
+	return v672
 end
-function t44.jsonEncode(p33) -- line: 6452
+function t44.jsonEncode(p33) -- line: 6699
 	local t46 = {}
 
 	if p33.share ~= nil and p33.share ~= "" then
@@ -3481,19 +3580,19 @@ function t44.jsonEncode(p33) -- line: 6452
 
 	return t46
 end
-function t44.jsonDecode(t47: {[any]: any}) -- line: 6468
+function t44.jsonDecode(t47: {[any]: any}) -- line: 6715
 	-- upvalues: t44 (copy)
-	local v669 = t44.new()
+	local v686 = t44.new()
 
 	if t47.share ~= nil then
-		v669.share = t47.share
+		v686.share = t47.share
 	end
 
 	if t47.report ~= nil then
-		v669.report = t47.report
+		v686.report = t47.report
 	end
 
-	return v669
+	return v686
 end
 
 t44.descriptor = {
@@ -3507,28 +3606,28 @@ local t48 = {}
 
 t48.__index = t48
 
-function t48.new(t49: {[any]: any}?) -- line: 6500
+function t48.new(t49: {[any]: any}?) -- line: 6747
 	-- upvalues: t48 (copy)
 	return (setmetatable({
 		report = if t49 ~= nil and t49.report ~= nil then t49.report else "",
 		remove = if t49 ~= nil and t49.remove ~= nil then t49.remove else ""
 	}, t48))
 end
-function t48.encode(p34) -- line: 6512
+function t48.encode(p34) -- line: 6759
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n23 = 0
 
 	if p34.report ~= nil and p34.report ~= "" then
-		local v674, v675 = proto.writeTag(buf, n23, 1, proto.wireTypes.lengthDelimited)
+		local v691, v692 = proto.writeTag(buf, n23, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n23 = proto.writeString(v674, v675, p34.report)
+		buf, n23 = proto.writeString(v691, v692, p34.report)
 	end
 
 	if p34.remove ~= nil and p34.remove ~= "" then
-		local v676, v677 = proto.writeTag(buf, n23, 2, proto.wireTypes.lengthDelimited)
+		local v693, v694 = proto.writeTag(buf, n23, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n23 = proto.writeString(v676, v677, p34.remove)
+		buf, n23 = proto.writeString(v693, v694, p34.remove)
 	end
 
 	local buf13 = buffer.create(n23)
@@ -3537,52 +3636,52 @@ function t48.encode(p34) -- line: 6512
 
 	return buf13
 end
-function t48.decode(p35: buffer) -- line: 6533
+function t48.decode(p35: buffer) -- line: 6780
 	-- upvalues: t48 (copy), proto (copy)
-	local v680 = t48.new()
+	local v697 = t48.new()
 	local n24 = 0
 
 	while n24 < buffer.len(p35) do
-		local v682, v683
+		local v699, v700
 
-		v682, v683, n24 = proto.readTag(p35, n24)
+		v699, v700, n24 = proto.readTag(p35, n24)
 
-		if v683 == proto.wireTypes.varint then
-			local v684
+		if v700 == proto.wireTypes.varint then
+			local v701
 
-			v684, n24 = proto.readVarInt(p35, n24)
-		elseif v683 == proto.wireTypes.lengthDelimited then
-			if v682 == 1 then
-				local v685
+			v701, n24 = proto.readVarInt(p35, n24)
+		elseif v700 == proto.wireTypes.lengthDelimited then
+			if v699 == 1 then
+				local v702
 
-				v685, n24 = proto.readBuffer(p35, n24)
-				v680.report = buffer.tostring(v685)
-			elseif v682 == 2 then
-				local v686
+				v702, n24 = proto.readBuffer(p35, n24)
+				v697.report = buffer.tostring(v702)
+			elseif v699 == 2 then
+				local v703
 
-				v686, n24 = proto.readBuffer(p35, n24)
-				v680.remove = buffer.tostring(v686)
+				v703, n24 = proto.readBuffer(p35, n24)
+				v697.remove = buffer.tostring(v703)
 			else
-				local v687, v688 = proto.readVarInt(p35, n24)
+				local v704, v705 = proto.readVarInt(p35, n24)
 
-				n24 = v688 + v687
+				n24 = v705 + v704
 			end
-		elseif v683 == proto.wireTypes.i32 then
-			local v689
+		elseif v700 == proto.wireTypes.i32 then
+			local v706
 
-			v689, n24 = proto.readFixed32(p35, n24)
-		elseif v683 == proto.wireTypes.i64 then
-			local v690
+			v706, n24 = proto.readFixed32(p35, n24)
+		elseif v700 == proto.wireTypes.i64 then
+			local v707
 
-			v690, n24 = proto.readFixed64(p35, n24)
+			v707, n24 = proto.readFixed64(p35, n24)
 		else
-			error("Unsupported wire type: " .. v683)
+			error("Unsupported wire type: " .. v700)
 		end
 	end
 
-	return v680
+	return v697
 end
-function t48.jsonEncode(p36) -- line: 6583
+function t48.jsonEncode(p36) -- line: 6830
 	local t50 = {}
 
 	if p36.report ~= nil and p36.report ~= "" then
@@ -3595,19 +3694,19 @@ function t48.jsonEncode(p36) -- line: 6583
 
 	return t50
 end
-function t48.jsonDecode(t51: {[any]: any}) -- line: 6599
+function t48.jsonDecode(t51: {[any]: any}) -- line: 6846
 	-- upvalues: t48 (copy)
-	local v694 = t48.new()
+	local v711 = t48.new()
 
 	if t51.report ~= nil then
-		v694.report = t51.report
+		v711.report = t51.report
 	end
 
 	if t51.remove ~= nil then
-		v694.remove = t51.remove
+		v711.remove = t51.remove
 	end
 
-	return v694
+	return v711
 end
 
 t48.descriptor = {
@@ -3621,11 +3720,11 @@ local t52 = {}
 
 t52.__index = t52
 
-function t52.new(_: {[any]: any}?) -- line: 6630
+function t52.new(_: {[any]: any}?) -- line: 6877
 	-- upvalues: t52 (copy)
 	return (setmetatable({}, t52))
 end
-function t52.encode(_) -- line: 6634
+function t52.encode(_) -- line: 6881
 	local buf = buffer.create(0)
 	local buf14 = buffer.create(0)
 
@@ -3633,43 +3732,43 @@ function t52.encode(_) -- line: 6634
 
 	return buf14
 end
-function t52.decode(p38: buffer) -- line: 6643
+function t52.decode(p38: buffer) -- line: 6890
 	-- upvalues: t52 (copy), proto (copy)
-	local v700 = t52.new()
+	local v717 = t52.new()
 	local n25 = 0
 
 	while n25 < buffer.len(p38) do
-		local v702, v703
+		local v719, v720
 
-		v702, v703, n25 = proto.readTag(p38, n25)
+		v719, v720, n25 = proto.readTag(p38, n25)
 
-		if v703 == proto.wireTypes.varint then
-			local v704
+		if v720 == proto.wireTypes.varint then
+			local v721
 
-			v704, n25 = proto.readVarInt(p38, n25)
-		elseif v703 == proto.wireTypes.lengthDelimited then
-			local v705, v706 = proto.readVarInt(p38, n25)
+			v721, n25 = proto.readVarInt(p38, n25)
+		elseif v720 == proto.wireTypes.lengthDelimited then
+			local v722, v723 = proto.readVarInt(p38, n25)
 
-			n25 = v706 + v705
-		elseif v703 == proto.wireTypes.i32 then
-			local v707
+			n25 = v723 + v722
+		elseif v720 == proto.wireTypes.i32 then
+			local v724
 
-			v707, n25 = proto.readFixed32(p38, n25)
-		elseif v703 == proto.wireTypes.i64 then
-			local v708
+			v724, n25 = proto.readFixed32(p38, n25)
+		elseif v720 == proto.wireTypes.i64 then
+			local v725
 
-			v708, n25 = proto.readFixed64(p38, n25)
+			v725, n25 = proto.readFixed64(p38, n25)
 		else
-			error("Unsupported wire type: " .. v703)
+			error("Unsupported wire type: " .. v720)
 		end
 	end
 
-	return v700
+	return v717
 end
-function t52.jsonEncode(_) -- line: 6681
+function t52.jsonEncode(_) -- line: 6928
 	return {}
 end
-function t52.jsonDecode(_: {[any]: any}) -- line: 6687
+function t52.jsonDecode(_: {[any]: any}) -- line: 6934
 	-- upvalues: t52 (copy)
 	return (t52.new())
 end
@@ -3685,7 +3784,7 @@ local t55 = {}
 
 t55.__index = t55
 
-function t55.new(t56: {[any]: any}?) -- line: 6707
+function t55.new(t56: {[any]: any}?) -- line: 6954
 	-- upvalues: t55 (copy)
 	return (setmetatable({
 		universe_id = if t56 ~= nil and t56.universe_id ~= nil then t56.universe_id else "",
@@ -3695,56 +3794,56 @@ function t55.new(t56: {[any]: any}?) -- line: 6707
 		entry_order_map = if t56 ~= nil and t56.entry_order_map ~= nil then t56.entry_order_map else {}
 	}, t55))
 end
-function t55.encode(p40) -- line: 6719
+function t55.encode(p40) -- line: 6966
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n26 = 0
 
 	if p40.universe_id ~= nil and p40.universe_id ~= "" then
-		local v715, v716 = proto.writeTag(buf, n26, 1, proto.wireTypes.lengthDelimited)
+		local v732, v733 = proto.writeTag(buf, n26, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n26 = proto.writeString(v715, v716, p40.universe_id)
+		buf, n26 = proto.writeString(v732, v733, p40.universe_id)
 	end
 
 	if p40.creator_key ~= nil and p40.creator_key ~= "" then
-		local v717, v718 = proto.writeTag(buf, n26, 2, proto.wireTypes.lengthDelimited)
+		local v734, v735 = proto.writeTag(buf, n26, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n26 = proto.writeString(v717, v718, p40.creator_key)
+		buf, n26 = proto.writeString(v734, v735, p40.creator_key)
 	end
 
 	if p40.entry_map ~= nil and next(p40.entry_map) ~= nil then
-		for v719, v720 in p40.entry_map do
+		for v736, v737 in p40.entry_map do
 			local buf15 = buffer.create(0)
-			local v722, v723 = proto.writeTag(buf15, 0, 1, proto.wireTypes.lengthDelimited)
-			local v724, v725 = proto.writeString(v722, v723, v719)
-			local v726 = v720:encode()
-			local v727, v728 = proto.writeTag(v724, v725, 2, proto.wireTypes.lengthDelimited)
-			local v729, v730 = proto.writeBuffer(v727, v728, v726, buffer.len(v726))
-			local v731, v732 = proto.writeTag(buf, n26, 3, proto.wireTypes.lengthDelimited)
+			local v739, v740 = proto.writeTag(buf15, 0, 1, proto.wireTypes.lengthDelimited)
+			local v741, v742 = proto.writeString(v739, v740, v736)
+			local v743 = v737:encode()
+			local v744, v745 = proto.writeTag(v741, v742, 2, proto.wireTypes.lengthDelimited)
+			local v746, v747 = proto.writeBuffer(v744, v745, v743, buffer.len(v743))
+			local v748, v749 = proto.writeTag(buf, n26, 3, proto.wireTypes.lengthDelimited)
 
-			buf, n26 = proto.writeBuffer(v731, v732, v729, v730)
+			buf, n26 = proto.writeBuffer(v748, v749, v746, v747)
 		end
 	end
 
 	if p40.entry_order ~= nil and #p40.entry_order > 0 then
-		for _, v734 in p40.entry_order do
-			local v735, v736 = proto.writeTag(buf, n26, 4, proto.wireTypes.lengthDelimited)
+		for _, v751 in p40.entry_order do
+			local v752, v753 = proto.writeTag(buf, n26, 4, proto.wireTypes.lengthDelimited)
 
-			buf, n26 = proto.writeString(v735, v736, v734)
+			buf, n26 = proto.writeString(v752, v753, v751)
 		end
 	end
 
 	if p40.entry_order_map ~= nil and next(p40.entry_order_map) ~= nil then
-		for v737, v738 in p40.entry_order_map do
+		for v754, v755 in p40.entry_order_map do
 			local buf16 = buffer.create(0)
-			local v740, v741 = proto.writeTag(buf16, 0, 1, proto.wireTypes.lengthDelimited)
-			local v742, v743 = proto.writeString(v740, v741, v737)
-			local v744 = v738:encode()
-			local v745, v746 = proto.writeTag(v742, v743, 2, proto.wireTypes.lengthDelimited)
-			local v747, v748 = proto.writeBuffer(v745, v746, v744, buffer.len(v744))
-			local v749, v750 = proto.writeTag(buf, n26, 5, proto.wireTypes.lengthDelimited)
+			local v757, v758 = proto.writeTag(buf16, 0, 1, proto.wireTypes.lengthDelimited)
+			local v759, v760 = proto.writeString(v757, v758, v754)
+			local v761 = v755:encode()
+			local v762, v763 = proto.writeTag(v759, v760, 2, proto.wireTypes.lengthDelimited)
+			local v764, v765 = proto.writeBuffer(v762, v763, v761, buffer.len(v761))
+			local v766, v767 = proto.writeTag(buf, n26, 5, proto.wireTypes.lengthDelimited)
 
-			buf, n26 = proto.writeBuffer(v749, v750, v747, v748)
+			buf, n26 = proto.writeBuffer(v766, v767, v764, v765)
 		end
 	end
 
@@ -3754,75 +3853,75 @@ function t55.encode(p40) -- line: 6719
 
 	return buf17
 end
-function t55.decode(p41: buffer) -- line: 6773
+function t55.decode(p41: buffer) -- line: 7020
 	-- upvalues: t55 (copy), proto (copy), t1 (copy)
-	local v753 = t55.new()
+	local v770 = t55.new()
 	local n27 = 0
 
 	while n27 < buffer.len(p41) do
-		local v755, v756
+		local v772, v773
 
-		v755, v756, n27 = proto.readTag(p41, n27)
+		v772, v773, n27 = proto.readTag(p41, n27)
 
-		if v756 == proto.wireTypes.varint then
-			local v757
+		if v773 == proto.wireTypes.varint then
+			local v774
 
-			v757, n27 = proto.readVarInt(p41, n27)
-		elseif v756 == proto.wireTypes.lengthDelimited then
-			if v755 == 1 then
-				local v758
+			v774, n27 = proto.readVarInt(p41, n27)
+		elseif v773 == proto.wireTypes.lengthDelimited then
+			if v772 == 1 then
+				local v775
 
-				v758, n27 = proto.readBuffer(p41, n27)
-				v753.universe_id = buffer.tostring(v758)
-			elseif v755 == 2 then
-				local v759
+				v775, n27 = proto.readBuffer(p41, n27)
+				v770.universe_id = buffer.tostring(v775)
+			elseif v772 == 2 then
+				local v776
 
-				v759, n27 = proto.readBuffer(p41, n27)
-				v753.creator_key = buffer.tostring(v759)
-			elseif v755 == 3 then
-				local v760
+				v776, n27 = proto.readBuffer(p41, n27)
+				v770.creator_key = buffer.tostring(v776)
+			elseif v772 == 3 then
+				local v777
 
-				v760, n27 = proto.readBuffer(p41, n27)
+				v777, n27 = proto.readBuffer(p41, n27)
 
-				local v761 = t1.ExperienceDetailsFeedInputData_EntryMapEntry.decode(v760)
-				local v762 = t1.FeedEntry.new()
+				local v778 = t1.ExperienceDetailsFeedInputData_EntryMapEntry.decode(v777)
+				local v779 = t1.FeedEntry.new()
 
-				v753.entry_map[v761.key or ""] = v761.value or v762
-			elseif v755 == 4 then
-				local v763
+				v770.entry_map[v778.key or ""] = v778.value or v779
+			elseif v772 == 4 then
+				local v780
 
-				v763, n27 = proto.readBuffer(p41, n27)
-				table.insert(v753.entry_order, buffer.tostring(v763))
-			elseif v755 == 5 then
-				local v764
+				v780, n27 = proto.readBuffer(p41, n27)
+				table.insert(v770.entry_order, buffer.tostring(v780))
+			elseif v772 == 5 then
+				local v781
 
-				v764, n27 = proto.readBuffer(p41, n27)
+				v781, n27 = proto.readBuffer(p41, n27)
 
-				local v765 = t1.ExperienceDetailsFeedInputData_EntryOrderMapEntry.decode(v764)
-				local v766 = t1.EntryOrder.new()
+				local v782 = t1.ExperienceDetailsFeedInputData_EntryOrderMapEntry.decode(v781)
+				local v783 = t1.EntryOrder.new()
 
-				v753.entry_order_map[v765.key or ""] = v765.value or v766
+				v770.entry_order_map[v782.key or ""] = v782.value or v783
 			else
-				local v767, v768 = proto.readVarInt(p41, n27)
+				local v784, v785 = proto.readVarInt(p41, n27)
 
-				n27 = v768 + v767
+				n27 = v785 + v784
 			end
-		elseif v756 == proto.wireTypes.i32 then
-			local v769
+		elseif v773 == proto.wireTypes.i32 then
+			local v786
 
-			v769, n27 = proto.readFixed32(p41, n27)
-		elseif v756 == proto.wireTypes.i64 then
-			local v770
+			v786, n27 = proto.readFixed32(p41, n27)
+		elseif v773 == proto.wireTypes.i64 then
+			local v787
 
-			v770, n27 = proto.readFixed64(p41, n27)
+			v787, n27 = proto.readFixed64(p41, n27)
 		else
-			error("Unsupported wire type: " .. v756)
+			error("Unsupported wire type: " .. v773)
 		end
 	end
 
-	return v753
+	return v770
 end
-function t55.jsonEncode(p42) -- line: 6850
+function t55.jsonEncode(p42) -- line: 7097
 	local t57 = {}
 
 	if p42.universe_id ~= nil and p42.universe_id ~= "" then
@@ -3836,8 +3935,8 @@ function t55.jsonEncode(p42) -- line: 6850
 	if p42.entry_map ~= nil and next(p42.entry_map) ~= nil then
 		local t58 = {}
 
-		for v774, v775 in p42.entry_map do
-			t58[v774] = v775:jsonEncode()
+		for v791, v792 in p42.entry_map do
+			t58[v791] = v792:jsonEncode()
 		end
 
 		t57.entryMap = t58
@@ -3846,8 +3945,8 @@ function t55.jsonEncode(p42) -- line: 6850
 	if p42.entry_order ~= nil and #p42.entry_order > 0 then
 		local t59 = {}
 
-		for _, v778 in p42.entry_order do
-			table.insert(t59, v778)
+		for _, v795 in p42.entry_order do
+			table.insert(t59, v795)
 		end
 
 		t57.entryOrder = t59
@@ -3856,8 +3955,8 @@ function t55.jsonEncode(p42) -- line: 6850
 	if p42.entry_order_map ~= nil and next(p42.entry_order_map) ~= nil then
 		local t60 = {}
 
-		for v780, v781 in p42.entry_order_map do
-			t60[v780] = v781:jsonEncode()
+		for v797, v798 in p42.entry_order_map do
+			t60[v797] = v798:jsonEncode()
 		end
 
 		t57.entryOrderMap = t60
@@ -3865,87 +3964,87 @@ function t55.jsonEncode(p42) -- line: 6850
 
 	return t57
 end
-function t55.jsonDecode(t61: {[any]: any}) -- line: 6888
+function t55.jsonDecode(t61: {[any]: any}) -- line: 7135
 	-- upvalues: t55 (copy), t1 (copy)
-	local v783 = t55.new()
+	local v800 = t55.new()
 
 	if t61.universe_id ~= nil then
-		v783.universe_id = t61.universe_id
+		v800.universe_id = t61.universe_id
 	end
 
 	if t61.universeId ~= nil then
-		v783.universe_id = t61.universeId
+		v800.universe_id = t61.universeId
 	end
 
 	if t61.creator_key ~= nil then
-		v783.creator_key = t61.creator_key
+		v800.creator_key = t61.creator_key
 	end
 
 	if t61.creatorKey ~= nil then
-		v783.creator_key = t61.creatorKey
+		v800.creator_key = t61.creatorKey
 	end
 
 	if t61.entry_map ~= nil then
 		local t62 = {}
 
-		for v785, v786 in t61.entry_map do
-			t62[v785] = t1.FeedEntry.jsonDecode(v786)
+		for v802, v803 in t61.entry_map do
+			t62[v802] = t1.FeedEntry.jsonDecode(v803)
 		end
 
-		v783.entry_map = t62
+		v800.entry_map = t62
 	end
 
 	if t61.entryMap ~= nil then
 		local t63 = {}
 
-		for v788, v789 in t61.entryMap do
-			t63[v788] = t1.FeedEntry.jsonDecode(v789)
+		for v805, v806 in t61.entryMap do
+			t63[v805] = t1.FeedEntry.jsonDecode(v806)
 		end
 
-		v783.entry_map = t63
+		v800.entry_map = t63
 	end
 
 	if t61.entry_order ~= nil then
 		local t64 = {}
 
-		for _, v792 in t61.entry_order do
-			table.insert(t64, v792)
+		for _, v809 in t61.entry_order do
+			table.insert(t64, v809)
 		end
 
-		v783.entry_order = t64
+		v800.entry_order = t64
 	end
 
 	if t61.entryOrder ~= nil then
 		local t65 = {}
 
-		for _, v795 in t61.entryOrder do
-			table.insert(t65, v795)
+		for _, v812 in t61.entryOrder do
+			table.insert(t65, v812)
 		end
 
-		v783.entry_order = t65
+		v800.entry_order = t65
 	end
 
 	if t61.entry_order_map ~= nil then
 		local t66 = {}
 
-		for v797, v798 in t61.entry_order_map do
-			t66[v797] = t1.EntryOrder.jsonDecode(v798)
+		for v814, v815 in t61.entry_order_map do
+			t66[v814] = t1.EntryOrder.jsonDecode(v815)
 		end
 
-		v783.entry_order_map = t66
+		v800.entry_order_map = t66
 	end
 
 	if t61.entryOrderMap ~= nil then
 		local t67 = {}
 
-		for v800, v801 in t61.entryOrderMap do
-			t67[v800] = t1.EntryOrder.jsonDecode(v801)
+		for v817, v818 in t61.entryOrderMap do
+			t67[v817] = t1.EntryOrder.jsonDecode(v818)
 		end
 
-		v783.entry_order_map = t67
+		v800.entry_order_map = t67
 	end
 
-	return v783
+	return v800
 end
 
 t55.descriptor = {
@@ -3959,29 +4058,29 @@ local t68 = {}
 
 t68.__index = t68
 
-function t68.new(t69: {[any]: any}?) -- line: 6978
+function t68.new(t69: {[any]: any}?) -- line: 7225
 	-- upvalues: t68 (copy)
 	return (setmetatable({
 		key = if t69 ~= nil and t69.key ~= nil then t69.key else "",
 		value = if t69 ~= nil and t69.value ~= nil then t69.value else nil
 	}, t68))
 end
-function t68.encode(p43) -- line: 6987
+function t68.encode(p43) -- line: 7234
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n28 = 0
 
 	if p43.key ~= nil and p43.key ~= "" then
-		local v806, v807 = proto.writeTag(buf, n28, 1, proto.wireTypes.lengthDelimited)
+		local v823, v824 = proto.writeTag(buf, n28, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n28 = proto.writeString(v806, v807, p43.key)
+		buf, n28 = proto.writeString(v823, v824, p43.key)
 	end
 
 	if p43.value ~= nil then
-		local v808 = p43.value:encode()
-		local v809, v810 = proto.writeTag(buf, n28, 2, proto.wireTypes.lengthDelimited)
+		local v825 = p43.value:encode()
+		local v826, v827 = proto.writeTag(buf, n28, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n28 = proto.writeBuffer(v809, v810, v808, buffer.len(v808))
+		buf, n28 = proto.writeBuffer(v826, v827, v825, buffer.len(v825))
 	end
 
 	local buf18 = buffer.create(n28)
@@ -3990,52 +4089,52 @@ function t68.encode(p43) -- line: 6987
 
 	return buf18
 end
-function t68.decode(p44: buffer) -- line: 7009
+function t68.decode(p44: buffer) -- line: 7256
 	-- upvalues: t68 (copy), proto (copy), t1 (copy)
-	local v813 = t68.new()
+	local v830 = t68.new()
 	local n29 = 0
 
 	while n29 < buffer.len(p44) do
-		local v815, v816
+		local v832, v833
 
-		v815, v816, n29 = proto.readTag(p44, n29)
+		v832, v833, n29 = proto.readTag(p44, n29)
 
-		if v816 == proto.wireTypes.varint then
-			local v817
+		if v833 == proto.wireTypes.varint then
+			local v834
 
-			v817, n29 = proto.readVarInt(p44, n29)
-		elseif v816 == proto.wireTypes.lengthDelimited then
-			if v815 == 1 then
-				local v818
+			v834, n29 = proto.readVarInt(p44, n29)
+		elseif v833 == proto.wireTypes.lengthDelimited then
+			if v832 == 1 then
+				local v835
 
-				v818, n29 = proto.readBuffer(p44, n29)
-				v813.key = buffer.tostring(v818)
-			elseif v815 == 2 then
-				local v819
+				v835, n29 = proto.readBuffer(p44, n29)
+				v830.key = buffer.tostring(v835)
+			elseif v832 == 2 then
+				local v836
 
-				v819, n29 = proto.readBuffer(p44, n29)
-				v813.value = t1.FeedEntry.decode(v819)
+				v836, n29 = proto.readBuffer(p44, n29)
+				v830.value = t1.FeedEntry.decode(v836)
 			else
-				local v820, v821 = proto.readVarInt(p44, n29)
+				local v837, v838 = proto.readVarInt(p44, n29)
 
-				n29 = v821 + v820
+				n29 = v838 + v837
 			end
-		elseif v816 == proto.wireTypes.i32 then
-			local v822
+		elseif v833 == proto.wireTypes.i32 then
+			local v839
 
-			v822, n29 = proto.readFixed32(p44, n29)
-		elseif v816 == proto.wireTypes.i64 then
-			local v823
+			v839, n29 = proto.readFixed32(p44, n29)
+		elseif v833 == proto.wireTypes.i64 then
+			local v840
 
-			v823, n29 = proto.readFixed64(p44, n29)
+			v840, n29 = proto.readFixed64(p44, n29)
 		else
-			error("Unsupported wire type: " .. v816)
+			error("Unsupported wire type: " .. v833)
 		end
 	end
 
-	return v813
+	return v830
 end
-function t68.jsonEncode(p45) -- line: 7059
+function t68.jsonEncode(p45) -- line: 7306
 	local t70 = {}
 
 	if p45.key ~= nil and p45.key ~= "" then
@@ -4048,19 +4147,19 @@ function t68.jsonEncode(p45) -- line: 7059
 
 	return t70
 end
-function t68.jsonDecode(t71: {[any]: any}) -- line: 7075
+function t68.jsonDecode(t71: {[any]: any}) -- line: 7322
 	-- upvalues: t68 (copy), t1 (copy)
-	local v827 = t68.new()
+	local v844 = t68.new()
 
 	if t71.key ~= nil then
-		v827.key = t71.key
+		v844.key = t71.key
 	end
 
 	if t71.value ~= nil then
-		v827.value = t1.FeedEntry.jsonDecode(t71.value)
+		v844.value = t1.FeedEntry.jsonDecode(t71.value)
 	end
 
-	return v827
+	return v844
 end
 
 t68.descriptor = {
@@ -4074,29 +4173,29 @@ local t72 = {}
 
 t72.__index = t72
 
-function t72.new(t73: {[any]: any}?) -- line: 7106
+function t72.new(t73: {[any]: any}?) -- line: 7353
 	-- upvalues: t72 (copy)
 	return (setmetatable({
 		key = if t73 ~= nil and t73.key ~= nil then t73.key else "",
 		value = if t73 ~= nil and t73.value ~= nil then t73.value else nil
 	}, t72))
 end
-function t72.encode(p46) -- line: 7118
+function t72.encode(p46) -- line: 7365
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n30 = 0
 
 	if p46.key ~= nil and p46.key ~= "" then
-		local v832, v833 = proto.writeTag(buf, n30, 1, proto.wireTypes.lengthDelimited)
+		local v849, v850 = proto.writeTag(buf, n30, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n30 = proto.writeString(v832, v833, p46.key)
+		buf, n30 = proto.writeString(v849, v850, p46.key)
 	end
 
 	if p46.value ~= nil then
-		local v834 = p46.value:encode()
-		local v835, v836 = proto.writeTag(buf, n30, 2, proto.wireTypes.lengthDelimited)
+		local v851 = p46.value:encode()
+		local v852, v853 = proto.writeTag(buf, n30, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n30 = proto.writeBuffer(v835, v836, v834, buffer.len(v834))
+		buf, n30 = proto.writeBuffer(v852, v853, v851, buffer.len(v851))
 	end
 
 	local buf19 = buffer.create(n30)
@@ -4105,52 +4204,52 @@ function t72.encode(p46) -- line: 7118
 
 	return buf19
 end
-function t72.decode(p47: buffer) -- line: 7140
+function t72.decode(p47: buffer) -- line: 7387
 	-- upvalues: t72 (copy), proto (copy), t1 (copy)
-	local v839 = t72.new()
+	local v856 = t72.new()
 	local n31 = 0
 
 	while n31 < buffer.len(p47) do
-		local v841, v842
+		local v858, v859
 
-		v841, v842, n31 = proto.readTag(p47, n31)
+		v858, v859, n31 = proto.readTag(p47, n31)
 
-		if v842 == proto.wireTypes.varint then
-			local v843
+		if v859 == proto.wireTypes.varint then
+			local v860
 
-			v843, n31 = proto.readVarInt(p47, n31)
-		elseif v842 == proto.wireTypes.lengthDelimited then
-			if v841 == 1 then
-				local v844
+			v860, n31 = proto.readVarInt(p47, n31)
+		elseif v859 == proto.wireTypes.lengthDelimited then
+			if v858 == 1 then
+				local v861
 
-				v844, n31 = proto.readBuffer(p47, n31)
-				v839.key = buffer.tostring(v844)
-			elseif v841 == 2 then
-				local v845
+				v861, n31 = proto.readBuffer(p47, n31)
+				v856.key = buffer.tostring(v861)
+			elseif v858 == 2 then
+				local v862
 
-				v845, n31 = proto.readBuffer(p47, n31)
-				v839.value = t1.EntryOrder.decode(v845)
+				v862, n31 = proto.readBuffer(p47, n31)
+				v856.value = t1.EntryOrder.decode(v862)
 			else
-				local v846, v847 = proto.readVarInt(p47, n31)
+				local v863, v864 = proto.readVarInt(p47, n31)
 
-				n31 = v847 + v846
+				n31 = v864 + v863
 			end
-		elseif v842 == proto.wireTypes.i32 then
-			local v848
+		elseif v859 == proto.wireTypes.i32 then
+			local v865
 
-			v848, n31 = proto.readFixed32(p47, n31)
-		elseif v842 == proto.wireTypes.i64 then
-			local v849
+			v865, n31 = proto.readFixed32(p47, n31)
+		elseif v859 == proto.wireTypes.i64 then
+			local v866
 
-			v849, n31 = proto.readFixed64(p47, n31)
+			v866, n31 = proto.readFixed64(p47, n31)
 		else
-			error("Unsupported wire type: " .. v842)
+			error("Unsupported wire type: " .. v859)
 		end
 	end
 
-	return v839
+	return v856
 end
-function t72.jsonEncode(p48) -- line: 7190
+function t72.jsonEncode(p48) -- line: 7437
 	local t74 = {}
 
 	if p48.key ~= nil and p48.key ~= "" then
@@ -4163,19 +4262,19 @@ function t72.jsonEncode(p48) -- line: 7190
 
 	return t74
 end
-function t72.jsonDecode(t75: {[any]: any}) -- line: 7206
+function t72.jsonDecode(t75: {[any]: any}) -- line: 7453
 	-- upvalues: t72 (copy), t1 (copy)
-	local v853 = t72.new()
+	local v870 = t72.new()
 
 	if t75.key ~= nil then
-		v853.key = t75.key
+		v870.key = t75.key
 	end
 
 	if t75.value ~= nil then
-		v853.value = t1.EntryOrder.jsonDecode(t75.value)
+		v870.value = t1.EntryOrder.jsonDecode(t75.value)
 	end
 
-	return v853
+	return v870
 end
 
 t72.descriptor = {
@@ -4189,22 +4288,22 @@ local t76 = {}
 
 t76.__index = t76
 
-function t76.new(t77: {[any]: any}?) -- line: 7237
+function t76.new(t77: {[any]: any}?) -- line: 7484
 	-- upvalues: t76 (copy)
 	return (setmetatable({
 		items = if t77 ~= nil and t77.items ~= nil then t77.items else {}
 	}, t76))
 end
-function t76.encode(p49) -- line: 7243
+function t76.encode(p49) -- line: 7490
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n32 = 0
 
 	if p49.items ~= nil and #p49.items > 0 then
-		for _, v859 in p49.items do
-			local v860, v861 = proto.writeTag(buf, n32, 1, proto.wireTypes.lengthDelimited)
+		for _, v876 in p49.items do
+			local v877, v878 = proto.writeTag(buf, n32, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n32 = proto.writeString(v860, v861, v859)
+			buf, n32 = proto.writeString(v877, v878, v876)
 		end
 	end
 
@@ -4214,54 +4313,54 @@ function t76.encode(p49) -- line: 7243
 
 	return buf20
 end
-function t76.decode(p50: buffer) -- line: 7259
+function t76.decode(p50: buffer) -- line: 7506
 	-- upvalues: t76 (copy), proto (copy)
-	local v864 = t76.new()
+	local v881 = t76.new()
 	local n33 = 0
 
 	while n33 < buffer.len(p50) do
-		local v866, v867
+		local v883, v884
 
-		v866, v867, n33 = proto.readTag(p50, n33)
+		v883, v884, n33 = proto.readTag(p50, n33)
 
-		if v867 == proto.wireTypes.varint then
-			local v868
+		if v884 == proto.wireTypes.varint then
+			local v885
 
-			v868, n33 = proto.readVarInt(p50, n33)
-		elseif v867 == proto.wireTypes.lengthDelimited then
-			if v866 == 1 then
-				local v869
+			v885, n33 = proto.readVarInt(p50, n33)
+		elseif v884 == proto.wireTypes.lengthDelimited then
+			if v883 == 1 then
+				local v886
 
-				v869, n33 = proto.readBuffer(p50, n33)
-				table.insert(v864.items, buffer.tostring(v869))
+				v886, n33 = proto.readBuffer(p50, n33)
+				table.insert(v881.items, buffer.tostring(v886))
 			else
-				local v870, v871 = proto.readVarInt(p50, n33)
+				local v887, v888 = proto.readVarInt(p50, n33)
 
-				n33 = v871 + v870
+				n33 = v888 + v887
 			end
-		elseif v867 == proto.wireTypes.i32 then
-			local v872
+		elseif v884 == proto.wireTypes.i32 then
+			local v889
 
-			v872, n33 = proto.readFixed32(p50, n33)
-		elseif v867 == proto.wireTypes.i64 then
-			local v873
+			v889, n33 = proto.readFixed32(p50, n33)
+		elseif v884 == proto.wireTypes.i64 then
+			local v890
 
-			v873, n33 = proto.readFixed64(p50, n33)
+			v890, n33 = proto.readFixed64(p50, n33)
 		else
-			error("Unsupported wire type: " .. v867)
+			error("Unsupported wire type: " .. v884)
 		end
 	end
 
-	return v864
+	return v881
 end
-function t76.jsonEncode(p51) -- line: 7302
+function t76.jsonEncode(p51) -- line: 7549
 	local t78 = {}
 
 	if p51.items ~= nil and #p51.items > 0 then
 		local t79 = {}
 
-		for _, v878 in p51.items do
-			table.insert(t79, v878)
+		for _, v895 in p51.items do
+			table.insert(t79, v895)
 		end
 
 		t78.items = t79
@@ -4269,21 +4368,21 @@ function t76.jsonEncode(p51) -- line: 7302
 
 	return t78
 end
-function t76.jsonDecode(t80: {[any]: any}) -- line: 7316
+function t76.jsonDecode(t80: {[any]: any}) -- line: 7563
 	-- upvalues: t76 (copy)
-	local v880 = t76.new()
+	local v897 = t76.new()
 
 	if t80.items ~= nil then
 		local t81 = {}
 
-		for _, v883 in t80.items do
-			table.insert(t81, v883)
+		for _, v900 in t80.items do
+			table.insert(t81, v900)
 		end
 
-		v880.items = t81
+		v897.items = t81
 	end
 
-	return v880
+	return v897
 end
 
 t76.descriptor = {
@@ -4297,28 +4396,28 @@ local t82 = {}
 
 t82.__index = t82
 
-function t82.new(t83: {[any]: any}?) -- line: 7345
+function t82.new(t83: {[any]: any}?) -- line: 7592
 	-- upvalues: t82 (copy)
 	return (setmetatable({
 		universe_id = if t83 ~= nil and t83.universe_id ~= nil then t83.universe_id else "",
 		user_owns_experience = t83 ~= nil and (t83.user_owns_experience ~= nil and t83.user_owns_experience)
 	}, t82))
 end
-function t82.encode(p52) -- line: 7356
+function t82.encode(p52) -- line: 7603
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n34 = 0
 
 	if p52.universe_id ~= nil and p52.universe_id ~= "" then
-		local v888, v889 = proto.writeTag(buf, n34, 1, proto.wireTypes.lengthDelimited)
+		local v905, v906 = proto.writeTag(buf, n34, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n34 = proto.writeString(v888, v889, p52.universe_id)
+		buf, n34 = proto.writeString(v905, v906, p52.universe_id)
 	end
 
 	if p52.user_owns_experience then
-		local v890, v891 = proto.writeTag(buf, n34, 2, proto.wireTypes.varint)
+		local v907, v908 = proto.writeTag(buf, n34, 2, proto.wireTypes.varint)
 
-		buf, n34 = proto.writeVarInt(v890, v891, not p52.user_owns_experience and 0 or 1)
+		buf, n34 = proto.writeVarInt(v907, v908, not p52.user_owns_experience and 0 or 1)
 	end
 
 	local buf21 = buffer.create(n34)
@@ -4327,54 +4426,54 @@ function t82.encode(p52) -- line: 7356
 
 	return buf21
 end
-function t82.decode(p53: buffer) -- line: 7375
+function t82.decode(p53: buffer) -- line: 7622
 	-- upvalues: t82 (copy), proto (copy)
-	local v894 = t82.new()
+	local v911 = t82.new()
 	local n35 = 0
 
 	while n35 < buffer.len(p53) do
-		local v896, v897
+		local v913, v914
 
-		v896, v897, n35 = proto.readTag(p53, n35)
+		v913, v914, n35 = proto.readTag(p53, n35)
 
-		if v897 == proto.wireTypes.varint then
-			if v896 == 2 then
-				local v898
+		if v914 == proto.wireTypes.varint then
+			if v913 == 2 then
+				local v915
 
-				v898, n35 = proto.readVarInt(p53, n35)
-				v894.user_owns_experience = v898 ~= 0
+				v915, n35 = proto.readVarInt(p53, n35)
+				v911.user_owns_experience = v915 ~= 0
 			else
-				local v899
+				local v916
 
-				v899, n35 = proto.readVarInt(p53, n35)
+				v916, n35 = proto.readVarInt(p53, n35)
 			end
-		elseif v897 == proto.wireTypes.lengthDelimited then
-			if v896 == 1 then
-				local v900
+		elseif v914 == proto.wireTypes.lengthDelimited then
+			if v913 == 1 then
+				local v917
 
-				v900, n35 = proto.readBuffer(p53, n35)
-				v894.universe_id = buffer.tostring(v900)
+				v917, n35 = proto.readBuffer(p53, n35)
+				v911.universe_id = buffer.tostring(v917)
 			else
-				local v901, v902 = proto.readVarInt(p53, n35)
+				local v918, v919 = proto.readVarInt(p53, n35)
 
-				n35 = v902 + v901
+				n35 = v919 + v918
 			end
-		elseif v897 == proto.wireTypes.i32 then
-			local v903
+		elseif v914 == proto.wireTypes.i32 then
+			local v920
 
-			v903, n35 = proto.readFixed32(p53, n35)
-		elseif v897 == proto.wireTypes.i64 then
-			local v904
+			v920, n35 = proto.readFixed32(p53, n35)
+		elseif v914 == proto.wireTypes.i64 then
+			local v921
 
-			v904, n35 = proto.readFixed64(p53, n35)
+			v921, n35 = proto.readFixed64(p53, n35)
 		else
-			error("Unsupported wire type: " .. v897)
+			error("Unsupported wire type: " .. v914)
 		end
 	end
 
-	return v894
+	return v911
 end
-function t82.jsonEncode(p54) -- line: 7423
+function t82.jsonEncode(p54) -- line: 7670
 	local t84 = {}
 
 	if p54.universe_id ~= nil and p54.universe_id ~= "" then
@@ -4387,27 +4486,27 @@ function t82.jsonEncode(p54) -- line: 7423
 
 	return t84
 end
-function t82.jsonDecode(t85: {[any]: any}) -- line: 7437
+function t82.jsonDecode(t85: {[any]: any}) -- line: 7684
 	-- upvalues: t82 (copy)
-	local v908 = t82.new()
+	local v925 = t82.new()
 
 	if t85.universe_id ~= nil then
-		v908.universe_id = t85.universe_id
+		v925.universe_id = t85.universe_id
 	end
 
 	if t85.universeId ~= nil then
-		v908.universe_id = t85.universeId
+		v925.universe_id = t85.universeId
 	end
 
 	if t85.user_owns_experience ~= nil then
-		v908.user_owns_experience = t85.user_owns_experience
+		v925.user_owns_experience = t85.user_owns_experience
 	end
 
 	if t85.userOwnsExperience ~= nil then
-		v908.user_owns_experience = t85.userOwnsExperience
+		v925.user_owns_experience = t85.userOwnsExperience
 	end
 
-	return v908
+	return v925
 end
 
 t82.descriptor = {
@@ -4421,21 +4520,21 @@ local t86 = {}
 
 t86.__index = t86
 
-function t86.new(t87: {[any]: any}?) -- line: 7475
+function t86.new(t87: {[any]: any}?) -- line: 7722
 	-- upvalues: t86 (copy)
 	return (setmetatable({
 		media_asset_id = if t87 ~= nil and t87.media_asset_id ~= nil then t87.media_asset_id else ""
 	}, t86))
 end
-function t86.encode(p55) -- line: 7483
+function t86.encode(p55) -- line: 7730
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n36 = 0
 
 	if p55.media_asset_id ~= nil and p55.media_asset_id ~= "" then
-		local v913, v914 = proto.writeTag(buf, n36, 1, proto.wireTypes.lengthDelimited)
+		local v930, v931 = proto.writeTag(buf, n36, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n36 = proto.writeString(v913, v914, p55.media_asset_id)
+		buf, n36 = proto.writeString(v930, v931, p55.media_asset_id)
 	end
 
 	local buf22 = buffer.create(n36)
@@ -4444,47 +4543,47 @@ function t86.encode(p55) -- line: 7483
 
 	return buf22
 end
-function t86.decode(p56: buffer) -- line: 7497
+function t86.decode(p56: buffer) -- line: 7744
 	-- upvalues: t86 (copy), proto (copy)
-	local v917 = t86.new()
+	local v934 = t86.new()
 	local n37 = 0
 
 	while n37 < buffer.len(p56) do
-		local v919, v920
+		local v936, v937
 
-		v919, v920, n37 = proto.readTag(p56, n37)
+		v936, v937, n37 = proto.readTag(p56, n37)
 
-		if v920 == proto.wireTypes.varint then
-			local v921
+		if v937 == proto.wireTypes.varint then
+			local v938
 
-			v921, n37 = proto.readVarInt(p56, n37)
-		elseif v920 == proto.wireTypes.lengthDelimited then
-			if v919 == 1 then
-				local v922
+			v938, n37 = proto.readVarInt(p56, n37)
+		elseif v937 == proto.wireTypes.lengthDelimited then
+			if v936 == 1 then
+				local v939
 
-				v922, n37 = proto.readBuffer(p56, n37)
-				v917.media_asset_id = buffer.tostring(v922)
+				v939, n37 = proto.readBuffer(p56, n37)
+				v934.media_asset_id = buffer.tostring(v939)
 			else
-				local v923, v924 = proto.readVarInt(p56, n37)
+				local v940, v941 = proto.readVarInt(p56, n37)
 
-				n37 = v924 + v923
+				n37 = v941 + v940
 			end
-		elseif v920 == proto.wireTypes.i32 then
-			local v925
+		elseif v937 == proto.wireTypes.i32 then
+			local v942
 
-			v925, n37 = proto.readFixed32(p56, n37)
-		elseif v920 == proto.wireTypes.i64 then
-			local v926
+			v942, n37 = proto.readFixed32(p56, n37)
+		elseif v937 == proto.wireTypes.i64 then
+			local v943
 
-			v926, n37 = proto.readFixed64(p56, n37)
+			v943, n37 = proto.readFixed64(p56, n37)
 		else
-			error("Unsupported wire type: " .. v920)
+			error("Unsupported wire type: " .. v937)
 		end
 	end
 
-	return v917
+	return v934
 end
-function t86.jsonEncode(p57) -- line: 7540
+function t86.jsonEncode(p57) -- line: 7787
 	local t88 = {}
 
 	if p57.media_asset_id ~= nil and p57.media_asset_id ~= "" then
@@ -4493,19 +4592,19 @@ function t86.jsonEncode(p57) -- line: 7540
 
 	return t88
 end
-function t86.jsonDecode(t89: {[any]: any}) -- line: 7550
+function t86.jsonDecode(t89: {[any]: any}) -- line: 7797
 	-- upvalues: t86 (copy)
-	local v930 = t86.new()
+	local v947 = t86.new()
 
 	if t89.media_asset_id ~= nil then
-		v930.media_asset_id = t89.media_asset_id
+		v947.media_asset_id = t89.media_asset_id
 	end
 
 	if t89.mediaAssetId ~= nil then
-		v930.media_asset_id = t89.mediaAssetId
+		v947.media_asset_id = t89.mediaAssetId
 	end
 
-	return v930
+	return v947
 end
 
 t86.descriptor = {
@@ -4519,21 +4618,21 @@ local t90 = {}
 
 t90.__index = t90
 
-function t90.new(t91: {[any]: any}?) -- line: 7580
+function t90.new(t91: {[any]: any}?) -- line: 7827
 	-- upvalues: t90 (copy)
 	return (setmetatable({
 		universe_id = if t91 ~= nil and t91.universe_id ~= nil then t91.universe_id else ""
 	}, t90))
 end
-function t90.encode(p58) -- line: 7588
+function t90.encode(p58) -- line: 7835
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n38 = 0
 
 	if p58.universe_id ~= nil and p58.universe_id ~= "" then
-		local v935, v936 = proto.writeTag(buf, n38, 1, proto.wireTypes.lengthDelimited)
+		local v952, v953 = proto.writeTag(buf, n38, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n38 = proto.writeString(v935, v936, p58.universe_id)
+		buf, n38 = proto.writeString(v952, v953, p58.universe_id)
 	end
 
 	local buf23 = buffer.create(n38)
@@ -4542,47 +4641,47 @@ function t90.encode(p58) -- line: 7588
 
 	return buf23
 end
-function t90.decode(p59: buffer) -- line: 7602
+function t90.decode(p59: buffer) -- line: 7849
 	-- upvalues: t90 (copy), proto (copy)
-	local v939 = t90.new()
+	local v956 = t90.new()
 	local n39 = 0
 
 	while n39 < buffer.len(p59) do
-		local v941, v942
+		local v958, v959
 
-		v941, v942, n39 = proto.readTag(p59, n39)
+		v958, v959, n39 = proto.readTag(p59, n39)
 
-		if v942 == proto.wireTypes.varint then
-			local v943
+		if v959 == proto.wireTypes.varint then
+			local v960
 
-			v943, n39 = proto.readVarInt(p59, n39)
-		elseif v942 == proto.wireTypes.lengthDelimited then
-			if v941 == 1 then
-				local v944
+			v960, n39 = proto.readVarInt(p59, n39)
+		elseif v959 == proto.wireTypes.lengthDelimited then
+			if v958 == 1 then
+				local v961
 
-				v944, n39 = proto.readBuffer(p59, n39)
-				v939.universe_id = buffer.tostring(v944)
+				v961, n39 = proto.readBuffer(p59, n39)
+				v956.universe_id = buffer.tostring(v961)
 			else
-				local v945, v946 = proto.readVarInt(p59, n39)
+				local v962, v963 = proto.readVarInt(p59, n39)
 
-				n39 = v946 + v945
+				n39 = v963 + v962
 			end
-		elseif v942 == proto.wireTypes.i32 then
-			local v947
+		elseif v959 == proto.wireTypes.i32 then
+			local v964
 
-			v947, n39 = proto.readFixed32(p59, n39)
-		elseif v942 == proto.wireTypes.i64 then
-			local v948
+			v964, n39 = proto.readFixed32(p59, n39)
+		elseif v959 == proto.wireTypes.i64 then
+			local v965
 
-			v948, n39 = proto.readFixed64(p59, n39)
+			v965, n39 = proto.readFixed64(p59, n39)
 		else
-			error("Unsupported wire type: " .. v942)
+			error("Unsupported wire type: " .. v959)
 		end
 	end
 
-	return v939
+	return v956
 end
-function t90.jsonEncode(p60) -- line: 7645
+function t90.jsonEncode(p60) -- line: 7892
 	local t92 = {}
 
 	if p60.universe_id ~= nil and p60.universe_id ~= "" then
@@ -4591,19 +4690,19 @@ function t90.jsonEncode(p60) -- line: 7645
 
 	return t92
 end
-function t90.jsonDecode(t93: {[any]: any}) -- line: 7655
+function t90.jsonDecode(t93: {[any]: any}) -- line: 7902
 	-- upvalues: t90 (copy)
-	local v952 = t90.new()
+	local v969 = t90.new()
 
 	if t93.universe_id ~= nil then
-		v952.universe_id = t93.universe_id
+		v969.universe_id = t93.universe_id
 	end
 
 	if t93.universeId ~= nil then
-		v952.universe_id = t93.universeId
+		v969.universe_id = t93.universeId
 	end
 
-	return v952
+	return v969
 end
 
 t90.descriptor = {
@@ -4617,28 +4716,28 @@ local t94 = {}
 
 t94.__index = t94
 
-function t94.new(t95: {[any]: any}?) -- line: 7685
+function t94.new(t95: {[any]: any}?) -- line: 7932
 	-- upvalues: t94 (copy)
 	return (setmetatable({
 		universe_id = if t95 ~= nil and t95.universe_id ~= nil then t95.universe_id else "",
 		creator_key = if t95 ~= nil and t95.creator_key ~= nil then t95.creator_key else ""
 	}, t94))
 end
-function t94.encode(p61) -- line: 7694
+function t94.encode(p61) -- line: 7941
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n40 = 0
 
 	if p61.universe_id ~= nil and p61.universe_id ~= "" then
-		local v957, v958 = proto.writeTag(buf, n40, 1, proto.wireTypes.lengthDelimited)
+		local v974, v975 = proto.writeTag(buf, n40, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n40 = proto.writeString(v957, v958, p61.universe_id)
+		buf, n40 = proto.writeString(v974, v975, p61.universe_id)
 	end
 
 	if p61.creator_key ~= nil and p61.creator_key ~= "" then
-		local v959, v960 = proto.writeTag(buf, n40, 2, proto.wireTypes.lengthDelimited)
+		local v976, v977 = proto.writeTag(buf, n40, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n40 = proto.writeString(v959, v960, p61.creator_key)
+		buf, n40 = proto.writeString(v976, v977, p61.creator_key)
 	end
 
 	local buf24 = buffer.create(n40)
@@ -4647,52 +4746,52 @@ function t94.encode(p61) -- line: 7694
 
 	return buf24
 end
-function t94.decode(p62: buffer) -- line: 7713
+function t94.decode(p62: buffer) -- line: 7960
 	-- upvalues: t94 (copy), proto (copy)
-	local v963 = t94.new()
+	local v980 = t94.new()
 	local n41 = 0
 
 	while n41 < buffer.len(p62) do
-		local v965, v966
+		local v982, v983
 
-		v965, v966, n41 = proto.readTag(p62, n41)
+		v982, v983, n41 = proto.readTag(p62, n41)
 
-		if v966 == proto.wireTypes.varint then
-			local v967
+		if v983 == proto.wireTypes.varint then
+			local v984
 
-			v967, n41 = proto.readVarInt(p62, n41)
-		elseif v966 == proto.wireTypes.lengthDelimited then
-			if v965 == 1 then
-				local v968
+			v984, n41 = proto.readVarInt(p62, n41)
+		elseif v983 == proto.wireTypes.lengthDelimited then
+			if v982 == 1 then
+				local v985
 
-				v968, n41 = proto.readBuffer(p62, n41)
-				v963.universe_id = buffer.tostring(v968)
-			elseif v965 == 2 then
-				local v969
+				v985, n41 = proto.readBuffer(p62, n41)
+				v980.universe_id = buffer.tostring(v985)
+			elseif v982 == 2 then
+				local v986
 
-				v969, n41 = proto.readBuffer(p62, n41)
-				v963.creator_key = buffer.tostring(v969)
+				v986, n41 = proto.readBuffer(p62, n41)
+				v980.creator_key = buffer.tostring(v986)
 			else
-				local v970, v971 = proto.readVarInt(p62, n41)
+				local v987, v988 = proto.readVarInt(p62, n41)
 
-				n41 = v971 + v970
+				n41 = v988 + v987
 			end
-		elseif v966 == proto.wireTypes.i32 then
-			local v972
+		elseif v983 == proto.wireTypes.i32 then
+			local v989
 
-			v972, n41 = proto.readFixed32(p62, n41)
-		elseif v966 == proto.wireTypes.i64 then
-			local v973
+			v989, n41 = proto.readFixed32(p62, n41)
+		elseif v983 == proto.wireTypes.i64 then
+			local v990
 
-			v973, n41 = proto.readFixed64(p62, n41)
+			v990, n41 = proto.readFixed64(p62, n41)
 		else
-			error("Unsupported wire type: " .. v966)
+			error("Unsupported wire type: " .. v983)
 		end
 	end
 
-	return v963
+	return v980
 end
-function t94.jsonEncode(p63) -- line: 7761
+function t94.jsonEncode(p63) -- line: 8008
 	local t96 = {}
 
 	if p63.universe_id ~= nil and p63.universe_id ~= "" then
@@ -4705,27 +4804,27 @@ function t94.jsonEncode(p63) -- line: 7761
 
 	return t96
 end
-function t94.jsonDecode(t97: {[any]: any}) -- line: 7775
+function t94.jsonDecode(t97: {[any]: any}) -- line: 8022
 	-- upvalues: t94 (copy)
-	local v977 = t94.new()
+	local v994 = t94.new()
 
 	if t97.universe_id ~= nil then
-		v977.universe_id = t97.universe_id
+		v994.universe_id = t97.universe_id
 	end
 
 	if t97.universeId ~= nil then
-		v977.universe_id = t97.universeId
+		v994.universe_id = t97.universeId
 	end
 
 	if t97.creator_key ~= nil then
-		v977.creator_key = t97.creator_key
+		v994.creator_key = t97.creator_key
 	end
 
 	if t97.creatorKey ~= nil then
-		v977.creator_key = t97.creatorKey
+		v994.creator_key = t97.creatorKey
 	end
 
-	return v977
+	return v994
 end
 
 t94.descriptor = {
@@ -4739,7 +4838,7 @@ local t98 = {}
 
 t98.__index = t98
 
-function t98.new(t99: {[any]: any}?) -- line: 7813
+function t98.new(t99: {[any]: any}?) -- line: 8060
 	-- upvalues: t98 (copy)
 	return (setmetatable({
 		universe_id = if t99 ~= nil and t99.universe_id ~= nil then t99.universe_id else "",
@@ -4751,54 +4850,54 @@ function t98.new(t99: {[any]: any}?) -- line: 7813
 		connection_played_total_count = if t99 ~= nil and t99.connection_played_total_count ~= nil then t99.connection_played_total_count else 0
 	}, t98))
 end
-function t98.encode(p64) -- line: 7835
+function t98.encode(p64) -- line: 8082
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n42 = 0
 
 	if p64.universe_id ~= nil and p64.universe_id ~= "" then
-		local v982, v983 = proto.writeTag(buf, n42, 1, proto.wireTypes.lengthDelimited)
+		local v999, v1000 = proto.writeTag(buf, n42, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n42 = proto.writeString(v982, v983, p64.universe_id)
+		buf, n42 = proto.writeString(v999, v1000, p64.universe_id)
 	end
 
 	if p64.root_place_id ~= nil and p64.root_place_id ~= "" then
-		local v984, v985 = proto.writeTag(buf, n42, 2, proto.wireTypes.lengthDelimited)
+		local v1001, v1002 = proto.writeTag(buf, n42, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n42 = proto.writeString(v984, v985, p64.root_place_id)
+		buf, n42 = proto.writeString(v1001, v1002, p64.root_place_id)
 	end
 
 	if p64.connection_played_display_name ~= nil and p64.connection_played_display_name ~= "" then
-		local v986, v987 = proto.writeTag(buf, n42, 3, proto.wireTypes.lengthDelimited)
+		local v1003, v1004 = proto.writeTag(buf, n42, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n42 = proto.writeString(v986, v987, p64.connection_played_display_name)
+		buf, n42 = proto.writeString(v1003, v1004, p64.connection_played_display_name)
 	end
 
 	if p64.upsell_prompt ~= nil and p64.upsell_prompt ~= "" then
-		local v988, v989 = proto.writeTag(buf, n42, 4, proto.wireTypes.lengthDelimited)
+		local v1005, v1006 = proto.writeTag(buf, n42, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n42 = proto.writeString(v988, v989, p64.upsell_prompt)
+		buf, n42 = proto.writeString(v1005, v1006, p64.upsell_prompt)
 	end
 
 	if p64.connection_played_users ~= nil and #p64.connection_played_users > 0 then
-		for _, v991 in p64.connection_played_users do
-			local v992 = v991:encode()
-			local v993, v994 = proto.writeTag(buf, n42, 5, proto.wireTypes.lengthDelimited)
+		for _, v1008 in p64.connection_played_users do
+			local v1009 = v1008:encode()
+			local v1010, v1011 = proto.writeTag(buf, n42, 5, proto.wireTypes.lengthDelimited)
 
-			buf, n42 = proto.writeBuffer(v993, v994, v992, buffer.len(v992))
+			buf, n42 = proto.writeBuffer(v1010, v1011, v1009, buffer.len(v1009))
 		end
 	end
 
 	if p64.connection_played_num_others ~= nil and p64.connection_played_num_others ~= 0 then
-		local v995, v996 = proto.writeTag(buf, n42, 6, proto.wireTypes.varint)
+		local v1012, v1013 = proto.writeTag(buf, n42, 6, proto.wireTypes.varint)
 
-		buf, n42 = proto.writeVarInt(v995, v996, p64.connection_played_num_others)
+		buf, n42 = proto.writeVarInt(v1012, v1013, p64.connection_played_num_others)
 	end
 
 	if p64.connection_played_total_count ~= nil and p64.connection_played_total_count ~= 0 then
-		local v997, v998 = proto.writeTag(buf, n42, 7, proto.wireTypes.varint)
+		local v1014, v1015 = proto.writeTag(buf, n42, 7, proto.wireTypes.varint)
 
-		buf, n42 = proto.writeVarInt(v997, v998, p64.connection_played_total_count)
+		buf, n42 = proto.writeVarInt(v1014, v1015, p64.connection_played_total_count)
 	end
 
 	local buf25 = buffer.create(n42)
@@ -4807,79 +4906,79 @@ function t98.encode(p64) -- line: 7835
 
 	return buf25
 end
-function t98.decode(p65: buffer) -- line: 7882
+function t98.decode(p65: buffer) -- line: 8129
 	-- upvalues: t98 (copy), proto (copy), t1 (copy)
-	local v1001 = t98.new()
+	local v1018 = t98.new()
 	local n43 = 0
 
 	while n43 < buffer.len(p65) do
-		local v1003, v1004
+		local v1020, v1021
 
-		v1003, v1004, n43 = proto.readTag(p65, n43)
+		v1020, v1021, n43 = proto.readTag(p65, n43)
 
-		if v1004 == proto.wireTypes.varint then
-			if v1003 == 6 then
-				local v1005
+		if v1021 == proto.wireTypes.varint then
+			if v1020 == 6 then
+				local v1022
 
-				v1005, n43 = proto.readVarIntI32(p65, n43)
-				v1001.connection_played_num_others = v1005
-			elseif v1003 == 7 then
-				local v1006
+				v1022, n43 = proto.readVarIntI32(p65, n43)
+				v1018.connection_played_num_others = v1022
+			elseif v1020 == 7 then
+				local v1023
 
-				v1006, n43 = proto.readVarIntI32(p65, n43)
-				v1001.connection_played_total_count = v1006
+				v1023, n43 = proto.readVarIntI32(p65, n43)
+				v1018.connection_played_total_count = v1023
 			else
-				local v1007
+				local v1024
 
-				v1007, n43 = proto.readVarInt(p65, n43)
+				v1024, n43 = proto.readVarInt(p65, n43)
 			end
-		elseif v1004 == proto.wireTypes.lengthDelimited then
-			if v1003 == 1 then
-				local v1008
+		elseif v1021 == proto.wireTypes.lengthDelimited then
+			if v1020 == 1 then
+				local v1025
 
-				v1008, n43 = proto.readBuffer(p65, n43)
-				v1001.universe_id = buffer.tostring(v1008)
-			elseif v1003 == 2 then
-				local v1009
+				v1025, n43 = proto.readBuffer(p65, n43)
+				v1018.universe_id = buffer.tostring(v1025)
+			elseif v1020 == 2 then
+				local v1026
 
-				v1009, n43 = proto.readBuffer(p65, n43)
-				v1001.root_place_id = buffer.tostring(v1009)
-			elseif v1003 == 3 then
-				local v1010
+				v1026, n43 = proto.readBuffer(p65, n43)
+				v1018.root_place_id = buffer.tostring(v1026)
+			elseif v1020 == 3 then
+				local v1027
 
-				v1010, n43 = proto.readBuffer(p65, n43)
-				v1001.connection_played_display_name = buffer.tostring(v1010)
-			elseif v1003 == 4 then
-				local v1011
+				v1027, n43 = proto.readBuffer(p65, n43)
+				v1018.connection_played_display_name = buffer.tostring(v1027)
+			elseif v1020 == 4 then
+				local v1028
 
-				v1011, n43 = proto.readBuffer(p65, n43)
-				v1001.upsell_prompt = buffer.tostring(v1011)
-			elseif v1003 == 5 then
-				local v1012
+				v1028, n43 = proto.readBuffer(p65, n43)
+				v1018.upsell_prompt = buffer.tostring(v1028)
+			elseif v1020 == 5 then
+				local v1029
 
-				v1012, n43 = proto.readBuffer(p65, n43)
-				table.insert(v1001.connection_played_users, t1.ExperienceActionModuleInputData_ConnectionPlayedUser.decode(v1012))
+				v1029, n43 = proto.readBuffer(p65, n43)
+				table.insert(v1018.connection_played_users, t1.ExperienceActionModuleInputData_ConnectionPlayedUser.decode(v1029))
 			else
-				local v1013, v1014 = proto.readVarInt(p65, n43)
+				local v1030, v1031 = proto.readVarInt(p65, n43)
 
-				n43 = v1014 + v1013
+				n43 = v1031 + v1030
 			end
-		elseif v1004 == proto.wireTypes.i32 then
-			local v1015
+		elseif v1021 == proto.wireTypes.i32 then
+			local v1032
 
-			v1015, n43 = proto.readFixed32(p65, n43)
-		elseif v1004 == proto.wireTypes.i64 then
-			local v1016
+			v1032, n43 = proto.readFixed32(p65, n43)
+		elseif v1021 == proto.wireTypes.i64 then
+			local v1033
 
-			v1016, n43 = proto.readFixed64(p65, n43)
+			v1033, n43 = proto.readFixed64(p65, n43)
 		else
-			error("Unsupported wire type: " .. v1004)
+			error("Unsupported wire type: " .. v1021)
 		end
 	end
 
-	return v1001
+	return v1018
 end
-function t98.jsonEncode(p66) -- line: 7958
+function t98.jsonEncode(p66) -- line: 8205
 	local t100 = {}
 
 	if p66.universe_id ~= nil and p66.universe_id ~= "" then
@@ -4901,8 +5000,8 @@ function t98.jsonEncode(p66) -- line: 7958
 	if p66.connection_played_users ~= nil and #p66.connection_played_users > 0 then
 		local t101 = {}
 
-		for _, v1021 in p66.connection_played_users do
-			table.insert(t101, v1021:jsonEncode())
+		for _, v1038 in p66.connection_played_users do
+			table.insert(t101, v1038:jsonEncode())
 		end
 
 		t100.connectionPlayedUsers = t101
@@ -4918,79 +5017,79 @@ function t98.jsonEncode(p66) -- line: 7958
 
 	return t100
 end
-function t98.jsonDecode(t102: {[any]: any}) -- line: 7996
+function t98.jsonDecode(t102: {[any]: any}) -- line: 8243
 	-- upvalues: t98 (copy), t1 (copy)
-	local v1023 = t98.new()
+	local v1040 = t98.new()
 
 	if t102.universe_id ~= nil then
-		v1023.universe_id = t102.universe_id
+		v1040.universe_id = t102.universe_id
 	end
 
 	if t102.universeId ~= nil then
-		v1023.universe_id = t102.universeId
+		v1040.universe_id = t102.universeId
 	end
 
 	if t102.root_place_id ~= nil then
-		v1023.root_place_id = t102.root_place_id
+		v1040.root_place_id = t102.root_place_id
 	end
 
 	if t102.rootPlaceId ~= nil then
-		v1023.root_place_id = t102.rootPlaceId
+		v1040.root_place_id = t102.rootPlaceId
 	end
 
 	if t102.connection_played_display_name ~= nil then
-		v1023.connection_played_display_name = t102.connection_played_display_name
+		v1040.connection_played_display_name = t102.connection_played_display_name
 	end
 
 	if t102.connectionPlayedDisplayName ~= nil then
-		v1023.connection_played_display_name = t102.connectionPlayedDisplayName
+		v1040.connection_played_display_name = t102.connectionPlayedDisplayName
 	end
 
 	if t102.upsell_prompt ~= nil then
-		v1023.upsell_prompt = t102.upsell_prompt
+		v1040.upsell_prompt = t102.upsell_prompt
 	end
 
 	if t102.upsellPrompt ~= nil then
-		v1023.upsell_prompt = t102.upsellPrompt
+		v1040.upsell_prompt = t102.upsellPrompt
 	end
 
 	if t102.connection_played_users ~= nil then
 		local t103 = {}
 
-		for _, v1026 in t102.connection_played_users do
-			table.insert(t103, t1.ExperienceActionModuleInputData_ConnectionPlayedUser.jsonDecode(v1026))
+		for _, v1043 in t102.connection_played_users do
+			table.insert(t103, t1.ExperienceActionModuleInputData_ConnectionPlayedUser.jsonDecode(v1043))
 		end
 
-		v1023.connection_played_users = t103
+		v1040.connection_played_users = t103
 	end
 
 	if t102.connectionPlayedUsers ~= nil then
 		local t104 = {}
 
-		for _, v1029 in t102.connectionPlayedUsers do
-			table.insert(t104, t1.ExperienceActionModuleInputData_ConnectionPlayedUser.jsonDecode(v1029))
+		for _, v1046 in t102.connectionPlayedUsers do
+			table.insert(t104, t1.ExperienceActionModuleInputData_ConnectionPlayedUser.jsonDecode(v1046))
 		end
 
-		v1023.connection_played_users = t104
+		v1040.connection_played_users = t104
 	end
 
 	if t102.connection_played_num_others ~= nil then
-		v1023.connection_played_num_others = t102.connection_played_num_others
+		v1040.connection_played_num_others = t102.connection_played_num_others
 	end
 
 	if t102.connectionPlayedNumOthers ~= nil then
-		v1023.connection_played_num_others = t102.connectionPlayedNumOthers
+		v1040.connection_played_num_others = t102.connectionPlayedNumOthers
 	end
 
 	if t102.connection_played_total_count ~= nil then
-		v1023.connection_played_total_count = t102.connection_played_total_count
+		v1040.connection_played_total_count = t102.connection_played_total_count
 	end
 
 	if t102.connectionPlayedTotalCount ~= nil then
-		v1023.connection_played_total_count = t102.connectionPlayedTotalCount
+		v1040.connection_played_total_count = t102.connectionPlayedTotalCount
 	end
 
-	return v1023
+	return v1040
 end
 
 t98.descriptor = {
@@ -5004,21 +5103,21 @@ local t105 = {}
 
 t105.__index = t105
 
-function t105.new(t106: {[any]: any}?) -- line: 8083
+function t105.new(t106: {[any]: any}?) -- line: 8330
 	-- upvalues: t105 (copy)
 	return (setmetatable({
 		user_id = if t106 ~= nil and t106.user_id ~= nil then t106.user_id else ""
 	}, t105))
 end
-function t105.encode(p67) -- line: 8094
+function t105.encode(p67) -- line: 8341
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n44 = 0
 
 	if p67.user_id ~= nil and p67.user_id ~= "" then
-		local v1034, v1035 = proto.writeTag(buf, n44, 1, proto.wireTypes.lengthDelimited)
+		local v1051, v1052 = proto.writeTag(buf, n44, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n44 = proto.writeString(v1034, v1035, p67.user_id)
+		buf, n44 = proto.writeString(v1051, v1052, p67.user_id)
 	end
 
 	local buf26 = buffer.create(n44)
@@ -5027,47 +5126,47 @@ function t105.encode(p67) -- line: 8094
 
 	return buf26
 end
-function t105.decode(p68: buffer) -- line: 8110
+function t105.decode(p68: buffer) -- line: 8357
 	-- upvalues: t105 (copy), proto (copy)
-	local v1038 = t105.new()
+	local v1055 = t105.new()
 	local n45 = 0
 
 	while n45 < buffer.len(p68) do
-		local v1040, v1041
+		local v1057, v1058
 
-		v1040, v1041, n45 = proto.readTag(p68, n45)
+		v1057, v1058, n45 = proto.readTag(p68, n45)
 
-		if v1041 == proto.wireTypes.varint then
-			local v1042
+		if v1058 == proto.wireTypes.varint then
+			local v1059
 
-			v1042, n45 = proto.readVarInt(p68, n45)
-		elseif v1041 == proto.wireTypes.lengthDelimited then
-			if v1040 == 1 then
-				local v1043
+			v1059, n45 = proto.readVarInt(p68, n45)
+		elseif v1058 == proto.wireTypes.lengthDelimited then
+			if v1057 == 1 then
+				local v1060
 
-				v1043, n45 = proto.readBuffer(p68, n45)
-				v1038.user_id = buffer.tostring(v1043)
+				v1060, n45 = proto.readBuffer(p68, n45)
+				v1055.user_id = buffer.tostring(v1060)
 			else
-				local v1044, v1045 = proto.readVarInt(p68, n45)
+				local v1061, v1062 = proto.readVarInt(p68, n45)
 
-				n45 = v1045 + v1044
+				n45 = v1062 + v1061
 			end
-		elseif v1041 == proto.wireTypes.i32 then
-			local v1046
+		elseif v1058 == proto.wireTypes.i32 then
+			local v1063
 
-			v1046, n45 = proto.readFixed32(p68, n45)
-		elseif v1041 == proto.wireTypes.i64 then
-			local v1047
+			v1063, n45 = proto.readFixed32(p68, n45)
+		elseif v1058 == proto.wireTypes.i64 then
+			local v1064
 
-			v1047, n45 = proto.readFixed64(p68, n45)
+			v1064, n45 = proto.readFixed64(p68, n45)
 		else
-			error("Unsupported wire type: " .. v1041)
+			error("Unsupported wire type: " .. v1058)
 		end
 	end
 
-	return v1038
+	return v1055
 end
-function t105.jsonEncode(p69) -- line: 8155
+function t105.jsonEncode(p69) -- line: 8402
 	local t107 = {}
 
 	if p69.user_id ~= nil and p69.user_id ~= "" then
@@ -5076,19 +5175,19 @@ function t105.jsonEncode(p69) -- line: 8155
 
 	return t107
 end
-function t105.jsonDecode(t108: {[any]: any}) -- line: 8167
+function t105.jsonDecode(t108: {[any]: any}) -- line: 8414
 	-- upvalues: t105 (copy)
-	local v1051 = t105.new()
+	local v1068 = t105.new()
 
 	if t108.user_id ~= nil then
-		v1051.user_id = t108.user_id
+		v1068.user_id = t108.user_id
 	end
 
 	if t108.userId ~= nil then
-		v1051.user_id = t108.userId
+		v1068.user_id = t108.userId
 	end
 
-	return v1051
+	return v1068
 end
 
 t105.descriptor = {
@@ -5102,7 +5201,7 @@ local t109 = {}
 
 t109.__index = t109
 
-function t109.new(t110: {[any]: any}?) -- line: 8198
+function t109.new(t110: {[any]: any}?) -- line: 8445
 	-- upvalues: t109 (copy)
 	return (setmetatable({
 		media_items = if t110 ~= nil and t110.media_items ~= nil then t110.media_items else {},
@@ -5110,30 +5209,30 @@ function t109.new(t110: {[any]: any}?) -- line: 8198
 		place_id = if t110 ~= nil and t110.place_id ~= nil then t110.place_id else ""
 	}, t109))
 end
-function t109.encode(p70) -- line: 8208
+function t109.encode(p70) -- line: 8455
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n46 = 0
 
 	if p70.media_items ~= nil and #p70.media_items > 0 then
-		for _, v1057 in p70.media_items do
-			local v1058 = v1057:encode()
-			local v1059, v1060 = proto.writeTag(buf, n46, 1, proto.wireTypes.lengthDelimited)
+		for _, v1074 in p70.media_items do
+			local v1075 = v1074:encode()
+			local v1076, v1077 = proto.writeTag(buf, n46, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n46 = proto.writeBuffer(v1059, v1060, v1058, buffer.len(v1058))
+			buf, n46 = proto.writeBuffer(v1076, v1077, v1075, buffer.len(v1075))
 		end
 	end
 
 	if p70.universe_id ~= nil and p70.universe_id ~= "" then
-		local v1061, v1062 = proto.writeTag(buf, n46, 2, proto.wireTypes.lengthDelimited)
+		local v1078, v1079 = proto.writeTag(buf, n46, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n46 = proto.writeString(v1061, v1062, p70.universe_id)
+		buf, n46 = proto.writeString(v1078, v1079, p70.universe_id)
 	end
 
 	if p70.place_id ~= nil and p70.place_id ~= "" then
-		local v1063, v1064 = proto.writeTag(buf, n46, 3, proto.wireTypes.lengthDelimited)
+		local v1080, v1081 = proto.writeTag(buf, n46, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n46 = proto.writeString(v1063, v1064, p70.place_id)
+		buf, n46 = proto.writeString(v1080, v1081, p70.place_id)
 	end
 
 	local buf27 = buffer.create(n46)
@@ -5142,64 +5241,64 @@ function t109.encode(p70) -- line: 8208
 
 	return buf27
 end
-function t109.decode(p71: buffer) -- line: 8235
+function t109.decode(p71: buffer) -- line: 8482
 	-- upvalues: t109 (copy), proto (copy), t1 (copy)
-	local v1067 = t109.new()
+	local v1084 = t109.new()
 	local n47 = 0
 
 	while n47 < buffer.len(p71) do
-		local v1069, v1070
+		local v1086, v1087
 
-		v1069, v1070, n47 = proto.readTag(p71, n47)
+		v1086, v1087, n47 = proto.readTag(p71, n47)
 
-		if v1070 == proto.wireTypes.varint then
-			local v1071
+		if v1087 == proto.wireTypes.varint then
+			local v1088
 
-			v1071, n47 = proto.readVarInt(p71, n47)
-		elseif v1070 == proto.wireTypes.lengthDelimited then
-			if v1069 == 1 then
-				local v1072
+			v1088, n47 = proto.readVarInt(p71, n47)
+		elseif v1087 == proto.wireTypes.lengthDelimited then
+			if v1086 == 1 then
+				local v1089
 
-				v1072, n47 = proto.readBuffer(p71, n47)
-				table.insert(v1067.media_items, t1.ExperienceMediaGalleryInputData_MediaItem.decode(v1072))
-			elseif v1069 == 2 then
-				local v1073
+				v1089, n47 = proto.readBuffer(p71, n47)
+				table.insert(v1084.media_items, t1.ExperienceMediaGalleryInputData_MediaItem.decode(v1089))
+			elseif v1086 == 2 then
+				local v1090
 
-				v1073, n47 = proto.readBuffer(p71, n47)
-				v1067.universe_id = buffer.tostring(v1073)
-			elseif v1069 == 3 then
-				local v1074
+				v1090, n47 = proto.readBuffer(p71, n47)
+				v1084.universe_id = buffer.tostring(v1090)
+			elseif v1086 == 3 then
+				local v1091
 
-				v1074, n47 = proto.readBuffer(p71, n47)
-				v1067.place_id = buffer.tostring(v1074)
+				v1091, n47 = proto.readBuffer(p71, n47)
+				v1084.place_id = buffer.tostring(v1091)
 			else
-				local v1075, v1076 = proto.readVarInt(p71, n47)
+				local v1092, v1093 = proto.readVarInt(p71, n47)
 
-				n47 = v1076 + v1075
+				n47 = v1093 + v1092
 			end
-		elseif v1070 == proto.wireTypes.i32 then
-			local v1077
+		elseif v1087 == proto.wireTypes.i32 then
+			local v1094
 
-			v1077, n47 = proto.readFixed32(p71, n47)
-		elseif v1070 == proto.wireTypes.i64 then
-			local v1078
+			v1094, n47 = proto.readFixed32(p71, n47)
+		elseif v1087 == proto.wireTypes.i64 then
+			local v1095
 
-			v1078, n47 = proto.readFixed64(p71, n47)
+			v1095, n47 = proto.readFixed64(p71, n47)
 		else
-			error("Unsupported wire type: " .. v1070)
+			error("Unsupported wire type: " .. v1087)
 		end
 	end
 
-	return v1067
+	return v1084
 end
-function t109.jsonEncode(p72) -- line: 8288
+function t109.jsonEncode(p72) -- line: 8535
 	local t111 = {}
 
 	if p72.media_items ~= nil and #p72.media_items > 0 then
 		local t112 = {}
 
-		for _, v1083 in p72.media_items do
-			table.insert(t112, v1083:jsonEncode())
+		for _, v1100 in p72.media_items do
+			table.insert(t112, v1100:jsonEncode())
 		end
 
 		t111.mediaItems = t112
@@ -5215,47 +5314,47 @@ function t109.jsonEncode(p72) -- line: 8288
 
 	return t111
 end
-function t109.jsonDecode(t113: {[any]: any}) -- line: 8310
+function t109.jsonDecode(t113: {[any]: any}) -- line: 8557
 	-- upvalues: t109 (copy), t1 (copy)
-	local v1085 = t109.new()
+	local v1102 = t109.new()
 
 	if t113.media_items ~= nil then
 		local t114 = {}
 
-		for _, v1088 in t113.media_items do
-			table.insert(t114, t1.ExperienceMediaGalleryInputData_MediaItem.jsonDecode(v1088))
+		for _, v1105 in t113.media_items do
+			table.insert(t114, t1.ExperienceMediaGalleryInputData_MediaItem.jsonDecode(v1105))
 		end
 
-		v1085.media_items = t114
+		v1102.media_items = t114
 	end
 
 	if t113.mediaItems ~= nil then
 		local t115 = {}
 
-		for _, v1091 in t113.mediaItems do
-			table.insert(t115, t1.ExperienceMediaGalleryInputData_MediaItem.jsonDecode(v1091))
+		for _, v1108 in t113.mediaItems do
+			table.insert(t115, t1.ExperienceMediaGalleryInputData_MediaItem.jsonDecode(v1108))
 		end
 
-		v1085.media_items = t115
+		v1102.media_items = t115
 	end
 
 	if t113.universe_id ~= nil then
-		v1085.universe_id = t113.universe_id
+		v1102.universe_id = t113.universe_id
 	end
 
 	if t113.universeId ~= nil then
-		v1085.universe_id = t113.universeId
+		v1102.universe_id = t113.universeId
 	end
 
 	if t113.place_id ~= nil then
-		v1085.place_id = t113.place_id
+		v1102.place_id = t113.place_id
 	end
 
 	if t113.placeId ~= nil then
-		v1085.place_id = t113.placeId
+		v1102.place_id = t113.placeId
 	end
 
-	return v1085
+	return v1102
 end
 
 t109.descriptor = {
@@ -5269,21 +5368,21 @@ local t116 = {}
 
 t116.__index = t116
 
-function t116.new(t117: {[any]: any}?) -- line: 8364
+function t116.new(t117: {[any]: any}?) -- line: 8611
 	-- upvalues: t116 (copy)
 	return (setmetatable({
 		media_asset_id = if t117 ~= nil and t117.media_asset_id ~= nil then t117.media_asset_id else ""
 	}, t116))
 end
-function t116.encode(p73) -- line: 8372
+function t116.encode(p73) -- line: 8619
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n48 = 0
 
 	if p73.media_asset_id ~= nil and p73.media_asset_id ~= "" then
-		local v1096, v1097 = proto.writeTag(buf, n48, 1, proto.wireTypes.lengthDelimited)
+		local v1113, v1114 = proto.writeTag(buf, n48, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n48 = proto.writeString(v1096, v1097, p73.media_asset_id)
+		buf, n48 = proto.writeString(v1113, v1114, p73.media_asset_id)
 	end
 
 	local buf28 = buffer.create(n48)
@@ -5292,47 +5391,47 @@ function t116.encode(p73) -- line: 8372
 
 	return buf28
 end
-function t116.decode(p74: buffer) -- line: 8388
+function t116.decode(p74: buffer) -- line: 8635
 	-- upvalues: t116 (copy), proto (copy)
-	local v1100 = t116.new()
+	local v1117 = t116.new()
 	local n49 = 0
 
 	while n49 < buffer.len(p74) do
-		local v1102, v1103
+		local v1119, v1120
 
-		v1102, v1103, n49 = proto.readTag(p74, n49)
+		v1119, v1120, n49 = proto.readTag(p74, n49)
 
-		if v1103 == proto.wireTypes.varint then
-			local v1104
+		if v1120 == proto.wireTypes.varint then
+			local v1121
 
-			v1104, n49 = proto.readVarInt(p74, n49)
-		elseif v1103 == proto.wireTypes.lengthDelimited then
-			if v1102 == 1 then
-				local v1105
+			v1121, n49 = proto.readVarInt(p74, n49)
+		elseif v1120 == proto.wireTypes.lengthDelimited then
+			if v1119 == 1 then
+				local v1122
 
-				v1105, n49 = proto.readBuffer(p74, n49)
-				v1100.media_asset_id = buffer.tostring(v1105)
+				v1122, n49 = proto.readBuffer(p74, n49)
+				v1117.media_asset_id = buffer.tostring(v1122)
 			else
-				local v1106, v1107 = proto.readVarInt(p74, n49)
+				local v1123, v1124 = proto.readVarInt(p74, n49)
 
-				n49 = v1107 + v1106
+				n49 = v1124 + v1123
 			end
-		elseif v1103 == proto.wireTypes.i32 then
-			local v1108
+		elseif v1120 == proto.wireTypes.i32 then
+			local v1125
 
-			v1108, n49 = proto.readFixed32(p74, n49)
-		elseif v1103 == proto.wireTypes.i64 then
-			local v1109
+			v1125, n49 = proto.readFixed32(p74, n49)
+		elseif v1120 == proto.wireTypes.i64 then
+			local v1126
 
-			v1109, n49 = proto.readFixed64(p74, n49)
+			v1126, n49 = proto.readFixed64(p74, n49)
 		else
-			error("Unsupported wire type: " .. v1103)
+			error("Unsupported wire type: " .. v1120)
 		end
 	end
 
-	return v1100
+	return v1117
 end
-function t116.jsonEncode(p75) -- line: 8433
+function t116.jsonEncode(p75) -- line: 8680
 	local t118 = {}
 
 	if p75.media_asset_id ~= nil and p75.media_asset_id ~= "" then
@@ -5341,19 +5440,19 @@ function t116.jsonEncode(p75) -- line: 8433
 
 	return t118
 end
-function t116.jsonDecode(t119: {[any]: any}) -- line: 8445
+function t116.jsonDecode(t119: {[any]: any}) -- line: 8692
 	-- upvalues: t116 (copy)
-	local v1113 = t116.new()
+	local v1130 = t116.new()
 
 	if t119.media_asset_id ~= nil then
-		v1113.media_asset_id = t119.media_asset_id
+		v1130.media_asset_id = t119.media_asset_id
 	end
 
 	if t119.mediaAssetId ~= nil then
-		v1113.media_asset_id = t119.mediaAssetId
+		v1130.media_asset_id = t119.mediaAssetId
 	end
 
-	return v1113
+	return v1130
 end
 
 t116.descriptor = {
@@ -5367,21 +5466,21 @@ local t120 = {}
 
 t120.__index = t120
 
-function t120.new(t121: {[any]: any}?) -- line: 8475
+function t120.new(t121: {[any]: any}?) -- line: 8722
 	-- upvalues: t120 (copy)
 	return (setmetatable({
 		universe_id = if t121 ~= nil and t121.universe_id ~= nil then t121.universe_id else ""
 	}, t120))
 end
-function t120.encode(p76) -- line: 8483
+function t120.encode(p76) -- line: 8730
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n50 = 0
 
 	if p76.universe_id ~= nil and p76.universe_id ~= "" then
-		local v1118, v1119 = proto.writeTag(buf, n50, 1, proto.wireTypes.lengthDelimited)
+		local v1135, v1136 = proto.writeTag(buf, n50, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n50 = proto.writeString(v1118, v1119, p76.universe_id)
+		buf, n50 = proto.writeString(v1135, v1136, p76.universe_id)
 	end
 
 	local buf29 = buffer.create(n50)
@@ -5390,47 +5489,47 @@ function t120.encode(p76) -- line: 8483
 
 	return buf29
 end
-function t120.decode(p77: buffer) -- line: 8497
+function t120.decode(p77: buffer) -- line: 8744
 	-- upvalues: t120 (copy), proto (copy)
-	local v1122 = t120.new()
+	local v1139 = t120.new()
 	local n51 = 0
 
 	while n51 < buffer.len(p77) do
-		local v1124, v1125
+		local v1141, v1142
 
-		v1124, v1125, n51 = proto.readTag(p77, n51)
+		v1141, v1142, n51 = proto.readTag(p77, n51)
 
-		if v1125 == proto.wireTypes.varint then
-			local v1126
+		if v1142 == proto.wireTypes.varint then
+			local v1143
 
-			v1126, n51 = proto.readVarInt(p77, n51)
-		elseif v1125 == proto.wireTypes.lengthDelimited then
-			if v1124 == 1 then
-				local v1127
+			v1143, n51 = proto.readVarInt(p77, n51)
+		elseif v1142 == proto.wireTypes.lengthDelimited then
+			if v1141 == 1 then
+				local v1144
 
-				v1127, n51 = proto.readBuffer(p77, n51)
-				v1122.universe_id = buffer.tostring(v1127)
+				v1144, n51 = proto.readBuffer(p77, n51)
+				v1139.universe_id = buffer.tostring(v1144)
 			else
-				local v1128, v1129 = proto.readVarInt(p77, n51)
+				local v1145, v1146 = proto.readVarInt(p77, n51)
 
-				n51 = v1129 + v1128
+				n51 = v1146 + v1145
 			end
-		elseif v1125 == proto.wireTypes.i32 then
-			local v1130
+		elseif v1142 == proto.wireTypes.i32 then
+			local v1147
 
-			v1130, n51 = proto.readFixed32(p77, n51)
-		elseif v1125 == proto.wireTypes.i64 then
-			local v1131
+			v1147, n51 = proto.readFixed32(p77, n51)
+		elseif v1142 == proto.wireTypes.i64 then
+			local v1148
 
-			v1131, n51 = proto.readFixed64(p77, n51)
+			v1148, n51 = proto.readFixed64(p77, n51)
 		else
-			error("Unsupported wire type: " .. v1125)
+			error("Unsupported wire type: " .. v1142)
 		end
 	end
 
-	return v1122
+	return v1139
 end
-function t120.jsonEncode(p78) -- line: 8540
+function t120.jsonEncode(p78) -- line: 8787
 	local t122 = {}
 
 	if p78.universe_id ~= nil and p78.universe_id ~= "" then
@@ -5439,19 +5538,19 @@ function t120.jsonEncode(p78) -- line: 8540
 
 	return t122
 end
-function t120.jsonDecode(t123: {[any]: any}) -- line: 8550
+function t120.jsonDecode(t123: {[any]: any}) -- line: 8797
 	-- upvalues: t120 (copy)
-	local v1135 = t120.new()
+	local v1152 = t120.new()
 
 	if t123.universe_id ~= nil then
-		v1135.universe_id = t123.universe_id
+		v1152.universe_id = t123.universe_id
 	end
 
 	if t123.universeId ~= nil then
-		v1135.universe_id = t123.universeId
+		v1152.universe_id = t123.universeId
 	end
 
-	return v1135
+	return v1152
 end
 
 t120.descriptor = {
@@ -5465,21 +5564,21 @@ local t124 = {}
 
 t124.__index = t124
 
-function t124.new(t125: {[any]: any}?) -- line: 8578
+function t124.new(t125: {[any]: any}?) -- line: 8825
 	-- upvalues: t124 (copy)
 	return (setmetatable({
 		universe_id = if t125 ~= nil and t125.universe_id ~= nil then t125.universe_id else ""
 	}, t124))
 end
-function t124.encode(p79) -- line: 8586
+function t124.encode(p79) -- line: 8833
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n52 = 0
 
 	if p79.universe_id ~= nil and p79.universe_id ~= "" then
-		local v1140, v1141 = proto.writeTag(buf, n52, 1, proto.wireTypes.lengthDelimited)
+		local v1157, v1158 = proto.writeTag(buf, n52, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n52 = proto.writeString(v1140, v1141, p79.universe_id)
+		buf, n52 = proto.writeString(v1157, v1158, p79.universe_id)
 	end
 
 	local buf30 = buffer.create(n52)
@@ -5488,47 +5587,47 @@ function t124.encode(p79) -- line: 8586
 
 	return buf30
 end
-function t124.decode(p80: buffer) -- line: 8600
+function t124.decode(p80: buffer) -- line: 8847
 	-- upvalues: t124 (copy), proto (copy)
-	local v1144 = t124.new()
+	local v1161 = t124.new()
 	local n53 = 0
 
 	while n53 < buffer.len(p80) do
-		local v1146, v1147
+		local v1163, v1164
 
-		v1146, v1147, n53 = proto.readTag(p80, n53)
+		v1163, v1164, n53 = proto.readTag(p80, n53)
 
-		if v1147 == proto.wireTypes.varint then
-			local v1148
+		if v1164 == proto.wireTypes.varint then
+			local v1165
 
-			v1148, n53 = proto.readVarInt(p80, n53)
-		elseif v1147 == proto.wireTypes.lengthDelimited then
-			if v1146 == 1 then
-				local v1149
+			v1165, n53 = proto.readVarInt(p80, n53)
+		elseif v1164 == proto.wireTypes.lengthDelimited then
+			if v1163 == 1 then
+				local v1166
 
-				v1149, n53 = proto.readBuffer(p80, n53)
-				v1144.universe_id = buffer.tostring(v1149)
+				v1166, n53 = proto.readBuffer(p80, n53)
+				v1161.universe_id = buffer.tostring(v1166)
 			else
-				local v1150, v1151 = proto.readVarInt(p80, n53)
+				local v1167, v1168 = proto.readVarInt(p80, n53)
 
-				n53 = v1151 + v1150
+				n53 = v1168 + v1167
 			end
-		elseif v1147 == proto.wireTypes.i32 then
-			local v1152
+		elseif v1164 == proto.wireTypes.i32 then
+			local v1169
 
-			v1152, n53 = proto.readFixed32(p80, n53)
-		elseif v1147 == proto.wireTypes.i64 then
-			local v1153
+			v1169, n53 = proto.readFixed32(p80, n53)
+		elseif v1164 == proto.wireTypes.i64 then
+			local v1170
 
-			v1153, n53 = proto.readFixed64(p80, n53)
+			v1170, n53 = proto.readFixed64(p80, n53)
 		else
-			error("Unsupported wire type: " .. v1147)
+			error("Unsupported wire type: " .. v1164)
 		end
 	end
 
-	return v1144
+	return v1161
 end
-function t124.jsonEncode(p81) -- line: 8643
+function t124.jsonEncode(p81) -- line: 8890
 	local t126 = {}
 
 	if p81.universe_id ~= nil and p81.universe_id ~= "" then
@@ -5537,19 +5636,19 @@ function t124.jsonEncode(p81) -- line: 8643
 
 	return t126
 end
-function t124.jsonDecode(t127: {[any]: any}) -- line: 8653
+function t124.jsonDecode(t127: {[any]: any}) -- line: 8900
 	-- upvalues: t124 (copy)
-	local v1157 = t124.new()
+	local v1174 = t124.new()
 
 	if t127.universe_id ~= nil then
-		v1157.universe_id = t127.universe_id
+		v1174.universe_id = t127.universe_id
 	end
 
 	if t127.universeId ~= nil then
-		v1157.universe_id = t127.universeId
+		v1174.universe_id = t127.universeId
 	end
 
-	return v1157
+	return v1174
 end
 
 t124.descriptor = {
@@ -5563,7 +5662,7 @@ local t128 = {}
 
 t128.__index = t128
 
-function t128.new(t129: {[any]: any}?) -- line: 8681
+function t128.new(t129: {[any]: any}?) -- line: 8928
 	-- upvalues: t128 (copy)
 	return (setmetatable({
 		universe_id = if t129 ~= nil and t129.universe_id ~= nil then t129.universe_id else "",
@@ -5572,33 +5671,33 @@ function t128.new(t129: {[any]: any}?) -- line: 8681
 		has_game_passes = t129 ~= nil and (t129.has_game_passes ~= nil and t129.has_game_passes)
 	}, t128))
 end
-function t128.encode(p82) -- line: 8692
+function t128.encode(p82) -- line: 8939
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n54 = 0
 
 	if p82.universe_id ~= nil and p82.universe_id ~= "" then
-		local v1162, v1163 = proto.writeTag(buf, n54, 1, proto.wireTypes.lengthDelimited)
+		local v1179, v1180 = proto.writeTag(buf, n54, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n54 = proto.writeString(v1162, v1163, p82.universe_id)
+		buf, n54 = proto.writeString(v1179, v1180, p82.universe_id)
 	end
 
 	if p82.has_store_items then
-		local v1164, v1165 = proto.writeTag(buf, n54, 2, proto.wireTypes.varint)
+		local v1181, v1182 = proto.writeTag(buf, n54, 2, proto.wireTypes.varint)
 
-		buf, n54 = proto.writeVarInt(v1164, v1165, not p82.has_store_items and 0 or 1)
+		buf, n54 = proto.writeVarInt(v1181, v1182, not p82.has_store_items and 0 or 1)
 	end
 
 	if p82.has_badges then
-		local v1166, v1167 = proto.writeTag(buf, n54, 3, proto.wireTypes.varint)
+		local v1183, v1184 = proto.writeTag(buf, n54, 3, proto.wireTypes.varint)
 
-		buf, n54 = proto.writeVarInt(v1166, v1167, not p82.has_badges and 0 or 1)
+		buf, n54 = proto.writeVarInt(v1183, v1184, not p82.has_badges and 0 or 1)
 	end
 
 	if p82.has_game_passes then
-		local v1168, v1169 = proto.writeTag(buf, n54, 4, proto.wireTypes.varint)
+		local v1185, v1186 = proto.writeTag(buf, n54, 4, proto.wireTypes.varint)
 
-		buf, n54 = proto.writeVarInt(v1168, v1169, not p82.has_game_passes and 0 or 1)
+		buf, n54 = proto.writeVarInt(v1185, v1186, not p82.has_game_passes and 0 or 1)
 	end
 
 	local buf31 = buffer.create(n54)
@@ -5607,64 +5706,64 @@ function t128.encode(p82) -- line: 8692
 
 	return buf31
 end
-function t128.decode(p83: buffer) -- line: 8721
+function t128.decode(p83: buffer) -- line: 8968
 	-- upvalues: t128 (copy), proto (copy)
-	local v1172 = t128.new()
+	local v1189 = t128.new()
 	local n55 = 0
 
 	while n55 < buffer.len(p83) do
-		local v1174, v1175
+		local v1191, v1192
 
-		v1174, v1175, n55 = proto.readTag(p83, n55)
+		v1191, v1192, n55 = proto.readTag(p83, n55)
 
-		if v1175 == proto.wireTypes.varint then
-			if v1174 == 2 then
-				local v1176
+		if v1192 == proto.wireTypes.varint then
+			if v1191 == 2 then
+				local v1193
 
-				v1176, n55 = proto.readVarInt(p83, n55)
-				v1172.has_store_items = v1176 ~= 0
-			elseif v1174 == 3 then
-				local v1177
+				v1193, n55 = proto.readVarInt(p83, n55)
+				v1189.has_store_items = v1193 ~= 0
+			elseif v1191 == 3 then
+				local v1194
 
-				v1177, n55 = proto.readVarInt(p83, n55)
-				v1172.has_badges = v1177 ~= 0
-			elseif v1174 == 4 then
-				local v1178
+				v1194, n55 = proto.readVarInt(p83, n55)
+				v1189.has_badges = v1194 ~= 0
+			elseif v1191 == 4 then
+				local v1195
 
-				v1178, n55 = proto.readVarInt(p83, n55)
-				v1172.has_game_passes = v1178 ~= 0
+				v1195, n55 = proto.readVarInt(p83, n55)
+				v1189.has_game_passes = v1195 ~= 0
 			else
-				local v1179
+				local v1196
 
-				v1179, n55 = proto.readVarInt(p83, n55)
+				v1196, n55 = proto.readVarInt(p83, n55)
 			end
-		elseif v1175 == proto.wireTypes.lengthDelimited then
-			if v1174 == 1 then
-				local v1180
+		elseif v1192 == proto.wireTypes.lengthDelimited then
+			if v1191 == 1 then
+				local v1197
 
-				v1180, n55 = proto.readBuffer(p83, n55)
-				v1172.universe_id = buffer.tostring(v1180)
+				v1197, n55 = proto.readBuffer(p83, n55)
+				v1189.universe_id = buffer.tostring(v1197)
 			else
-				local v1181, v1182 = proto.readVarInt(p83, n55)
+				local v1198, v1199 = proto.readVarInt(p83, n55)
 
-				n55 = v1182 + v1181
+				n55 = v1199 + v1198
 			end
-		elseif v1175 == proto.wireTypes.i32 then
-			local v1183
+		elseif v1192 == proto.wireTypes.i32 then
+			local v1200
 
-			v1183, n55 = proto.readFixed32(p83, n55)
-		elseif v1175 == proto.wireTypes.i64 then
-			local v1184
+			v1200, n55 = proto.readFixed32(p83, n55)
+		elseif v1192 == proto.wireTypes.i64 then
+			local v1201
 
-			v1184, n55 = proto.readFixed64(p83, n55)
+			v1201, n55 = proto.readFixed64(p83, n55)
 		else
-			error("Unsupported wire type: " .. v1175)
+			error("Unsupported wire type: " .. v1192)
 		end
 	end
 
-	return v1172
+	return v1189
 end
-function t128.jsonEncode(p84) -- line: 8779
+function t128.jsonEncode(p84) -- line: 9026
 	local t130 = {}
 
 	if p84.universe_id ~= nil and p84.universe_id ~= "" then
@@ -5685,43 +5784,43 @@ function t128.jsonEncode(p84) -- line: 8779
 
 	return t130
 end
-function t128.jsonDecode(t131: {[any]: any}) -- line: 8801
+function t128.jsonDecode(t131: {[any]: any}) -- line: 9048
 	-- upvalues: t128 (copy)
-	local v1188 = t128.new()
+	local v1205 = t128.new()
 
 	if t131.universe_id ~= nil then
-		v1188.universe_id = t131.universe_id
+		v1205.universe_id = t131.universe_id
 	end
 
 	if t131.universeId ~= nil then
-		v1188.universe_id = t131.universeId
+		v1205.universe_id = t131.universeId
 	end
 
 	if t131.has_store_items ~= nil then
-		v1188.has_store_items = t131.has_store_items
+		v1205.has_store_items = t131.has_store_items
 	end
 
 	if t131.hasStoreItems ~= nil then
-		v1188.has_store_items = t131.hasStoreItems
+		v1205.has_store_items = t131.hasStoreItems
 	end
 
 	if t131.has_badges ~= nil then
-		v1188.has_badges = t131.has_badges
+		v1205.has_badges = t131.has_badges
 	end
 
 	if t131.hasBadges ~= nil then
-		v1188.has_badges = t131.hasBadges
+		v1205.has_badges = t131.hasBadges
 	end
 
 	if t131.has_game_passes ~= nil then
-		v1188.has_game_passes = t131.has_game_passes
+		v1205.has_game_passes = t131.has_game_passes
 	end
 
 	if t131.hasGamePasses ~= nil then
-		v1188.has_game_passes = t131.hasGamePasses
+		v1205.has_game_passes = t131.hasGamePasses
 	end
 
-	return v1188
+	return v1205
 end
 
 t128.descriptor = {
@@ -5735,21 +5834,21 @@ local t132 = {}
 
 t132.__index = t132
 
-function t132.new(t133: {[any]: any}?) -- line: 8853
+function t132.new(t133: {[any]: any}?) -- line: 9100
 	-- upvalues: t132 (copy)
 	return (setmetatable({
 		universe_id = if t133 ~= nil and t133.universe_id ~= nil then t133.universe_id else ""
 	}, t132))
 end
-function t132.encode(p85) -- line: 8861
+function t132.encode(p85) -- line: 9108
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n56 = 0
 
 	if p85.universe_id ~= nil and p85.universe_id ~= "" then
-		local v1193, v1194 = proto.writeTag(buf, n56, 1, proto.wireTypes.lengthDelimited)
+		local v1210, v1211 = proto.writeTag(buf, n56, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n56 = proto.writeString(v1193, v1194, p85.universe_id)
+		buf, n56 = proto.writeString(v1210, v1211, p85.universe_id)
 	end
 
 	local buf32 = buffer.create(n56)
@@ -5758,47 +5857,47 @@ function t132.encode(p85) -- line: 8861
 
 	return buf32
 end
-function t132.decode(p86: buffer) -- line: 8875
+function t132.decode(p86: buffer) -- line: 9122
 	-- upvalues: t132 (copy), proto (copy)
-	local v1197 = t132.new()
+	local v1214 = t132.new()
 	local n57 = 0
 
 	while n57 < buffer.len(p86) do
-		local v1199, v1200
+		local v1216, v1217
 
-		v1199, v1200, n57 = proto.readTag(p86, n57)
+		v1216, v1217, n57 = proto.readTag(p86, n57)
 
-		if v1200 == proto.wireTypes.varint then
-			local v1201
+		if v1217 == proto.wireTypes.varint then
+			local v1218
 
-			v1201, n57 = proto.readVarInt(p86, n57)
-		elseif v1200 == proto.wireTypes.lengthDelimited then
-			if v1199 == 1 then
-				local v1202
+			v1218, n57 = proto.readVarInt(p86, n57)
+		elseif v1217 == proto.wireTypes.lengthDelimited then
+			if v1216 == 1 then
+				local v1219
 
-				v1202, n57 = proto.readBuffer(p86, n57)
-				v1197.universe_id = buffer.tostring(v1202)
+				v1219, n57 = proto.readBuffer(p86, n57)
+				v1214.universe_id = buffer.tostring(v1219)
 			else
-				local v1203, v1204 = proto.readVarInt(p86, n57)
+				local v1220, v1221 = proto.readVarInt(p86, n57)
 
-				n57 = v1204 + v1203
+				n57 = v1221 + v1220
 			end
-		elseif v1200 == proto.wireTypes.i32 then
-			local v1205
+		elseif v1217 == proto.wireTypes.i32 then
+			local v1222
 
-			v1205, n57 = proto.readFixed32(p86, n57)
-		elseif v1200 == proto.wireTypes.i64 then
-			local v1206
+			v1222, n57 = proto.readFixed32(p86, n57)
+		elseif v1217 == proto.wireTypes.i64 then
+			local v1223
 
-			v1206, n57 = proto.readFixed64(p86, n57)
+			v1223, n57 = proto.readFixed64(p86, n57)
 		else
-			error("Unsupported wire type: " .. v1200)
+			error("Unsupported wire type: " .. v1217)
 		end
 	end
 
-	return v1197
+	return v1214
 end
-function t132.jsonEncode(p87) -- line: 8918
+function t132.jsonEncode(p87) -- line: 9165
 	local t134 = {}
 
 	if p87.universe_id ~= nil and p87.universe_id ~= "" then
@@ -5807,19 +5906,19 @@ function t132.jsonEncode(p87) -- line: 8918
 
 	return t134
 end
-function t132.jsonDecode(t135: {[any]: any}) -- line: 8928
+function t132.jsonDecode(t135: {[any]: any}) -- line: 9175
 	-- upvalues: t132 (copy)
-	local v1210 = t132.new()
+	local v1227 = t132.new()
 
 	if t135.universe_id ~= nil then
-		v1210.universe_id = t135.universe_id
+		v1227.universe_id = t135.universe_id
 	end
 
 	if t135.universeId ~= nil then
-		v1210.universe_id = t135.universeId
+		v1227.universe_id = t135.universeId
 	end
 
-	return v1210
+	return v1227
 end
 
 t132.descriptor = {
@@ -5833,28 +5932,28 @@ local t136 = {}
 
 t136.__index = t136
 
-function t136.new(t137: {[any]: any}?) -- line: 8958
+function t136.new(t137: {[any]: any}?) -- line: 9205
 	-- upvalues: t136 (copy)
 	return (setmetatable({
 		universe_id = if t137 ~= nil and t137.universe_id ~= nil then t137.universe_id else "",
 		user_owns_experience = t137 ~= nil and (t137.user_owns_experience ~= nil and t137.user_owns_experience)
 	}, t136))
 end
-function t136.encode(p88) -- line: 8969
+function t136.encode(p88) -- line: 9216
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n58 = 0
 
 	if p88.universe_id ~= nil and p88.universe_id ~= "" then
-		local v1215, v1216 = proto.writeTag(buf, n58, 1, proto.wireTypes.lengthDelimited)
+		local v1232, v1233 = proto.writeTag(buf, n58, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n58 = proto.writeString(v1215, v1216, p88.universe_id)
+		buf, n58 = proto.writeString(v1232, v1233, p88.universe_id)
 	end
 
 	if p88.user_owns_experience then
-		local v1217, v1218 = proto.writeTag(buf, n58, 2, proto.wireTypes.varint)
+		local v1234, v1235 = proto.writeTag(buf, n58, 2, proto.wireTypes.varint)
 
-		buf, n58 = proto.writeVarInt(v1217, v1218, not p88.user_owns_experience and 0 or 1)
+		buf, n58 = proto.writeVarInt(v1234, v1235, not p88.user_owns_experience and 0 or 1)
 	end
 
 	local buf33 = buffer.create(n58)
@@ -5863,54 +5962,54 @@ function t136.encode(p88) -- line: 8969
 
 	return buf33
 end
-function t136.decode(p89: buffer) -- line: 8988
+function t136.decode(p89: buffer) -- line: 9235
 	-- upvalues: t136 (copy), proto (copy)
-	local v1221 = t136.new()
+	local v1238 = t136.new()
 	local n59 = 0
 
 	while n59 < buffer.len(p89) do
-		local v1223, v1224
+		local v1240, v1241
 
-		v1223, v1224, n59 = proto.readTag(p89, n59)
+		v1240, v1241, n59 = proto.readTag(p89, n59)
 
-		if v1224 == proto.wireTypes.varint then
-			if v1223 == 2 then
-				local v1225
+		if v1241 == proto.wireTypes.varint then
+			if v1240 == 2 then
+				local v1242
 
-				v1225, n59 = proto.readVarInt(p89, n59)
-				v1221.user_owns_experience = v1225 ~= 0
+				v1242, n59 = proto.readVarInt(p89, n59)
+				v1238.user_owns_experience = v1242 ~= 0
 			else
-				local v1226
+				local v1243
 
-				v1226, n59 = proto.readVarInt(p89, n59)
+				v1243, n59 = proto.readVarInt(p89, n59)
 			end
-		elseif v1224 == proto.wireTypes.lengthDelimited then
-			if v1223 == 1 then
-				local v1227
+		elseif v1241 == proto.wireTypes.lengthDelimited then
+			if v1240 == 1 then
+				local v1244
 
-				v1227, n59 = proto.readBuffer(p89, n59)
-				v1221.universe_id = buffer.tostring(v1227)
+				v1244, n59 = proto.readBuffer(p89, n59)
+				v1238.universe_id = buffer.tostring(v1244)
 			else
-				local v1228, v1229 = proto.readVarInt(p89, n59)
+				local v1245, v1246 = proto.readVarInt(p89, n59)
 
-				n59 = v1229 + v1228
+				n59 = v1246 + v1245
 			end
-		elseif v1224 == proto.wireTypes.i32 then
-			local v1230
+		elseif v1241 == proto.wireTypes.i32 then
+			local v1247
 
-			v1230, n59 = proto.readFixed32(p89, n59)
-		elseif v1224 == proto.wireTypes.i64 then
-			local v1231
+			v1247, n59 = proto.readFixed32(p89, n59)
+		elseif v1241 == proto.wireTypes.i64 then
+			local v1248
 
-			v1231, n59 = proto.readFixed64(p89, n59)
+			v1248, n59 = proto.readFixed64(p89, n59)
 		else
-			error("Unsupported wire type: " .. v1224)
+			error("Unsupported wire type: " .. v1241)
 		end
 	end
 
-	return v1221
+	return v1238
 end
-function t136.jsonEncode(p90) -- line: 9036
+function t136.jsonEncode(p90) -- line: 9283
 	local t138 = {}
 
 	if p90.universe_id ~= nil and p90.universe_id ~= "" then
@@ -5923,27 +6022,27 @@ function t136.jsonEncode(p90) -- line: 9036
 
 	return t138
 end
-function t136.jsonDecode(t139: {[any]: any}) -- line: 9050
+function t136.jsonDecode(t139: {[any]: any}) -- line: 9297
 	-- upvalues: t136 (copy)
-	local v1235 = t136.new()
+	local v1252 = t136.new()
 
 	if t139.universe_id ~= nil then
-		v1235.universe_id = t139.universe_id
+		v1252.universe_id = t139.universe_id
 	end
 
 	if t139.universeId ~= nil then
-		v1235.universe_id = t139.universeId
+		v1252.universe_id = t139.universeId
 	end
 
 	if t139.user_owns_experience ~= nil then
-		v1235.user_owns_experience = t139.user_owns_experience
+		v1252.user_owns_experience = t139.user_owns_experience
 	end
 
 	if t139.userOwnsExperience ~= nil then
-		v1235.user_owns_experience = t139.userOwnsExperience
+		v1252.user_owns_experience = t139.userOwnsExperience
 	end
 
-	return v1235
+	return v1252
 end
 
 t136.descriptor = {
@@ -5957,28 +6056,28 @@ local t140 = {}
 
 t140.__index = t140
 
-function t140.new(t141: {[any]: any}?) -- line: 9086
+function t140.new(t141: {[any]: any}?) -- line: 9333
 	-- upvalues: t140 (copy)
 	return (setmetatable({
 		universe_id = if t141 ~= nil and t141.universe_id ~= nil then t141.universe_id else "",
 		place_id = if t141 ~= nil and t141.place_id ~= nil then t141.place_id else ""
 	}, t140))
 end
-function t140.encode(p91) -- line: 9095
+function t140.encode(p91) -- line: 9342
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n60 = 0
 
 	if p91.universe_id ~= nil and p91.universe_id ~= "" then
-		local v1240, v1241 = proto.writeTag(buf, n60, 1, proto.wireTypes.lengthDelimited)
+		local v1257, v1258 = proto.writeTag(buf, n60, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n60 = proto.writeString(v1240, v1241, p91.universe_id)
+		buf, n60 = proto.writeString(v1257, v1258, p91.universe_id)
 	end
 
 	if p91.place_id ~= nil and p91.place_id ~= "" then
-		local v1242, v1243 = proto.writeTag(buf, n60, 2, proto.wireTypes.lengthDelimited)
+		local v1259, v1260 = proto.writeTag(buf, n60, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n60 = proto.writeString(v1242, v1243, p91.place_id)
+		buf, n60 = proto.writeString(v1259, v1260, p91.place_id)
 	end
 
 	local buf34 = buffer.create(n60)
@@ -5987,52 +6086,52 @@ function t140.encode(p91) -- line: 9095
 
 	return buf34
 end
-function t140.decode(p92: buffer) -- line: 9114
+function t140.decode(p92: buffer) -- line: 9361
 	-- upvalues: t140 (copy), proto (copy)
-	local v1246 = t140.new()
+	local v1263 = t140.new()
 	local n61 = 0
 
 	while n61 < buffer.len(p92) do
-		local v1248, v1249
+		local v1265, v1266
 
-		v1248, v1249, n61 = proto.readTag(p92, n61)
+		v1265, v1266, n61 = proto.readTag(p92, n61)
 
-		if v1249 == proto.wireTypes.varint then
-			local v1250
+		if v1266 == proto.wireTypes.varint then
+			local v1267
 
-			v1250, n61 = proto.readVarInt(p92, n61)
-		elseif v1249 == proto.wireTypes.lengthDelimited then
-			if v1248 == 1 then
-				local v1251
+			v1267, n61 = proto.readVarInt(p92, n61)
+		elseif v1266 == proto.wireTypes.lengthDelimited then
+			if v1265 == 1 then
+				local v1268
 
-				v1251, n61 = proto.readBuffer(p92, n61)
-				v1246.universe_id = buffer.tostring(v1251)
-			elseif v1248 == 2 then
-				local v1252
+				v1268, n61 = proto.readBuffer(p92, n61)
+				v1263.universe_id = buffer.tostring(v1268)
+			elseif v1265 == 2 then
+				local v1269
 
-				v1252, n61 = proto.readBuffer(p92, n61)
-				v1246.place_id = buffer.tostring(v1252)
+				v1269, n61 = proto.readBuffer(p92, n61)
+				v1263.place_id = buffer.tostring(v1269)
 			else
-				local v1253, v1254 = proto.readVarInt(p92, n61)
+				local v1270, v1271 = proto.readVarInt(p92, n61)
 
-				n61 = v1254 + v1253
+				n61 = v1271 + v1270
 			end
-		elseif v1249 == proto.wireTypes.i32 then
-			local v1255
+		elseif v1266 == proto.wireTypes.i32 then
+			local v1272
 
-			v1255, n61 = proto.readFixed32(p92, n61)
-		elseif v1249 == proto.wireTypes.i64 then
-			local v1256
+			v1272, n61 = proto.readFixed32(p92, n61)
+		elseif v1266 == proto.wireTypes.i64 then
+			local v1273
 
-			v1256, n61 = proto.readFixed64(p92, n61)
+			v1273, n61 = proto.readFixed64(p92, n61)
 		else
-			error("Unsupported wire type: " .. v1249)
+			error("Unsupported wire type: " .. v1266)
 		end
 	end
 
-	return v1246
+	return v1263
 end
-function t140.jsonEncode(p93) -- line: 9162
+function t140.jsonEncode(p93) -- line: 9409
 	local t142 = {}
 
 	if p93.universe_id ~= nil and p93.universe_id ~= "" then
@@ -6045,27 +6144,27 @@ function t140.jsonEncode(p93) -- line: 9162
 
 	return t142
 end
-function t140.jsonDecode(t143: {[any]: any}) -- line: 9176
+function t140.jsonDecode(t143: {[any]: any}) -- line: 9423
 	-- upvalues: t140 (copy)
-	local v1260 = t140.new()
+	local v1277 = t140.new()
 
 	if t143.universe_id ~= nil then
-		v1260.universe_id = t143.universe_id
+		v1277.universe_id = t143.universe_id
 	end
 
 	if t143.universeId ~= nil then
-		v1260.universe_id = t143.universeId
+		v1277.universe_id = t143.universeId
 	end
 
 	if t143.place_id ~= nil then
-		v1260.place_id = t143.place_id
+		v1277.place_id = t143.place_id
 	end
 
 	if t143.placeId ~= nil then
-		v1260.place_id = t143.placeId
+		v1277.place_id = t143.placeId
 	end
 
-	return v1260
+	return v1277
 end
 
 t140.descriptor = {
@@ -6079,24 +6178,21 @@ local t144 = {}
 
 t144.__index = t144
 
-function t144.new(t145: {[any]: any}?) -- line: 9214
+function t144.new(t145: {[any]: any}?) -- line: 9461
 	-- upvalues: t144 (copy)
 	return (setmetatable({
-		social_link_items = if t145 ~= nil and t145.social_link_items ~= nil then t145.social_link_items else {}
+		community_id = if t145 ~= nil and t145.community_id ~= nil then t145.community_id else ""
 	}, t144))
 end
-function t144.encode(p94) -- line: 9220
+function t144.encode(p94) -- line: 9469
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n62 = 0
 
-	if p94.social_link_items ~= nil and #p94.social_link_items > 0 then
-		for _, v1266 in p94.social_link_items do
-			local v1267 = v1266:encode()
-			local v1268, v1269 = proto.writeTag(buf, n62, 1, proto.wireTypes.lengthDelimited)
+	if p94.community_id ~= nil and p94.community_id ~= "" then
+		local v1282, v1283 = proto.writeTag(buf, n62, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n62 = proto.writeBuffer(v1268, v1269, v1267, buffer.len(v1267))
-		end
+		buf, n62 = proto.writeString(v1282, v1283, p94.community_id)
 	end
 
 	local buf35 = buffer.create(n62)
@@ -6105,114 +6201,99 @@ function t144.encode(p94) -- line: 9220
 
 	return buf35
 end
-function t144.decode(p95: buffer) -- line: 9237
-	-- upvalues: t144 (copy), proto (copy), t1 (copy)
-	local v1272 = t144.new()
+function t144.decode(p95: buffer) -- line: 9483
+	-- upvalues: t144 (copy), proto (copy)
+	local v1286 = t144.new()
 	local n63 = 0
 
 	while n63 < buffer.len(p95) do
-		local v1274, v1275
+		local v1288, v1289
 
-		v1274, v1275, n63 = proto.readTag(p95, n63)
+		v1288, v1289, n63 = proto.readTag(p95, n63)
 
-		if v1275 == proto.wireTypes.varint then
-			local v1276
+		if v1289 == proto.wireTypes.varint then
+			local v1290
 
-			v1276, n63 = proto.readVarInt(p95, n63)
-		elseif v1275 == proto.wireTypes.lengthDelimited then
-			if v1274 == 1 then
-				local v1277
+			v1290, n63 = proto.readVarInt(p95, n63)
+		elseif v1289 == proto.wireTypes.lengthDelimited then
+			if v1288 == 1 then
+				local v1291
 
-				v1277, n63 = proto.readBuffer(p95, n63)
-				table.insert(v1272.social_link_items, t1.SocialLinkRowInputData_SocialLinkItem.decode(v1277))
+				v1291, n63 = proto.readBuffer(p95, n63)
+				v1286.community_id = buffer.tostring(v1291)
 			else
-				local v1278, v1279 = proto.readVarInt(p95, n63)
+				local v1292, v1293 = proto.readVarInt(p95, n63)
 
-				n63 = v1279 + v1278
+				n63 = v1293 + v1292
 			end
-		elseif v1275 == proto.wireTypes.i32 then
-			local v1280
+		elseif v1289 == proto.wireTypes.i32 then
+			local v1294
 
-			v1280, n63 = proto.readFixed32(p95, n63)
-		elseif v1275 == proto.wireTypes.i64 then
-			local v1281
+			v1294, n63 = proto.readFixed32(p95, n63)
+		elseif v1289 == proto.wireTypes.i64 then
+			local v1295
 
-			v1281, n63 = proto.readFixed64(p95, n63)
+			v1295, n63 = proto.readFixed64(p95, n63)
 		else
-			error("Unsupported wire type: " .. v1275)
+			error("Unsupported wire type: " .. v1289)
 		end
 	end
 
-	return v1272
+	return v1286
 end
-function t144.jsonEncode(p96) -- line: 9280
+function t144.jsonEncode(p96) -- line: 9526
 	local t146 = {}
 
-	if p96.social_link_items ~= nil and #p96.social_link_items > 0 then
-		local t147 = {}
-
-		for _, v1286 in p96.social_link_items do
-			table.insert(t147, v1286:jsonEncode())
-		end
-
-		t146.socialLinkItems = t147
+	if p96.community_id ~= nil and p96.community_id ~= "" then
+		t146.communityId = p96.community_id
 	end
 
 	return t146
 end
-function t144.jsonDecode(t148: {[any]: any}) -- line: 9294
-	-- upvalues: t144 (copy), t1 (copy)
-	local v1288 = t144.new()
+function t144.jsonDecode(t147: {[any]: any}) -- line: 9536
+	-- upvalues: t144 (copy)
+	local v1299 = t144.new()
 
-	if t148.social_link_items ~= nil then
-		local t149 = {}
-
-		for _, v1291 in t148.social_link_items do
-			table.insert(t149, t1.SocialLinkRowInputData_SocialLinkItem.jsonDecode(v1291))
-		end
-
-		v1288.social_link_items = t149
+	if t147.community_id ~= nil then
+		v1299.community_id = t147.community_id
 	end
 
-	if t148.socialLinkItems ~= nil then
-		local t150 = {}
-
-		for _, v1294 in t148.socialLinkItems do
-			table.insert(t150, t1.SocialLinkRowInputData_SocialLinkItem.jsonDecode(v1294))
-		end
-
-		v1288.social_link_items = t150
+	if t147.communityId ~= nil then
+		v1299.community_id = t147.communityId
 	end
 
-	return v1288
+	return v1299
 end
 
 t144.descriptor = {
-	name = "SocialLinkRowInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SocialLinkRowInputData"
+	name = "CommunitySectionInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CommunitySectionInputData"
 }
-t1.SocialLinkRowInputData = t144
-typeRegistry.default:register(t1.SocialLinkRowInputData)
+t1.CommunitySectionInputData = t144
+typeRegistry.default:register(t1.CommunitySectionInputData)
 
-local t151 = {}
+local t148 = {}
 
-t151.__index = t151
+t148.__index = t148
 
-function t151.new(t152: {[any]: any}?) -- line: 9332
-	-- upvalues: t151 (copy)
+function t148.new(t149: {[any]: any}?) -- line: 9564
+	-- upvalues: t148 (copy)
 	return (setmetatable({
-		social_link_id = if t152 ~= nil and t152.social_link_id ~= nil then t152.social_link_id else ""
-	}, t151))
+		social_link_items = if t149 ~= nil and t149.social_link_items ~= nil then t149.social_link_items else {}
+	}, t148))
 end
-function t151.encode(p97) -- line: 9340
+function t148.encode(p97) -- line: 9570
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n64 = 0
 
-	if p97.social_link_id ~= nil and p97.social_link_id ~= "" then
-		local v1299, v1300 = proto.writeTag(buf, n64, 1, proto.wireTypes.lengthDelimited)
+	if p97.social_link_items ~= nil and #p97.social_link_items > 0 then
+		for _, v1305 in p97.social_link_items do
+			local v1306 = v1305:encode()
+			local v1307, v1308 = proto.writeTag(buf, n64, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n64 = proto.writeString(v1299, v1300, p97.social_link_id)
+			buf, n64 = proto.writeBuffer(v1307, v1308, v1306, buffer.len(v1306))
+		end
 	end
 
 	local buf36 = buffer.create(n64)
@@ -6221,183 +6302,114 @@ function t151.encode(p97) -- line: 9340
 
 	return buf36
 end
-function t151.decode(p98: buffer) -- line: 9354
-	-- upvalues: t151 (copy), proto (copy)
-	local v1303 = t151.new()
+function t148.decode(p98: buffer) -- line: 9587
+	-- upvalues: t148 (copy), proto (copy), t1 (copy)
+	local v1311 = t148.new()
 	local n65 = 0
 
 	while n65 < buffer.len(p98) do
-		local v1305, v1306
+		local v1313, v1314
 
-		v1305, v1306, n65 = proto.readTag(p98, n65)
+		v1313, v1314, n65 = proto.readTag(p98, n65)
 
-		if v1306 == proto.wireTypes.varint then
-			local v1307
+		if v1314 == proto.wireTypes.varint then
+			local v1315
 
-			v1307, n65 = proto.readVarInt(p98, n65)
-		elseif v1306 == proto.wireTypes.lengthDelimited then
-			if v1305 == 1 then
-				local v1308
+			v1315, n65 = proto.readVarInt(p98, n65)
+		elseif v1314 == proto.wireTypes.lengthDelimited then
+			if v1313 == 1 then
+				local v1316
 
-				v1308, n65 = proto.readBuffer(p98, n65)
-				v1303.social_link_id = buffer.tostring(v1308)
+				v1316, n65 = proto.readBuffer(p98, n65)
+				table.insert(v1311.social_link_items, t1.SocialLinkRowInputData_SocialLinkItem.decode(v1316))
 			else
-				local v1309, v1310 = proto.readVarInt(p98, n65)
+				local v1317, v1318 = proto.readVarInt(p98, n65)
 
-				n65 = v1310 + v1309
+				n65 = v1318 + v1317
 			end
-		elseif v1306 == proto.wireTypes.i32 then
-			local v1311
+		elseif v1314 == proto.wireTypes.i32 then
+			local v1319
 
-			v1311, n65 = proto.readFixed32(p98, n65)
-		elseif v1306 == proto.wireTypes.i64 then
-			local v1312
+			v1319, n65 = proto.readFixed32(p98, n65)
+		elseif v1314 == proto.wireTypes.i64 then
+			local v1320
 
-			v1312, n65 = proto.readFixed64(p98, n65)
+			v1320, n65 = proto.readFixed64(p98, n65)
 		else
-			error("Unsupported wire type: " .. v1306)
+			error("Unsupported wire type: " .. v1314)
 		end
 	end
 
-	return v1303
+	return v1311
 end
-function t151.jsonEncode(p99) -- line: 9397
-	local t153 = {}
+function t148.jsonEncode(p99) -- line: 9630
+	local t150 = {}
 
-	if p99.social_link_id ~= nil and p99.social_link_id ~= "" then
-		t153.socialLinkId = p99.social_link_id
+	if p99.social_link_items ~= nil and #p99.social_link_items > 0 then
+		local t151 = {}
+
+		for _, v1325 in p99.social_link_items do
+			table.insert(t151, v1325:jsonEncode())
+		end
+
+		t150.socialLinkItems = t151
 	end
 
-	return t153
+	return t150
 end
-function t151.jsonDecode(t154: {[any]: any}) -- line: 9407
-	-- upvalues: t151 (copy)
-	local v1316 = t151.new()
+function t148.jsonDecode(t152: {[any]: any}) -- line: 9644
+	-- upvalues: t148 (copy), t1 (copy)
+	local v1327 = t148.new()
 
-	if t154.social_link_id ~= nil then
-		v1316.social_link_id = t154.social_link_id
+	if t152.social_link_items ~= nil then
+		local t153 = {}
+
+		for _, v1330 in t152.social_link_items do
+			table.insert(t153, t1.SocialLinkRowInputData_SocialLinkItem.jsonDecode(v1330))
+		end
+
+		v1327.social_link_items = t153
 	end
 
-	if t154.socialLinkId ~= nil then
-		v1316.social_link_id = t154.socialLinkId
+	if t152.socialLinkItems ~= nil then
+		local t154 = {}
+
+		for _, v1333 in t152.socialLinkItems do
+			table.insert(t154, t1.SocialLinkRowInputData_SocialLinkItem.jsonDecode(v1333))
+		end
+
+		v1327.social_link_items = t154
 	end
 
-	return v1316
+	return v1327
 end
 
-t151.descriptor = {
-	name = "SocialLinkRowInputData_SocialLinkItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SocialLinkItem"
+t148.descriptor = {
+	name = "SocialLinkRowInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SocialLinkRowInputData"
 }
-t1.SocialLinkRowInputData_SocialLinkItem = t151
-typeRegistry.default:register(t1.SocialLinkRowInputData_SocialLinkItem)
+t1.SocialLinkRowInputData = t148
+typeRegistry.default:register(t1.SocialLinkRowInputData)
 
 local t155 = {}
 
 t155.__index = t155
 
-function t155.new(t156: {[any]: any}?) -- line: 9437
+function t155.new(t156: {[any]: any}?) -- line: 9682
 	-- upvalues: t155 (copy)
 	return (setmetatable({
-		title = if t156 ~= nil and t156.title ~= nil then t156.title else "",
-		universe_items = if t156 ~= nil and t156.universe_items ~= nil then t156.universe_items else {},
-		next_page_token = if t156 ~= nil and t156.next_page_token ~= nil then t156.next_page_token else "",
-		sort_id = if t156 ~= nil and t156.sort_id ~= nil then t156.sort_id else "",
-		secondary_sort_id = if t156 ~= nil and t156.secondary_sort_id ~= nil then t156.secondary_sort_id else 0,
-		max_visible_rows = if t156 ~= nil and t156.max_visible_rows ~= nil then t156.max_visible_rows else 0,
-		subtitle = if t156 ~= nil and t156.subtitle ~= nil then t156.subtitle else "",
-		info_text = if t156 ~= nil and t156.info_text ~= nil then t156.info_text else "",
-		subtitle_link_path = if t156 ~= nil and t156.subtitle_link_path ~= nil then t156.subtitle_link_path else "",
-		is_placeholder = if t156 ~= nil and t156.is_placeholder ~= nil then t156.is_placeholder else nil,
-		primary_sort_id = if t156 ~= nil and t156.primary_sort_id ~= nil then t156.primary_sort_id else nil,
-		applied_filters = if t156 ~= nil and t156.applied_filters ~= nil then t156.applied_filters else nil,
-		pool_id = if t156 ~= nil and t156.pool_id ~= nil then t156.pool_id else nil
+		social_link_id = if t156 ~= nil and t156.social_link_id ~= nil then t156.social_link_id else ""
 	}, t155))
 end
-function t155.encode(p100) -- line: 9457
+function t155.encode(p100) -- line: 9690
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n66 = 0
 
-	if p100.title ~= nil and p100.title ~= "" then
-		local v1321, v1322 = proto.writeTag(buf, n66, 1, proto.wireTypes.lengthDelimited)
+	if p100.social_link_id ~= nil and p100.social_link_id ~= "" then
+		local v1338, v1339 = proto.writeTag(buf, n66, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n66 = proto.writeString(v1321, v1322, p100.title)
-	end
-
-	if p100.universe_items ~= nil and #p100.universe_items > 0 then
-		for _, v1324 in p100.universe_items do
-			local v1325 = v1324:encode()
-			local v1326, v1327 = proto.writeTag(buf, n66, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n66 = proto.writeBuffer(v1326, v1327, v1325, buffer.len(v1325))
-		end
-	end
-
-	if p100.next_page_token ~= nil and p100.next_page_token ~= "" then
-		local v1328, v1329 = proto.writeTag(buf, n66, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1328, v1329, p100.next_page_token)
-	end
-
-	if p100.sort_id ~= nil and p100.sort_id ~= "" then
-		local v1330, v1331 = proto.writeTag(buf, n66, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1330, v1331, p100.sort_id)
-	end
-
-	if p100.secondary_sort_id ~= nil and p100.secondary_sort_id ~= 0 then
-		local v1332, v1333 = proto.writeTag(buf, n66, 5, proto.wireTypes.varint)
-
-		buf, n66 = proto.writeVarInt(v1332, v1333, p100.secondary_sort_id)
-	end
-
-	if p100.max_visible_rows ~= nil and p100.max_visible_rows ~= 0 then
-		local v1334, v1335 = proto.writeTag(buf, n66, 6, proto.wireTypes.varint)
-
-		buf, n66 = proto.writeVarInt(v1334, v1335, p100.max_visible_rows)
-	end
-
-	if p100.subtitle ~= nil and p100.subtitle ~= "" then
-		local v1336, v1337 = proto.writeTag(buf, n66, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1336, v1337, p100.subtitle)
-	end
-
-	if p100.info_text ~= nil and p100.info_text ~= "" then
-		local v1338, v1339 = proto.writeTag(buf, n66, 8, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1338, v1339, p100.info_text)
-	end
-
-	if p100.subtitle_link_path ~= nil and p100.subtitle_link_path ~= "" then
-		local v1340, v1341 = proto.writeTag(buf, n66, 9, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1340, v1341, p100.subtitle_link_path)
-	end
-
-	if p100.is_placeholder ~= nil then
-		local v1342, v1343 = proto.writeTag(buf, n66, 10, proto.wireTypes.varint)
-
-		buf, n66 = proto.writeVarInt(v1342, v1343, not p100.is_placeholder and 0 or 1)
-	end
-
-	if p100.primary_sort_id ~= nil then
-		local v1344, v1345 = proto.writeTag(buf, n66, 11, proto.wireTypes.varint)
-
-		buf, n66 = proto.writeVarInt(v1344, v1345, p100.primary_sort_id)
-	end
-
-	if p100.applied_filters ~= nil then
-		local v1346, v1347 = proto.writeTag(buf, n66, 12, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1346, v1347, p100.applied_filters)
-	end
-
-	if p100.pool_id ~= nil then
-		local v1348, v1349 = proto.writeTag(buf, n66, 13, proto.wireTypes.lengthDelimited)
-
-		buf, n66 = proto.writeString(v1348, v1349, p100.pool_id)
+		buf, n66 = proto.writeString(v1338, v1339, p100.social_link_id)
 	end
 
 	local buf37 = buffer.create(n66)
@@ -6406,389 +6418,183 @@ function t155.encode(p100) -- line: 9457
 
 	return buf37
 end
-function t155.decode(p101: buffer) -- line: 9534
-	-- upvalues: t155 (copy), proto (copy), t1 (copy)
-	local v1352 = t155.new()
+function t155.decode(p101: buffer) -- line: 9704
+	-- upvalues: t155 (copy), proto (copy)
+	local v1342 = t155.new()
 	local n67 = 0
 
 	while n67 < buffer.len(p101) do
-		local v1354, v1355
+		local v1344, v1345
 
-		v1354, v1355, n67 = proto.readTag(p101, n67)
+		v1344, v1345, n67 = proto.readTag(p101, n67)
 
-		if v1355 == proto.wireTypes.varint then
-			if v1354 == 5 then
-				local v1356
+		if v1345 == proto.wireTypes.varint then
+			local v1346
 
-				v1356, n67 = proto.readVarIntI32(p101, n67)
-				v1352.secondary_sort_id = v1356
-			elseif v1354 == 6 then
-				local v1357
+			v1346, n67 = proto.readVarInt(p101, n67)
+		elseif v1345 == proto.wireTypes.lengthDelimited then
+			if v1344 == 1 then
+				local v1347
 
-				v1357, n67 = proto.readVarIntI32(p101, n67)
-				v1352.max_visible_rows = v1357
-			elseif v1354 == 10 then
-				local v1358
-
-				v1358, n67 = proto.readVarInt(p101, n67)
-				v1352.is_placeholder = v1358 ~= 0
-			elseif v1354 == 11 then
-				local v1359
-
-				v1359, n67 = proto.readVarIntI32(p101, n67)
-				v1352.primary_sort_id = v1359
+				v1347, n67 = proto.readBuffer(p101, n67)
+				v1342.social_link_id = buffer.tostring(v1347)
 			else
-				local v1360
+				local v1348, v1349 = proto.readVarInt(p101, n67)
 
-				v1360, n67 = proto.readVarInt(p101, n67)
+				n67 = v1349 + v1348
 			end
-		elseif v1355 == proto.wireTypes.lengthDelimited then
-			if v1354 == 1 then
-				local v1361
+		elseif v1345 == proto.wireTypes.i32 then
+			local v1350
 
-				v1361, n67 = proto.readBuffer(p101, n67)
-				v1352.title = buffer.tostring(v1361)
-			elseif v1354 == 2 then
-				local v1362
+			v1350, n67 = proto.readFixed32(p101, n67)
+		elseif v1345 == proto.wireTypes.i64 then
+			local v1351
 
-				v1362, n67 = proto.readBuffer(p101, n67)
-				table.insert(v1352.universe_items, t1.ExperienceCarouselInputData_UniverseItem.decode(v1362))
-			elseif v1354 == 3 then
-				local v1363
-
-				v1363, n67 = proto.readBuffer(p101, n67)
-				v1352.next_page_token = buffer.tostring(v1363)
-			elseif v1354 == 4 then
-				local v1364
-
-				v1364, n67 = proto.readBuffer(p101, n67)
-				v1352.sort_id = buffer.tostring(v1364)
-			elseif v1354 == 7 then
-				local v1365
-
-				v1365, n67 = proto.readBuffer(p101, n67)
-				v1352.subtitle = buffer.tostring(v1365)
-			elseif v1354 == 8 then
-				local v1366
-
-				v1366, n67 = proto.readBuffer(p101, n67)
-				v1352.info_text = buffer.tostring(v1366)
-			elseif v1354 == 9 then
-				local v1367
-
-				v1367, n67 = proto.readBuffer(p101, n67)
-				v1352.subtitle_link_path = buffer.tostring(v1367)
-			elseif v1354 == 12 then
-				local v1368
-
-				v1368, n67 = proto.readBuffer(p101, n67)
-				v1352.applied_filters = buffer.tostring(v1368)
-			elseif v1354 == 13 then
-				local v1369
-
-				v1369, n67 = proto.readBuffer(p101, n67)
-				v1352.pool_id = buffer.tostring(v1369)
-			else
-				local v1370, v1371 = proto.readVarInt(p101, n67)
-
-				n67 = v1371 + v1370
-			end
-		elseif v1355 == proto.wireTypes.i32 then
-			local v1372
-
-			v1372, n67 = proto.readFixed32(p101, n67)
-		elseif v1355 == proto.wireTypes.i64 then
-			local v1373
-
-			v1373, n67 = proto.readFixed64(p101, n67)
+			v1351, n67 = proto.readFixed64(p101, n67)
 		else
-			error("Unsupported wire type: " .. v1355)
+			error("Unsupported wire type: " .. v1345)
 		end
 	end
 
-	return v1352
+	return v1342
 end
-function t155.jsonEncode(p102) -- line: 9637
+function t155.jsonEncode(p102) -- line: 9747
 	local t157 = {}
 
-	if p102.title ~= nil and p102.title ~= "" then
-		t157.title = p102.title
-	end
-
-	if p102.universe_items ~= nil and #p102.universe_items > 0 then
-		local t158 = {}
-
-		for _, v1378 in p102.universe_items do
-			table.insert(t158, v1378:jsonEncode())
-		end
-
-		t157.universeItems = t158
-	end
-
-	if p102.next_page_token ~= nil and p102.next_page_token ~= "" then
-		t157.nextPageToken = p102.next_page_token
-	end
-
-	if p102.sort_id ~= nil and p102.sort_id ~= "" then
-		t157.sortId = p102.sort_id
-	end
-
-	if p102.secondary_sort_id ~= nil and p102.secondary_sort_id ~= 0 then
-		t157.secondarySortId = p102.secondary_sort_id
-	end
-
-	if p102.max_visible_rows ~= nil and p102.max_visible_rows ~= 0 then
-		t157.maxVisibleRows = p102.max_visible_rows
-	end
-
-	if p102.subtitle ~= nil and p102.subtitle ~= "" then
-		t157.subtitle = p102.subtitle
-	end
-
-	if p102.info_text ~= nil and p102.info_text ~= "" then
-		t157.infoText = p102.info_text
-	end
-
-	if p102.subtitle_link_path ~= nil and p102.subtitle_link_path ~= "" then
-		t157.subtitleLinkPath = p102.subtitle_link_path
-	end
-
-	if p102.is_placeholder ~= nil then
-		t157.isPlaceholder = p102.is_placeholder
-	end
-
-	if p102.primary_sort_id ~= nil then
-		t157.primarySortId = p102.primary_sort_id
-	end
-
-	if p102.applied_filters ~= nil then
-		t157.appliedFilters = p102.applied_filters
-	end
-
-	if p102.pool_id ~= nil then
-		t157.poolId = p102.pool_id
+	if p102.social_link_id ~= nil and p102.social_link_id ~= "" then
+		t157.socialLinkId = p102.social_link_id
 	end
 
 	return t157
 end
-function t155.jsonDecode(t159: {[any]: any}) -- line: 9699
-	-- upvalues: t155 (copy), t1 (copy)
-	local v1380 = t155.new()
+function t155.jsonDecode(t158: {[any]: any}) -- line: 9757
+	-- upvalues: t155 (copy)
+	local v1355 = t155.new()
 
-	if t159.title ~= nil then
-		v1380.title = t159.title
+	if t158.social_link_id ~= nil then
+		v1355.social_link_id = t158.social_link_id
 	end
 
-	if t159.universe_items ~= nil then
-		local t160 = {}
-
-		for _, v1383 in t159.universe_items do
-			table.insert(t160, t1.ExperienceCarouselInputData_UniverseItem.jsonDecode(v1383))
-		end
-
-		v1380.universe_items = t160
+	if t158.socialLinkId ~= nil then
+		v1355.social_link_id = t158.socialLinkId
 	end
 
-	if t159.universeItems ~= nil then
-		local t161 = {}
-
-		for _, v1386 in t159.universeItems do
-			table.insert(t161, t1.ExperienceCarouselInputData_UniverseItem.jsonDecode(v1386))
-		end
-
-		v1380.universe_items = t161
-	end
-
-	if t159.next_page_token ~= nil then
-		v1380.next_page_token = t159.next_page_token
-	end
-
-	if t159.nextPageToken ~= nil then
-		v1380.next_page_token = t159.nextPageToken
-	end
-
-	if t159.sort_id ~= nil then
-		v1380.sort_id = t159.sort_id
-	end
-
-	if t159.sortId ~= nil then
-		v1380.sort_id = t159.sortId
-	end
-
-	if t159.secondary_sort_id ~= nil then
-		v1380.secondary_sort_id = t159.secondary_sort_id
-	end
-
-	if t159.secondarySortId ~= nil then
-		v1380.secondary_sort_id = t159.secondarySortId
-	end
-
-	if t159.max_visible_rows ~= nil then
-		v1380.max_visible_rows = t159.max_visible_rows
-	end
-
-	if t159.maxVisibleRows ~= nil then
-		v1380.max_visible_rows = t159.maxVisibleRows
-	end
-
-	if t159.subtitle ~= nil then
-		v1380.subtitle = t159.subtitle
-	end
-
-	if t159.info_text ~= nil then
-		v1380.info_text = t159.info_text
-	end
-
-	if t159.infoText ~= nil then
-		v1380.info_text = t159.infoText
-	end
-
-	if t159.subtitle_link_path ~= nil then
-		v1380.subtitle_link_path = t159.subtitle_link_path
-	end
-
-	if t159.subtitleLinkPath ~= nil then
-		v1380.subtitle_link_path = t159.subtitleLinkPath
-	end
-
-	if t159.is_placeholder ~= nil then
-		v1380.is_placeholder = t159.is_placeholder
-	end
-
-	if t159.isPlaceholder ~= nil then
-		v1380.is_placeholder = t159.isPlaceholder
-	end
-
-	if t159.primary_sort_id ~= nil then
-		v1380.primary_sort_id = t159.primary_sort_id
-	end
-
-	if t159.primarySortId ~= nil then
-		v1380.primary_sort_id = t159.primarySortId
-	end
-
-	if t159.applied_filters ~= nil then
-		v1380.applied_filters = t159.applied_filters
-	end
-
-	if t159.appliedFilters ~= nil then
-		v1380.applied_filters = t159.appliedFilters
-	end
-
-	if t159.pool_id ~= nil then
-		v1380.pool_id = t159.pool_id
-	end
-
-	if t159.poolId ~= nil then
-		v1380.pool_id = t159.poolId
-	end
-
-	return v1380
+	return v1355
 end
 
 t155.descriptor = {
-	name = "ExperienceCarouselInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceCarouselInputData"
+	name = "SocialLinkRowInputData_SocialLinkItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SocialLinkItem"
 }
-t1.ExperienceCarouselInputData = t155
-typeRegistry.default:register(t1.ExperienceCarouselInputData)
+t1.SocialLinkRowInputData_SocialLinkItem = t155
+typeRegistry.default:register(t1.SocialLinkRowInputData_SocialLinkItem)
 
-local t162 = {}
+local t159 = {}
 
-t162.__index = t162
+t159.__index = t159
 
-function t162.new(t163: {[any]: any}?) -- line: 9825
-	-- upvalues: t162 (copy)
+function t159.new(t160: {[any]: any}?) -- line: 9787
+	-- upvalues: t159 (copy)
 	return (setmetatable({
-		universe_id = if t163 ~= nil and t163.universe_id ~= nil then t163.universe_id else "",
-		is_sponsored = t163 ~= nil and (t163.is_sponsored ~= nil and t163.is_sponsored),
-		roblox_component = if t163 ~= nil and t163.roblox_component ~= nil then t163.roblox_component else "",
-		native_ad_data = if t163 ~= nil and t163.native_ad_data ~= nil then t163.native_ad_data else "",
-		is_content_locked = t163 ~= nil and (t163.is_content_locked ~= nil and t163.is_content_locked),
-		title = if t163 ~= nil and t163.title ~= nil then t163.title else "",
-		subtitle = if t163 ~= nil and t163.subtitle ~= nil then t163.subtitle else "",
-		image_asset_id = if t163 ~= nil and t163.image_asset_id ~= nil then t163.image_asset_id else "",
-		video_asset_id = if t163 ~= nil and t163.video_asset_id ~= nil then t163.video_asset_id else "",
-		badge_text = if t163 ~= nil and t163.badge_text ~= nil then t163.badge_text else "",
-		player_count = if t163 ~= nil and t163.player_count ~= nil then t163.player_count else nil,
-		creator_key = if t163 ~= nil and t163.creator_key ~= nil then t163.creator_key else ""
-	}, t162))
+		title = if t160 ~= nil and t160.title ~= nil then t160.title else "",
+		universe_items = if t160 ~= nil and t160.universe_items ~= nil then t160.universe_items else {},
+		next_page_token = if t160 ~= nil and t160.next_page_token ~= nil then t160.next_page_token else "",
+		sort_id = if t160 ~= nil and t160.sort_id ~= nil then t160.sort_id else "",
+		secondary_sort_id = if t160 ~= nil and t160.secondary_sort_id ~= nil then t160.secondary_sort_id else 0,
+		max_visible_rows = if t160 ~= nil and t160.max_visible_rows ~= nil then t160.max_visible_rows else 0,
+		subtitle = if t160 ~= nil and t160.subtitle ~= nil then t160.subtitle else "",
+		info_text = if t160 ~= nil and t160.info_text ~= nil then t160.info_text else "",
+		subtitle_link_path = if t160 ~= nil and t160.subtitle_link_path ~= nil then t160.subtitle_link_path else "",
+		is_placeholder = if t160 ~= nil and t160.is_placeholder ~= nil then t160.is_placeholder else nil,
+		primary_sort_id = if t160 ~= nil and t160.primary_sort_id ~= nil then t160.primary_sort_id else nil,
+		applied_filters = if t160 ~= nil and t160.applied_filters ~= nil then t160.applied_filters else nil,
+		pool_id = if t160 ~= nil and t160.pool_id ~= nil then t160.pool_id else nil
+	}, t159))
 end
-function t162.encode(p103) -- line: 9844
+function t159.encode(p103) -- line: 9807
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n68 = 0
 
-	if p103.universe_id ~= nil and p103.universe_id ~= "" then
-		local v1391, v1392 = proto.writeTag(buf, n68, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n68 = proto.writeString(v1391, v1392, p103.universe_id)
-	end
-
-	if p103.is_sponsored then
-		local v1393, v1394 = proto.writeTag(buf, n68, 2, proto.wireTypes.varint)
-
-		buf, n68 = proto.writeVarInt(v1393, v1394, not p103.is_sponsored and 0 or 1)
-	end
-
-	if p103.roblox_component ~= nil and p103.roblox_component ~= "" then
-		local v1395, v1396 = proto.writeTag(buf, n68, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n68 = proto.writeString(v1395, v1396, p103.roblox_component)
-	end
-
-	if p103.native_ad_data ~= nil and p103.native_ad_data ~= "" then
-		local v1397, v1398 = proto.writeTag(buf, n68, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n68 = proto.writeString(v1397, v1398, p103.native_ad_data)
-	end
-
-	if p103.is_content_locked then
-		local v1399, v1400 = proto.writeTag(buf, n68, 5, proto.wireTypes.varint)
-
-		buf, n68 = proto.writeVarInt(v1399, v1400, not p103.is_content_locked and 0 or 1)
-	end
-
 	if p103.title ~= nil and p103.title ~= "" then
-		local v1401, v1402 = proto.writeTag(buf, n68, 6, proto.wireTypes.lengthDelimited)
+		local v1360, v1361 = proto.writeTag(buf, n68, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n68 = proto.writeString(v1401, v1402, p103.title)
+		buf, n68 = proto.writeString(v1360, v1361, p103.title)
+	end
+
+	if p103.universe_items ~= nil and #p103.universe_items > 0 then
+		for _, v1363 in p103.universe_items do
+			local v1364 = v1363:encode()
+			local v1365, v1366 = proto.writeTag(buf, n68, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n68 = proto.writeBuffer(v1365, v1366, v1364, buffer.len(v1364))
+		end
+	end
+
+	if p103.next_page_token ~= nil and p103.next_page_token ~= "" then
+		local v1367, v1368 = proto.writeTag(buf, n68, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n68 = proto.writeString(v1367, v1368, p103.next_page_token)
+	end
+
+	if p103.sort_id ~= nil and p103.sort_id ~= "" then
+		local v1369, v1370 = proto.writeTag(buf, n68, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n68 = proto.writeString(v1369, v1370, p103.sort_id)
+	end
+
+	if p103.secondary_sort_id ~= nil and p103.secondary_sort_id ~= 0 then
+		local v1371, v1372 = proto.writeTag(buf, n68, 5, proto.wireTypes.varint)
+
+		buf, n68 = proto.writeVarInt(v1371, v1372, p103.secondary_sort_id)
+	end
+
+	if p103.max_visible_rows ~= nil and p103.max_visible_rows ~= 0 then
+		local v1373, v1374 = proto.writeTag(buf, n68, 6, proto.wireTypes.varint)
+
+		buf, n68 = proto.writeVarInt(v1373, v1374, p103.max_visible_rows)
 	end
 
 	if p103.subtitle ~= nil and p103.subtitle ~= "" then
-		local v1403, v1404 = proto.writeTag(buf, n68, 7, proto.wireTypes.lengthDelimited)
+		local v1375, v1376 = proto.writeTag(buf, n68, 7, proto.wireTypes.lengthDelimited)
 
-		buf, n68 = proto.writeString(v1403, v1404, p103.subtitle)
+		buf, n68 = proto.writeString(v1375, v1376, p103.subtitle)
 	end
 
-	if p103.image_asset_id ~= nil and p103.image_asset_id ~= "" then
-		local v1405, v1406 = proto.writeTag(buf, n68, 8, proto.wireTypes.lengthDelimited)
+	if p103.info_text ~= nil and p103.info_text ~= "" then
+		local v1377, v1378 = proto.writeTag(buf, n68, 8, proto.wireTypes.lengthDelimited)
 
-		buf, n68 = proto.writeString(v1405, v1406, p103.image_asset_id)
+		buf, n68 = proto.writeString(v1377, v1378, p103.info_text)
 	end
 
-	if p103.video_asset_id ~= nil and p103.video_asset_id ~= "" then
-		local v1407, v1408 = proto.writeTag(buf, n68, 9, proto.wireTypes.lengthDelimited)
+	if p103.subtitle_link_path ~= nil and p103.subtitle_link_path ~= "" then
+		local v1379, v1380 = proto.writeTag(buf, n68, 9, proto.wireTypes.lengthDelimited)
 
-		buf, n68 = proto.writeString(v1407, v1408, p103.video_asset_id)
+		buf, n68 = proto.writeString(v1379, v1380, p103.subtitle_link_path)
 	end
 
-	if p103.badge_text ~= nil and p103.badge_text ~= "" then
-		local v1409, v1410 = proto.writeTag(buf, n68, 10, proto.wireTypes.lengthDelimited)
+	if p103.is_placeholder ~= nil then
+		local v1381, v1382 = proto.writeTag(buf, n68, 10, proto.wireTypes.varint)
 
-		buf, n68 = proto.writeString(v1409, v1410, p103.badge_text)
+		buf, n68 = proto.writeVarInt(v1381, v1382, not p103.is_placeholder and 0 or 1)
 	end
 
-	if p103.player_count ~= nil then
-		local v1411, v1412 = proto.writeTag(buf, n68, 11, proto.wireTypes.varint)
+	if p103.primary_sort_id ~= nil then
+		local v1383, v1384 = proto.writeTag(buf, n68, 11, proto.wireTypes.varint)
 
-		buf, n68 = proto.writeVarInt(v1411, v1412, p103.player_count)
+		buf, n68 = proto.writeVarInt(v1383, v1384, p103.primary_sort_id)
 	end
 
-	if p103.creator_key ~= nil and p103.creator_key ~= "" then
-		local v1413, v1414 = proto.writeTag(buf, n68, 12, proto.wireTypes.lengthDelimited)
+	if p103.applied_filters ~= nil then
+		local v1385, v1386 = proto.writeTag(buf, n68, 12, proto.wireTypes.lengthDelimited)
 
-		buf, n68 = proto.writeString(v1413, v1414, p103.creator_key)
+		buf, n68 = proto.writeString(v1385, v1386, p103.applied_filters)
+	end
+
+	if p103.pool_id ~= nil then
+		local v1387, v1388 = proto.writeTag(buf, n68, 13, proto.wireTypes.lengthDelimited)
+
+		buf, n68 = proto.writeString(v1387, v1388, p103.pool_id)
 	end
 
 	local buf38 = buffer.create(n68)
@@ -6797,350 +6603,389 @@ function t162.encode(p103) -- line: 9844
 
 	return buf38
 end
-function t162.decode(p104: buffer) -- line: 9915
-	-- upvalues: t162 (copy), proto (copy)
-	local v1417 = t162.new()
+function t159.decode(p104: buffer) -- line: 9884
+	-- upvalues: t159 (copy), proto (copy), t1 (copy)
+	local v1391 = t159.new()
 	local n69 = 0
 
 	while n69 < buffer.len(p104) do
-		local v1419, v1420
+		local v1393, v1394
 
-		v1419, v1420, n69 = proto.readTag(p104, n69)
+		v1393, v1394, n69 = proto.readTag(p104, n69)
 
-		if v1420 == proto.wireTypes.varint then
-			if v1419 == 2 then
-				local v1421
+		if v1394 == proto.wireTypes.varint then
+			if v1393 == 5 then
+				local v1395
 
-				v1421, n69 = proto.readVarInt(p104, n69)
-				v1417.is_sponsored = v1421 ~= 0
-			elseif v1419 == 5 then
-				local v1422
+				v1395, n69 = proto.readVarIntI32(p104, n69)
+				v1391.secondary_sort_id = v1395
+			elseif v1393 == 6 then
+				local v1396
 
-				v1422, n69 = proto.readVarInt(p104, n69)
-				v1417.is_content_locked = v1422 ~= 0
-			elseif v1419 == 11 then
-				local v1423
+				v1396, n69 = proto.readVarIntI32(p104, n69)
+				v1391.max_visible_rows = v1396
+			elseif v1393 == 10 then
+				local v1397
 
-				v1423, n69 = proto.readVarIntI64(p104, n69)
-				v1417.player_count = v1423
+				v1397, n69 = proto.readVarInt(p104, n69)
+				v1391.is_placeholder = v1397 ~= 0
+			elseif v1393 == 11 then
+				local v1398
+
+				v1398, n69 = proto.readVarIntI32(p104, n69)
+				v1391.primary_sort_id = v1398
 			else
-				local v1424
+				local v1399
 
-				v1424, n69 = proto.readVarInt(p104, n69)
+				v1399, n69 = proto.readVarInt(p104, n69)
 			end
-		elseif v1420 == proto.wireTypes.lengthDelimited then
-			if v1419 == 1 then
-				local v1425
+		elseif v1394 == proto.wireTypes.lengthDelimited then
+			if v1393 == 1 then
+				local v1400
 
-				v1425, n69 = proto.readBuffer(p104, n69)
-				v1417.universe_id = buffer.tostring(v1425)
-			elseif v1419 == 3 then
-				local v1426
+				v1400, n69 = proto.readBuffer(p104, n69)
+				v1391.title = buffer.tostring(v1400)
+			elseif v1393 == 2 then
+				local v1401
 
-				v1426, n69 = proto.readBuffer(p104, n69)
-				v1417.roblox_component = buffer.tostring(v1426)
-			elseif v1419 == 4 then
-				local v1427
+				v1401, n69 = proto.readBuffer(p104, n69)
+				table.insert(v1391.universe_items, t1.ExperienceCarouselInputData_UniverseItem.decode(v1401))
+			elseif v1393 == 3 then
+				local v1402
 
-				v1427, n69 = proto.readBuffer(p104, n69)
-				v1417.native_ad_data = buffer.tostring(v1427)
-			elseif v1419 == 6 then
-				local v1428
+				v1402, n69 = proto.readBuffer(p104, n69)
+				v1391.next_page_token = buffer.tostring(v1402)
+			elseif v1393 == 4 then
+				local v1403
 
-				v1428, n69 = proto.readBuffer(p104, n69)
-				v1417.title = buffer.tostring(v1428)
-			elseif v1419 == 7 then
-				local v1429
+				v1403, n69 = proto.readBuffer(p104, n69)
+				v1391.sort_id = buffer.tostring(v1403)
+			elseif v1393 == 7 then
+				local v1404
 
-				v1429, n69 = proto.readBuffer(p104, n69)
-				v1417.subtitle = buffer.tostring(v1429)
-			elseif v1419 == 8 then
-				local v1430
+				v1404, n69 = proto.readBuffer(p104, n69)
+				v1391.subtitle = buffer.tostring(v1404)
+			elseif v1393 == 8 then
+				local v1405
 
-				v1430, n69 = proto.readBuffer(p104, n69)
-				v1417.image_asset_id = buffer.tostring(v1430)
-			elseif v1419 == 9 then
-				local v1431
+				v1405, n69 = proto.readBuffer(p104, n69)
+				v1391.info_text = buffer.tostring(v1405)
+			elseif v1393 == 9 then
+				local v1406
 
-				v1431, n69 = proto.readBuffer(p104, n69)
-				v1417.video_asset_id = buffer.tostring(v1431)
-			elseif v1419 == 10 then
-				local v1432
+				v1406, n69 = proto.readBuffer(p104, n69)
+				v1391.subtitle_link_path = buffer.tostring(v1406)
+			elseif v1393 == 12 then
+				local v1407
 
-				v1432, n69 = proto.readBuffer(p104, n69)
-				v1417.badge_text = buffer.tostring(v1432)
-			elseif v1419 == 12 then
-				local v1433
+				v1407, n69 = proto.readBuffer(p104, n69)
+				v1391.applied_filters = buffer.tostring(v1407)
+			elseif v1393 == 13 then
+				local v1408
 
-				v1433, n69 = proto.readBuffer(p104, n69)
-				v1417.creator_key = buffer.tostring(v1433)
+				v1408, n69 = proto.readBuffer(p104, n69)
+				v1391.pool_id = buffer.tostring(v1408)
 			else
-				local v1434, v1435 = proto.readVarInt(p104, n69)
+				local v1409, v1410 = proto.readVarInt(p104, n69)
 
-				n69 = v1435 + v1434
+				n69 = v1410 + v1409
 			end
-		elseif v1420 == proto.wireTypes.i32 then
-			local v1436
+		elseif v1394 == proto.wireTypes.i32 then
+			local v1411
 
-			v1436, n69 = proto.readFixed32(p104, n69)
-		elseif v1420 == proto.wireTypes.i64 then
-			local v1437
+			v1411, n69 = proto.readFixed32(p104, n69)
+		elseif v1394 == proto.wireTypes.i64 then
+			local v1412
 
-			v1437, n69 = proto.readFixed64(p104, n69)
+			v1412, n69 = proto.readFixed64(p104, n69)
 		else
-			error("Unsupported wire type: " .. v1420)
+			error("Unsupported wire type: " .. v1394)
 		end
 	end
 
-	return v1417
+	return v1391
 end
-function t162.jsonEncode(p105) -- line: 10015
-	local t164 = {}
-
-	if p105.universe_id ~= nil and p105.universe_id ~= "" then
-		t164.universeId = p105.universe_id
-	end
-
-	if p105.is_sponsored then
-		t164.isSponsored = p105.is_sponsored
-	end
-
-	if p105.roblox_component ~= nil and p105.roblox_component ~= "" then
-		t164.robloxComponent = p105.roblox_component
-	end
-
-	if p105.native_ad_data ~= nil and p105.native_ad_data ~= "" then
-		t164.nativeAdData = p105.native_ad_data
-	end
-
-	if p105.is_content_locked then
-		t164.isContentLocked = p105.is_content_locked
-	end
+function t159.jsonEncode(p105) -- line: 9987
+	local t161 = {}
 
 	if p105.title ~= nil and p105.title ~= "" then
-		t164.title = p105.title
+		t161.title = p105.title
+	end
+
+	if p105.universe_items ~= nil and #p105.universe_items > 0 then
+		local t162 = {}
+
+		for _, v1417 in p105.universe_items do
+			table.insert(t162, v1417:jsonEncode())
+		end
+
+		t161.universeItems = t162
+	end
+
+	if p105.next_page_token ~= nil and p105.next_page_token ~= "" then
+		t161.nextPageToken = p105.next_page_token
+	end
+
+	if p105.sort_id ~= nil and p105.sort_id ~= "" then
+		t161.sortId = p105.sort_id
+	end
+
+	if p105.secondary_sort_id ~= nil and p105.secondary_sort_id ~= 0 then
+		t161.secondarySortId = p105.secondary_sort_id
+	end
+
+	if p105.max_visible_rows ~= nil and p105.max_visible_rows ~= 0 then
+		t161.maxVisibleRows = p105.max_visible_rows
 	end
 
 	if p105.subtitle ~= nil and p105.subtitle ~= "" then
-		t164.subtitle = p105.subtitle
+		t161.subtitle = p105.subtitle
 	end
 
-	if p105.image_asset_id ~= nil and p105.image_asset_id ~= "" then
-		t164.imageAssetId = p105.image_asset_id
+	if p105.info_text ~= nil and p105.info_text ~= "" then
+		t161.infoText = p105.info_text
 	end
 
-	if p105.video_asset_id ~= nil and p105.video_asset_id ~= "" then
-		t164.videoAssetId = p105.video_asset_id
+	if p105.subtitle_link_path ~= nil and p105.subtitle_link_path ~= "" then
+		t161.subtitleLinkPath = p105.subtitle_link_path
 	end
 
-	if p105.badge_text ~= nil and p105.badge_text ~= "" then
-		t164.badgeText = p105.badge_text
+	if p105.is_placeholder ~= nil then
+		t161.isPlaceholder = p105.is_placeholder
 	end
 
-	if p105.player_count ~= nil then
-		t164.playerCount = p105.player_count
+	if p105.primary_sort_id ~= nil then
+		t161.primarySortId = p105.primary_sort_id
 	end
 
-	if p105.creator_key ~= nil and p105.creator_key ~= "" then
-		t164.creatorKey = p105.creator_key
+	if p105.applied_filters ~= nil then
+		t161.appliedFilters = p105.applied_filters
 	end
 
-	return t164
+	if p105.pool_id ~= nil then
+		t161.poolId = p105.pool_id
+	end
+
+	return t161
 end
-function t162.jsonDecode(t165: {[any]: any}) -- line: 10071
-	-- upvalues: t162 (copy)
-	local v1441 = t162.new()
+function t159.jsonDecode(t163: {[any]: any}) -- line: 10049
+	-- upvalues: t159 (copy), t1 (copy)
+	local v1419 = t159.new()
 
-	if t165.universe_id ~= nil then
-		v1441.universe_id = t165.universe_id
+	if t163.title ~= nil then
+		v1419.title = t163.title
 	end
 
-	if t165.universeId ~= nil then
-		v1441.universe_id = t165.universeId
+	if t163.universe_items ~= nil then
+		local t164 = {}
+
+		for _, v1422 in t163.universe_items do
+			table.insert(t164, t1.ExperienceCarouselInputData_UniverseItem.jsonDecode(v1422))
+		end
+
+		v1419.universe_items = t164
 	end
 
-	if t165.is_sponsored ~= nil then
-		v1441.is_sponsored = t165.is_sponsored
+	if t163.universeItems ~= nil then
+		local t165 = {}
+
+		for _, v1425 in t163.universeItems do
+			table.insert(t165, t1.ExperienceCarouselInputData_UniverseItem.jsonDecode(v1425))
+		end
+
+		v1419.universe_items = t165
 	end
 
-	if t165.isSponsored ~= nil then
-		v1441.is_sponsored = t165.isSponsored
+	if t163.next_page_token ~= nil then
+		v1419.next_page_token = t163.next_page_token
 	end
 
-	if t165.roblox_component ~= nil then
-		v1441.roblox_component = t165.roblox_component
+	if t163.nextPageToken ~= nil then
+		v1419.next_page_token = t163.nextPageToken
 	end
 
-	if t165.robloxComponent ~= nil then
-		v1441.roblox_component = t165.robloxComponent
+	if t163.sort_id ~= nil then
+		v1419.sort_id = t163.sort_id
 	end
 
-	if t165.native_ad_data ~= nil then
-		v1441.native_ad_data = t165.native_ad_data
+	if t163.sortId ~= nil then
+		v1419.sort_id = t163.sortId
 	end
 
-	if t165.nativeAdData ~= nil then
-		v1441.native_ad_data = t165.nativeAdData
+	if t163.secondary_sort_id ~= nil then
+		v1419.secondary_sort_id = t163.secondary_sort_id
 	end
 
-	if t165.is_content_locked ~= nil then
-		v1441.is_content_locked = t165.is_content_locked
+	if t163.secondarySortId ~= nil then
+		v1419.secondary_sort_id = t163.secondarySortId
 	end
 
-	if t165.isContentLocked ~= nil then
-		v1441.is_content_locked = t165.isContentLocked
+	if t163.max_visible_rows ~= nil then
+		v1419.max_visible_rows = t163.max_visible_rows
 	end
 
-	if t165.title ~= nil then
-		v1441.title = t165.title
+	if t163.maxVisibleRows ~= nil then
+		v1419.max_visible_rows = t163.maxVisibleRows
 	end
 
-	if t165.subtitle ~= nil then
-		v1441.subtitle = t165.subtitle
+	if t163.subtitle ~= nil then
+		v1419.subtitle = t163.subtitle
 	end
 
-	if t165.image_asset_id ~= nil then
-		v1441.image_asset_id = t165.image_asset_id
+	if t163.info_text ~= nil then
+		v1419.info_text = t163.info_text
 	end
 
-	if t165.imageAssetId ~= nil then
-		v1441.image_asset_id = t165.imageAssetId
+	if t163.infoText ~= nil then
+		v1419.info_text = t163.infoText
 	end
 
-	if t165.video_asset_id ~= nil then
-		v1441.video_asset_id = t165.video_asset_id
+	if t163.subtitle_link_path ~= nil then
+		v1419.subtitle_link_path = t163.subtitle_link_path
 	end
 
-	if t165.videoAssetId ~= nil then
-		v1441.video_asset_id = t165.videoAssetId
+	if t163.subtitleLinkPath ~= nil then
+		v1419.subtitle_link_path = t163.subtitleLinkPath
 	end
 
-	if t165.badge_text ~= nil then
-		v1441.badge_text = t165.badge_text
+	if t163.is_placeholder ~= nil then
+		v1419.is_placeholder = t163.is_placeholder
 	end
 
-	if t165.badgeText ~= nil then
-		v1441.badge_text = t165.badgeText
+	if t163.isPlaceholder ~= nil then
+		v1419.is_placeholder = t163.isPlaceholder
 	end
 
-	if t165.player_count ~= nil then
-		v1441.player_count = t165.player_count
+	if t163.primary_sort_id ~= nil then
+		v1419.primary_sort_id = t163.primary_sort_id
 	end
 
-	if t165.playerCount ~= nil then
-		v1441.player_count = t165.playerCount
+	if t163.primarySortId ~= nil then
+		v1419.primary_sort_id = t163.primarySortId
 	end
 
-	if t165.creator_key ~= nil then
-		v1441.creator_key = t165.creator_key
+	if t163.applied_filters ~= nil then
+		v1419.applied_filters = t163.applied_filters
 	end
 
-	if t165.creatorKey ~= nil then
-		v1441.creator_key = t165.creatorKey
+	if t163.appliedFilters ~= nil then
+		v1419.applied_filters = t163.appliedFilters
 	end
 
-	return v1441
+	if t163.pool_id ~= nil then
+		v1419.pool_id = t163.pool_id
+	end
+
+	if t163.poolId ~= nil then
+		v1419.pool_id = t163.poolId
+	end
+
+	return v1419
 end
 
-t162.descriptor = {
-	name = "ExperienceCarouselInputData_UniverseItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseItem"
+t159.descriptor = {
+	name = "ExperienceCarouselInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceCarouselInputData"
 }
-t1.ExperienceCarouselInputData_UniverseItem = t162
-typeRegistry.default:register(t1.ExperienceCarouselInputData_UniverseItem)
+t1.ExperienceCarouselInputData = t159
+typeRegistry.default:register(t1.ExperienceCarouselInputData)
 
 local t166 = {}
 
 t166.__index = t166
 
-function t166.new(t167: {[any]: any}?) -- line: 10181
+function t166.new(t167: {[any]: any}?) -- line: 10175
 	-- upvalues: t166 (copy)
 	return (setmetatable({
+		universe_id = if t167 ~= nil and t167.universe_id ~= nil then t167.universe_id else "",
+		is_sponsored = t167 ~= nil and (t167.is_sponsored ~= nil and t167.is_sponsored),
+		roblox_component = if t167 ~= nil and t167.roblox_component ~= nil then t167.roblox_component else "",
+		native_ad_data = if t167 ~= nil and t167.native_ad_data ~= nil then t167.native_ad_data else "",
+		is_content_locked = t167 ~= nil and (t167.is_content_locked ~= nil and t167.is_content_locked),
 		title = if t167 ~= nil and t167.title ~= nil then t167.title else "",
-		song_items = if t167 ~= nil and t167.song_items ~= nil then t167.song_items else {},
-		next_page_token = if t167 ~= nil and t167.next_page_token ~= nil then t167.next_page_token else "",
-		sort_id = if t167 ~= nil and t167.sort_id ~= nil then t167.sort_id else "",
-		secondary_sort_id = if t167 ~= nil and t167.secondary_sort_id ~= nil then t167.secondary_sort_id else 0,
 		subtitle = if t167 ~= nil and t167.subtitle ~= nil then t167.subtitle else "",
-		info_text = if t167 ~= nil and t167.info_text ~= nil then t167.info_text else "",
-		subtitle_link_path = if t167 ~= nil and t167.subtitle_link_path ~= nil then t167.subtitle_link_path else "",
-		is_placeholder = if t167 ~= nil and t167.is_placeholder ~= nil then t167.is_placeholder else nil,
-		primary_sort_id = if t167 ~= nil and t167.primary_sort_id ~= nil then t167.primary_sort_id else nil,
-		applied_filters = if t167 ~= nil and t167.applied_filters ~= nil then t167.applied_filters else nil
+		image_asset_id = if t167 ~= nil and t167.image_asset_id ~= nil then t167.image_asset_id else "",
+		video_asset_id = if t167 ~= nil and t167.video_asset_id ~= nil then t167.video_asset_id else "",
+		badge_text = if t167 ~= nil and t167.badge_text ~= nil then t167.badge_text else "",
+		player_count = if t167 ~= nil and t167.player_count ~= nil then t167.player_count else nil,
+		creator_key = if t167 ~= nil and t167.creator_key ~= nil then t167.creator_key else ""
 	}, t166))
 end
-function t166.encode(p106) -- line: 10197
+function t166.encode(p106) -- line: 10194
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n70 = 0
 
+	if p106.universe_id ~= nil and p106.universe_id ~= "" then
+		local v1430, v1431 = proto.writeTag(buf, n70, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n70 = proto.writeString(v1430, v1431, p106.universe_id)
+	end
+
+	if p106.is_sponsored then
+		local v1432, v1433 = proto.writeTag(buf, n70, 2, proto.wireTypes.varint)
+
+		buf, n70 = proto.writeVarInt(v1432, v1433, not p106.is_sponsored and 0 or 1)
+	end
+
+	if p106.roblox_component ~= nil and p106.roblox_component ~= "" then
+		local v1434, v1435 = proto.writeTag(buf, n70, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n70 = proto.writeString(v1434, v1435, p106.roblox_component)
+	end
+
+	if p106.native_ad_data ~= nil and p106.native_ad_data ~= "" then
+		local v1436, v1437 = proto.writeTag(buf, n70, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n70 = proto.writeString(v1436, v1437, p106.native_ad_data)
+	end
+
+	if p106.is_content_locked then
+		local v1438, v1439 = proto.writeTag(buf, n70, 5, proto.wireTypes.varint)
+
+		buf, n70 = proto.writeVarInt(v1438, v1439, not p106.is_content_locked and 0 or 1)
+	end
+
 	if p106.title ~= nil and p106.title ~= "" then
-		local v1446, v1447 = proto.writeTag(buf, n70, 1, proto.wireTypes.lengthDelimited)
+		local v1440, v1441 = proto.writeTag(buf, n70, 6, proto.wireTypes.lengthDelimited)
 
-		buf, n70 = proto.writeString(v1446, v1447, p106.title)
-	end
-
-	if p106.song_items ~= nil and #p106.song_items > 0 then
-		for _, v1449 in p106.song_items do
-			local v1450 = v1449:encode()
-			local v1451, v1452 = proto.writeTag(buf, n70, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n70 = proto.writeBuffer(v1451, v1452, v1450, buffer.len(v1450))
-		end
-	end
-
-	if p106.next_page_token ~= nil and p106.next_page_token ~= "" then
-		local v1453, v1454 = proto.writeTag(buf, n70, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n70 = proto.writeString(v1453, v1454, p106.next_page_token)
-	end
-
-	if p106.sort_id ~= nil and p106.sort_id ~= "" then
-		local v1455, v1456 = proto.writeTag(buf, n70, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n70 = proto.writeString(v1455, v1456, p106.sort_id)
-	end
-
-	if p106.secondary_sort_id ~= nil and p106.secondary_sort_id ~= 0 then
-		local v1457, v1458 = proto.writeTag(buf, n70, 5, proto.wireTypes.varint)
-
-		buf, n70 = proto.writeVarInt(v1457, v1458, p106.secondary_sort_id)
+		buf, n70 = proto.writeString(v1440, v1441, p106.title)
 	end
 
 	if p106.subtitle ~= nil and p106.subtitle ~= "" then
-		local v1459, v1460 = proto.writeTag(buf, n70, 6, proto.wireTypes.lengthDelimited)
+		local v1442, v1443 = proto.writeTag(buf, n70, 7, proto.wireTypes.lengthDelimited)
 
-		buf, n70 = proto.writeString(v1459, v1460, p106.subtitle)
+		buf, n70 = proto.writeString(v1442, v1443, p106.subtitle)
 	end
 
-	if p106.info_text ~= nil and p106.info_text ~= "" then
-		local v1461, v1462 = proto.writeTag(buf, n70, 7, proto.wireTypes.lengthDelimited)
+	if p106.image_asset_id ~= nil and p106.image_asset_id ~= "" then
+		local v1444, v1445 = proto.writeTag(buf, n70, 8, proto.wireTypes.lengthDelimited)
 
-		buf, n70 = proto.writeString(v1461, v1462, p106.info_text)
+		buf, n70 = proto.writeString(v1444, v1445, p106.image_asset_id)
 	end
 
-	if p106.subtitle_link_path ~= nil and p106.subtitle_link_path ~= "" then
-		local v1463, v1464 = proto.writeTag(buf, n70, 8, proto.wireTypes.lengthDelimited)
+	if p106.video_asset_id ~= nil and p106.video_asset_id ~= "" then
+		local v1446, v1447 = proto.writeTag(buf, n70, 9, proto.wireTypes.lengthDelimited)
 
-		buf, n70 = proto.writeString(v1463, v1464, p106.subtitle_link_path)
+		buf, n70 = proto.writeString(v1446, v1447, p106.video_asset_id)
 	end
 
-	if p106.is_placeholder ~= nil then
-		local v1465, v1466 = proto.writeTag(buf, n70, 9, proto.wireTypes.varint)
+	if p106.badge_text ~= nil and p106.badge_text ~= "" then
+		local v1448, v1449 = proto.writeTag(buf, n70, 10, proto.wireTypes.lengthDelimited)
 
-		buf, n70 = proto.writeVarInt(v1465, v1466, not p106.is_placeholder and 0 or 1)
+		buf, n70 = proto.writeString(v1448, v1449, p106.badge_text)
 	end
 
-	if p106.primary_sort_id ~= nil then
-		local v1467, v1468 = proto.writeTag(buf, n70, 10, proto.wireTypes.varint)
+	if p106.player_count ~= nil then
+		local v1450, v1451 = proto.writeTag(buf, n70, 11, proto.wireTypes.varint)
 
-		buf, n70 = proto.writeVarInt(v1467, v1468, p106.primary_sort_id)
+		buf, n70 = proto.writeVarInt(v1450, v1451, p106.player_count)
 	end
 
-	if p106.applied_filters ~= nil then
-		local v1469, v1470 = proto.writeTag(buf, n70, 11, proto.wireTypes.lengthDelimited)
+	if p106.creator_key ~= nil and p106.creator_key ~= "" then
+		local v1452, v1453 = proto.writeTag(buf, n70, 12, proto.wireTypes.lengthDelimited)
 
-		buf, n70 = proto.writeString(v1469, v1470, p106.applied_filters)
+		buf, n70 = proto.writeString(v1452, v1453, p106.creator_key)
 	end
 
 	local buf39 = buffer.create(n70)
@@ -7149,278 +6994,350 @@ function t166.encode(p106) -- line: 10197
 
 	return buf39
 end
-function t166.decode(p107: buffer) -- line: 10264
-	-- upvalues: t166 (copy), proto (copy), t1 (copy)
-	local v1473 = t166.new()
+function t166.decode(p107: buffer) -- line: 10265
+	-- upvalues: t166 (copy), proto (copy)
+	local v1456 = t166.new()
 	local n71 = 0
 
 	while n71 < buffer.len(p107) do
-		local v1475, v1476
+		local v1458, v1459
 
-		v1475, v1476, n71 = proto.readTag(p107, n71)
+		v1458, v1459, n71 = proto.readTag(p107, n71)
 
-		if v1476 == proto.wireTypes.varint then
-			if v1475 == 5 then
-				local v1477
+		if v1459 == proto.wireTypes.varint then
+			if v1458 == 2 then
+				local v1460
 
-				v1477, n71 = proto.readVarIntI32(p107, n71)
-				v1473.secondary_sort_id = v1477
-			elseif v1475 == 9 then
-				local v1478
+				v1460, n71 = proto.readVarInt(p107, n71)
+				v1456.is_sponsored = v1460 ~= 0
+			elseif v1458 == 5 then
+				local v1461
 
-				v1478, n71 = proto.readVarInt(p107, n71)
-				v1473.is_placeholder = v1478 ~= 0
-			elseif v1475 == 10 then
-				local v1479
+				v1461, n71 = proto.readVarInt(p107, n71)
+				v1456.is_content_locked = v1461 ~= 0
+			elseif v1458 == 11 then
+				local v1462
 
-				v1479, n71 = proto.readVarIntI32(p107, n71)
-				v1473.primary_sort_id = v1479
+				v1462, n71 = proto.readVarIntI64(p107, n71)
+				v1456.player_count = v1462
 			else
-				local v1480
+				local v1463
 
-				v1480, n71 = proto.readVarInt(p107, n71)
+				v1463, n71 = proto.readVarInt(p107, n71)
 			end
-		elseif v1476 == proto.wireTypes.lengthDelimited then
-			if v1475 == 1 then
-				local v1481
+		elseif v1459 == proto.wireTypes.lengthDelimited then
+			if v1458 == 1 then
+				local v1464
 
-				v1481, n71 = proto.readBuffer(p107, n71)
-				v1473.title = buffer.tostring(v1481)
-			elseif v1475 == 2 then
-				local v1482
+				v1464, n71 = proto.readBuffer(p107, n71)
+				v1456.universe_id = buffer.tostring(v1464)
+			elseif v1458 == 3 then
+				local v1465
 
-				v1482, n71 = proto.readBuffer(p107, n71)
-				table.insert(v1473.song_items, t1.SongCarouselInputData_SongItem.decode(v1482))
-			elseif v1475 == 3 then
-				local v1483
+				v1465, n71 = proto.readBuffer(p107, n71)
+				v1456.roblox_component = buffer.tostring(v1465)
+			elseif v1458 == 4 then
+				local v1466
 
-				v1483, n71 = proto.readBuffer(p107, n71)
-				v1473.next_page_token = buffer.tostring(v1483)
-			elseif v1475 == 4 then
-				local v1484
+				v1466, n71 = proto.readBuffer(p107, n71)
+				v1456.native_ad_data = buffer.tostring(v1466)
+			elseif v1458 == 6 then
+				local v1467
 
-				v1484, n71 = proto.readBuffer(p107, n71)
-				v1473.sort_id = buffer.tostring(v1484)
-			elseif v1475 == 6 then
-				local v1485
+				v1467, n71 = proto.readBuffer(p107, n71)
+				v1456.title = buffer.tostring(v1467)
+			elseif v1458 == 7 then
+				local v1468
 
-				v1485, n71 = proto.readBuffer(p107, n71)
-				v1473.subtitle = buffer.tostring(v1485)
-			elseif v1475 == 7 then
-				local v1486
+				v1468, n71 = proto.readBuffer(p107, n71)
+				v1456.subtitle = buffer.tostring(v1468)
+			elseif v1458 == 8 then
+				local v1469
 
-				v1486, n71 = proto.readBuffer(p107, n71)
-				v1473.info_text = buffer.tostring(v1486)
-			elseif v1475 == 8 then
-				local v1487
+				v1469, n71 = proto.readBuffer(p107, n71)
+				v1456.image_asset_id = buffer.tostring(v1469)
+			elseif v1458 == 9 then
+				local v1470
 
-				v1487, n71 = proto.readBuffer(p107, n71)
-				v1473.subtitle_link_path = buffer.tostring(v1487)
-			elseif v1475 == 11 then
-				local v1488
+				v1470, n71 = proto.readBuffer(p107, n71)
+				v1456.video_asset_id = buffer.tostring(v1470)
+			elseif v1458 == 10 then
+				local v1471
 
-				v1488, n71 = proto.readBuffer(p107, n71)
-				v1473.applied_filters = buffer.tostring(v1488)
+				v1471, n71 = proto.readBuffer(p107, n71)
+				v1456.badge_text = buffer.tostring(v1471)
+			elseif v1458 == 12 then
+				local v1472
+
+				v1472, n71 = proto.readBuffer(p107, n71)
+				v1456.creator_key = buffer.tostring(v1472)
 			else
-				local v1489, v1490 = proto.readVarInt(p107, n71)
+				local v1473, v1474 = proto.readVarInt(p107, n71)
 
-				n71 = v1490 + v1489
+				n71 = v1474 + v1473
 			end
-		elseif v1476 == proto.wireTypes.i32 then
-			local v1491
+		elseif v1459 == proto.wireTypes.i32 then
+			local v1475
 
-			v1491, n71 = proto.readFixed32(p107, n71)
-		elseif v1476 == proto.wireTypes.i64 then
-			local v1492
+			v1475, n71 = proto.readFixed32(p107, n71)
+		elseif v1459 == proto.wireTypes.i64 then
+			local v1476
 
-			v1492, n71 = proto.readFixed64(p107, n71)
+			v1476, n71 = proto.readFixed64(p107, n71)
 		else
-			error("Unsupported wire type: " .. v1476)
+			error("Unsupported wire type: " .. v1459)
 		end
 	end
 
-	return v1473
+	return v1456
 end
-function t166.jsonEncode(p108) -- line: 10357
+function t166.jsonEncode(p108) -- line: 10365
 	local t168 = {}
+
+	if p108.universe_id ~= nil and p108.universe_id ~= "" then
+		t168.universeId = p108.universe_id
+	end
+
+	if p108.is_sponsored then
+		t168.isSponsored = p108.is_sponsored
+	end
+
+	if p108.roblox_component ~= nil and p108.roblox_component ~= "" then
+		t168.robloxComponent = p108.roblox_component
+	end
+
+	if p108.native_ad_data ~= nil and p108.native_ad_data ~= "" then
+		t168.nativeAdData = p108.native_ad_data
+	end
+
+	if p108.is_content_locked then
+		t168.isContentLocked = p108.is_content_locked
+	end
 
 	if p108.title ~= nil and p108.title ~= "" then
 		t168.title = p108.title
-	end
-
-	if p108.song_items ~= nil and #p108.song_items > 0 then
-		local t169 = {}
-
-		for _, v1497 in p108.song_items do
-			table.insert(t169, v1497:jsonEncode())
-		end
-
-		t168.songItems = t169
-	end
-
-	if p108.next_page_token ~= nil and p108.next_page_token ~= "" then
-		t168.nextPageToken = p108.next_page_token
-	end
-
-	if p108.sort_id ~= nil and p108.sort_id ~= "" then
-		t168.sortId = p108.sort_id
-	end
-
-	if p108.secondary_sort_id ~= nil and p108.secondary_sort_id ~= 0 then
-		t168.secondarySortId = p108.secondary_sort_id
 	end
 
 	if p108.subtitle ~= nil and p108.subtitle ~= "" then
 		t168.subtitle = p108.subtitle
 	end
 
-	if p108.info_text ~= nil and p108.info_text ~= "" then
-		t168.infoText = p108.info_text
+	if p108.image_asset_id ~= nil and p108.image_asset_id ~= "" then
+		t168.imageAssetId = p108.image_asset_id
 	end
 
-	if p108.subtitle_link_path ~= nil and p108.subtitle_link_path ~= "" then
-		t168.subtitleLinkPath = p108.subtitle_link_path
+	if p108.video_asset_id ~= nil and p108.video_asset_id ~= "" then
+		t168.videoAssetId = p108.video_asset_id
 	end
 
-	if p108.is_placeholder ~= nil then
-		t168.isPlaceholder = p108.is_placeholder
+	if p108.badge_text ~= nil and p108.badge_text ~= "" then
+		t168.badgeText = p108.badge_text
 	end
 
-	if p108.primary_sort_id ~= nil then
-		t168.primarySortId = p108.primary_sort_id
+	if p108.player_count ~= nil then
+		t168.playerCount = p108.player_count
 	end
 
-	if p108.applied_filters ~= nil then
-		t168.appliedFilters = p108.applied_filters
+	if p108.creator_key ~= nil and p108.creator_key ~= "" then
+		t168.creatorKey = p108.creator_key
 	end
 
 	return t168
 end
-function t166.jsonDecode(t170: {[any]: any}) -- line: 10411
-	-- upvalues: t166 (copy), t1 (copy)
-	local v1499 = t166.new()
+function t166.jsonDecode(t169: {[any]: any}) -- line: 10421
+	-- upvalues: t166 (copy)
+	local v1480 = t166.new()
 
-	if t170.title ~= nil then
-		v1499.title = t170.title
+	if t169.universe_id ~= nil then
+		v1480.universe_id = t169.universe_id
 	end
 
-	if t170.song_items ~= nil then
-		local t171 = {}
-
-		for _, v1502 in t170.song_items do
-			table.insert(t171, t1.SongCarouselInputData_SongItem.jsonDecode(v1502))
-		end
-
-		v1499.song_items = t171
+	if t169.universeId ~= nil then
+		v1480.universe_id = t169.universeId
 	end
 
-	if t170.songItems ~= nil then
-		local t172 = {}
-
-		for _, v1505 in t170.songItems do
-			table.insert(t172, t1.SongCarouselInputData_SongItem.jsonDecode(v1505))
-		end
-
-		v1499.song_items = t172
+	if t169.is_sponsored ~= nil then
+		v1480.is_sponsored = t169.is_sponsored
 	end
 
-	if t170.next_page_token ~= nil then
-		v1499.next_page_token = t170.next_page_token
+	if t169.isSponsored ~= nil then
+		v1480.is_sponsored = t169.isSponsored
 	end
 
-	if t170.nextPageToken ~= nil then
-		v1499.next_page_token = t170.nextPageToken
+	if t169.roblox_component ~= nil then
+		v1480.roblox_component = t169.roblox_component
 	end
 
-	if t170.sort_id ~= nil then
-		v1499.sort_id = t170.sort_id
+	if t169.robloxComponent ~= nil then
+		v1480.roblox_component = t169.robloxComponent
 	end
 
-	if t170.sortId ~= nil then
-		v1499.sort_id = t170.sortId
+	if t169.native_ad_data ~= nil then
+		v1480.native_ad_data = t169.native_ad_data
 	end
 
-	if t170.secondary_sort_id ~= nil then
-		v1499.secondary_sort_id = t170.secondary_sort_id
+	if t169.nativeAdData ~= nil then
+		v1480.native_ad_data = t169.nativeAdData
 	end
 
-	if t170.secondarySortId ~= nil then
-		v1499.secondary_sort_id = t170.secondarySortId
+	if t169.is_content_locked ~= nil then
+		v1480.is_content_locked = t169.is_content_locked
 	end
 
-	if t170.subtitle ~= nil then
-		v1499.subtitle = t170.subtitle
+	if t169.isContentLocked ~= nil then
+		v1480.is_content_locked = t169.isContentLocked
 	end
 
-	if t170.info_text ~= nil then
-		v1499.info_text = t170.info_text
+	if t169.title ~= nil then
+		v1480.title = t169.title
 	end
 
-	if t170.infoText ~= nil then
-		v1499.info_text = t170.infoText
+	if t169.subtitle ~= nil then
+		v1480.subtitle = t169.subtitle
 	end
 
-	if t170.subtitle_link_path ~= nil then
-		v1499.subtitle_link_path = t170.subtitle_link_path
+	if t169.image_asset_id ~= nil then
+		v1480.image_asset_id = t169.image_asset_id
 	end
 
-	if t170.subtitleLinkPath ~= nil then
-		v1499.subtitle_link_path = t170.subtitleLinkPath
+	if t169.imageAssetId ~= nil then
+		v1480.image_asset_id = t169.imageAssetId
 	end
 
-	if t170.is_placeholder ~= nil then
-		v1499.is_placeholder = t170.is_placeholder
+	if t169.video_asset_id ~= nil then
+		v1480.video_asset_id = t169.video_asset_id
 	end
 
-	if t170.isPlaceholder ~= nil then
-		v1499.is_placeholder = t170.isPlaceholder
+	if t169.videoAssetId ~= nil then
+		v1480.video_asset_id = t169.videoAssetId
 	end
 
-	if t170.primary_sort_id ~= nil then
-		v1499.primary_sort_id = t170.primary_sort_id
+	if t169.badge_text ~= nil then
+		v1480.badge_text = t169.badge_text
 	end
 
-	if t170.primarySortId ~= nil then
-		v1499.primary_sort_id = t170.primarySortId
+	if t169.badgeText ~= nil then
+		v1480.badge_text = t169.badgeText
 	end
 
-	if t170.applied_filters ~= nil then
-		v1499.applied_filters = t170.applied_filters
+	if t169.player_count ~= nil then
+		v1480.player_count = t169.player_count
 	end
 
-	if t170.appliedFilters ~= nil then
-		v1499.applied_filters = t170.appliedFilters
+	if t169.playerCount ~= nil then
+		v1480.player_count = t169.playerCount
 	end
 
-	return v1499
+	if t169.creator_key ~= nil then
+		v1480.creator_key = t169.creator_key
+	end
+
+	if t169.creatorKey ~= nil then
+		v1480.creator_key = t169.creatorKey
+	end
+
+	return v1480
 end
 
 t166.descriptor = {
-	name = "SongCarouselInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SongCarouselInputData"
+	name = "ExperienceCarouselInputData_UniverseItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseItem"
 }
-t1.SongCarouselInputData = t166
-typeRegistry.default:register(t1.SongCarouselInputData)
+t1.ExperienceCarouselInputData_UniverseItem = t166
+typeRegistry.default:register(t1.ExperienceCarouselInputData_UniverseItem)
 
-local t173 = {}
+local t170 = {}
 
-t173.__index = t173
+t170.__index = t170
 
-function t173.new(t174: {[any]: any}?) -- line: 10521
-	-- upvalues: t173 (copy)
+function t170.new(t171: {[any]: any}?) -- line: 10531
+	-- upvalues: t170 (copy)
 	return (setmetatable({
-		song_id = if t174 ~= nil and t174.song_id ~= nil then t174.song_id else ""
-	}, t173))
+		title = if t171 ~= nil and t171.title ~= nil then t171.title else "",
+		song_items = if t171 ~= nil and t171.song_items ~= nil then t171.song_items else {},
+		next_page_token = if t171 ~= nil and t171.next_page_token ~= nil then t171.next_page_token else "",
+		sort_id = if t171 ~= nil and t171.sort_id ~= nil then t171.sort_id else "",
+		secondary_sort_id = if t171 ~= nil and t171.secondary_sort_id ~= nil then t171.secondary_sort_id else 0,
+		subtitle = if t171 ~= nil and t171.subtitle ~= nil then t171.subtitle else "",
+		info_text = if t171 ~= nil and t171.info_text ~= nil then t171.info_text else "",
+		subtitle_link_path = if t171 ~= nil and t171.subtitle_link_path ~= nil then t171.subtitle_link_path else "",
+		is_placeholder = if t171 ~= nil and t171.is_placeholder ~= nil then t171.is_placeholder else nil,
+		primary_sort_id = if t171 ~= nil and t171.primary_sort_id ~= nil then t171.primary_sort_id else nil,
+		applied_filters = if t171 ~= nil and t171.applied_filters ~= nil then t171.applied_filters else nil
+	}, t170))
 end
-function t173.encode(p109) -- line: 10529
+function t170.encode(p109) -- line: 10547
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n72 = 0
 
-	if p109.song_id ~= nil and p109.song_id ~= "" then
-		local v1510, v1511 = proto.writeTag(buf, n72, 1, proto.wireTypes.lengthDelimited)
+	if p109.title ~= nil and p109.title ~= "" then
+		local v1485, v1486 = proto.writeTag(buf, n72, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n72 = proto.writeString(v1510, v1511, p109.song_id)
+		buf, n72 = proto.writeString(v1485, v1486, p109.title)
+	end
+
+	if p109.song_items ~= nil and #p109.song_items > 0 then
+		for _, v1488 in p109.song_items do
+			local v1489 = v1488:encode()
+			local v1490, v1491 = proto.writeTag(buf, n72, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n72 = proto.writeBuffer(v1490, v1491, v1489, buffer.len(v1489))
+		end
+	end
+
+	if p109.next_page_token ~= nil and p109.next_page_token ~= "" then
+		local v1492, v1493 = proto.writeTag(buf, n72, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n72 = proto.writeString(v1492, v1493, p109.next_page_token)
+	end
+
+	if p109.sort_id ~= nil and p109.sort_id ~= "" then
+		local v1494, v1495 = proto.writeTag(buf, n72, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n72 = proto.writeString(v1494, v1495, p109.sort_id)
+	end
+
+	if p109.secondary_sort_id ~= nil and p109.secondary_sort_id ~= 0 then
+		local v1496, v1497 = proto.writeTag(buf, n72, 5, proto.wireTypes.varint)
+
+		buf, n72 = proto.writeVarInt(v1496, v1497, p109.secondary_sort_id)
+	end
+
+	if p109.subtitle ~= nil and p109.subtitle ~= "" then
+		local v1498, v1499 = proto.writeTag(buf, n72, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n72 = proto.writeString(v1498, v1499, p109.subtitle)
+	end
+
+	if p109.info_text ~= nil and p109.info_text ~= "" then
+		local v1500, v1501 = proto.writeTag(buf, n72, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n72 = proto.writeString(v1500, v1501, p109.info_text)
+	end
+
+	if p109.subtitle_link_path ~= nil and p109.subtitle_link_path ~= "" then
+		local v1502, v1503 = proto.writeTag(buf, n72, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n72 = proto.writeString(v1502, v1503, p109.subtitle_link_path)
+	end
+
+	if p109.is_placeholder ~= nil then
+		local v1504, v1505 = proto.writeTag(buf, n72, 9, proto.wireTypes.varint)
+
+		buf, n72 = proto.writeVarInt(v1504, v1505, not p109.is_placeholder and 0 or 1)
+	end
+
+	if p109.primary_sort_id ~= nil then
+		local v1506, v1507 = proto.writeTag(buf, n72, 10, proto.wireTypes.varint)
+
+		buf, n72 = proto.writeVarInt(v1506, v1507, p109.primary_sort_id)
+	end
+
+	if p109.applied_filters ~= nil then
+		local v1508, v1509 = proto.writeTag(buf, n72, 11, proto.wireTypes.lengthDelimited)
+
+		buf, n72 = proto.writeString(v1508, v1509, p109.applied_filters)
 	end
 
 	local buf40 = buffer.create(n72)
@@ -7429,134 +7346,278 @@ function t173.encode(p109) -- line: 10529
 
 	return buf40
 end
-function t173.decode(p110: buffer) -- line: 10543
-	-- upvalues: t173 (copy), proto (copy)
-	local v1514 = t173.new()
+function t170.decode(p110: buffer) -- line: 10614
+	-- upvalues: t170 (copy), proto (copy), t1 (copy)
+	local v1512 = t170.new()
 	local n73 = 0
 
 	while n73 < buffer.len(p110) do
-		local v1516, v1517
+		local v1514, v1515
 
-		v1516, v1517, n73 = proto.readTag(p110, n73)
+		v1514, v1515, n73 = proto.readTag(p110, n73)
 
-		if v1517 == proto.wireTypes.varint then
-			local v1518
+		if v1515 == proto.wireTypes.varint then
+			if v1514 == 5 then
+				local v1516
 
-			v1518, n73 = proto.readVarInt(p110, n73)
-		elseif v1517 == proto.wireTypes.lengthDelimited then
-			if v1516 == 1 then
+				v1516, n73 = proto.readVarIntI32(p110, n73)
+				v1512.secondary_sort_id = v1516
+			elseif v1514 == 9 then
+				local v1517
+
+				v1517, n73 = proto.readVarInt(p110, n73)
+				v1512.is_placeholder = v1517 ~= 0
+			elseif v1514 == 10 then
+				local v1518
+
+				v1518, n73 = proto.readVarIntI32(p110, n73)
+				v1512.primary_sort_id = v1518
+			else
 				local v1519
 
-				v1519, n73 = proto.readBuffer(p110, n73)
-				v1514.song_id = buffer.tostring(v1519)
-			else
-				local v1520, v1521 = proto.readVarInt(p110, n73)
-
-				n73 = v1521 + v1520
+				v1519, n73 = proto.readVarInt(p110, n73)
 			end
-		elseif v1517 == proto.wireTypes.i32 then
-			local v1522
+		elseif v1515 == proto.wireTypes.lengthDelimited then
+			if v1514 == 1 then
+				local v1520
 
-			v1522, n73 = proto.readFixed32(p110, n73)
-		elseif v1517 == proto.wireTypes.i64 then
-			local v1523
+				v1520, n73 = proto.readBuffer(p110, n73)
+				v1512.title = buffer.tostring(v1520)
+			elseif v1514 == 2 then
+				local v1521
 
-			v1523, n73 = proto.readFixed64(p110, n73)
+				v1521, n73 = proto.readBuffer(p110, n73)
+				table.insert(v1512.song_items, t1.SongCarouselInputData_SongItem.decode(v1521))
+			elseif v1514 == 3 then
+				local v1522
+
+				v1522, n73 = proto.readBuffer(p110, n73)
+				v1512.next_page_token = buffer.tostring(v1522)
+			elseif v1514 == 4 then
+				local v1523
+
+				v1523, n73 = proto.readBuffer(p110, n73)
+				v1512.sort_id = buffer.tostring(v1523)
+			elseif v1514 == 6 then
+				local v1524
+
+				v1524, n73 = proto.readBuffer(p110, n73)
+				v1512.subtitle = buffer.tostring(v1524)
+			elseif v1514 == 7 then
+				local v1525
+
+				v1525, n73 = proto.readBuffer(p110, n73)
+				v1512.info_text = buffer.tostring(v1525)
+			elseif v1514 == 8 then
+				local v1526
+
+				v1526, n73 = proto.readBuffer(p110, n73)
+				v1512.subtitle_link_path = buffer.tostring(v1526)
+			elseif v1514 == 11 then
+				local v1527
+
+				v1527, n73 = proto.readBuffer(p110, n73)
+				v1512.applied_filters = buffer.tostring(v1527)
+			else
+				local v1528, v1529 = proto.readVarInt(p110, n73)
+
+				n73 = v1529 + v1528
+			end
+		elseif v1515 == proto.wireTypes.i32 then
+			local v1530
+
+			v1530, n73 = proto.readFixed32(p110, n73)
+		elseif v1515 == proto.wireTypes.i64 then
+			local v1531
+
+			v1531, n73 = proto.readFixed64(p110, n73)
 		else
-			error("Unsupported wire type: " .. v1517)
+			error("Unsupported wire type: " .. v1515)
 		end
 	end
 
-	return v1514
+	return v1512
 end
-function t173.jsonEncode(p111) -- line: 10586
-	local t175 = {}
+function t170.jsonEncode(p111) -- line: 10707
+	local t172 = {}
 
-	if p111.song_id ~= nil and p111.song_id ~= "" then
-		t175.songId = p111.song_id
+	if p111.title ~= nil and p111.title ~= "" then
+		t172.title = p111.title
 	end
 
-	return t175
-end
-function t173.jsonDecode(t176: {[any]: any}) -- line: 10596
-	-- upvalues: t173 (copy)
-	local v1527 = t173.new()
+	if p111.song_items ~= nil and #p111.song_items > 0 then
+		local t173 = {}
 
-	if t176.song_id ~= nil then
-		v1527.song_id = t176.song_id
+		for _, v1536 in p111.song_items do
+			table.insert(t173, v1536:jsonEncode())
+		end
+
+		t172.songItems = t173
 	end
 
-	if t176.songId ~= nil then
-		v1527.song_id = t176.songId
+	if p111.next_page_token ~= nil and p111.next_page_token ~= "" then
+		t172.nextPageToken = p111.next_page_token
 	end
 
-	return v1527
+	if p111.sort_id ~= nil and p111.sort_id ~= "" then
+		t172.sortId = p111.sort_id
+	end
+
+	if p111.secondary_sort_id ~= nil and p111.secondary_sort_id ~= 0 then
+		t172.secondarySortId = p111.secondary_sort_id
+	end
+
+	if p111.subtitle ~= nil and p111.subtitle ~= "" then
+		t172.subtitle = p111.subtitle
+	end
+
+	if p111.info_text ~= nil and p111.info_text ~= "" then
+		t172.infoText = p111.info_text
+	end
+
+	if p111.subtitle_link_path ~= nil and p111.subtitle_link_path ~= "" then
+		t172.subtitleLinkPath = p111.subtitle_link_path
+	end
+
+	if p111.is_placeholder ~= nil then
+		t172.isPlaceholder = p111.is_placeholder
+	end
+
+	if p111.primary_sort_id ~= nil then
+		t172.primarySortId = p111.primary_sort_id
+	end
+
+	if p111.applied_filters ~= nil then
+		t172.appliedFilters = p111.applied_filters
+	end
+
+	return t172
+end
+function t170.jsonDecode(t174: {[any]: any}) -- line: 10761
+	-- upvalues: t170 (copy), t1 (copy)
+	local v1538 = t170.new()
+
+	if t174.title ~= nil then
+		v1538.title = t174.title
+	end
+
+	if t174.song_items ~= nil then
+		local t175 = {}
+
+		for _, v1541 in t174.song_items do
+			table.insert(t175, t1.SongCarouselInputData_SongItem.jsonDecode(v1541))
+		end
+
+		v1538.song_items = t175
+	end
+
+	if t174.songItems ~= nil then
+		local t176 = {}
+
+		for _, v1544 in t174.songItems do
+			table.insert(t176, t1.SongCarouselInputData_SongItem.jsonDecode(v1544))
+		end
+
+		v1538.song_items = t176
+	end
+
+	if t174.next_page_token ~= nil then
+		v1538.next_page_token = t174.next_page_token
+	end
+
+	if t174.nextPageToken ~= nil then
+		v1538.next_page_token = t174.nextPageToken
+	end
+
+	if t174.sort_id ~= nil then
+		v1538.sort_id = t174.sort_id
+	end
+
+	if t174.sortId ~= nil then
+		v1538.sort_id = t174.sortId
+	end
+
+	if t174.secondary_sort_id ~= nil then
+		v1538.secondary_sort_id = t174.secondary_sort_id
+	end
+
+	if t174.secondarySortId ~= nil then
+		v1538.secondary_sort_id = t174.secondarySortId
+	end
+
+	if t174.subtitle ~= nil then
+		v1538.subtitle = t174.subtitle
+	end
+
+	if t174.info_text ~= nil then
+		v1538.info_text = t174.info_text
+	end
+
+	if t174.infoText ~= nil then
+		v1538.info_text = t174.infoText
+	end
+
+	if t174.subtitle_link_path ~= nil then
+		v1538.subtitle_link_path = t174.subtitle_link_path
+	end
+
+	if t174.subtitleLinkPath ~= nil then
+		v1538.subtitle_link_path = t174.subtitleLinkPath
+	end
+
+	if t174.is_placeholder ~= nil then
+		v1538.is_placeholder = t174.is_placeholder
+	end
+
+	if t174.isPlaceholder ~= nil then
+		v1538.is_placeholder = t174.isPlaceholder
+	end
+
+	if t174.primary_sort_id ~= nil then
+		v1538.primary_sort_id = t174.primary_sort_id
+	end
+
+	if t174.primarySortId ~= nil then
+		v1538.primary_sort_id = t174.primarySortId
+	end
+
+	if t174.applied_filters ~= nil then
+		v1538.applied_filters = t174.applied_filters
+	end
+
+	if t174.appliedFilters ~= nil then
+		v1538.applied_filters = t174.appliedFilters
+	end
+
+	return v1538
 end
 
-t173.descriptor = {
-	name = "SongCarouselInputData_SongItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SongItem"
+t170.descriptor = {
+	name = "SongCarouselInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SongCarouselInputData"
 }
-t1.SongCarouselInputData_SongItem = t173
-typeRegistry.default:register(t1.SongCarouselInputData_SongItem)
+t1.SongCarouselInputData = t170
+typeRegistry.default:register(t1.SongCarouselInputData)
 
 local t177 = {}
 
 t177.__index = t177
 
-function t177.new(t178: {[any]: any}?) -- line: 10624
+function t177.new(t178: {[any]: any}?) -- line: 10871
 	-- upvalues: t177 (copy)
 	return (setmetatable({
-		title = if t178 ~= nil and t178.title ~= nil then t178.title else "",
-		event_items = if t178 ~= nil and t178.event_items ~= nil then t178.event_items else {},
-		universe_id = if t178 ~= nil and t178.universe_id ~= nil then t178.universe_id else "",
-		sort_id = if t178 ~= nil and t178.sort_id ~= nil then t178.sort_id else "",
-		subtitle = if t178 ~= nil and t178.subtitle ~= nil then t178.subtitle else "",
-		info_text = if t178 ~= nil and t178.info_text ~= nil then t178.info_text else ""
+		song_id = if t178 ~= nil and t178.song_id ~= nil then t178.song_id else ""
 	}, t177))
 end
-function t177.encode(p112) -- line: 10635
+function t177.encode(p112) -- line: 10879
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n74 = 0
 
-	if p112.title ~= nil and p112.title ~= "" then
-		local v1532, v1533 = proto.writeTag(buf, n74, 1, proto.wireTypes.lengthDelimited)
+	if p112.song_id ~= nil and p112.song_id ~= "" then
+		local v1549, v1550 = proto.writeTag(buf, n74, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n74 = proto.writeString(v1532, v1533, p112.title)
-	end
-
-	if p112.event_items ~= nil and #p112.event_items > 0 then
-		for _, v1535 in p112.event_items do
-			local v1536 = v1535:encode()
-			local v1537, v1538 = proto.writeTag(buf, n74, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n74 = proto.writeBuffer(v1537, v1538, v1536, buffer.len(v1536))
-		end
-	end
-
-	if p112.universe_id ~= nil and p112.universe_id ~= "" then
-		local v1539, v1540 = proto.writeTag(buf, n74, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n74 = proto.writeString(v1539, v1540, p112.universe_id)
-	end
-
-	if p112.sort_id ~= nil and p112.sort_id ~= "" then
-		local v1541, v1542 = proto.writeTag(buf, n74, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n74 = proto.writeString(v1541, v1542, p112.sort_id)
-	end
-
-	if p112.subtitle ~= nil and p112.subtitle ~= "" then
-		local v1543, v1544 = proto.writeTag(buf, n74, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n74 = proto.writeString(v1543, v1544, p112.subtitle)
-	end
-
-	if p112.info_text ~= nil and p112.info_text ~= "" then
-		local v1545, v1546 = proto.writeTag(buf, n74, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n74 = proto.writeString(v1545, v1546, p112.info_text)
+		buf, n74 = proto.writeString(v1549, v1550, p112.song_id)
 	end
 
 	local buf41 = buffer.create(n74)
@@ -7565,191 +7626,134 @@ function t177.encode(p112) -- line: 10635
 
 	return buf41
 end
-function t177.decode(p113: buffer) -- line: 10677
-	-- upvalues: t177 (copy), proto (copy), t1 (copy)
-	local v1549 = t177.new()
+function t177.decode(p113: buffer) -- line: 10893
+	-- upvalues: t177 (copy), proto (copy)
+	local v1553 = t177.new()
 	local n75 = 0
 
 	while n75 < buffer.len(p113) do
-		local v1551, v1552
+		local v1555, v1556
 
-		v1551, v1552, n75 = proto.readTag(p113, n75)
+		v1555, v1556, n75 = proto.readTag(p113, n75)
 
-		if v1552 == proto.wireTypes.varint then
-			local v1553
+		if v1556 == proto.wireTypes.varint then
+			local v1557
 
-			v1553, n75 = proto.readVarInt(p113, n75)
-		elseif v1552 == proto.wireTypes.lengthDelimited then
-			if v1551 == 1 then
-				local v1554
-
-				v1554, n75 = proto.readBuffer(p113, n75)
-				v1549.title = buffer.tostring(v1554)
-			elseif v1551 == 2 then
-				local v1555
-
-				v1555, n75 = proto.readBuffer(p113, n75)
-				table.insert(v1549.event_items, t1.EventsCarouselInputData_EventItem.decode(v1555))
-			elseif v1551 == 3 then
-				local v1556
-
-				v1556, n75 = proto.readBuffer(p113, n75)
-				v1549.universe_id = buffer.tostring(v1556)
-			elseif v1551 == 4 then
-				local v1557
-
-				v1557, n75 = proto.readBuffer(p113, n75)
-				v1549.sort_id = buffer.tostring(v1557)
-			elseif v1551 == 5 then
+			v1557, n75 = proto.readVarInt(p113, n75)
+		elseif v1556 == proto.wireTypes.lengthDelimited then
+			if v1555 == 1 then
 				local v1558
 
 				v1558, n75 = proto.readBuffer(p113, n75)
-				v1549.subtitle = buffer.tostring(v1558)
-			elseif v1551 == 6 then
-				local v1559
-
-				v1559, n75 = proto.readBuffer(p113, n75)
-				v1549.info_text = buffer.tostring(v1559)
+				v1553.song_id = buffer.tostring(v1558)
 			else
-				local v1560, v1561 = proto.readVarInt(p113, n75)
+				local v1559, v1560 = proto.readVarInt(p113, n75)
 
-				n75 = v1561 + v1560
+				n75 = v1560 + v1559
 			end
-		elseif v1552 == proto.wireTypes.i32 then
+		elseif v1556 == proto.wireTypes.i32 then
+			local v1561
+
+			v1561, n75 = proto.readFixed32(p113, n75)
+		elseif v1556 == proto.wireTypes.i64 then
 			local v1562
 
-			v1562, n75 = proto.readFixed32(p113, n75)
-		elseif v1552 == proto.wireTypes.i64 then
-			local v1563
-
-			v1563, n75 = proto.readFixed64(p113, n75)
+			v1562, n75 = proto.readFixed64(p113, n75)
 		else
-			error("Unsupported wire type: " .. v1552)
+			error("Unsupported wire type: " .. v1556)
 		end
 	end
 
-	return v1549
+	return v1553
 end
-function t177.jsonEncode(p114) -- line: 10745
+function t177.jsonEncode(p114) -- line: 10936
 	local t179 = {}
 
-	if p114.title ~= nil and p114.title ~= "" then
-		t179.title = p114.title
-	end
-
-	if p114.event_items ~= nil and #p114.event_items > 0 then
-		local t180 = {}
-
-		for _, v1568 in p114.event_items do
-			table.insert(t180, v1568:jsonEncode())
-		end
-
-		t179.eventItems = t180
-	end
-
-	if p114.universe_id ~= nil and p114.universe_id ~= "" then
-		t179.universeId = p114.universe_id
-	end
-
-	if p114.sort_id ~= nil and p114.sort_id ~= "" then
-		t179.sortId = p114.sort_id
-	end
-
-	if p114.subtitle ~= nil and p114.subtitle ~= "" then
-		t179.subtitle = p114.subtitle
-	end
-
-	if p114.info_text ~= nil and p114.info_text ~= "" then
-		t179.infoText = p114.info_text
+	if p114.song_id ~= nil and p114.song_id ~= "" then
+		t179.songId = p114.song_id
 	end
 
 	return t179
 end
-function t177.jsonDecode(t181: {[any]: any}) -- line: 10779
-	-- upvalues: t177 (copy), t1 (copy)
-	local v1570 = t177.new()
+function t177.jsonDecode(t180: {[any]: any}) -- line: 10946
+	-- upvalues: t177 (copy)
+	local v1566 = t177.new()
 
-	if t181.title ~= nil then
-		v1570.title = t181.title
+	if t180.song_id ~= nil then
+		v1566.song_id = t180.song_id
 	end
 
-	if t181.event_items ~= nil then
-		local t182 = {}
-
-		for _, v1573 in t181.event_items do
-			table.insert(t182, t1.EventsCarouselInputData_EventItem.jsonDecode(v1573))
-		end
-
-		v1570.event_items = t182
+	if t180.songId ~= nil then
+		v1566.song_id = t180.songId
 	end
 
-	if t181.eventItems ~= nil then
-		local t183 = {}
-
-		for _, v1576 in t181.eventItems do
-			table.insert(t183, t1.EventsCarouselInputData_EventItem.jsonDecode(v1576))
-		end
-
-		v1570.event_items = t183
-	end
-
-	if t181.universe_id ~= nil then
-		v1570.universe_id = t181.universe_id
-	end
-
-	if t181.universeId ~= nil then
-		v1570.universe_id = t181.universeId
-	end
-
-	if t181.sort_id ~= nil then
-		v1570.sort_id = t181.sort_id
-	end
-
-	if t181.sortId ~= nil then
-		v1570.sort_id = t181.sortId
-	end
-
-	if t181.subtitle ~= nil then
-		v1570.subtitle = t181.subtitle
-	end
-
-	if t181.info_text ~= nil then
-		v1570.info_text = t181.info_text
-	end
-
-	if t181.infoText ~= nil then
-		v1570.info_text = t181.infoText
-	end
-
-	return v1570
+	return v1566
 end
 
 t177.descriptor = {
-	name = "EventsCarouselInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventsCarouselInputData"
+	name = "SongCarouselInputData_SongItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SongItem"
 }
-t1.EventsCarouselInputData = t177
-typeRegistry.default:register(t1.EventsCarouselInputData)
+t1.SongCarouselInputData_SongItem = t177
+typeRegistry.default:register(t1.SongCarouselInputData_SongItem)
 
-local t184 = {}
+local t181 = {}
 
-t184.__index = t184
+t181.__index = t181
 
-function t184.new(t185: {[any]: any}?) -- line: 10849
-	-- upvalues: t184 (copy)
+function t181.new(t182: {[any]: any}?) -- line: 10974
+	-- upvalues: t181 (copy)
 	return (setmetatable({
-		event_id = if t185 ~= nil and t185.event_id ~= nil then t185.event_id else ""
-	}, t184))
+		title = if t182 ~= nil and t182.title ~= nil then t182.title else "",
+		event_items = if t182 ~= nil and t182.event_items ~= nil then t182.event_items else {},
+		universe_id = if t182 ~= nil and t182.universe_id ~= nil then t182.universe_id else "",
+		sort_id = if t182 ~= nil and t182.sort_id ~= nil then t182.sort_id else "",
+		subtitle = if t182 ~= nil and t182.subtitle ~= nil then t182.subtitle else "",
+		info_text = if t182 ~= nil and t182.info_text ~= nil then t182.info_text else ""
+	}, t181))
 end
-function t184.encode(p115) -- line: 10857
+function t181.encode(p115) -- line: 10985
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n76 = 0
 
-	if p115.event_id ~= nil and p115.event_id ~= "" then
-		local v1581, v1582 = proto.writeTag(buf, n76, 1, proto.wireTypes.lengthDelimited)
+	if p115.title ~= nil and p115.title ~= "" then
+		local v1571, v1572 = proto.writeTag(buf, n76, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n76 = proto.writeString(v1581, v1582, p115.event_id)
+		buf, n76 = proto.writeString(v1571, v1572, p115.title)
+	end
+
+	if p115.event_items ~= nil and #p115.event_items > 0 then
+		for _, v1574 in p115.event_items do
+			local v1575 = v1574:encode()
+			local v1576, v1577 = proto.writeTag(buf, n76, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n76 = proto.writeBuffer(v1576, v1577, v1575, buffer.len(v1575))
+		end
+	end
+
+	if p115.universe_id ~= nil and p115.universe_id ~= "" then
+		local v1578, v1579 = proto.writeTag(buf, n76, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n76 = proto.writeString(v1578, v1579, p115.universe_id)
+	end
+
+	if p115.sort_id ~= nil and p115.sort_id ~= "" then
+		local v1580, v1581 = proto.writeTag(buf, n76, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n76 = proto.writeString(v1580, v1581, p115.sort_id)
+	end
+
+	if p115.subtitle ~= nil and p115.subtitle ~= "" then
+		local v1582, v1583 = proto.writeTag(buf, n76, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n76 = proto.writeString(v1582, v1583, p115.subtitle)
+	end
+
+	if p115.info_text ~= nil and p115.info_text ~= "" then
+		local v1584, v1585 = proto.writeTag(buf, n76, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n76 = proto.writeString(v1584, v1585, p115.info_text)
 	end
 
 	local buf42 = buffer.create(n76)
@@ -7758,324 +7762,320 @@ function t184.encode(p115) -- line: 10857
 
 	return buf42
 end
-function t184.decode(p116: buffer) -- line: 10871
-	-- upvalues: t184 (copy), proto (copy)
-	local v1585 = t184.new()
+function t181.decode(p116: buffer) -- line: 11027
+	-- upvalues: t181 (copy), proto (copy), t1 (copy)
+	local v1588 = t181.new()
 	local n77 = 0
 
 	while n77 < buffer.len(p116) do
-		local v1587, v1588
+		local v1590, v1591
 
-		v1587, v1588, n77 = proto.readTag(p116, n77)
+		v1590, v1591, n77 = proto.readTag(p116, n77)
 
-		if v1588 == proto.wireTypes.varint then
-			local v1589
+		if v1591 == proto.wireTypes.varint then
+			local v1592
 
-			v1589, n77 = proto.readVarInt(p116, n77)
-		elseif v1588 == proto.wireTypes.lengthDelimited then
-			if v1587 == 1 then
-				local v1590
+			v1592, n77 = proto.readVarInt(p116, n77)
+		elseif v1591 == proto.wireTypes.lengthDelimited then
+			if v1590 == 1 then
+				local v1593
 
-				v1590, n77 = proto.readBuffer(p116, n77)
-				v1585.event_id = buffer.tostring(v1590)
+				v1593, n77 = proto.readBuffer(p116, n77)
+				v1588.title = buffer.tostring(v1593)
+			elseif v1590 == 2 then
+				local v1594
+
+				v1594, n77 = proto.readBuffer(p116, n77)
+				table.insert(v1588.event_items, t1.EventsCarouselInputData_EventItem.decode(v1594))
+			elseif v1590 == 3 then
+				local v1595
+
+				v1595, n77 = proto.readBuffer(p116, n77)
+				v1588.universe_id = buffer.tostring(v1595)
+			elseif v1590 == 4 then
+				local v1596
+
+				v1596, n77 = proto.readBuffer(p116, n77)
+				v1588.sort_id = buffer.tostring(v1596)
+			elseif v1590 == 5 then
+				local v1597
+
+				v1597, n77 = proto.readBuffer(p116, n77)
+				v1588.subtitle = buffer.tostring(v1597)
+			elseif v1590 == 6 then
+				local v1598
+
+				v1598, n77 = proto.readBuffer(p116, n77)
+				v1588.info_text = buffer.tostring(v1598)
 			else
-				local v1591, v1592 = proto.readVarInt(p116, n77)
+				local v1599, v1600 = proto.readVarInt(p116, n77)
 
-				n77 = v1592 + v1591
+				n77 = v1600 + v1599
 			end
-		elseif v1588 == proto.wireTypes.i32 then
-			local v1593
+		elseif v1591 == proto.wireTypes.i32 then
+			local v1601
 
-			v1593, n77 = proto.readFixed32(p116, n77)
-		elseif v1588 == proto.wireTypes.i64 then
-			local v1594
+			v1601, n77 = proto.readFixed32(p116, n77)
+		elseif v1591 == proto.wireTypes.i64 then
+			local v1602
 
-			v1594, n77 = proto.readFixed64(p116, n77)
+			v1602, n77 = proto.readFixed64(p116, n77)
 		else
-			error("Unsupported wire type: " .. v1588)
+			error("Unsupported wire type: " .. v1591)
 		end
 	end
 
-	return v1585
+	return v1588
 end
-function t184.jsonEncode(p117) -- line: 10914
-	local t186 = {}
+function t181.jsonEncode(p117) -- line: 11095
+	local t183 = {}
 
-	if p117.event_id ~= nil and p117.event_id ~= "" then
-		t186.eventId = p117.event_id
+	if p117.title ~= nil and p117.title ~= "" then
+		t183.title = p117.title
 	end
 
-	return t186
-end
-function t184.jsonDecode(t187: {[any]: any}) -- line: 10924
-	-- upvalues: t184 (copy)
-	local v1598 = t184.new()
+	if p117.event_items ~= nil and #p117.event_items > 0 then
+		local t184 = {}
 
-	if t187.event_id ~= nil then
-		v1598.event_id = t187.event_id
+		for _, v1607 in p117.event_items do
+			table.insert(t184, v1607:jsonEncode())
+		end
+
+		t183.eventItems = t184
 	end
 
-	if t187.eventId ~= nil then
-		v1598.event_id = t187.eventId
+	if p117.universe_id ~= nil and p117.universe_id ~= "" then
+		t183.universeId = p117.universe_id
 	end
 
-	return v1598
+	if p117.sort_id ~= nil and p117.sort_id ~= "" then
+		t183.sortId = p117.sort_id
+	end
+
+	if p117.subtitle ~= nil and p117.subtitle ~= "" then
+		t183.subtitle = p117.subtitle
+	end
+
+	if p117.info_text ~= nil and p117.info_text ~= "" then
+		t183.infoText = p117.info_text
+	end
+
+	return t183
+end
+function t181.jsonDecode(t185: {[any]: any}) -- line: 11129
+	-- upvalues: t181 (copy), t1 (copy)
+	local v1609 = t181.new()
+
+	if t185.title ~= nil then
+		v1609.title = t185.title
+	end
+
+	if t185.event_items ~= nil then
+		local t186 = {}
+
+		for _, v1612 in t185.event_items do
+			table.insert(t186, t1.EventsCarouselInputData_EventItem.jsonDecode(v1612))
+		end
+
+		v1609.event_items = t186
+	end
+
+	if t185.eventItems ~= nil then
+		local t187 = {}
+
+		for _, v1615 in t185.eventItems do
+			table.insert(t187, t1.EventsCarouselInputData_EventItem.jsonDecode(v1615))
+		end
+
+		v1609.event_items = t187
+	end
+
+	if t185.universe_id ~= nil then
+		v1609.universe_id = t185.universe_id
+	end
+
+	if t185.universeId ~= nil then
+		v1609.universe_id = t185.universeId
+	end
+
+	if t185.sort_id ~= nil then
+		v1609.sort_id = t185.sort_id
+	end
+
+	if t185.sortId ~= nil then
+		v1609.sort_id = t185.sortId
+	end
+
+	if t185.subtitle ~= nil then
+		v1609.subtitle = t185.subtitle
+	end
+
+	if t185.info_text ~= nil then
+		v1609.info_text = t185.info_text
+	end
+
+	if t185.infoText ~= nil then
+		v1609.info_text = t185.infoText
+	end
+
+	return v1609
 end
 
-t184.descriptor = {
-	name = "EventsCarouselInputData_EventItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventItem"
+t181.descriptor = {
+	name = "EventsCarouselInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventsCarouselInputData"
 }
-t1.EventsCarouselInputData_EventItem = t184
-typeRegistry.default:register(t1.EventsCarouselInputData_EventItem)
+t1.EventsCarouselInputData = t181
+typeRegistry.default:register(t1.EventsCarouselInputData)
 
 local t188 = {}
 
 t188.__index = t188
 
-function t188.new(t189: {[any]: any}?) -- line: 10954
+function t188.new(t189: {[any]: any}?) -- line: 11199
 	-- upvalues: t188 (copy)
 	return (setmetatable({
-		universe_id = if t189 ~= nil and t189.universe_id ~= nil then t189.universe_id else "",
-		entry_map = if t189 ~= nil and t189.entry_map ~= nil then t189.entry_map else {},
-		entry_order = if t189 ~= nil and t189.entry_order ~= nil then t189.entry_order else {},
-		creator_key = if t189 ~= nil and t189.creator_key ~= nil then t189.creator_key else ""
+		event_id = if t189 ~= nil and t189.event_id ~= nil then t189.event_id else ""
 	}, t188))
 end
-function t188.encode(p118) -- line: 10963
+function t188.encode(p118) -- line: 11207
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n78 = 0
 
-	if p118.universe_id ~= nil and p118.universe_id ~= "" then
-		local v1603, v1604 = proto.writeTag(buf, n78, 1, proto.wireTypes.lengthDelimited)
+	if p118.event_id ~= nil and p118.event_id ~= "" then
+		local v1620, v1621 = proto.writeTag(buf, n78, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n78 = proto.writeString(v1603, v1604, p118.universe_id)
+		buf, n78 = proto.writeString(v1620, v1621, p118.event_id)
 	end
 
-	if p118.entry_map ~= nil and next(p118.entry_map) ~= nil then
-		for v1605, v1606 in p118.entry_map do
-			local buf43 = buffer.create(0)
-			local v1608, v1609 = proto.writeTag(buf43, 0, 1, proto.wireTypes.lengthDelimited)
-			local v1610, v1611 = proto.writeString(v1608, v1609, v1605)
-			local v1612 = v1606:encode()
-			local v1613, v1614 = proto.writeTag(v1610, v1611, 2, proto.wireTypes.lengthDelimited)
-			local v1615, v1616 = proto.writeBuffer(v1613, v1614, v1612, buffer.len(v1612))
-			local v1617, v1618 = proto.writeTag(buf, n78, 2, proto.wireTypes.lengthDelimited)
+	local buf43 = buffer.create(n78)
 
-			buf, n78 = proto.writeBuffer(v1617, v1618, v1615, v1616)
-		end
-	end
+	buffer.copy(buf43, 0, buf, 0, n78)
 
-	if p118.entry_order ~= nil and #p118.entry_order > 0 then
-		for _, v1620 in p118.entry_order do
-			local v1621, v1622 = proto.writeTag(buf, n78, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n78 = proto.writeString(v1621, v1622, v1620)
-		end
-	end
-
-	if p118.creator_key ~= nil and p118.creator_key ~= "" then
-		local v1623, v1624 = proto.writeTag(buf, n78, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n78 = proto.writeString(v1623, v1624, p118.creator_key)
-	end
-
-	local buf44 = buffer.create(n78)
-
-	buffer.copy(buf44, 0, buf, 0, n78)
-
-	return buf44
+	return buf43
 end
-function t188.decode(p119: buffer) -- line: 11003
-	-- upvalues: t188 (copy), proto (copy), t1 (copy)
-	local v1627 = t188.new()
+function t188.decode(p119: buffer) -- line: 11221
+	-- upvalues: t188 (copy), proto (copy)
+	local v1624 = t188.new()
 	local n79 = 0
 
 	while n79 < buffer.len(p119) do
-		local v1629, v1630
+		local v1626, v1627
 
-		v1629, v1630, n79 = proto.readTag(p119, n79)
+		v1626, v1627, n79 = proto.readTag(p119, n79)
 
-		if v1630 == proto.wireTypes.varint then
-			local v1631
+		if v1627 == proto.wireTypes.varint then
+			local v1628
 
-			v1631, n79 = proto.readVarInt(p119, n79)
-		elseif v1630 == proto.wireTypes.lengthDelimited then
-			if v1629 == 1 then
-				local v1632
+			v1628, n79 = proto.readVarInt(p119, n79)
+		elseif v1627 == proto.wireTypes.lengthDelimited then
+			if v1626 == 1 then
+				local v1629
 
-				v1632, n79 = proto.readBuffer(p119, n79)
-				v1627.universe_id = buffer.tostring(v1632)
-			elseif v1629 == 2 then
-				local v1633
-
-				v1633, n79 = proto.readBuffer(p119, n79)
-
-				local v1634 = t1.DevStoreFeedInputData_EntryMapEntry.decode(v1633)
-				local v1635 = t1.FeedEntry.new()
-
-				v1627.entry_map[v1634.key or ""] = v1634.value or v1635
-			elseif v1629 == 3 then
-				local v1636
-
-				v1636, n79 = proto.readBuffer(p119, n79)
-				table.insert(v1627.entry_order, buffer.tostring(v1636))
-			elseif v1629 == 4 then
-				local v1637
-
-				v1637, n79 = proto.readBuffer(p119, n79)
-				v1627.creator_key = buffer.tostring(v1637)
+				v1629, n79 = proto.readBuffer(p119, n79)
+				v1624.event_id = buffer.tostring(v1629)
 			else
-				local v1638, v1639 = proto.readVarInt(p119, n79)
+				local v1630, v1631 = proto.readVarInt(p119, n79)
 
-				n79 = v1639 + v1638
+				n79 = v1631 + v1630
 			end
-		elseif v1630 == proto.wireTypes.i32 then
-			local v1640
+		elseif v1627 == proto.wireTypes.i32 then
+			local v1632
 
-			v1640, n79 = proto.readFixed32(p119, n79)
-		elseif v1630 == proto.wireTypes.i64 then
-			local v1641
+			v1632, n79 = proto.readFixed32(p119, n79)
+		elseif v1627 == proto.wireTypes.i64 then
+			local v1633
 
-			v1641, n79 = proto.readFixed64(p119, n79)
+			v1633, n79 = proto.readFixed64(p119, n79)
 		else
-			error("Unsupported wire type: " .. v1630)
+			error("Unsupported wire type: " .. v1627)
 		end
 	end
 
-	return v1627
+	return v1624
 end
-function t188.jsonEncode(p120) -- line: 11068
+function t188.jsonEncode(p120) -- line: 11264
 	local t190 = {}
 
-	if p120.universe_id ~= nil and p120.universe_id ~= "" then
-		t190.universeId = p120.universe_id
-	end
-
-	if p120.entry_map ~= nil and next(p120.entry_map) ~= nil then
-		local t191 = {}
-
-		for v1645, v1646 in p120.entry_map do
-			t191[v1645] = v1646:jsonEncode()
-		end
-
-		t190.entryMap = t191
-	end
-
-	if p120.entry_order ~= nil and #p120.entry_order > 0 then
-		local t192 = {}
-
-		for _, v1649 in p120.entry_order do
-			table.insert(t192, v1649)
-		end
-
-		t190.entryOrder = t192
-	end
-
-	if p120.creator_key ~= nil and p120.creator_key ~= "" then
-		t190.creatorKey = p120.creator_key
+	if p120.event_id ~= nil and p120.event_id ~= "" then
+		t190.eventId = p120.event_id
 	end
 
 	return t190
 end
-function t188.jsonDecode(t193: {[any]: any}) -- line: 11098
-	-- upvalues: t188 (copy), t1 (copy)
-	local v1651 = t188.new()
+function t188.jsonDecode(t191: {[any]: any}) -- line: 11274
+	-- upvalues: t188 (copy)
+	local v1637 = t188.new()
 
-	if t193.universe_id ~= nil then
-		v1651.universe_id = t193.universe_id
+	if t191.event_id ~= nil then
+		v1637.event_id = t191.event_id
 	end
 
-	if t193.universeId ~= nil then
-		v1651.universe_id = t193.universeId
+	if t191.eventId ~= nil then
+		v1637.event_id = t191.eventId
 	end
 
-	if t193.entry_map ~= nil then
-		local t194 = {}
-
-		for v1653, v1654 in t193.entry_map do
-			t194[v1653] = t1.FeedEntry.jsonDecode(v1654)
-		end
-
-		v1651.entry_map = t194
-	end
-
-	if t193.entryMap ~= nil then
-		local t195 = {}
-
-		for v1656, v1657 in t193.entryMap do
-			t195[v1656] = t1.FeedEntry.jsonDecode(v1657)
-		end
-
-		v1651.entry_map = t195
-	end
-
-	if t193.entry_order ~= nil then
-		local t196 = {}
-
-		for _, v1660 in t193.entry_order do
-			table.insert(t196, v1660)
-		end
-
-		v1651.entry_order = t196
-	end
-
-	if t193.entryOrder ~= nil then
-		local t197 = {}
-
-		for _, v1663 in t193.entryOrder do
-			table.insert(t197, v1663)
-		end
-
-		v1651.entry_order = t197
-	end
-
-	if t193.creator_key ~= nil then
-		v1651.creator_key = t193.creator_key
-	end
-
-	if t193.creatorKey ~= nil then
-		v1651.creator_key = t193.creatorKey
-	end
-
-	return v1651
+	return v1637
 end
 
 t188.descriptor = {
-	name = "DevStoreFeedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.DevStoreFeedInputData"
+	name = "EventsCarouselInputData_EventItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventItem"
 }
-t1.DevStoreFeedInputData = t188
-typeRegistry.default:register(t1.DevStoreFeedInputData)
+t1.EventsCarouselInputData_EventItem = t188
+typeRegistry.default:register(t1.EventsCarouselInputData_EventItem)
 
-local t198 = {}
+local t192 = {}
 
-t198.__index = t198
+t192.__index = t192
 
-function t198.new(t199: {[any]: any}?) -- line: 11170
-	-- upvalues: t198 (copy)
+function t192.new(t193: {[any]: any}?) -- line: 11304
+	-- upvalues: t192 (copy)
 	return (setmetatable({
-		key = if t199 ~= nil and t199.key ~= nil then t199.key else "",
-		value = if t199 ~= nil and t199.value ~= nil then t199.value else nil
-	}, t198))
+		universe_id = if t193 ~= nil and t193.universe_id ~= nil then t193.universe_id else "",
+		entry_map = if t193 ~= nil and t193.entry_map ~= nil then t193.entry_map else {},
+		entry_order = if t193 ~= nil and t193.entry_order ~= nil then t193.entry_order else {},
+		creator_key = if t193 ~= nil and t193.creator_key ~= nil then t193.creator_key else ""
+	}, t192))
 end
-function t198.encode(p121) -- line: 11179
+function t192.encode(p121) -- line: 11313
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n80 = 0
 
-	if p121.key ~= nil and p121.key ~= "" then
-		local v1668, v1669 = proto.writeTag(buf, n80, 1, proto.wireTypes.lengthDelimited)
+	if p121.universe_id ~= nil and p121.universe_id ~= "" then
+		local v1642, v1643 = proto.writeTag(buf, n80, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n80 = proto.writeString(v1668, v1669, p121.key)
+		buf, n80 = proto.writeString(v1642, v1643, p121.universe_id)
 	end
 
-	if p121.value ~= nil then
-		local v1670 = p121.value:encode()
-		local v1671, v1672 = proto.writeTag(buf, n80, 2, proto.wireTypes.lengthDelimited)
+	if p121.entry_map ~= nil and next(p121.entry_map) ~= nil then
+		for v1644, v1645 in p121.entry_map do
+			local buf44 = buffer.create(0)
+			local v1647, v1648 = proto.writeTag(buf44, 0, 1, proto.wireTypes.lengthDelimited)
+			local v1649, v1650 = proto.writeString(v1647, v1648, v1644)
+			local v1651 = v1645:encode()
+			local v1652, v1653 = proto.writeTag(v1649, v1650, 2, proto.wireTypes.lengthDelimited)
+			local v1654, v1655 = proto.writeBuffer(v1652, v1653, v1651, buffer.len(v1651))
+			local v1656, v1657 = proto.writeTag(buf, n80, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n80 = proto.writeBuffer(v1671, v1672, v1670, buffer.len(v1670))
+			buf, n80 = proto.writeBuffer(v1656, v1657, v1654, v1655)
+		end
+	end
+
+	if p121.entry_order ~= nil and #p121.entry_order > 0 then
+		for _, v1659 in p121.entry_order do
+			local v1660, v1661 = proto.writeTag(buf, n80, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n80 = proto.writeString(v1660, v1661, v1659)
+		end
+	end
+
+	if p121.creator_key ~= nil and p121.creator_key ~= "" then
+		local v1662, v1663 = proto.writeTag(buf, n80, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n80 = proto.writeString(v1662, v1663, p121.creator_key)
 	end
 
 	local buf45 = buffer.create(n80)
@@ -8084,108 +8084,195 @@ function t198.encode(p121) -- line: 11179
 
 	return buf45
 end
-function t198.decode(p122: buffer) -- line: 11199
-	-- upvalues: t198 (copy), proto (copy), t1 (copy)
-	local v1675 = t198.new()
+function t192.decode(p122: buffer) -- line: 11353
+	-- upvalues: t192 (copy), proto (copy), t1 (copy)
+	local v1666 = t192.new()
 	local n81 = 0
 
 	while n81 < buffer.len(p122) do
-		local v1677, v1678
+		local v1668, v1669
 
-		v1677, v1678, n81 = proto.readTag(p122, n81)
+		v1668, v1669, n81 = proto.readTag(p122, n81)
 
-		if v1678 == proto.wireTypes.varint then
+		if v1669 == proto.wireTypes.varint then
+			local v1670
+
+			v1670, n81 = proto.readVarInt(p122, n81)
+		elseif v1669 == proto.wireTypes.lengthDelimited then
+			if v1668 == 1 then
+				local v1671
+
+				v1671, n81 = proto.readBuffer(p122, n81)
+				v1666.universe_id = buffer.tostring(v1671)
+			elseif v1668 == 2 then
+				local v1672
+
+				v1672, n81 = proto.readBuffer(p122, n81)
+
+				local v1673 = t1.DevStoreFeedInputData_EntryMapEntry.decode(v1672)
+				local v1674 = t1.FeedEntry.new()
+
+				v1666.entry_map[v1673.key or ""] = v1673.value or v1674
+			elseif v1668 == 3 then
+				local v1675
+
+				v1675, n81 = proto.readBuffer(p122, n81)
+				table.insert(v1666.entry_order, buffer.tostring(v1675))
+			elseif v1668 == 4 then
+				local v1676
+
+				v1676, n81 = proto.readBuffer(p122, n81)
+				v1666.creator_key = buffer.tostring(v1676)
+			else
+				local v1677, v1678 = proto.readVarInt(p122, n81)
+
+				n81 = v1678 + v1677
+			end
+		elseif v1669 == proto.wireTypes.i32 then
 			local v1679
 
-			v1679, n81 = proto.readVarInt(p122, n81)
-		elseif v1678 == proto.wireTypes.lengthDelimited then
-			if v1677 == 1 then
-				local v1680
+			v1679, n81 = proto.readFixed32(p122, n81)
+		elseif v1669 == proto.wireTypes.i64 then
+			local v1680
 
-				v1680, n81 = proto.readBuffer(p122, n81)
-				v1675.key = buffer.tostring(v1680)
-			elseif v1677 == 2 then
-				local v1681
-
-				v1681, n81 = proto.readBuffer(p122, n81)
-				v1675.value = t1.FeedEntry.decode(v1681)
-			else
-				local v1682, v1683 = proto.readVarInt(p122, n81)
-
-				n81 = v1683 + v1682
-			end
-		elseif v1678 == proto.wireTypes.i32 then
-			local v1684
-
-			v1684, n81 = proto.readFixed32(p122, n81)
-		elseif v1678 == proto.wireTypes.i64 then
-			local v1685
-
-			v1685, n81 = proto.readFixed64(p122, n81)
+			v1680, n81 = proto.readFixed64(p122, n81)
 		else
-			error("Unsupported wire type: " .. v1678)
+			error("Unsupported wire type: " .. v1669)
 		end
 	end
 
-	return v1675
+	return v1666
 end
-function t198.jsonEncode(p123) -- line: 11247
-	local t200 = {}
+function t192.jsonEncode(p123) -- line: 11418
+	local t194 = {}
 
-	if p123.key ~= nil and p123.key ~= "" then
-		t200.key = p123.key
+	if p123.universe_id ~= nil and p123.universe_id ~= "" then
+		t194.universeId = p123.universe_id
 	end
 
-	if p123.value ~= nil then
-		t200.value = p123.value:jsonEncode()
+	if p123.entry_map ~= nil and next(p123.entry_map) ~= nil then
+		local t195 = {}
+
+		for v1684, v1685 in p123.entry_map do
+			t195[v1684] = v1685:jsonEncode()
+		end
+
+		t194.entryMap = t195
 	end
 
-	return t200
+	if p123.entry_order ~= nil and #p123.entry_order > 0 then
+		local t196 = {}
+
+		for _, v1688 in p123.entry_order do
+			table.insert(t196, v1688)
+		end
+
+		t194.entryOrder = t196
+	end
+
+	if p123.creator_key ~= nil and p123.creator_key ~= "" then
+		t194.creatorKey = p123.creator_key
+	end
+
+	return t194
 end
-function t198.jsonDecode(t201: {[any]: any}) -- line: 11261
-	-- upvalues: t198 (copy), t1 (copy)
-	local v1689 = t198.new()
+function t192.jsonDecode(t197: {[any]: any}) -- line: 11448
+	-- upvalues: t192 (copy), t1 (copy)
+	local v1690 = t192.new()
 
-	if t201.key ~= nil then
-		v1689.key = t201.key
+	if t197.universe_id ~= nil then
+		v1690.universe_id = t197.universe_id
 	end
 
-	if t201.value ~= nil then
-		v1689.value = t1.FeedEntry.jsonDecode(t201.value)
+	if t197.universeId ~= nil then
+		v1690.universe_id = t197.universeId
 	end
 
-	return v1689
+	if t197.entry_map ~= nil then
+		local t198 = {}
+
+		for v1692, v1693 in t197.entry_map do
+			t198[v1692] = t1.FeedEntry.jsonDecode(v1693)
+		end
+
+		v1690.entry_map = t198
+	end
+
+	if t197.entryMap ~= nil then
+		local t199 = {}
+
+		for v1695, v1696 in t197.entryMap do
+			t199[v1695] = t1.FeedEntry.jsonDecode(v1696)
+		end
+
+		v1690.entry_map = t199
+	end
+
+	if t197.entry_order ~= nil then
+		local t200 = {}
+
+		for _, v1699 in t197.entry_order do
+			table.insert(t200, v1699)
+		end
+
+		v1690.entry_order = t200
+	end
+
+	if t197.entryOrder ~= nil then
+		local t201 = {}
+
+		for _, v1702 in t197.entryOrder do
+			table.insert(t201, v1702)
+		end
+
+		v1690.entry_order = t201
+	end
+
+	if t197.creator_key ~= nil then
+		v1690.creator_key = t197.creator_key
+	end
+
+	if t197.creatorKey ~= nil then
+		v1690.creator_key = t197.creatorKey
+	end
+
+	return v1690
 end
 
-t198.descriptor = {
-	name = "DevStoreFeedInputData_EntryMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+t192.descriptor = {
+	name = "DevStoreFeedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.DevStoreFeedInputData"
 }
-t1.DevStoreFeedInputData_EntryMapEntry = t198
-typeRegistry.default:register(t1.DevStoreFeedInputData_EntryMapEntry)
+t1.DevStoreFeedInputData = t192
+typeRegistry.default:register(t1.DevStoreFeedInputData)
 
 local t202 = {}
 
 t202.__index = t202
 
-function t202.new(t203: {[any]: any}?) -- line: 11291
+function t202.new(t203: {[any]: any}?) -- line: 11520
 	-- upvalues: t202 (copy)
 	return (setmetatable({
-		game_passes = if t203 ~= nil and t203.game_passes ~= nil then t203.game_passes else {}
+		key = if t203 ~= nil and t203.key ~= nil then t203.key else "",
+		value = if t203 ~= nil and t203.value ~= nil then t203.value else nil
 	}, t202))
 end
-function t202.encode(p124) -- line: 11299
+function t202.encode(p124) -- line: 11529
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n82 = 0
 
-	if p124.game_passes ~= nil and #p124.game_passes > 0 then
-		for _, v1695 in p124.game_passes do
-			local v1696 = v1695:encode()
-			local v1697, v1698 = proto.writeTag(buf, n82, 1, proto.wireTypes.lengthDelimited)
+	if p124.key ~= nil and p124.key ~= "" then
+		local v1707, v1708 = proto.writeTag(buf, n82, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n82 = proto.writeBuffer(v1697, v1698, v1696, buffer.len(v1696))
-		end
+		buf, n82 = proto.writeString(v1707, v1708, p124.key)
+	end
+
+	if p124.value ~= nil then
+		local v1709 = p124.value:encode()
+		local v1710, v1711 = proto.writeTag(buf, n82, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n82 = proto.writeBuffer(v1710, v1711, v1709, buffer.len(v1709))
 	end
 
 	local buf46 = buffer.create(n82)
@@ -8194,114 +8281,108 @@ function t202.encode(p124) -- line: 11299
 
 	return buf46
 end
-function t202.decode(p125: buffer) -- line: 11316
+function t202.decode(p125: buffer) -- line: 11549
 	-- upvalues: t202 (copy), proto (copy), t1 (copy)
-	local v1701 = t202.new()
+	local v1714 = t202.new()
 	local n83 = 0
 
 	while n83 < buffer.len(p125) do
-		local v1703, v1704
+		local v1716, v1717
 
-		v1703, v1704, n83 = proto.readTag(p125, n83)
+		v1716, v1717, n83 = proto.readTag(p125, n83)
 
-		if v1704 == proto.wireTypes.varint then
-			local v1705
+		if v1717 == proto.wireTypes.varint then
+			local v1718
 
-			v1705, n83 = proto.readVarInt(p125, n83)
-		elseif v1704 == proto.wireTypes.lengthDelimited then
-			if v1703 == 1 then
-				local v1706
+			v1718, n83 = proto.readVarInt(p125, n83)
+		elseif v1717 == proto.wireTypes.lengthDelimited then
+			if v1716 == 1 then
+				local v1719
 
-				v1706, n83 = proto.readBuffer(p125, n83)
-				table.insert(v1701.game_passes, t1.GamePassCollectionInputData_GamePassItem.decode(v1706))
+				v1719, n83 = proto.readBuffer(p125, n83)
+				v1714.key = buffer.tostring(v1719)
+			elseif v1716 == 2 then
+				local v1720
+
+				v1720, n83 = proto.readBuffer(p125, n83)
+				v1714.value = t1.FeedEntry.decode(v1720)
 			else
-				local v1707, v1708 = proto.readVarInt(p125, n83)
+				local v1721, v1722 = proto.readVarInt(p125, n83)
 
-				n83 = v1708 + v1707
+				n83 = v1722 + v1721
 			end
-		elseif v1704 == proto.wireTypes.i32 then
-			local v1709
+		elseif v1717 == proto.wireTypes.i32 then
+			local v1723
 
-			v1709, n83 = proto.readFixed32(p125, n83)
-		elseif v1704 == proto.wireTypes.i64 then
-			local v1710
+			v1723, n83 = proto.readFixed32(p125, n83)
+		elseif v1717 == proto.wireTypes.i64 then
+			local v1724
 
-			v1710, n83 = proto.readFixed64(p125, n83)
+			v1724, n83 = proto.readFixed64(p125, n83)
 		else
-			error("Unsupported wire type: " .. v1704)
+			error("Unsupported wire type: " .. v1717)
 		end
 	end
 
-	return v1701
+	return v1714
 end
-function t202.jsonEncode(p126) -- line: 11359
+function t202.jsonEncode(p126) -- line: 11597
 	local t204 = {}
 
-	if p126.game_passes ~= nil and #p126.game_passes > 0 then
-		local t205 = {}
+	if p126.key ~= nil and p126.key ~= "" then
+		t204.key = p126.key
+	end
 
-		for _, v1715 in p126.game_passes do
-			table.insert(t205, v1715:jsonEncode())
-		end
-
-		t204.gamePasses = t205
+	if p126.value ~= nil then
+		t204.value = p126.value:jsonEncode()
 	end
 
 	return t204
 end
-function t202.jsonDecode(t206: {[any]: any}) -- line: 11373
+function t202.jsonDecode(t205: {[any]: any}) -- line: 11611
 	-- upvalues: t202 (copy), t1 (copy)
-	local v1717 = t202.new()
+	local v1728 = t202.new()
 
-	if t206.game_passes ~= nil then
-		local t207 = {}
-
-		for _, v1720 in t206.game_passes do
-			table.insert(t207, t1.GamePassCollectionInputData_GamePassItem.jsonDecode(v1720))
-		end
-
-		v1717.game_passes = t207
+	if t205.key ~= nil then
+		v1728.key = t205.key
 	end
 
-	if t206.gamePasses ~= nil then
-		local t208 = {}
-
-		for _, v1723 in t206.gamePasses do
-			table.insert(t208, t1.GamePassCollectionInputData_GamePassItem.jsonDecode(v1723))
-		end
-
-		v1717.game_passes = t208
+	if t205.value ~= nil then
+		v1728.value = t1.FeedEntry.jsonDecode(t205.value)
 	end
 
-	return v1717
+	return v1728
 end
 
 t202.descriptor = {
-	name = "GamePassCollectionInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.GamePassCollectionInputData"
+	name = "DevStoreFeedInputData_EntryMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
 }
-t1.GamePassCollectionInputData = t202
-typeRegistry.default:register(t1.GamePassCollectionInputData)
+t1.DevStoreFeedInputData_EntryMapEntry = t202
+typeRegistry.default:register(t1.DevStoreFeedInputData_EntryMapEntry)
 
-local t209 = {}
+local t206 = {}
 
-t209.__index = t209
+t206.__index = t206
 
-function t209.new(t210: {[any]: any}?) -- line: 11411
-	-- upvalues: t209 (copy)
+function t206.new(t207: {[any]: any}?) -- line: 11641
+	-- upvalues: t206 (copy)
 	return (setmetatable({
-		game_pass_id = if t210 ~= nil and t210.game_pass_id ~= nil then t210.game_pass_id else ""
-	}, t209))
+		game_passes = if t207 ~= nil and t207.game_passes ~= nil then t207.game_passes else {}
+	}, t206))
 end
-function t209.encode(p127) -- line: 11419
+function t206.encode(p127) -- line: 11649
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n84 = 0
 
-	if p127.game_pass_id ~= nil and p127.game_pass_id ~= "" then
-		local v1728, v1729 = proto.writeTag(buf, n84, 1, proto.wireTypes.lengthDelimited)
+	if p127.game_passes ~= nil and #p127.game_passes > 0 then
+		for _, v1734 in p127.game_passes do
+			local v1735 = v1734:encode()
+			local v1736, v1737 = proto.writeTag(buf, n84, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n84 = proto.writeString(v1728, v1729, p127.game_pass_id)
+			buf, n84 = proto.writeBuffer(v1736, v1737, v1735, buffer.len(v1735))
+		end
 	end
 
 	local buf47 = buffer.create(n84)
@@ -8310,99 +8391,114 @@ function t209.encode(p127) -- line: 11419
 
 	return buf47
 end
-function t209.decode(p128: buffer) -- line: 11435
-	-- upvalues: t209 (copy), proto (copy)
-	local v1732 = t209.new()
+function t206.decode(p128: buffer) -- line: 11666
+	-- upvalues: t206 (copy), proto (copy), t1 (copy)
+	local v1740 = t206.new()
 	local n85 = 0
 
 	while n85 < buffer.len(p128) do
-		local v1734, v1735
+		local v1742, v1743
 
-		v1734, v1735, n85 = proto.readTag(p128, n85)
+		v1742, v1743, n85 = proto.readTag(p128, n85)
 
-		if v1735 == proto.wireTypes.varint then
-			local v1736
+		if v1743 == proto.wireTypes.varint then
+			local v1744
 
-			v1736, n85 = proto.readVarInt(p128, n85)
-		elseif v1735 == proto.wireTypes.lengthDelimited then
-			if v1734 == 1 then
-				local v1737
+			v1744, n85 = proto.readVarInt(p128, n85)
+		elseif v1743 == proto.wireTypes.lengthDelimited then
+			if v1742 == 1 then
+				local v1745
 
-				v1737, n85 = proto.readBuffer(p128, n85)
-				v1732.game_pass_id = buffer.tostring(v1737)
+				v1745, n85 = proto.readBuffer(p128, n85)
+				table.insert(v1740.game_passes, t1.GamePassCollectionInputData_GamePassItem.decode(v1745))
 			else
-				local v1738, v1739 = proto.readVarInt(p128, n85)
+				local v1746, v1747 = proto.readVarInt(p128, n85)
 
-				n85 = v1739 + v1738
+				n85 = v1747 + v1746
 			end
-		elseif v1735 == proto.wireTypes.i32 then
-			local v1740
+		elseif v1743 == proto.wireTypes.i32 then
+			local v1748
 
-			v1740, n85 = proto.readFixed32(p128, n85)
-		elseif v1735 == proto.wireTypes.i64 then
-			local v1741
+			v1748, n85 = proto.readFixed32(p128, n85)
+		elseif v1743 == proto.wireTypes.i64 then
+			local v1749
 
-			v1741, n85 = proto.readFixed64(p128, n85)
+			v1749, n85 = proto.readFixed64(p128, n85)
 		else
-			error("Unsupported wire type: " .. v1735)
+			error("Unsupported wire type: " .. v1743)
 		end
 	end
 
-	return v1732
+	return v1740
 end
-function t209.jsonEncode(p129) -- line: 11480
-	local t211 = {}
+function t206.jsonEncode(p129) -- line: 11709
+	local t208 = {}
 
-	if p129.game_pass_id ~= nil and p129.game_pass_id ~= "" then
-		t211.gamePassId = p129.game_pass_id
+	if p129.game_passes ~= nil and #p129.game_passes > 0 then
+		local t209 = {}
+
+		for _, v1754 in p129.game_passes do
+			table.insert(t209, v1754:jsonEncode())
+		end
+
+		t208.gamePasses = t209
 	end
 
-	return t211
+	return t208
 end
-function t209.jsonDecode(t212: {[any]: any}) -- line: 11492
-	-- upvalues: t209 (copy)
-	local v1745 = t209.new()
+function t206.jsonDecode(t210: {[any]: any}) -- line: 11723
+	-- upvalues: t206 (copy), t1 (copy)
+	local v1756 = t206.new()
 
-	if t212.game_pass_id ~= nil then
-		v1745.game_pass_id = t212.game_pass_id
+	if t210.game_passes ~= nil then
+		local t211 = {}
+
+		for _, v1759 in t210.game_passes do
+			table.insert(t211, t1.GamePassCollectionInputData_GamePassItem.jsonDecode(v1759))
+		end
+
+		v1756.game_passes = t211
 	end
 
-	if t212.gamePassId ~= nil then
-		v1745.game_pass_id = t212.gamePassId
+	if t210.gamePasses ~= nil then
+		local t212 = {}
+
+		for _, v1762 in t210.gamePasses do
+			table.insert(t212, t1.GamePassCollectionInputData_GamePassItem.jsonDecode(v1762))
+		end
+
+		v1756.game_passes = t212
 	end
 
-	return v1745
+	return v1756
 end
 
-t209.descriptor = {
-	name = "GamePassCollectionInputData_GamePassItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.GamePassItem"
+t206.descriptor = {
+	name = "GamePassCollectionInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.GamePassCollectionInputData"
 }
-t1.GamePassCollectionInputData_GamePassItem = t209
-typeRegistry.default:register(t1.GamePassCollectionInputData_GamePassItem)
+t1.GamePassCollectionInputData = t206
+typeRegistry.default:register(t1.GamePassCollectionInputData)
 
 local t213 = {}
 
 t213.__index = t213
 
-function t213.new(t214: {[any]: any}?) -- line: 11522
+function t213.new(t214: {[any]: any}?) -- line: 11761
 	-- upvalues: t213 (copy)
 	return (setmetatable({
-		developer_products = if t214 ~= nil and t214.developer_products ~= nil then t214.developer_products else {}
+		game_pass_id = if t214 ~= nil and t214.game_pass_id ~= nil then t214.game_pass_id else ""
 	}, t213))
 end
-function t213.encode(p130) -- line: 11530
+function t213.encode(p130) -- line: 11769
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n86 = 0
 
-	if p130.developer_products ~= nil and #p130.developer_products > 0 then
-		for _, v1751 in p130.developer_products do
-			local v1752 = v1751:encode()
-			local v1753, v1754 = proto.writeTag(buf, n86, 1, proto.wireTypes.lengthDelimited)
+	if p130.game_pass_id ~= nil and p130.game_pass_id ~= "" then
+		local v1767, v1768 = proto.writeTag(buf, n86, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n86 = proto.writeBuffer(v1753, v1754, v1752, buffer.len(v1752))
-		end
+		buf, n86 = proto.writeString(v1767, v1768, p130.game_pass_id)
 	end
 
 	local buf48 = buffer.create(n86)
@@ -8411,114 +8507,99 @@ function t213.encode(p130) -- line: 11530
 
 	return buf48
 end
-function t213.decode(p131: buffer) -- line: 11547
-	-- upvalues: t213 (copy), proto (copy), t1 (copy)
-	local v1757 = t213.new()
+function t213.decode(p131: buffer) -- line: 11785
+	-- upvalues: t213 (copy), proto (copy)
+	local v1771 = t213.new()
 	local n87 = 0
 
 	while n87 < buffer.len(p131) do
-		local v1759, v1760
+		local v1773, v1774
 
-		v1759, v1760, n87 = proto.readTag(p131, n87)
+		v1773, v1774, n87 = proto.readTag(p131, n87)
 
-		if v1760 == proto.wireTypes.varint then
-			local v1761
+		if v1774 == proto.wireTypes.varint then
+			local v1775
 
-			v1761, n87 = proto.readVarInt(p131, n87)
-		elseif v1760 == proto.wireTypes.lengthDelimited then
-			if v1759 == 1 then
-				local v1762
+			v1775, n87 = proto.readVarInt(p131, n87)
+		elseif v1774 == proto.wireTypes.lengthDelimited then
+			if v1773 == 1 then
+				local v1776
 
-				v1762, n87 = proto.readBuffer(p131, n87)
-				table.insert(v1757.developer_products, t1.DeveloperProductCollectionInputData_DeveloperProductItem.decode(v1762))
+				v1776, n87 = proto.readBuffer(p131, n87)
+				v1771.game_pass_id = buffer.tostring(v1776)
 			else
-				local v1763, v1764 = proto.readVarInt(p131, n87)
+				local v1777, v1778 = proto.readVarInt(p131, n87)
 
-				n87 = v1764 + v1763
+				n87 = v1778 + v1777
 			end
-		elseif v1760 == proto.wireTypes.i32 then
-			local v1765
+		elseif v1774 == proto.wireTypes.i32 then
+			local v1779
 
-			v1765, n87 = proto.readFixed32(p131, n87)
-		elseif v1760 == proto.wireTypes.i64 then
-			local v1766
+			v1779, n87 = proto.readFixed32(p131, n87)
+		elseif v1774 == proto.wireTypes.i64 then
+			local v1780
 
-			v1766, n87 = proto.readFixed64(p131, n87)
+			v1780, n87 = proto.readFixed64(p131, n87)
 		else
-			error("Unsupported wire type: " .. v1760)
+			error("Unsupported wire type: " .. v1774)
 		end
 	end
 
-	return v1757
+	return v1771
 end
-function t213.jsonEncode(p132) -- line: 11593
+function t213.jsonEncode(p132) -- line: 11830
 	local t215 = {}
 
-	if p132.developer_products ~= nil and #p132.developer_products > 0 then
-		local t216 = {}
-
-		for _, v1771 in p132.developer_products do
-			table.insert(t216, v1771:jsonEncode())
-		end
-
-		t215.developerProducts = t216
+	if p132.game_pass_id ~= nil and p132.game_pass_id ~= "" then
+		t215.gamePassId = p132.game_pass_id
 	end
 
 	return t215
 end
-function t213.jsonDecode(t217: {[any]: any}) -- line: 11607
-	-- upvalues: t213 (copy), t1 (copy)
-	local v1773 = t213.new()
+function t213.jsonDecode(t216: {[any]: any}) -- line: 11842
+	-- upvalues: t213 (copy)
+	local v1784 = t213.new()
 
-	if t217.developer_products ~= nil then
-		local t218 = {}
-
-		for _, v1776 in t217.developer_products do
-			table.insert(t218, t1.DeveloperProductCollectionInputData_DeveloperProductItem.jsonDecode(v1776))
-		end
-
-		v1773.developer_products = t218
+	if t216.game_pass_id ~= nil then
+		v1784.game_pass_id = t216.game_pass_id
 	end
 
-	if t217.developerProducts ~= nil then
-		local t219 = {}
-
-		for _, v1779 in t217.developerProducts do
-			table.insert(t219, t1.DeveloperProductCollectionInputData_DeveloperProductItem.jsonDecode(v1779))
-		end
-
-		v1773.developer_products = t219
+	if t216.gamePassId ~= nil then
+		v1784.game_pass_id = t216.gamePassId
 	end
 
-	return v1773
+	return v1784
 end
 
 t213.descriptor = {
-	name = "DeveloperProductCollectionInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.DeveloperProductCollectionInputData"
+	name = "GamePassCollectionInputData_GamePassItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.GamePassItem"
 }
-t1.DeveloperProductCollectionInputData = t213
-typeRegistry.default:register(t1.DeveloperProductCollectionInputData)
+t1.GamePassCollectionInputData_GamePassItem = t213
+typeRegistry.default:register(t1.GamePassCollectionInputData_GamePassItem)
 
-local t220 = {}
+local t217 = {}
 
-t220.__index = t220
+t217.__index = t217
 
-function t220.new(t221: {[any]: any}?) -- line: 11654
-	-- upvalues: t220 (copy)
+function t217.new(t218: {[any]: any}?) -- line: 11872
+	-- upvalues: t217 (copy)
 	return (setmetatable({
-		developer_product_id = if t221 ~= nil and t221.developer_product_id ~= nil then t221.developer_product_id else ""
-	}, t220))
+		developer_products = if t218 ~= nil and t218.developer_products ~= nil then t218.developer_products else {}
+	}, t217))
 end
-function t220.encode(p133) -- line: 11667
+function t217.encode(p133) -- line: 11880
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n88 = 0
 
-	if p133.developer_product_id ~= nil and p133.developer_product_id ~= "" then
-		local v1784, v1785 = proto.writeTag(buf, n88, 1, proto.wireTypes.lengthDelimited)
+	if p133.developer_products ~= nil and #p133.developer_products > 0 then
+		for _, v1790 in p133.developer_products do
+			local v1791 = v1790:encode()
+			local v1792, v1793 = proto.writeTag(buf, n88, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n88 = proto.writeString(v1784, v1785, p133.developer_product_id)
+			buf, n88 = proto.writeBuffer(v1792, v1793, v1791, buffer.len(v1791))
+		end
 	end
 
 	local buf49 = buffer.create(n88)
@@ -8527,99 +8608,114 @@ function t220.encode(p133) -- line: 11667
 
 	return buf49
 end
-function t220.decode(p134: buffer) -- line: 11683
-	-- upvalues: t220 (copy), proto (copy)
-	local v1788 = t220.new()
+function t217.decode(p134: buffer) -- line: 11897
+	-- upvalues: t217 (copy), proto (copy), t1 (copy)
+	local v1796 = t217.new()
 	local n89 = 0
 
 	while n89 < buffer.len(p134) do
-		local v1790, v1791
+		local v1798, v1799
 
-		v1790, v1791, n89 = proto.readTag(p134, n89)
+		v1798, v1799, n89 = proto.readTag(p134, n89)
 
-		if v1791 == proto.wireTypes.varint then
-			local v1792
+		if v1799 == proto.wireTypes.varint then
+			local v1800
 
-			v1792, n89 = proto.readVarInt(p134, n89)
-		elseif v1791 == proto.wireTypes.lengthDelimited then
-			if v1790 == 1 then
-				local v1793
+			v1800, n89 = proto.readVarInt(p134, n89)
+		elseif v1799 == proto.wireTypes.lengthDelimited then
+			if v1798 == 1 then
+				local v1801
 
-				v1793, n89 = proto.readBuffer(p134, n89)
-				v1788.developer_product_id = buffer.tostring(v1793)
+				v1801, n89 = proto.readBuffer(p134, n89)
+				table.insert(v1796.developer_products, t1.DeveloperProductCollectionInputData_DeveloperProductItem.decode(v1801))
 			else
-				local v1794, v1795 = proto.readVarInt(p134, n89)
+				local v1802, v1803 = proto.readVarInt(p134, n89)
 
-				n89 = v1795 + v1794
+				n89 = v1803 + v1802
 			end
-		elseif v1791 == proto.wireTypes.i32 then
-			local v1796
+		elseif v1799 == proto.wireTypes.i32 then
+			local v1804
 
-			v1796, n89 = proto.readFixed32(p134, n89)
-		elseif v1791 == proto.wireTypes.i64 then
-			local v1797
+			v1804, n89 = proto.readFixed32(p134, n89)
+		elseif v1799 == proto.wireTypes.i64 then
+			local v1805
 
-			v1797, n89 = proto.readFixed64(p134, n89)
+			v1805, n89 = proto.readFixed64(p134, n89)
 		else
-			error("Unsupported wire type: " .. v1791)
+			error("Unsupported wire type: " .. v1799)
 		end
 	end
 
-	return v1788
+	return v1796
 end
-function t220.jsonEncode(p135) -- line: 11728
-	local t222 = {}
+function t217.jsonEncode(p135) -- line: 11943
+	local t219 = {}
 
-	if p135.developer_product_id ~= nil and p135.developer_product_id ~= "" then
-		t222.developerProductId = p135.developer_product_id
+	if p135.developer_products ~= nil and #p135.developer_products > 0 then
+		local t220 = {}
+
+		for _, v1810 in p135.developer_products do
+			table.insert(t220, v1810:jsonEncode())
+		end
+
+		t219.developerProducts = t220
 	end
 
-	return t222
+	return t219
 end
-function t220.jsonDecode(t223: {[any]: any}) -- line: 11740
-	-- upvalues: t220 (copy)
-	local v1801 = t220.new()
+function t217.jsonDecode(t221: {[any]: any}) -- line: 11957
+	-- upvalues: t217 (copy), t1 (copy)
+	local v1812 = t217.new()
 
-	if t223.developer_product_id ~= nil then
-		v1801.developer_product_id = t223.developer_product_id
+	if t221.developer_products ~= nil then
+		local t222 = {}
+
+		for _, v1815 in t221.developer_products do
+			table.insert(t222, t1.DeveloperProductCollectionInputData_DeveloperProductItem.jsonDecode(v1815))
+		end
+
+		v1812.developer_products = t222
 	end
 
-	if t223.developerProductId ~= nil then
-		v1801.developer_product_id = t223.developerProductId
+	if t221.developerProducts ~= nil then
+		local t223 = {}
+
+		for _, v1818 in t221.developerProducts do
+			table.insert(t223, t1.DeveloperProductCollectionInputData_DeveloperProductItem.jsonDecode(v1818))
+		end
+
+		v1812.developer_products = t223
 	end
 
-	return v1801
+	return v1812
 end
 
-t220.descriptor = {
-	name = "DeveloperProductCollectionInputData_DeveloperProductItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.DeveloperProductItem"
+t217.descriptor = {
+	name = "DeveloperProductCollectionInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.DeveloperProductCollectionInputData"
 }
-t1.DeveloperProductCollectionInputData_DeveloperProductItem = t220
-typeRegistry.default:register(t1.DeveloperProductCollectionInputData_DeveloperProductItem)
+t1.DeveloperProductCollectionInputData = t217
+typeRegistry.default:register(t1.DeveloperProductCollectionInputData)
 
 local t224 = {}
 
 t224.__index = t224
 
-function t224.new(t225: {[any]: any}?) -- line: 11771
+function t224.new(t225: {[any]: any}?) -- line: 12004
 	-- upvalues: t224 (copy)
 	return (setmetatable({
-		subscriptions = if t225 ~= nil and t225.subscriptions ~= nil then t225.subscriptions else {}
+		developer_product_id = if t225 ~= nil and t225.developer_product_id ~= nil then t225.developer_product_id else ""
 	}, t224))
 end
-function t224.encode(p136) -- line: 11779
+function t224.encode(p136) -- line: 12017
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n90 = 0
 
-	if p136.subscriptions ~= nil and #p136.subscriptions > 0 then
-		for _, v1807 in p136.subscriptions do
-			local v1808 = v1807:encode()
-			local v1809, v1810 = proto.writeTag(buf, n90, 1, proto.wireTypes.lengthDelimited)
+	if p136.developer_product_id ~= nil and p136.developer_product_id ~= "" then
+		local v1823, v1824 = proto.writeTag(buf, n90, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n90 = proto.writeBuffer(v1809, v1810, v1808, buffer.len(v1808))
-		end
+		buf, n90 = proto.writeString(v1823, v1824, p136.developer_product_id)
 	end
 
 	local buf50 = buffer.create(n90)
@@ -8628,104 +8724,99 @@ function t224.encode(p136) -- line: 11779
 
 	return buf50
 end
-function t224.decode(p137: buffer) -- line: 11796
-	-- upvalues: t224 (copy), proto (copy), t1 (copy)
-	local v1813 = t224.new()
+function t224.decode(p137: buffer) -- line: 12033
+	-- upvalues: t224 (copy), proto (copy)
+	local v1827 = t224.new()
 	local n91 = 0
 
 	while n91 < buffer.len(p137) do
-		local v1815, v1816
+		local v1829, v1830
 
-		v1815, v1816, n91 = proto.readTag(p137, n91)
+		v1829, v1830, n91 = proto.readTag(p137, n91)
 
-		if v1816 == proto.wireTypes.varint then
-			local v1817
+		if v1830 == proto.wireTypes.varint then
+			local v1831
 
-			v1817, n91 = proto.readVarInt(p137, n91)
-		elseif v1816 == proto.wireTypes.lengthDelimited then
-			if v1815 == 1 then
-				local v1818
+			v1831, n91 = proto.readVarInt(p137, n91)
+		elseif v1830 == proto.wireTypes.lengthDelimited then
+			if v1829 == 1 then
+				local v1832
 
-				v1818, n91 = proto.readBuffer(p137, n91)
-				table.insert(v1813.subscriptions, t1.SubscriptionCollectionInputData_SubscriptionItem.decode(v1818))
+				v1832, n91 = proto.readBuffer(p137, n91)
+				v1827.developer_product_id = buffer.tostring(v1832)
 			else
-				local v1819, v1820 = proto.readVarInt(p137, n91)
+				local v1833, v1834 = proto.readVarInt(p137, n91)
 
-				n91 = v1820 + v1819
+				n91 = v1834 + v1833
 			end
-		elseif v1816 == proto.wireTypes.i32 then
-			local v1821
+		elseif v1830 == proto.wireTypes.i32 then
+			local v1835
 
-			v1821, n91 = proto.readFixed32(p137, n91)
-		elseif v1816 == proto.wireTypes.i64 then
-			local v1822
+			v1835, n91 = proto.readFixed32(p137, n91)
+		elseif v1830 == proto.wireTypes.i64 then
+			local v1836
 
-			v1822, n91 = proto.readFixed64(p137, n91)
+			v1836, n91 = proto.readFixed64(p137, n91)
 		else
-			error("Unsupported wire type: " .. v1816)
+			error("Unsupported wire type: " .. v1830)
 		end
 	end
 
-	return v1813
+	return v1827
 end
-function t224.jsonEncode(p138) -- line: 11842
+function t224.jsonEncode(p138) -- line: 12078
 	local t226 = {}
 
-	if p138.subscriptions ~= nil and #p138.subscriptions > 0 then
-		local t227 = {}
-
-		for _, v1827 in p138.subscriptions do
-			table.insert(t227, v1827:jsonEncode())
-		end
-
-		t226.subscriptions = t227
+	if p138.developer_product_id ~= nil and p138.developer_product_id ~= "" then
+		t226.developerProductId = p138.developer_product_id
 	end
 
 	return t226
 end
-function t224.jsonDecode(t228: {[any]: any}) -- line: 11856
-	-- upvalues: t224 (copy), t1 (copy)
-	local v1829 = t224.new()
+function t224.jsonDecode(t227: {[any]: any}) -- line: 12090
+	-- upvalues: t224 (copy)
+	local v1840 = t224.new()
 
-	if t228.subscriptions ~= nil then
-		local t229 = {}
-
-		for _, v1832 in t228.subscriptions do
-			table.insert(t229, t1.SubscriptionCollectionInputData_SubscriptionItem.jsonDecode(v1832))
-		end
-
-		v1829.subscriptions = t229
+	if t227.developer_product_id ~= nil then
+		v1840.developer_product_id = t227.developer_product_id
 	end
 
-	return v1829
+	if t227.developerProductId ~= nil then
+		v1840.developer_product_id = t227.developerProductId
+	end
+
+	return v1840
 end
 
 t224.descriptor = {
-	name = "SubscriptionCollectionInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SubscriptionCollectionInputData"
+	name = "DeveloperProductCollectionInputData_DeveloperProductItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.DeveloperProductItem"
 }
-t1.SubscriptionCollectionInputData = t224
-typeRegistry.default:register(t1.SubscriptionCollectionInputData)
+t1.DeveloperProductCollectionInputData_DeveloperProductItem = t224
+typeRegistry.default:register(t1.DeveloperProductCollectionInputData_DeveloperProductItem)
 
-local t230 = {}
+local t228 = {}
 
-t230.__index = t230
+t228.__index = t228
 
-function t230.new(t231: {[any]: any}?) -- line: 11886
-	-- upvalues: t230 (copy)
+function t228.new(t229: {[any]: any}?) -- line: 12121
+	-- upvalues: t228 (copy)
 	return (setmetatable({
-		subscription_id = if t231 ~= nil and t231.subscription_id ~= nil then t231.subscription_id else ""
-	}, t230))
+		subscriptions = if t229 ~= nil and t229.subscriptions ~= nil then t229.subscriptions else {}
+	}, t228))
 end
-function t230.encode(p139) -- line: 11897
+function t228.encode(p139) -- line: 12129
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n92 = 0
 
-	if p139.subscription_id ~= nil and p139.subscription_id ~= "" then
-		local v1837, v1838 = proto.writeTag(buf, n92, 1, proto.wireTypes.lengthDelimited)
+	if p139.subscriptions ~= nil and #p139.subscriptions > 0 then
+		for _, v1846 in p139.subscriptions do
+			local v1847 = v1846:encode()
+			local v1848, v1849 = proto.writeTag(buf, n92, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n92 = proto.writeString(v1837, v1838, p139.subscription_id)
+			buf, n92 = proto.writeBuffer(v1848, v1849, v1847, buffer.len(v1847))
+		end
 	end
 
 	local buf51 = buffer.create(n92)
@@ -8734,145 +8825,104 @@ function t230.encode(p139) -- line: 11897
 
 	return buf51
 end
-function t230.decode(p140: buffer) -- line: 11913
-	-- upvalues: t230 (copy), proto (copy)
-	local v1841 = t230.new()
+function t228.decode(p140: buffer) -- line: 12146
+	-- upvalues: t228 (copy), proto (copy), t1 (copy)
+	local v1852 = t228.new()
 	local n93 = 0
 
 	while n93 < buffer.len(p140) do
-		local v1843, v1844
+		local v1854, v1855
 
-		v1843, v1844, n93 = proto.readTag(p140, n93)
+		v1854, v1855, n93 = proto.readTag(p140, n93)
 
-		if v1844 == proto.wireTypes.varint then
-			local v1845
+		if v1855 == proto.wireTypes.varint then
+			local v1856
 
-			v1845, n93 = proto.readVarInt(p140, n93)
-		elseif v1844 == proto.wireTypes.lengthDelimited then
-			if v1843 == 1 then
-				local v1846
+			v1856, n93 = proto.readVarInt(p140, n93)
+		elseif v1855 == proto.wireTypes.lengthDelimited then
+			if v1854 == 1 then
+				local v1857
 
-				v1846, n93 = proto.readBuffer(p140, n93)
-				v1841.subscription_id = buffer.tostring(v1846)
+				v1857, n93 = proto.readBuffer(p140, n93)
+				table.insert(v1852.subscriptions, t1.SubscriptionCollectionInputData_SubscriptionItem.decode(v1857))
 			else
-				local v1847, v1848 = proto.readVarInt(p140, n93)
+				local v1858, v1859 = proto.readVarInt(p140, n93)
 
-				n93 = v1848 + v1847
+				n93 = v1859 + v1858
 			end
-		elseif v1844 == proto.wireTypes.i32 then
-			local v1849
+		elseif v1855 == proto.wireTypes.i32 then
+			local v1860
 
-			v1849, n93 = proto.readFixed32(p140, n93)
-		elseif v1844 == proto.wireTypes.i64 then
-			local v1850
+			v1860, n93 = proto.readFixed32(p140, n93)
+		elseif v1855 == proto.wireTypes.i64 then
+			local v1861
 
-			v1850, n93 = proto.readFixed64(p140, n93)
+			v1861, n93 = proto.readFixed64(p140, n93)
 		else
-			error("Unsupported wire type: " .. v1844)
+			error("Unsupported wire type: " .. v1855)
 		end
 	end
 
-	return v1841
+	return v1852
 end
-function t230.jsonEncode(p141) -- line: 11958
-	local t232 = {}
+function t228.jsonEncode(p141) -- line: 12192
+	local t230 = {}
 
-	if p141.subscription_id ~= nil and p141.subscription_id ~= "" then
-		t232.subscriptionId = p141.subscription_id
+	if p141.subscriptions ~= nil and #p141.subscriptions > 0 then
+		local t231 = {}
+
+		for _, v1866 in p141.subscriptions do
+			table.insert(t231, v1866:jsonEncode())
+		end
+
+		t230.subscriptions = t231
 	end
 
-	return t232
+	return t230
 end
-function t230.jsonDecode(t233: {[any]: any}) -- line: 11970
-	-- upvalues: t230 (copy)
-	local v1854 = t230.new()
+function t228.jsonDecode(t232: {[any]: any}) -- line: 12206
+	-- upvalues: t228 (copy), t1 (copy)
+	local v1868 = t228.new()
 
-	if t233.subscription_id ~= nil then
-		v1854.subscription_id = t233.subscription_id
+	if t232.subscriptions ~= nil then
+		local t233 = {}
+
+		for _, v1871 in t232.subscriptions do
+			table.insert(t233, t1.SubscriptionCollectionInputData_SubscriptionItem.jsonDecode(v1871))
+		end
+
+		v1868.subscriptions = t233
 	end
 
-	if t233.subscriptionId ~= nil then
-		v1854.subscription_id = t233.subscriptionId
-	end
-
-	return v1854
+	return v1868
 end
 
-t230.descriptor = {
-	name = "SubscriptionCollectionInputData_SubscriptionItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SubscriptionItem"
+t228.descriptor = {
+	name = "SubscriptionCollectionInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SubscriptionCollectionInputData"
 }
-t1.SubscriptionCollectionInputData_SubscriptionItem = t230
-typeRegistry.default:register(t1.SubscriptionCollectionInputData_SubscriptionItem)
+t1.SubscriptionCollectionInputData = t228
+typeRegistry.default:register(t1.SubscriptionCollectionInputData)
 
 local t234 = {}
 
 t234.__index = t234
 
-function t234.new(t235: {[any]: any}?) -- line: 12001
+function t234.new(t235: {[any]: any}?) -- line: 12236
 	-- upvalues: t234 (copy)
 	return (setmetatable({
-		roblox_component = if t235 ~= nil and t235.roblox_component ~= nil then t235.roblox_component else "",
-		identifier = if t235 ~= nil and t235.identifier ~= nil then t235.identifier else "",
-		title = if t235 ~= nil and t235.title ~= nil then t235.title else "",
-		user_id = if t235 ~= nil and t235.user_id ~= nil then t235.user_id else "",
-		description = if t235 ~= nil and t235.description ~= nil then t235.description else "",
-		cta_text = if t235 ~= nil and t235.cta_text ~= nil then t235.cta_text else "",
-		prompt_id = if t235 ~= nil and t235.prompt_id ~= nil then t235.prompt_id else "",
-		prompt_type = if t235 ~= nil and t235.prompt_type ~= nil then t235.prompt_type else ""
+		subscription_id = if t235 ~= nil and t235.subscription_id ~= nil then t235.subscription_id else ""
 	}, t234))
 end
-function t234.encode(p142) -- line: 12016
+function t234.encode(p142) -- line: 12247
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n94 = 0
 
-	if p142.roblox_component ~= nil and p142.roblox_component ~= "" then
-		local v1859, v1860 = proto.writeTag(buf, n94, 1, proto.wireTypes.lengthDelimited)
+	if p142.subscription_id ~= nil and p142.subscription_id ~= "" then
+		local v1876, v1877 = proto.writeTag(buf, n94, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n94 = proto.writeString(v1859, v1860, p142.roblox_component)
-	end
-
-	if p142.identifier ~= nil and p142.identifier ~= "" then
-		local v1861, v1862 = proto.writeTag(buf, n94, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1861, v1862, p142.identifier)
-	end
-
-	if p142.title ~= nil and p142.title ~= "" then
-		local v1863, v1864 = proto.writeTag(buf, n94, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1863, v1864, p142.title)
-	end
-
-	if p142.user_id ~= nil and p142.user_id ~= "" then
-		local v1865, v1866 = proto.writeTag(buf, n94, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1865, v1866, p142.user_id)
-	end
-
-	if p142.description ~= nil and p142.description ~= "" then
-		local v1867, v1868 = proto.writeTag(buf, n94, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1867, v1868, p142.description)
-	end
-
-	if p142.cta_text ~= nil and p142.cta_text ~= "" then
-		local v1869, v1870 = proto.writeTag(buf, n94, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1869, v1870, p142.cta_text)
-	end
-
-	if p142.prompt_id ~= nil and p142.prompt_id ~= "" then
-		local v1871, v1872 = proto.writeTag(buf, n94, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1871, v1872, p142.prompt_id)
-	end
-
-	if p142.prompt_type ~= nil and p142.prompt_type ~= "" then
-		local v1873, v1874 = proto.writeTag(buf, n94, 8, proto.wireTypes.lengthDelimited)
-
-		buf, n94 = proto.writeString(v1873, v1874, p142.prompt_type)
+		buf, n94 = proto.writeString(v1876, v1877, p142.subscription_id)
 	end
 
 	local buf52 = buffer.create(n94)
@@ -8881,241 +8931,113 @@ function t234.encode(p142) -- line: 12016
 
 	return buf52
 end
-function t234.decode(p143: buffer) -- line: 12065
+function t234.decode(p143: buffer) -- line: 12263
 	-- upvalues: t234 (copy), proto (copy)
-	local v1877 = t234.new()
+	local v1880 = t234.new()
 	local n95 = 0
 
 	while n95 < buffer.len(p143) do
-		local v1879, v1880
+		local v1882, v1883
 
-		v1879, v1880, n95 = proto.readTag(p143, n95)
+		v1882, v1883, n95 = proto.readTag(p143, n95)
 
-		if v1880 == proto.wireTypes.varint then
-			local v1881
+		if v1883 == proto.wireTypes.varint then
+			local v1884
 
-			v1881, n95 = proto.readVarInt(p143, n95)
-		elseif v1880 == proto.wireTypes.lengthDelimited then
-			if v1879 == 1 then
-				local v1882
-
-				v1882, n95 = proto.readBuffer(p143, n95)
-				v1877.roblox_component = buffer.tostring(v1882)
-			elseif v1879 == 2 then
-				local v1883
-
-				v1883, n95 = proto.readBuffer(p143, n95)
-				v1877.identifier = buffer.tostring(v1883)
-			elseif v1879 == 3 then
-				local v1884
-
-				v1884, n95 = proto.readBuffer(p143, n95)
-				v1877.title = buffer.tostring(v1884)
-			elseif v1879 == 4 then
+			v1884, n95 = proto.readVarInt(p143, n95)
+		elseif v1883 == proto.wireTypes.lengthDelimited then
+			if v1882 == 1 then
 				local v1885
 
 				v1885, n95 = proto.readBuffer(p143, n95)
-				v1877.user_id = buffer.tostring(v1885)
-			elseif v1879 == 5 then
-				local v1886
-
-				v1886, n95 = proto.readBuffer(p143, n95)
-				v1877.description = buffer.tostring(v1886)
-			elseif v1879 == 6 then
-				local v1887
-
-				v1887, n95 = proto.readBuffer(p143, n95)
-				v1877.cta_text = buffer.tostring(v1887)
-			elseif v1879 == 7 then
-				local v1888
-
-				v1888, n95 = proto.readBuffer(p143, n95)
-				v1877.prompt_id = buffer.tostring(v1888)
-			elseif v1879 == 8 then
-				local v1889
-
-				v1889, n95 = proto.readBuffer(p143, n95)
-				v1877.prompt_type = buffer.tostring(v1889)
+				v1880.subscription_id = buffer.tostring(v1885)
 			else
-				local v1890, v1891 = proto.readVarInt(p143, n95)
+				local v1886, v1887 = proto.readVarInt(p143, n95)
 
-				n95 = v1891 + v1890
+				n95 = v1887 + v1886
 			end
-		elseif v1880 == proto.wireTypes.i32 then
-			local v1892
+		elseif v1883 == proto.wireTypes.i32 then
+			local v1888
 
-			v1892, n95 = proto.readFixed32(p143, n95)
-		elseif v1880 == proto.wireTypes.i64 then
-			local v1893
+			v1888, n95 = proto.readFixed32(p143, n95)
+		elseif v1883 == proto.wireTypes.i64 then
+			local v1889
 
-			v1893, n95 = proto.readFixed64(p143, n95)
+			v1889, n95 = proto.readFixed64(p143, n95)
 		else
-			error("Unsupported wire type: " .. v1880)
+			error("Unsupported wire type: " .. v1883)
 		end
 	end
 
-	return v1877
+	return v1880
 end
-function t234.jsonEncode(p144) -- line: 12143
+function t234.jsonEncode(p144) -- line: 12308
 	local t236 = {}
 
-	if p144.roblox_component ~= nil and p144.roblox_component ~= "" then
-		t236.robloxComponent = p144.roblox_component
-	end
-
-	if p144.identifier ~= nil and p144.identifier ~= "" then
-		t236.identifier = p144.identifier
-	end
-
-	if p144.title ~= nil and p144.title ~= "" then
-		t236.title = p144.title
-	end
-
-	if p144.user_id ~= nil and p144.user_id ~= "" then
-		t236.userId = p144.user_id
-	end
-
-	if p144.description ~= nil and p144.description ~= "" then
-		t236.description = p144.description
-	end
-
-	if p144.cta_text ~= nil and p144.cta_text ~= "" then
-		t236.ctaText = p144.cta_text
-	end
-
-	if p144.prompt_id ~= nil and p144.prompt_id ~= "" then
-		t236.promptId = p144.prompt_id
-	end
-
-	if p144.prompt_type ~= nil and p144.prompt_type ~= "" then
-		t236.promptType = p144.prompt_type
+	if p144.subscription_id ~= nil and p144.subscription_id ~= "" then
+		t236.subscriptionId = p144.subscription_id
 	end
 
 	return t236
 end
-function t234.jsonDecode(t237: {[any]: any}) -- line: 12181
+function t234.jsonDecode(t237: {[any]: any}) -- line: 12320
 	-- upvalues: t234 (copy)
-	local v1897 = t234.new()
+	local v1893 = t234.new()
 
-	if t237.roblox_component ~= nil then
-		v1897.roblox_component = t237.roblox_component
+	if t237.subscription_id ~= nil then
+		v1893.subscription_id = t237.subscription_id
 	end
 
-	if t237.robloxComponent ~= nil then
-		v1897.roblox_component = t237.robloxComponent
+	if t237.subscriptionId ~= nil then
+		v1893.subscription_id = t237.subscriptionId
 	end
 
-	if t237.identifier ~= nil then
-		v1897.identifier = t237.identifier
-	end
-
-	if t237.title ~= nil then
-		v1897.title = t237.title
-	end
-
-	if t237.user_id ~= nil then
-		v1897.user_id = t237.user_id
-	end
-
-	if t237.userId ~= nil then
-		v1897.user_id = t237.userId
-	end
-
-	if t237.description ~= nil then
-		v1897.description = t237.description
-	end
-
-	if t237.cta_text ~= nil then
-		v1897.cta_text = t237.cta_text
-	end
-
-	if t237.ctaText ~= nil then
-		v1897.cta_text = t237.ctaText
-	end
-
-	if t237.prompt_id ~= nil then
-		v1897.prompt_id = t237.prompt_id
-	end
-
-	if t237.promptId ~= nil then
-		v1897.prompt_id = t237.promptId
-	end
-
-	if t237.prompt_type ~= nil then
-		v1897.prompt_type = t237.prompt_type
-	end
-
-	if t237.promptType ~= nil then
-		v1897.prompt_type = t237.promptType
-	end
-
-	return v1897
+	return v1893
 end
 
 t234.descriptor = {
-	name = "CardContainerCardInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CardContainerCardInputData"
+	name = "SubscriptionCollectionInputData_SubscriptionItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SubscriptionItem"
 }
-t1.CardContainerCardInputData = t234
-typeRegistry.default:register(t1.CardContainerCardInputData)
+t1.SubscriptionCollectionInputData_SubscriptionItem = t234
+typeRegistry.default:register(t1.SubscriptionCollectionInputData_SubscriptionItem)
 
 local t238 = {}
 
 t238.__index = t238
 
-function t238.new(t239: {[any]: any}?) -- line: 12253
+function t238.new(t239: {[any]: any}?) -- line: 12351
 	-- upvalues: t238 (copy)
 	return (setmetatable({
-		title = if t239 ~= nil and t239.title ~= nil then t239.title else "",
-		dismiss_text = if t239 ~= nil and t239.dismiss_text ~= nil then t239.dismiss_text else "",
-		user_id = if t239 ~= nil and t239.user_id ~= nil then t239.user_id else "",
-		cards = if t239 ~= nil and t239.cards ~= nil then t239.cards else {},
-		prompt_id = if t239 ~= nil and t239.prompt_id ~= nil then t239.prompt_id else "",
-		prompt_type = if t239 ~= nil and t239.prompt_type ~= nil then t239.prompt_type else ""
+		items = if t239 ~= nil and t239.items ~= nil then t239.items else {},
+		universe_id = if t239 ~= nil and t239.universe_id ~= nil then t239.universe_id else "",
+		section_title = if t239 ~= nil and t239.section_title ~= nil then t239.section_title else ""
 	}, t238))
 end
-function t238.encode(p145) -- line: 12264
+function t238.encode(p145) -- line: 12361
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n96 = 0
 
-	if p145.title ~= nil and p145.title ~= "" then
-		local v1902, v1903 = proto.writeTag(buf, n96, 1, proto.wireTypes.lengthDelimited)
+	if p145.items ~= nil and #p145.items > 0 then
+		for _, v1899 in p145.items do
+			local v1900 = v1899:encode()
+			local v1901, v1902 = proto.writeTag(buf, n96, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n96 = proto.writeString(v1902, v1903, p145.title)
-	end
-
-	if p145.dismiss_text ~= nil and p145.dismiss_text ~= "" then
-		local v1904, v1905 = proto.writeTag(buf, n96, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n96 = proto.writeString(v1904, v1905, p145.dismiss_text)
-	end
-
-	if p145.user_id ~= nil and p145.user_id ~= "" then
-		local v1906, v1907 = proto.writeTag(buf, n96, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n96 = proto.writeString(v1906, v1907, p145.user_id)
-	end
-
-	if p145.cards ~= nil and #p145.cards > 0 then
-		for _, v1909 in p145.cards do
-			local v1910 = v1909:encode()
-			local v1911, v1912 = proto.writeTag(buf, n96, 4, proto.wireTypes.lengthDelimited)
-
-			buf, n96 = proto.writeBuffer(v1911, v1912, v1910, buffer.len(v1910))
+			buf, n96 = proto.writeBuffer(v1901, v1902, v1900, buffer.len(v1900))
 		end
 	end
 
-	if p145.prompt_id ~= nil and p145.prompt_id ~= "" then
-		local v1913, v1914 = proto.writeTag(buf, n96, 5, proto.wireTypes.lengthDelimited)
+	if p145.universe_id ~= nil and p145.universe_id ~= "" then
+		local v1903, v1904 = proto.writeTag(buf, n96, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n96 = proto.writeString(v1913, v1914, p145.prompt_id)
+		buf, n96 = proto.writeString(v1903, v1904, p145.universe_id)
 	end
 
-	if p145.prompt_type ~= nil and p145.prompt_type ~= "" then
-		local v1915, v1916 = proto.writeTag(buf, n96, 6, proto.wireTypes.lengthDelimited)
+	if p145.section_title ~= nil and p145.section_title ~= "" then
+		local v1905, v1906 = proto.writeTag(buf, n96, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n96 = proto.writeString(v1915, v1916, p145.prompt_type)
+		buf, n96 = proto.writeString(v1905, v1906, p145.section_title)
 	end
 
 	local buf53 = buffer.create(n96)
@@ -9124,220 +9046,145 @@ function t238.encode(p145) -- line: 12264
 
 	return buf53
 end
-function t238.decode(p146: buffer) -- line: 12306
+function t238.decode(p146: buffer) -- line: 12388
 	-- upvalues: t238 (copy), proto (copy), t1 (copy)
-	local v1919 = t238.new()
+	local v1909 = t238.new()
 	local n97 = 0
 
 	while n97 < buffer.len(p146) do
-		local v1921, v1922
+		local v1911, v1912
 
-		v1921, v1922, n97 = proto.readTag(p146, n97)
+		v1911, v1912, n97 = proto.readTag(p146, n97)
 
-		if v1922 == proto.wireTypes.varint then
-			local v1923
+		if v1912 == proto.wireTypes.varint then
+			local v1913
 
-			v1923, n97 = proto.readVarInt(p146, n97)
-		elseif v1922 == proto.wireTypes.lengthDelimited then
-			if v1921 == 1 then
-				local v1924
+			v1913, n97 = proto.readVarInt(p146, n97)
+		elseif v1912 == proto.wireTypes.lengthDelimited then
+			if v1911 == 1 then
+				local v1914
 
-				v1924, n97 = proto.readBuffer(p146, n97)
-				v1919.title = buffer.tostring(v1924)
-			elseif v1921 == 2 then
-				local v1925
+				v1914, n97 = proto.readBuffer(p146, n97)
+				table.insert(v1909.items, t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItem.decode(v1914))
+			elseif v1911 == 2 then
+				local v1915
 
-				v1925, n97 = proto.readBuffer(p146, n97)
-				v1919.dismiss_text = buffer.tostring(v1925)
-			elseif v1921 == 3 then
-				local v1926
+				v1915, n97 = proto.readBuffer(p146, n97)
+				v1909.universe_id = buffer.tostring(v1915)
+			elseif v1911 == 3 then
+				local v1916
 
-				v1926, n97 = proto.readBuffer(p146, n97)
-				v1919.user_id = buffer.tostring(v1926)
-			elseif v1921 == 4 then
-				local v1927
-
-				v1927, n97 = proto.readBuffer(p146, n97)
-				table.insert(v1919.cards, t1.CardContainerCardInputData.decode(v1927))
-			elseif v1921 == 5 then
-				local v1928
-
-				v1928, n97 = proto.readBuffer(p146, n97)
-				v1919.prompt_id = buffer.tostring(v1928)
-			elseif v1921 == 6 then
-				local v1929
-
-				v1929, n97 = proto.readBuffer(p146, n97)
-				v1919.prompt_type = buffer.tostring(v1929)
+				v1916, n97 = proto.readBuffer(p146, n97)
+				v1909.section_title = buffer.tostring(v1916)
 			else
-				local v1930, v1931 = proto.readVarInt(p146, n97)
+				local v1917, v1918 = proto.readVarInt(p146, n97)
 
-				n97 = v1931 + v1930
+				n97 = v1918 + v1917
 			end
-		elseif v1922 == proto.wireTypes.i32 then
-			local v1932
+		elseif v1912 == proto.wireTypes.i32 then
+			local v1919
 
-			v1932, n97 = proto.readFixed32(p146, n97)
-		elseif v1922 == proto.wireTypes.i64 then
-			local v1933
+			v1919, n97 = proto.readFixed32(p146, n97)
+		elseif v1912 == proto.wireTypes.i64 then
+			local v1920
 
-			v1933, n97 = proto.readFixed64(p146, n97)
+			v1920, n97 = proto.readFixed64(p146, n97)
 		else
-			error("Unsupported wire type: " .. v1922)
+			error("Unsupported wire type: " .. v1912)
 		end
 	end
 
-	return v1919
+	return v1909
 end
-function t238.jsonEncode(p147) -- line: 12374
+function t238.jsonEncode(p147) -- line: 12444
 	local t240 = {}
 
-	if p147.title ~= nil and p147.title ~= "" then
-		t240.title = p147.title
-	end
-
-	if p147.dismiss_text ~= nil and p147.dismiss_text ~= "" then
-		t240.dismissText = p147.dismiss_text
-	end
-
-	if p147.user_id ~= nil and p147.user_id ~= "" then
-		t240.userId = p147.user_id
-	end
-
-	if p147.cards ~= nil and #p147.cards > 0 then
+	if p147.items ~= nil and #p147.items > 0 then
 		local t241 = {}
 
-		for _, v1938 in p147.cards do
-			table.insert(t241, v1938:jsonEncode())
+		for _, v1925 in p147.items do
+			table.insert(t241, v1925:jsonEncode())
 		end
 
-		t240.cards = t241
+		t240.items = t241
 	end
 
-	if p147.prompt_id ~= nil and p147.prompt_id ~= "" then
-		t240.promptId = p147.prompt_id
+	if p147.universe_id ~= nil and p147.universe_id ~= "" then
+		t240.universeId = p147.universe_id
 	end
 
-	if p147.prompt_type ~= nil and p147.prompt_type ~= "" then
-		t240.promptType = p147.prompt_type
+	if p147.section_title ~= nil and p147.section_title ~= "" then
+		t240.sectionTitle = p147.section_title
 	end
 
 	return t240
 end
-function t238.jsonDecode(t242: {[any]: any}) -- line: 12408
+function t238.jsonDecode(t242: {[any]: any}) -- line: 12466
 	-- upvalues: t238 (copy), t1 (copy)
-	local v1940 = t238.new()
+	local v1927 = t238.new()
 
-	if t242.title ~= nil then
-		v1940.title = t242.title
-	end
-
-	if t242.dismiss_text ~= nil then
-		v1940.dismiss_text = t242.dismiss_text
-	end
-
-	if t242.dismissText ~= nil then
-		v1940.dismiss_text = t242.dismissText
-	end
-
-	if t242.user_id ~= nil then
-		v1940.user_id = t242.user_id
-	end
-
-	if t242.userId ~= nil then
-		v1940.user_id = t242.userId
-	end
-
-	if t242.cards ~= nil then
+	if t242.items ~= nil then
 		local t243 = {}
 
-		for _, v1943 in t242.cards do
-			table.insert(t243, t1.CardContainerCardInputData.jsonDecode(v1943))
+		for _, v1930 in t242.items do
+			table.insert(t243, t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItem.jsonDecode(v1930))
 		end
 
-		v1940.cards = t243
+		v1927.items = t243
 	end
 
-	if t242.prompt_id ~= nil then
-		v1940.prompt_id = t242.prompt_id
+	if t242.universe_id ~= nil then
+		v1927.universe_id = t242.universe_id
 	end
 
-	if t242.promptId ~= nil then
-		v1940.prompt_id = t242.promptId
+	if t242.universeId ~= nil then
+		v1927.universe_id = t242.universeId
 	end
 
-	if t242.prompt_type ~= nil then
-		v1940.prompt_type = t242.prompt_type
+	if t242.section_title ~= nil then
+		v1927.section_title = t242.section_title
 	end
 
-	if t242.promptType ~= nil then
-		v1940.prompt_type = t242.promptType
+	if t242.sectionTitle ~= nil then
+		v1927.section_title = t242.sectionTitle
 	end
 
-	return v1940
+	return v1927
 end
 
 t238.descriptor = {
-	name = "CardContainerInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CardContainerInputData"
+	name = "DynamicStoreCategoryInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.DynamicStoreCategoryInputData"
 }
-t1.CardContainerInputData = t238
-typeRegistry.default:register(t1.CardContainerInputData)
+t1.DynamicStoreCategoryInputData = t238
+typeRegistry.default:register(t1.DynamicStoreCategoryInputData)
 
 local t244 = {}
 
 t244.__index = t244
 
-function t244.new(t245: {[any]: any}?) -- line: 12473
-	-- upvalues: t244 (copy)
+function t244.new(t245: {[any]: any}?) -- line: 12515
+	-- upvalues: t1 (copy), t244 (copy)
 	return (setmetatable({
-		title = if t245 ~= nil and t245.title ~= nil then t245.title else "",
-		user_id = if t245 ~= nil and t245.user_id ~= nil then t245.user_id else "",
-		description = if t245 ~= nil and t245.description ~= nil then t245.description else "",
-		cta_text = if t245 ~= nil and t245.cta_text ~= nil then t245.cta_text else "",
-		prompt_id = if t245 ~= nil and t245.prompt_id ~= nil then t245.prompt_id else "",
-		prompt_type = if t245 ~= nil and t245.prompt_type ~= nil then t245.prompt_type else ""
+		item_id = if t245 ~= nil and t245.item_id ~= nil then t245.item_id else "",
+		identifier = if t245 ~= nil and t245.identifier ~= nil then t245.identifier else assert(t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.fromNumber(0), "Enum has no 0 default")
 	}, t244))
 end
-function t244.encode(p148) -- line: 12484
-	-- upvalues: proto (copy)
+function t244.encode(p148) -- line: 12532
+	-- upvalues: proto (copy), t1 (copy)
 	local buf = buffer.create(0)
 	local n98 = 0
 
-	if p148.title ~= nil and p148.title ~= "" then
-		local v1948, v1949 = proto.writeTag(buf, n98, 1, proto.wireTypes.lengthDelimited)
+	if p148.item_id ~= nil and p148.item_id ~= "" then
+		local v1935, v1936 = proto.writeTag(buf, n98, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n98 = proto.writeString(v1948, v1949, p148.title)
+		buf, n98 = proto.writeString(v1935, v1936, p148.item_id)
 	end
 
-	if p148.user_id ~= nil and p148.user_id ~= "" then
-		local v1950, v1951 = proto.writeTag(buf, n98, 2, proto.wireTypes.lengthDelimited)
+	if p148.identifier ~= nil and (p148.identifier ~= nil and p148.identifier ~= 0 or p148.identifier ~= t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.fromNumber(0)) then
+		local v1937, v1938 = proto.writeTag(buf, n98, 2, proto.wireTypes.varint)
 
-		buf, n98 = proto.writeString(v1950, v1951, p148.user_id)
-	end
-
-	if p148.description ~= nil and p148.description ~= "" then
-		local v1952, v1953 = proto.writeTag(buf, n98, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n98 = proto.writeString(v1952, v1953, p148.description)
-	end
-
-	if p148.cta_text ~= nil and p148.cta_text ~= "" then
-		local v1954, v1955 = proto.writeTag(buf, n98, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n98 = proto.writeString(v1954, v1955, p148.cta_text)
-	end
-
-	if p148.prompt_id ~= nil and p148.prompt_id ~= "" then
-		local v1956, v1957 = proto.writeTag(buf, n98, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n98 = proto.writeString(v1956, v1957, p148.prompt_id)
-	end
-
-	if p148.prompt_type ~= nil and p148.prompt_type ~= "" then
-		local v1958, v1959 = proto.writeTag(buf, n98, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n98 = proto.writeString(v1958, v1959, p148.prompt_type)
+		buf, n98 = proto.writeVarInt(v1937, v1938, t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.toNumber(p148.identifier))
 	end
 
 	local buf54 = buffer.create(n98)
@@ -9346,3934 +9193,4110 @@ function t244.encode(p148) -- line: 12484
 
 	return buf54
 end
-function t244.decode(p149: buffer) -- line: 12523
-	-- upvalues: t244 (copy), proto (copy)
-	local v1962 = t244.new()
+function t244.decode(p149: buffer) -- line: 12564
+	-- upvalues: t244 (copy), proto (copy), t1 (copy)
+	local v1941 = t244.new()
 	local n99 = 0
 
 	while n99 < buffer.len(p149) do
-		local v1964, v1965
+		local v1943, v1944
 
-		v1964, v1965, n99 = proto.readTag(p149, n99)
+		v1943, v1944, n99 = proto.readTag(p149, n99)
 
-		if v1965 == proto.wireTypes.varint then
-			local v1966
+		if v1944 == proto.wireTypes.varint then
+			if v1943 == 2 then
+				local v1945
 
-			v1966, n99 = proto.readVarInt(p149, n99)
-		elseif v1965 == proto.wireTypes.lengthDelimited then
-			if v1964 == 1 then
-				local v1967
-
-				v1967, n99 = proto.readBuffer(p149, n99)
-				v1962.title = buffer.tostring(v1967)
-			elseif v1964 == 2 then
-				local v1968
-
-				v1968, n99 = proto.readBuffer(p149, n99)
-				v1962.user_id = buffer.tostring(v1968)
-			elseif v1964 == 3 then
-				local v1969
-
-				v1969, n99 = proto.readBuffer(p149, n99)
-				v1962.description = buffer.tostring(v1969)
-			elseif v1964 == 4 then
-				local v1970
-
-				v1970, n99 = proto.readBuffer(p149, n99)
-				v1962.cta_text = buffer.tostring(v1970)
-			elseif v1964 == 5 then
-				local v1971
-
-				v1971, n99 = proto.readBuffer(p149, n99)
-				v1962.prompt_id = buffer.tostring(v1971)
-			elseif v1964 == 6 then
-				local v1972
-
-				v1972, n99 = proto.readBuffer(p149, n99)
-				v1962.prompt_type = buffer.tostring(v1972)
+				v1945, n99 = proto.readVarIntI32(p149, n99)
+				v1941.identifier = t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.fromNumber(v1945) or v1945
 			else
-				local v1973, v1974 = proto.readVarInt(p149, n99)
+				local v1946
 
-				n99 = v1974 + v1973
+				v1946, n99 = proto.readVarInt(p149, n99)
 			end
-		elseif v1965 == proto.wireTypes.i32 then
-			local v1975
+		elseif v1944 == proto.wireTypes.lengthDelimited then
+			if v1943 == 1 then
+				local v1947
 
-			v1975, n99 = proto.readFixed32(p149, n99)
-		elseif v1965 == proto.wireTypes.i64 then
-			local v1976
+				v1947, n99 = proto.readBuffer(p149, n99)
+				v1941.item_id = buffer.tostring(v1947)
+			else
+				local v1948, v1949 = proto.readVarInt(p149, n99)
 
-			v1976, n99 = proto.readFixed64(p149, n99)
+				n99 = v1949 + v1948
+			end
+		elseif v1944 == proto.wireTypes.i32 then
+			local v1950
+
+			v1950, n99 = proto.readFixed32(p149, n99)
+		elseif v1944 == proto.wireTypes.i64 then
+			local v1951
+
+			v1951, n99 = proto.readFixed64(p149, n99)
 		else
-			error("Unsupported wire type: " .. v1965)
+			error("Unsupported wire type: " .. v1944)
 		end
 	end
 
-	return v1962
+	return v1941
 end
-function t244.jsonEncode(p150) -- line: 12591
+function t244.jsonEncode(p150) -- line: 12616
+	-- upvalues: t1 (copy)
 	local t246 = {}
 
-	if p150.title ~= nil and p150.title ~= "" then
-		t246.title = p150.title
+	if p150.item_id ~= nil and p150.item_id ~= "" then
+		t246.itemId = p150.item_id
 	end
 
-	if p150.user_id ~= nil and p150.user_id ~= "" then
-		t246.userId = p150.user_id
-	end
-
-	if p150.description ~= nil and p150.description ~= "" then
-		t246.description = p150.description
-	end
-
-	if p150.cta_text ~= nil and p150.cta_text ~= "" then
-		t246.ctaText = p150.cta_text
-	end
-
-	if p150.prompt_id ~= nil and p150.prompt_id ~= "" then
-		t246.promptId = p150.prompt_id
-	end
-
-	if p150.prompt_type ~= nil and p150.prompt_type ~= "" then
-		t246.promptType = p150.prompt_type
+	if p150.identifier ~= nil and (p150.identifier ~= nil and p150.identifier ~= 0 or p150.identifier ~= t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.fromNumber(0)) then
+		t246.identifier = if typeof(p150.identifier) ~= "number" then t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.toNumber(p150.identifier) else p150.identifier
 	end
 
 	return t246
 end
-function t244.jsonDecode(t247: {[any]: any}) -- line: 12621
-	-- upvalues: t244 (copy)
-	local v1980 = t244.new()
+function t244.jsonDecode(t247: {[any]: any}) -- line: 12643
+	-- upvalues: t244 (copy), t1 (copy)
+	local v1955 = t244.new()
 
-	if t247.title ~= nil then
-		v1980.title = t247.title
+	if t247.item_id ~= nil then
+		v1955.item_id = t247.item_id
 	end
 
-	if t247.user_id ~= nil then
-		v1980.user_id = t247.user_id
+	if t247.itemId ~= nil then
+		v1955.item_id = t247.itemId
 	end
 
-	if t247.userId ~= nil then
-		v1980.user_id = t247.userId
+	if t247.identifier ~= nil then
+		v1955.identifier = if typeof(t247.identifier) ~= "number" then t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.fromName(t247.identifier) or t247.identifier else t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType.fromNumber(t247.identifier) or t247.identifier
 	end
 
-	if t247.description ~= nil then
-		v1980.description = t247.description
-	end
-
-	if t247.cta_text ~= nil then
-		v1980.cta_text = t247.cta_text
-	end
-
-	if t247.ctaText ~= nil then
-		v1980.cta_text = t247.ctaText
-	end
-
-	if t247.prompt_id ~= nil then
-		v1980.prompt_id = t247.prompt_id
-	end
-
-	if t247.promptId ~= nil then
-		v1980.prompt_id = t247.promptId
-	end
-
-	if t247.prompt_type ~= nil then
-		v1980.prompt_type = t247.prompt_type
-	end
-
-	if t247.promptType ~= nil then
-		v1980.prompt_type = t247.promptType
-	end
-
-	return v1980
+	return v1955
 end
 
 t244.descriptor = {
-	name = "CardInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CardInputData"
+	name = "DynamicStoreCategoryInputData_DynamicStoreCategoryItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.DynamicStoreCategoryItem"
 }
-t1.CardInputData = t244
-typeRegistry.default:register(t1.CardInputData)
+t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItem = t244
+typeRegistry.default:register(t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItem)
+t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType = {
+	fromNumber = function(n100: number) -- line: 12682
+		if n100 == 0 then
+			return "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_INVALID"
+		end
+
+		if n100 == 1 then
+			return "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_GAME_PASS"
+		end
+
+		if n100 == 2 then
+			return "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_DEVELOPER_PRODUCT"
+		end
+
+		return nil
+	end,
+	toNumber = function(p151) -- line: 12694
+		if p151 == "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_INVALID" then
+			return 0
+		end
+
+		if p151 == "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_GAME_PASS" then
+			return 1
+		end
+
+		if p151 == "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_DEVELOPER_PRODUCT" then
+			return 2
+		end
+
+		return p151
+	end,
+	fromName = function(s1: string) -- line: 12706
+		if s1 == "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_INVALID" then
+			return "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_INVALID"
+		end
+
+		if s1 == "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_GAME_PASS" then
+			return "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_GAME_PASS"
+		end
+
+		if s1 == "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_DEVELOPER_PRODUCT" then
+			return "DYNAMIC_STORE_CATEGORY_ITEM_TYPE_DEVELOPER_PRODUCT"
+		end
+
+		return nil
+	end
+}
 
 local t248 = {}
 
 t248.__index = t248
 
-function t248.new(t249: {[any]: any}?) -- line: 12681
+function t248.new(t249: {[any]: any}?) -- line: 12723
 	-- upvalues: t248 (copy)
 	return (setmetatable({
-		prompt_id = if t249 ~= nil and t249.prompt_id ~= nil then t249.prompt_id else "",
-		prompt_type = if t249 ~= nil and t249.prompt_type ~= nil then t249.prompt_type else "",
+		roblox_component = if t249 ~= nil and t249.roblox_component ~= nil then t249.roblox_component else "",
+		identifier = if t249 ~= nil and t249.identifier ~= nil then t249.identifier else "",
+		title = if t249 ~= nil and t249.title ~= nil then t249.title else "",
 		user_id = if t249 ~= nil and t249.user_id ~= nil then t249.user_id else "",
-		audit_data = if t249 ~= nil and t249.audit_data ~= nil then t249.audit_data else ""
+		description = if t249 ~= nil and t249.description ~= nil then t249.description else "",
+		cta_text = if t249 ~= nil and t249.cta_text ~= nil then t249.cta_text else "",
+		prompt_id = if t249 ~= nil and t249.prompt_id ~= nil then t249.prompt_id else "",
+		prompt_type = if t249 ~= nil and t249.prompt_type ~= nil then t249.prompt_type else ""
 	}, t248))
 end
-function t248.encode(p151) -- line: 12690
+function t248.encode(p152) -- line: 12738
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n100 = 0
+	local n101 = 0
 
-	if p151.prompt_id ~= nil and p151.prompt_id ~= "" then
-		local v1985, v1986 = proto.writeTag(buf, n100, 1, proto.wireTypes.lengthDelimited)
+	if p152.roblox_component ~= nil and p152.roblox_component ~= "" then
+		local v1963, v1964 = proto.writeTag(buf, n101, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n100 = proto.writeString(v1985, v1986, p151.prompt_id)
+		buf, n101 = proto.writeString(v1963, v1964, p152.roblox_component)
 	end
 
-	if p151.prompt_type ~= nil and p151.prompt_type ~= "" then
-		local v1987, v1988 = proto.writeTag(buf, n100, 2, proto.wireTypes.lengthDelimited)
+	if p152.identifier ~= nil and p152.identifier ~= "" then
+		local v1965, v1966 = proto.writeTag(buf, n101, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n100 = proto.writeString(v1987, v1988, p151.prompt_type)
+		buf, n101 = proto.writeString(v1965, v1966, p152.identifier)
 	end
 
-	if p151.user_id ~= nil and p151.user_id ~= "" then
-		local v1989, v1990 = proto.writeTag(buf, n100, 3, proto.wireTypes.lengthDelimited)
+	if p152.title ~= nil and p152.title ~= "" then
+		local v1967, v1968 = proto.writeTag(buf, n101, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n100 = proto.writeString(v1989, v1990, p151.user_id)
+		buf, n101 = proto.writeString(v1967, v1968, p152.title)
 	end
 
-	if p151.audit_data ~= nil and p151.audit_data ~= "" then
-		local v1991, v1992 = proto.writeTag(buf, n100, 4, proto.wireTypes.lengthDelimited)
+	if p152.user_id ~= nil and p152.user_id ~= "" then
+		local v1969, v1970 = proto.writeTag(buf, n101, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n100 = proto.writeString(v1991, v1992, p151.audit_data)
+		buf, n101 = proto.writeString(v1969, v1970, p152.user_id)
 	end
 
-	local buf55 = buffer.create(n100)
+	if p152.description ~= nil and p152.description ~= "" then
+		local v1971, v1972 = proto.writeTag(buf, n101, 5, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf55, 0, buf, 0, n100)
+		buf, n101 = proto.writeString(v1971, v1972, p152.description)
+	end
+
+	if p152.cta_text ~= nil and p152.cta_text ~= "" then
+		local v1973, v1974 = proto.writeTag(buf, n101, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n101 = proto.writeString(v1973, v1974, p152.cta_text)
+	end
+
+	if p152.prompt_id ~= nil and p152.prompt_id ~= "" then
+		local v1975, v1976 = proto.writeTag(buf, n101, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n101 = proto.writeString(v1975, v1976, p152.prompt_id)
+	end
+
+	if p152.prompt_type ~= nil and p152.prompt_type ~= "" then
+		local v1977, v1978 = proto.writeTag(buf, n101, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n101 = proto.writeString(v1977, v1978, p152.prompt_type)
+	end
+
+	local buf55 = buffer.create(n101)
+
+	buffer.copy(buf55, 0, buf, 0, n101)
 
 	return buf55
 end
-function t248.decode(p152: buffer) -- line: 12719
+function t248.decode(p153: buffer) -- line: 12787
 	-- upvalues: t248 (copy), proto (copy)
-	local v1995 = t248.new()
-	local n101 = 0
+	local v1981 = t248.new()
+	local n102 = 0
 
-	while n101 < buffer.len(p152) do
-		local v1997, v1998
+	while n102 < buffer.len(p153) do
+		local v1983, v1984
 
-		v1997, v1998, n101 = proto.readTag(p152, n101)
+		v1983, v1984, n102 = proto.readTag(p153, n102)
 
-		if v1998 == proto.wireTypes.varint then
-			local v1999
+		if v1984 == proto.wireTypes.varint then
+			local v1985
 
-			v1999, n101 = proto.readVarInt(p152, n101)
-		elseif v1998 == proto.wireTypes.lengthDelimited then
-			if v1997 == 1 then
-				local v2000
+			v1985, n102 = proto.readVarInt(p153, n102)
+		elseif v1984 == proto.wireTypes.lengthDelimited then
+			if v1983 == 1 then
+				local v1986
 
-				v2000, n101 = proto.readBuffer(p152, n101)
-				v1995.prompt_id = buffer.tostring(v2000)
-			elseif v1997 == 2 then
-				local v2001
+				v1986, n102 = proto.readBuffer(p153, n102)
+				v1981.roblox_component = buffer.tostring(v1986)
+			elseif v1983 == 2 then
+				local v1987
 
-				v2001, n101 = proto.readBuffer(p152, n101)
-				v1995.prompt_type = buffer.tostring(v2001)
-			elseif v1997 == 3 then
-				local v2002
+				v1987, n102 = proto.readBuffer(p153, n102)
+				v1981.identifier = buffer.tostring(v1987)
+			elseif v1983 == 3 then
+				local v1988
 
-				v2002, n101 = proto.readBuffer(p152, n101)
-				v1995.user_id = buffer.tostring(v2002)
-			elseif v1997 == 4 then
-				local v2003
+				v1988, n102 = proto.readBuffer(p153, n102)
+				v1981.title = buffer.tostring(v1988)
+			elseif v1983 == 4 then
+				local v1989
 
-				v2003, n101 = proto.readBuffer(p152, n101)
-				v1995.audit_data = buffer.tostring(v2003)
+				v1989, n102 = proto.readBuffer(p153, n102)
+				v1981.user_id = buffer.tostring(v1989)
+			elseif v1983 == 5 then
+				local v1990
+
+				v1990, n102 = proto.readBuffer(p153, n102)
+				v1981.description = buffer.tostring(v1990)
+			elseif v1983 == 6 then
+				local v1991
+
+				v1991, n102 = proto.readBuffer(p153, n102)
+				v1981.cta_text = buffer.tostring(v1991)
+			elseif v1983 == 7 then
+				local v1992
+
+				v1992, n102 = proto.readBuffer(p153, n102)
+				v1981.prompt_id = buffer.tostring(v1992)
+			elseif v1983 == 8 then
+				local v1993
+
+				v1993, n102 = proto.readBuffer(p153, n102)
+				v1981.prompt_type = buffer.tostring(v1993)
 			else
-				local v2004, v2005 = proto.readVarInt(p152, n101)
+				local v1994, v1995 = proto.readVarInt(p153, n102)
 
-				n101 = v2005 + v2004
+				n102 = v1995 + v1994
 			end
-		elseif v1998 == proto.wireTypes.i32 then
-			local v2006
+		elseif v1984 == proto.wireTypes.i32 then
+			local v1996
 
-			v2006, n101 = proto.readFixed32(p152, n101)
-		elseif v1998 == proto.wireTypes.i64 then
-			local v2007
+			v1996, n102 = proto.readFixed32(p153, n102)
+		elseif v1984 == proto.wireTypes.i64 then
+			local v1997
 
-			v2007, n101 = proto.readFixed64(p152, n101)
+			v1997, n102 = proto.readFixed64(p153, n102)
 		else
-			error("Unsupported wire type: " .. v1998)
+			error("Unsupported wire type: " .. v1984)
 		end
 	end
 
-	return v1995
+	return v1981
 end
-function t248.jsonEncode(p153) -- line: 12777
+function t248.jsonEncode(p154) -- line: 12865
 	local t250 = {}
 
-	if p153.prompt_id ~= nil and p153.prompt_id ~= "" then
-		t250.promptId = p153.prompt_id
+	if p154.roblox_component ~= nil and p154.roblox_component ~= "" then
+		t250.robloxComponent = p154.roblox_component
 	end
 
-	if p153.prompt_type ~= nil and p153.prompt_type ~= "" then
-		t250.promptType = p153.prompt_type
+	if p154.identifier ~= nil and p154.identifier ~= "" then
+		t250.identifier = p154.identifier
 	end
 
-	if p153.user_id ~= nil and p153.user_id ~= "" then
-		t250.userId = p153.user_id
+	if p154.title ~= nil and p154.title ~= "" then
+		t250.title = p154.title
 	end
 
-	if p153.audit_data ~= nil and p153.audit_data ~= "" then
-		t250.auditData = p153.audit_data
+	if p154.user_id ~= nil and p154.user_id ~= "" then
+		t250.userId = p154.user_id
+	end
+
+	if p154.description ~= nil and p154.description ~= "" then
+		t250.description = p154.description
+	end
+
+	if p154.cta_text ~= nil and p154.cta_text ~= "" then
+		t250.ctaText = p154.cta_text
+	end
+
+	if p154.prompt_id ~= nil and p154.prompt_id ~= "" then
+		t250.promptId = p154.prompt_id
+	end
+
+	if p154.prompt_type ~= nil and p154.prompt_type ~= "" then
+		t250.promptType = p154.prompt_type
 	end
 
 	return t250
 end
-function t248.jsonDecode(t251: {[any]: any}) -- line: 12799
+function t248.jsonDecode(t251: {[any]: any}) -- line: 12903
 	-- upvalues: t248 (copy)
-	local v2011 = t248.new()
+	local v2001 = t248.new()
 
-	if t251.prompt_id ~= nil then
-		v2011.prompt_id = t251.prompt_id
+	if t251.roblox_component ~= nil then
+		v2001.roblox_component = t251.roblox_component
 	end
 
-	if t251.promptId ~= nil then
-		v2011.prompt_id = t251.promptId
+	if t251.robloxComponent ~= nil then
+		v2001.roblox_component = t251.robloxComponent
 	end
 
-	if t251.prompt_type ~= nil then
-		v2011.prompt_type = t251.prompt_type
+	if t251.identifier ~= nil then
+		v2001.identifier = t251.identifier
 	end
 
-	if t251.promptType ~= nil then
-		v2011.prompt_type = t251.promptType
+	if t251.title ~= nil then
+		v2001.title = t251.title
 	end
 
 	if t251.user_id ~= nil then
-		v2011.user_id = t251.user_id
+		v2001.user_id = t251.user_id
 	end
 
 	if t251.userId ~= nil then
-		v2011.user_id = t251.userId
+		v2001.user_id = t251.userId
 	end
 
-	if t251.audit_data ~= nil then
-		v2011.audit_data = t251.audit_data
+	if t251.description ~= nil then
+		v2001.description = t251.description
 	end
 
-	if t251.auditData ~= nil then
-		v2011.audit_data = t251.auditData
+	if t251.cta_text ~= nil then
+		v2001.cta_text = t251.cta_text
 	end
 
-	return v2011
+	if t251.ctaText ~= nil then
+		v2001.cta_text = t251.ctaText
+	end
+
+	if t251.prompt_id ~= nil then
+		v2001.prompt_id = t251.prompt_id
+	end
+
+	if t251.promptId ~= nil then
+		v2001.prompt_id = t251.promptId
+	end
+
+	if t251.prompt_type ~= nil then
+		v2001.prompt_type = t251.prompt_type
+	end
+
+	if t251.promptType ~= nil then
+		v2001.prompt_type = t251.promptType
+	end
+
+	return v2001
 end
 
 t248.descriptor = {
-	name = "DialogInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.DialogInputData"
+	name = "CardContainerCardInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CardContainerCardInputData"
 }
-t1.DialogInputData = t248
-typeRegistry.default:register(t1.DialogInputData)
+t1.CardContainerCardInputData = t248
+typeRegistry.default:register(t1.CardContainerCardInputData)
 
 local t252 = {}
 
 t252.__index = t252
 
-function t252.new(t253: {[any]: any}?) -- line: 12851
+function t252.new(t253: {[any]: any}?) -- line: 12975
 	-- upvalues: t252 (copy)
 	return (setmetatable({
 		title = if t253 ~= nil and t253.title ~= nil then t253.title else "",
-		description = if t253 ~= nil and t253.description ~= nil then t253.description else "",
-		primary_text = if t253 ~= nil and t253.primary_text ~= nil then t253.primary_text else "",
-		secondary_text = if t253 ~= nil and t253.secondary_text ~= nil then t253.secondary_text else "",
+		dismiss_text = if t253 ~= nil and t253.dismiss_text ~= nil then t253.dismiss_text else "",
+		user_id = if t253 ~= nil and t253.user_id ~= nil then t253.user_id else "",
+		cards = if t253 ~= nil and t253.cards ~= nil then t253.cards else {},
 		prompt_id = if t253 ~= nil and t253.prompt_id ~= nil then t253.prompt_id else "",
-		prompt_type = if t253 ~= nil and t253.prompt_type ~= nil then t253.prompt_type else "",
-		times_seen = if t253 ~= nil and t253.times_seen ~= nil then t253.times_seen else 0
+		prompt_type = if t253 ~= nil and t253.prompt_type ~= nil then t253.prompt_type else ""
 	}, t252))
 end
-function t252.encode(p154) -- line: 12863
+function t252.encode(p155) -- line: 12986
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n102 = 0
-
-	if p154.title ~= nil and p154.title ~= "" then
-		local v2016, v2017 = proto.writeTag(buf, n102, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n102 = proto.writeString(v2016, v2017, p154.title)
-	end
-
-	if p154.description ~= nil and p154.description ~= "" then
-		local v2018, v2019 = proto.writeTag(buf, n102, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n102 = proto.writeString(v2018, v2019, p154.description)
-	end
-
-	if p154.primary_text ~= nil and p154.primary_text ~= "" then
-		local v2020, v2021 = proto.writeTag(buf, n102, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n102 = proto.writeString(v2020, v2021, p154.primary_text)
-	end
-
-	if p154.secondary_text ~= nil and p154.secondary_text ~= "" then
-		local v2022, v2023 = proto.writeTag(buf, n102, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n102 = proto.writeString(v2022, v2023, p154.secondary_text)
-	end
-
-	if p154.prompt_id ~= nil and p154.prompt_id ~= "" then
-		local v2024, v2025 = proto.writeTag(buf, n102, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n102 = proto.writeString(v2024, v2025, p154.prompt_id)
-	end
-
-	if p154.prompt_type ~= nil and p154.prompt_type ~= "" then
-		local v2026, v2027 = proto.writeTag(buf, n102, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n102 = proto.writeString(v2026, v2027, p154.prompt_type)
-	end
-
-	if p154.times_seen ~= nil and p154.times_seen ~= 0 then
-		local v2028, v2029 = proto.writeTag(buf, n102, 7, proto.wireTypes.varint)
-
-		buf, n102 = proto.writeVarInt(v2028, v2029, p154.times_seen)
-	end
-
-	local buf56 = buffer.create(n102)
-
-	buffer.copy(buf56, 0, buf, 0, n102)
-
-	return buf56
-end
-function t252.decode(p155: buffer) -- line: 12907
-	-- upvalues: t252 (copy), proto (copy)
-	local v2032 = t252.new()
 	local n103 = 0
 
-	while n103 < buffer.len(p155) do
-		local v2034, v2035
+	if p155.title ~= nil and p155.title ~= "" then
+		local v2006, v2007 = proto.writeTag(buf, n103, 1, proto.wireTypes.lengthDelimited)
 
-		v2034, v2035, n103 = proto.readTag(p155, n103)
+		buf, n103 = proto.writeString(v2006, v2007, p155.title)
+	end
 
-		if v2035 == proto.wireTypes.varint then
-			if v2034 == 7 then
-				local v2036
+	if p155.dismiss_text ~= nil and p155.dismiss_text ~= "" then
+		local v2008, v2009 = proto.writeTag(buf, n103, 2, proto.wireTypes.lengthDelimited)
 
-				v2036, n103 = proto.readVarIntI32(p155, n103)
-				v2032.times_seen = v2036
-			else
-				local v2037
+		buf, n103 = proto.writeString(v2008, v2009, p155.dismiss_text)
+	end
 
-				v2037, n103 = proto.readVarInt(p155, n103)
-			end
-		elseif v2035 == proto.wireTypes.lengthDelimited then
-			if v2034 == 1 then
-				local v2038
+	if p155.user_id ~= nil and p155.user_id ~= "" then
+		local v2010, v2011 = proto.writeTag(buf, n103, 3, proto.wireTypes.lengthDelimited)
 
-				v2038, n103 = proto.readBuffer(p155, n103)
-				v2032.title = buffer.tostring(v2038)
-			elseif v2034 == 2 then
-				local v2039
+		buf, n103 = proto.writeString(v2010, v2011, p155.user_id)
+	end
 
-				v2039, n103 = proto.readBuffer(p155, n103)
-				v2032.description = buffer.tostring(v2039)
-			elseif v2034 == 3 then
-				local v2040
+	if p155.cards ~= nil and #p155.cards > 0 then
+		for _, v2013 in p155.cards do
+			local v2014 = v2013:encode()
+			local v2015, v2016 = proto.writeTag(buf, n103, 4, proto.wireTypes.lengthDelimited)
 
-				v2040, n103 = proto.readBuffer(p155, n103)
-				v2032.primary_text = buffer.tostring(v2040)
-			elseif v2034 == 4 then
-				local v2041
-
-				v2041, n103 = proto.readBuffer(p155, n103)
-				v2032.secondary_text = buffer.tostring(v2041)
-			elseif v2034 == 5 then
-				local v2042
-
-				v2042, n103 = proto.readBuffer(p155, n103)
-				v2032.prompt_id = buffer.tostring(v2042)
-			elseif v2034 == 6 then
-				local v2043
-
-				v2043, n103 = proto.readBuffer(p155, n103)
-				v2032.prompt_type = buffer.tostring(v2043)
-			else
-				local v2044, v2045 = proto.readVarInt(p155, n103)
-
-				n103 = v2045 + v2044
-			end
-		elseif v2035 == proto.wireTypes.i32 then
-			local v2046
-
-			v2046, n103 = proto.readFixed32(p155, n103)
-		elseif v2035 == proto.wireTypes.i64 then
-			local v2047
-
-			v2047, n103 = proto.readFixed64(p155, n103)
-		else
-			error("Unsupported wire type: " .. v2035)
+			buf, n103 = proto.writeBuffer(v2015, v2016, v2014, buffer.len(v2014))
 		end
 	end
 
-	return v2032
+	if p155.prompt_id ~= nil and p155.prompt_id ~= "" then
+		local v2017, v2018 = proto.writeTag(buf, n103, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n103 = proto.writeString(v2017, v2018, p155.prompt_id)
+	end
+
+	if p155.prompt_type ~= nil and p155.prompt_type ~= "" then
+		local v2019, v2020 = proto.writeTag(buf, n103, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n103 = proto.writeString(v2019, v2020, p155.prompt_type)
+	end
+
+	local buf56 = buffer.create(n103)
+
+	buffer.copy(buf56, 0, buf, 0, n103)
+
+	return buf56
 end
-function t252.jsonEncode(p156) -- line: 12980
+function t252.decode(p156: buffer) -- line: 13028
+	-- upvalues: t252 (copy), proto (copy), t1 (copy)
+	local v2023 = t252.new()
+	local n104 = 0
+
+	while n104 < buffer.len(p156) do
+		local v2025, v2026
+
+		v2025, v2026, n104 = proto.readTag(p156, n104)
+
+		if v2026 == proto.wireTypes.varint then
+			local v2027
+
+			v2027, n104 = proto.readVarInt(p156, n104)
+		elseif v2026 == proto.wireTypes.lengthDelimited then
+			if v2025 == 1 then
+				local v2028
+
+				v2028, n104 = proto.readBuffer(p156, n104)
+				v2023.title = buffer.tostring(v2028)
+			elseif v2025 == 2 then
+				local v2029
+
+				v2029, n104 = proto.readBuffer(p156, n104)
+				v2023.dismiss_text = buffer.tostring(v2029)
+			elseif v2025 == 3 then
+				local v2030
+
+				v2030, n104 = proto.readBuffer(p156, n104)
+				v2023.user_id = buffer.tostring(v2030)
+			elseif v2025 == 4 then
+				local v2031
+
+				v2031, n104 = proto.readBuffer(p156, n104)
+				table.insert(v2023.cards, t1.CardContainerCardInputData.decode(v2031))
+			elseif v2025 == 5 then
+				local v2032
+
+				v2032, n104 = proto.readBuffer(p156, n104)
+				v2023.prompt_id = buffer.tostring(v2032)
+			elseif v2025 == 6 then
+				local v2033
+
+				v2033, n104 = proto.readBuffer(p156, n104)
+				v2023.prompt_type = buffer.tostring(v2033)
+			else
+				local v2034, v2035 = proto.readVarInt(p156, n104)
+
+				n104 = v2035 + v2034
+			end
+		elseif v2026 == proto.wireTypes.i32 then
+			local v2036
+
+			v2036, n104 = proto.readFixed32(p156, n104)
+		elseif v2026 == proto.wireTypes.i64 then
+			local v2037
+
+			v2037, n104 = proto.readFixed64(p156, n104)
+		else
+			error("Unsupported wire type: " .. v2026)
+		end
+	end
+
+	return v2023
+end
+function t252.jsonEncode(p157) -- line: 13096
 	local t254 = {}
 
-	if p156.title ~= nil and p156.title ~= "" then
-		t254.title = p156.title
+	if p157.title ~= nil and p157.title ~= "" then
+		t254.title = p157.title
 	end
 
-	if p156.description ~= nil and p156.description ~= "" then
-		t254.description = p156.description
+	if p157.dismiss_text ~= nil and p157.dismiss_text ~= "" then
+		t254.dismissText = p157.dismiss_text
 	end
 
-	if p156.primary_text ~= nil and p156.primary_text ~= "" then
-		t254.primaryText = p156.primary_text
+	if p157.user_id ~= nil and p157.user_id ~= "" then
+		t254.userId = p157.user_id
 	end
 
-	if p156.secondary_text ~= nil and p156.secondary_text ~= "" then
-		t254.secondaryText = p156.secondary_text
+	if p157.cards ~= nil and #p157.cards > 0 then
+		local t255 = {}
+
+		for _, v2042 in p157.cards do
+			table.insert(t255, v2042:jsonEncode())
+		end
+
+		t254.cards = t255
 	end
 
-	if p156.prompt_id ~= nil and p156.prompt_id ~= "" then
-		t254.promptId = p156.prompt_id
+	if p157.prompt_id ~= nil and p157.prompt_id ~= "" then
+		t254.promptId = p157.prompt_id
 	end
 
-	if p156.prompt_type ~= nil and p156.prompt_type ~= "" then
-		t254.promptType = p156.prompt_type
-	end
-
-	if p156.times_seen ~= nil and p156.times_seen ~= 0 then
-		t254.timesSeen = p156.times_seen
+	if p157.prompt_type ~= nil and p157.prompt_type ~= "" then
+		t254.promptType = p157.prompt_type
 	end
 
 	return t254
 end
-function t252.jsonDecode(t255: {[any]: any}) -- line: 13014
-	-- upvalues: t252 (copy)
-	local v2051 = t252.new()
+function t252.jsonDecode(t256: {[any]: any}) -- line: 13130
+	-- upvalues: t252 (copy), t1 (copy)
+	local v2044 = t252.new()
 
-	if t255.title ~= nil then
-		v2051.title = t255.title
+	if t256.title ~= nil then
+		v2044.title = t256.title
 	end
 
-	if t255.description ~= nil then
-		v2051.description = t255.description
+	if t256.dismiss_text ~= nil then
+		v2044.dismiss_text = t256.dismiss_text
 	end
 
-	if t255.primary_text ~= nil then
-		v2051.primary_text = t255.primary_text
+	if t256.dismissText ~= nil then
+		v2044.dismiss_text = t256.dismissText
 	end
 
-	if t255.primaryText ~= nil then
-		v2051.primary_text = t255.primaryText
+	if t256.user_id ~= nil then
+		v2044.user_id = t256.user_id
 	end
 
-	if t255.secondary_text ~= nil then
-		v2051.secondary_text = t255.secondary_text
+	if t256.userId ~= nil then
+		v2044.user_id = t256.userId
 	end
 
-	if t255.secondaryText ~= nil then
-		v2051.secondary_text = t255.secondaryText
+	if t256.cards ~= nil then
+		local t257 = {}
+
+		for _, v2047 in t256.cards do
+			table.insert(t257, t1.CardContainerCardInputData.jsonDecode(v2047))
+		end
+
+		v2044.cards = t257
 	end
 
-	if t255.prompt_id ~= nil then
-		v2051.prompt_id = t255.prompt_id
+	if t256.prompt_id ~= nil then
+		v2044.prompt_id = t256.prompt_id
 	end
 
-	if t255.promptId ~= nil then
-		v2051.prompt_id = t255.promptId
+	if t256.promptId ~= nil then
+		v2044.prompt_id = t256.promptId
 	end
 
-	if t255.prompt_type ~= nil then
-		v2051.prompt_type = t255.prompt_type
+	if t256.prompt_type ~= nil then
+		v2044.prompt_type = t256.prompt_type
 	end
 
-	if t255.promptType ~= nil then
-		v2051.prompt_type = t255.promptType
+	if t256.promptType ~= nil then
+		v2044.prompt_type = t256.promptType
 	end
 
-	if t255.times_seen ~= nil then
-		v2051.times_seen = t255.times_seen
-	end
-
-	if t255.timesSeen ~= nil then
-		v2051.times_seen = t255.timesSeen
-	end
-
-	return v2051
+	return v2044
 end
 
 t252.descriptor = {
-	name = "BannerInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.BannerInputData"
+	name = "CardContainerInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CardContainerInputData"
 }
-t1.BannerInputData = t252
-typeRegistry.default:register(t1.BannerInputData)
+t1.CardContainerInputData = t252
+typeRegistry.default:register(t1.CardContainerInputData)
 
-local t256 = {}
+local t258 = {}
 
-t256.__index = t256
+t258.__index = t258
 
-function t256.new(t257: {[any]: any}?) -- line: 13082
-	-- upvalues: t256 (copy)
+function t258.new(t259: {[any]: any}?) -- line: 13195
+	-- upvalues: t258 (copy)
 	return (setmetatable({
-		tooltip_text = if t257 ~= nil and t257.tooltip_text ~= nil then t257.tooltip_text else "",
-		prompt_id = if t257 ~= nil and t257.prompt_id ~= nil then t257.prompt_id else "",
-		prompt_type = if t257 ~= nil and t257.prompt_type ~= nil then t257.prompt_type else ""
-	}, t256))
+		title = if t259 ~= nil and t259.title ~= nil then t259.title else "",
+		user_id = if t259 ~= nil and t259.user_id ~= nil then t259.user_id else "",
+		description = if t259 ~= nil and t259.description ~= nil then t259.description else "",
+		cta_text = if t259 ~= nil and t259.cta_text ~= nil then t259.cta_text else "",
+		prompt_id = if t259 ~= nil and t259.prompt_id ~= nil then t259.prompt_id else "",
+		prompt_type = if t259 ~= nil and t259.prompt_type ~= nil then t259.prompt_type else ""
+	}, t258))
 end
-function t256.encode(p157) -- line: 13090
+function t258.encode(p158) -- line: 13206
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n104 = 0
+	local n105 = 0
 
-	if p157.tooltip_text ~= nil and p157.tooltip_text ~= "" then
-		local v2056, v2057 = proto.writeTag(buf, n104, 1, proto.wireTypes.lengthDelimited)
+	if p158.title ~= nil and p158.title ~= "" then
+		local v2052, v2053 = proto.writeTag(buf, n105, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n104 = proto.writeString(v2056, v2057, p157.tooltip_text)
+		buf, n105 = proto.writeString(v2052, v2053, p158.title)
 	end
 
-	if p157.prompt_id ~= nil and p157.prompt_id ~= "" then
-		local v2058, v2059 = proto.writeTag(buf, n104, 2, proto.wireTypes.lengthDelimited)
+	if p158.user_id ~= nil and p158.user_id ~= "" then
+		local v2054, v2055 = proto.writeTag(buf, n105, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n104 = proto.writeString(v2058, v2059, p157.prompt_id)
+		buf, n105 = proto.writeString(v2054, v2055, p158.user_id)
 	end
 
-	if p157.prompt_type ~= nil and p157.prompt_type ~= "" then
-		local v2060, v2061 = proto.writeTag(buf, n104, 3, proto.wireTypes.lengthDelimited)
+	if p158.description ~= nil and p158.description ~= "" then
+		local v2056, v2057 = proto.writeTag(buf, n105, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n104 = proto.writeString(v2060, v2061, p157.prompt_type)
+		buf, n105 = proto.writeString(v2056, v2057, p158.description)
 	end
 
-	local buf57 = buffer.create(n104)
+	if p158.cta_text ~= nil and p158.cta_text ~= "" then
+		local v2058, v2059 = proto.writeTag(buf, n105, 4, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf57, 0, buf, 0, n104)
+		buf, n105 = proto.writeString(v2058, v2059, p158.cta_text)
+	end
+
+	if p158.prompt_id ~= nil and p158.prompt_id ~= "" then
+		local v2060, v2061 = proto.writeTag(buf, n105, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n105 = proto.writeString(v2060, v2061, p158.prompt_id)
+	end
+
+	if p158.prompt_type ~= nil and p158.prompt_type ~= "" then
+		local v2062, v2063 = proto.writeTag(buf, n105, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n105 = proto.writeString(v2062, v2063, p158.prompt_type)
+	end
+
+	local buf57 = buffer.create(n105)
+
+	buffer.copy(buf57, 0, buf, 0, n105)
 
 	return buf57
 end
-function t256.decode(p158: buffer) -- line: 13114
-	-- upvalues: t256 (copy), proto (copy)
-	local v2064 = t256.new()
-	local n105 = 0
+function t258.decode(p159: buffer) -- line: 13245
+	-- upvalues: t258 (copy), proto (copy)
+	local v2066 = t258.new()
+	local n106 = 0
 
-	while n105 < buffer.len(p158) do
-		local v2066, v2067
+	while n106 < buffer.len(p159) do
+		local v2068, v2069
 
-		v2066, v2067, n105 = proto.readTag(p158, n105)
+		v2068, v2069, n106 = proto.readTag(p159, n106)
 
-		if v2067 == proto.wireTypes.varint then
-			local v2068
+		if v2069 == proto.wireTypes.varint then
+			local v2070
 
-			v2068, n105 = proto.readVarInt(p158, n105)
-		elseif v2067 == proto.wireTypes.lengthDelimited then
-			if v2066 == 1 then
-				local v2069
-
-				v2069, n105 = proto.readBuffer(p158, n105)
-				v2064.tooltip_text = buffer.tostring(v2069)
-			elseif v2066 == 2 then
-				local v2070
-
-				v2070, n105 = proto.readBuffer(p158, n105)
-				v2064.prompt_id = buffer.tostring(v2070)
-			elseif v2066 == 3 then
+			v2070, n106 = proto.readVarInt(p159, n106)
+		elseif v2069 == proto.wireTypes.lengthDelimited then
+			if v2068 == 1 then
 				local v2071
 
-				v2071, n105 = proto.readBuffer(p158, n105)
-				v2064.prompt_type = buffer.tostring(v2071)
+				v2071, n106 = proto.readBuffer(p159, n106)
+				v2066.title = buffer.tostring(v2071)
+			elseif v2068 == 2 then
+				local v2072
+
+				v2072, n106 = proto.readBuffer(p159, n106)
+				v2066.user_id = buffer.tostring(v2072)
+			elseif v2068 == 3 then
+				local v2073
+
+				v2073, n106 = proto.readBuffer(p159, n106)
+				v2066.description = buffer.tostring(v2073)
+			elseif v2068 == 4 then
+				local v2074
+
+				v2074, n106 = proto.readBuffer(p159, n106)
+				v2066.cta_text = buffer.tostring(v2074)
+			elseif v2068 == 5 then
+				local v2075
+
+				v2075, n106 = proto.readBuffer(p159, n106)
+				v2066.prompt_id = buffer.tostring(v2075)
+			elseif v2068 == 6 then
+				local v2076
+
+				v2076, n106 = proto.readBuffer(p159, n106)
+				v2066.prompt_type = buffer.tostring(v2076)
 			else
-				local v2072, v2073 = proto.readVarInt(p158, n105)
+				local v2077, v2078 = proto.readVarInt(p159, n106)
 
-				n105 = v2073 + v2072
+				n106 = v2078 + v2077
 			end
-		elseif v2067 == proto.wireTypes.i32 then
-			local v2074
+		elseif v2069 == proto.wireTypes.i32 then
+			local v2079
 
-			v2074, n105 = proto.readFixed32(p158, n105)
-		elseif v2067 == proto.wireTypes.i64 then
-			local v2075
+			v2079, n106 = proto.readFixed32(p159, n106)
+		elseif v2069 == proto.wireTypes.i64 then
+			local v2080
 
-			v2075, n105 = proto.readFixed64(p158, n105)
+			v2080, n106 = proto.readFixed64(p159, n106)
 		else
-			error("Unsupported wire type: " .. v2067)
+			error("Unsupported wire type: " .. v2069)
 		end
 	end
 
-	return v2064
+	return v2066
 end
-function t256.jsonEncode(p159) -- line: 13167
-	local t258 = {}
-
-	if p159.tooltip_text ~= nil and p159.tooltip_text ~= "" then
-		t258.tooltipText = p159.tooltip_text
-	end
-
-	if p159.prompt_id ~= nil and p159.prompt_id ~= "" then
-		t258.promptId = p159.prompt_id
-	end
-
-	if p159.prompt_type ~= nil and p159.prompt_type ~= "" then
-		t258.promptType = p159.prompt_type
-	end
-
-	return t258
-end
-function t256.jsonDecode(t259: {[any]: any}) -- line: 13185
-	-- upvalues: t256 (copy)
-	local v2079 = t256.new()
-
-	if t259.tooltip_text ~= nil then
-		v2079.tooltip_text = t259.tooltip_text
-	end
-
-	if t259.tooltipText ~= nil then
-		v2079.tooltip_text = t259.tooltipText
-	end
-
-	if t259.prompt_id ~= nil then
-		v2079.prompt_id = t259.prompt_id
-	end
-
-	if t259.promptId ~= nil then
-		v2079.prompt_id = t259.promptId
-	end
-
-	if t259.prompt_type ~= nil then
-		v2079.prompt_type = t259.prompt_type
-	end
-
-	if t259.promptType ~= nil then
-		v2079.prompt_type = t259.promptType
-	end
-
-	return v2079
-end
-
-t256.descriptor = {
-	name = "TooltipInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.TooltipInputData"
-}
-t1.TooltipInputData = t256
-typeRegistry.default:register(t1.TooltipInputData)
-
-local t260 = {}
-
-t260.__index = t260
-
-function t260.new(t261: {[any]: any}?) -- line: 13229
-	-- upvalues: t260 (copy)
-	return (setmetatable({
-		media_id = if t261 ~= nil and t261.media_id ~= nil then t261.media_id else "",
-		title = if t261 ~= nil and t261.title ~= nil then t261.title else "",
-		description = if t261 ~= nil and t261.description ~= nil then t261.description else "",
-		prompt_id = if t261 ~= nil and t261.prompt_id ~= nil then t261.prompt_id else "",
-		prompt_type = if t261 ~= nil and t261.prompt_type ~= nil then t261.prompt_type else "",
-		anchor_tag = if t261 ~= nil and t261.anchor_tag ~= nil then t261.anchor_tag else ""
-	}, t260))
-end
-function t260.encode(p160) -- line: 13240
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n106 = 0
-
-	if p160.media_id ~= nil and p160.media_id ~= "" then
-		local v2084, v2085 = proto.writeTag(buf, n106, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n106 = proto.writeString(v2084, v2085, p160.media_id)
-	end
+function t258.jsonEncode(p160) -- line: 13313
+	local t260 = {}
 
 	if p160.title ~= nil and p160.title ~= "" then
-		local v2086, v2087 = proto.writeTag(buf, n106, 2, proto.wireTypes.lengthDelimited)
+		t260.title = p160.title
+	end
 
-		buf, n106 = proto.writeString(v2086, v2087, p160.title)
+	if p160.user_id ~= nil and p160.user_id ~= "" then
+		t260.userId = p160.user_id
 	end
 
 	if p160.description ~= nil and p160.description ~= "" then
-		local v2088, v2089 = proto.writeTag(buf, n106, 3, proto.wireTypes.lengthDelimited)
+		t260.description = p160.description
+	end
 
-		buf, n106 = proto.writeString(v2088, v2089, p160.description)
+	if p160.cta_text ~= nil and p160.cta_text ~= "" then
+		t260.ctaText = p160.cta_text
 	end
 
 	if p160.prompt_id ~= nil and p160.prompt_id ~= "" then
-		local v2090, v2091 = proto.writeTag(buf, n106, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n106 = proto.writeString(v2090, v2091, p160.prompt_id)
+		t260.promptId = p160.prompt_id
 	end
 
 	if p160.prompt_type ~= nil and p160.prompt_type ~= "" then
-		local v2092, v2093 = proto.writeTag(buf, n106, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n106 = proto.writeString(v2092, v2093, p160.prompt_type)
+		t260.promptType = p160.prompt_type
 	end
 
-	if p160.anchor_tag ~= nil and p160.anchor_tag ~= "" then
-		local v2094, v2095 = proto.writeTag(buf, n106, 6, proto.wireTypes.lengthDelimited)
+	return t260
+end
+function t258.jsonDecode(t261: {[any]: any}) -- line: 13343
+	-- upvalues: t258 (copy)
+	local v2084 = t258.new()
 
-		buf, n106 = proto.writeString(v2094, v2095, p160.anchor_tag)
+	if t261.title ~= nil then
+		v2084.title = t261.title
 	end
 
-	local buf58 = buffer.create(n106)
+	if t261.user_id ~= nil then
+		v2084.user_id = t261.user_id
+	end
 
-	buffer.copy(buf58, 0, buf, 0, n106)
+	if t261.userId ~= nil then
+		v2084.user_id = t261.userId
+	end
+
+	if t261.description ~= nil then
+		v2084.description = t261.description
+	end
+
+	if t261.cta_text ~= nil then
+		v2084.cta_text = t261.cta_text
+	end
+
+	if t261.ctaText ~= nil then
+		v2084.cta_text = t261.ctaText
+	end
+
+	if t261.prompt_id ~= nil then
+		v2084.prompt_id = t261.prompt_id
+	end
+
+	if t261.promptId ~= nil then
+		v2084.prompt_id = t261.promptId
+	end
+
+	if t261.prompt_type ~= nil then
+		v2084.prompt_type = t261.prompt_type
+	end
+
+	if t261.promptType ~= nil then
+		v2084.prompt_type = t261.promptType
+	end
+
+	return v2084
+end
+
+t258.descriptor = {
+	name = "CardInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CardInputData"
+}
+t1.CardInputData = t258
+typeRegistry.default:register(t1.CardInputData)
+
+local t262 = {}
+
+t262.__index = t262
+
+function t262.new(t263: {[any]: any}?) -- line: 13403
+	-- upvalues: t262 (copy)
+	return (setmetatable({
+		prompt_id = if t263 ~= nil and t263.prompt_id ~= nil then t263.prompt_id else "",
+		prompt_type = if t263 ~= nil and t263.prompt_type ~= nil then t263.prompt_type else "",
+		user_id = if t263 ~= nil and t263.user_id ~= nil then t263.user_id else "",
+		audit_data = if t263 ~= nil and t263.audit_data ~= nil then t263.audit_data else ""
+	}, t262))
+end
+function t262.encode(p161) -- line: 13412
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n107 = 0
+
+	if p161.prompt_id ~= nil and p161.prompt_id ~= "" then
+		local v2089, v2090 = proto.writeTag(buf, n107, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n107 = proto.writeString(v2089, v2090, p161.prompt_id)
+	end
+
+	if p161.prompt_type ~= nil and p161.prompt_type ~= "" then
+		local v2091, v2092 = proto.writeTag(buf, n107, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n107 = proto.writeString(v2091, v2092, p161.prompt_type)
+	end
+
+	if p161.user_id ~= nil and p161.user_id ~= "" then
+		local v2093, v2094 = proto.writeTag(buf, n107, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n107 = proto.writeString(v2093, v2094, p161.user_id)
+	end
+
+	if p161.audit_data ~= nil and p161.audit_data ~= "" then
+		local v2095, v2096 = proto.writeTag(buf, n107, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n107 = proto.writeString(v2095, v2096, p161.audit_data)
+	end
+
+	local buf58 = buffer.create(n107)
+
+	buffer.copy(buf58, 0, buf, 0, n107)
 
 	return buf58
 end
-function t260.decode(p161: buffer) -- line: 13279
-	-- upvalues: t260 (copy), proto (copy)
-	local v2098 = t260.new()
-	local n107 = 0
+function t262.decode(p162: buffer) -- line: 13441
+	-- upvalues: t262 (copy), proto (copy)
+	local v2099 = t262.new()
+	local n108 = 0
 
-	while n107 < buffer.len(p161) do
-		local v2100, v2101
+	while n108 < buffer.len(p162) do
+		local v2101, v2102
 
-		v2100, v2101, n107 = proto.readTag(p161, n107)
+		v2101, v2102, n108 = proto.readTag(p162, n108)
 
-		if v2101 == proto.wireTypes.varint then
-			local v2102
+		if v2102 == proto.wireTypes.varint then
+			local v2103
 
-			v2102, n107 = proto.readVarInt(p161, n107)
-		elseif v2101 == proto.wireTypes.lengthDelimited then
-			if v2100 == 1 then
-				local v2103
-
-				v2103, n107 = proto.readBuffer(p161, n107)
-				v2098.media_id = buffer.tostring(v2103)
-			elseif v2100 == 2 then
+			v2103, n108 = proto.readVarInt(p162, n108)
+		elseif v2102 == proto.wireTypes.lengthDelimited then
+			if v2101 == 1 then
 				local v2104
 
-				v2104, n107 = proto.readBuffer(p161, n107)
-				v2098.title = buffer.tostring(v2104)
-			elseif v2100 == 3 then
+				v2104, n108 = proto.readBuffer(p162, n108)
+				v2099.prompt_id = buffer.tostring(v2104)
+			elseif v2101 == 2 then
 				local v2105
 
-				v2105, n107 = proto.readBuffer(p161, n107)
-				v2098.description = buffer.tostring(v2105)
-			elseif v2100 == 4 then
+				v2105, n108 = proto.readBuffer(p162, n108)
+				v2099.prompt_type = buffer.tostring(v2105)
+			elseif v2101 == 3 then
 				local v2106
 
-				v2106, n107 = proto.readBuffer(p161, n107)
-				v2098.prompt_id = buffer.tostring(v2106)
-			elseif v2100 == 5 then
+				v2106, n108 = proto.readBuffer(p162, n108)
+				v2099.user_id = buffer.tostring(v2106)
+			elseif v2101 == 4 then
 				local v2107
 
-				v2107, n107 = proto.readBuffer(p161, n107)
-				v2098.prompt_type = buffer.tostring(v2107)
-			elseif v2100 == 6 then
-				local v2108
-
-				v2108, n107 = proto.readBuffer(p161, n107)
-				v2098.anchor_tag = buffer.tostring(v2108)
+				v2107, n108 = proto.readBuffer(p162, n108)
+				v2099.audit_data = buffer.tostring(v2107)
 			else
-				local v2109, v2110 = proto.readVarInt(p161, n107)
+				local v2108, v2109 = proto.readVarInt(p162, n108)
 
-				n107 = v2110 + v2109
+				n108 = v2109 + v2108
 			end
-		elseif v2101 == proto.wireTypes.i32 then
+		elseif v2102 == proto.wireTypes.i32 then
+			local v2110
+
+			v2110, n108 = proto.readFixed32(p162, n108)
+		elseif v2102 == proto.wireTypes.i64 then
 			local v2111
 
-			v2111, n107 = proto.readFixed32(p161, n107)
-		elseif v2101 == proto.wireTypes.i64 then
-			local v2112
-
-			v2112, n107 = proto.readFixed64(p161, n107)
+			v2111, n108 = proto.readFixed64(p162, n108)
 		else
-			error("Unsupported wire type: " .. v2101)
+			error("Unsupported wire type: " .. v2102)
 		end
 	end
 
-	return v2098
+	return v2099
 end
-function t260.jsonEncode(p162) -- line: 13347
-	local t262 = {}
-
-	if p162.media_id ~= nil and p162.media_id ~= "" then
-		t262.mediaId = p162.media_id
-	end
-
-	if p162.title ~= nil and p162.title ~= "" then
-		t262.title = p162.title
-	end
-
-	if p162.description ~= nil and p162.description ~= "" then
-		t262.description = p162.description
-	end
-
-	if p162.prompt_id ~= nil and p162.prompt_id ~= "" then
-		t262.promptId = p162.prompt_id
-	end
-
-	if p162.prompt_type ~= nil and p162.prompt_type ~= "" then
-		t262.promptType = p162.prompt_type
-	end
-
-	if p162.anchor_tag ~= nil and p162.anchor_tag ~= "" then
-		t262.anchorTag = p162.anchor_tag
-	end
-
-	return t262
-end
-function t260.jsonDecode(t263: {[any]: any}) -- line: 13377
-	-- upvalues: t260 (copy)
-	local v2116 = t260.new()
-
-	if t263.media_id ~= nil then
-		v2116.media_id = t263.media_id
-	end
-
-	if t263.mediaId ~= nil then
-		v2116.media_id = t263.mediaId
-	end
-
-	if t263.title ~= nil then
-		v2116.title = t263.title
-	end
-
-	if t263.description ~= nil then
-		v2116.description = t263.description
-	end
-
-	if t263.prompt_id ~= nil then
-		v2116.prompt_id = t263.prompt_id
-	end
-
-	if t263.promptId ~= nil then
-		v2116.prompt_id = t263.promptId
-	end
-
-	if t263.prompt_type ~= nil then
-		v2116.prompt_type = t263.prompt_type
-	end
-
-	if t263.promptType ~= nil then
-		v2116.prompt_type = t263.promptType
-	end
-
-	if t263.anchor_tag ~= nil then
-		v2116.anchor_tag = t263.anchor_tag
-	end
-
-	if t263.anchorTag ~= nil then
-		v2116.anchor_tag = t263.anchorTag
-	end
-
-	return v2116
-end
-
-t260.descriptor = {
-	name = "CoachmarkInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CoachmarkInputData"
-}
-t1.CoachmarkInputData = t260
-typeRegistry.default:register(t1.CoachmarkInputData)
-
-local t264 = {}
-
-t264.__index = t264
-
-function t264.new(t265: {[any]: any}?) -- line: 13437
-	-- upvalues: t264 (copy)
-	return (setmetatable({
-		prompt_id = if t265 ~= nil and t265.prompt_id ~= nil then t265.prompt_id else "",
-		prompt_type = if t265 ~= nil and t265.prompt_type ~= nil then t265.prompt_type else ""
-	}, t264))
-end
-function t264.encode(p163) -- line: 13444
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n108 = 0
+function t262.jsonEncode(p163) -- line: 13499
+	local t264 = {}
 
 	if p163.prompt_id ~= nil and p163.prompt_id ~= "" then
-		local v2121, v2122 = proto.writeTag(buf, n108, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n108 = proto.writeString(v2121, v2122, p163.prompt_id)
+		t264.promptId = p163.prompt_id
 	end
 
 	if p163.prompt_type ~= nil and p163.prompt_type ~= "" then
-		local v2123, v2124 = proto.writeTag(buf, n108, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n108 = proto.writeString(v2123, v2124, p163.prompt_type)
+		t264.promptType = p163.prompt_type
 	end
 
-	local buf59 = buffer.create(n108)
+	if p163.user_id ~= nil and p163.user_id ~= "" then
+		t264.userId = p163.user_id
+	end
 
-	buffer.copy(buf59, 0, buf, 0, n108)
+	if p163.audit_data ~= nil and p163.audit_data ~= "" then
+		t264.auditData = p163.audit_data
+	end
+
+	return t264
+end
+function t262.jsonDecode(t265: {[any]: any}) -- line: 13521
+	-- upvalues: t262 (copy)
+	local v2115 = t262.new()
+
+	if t265.prompt_id ~= nil then
+		v2115.prompt_id = t265.prompt_id
+	end
+
+	if t265.promptId ~= nil then
+		v2115.prompt_id = t265.promptId
+	end
+
+	if t265.prompt_type ~= nil then
+		v2115.prompt_type = t265.prompt_type
+	end
+
+	if t265.promptType ~= nil then
+		v2115.prompt_type = t265.promptType
+	end
+
+	if t265.user_id ~= nil then
+		v2115.user_id = t265.user_id
+	end
+
+	if t265.userId ~= nil then
+		v2115.user_id = t265.userId
+	end
+
+	if t265.audit_data ~= nil then
+		v2115.audit_data = t265.audit_data
+	end
+
+	if t265.auditData ~= nil then
+		v2115.audit_data = t265.auditData
+	end
+
+	return v2115
+end
+
+t262.descriptor = {
+	name = "DialogInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.DialogInputData"
+}
+t1.DialogInputData = t262
+typeRegistry.default:register(t1.DialogInputData)
+
+local t266 = {}
+
+t266.__index = t266
+
+function t266.new(t267: {[any]: any}?) -- line: 13573
+	-- upvalues: t266 (copy)
+	return (setmetatable({
+		sender_count = if t267 ~= nil and t267.sender_count ~= nil then t267.sender_count else 0,
+		total_robux_amount = if t267 ~= nil and t267.total_robux_amount ~= nil then t267.total_robux_amount else 0
+	}, t266))
+end
+function t266.encode(p164) -- line: 13580
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n109 = 0
+
+	if p164.sender_count ~= nil and p164.sender_count ~= 0 then
+		local v2120, v2121 = proto.writeTag(buf, n109, 1, proto.wireTypes.varint)
+
+		buf, n109 = proto.writeVarInt(v2120, v2121, p164.sender_count)
+	end
+
+	if p164.total_robux_amount ~= nil and p164.total_robux_amount ~= 0 then
+		local v2122, v2123 = proto.writeTag(buf, n109, 2, proto.wireTypes.varint)
+
+		buf, n109 = proto.writeVarInt(v2122, v2123, p164.total_robux_amount)
+	end
+
+	local buf59 = buffer.create(n109)
+
+	buffer.copy(buf59, 0, buf, 0, n109)
 
 	return buf59
 end
-function t264.decode(p164: buffer) -- line: 13463
-	-- upvalues: t264 (copy), proto (copy)
-	local v2127 = t264.new()
-	local n109 = 0
+function t266.decode(p165: buffer) -- line: 13599
+	-- upvalues: t266 (copy), proto (copy)
+	local v2126 = t266.new()
+	local n110 = 0
 
-	while n109 < buffer.len(p164) do
-		local v2129, v2130
+	while n110 < buffer.len(p165) do
+		local v2128, v2129
 
-		v2129, v2130, n109 = proto.readTag(p164, n109)
+		v2128, v2129, n110 = proto.readTag(p165, n110)
 
-		if v2130 == proto.wireTypes.varint then
-			local v2131
+		if v2129 == proto.wireTypes.varint then
+			if v2128 == 1 then
+				local v2130
 
-			v2131, n109 = proto.readVarInt(p164, n109)
-		elseif v2130 == proto.wireTypes.lengthDelimited then
-			if v2129 == 1 then
+				v2130, n110 = proto.readVarIntI32(p165, n110)
+				v2126.sender_count = v2130
+			elseif v2128 == 2 then
+				local v2131
+
+				v2131, n110 = proto.readVarIntI64(p165, n110)
+				v2126.total_robux_amount = v2131
+			else
 				local v2132
 
-				v2132, n109 = proto.readBuffer(p164, n109)
-				v2127.prompt_id = buffer.tostring(v2132)
-			elseif v2129 == 2 then
-				local v2133
-
-				v2133, n109 = proto.readBuffer(p164, n109)
-				v2127.prompt_type = buffer.tostring(v2133)
-			else
-				local v2134, v2135 = proto.readVarInt(p164, n109)
-
-				n109 = v2135 + v2134
+				v2132, n110 = proto.readVarInt(p165, n110)
 			end
-		elseif v2130 == proto.wireTypes.i32 then
+		elseif v2129 == proto.wireTypes.lengthDelimited then
+			local v2133, v2134 = proto.readVarInt(p165, n110)
+
+			n110 = v2134 + v2133
+		elseif v2129 == proto.wireTypes.i32 then
+			local v2135
+
+			v2135, n110 = proto.readFixed32(p165, n110)
+		elseif v2129 == proto.wireTypes.i64 then
 			local v2136
 
-			v2136, n109 = proto.readFixed32(p164, n109)
-		elseif v2130 == proto.wireTypes.i64 then
-			local v2137
-
-			v2137, n109 = proto.readFixed64(p164, n109)
+			v2136, n110 = proto.readFixed64(p165, n110)
 		else
-			error("Unsupported wire type: " .. v2130)
+			error("Unsupported wire type: " .. v2129)
 		end
 	end
 
-	return v2127
+	return v2126
 end
-function t264.jsonEncode(p165) -- line: 13511
-	local t266 = {}
+function t266.jsonEncode(p166) -- line: 13647
+	local t268 = {}
 
-	if p165.prompt_id ~= nil and p165.prompt_id ~= "" then
-		t266.promptId = p165.prompt_id
+	if p166.sender_count ~= nil and p166.sender_count ~= 0 then
+		t268.senderCount = p166.sender_count
 	end
 
-	if p165.prompt_type ~= nil and p165.prompt_type ~= "" then
-		t266.promptType = p165.prompt_type
+	if p166.total_robux_amount ~= nil and p166.total_robux_amount ~= 0 then
+		t268.totalRobuxAmount = p166.total_robux_amount
 	end
 
-	return t266
+	return t268
 end
-function t264.jsonDecode(t267: {[any]: any}) -- line: 13525
-	-- upvalues: t264 (copy)
-	local v2141 = t264.new()
+function t266.jsonDecode(t269: {[any]: any}) -- line: 13661
+	-- upvalues: t266 (copy)
+	local v2140 = t266.new()
 
-	if t267.prompt_id ~= nil then
-		v2141.prompt_id = t267.prompt_id
+	if t269.sender_count ~= nil then
+		v2140.sender_count = t269.sender_count
 	end
 
-	if t267.promptId ~= nil then
-		v2141.prompt_id = t267.promptId
+	if t269.senderCount ~= nil then
+		v2140.sender_count = t269.senderCount
 	end
 
-	if t267.prompt_type ~= nil then
-		v2141.prompt_type = t267.prompt_type
+	if t269.total_robux_amount ~= nil then
+		v2140.total_robux_amount = t269.total_robux_amount
 	end
 
-	if t267.promptType ~= nil then
-		v2141.prompt_type = t267.promptType
+	if t269.totalRobuxAmount ~= nil then
+		v2140.total_robux_amount = t269.totalRobuxAmount
 	end
 
-	return v2141
+	return v2140
 end
 
-t264.descriptor = {
-	name = "SystemBannerInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SystemBannerInputData"
+t266.descriptor = {
+	name = "IncomingTransferContent",
+	fullName = "roblox.apppageplatform.shared.v1beta1.IncomingTransferContent"
 }
-t1.SystemBannerInputData = t264
-typeRegistry.default:register(t1.SystemBannerInputData)
+t1.IncomingTransferContent = t266
+typeRegistry.default:register(t1.IncomingTransferContent)
 
-local t268 = {}
+local t270 = {}
 
-t268.__index = t268
+t270.__index = t270
 
-function t268.new(t269: {[any]: any}?) -- line: 13561
-	-- upvalues: t268 (copy)
+function t270.new(t271: {[any]: any}?) -- line: 13697
+	-- upvalues: t270 (copy)
 	return (setmetatable({
-		upsell_prompt = if t269 ~= nil and t269.upsell_prompt ~= nil then t269.upsell_prompt else ""
-	}, t268))
+		title = if t271 ~= nil and t271.title ~= nil then t271.title else "",
+		description = if t271 ~= nil and t271.description ~= nil then t271.description else "",
+		primary_text = if t271 ~= nil and t271.primary_text ~= nil then t271.primary_text else "",
+		secondary_text = if t271 ~= nil and t271.secondary_text ~= nil then t271.secondary_text else "",
+		prompt_id = if t271 ~= nil and t271.prompt_id ~= nil then t271.prompt_id else "",
+		prompt_type = if t271 ~= nil and t271.prompt_type ~= nil then t271.prompt_type else "",
+		times_seen = if t271 ~= nil and t271.times_seen ~= nil then t271.times_seen else 0,
+		content = if t271 ~= nil and t271.content ~= nil then t271.content else nil
+	}, t270))
 end
-function t268.encode(p166) -- line: 13567
+function t270.encode(p167) -- line: 13710
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n110 = 0
+	local n111 = 0
 
-	if p166.upsell_prompt ~= nil and p166.upsell_prompt ~= "" then
-		local v2146, v2147 = proto.writeTag(buf, n110, 1, proto.wireTypes.lengthDelimited)
+	if p167.title ~= nil and p167.title ~= "" then
+		local v2145, v2146 = proto.writeTag(buf, n111, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n110 = proto.writeString(v2146, v2147, p166.upsell_prompt)
+		buf, n111 = proto.writeString(v2145, v2146, p167.title)
 	end
 
-	local buf60 = buffer.create(n110)
+	if p167.description ~= nil and p167.description ~= "" then
+		local v2147, v2148 = proto.writeTag(buf, n111, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf60, 0, buf, 0, n110)
+		buf, n111 = proto.writeString(v2147, v2148, p167.description)
+	end
+
+	if p167.primary_text ~= nil and p167.primary_text ~= "" then
+		local v2149, v2150 = proto.writeTag(buf, n111, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n111 = proto.writeString(v2149, v2150, p167.primary_text)
+	end
+
+	if p167.secondary_text ~= nil and p167.secondary_text ~= "" then
+		local v2151, v2152 = proto.writeTag(buf, n111, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n111 = proto.writeString(v2151, v2152, p167.secondary_text)
+	end
+
+	if p167.prompt_id ~= nil and p167.prompt_id ~= "" then
+		local v2153, v2154 = proto.writeTag(buf, n111, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n111 = proto.writeString(v2153, v2154, p167.prompt_id)
+	end
+
+	if p167.prompt_type ~= nil and p167.prompt_type ~= "" then
+		local v2155, v2156 = proto.writeTag(buf, n111, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n111 = proto.writeString(v2155, v2156, p167.prompt_type)
+	end
+
+	if p167.times_seen ~= nil and p167.times_seen ~= 0 then
+		local v2157, v2158 = proto.writeTag(buf, n111, 7, proto.wireTypes.varint)
+
+		buf, n111 = proto.writeVarInt(v2157, v2158, p167.times_seen)
+	end
+
+	if p167.content ~= nil and p167.content.type == "incoming_transfer_content" then
+		local v2159 = p167.content.value:encode()
+		local v2160, v2161 = proto.writeTag(buf, n111, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n111 = proto.writeBuffer(v2160, v2161, v2159, buffer.len(v2159))
+	end
+
+	local buf60 = buffer.create(n111)
+
+	buffer.copy(buf60, 0, buf, 0, n111)
 
 	return buf60
 end
-function t268.decode(p167: buffer) -- line: 13581
-	-- upvalues: t268 (copy), proto (copy)
-	local v2150 = t268.new()
-	local n111 = 0
+function t270.decode(p168: buffer) -- line: 13762
+	-- upvalues: t270 (copy), proto (copy), t1 (copy)
+	local v2164 = t270.new()
+	local n112 = 0
 
-	while n111 < buffer.len(p167) do
-		local v2152, v2153
+	while n112 < buffer.len(p168) do
+		local v2166, v2167
 
-		v2152, v2153, n111 = proto.readTag(p167, n111)
+		v2166, v2167, n112 = proto.readTag(p168, n112)
 
-		if v2153 == proto.wireTypes.varint then
-			local v2154
+		if v2167 == proto.wireTypes.varint then
+			if v2166 == 7 then
+				local v2168
 
-			v2154, n111 = proto.readVarInt(p167, n111)
-		elseif v2153 == proto.wireTypes.lengthDelimited then
-			if v2152 == 1 then
-				local v2155
-
-				v2155, n111 = proto.readBuffer(p167, n111)
-				v2150.upsell_prompt = buffer.tostring(v2155)
+				v2168, n112 = proto.readVarIntI32(p168, n112)
+				v2164.times_seen = v2168
 			else
-				local v2156, v2157 = proto.readVarInt(p167, n111)
+				local v2169
 
-				n111 = v2157 + v2156
+				v2169, n112 = proto.readVarInt(p168, n112)
 			end
-		elseif v2153 == proto.wireTypes.i32 then
-			local v2158
+		elseif v2167 == proto.wireTypes.lengthDelimited then
+			if v2166 == 1 then
+				local v2170
 
-			v2158, n111 = proto.readFixed32(p167, n111)
-		elseif v2153 == proto.wireTypes.i64 then
-			local v2159
+				v2170, n112 = proto.readBuffer(p168, n112)
+				v2164.title = buffer.tostring(v2170)
+			elseif v2166 == 2 then
+				local v2171
 
-			v2159, n111 = proto.readFixed64(p167, n111)
+				v2171, n112 = proto.readBuffer(p168, n112)
+				v2164.description = buffer.tostring(v2171)
+			elseif v2166 == 3 then
+				local v2172
+
+				v2172, n112 = proto.readBuffer(p168, n112)
+				v2164.primary_text = buffer.tostring(v2172)
+			elseif v2166 == 4 then
+				local v2173
+
+				v2173, n112 = proto.readBuffer(p168, n112)
+				v2164.secondary_text = buffer.tostring(v2173)
+			elseif v2166 == 5 then
+				local v2174
+
+				v2174, n112 = proto.readBuffer(p168, n112)
+				v2164.prompt_id = buffer.tostring(v2174)
+			elseif v2166 == 6 then
+				local v2175
+
+				v2175, n112 = proto.readBuffer(p168, n112)
+				v2164.prompt_type = buffer.tostring(v2175)
+			elseif v2166 == 8 then
+				local v2176
+
+				v2176, n112 = proto.readBuffer(p168, n112)
+				v2164.content = {
+					type = "incoming_transfer_content",
+					value = t1.IncomingTransferContent.decode(v2176)
+				}
+			else
+				local v2177, v2178 = proto.readVarInt(p168, n112)
+
+				n112 = v2178 + v2177
+			end
+		elseif v2167 == proto.wireTypes.i32 then
+			local v2179
+
+			v2179, n112 = proto.readFixed32(p168, n112)
+		elseif v2167 == proto.wireTypes.i64 then
+			local v2180
+
+			v2180, n112 = proto.readFixed64(p168, n112)
 		else
-			error("Unsupported wire type: " .. v2153)
+			error("Unsupported wire type: " .. v2167)
 		end
 	end
 
-	return v2150
+	return v2164
 end
-function t268.jsonEncode(p168) -- line: 13624
-	local t270 = {}
+function t270.jsonEncode(p169) -- line: 13841
+	local t272 = {}
 
-	if p168.upsell_prompt ~= nil and p168.upsell_prompt ~= "" then
-		t270.upsellPrompt = p168.upsell_prompt
+	if p169.title ~= nil and p169.title ~= "" then
+		t272.title = p169.title
 	end
 
-	return t270
-end
-function t268.jsonDecode(t271: {[any]: any}) -- line: 13634
-	-- upvalues: t268 (copy)
-	local v2163 = t268.new()
-
-	if t271.upsell_prompt ~= nil then
-		v2163.upsell_prompt = t271.upsell_prompt
+	if p169.description ~= nil and p169.description ~= "" then
+		t272.description = p169.description
 	end
 
-	if t271.upsellPrompt ~= nil then
-		v2163.upsell_prompt = t271.upsellPrompt
+	if p169.primary_text ~= nil and p169.primary_text ~= "" then
+		t272.primaryText = p169.primary_text
 	end
 
-	return v2163
+	if p169.secondary_text ~= nil and p169.secondary_text ~= "" then
+		t272.secondaryText = p169.secondary_text
+	end
+
+	if p169.prompt_id ~= nil and p169.prompt_id ~= "" then
+		t272.promptId = p169.prompt_id
+	end
+
+	if p169.prompt_type ~= nil and p169.prompt_type ~= "" then
+		t272.promptType = p169.prompt_type
+	end
+
+	if p169.times_seen ~= nil and p169.times_seen ~= 0 then
+		t272.timesSeen = p169.times_seen
+	end
+
+	if p169.content ~= nil and p169.content.type == "incoming_transfer_content" then
+		t272.incomingTransferContent = p169.content.value:jsonEncode()
+	end
+
+	return t272
+end
+function t270.jsonDecode(t273: {[any]: any}) -- line: 13881
+	-- upvalues: t270 (copy), t1 (copy)
+	local v2184 = t270.new()
+
+	if t273.title ~= nil then
+		v2184.title = t273.title
+	end
+
+	if t273.description ~= nil then
+		v2184.description = t273.description
+	end
+
+	if t273.primary_text ~= nil then
+		v2184.primary_text = t273.primary_text
+	end
+
+	if t273.primaryText ~= nil then
+		v2184.primary_text = t273.primaryText
+	end
+
+	if t273.secondary_text ~= nil then
+		v2184.secondary_text = t273.secondary_text
+	end
+
+	if t273.secondaryText ~= nil then
+		v2184.secondary_text = t273.secondaryText
+	end
+
+	if t273.prompt_id ~= nil then
+		v2184.prompt_id = t273.prompt_id
+	end
+
+	if t273.promptId ~= nil then
+		v2184.prompt_id = t273.promptId
+	end
+
+	if t273.prompt_type ~= nil then
+		v2184.prompt_type = t273.prompt_type
+	end
+
+	if t273.promptType ~= nil then
+		v2184.prompt_type = t273.promptType
+	end
+
+	if t273.times_seen ~= nil then
+		v2184.times_seen = t273.times_seen
+	end
+
+	if t273.timesSeen ~= nil then
+		v2184.times_seen = t273.timesSeen
+	end
+
+	if t273.incoming_transfer_content ~= nil then
+		v2184.content = {
+			type = "incoming_transfer_content",
+			value = t1.IncomingTransferContent.jsonDecode(t273.incoming_transfer_content)
+		}
+	end
+
+	if t273.incomingTransferContent ~= nil then
+		v2184.content = {
+			type = "incoming_transfer_content",
+			value = t1.IncomingTransferContent.jsonDecode(t273.incomingTransferContent)
+		}
+	end
+
+	return v2184
 end
 
-t268.descriptor = {
-	name = "AgeCheckUpsellInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.AgeCheckUpsellInputData"
+t270.descriptor = {
+	name = "BannerInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.BannerInputData"
 }
-t1.AgeCheckUpsellInputData = t268
-typeRegistry.default:register(t1.AgeCheckUpsellInputData)
+t1.BannerInputData = t270
+typeRegistry.default:register(t1.BannerInputData)
 
-local t272 = {}
+local t274 = {}
 
-t272.__index = t272
+t274.__index = t274
 
-function t272.new(t273: {[any]: any}?) -- line: 13662
-	-- upvalues: t272 (copy)
+function t274.new(t275: {[any]: any}?) -- line: 13963
+	-- upvalues: t274 (copy)
 	return (setmetatable({
-		modal_variant = if t273 ~= nil and t273.modal_variant ~= nil then t273.modal_variant else "",
-		modal_sequence = if t273 ~= nil and t273.modal_sequence ~= nil then t273.modal_sequence else "",
-		conversation_id = if t273 ~= nil and t273.conversation_id ~= nil then t273.conversation_id else "",
-		friend_id = if t273 ~= nil and t273.friend_id ~= nil then t273.friend_id else ""
-	}, t272))
+		tooltip_text = if t275 ~= nil and t275.tooltip_text ~= nil then t275.tooltip_text else "",
+		prompt_id = if t275 ~= nil and t275.prompt_id ~= nil then t275.prompt_id else "",
+		prompt_type = if t275 ~= nil and t275.prompt_type ~= nil then t275.prompt_type else ""
+	}, t274))
 end
-function t272.encode(p169) -- line: 13673
+function t274.encode(p170) -- line: 13971
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n112 = 0
+	local n113 = 0
 
-	if p169.modal_variant ~= nil and p169.modal_variant ~= "" then
-		local v2168, v2169 = proto.writeTag(buf, n112, 1, proto.wireTypes.lengthDelimited)
+	if p170.tooltip_text ~= nil and p170.tooltip_text ~= "" then
+		local v2189, v2190 = proto.writeTag(buf, n113, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n112 = proto.writeString(v2168, v2169, p169.modal_variant)
+		buf, n113 = proto.writeString(v2189, v2190, p170.tooltip_text)
 	end
 
-	if p169.modal_sequence ~= nil and p169.modal_sequence ~= "" then
-		local v2170, v2171 = proto.writeTag(buf, n112, 2, proto.wireTypes.lengthDelimited)
+	if p170.prompt_id ~= nil and p170.prompt_id ~= "" then
+		local v2191, v2192 = proto.writeTag(buf, n113, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n112 = proto.writeString(v2170, v2171, p169.modal_sequence)
+		buf, n113 = proto.writeString(v2191, v2192, p170.prompt_id)
 	end
 
-	if p169.conversation_id ~= nil and p169.conversation_id ~= "" then
-		local v2172, v2173 = proto.writeTag(buf, n112, 3, proto.wireTypes.lengthDelimited)
+	if p170.prompt_type ~= nil and p170.prompt_type ~= "" then
+		local v2193, v2194 = proto.writeTag(buf, n113, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n112 = proto.writeString(v2172, v2173, p169.conversation_id)
+		buf, n113 = proto.writeString(v2193, v2194, p170.prompt_type)
 	end
 
-	if p169.friend_id ~= nil and p169.friend_id ~= "" then
-		local v2174, v2175 = proto.writeTag(buf, n112, 4, proto.wireTypes.lengthDelimited)
+	local buf61 = buffer.create(n113)
 
-		buf, n112 = proto.writeString(v2174, v2175, p169.friend_id)
-	end
-
-	local buf61 = buffer.create(n112)
-
-	buffer.copy(buf61, 0, buf, 0, n112)
+	buffer.copy(buf61, 0, buf, 0, n113)
 
 	return buf61
 end
-function t272.decode(p170: buffer) -- line: 13702
-	-- upvalues: t272 (copy), proto (copy)
-	local v2178 = t272.new()
-	local n113 = 0
-
-	while n113 < buffer.len(p170) do
-		local v2180, v2181
-
-		v2180, v2181, n113 = proto.readTag(p170, n113)
-
-		if v2181 == proto.wireTypes.varint then
-			local v2182
-
-			v2182, n113 = proto.readVarInt(p170, n113)
-		elseif v2181 == proto.wireTypes.lengthDelimited then
-			if v2180 == 1 then
-				local v2183
-
-				v2183, n113 = proto.readBuffer(p170, n113)
-				v2178.modal_variant = buffer.tostring(v2183)
-			elseif v2180 == 2 then
-				local v2184
-
-				v2184, n113 = proto.readBuffer(p170, n113)
-				v2178.modal_sequence = buffer.tostring(v2184)
-			elseif v2180 == 3 then
-				local v2185
-
-				v2185, n113 = proto.readBuffer(p170, n113)
-				v2178.conversation_id = buffer.tostring(v2185)
-			elseif v2180 == 4 then
-				local v2186
-
-				v2186, n113 = proto.readBuffer(p170, n113)
-				v2178.friend_id = buffer.tostring(v2186)
-			else
-				local v2187, v2188 = proto.readVarInt(p170, n113)
-
-				n113 = v2188 + v2187
-			end
-		elseif v2181 == proto.wireTypes.i32 then
-			local v2189
-
-			v2189, n113 = proto.readFixed32(p170, n113)
-		elseif v2181 == proto.wireTypes.i64 then
-			local v2190
-
-			v2190, n113 = proto.readFixed64(p170, n113)
-		else
-			error("Unsupported wire type: " .. v2181)
-		end
-	end
-
-	return v2178
-end
-function t272.jsonEncode(p171) -- line: 13760
-	local t274 = {}
-
-	if p171.modal_variant ~= nil and p171.modal_variant ~= "" then
-		t274.modalVariant = p171.modal_variant
-	end
-
-	if p171.modal_sequence ~= nil and p171.modal_sequence ~= "" then
-		t274.modalSequence = p171.modal_sequence
-	end
-
-	if p171.conversation_id ~= nil and p171.conversation_id ~= "" then
-		t274.conversationId = p171.conversation_id
-	end
-
-	if p171.friend_id ~= nil and p171.friend_id ~= "" then
-		t274.friendId = p171.friend_id
-	end
-
-	return t274
-end
-function t272.jsonDecode(t275: {[any]: any}) -- line: 13782
-	-- upvalues: t272 (copy)
-	local v2194 = t272.new()
-
-	if t275.modal_variant ~= nil then
-		v2194.modal_variant = t275.modal_variant
-	end
-
-	if t275.modalVariant ~= nil then
-		v2194.modal_variant = t275.modalVariant
-	end
-
-	if t275.modal_sequence ~= nil then
-		v2194.modal_sequence = t275.modal_sequence
-	end
-
-	if t275.modalSequence ~= nil then
-		v2194.modal_sequence = t275.modalSequence
-	end
-
-	if t275.conversation_id ~= nil then
-		v2194.conversation_id = t275.conversation_id
-	end
-
-	if t275.conversationId ~= nil then
-		v2194.conversation_id = t275.conversationId
-	end
-
-	if t275.friend_id ~= nil then
-		v2194.friend_id = t275.friend_id
-	end
-
-	if t275.friendId ~= nil then
-		v2194.friend_id = t275.friendId
-	end
-
-	return v2194
-end
-
-t272.descriptor = {
-	name = "PartyChatConversationUpsellInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.PartyChatConversationUpsellInputData"
-}
-t1.PartyChatConversationUpsellInputData = t272
-typeRegistry.default:register(t1.PartyChatConversationUpsellInputData)
-
-local t276 = {}
-
-t276.__index = t276
-
-function t276.new(t277: {[any]: any}?) -- line: 13836
-	-- upvalues: t276 (copy)
-	return (setmetatable({
-		event_id = if t277 ~= nil and t277.event_id ~= nil then t277.event_id else "",
-		universe_id = if t277 ~= nil and t277.universe_id ~= nil then t277.universe_id else "",
-		entry_map = if t277 ~= nil and t277.entry_map ~= nil then t277.entry_map else {},
-		entry_order = if t277 ~= nil and t277.entry_order ~= nil then t277.entry_order else {}
-	}, t276))
-end
-function t276.encode(p172) -- line: 13847
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t274.decode(p171: buffer) -- line: 13995
+	-- upvalues: t274 (copy), proto (copy)
+	local v2197 = t274.new()
 	local n114 = 0
 
-	if p172.event_id ~= nil and p172.event_id ~= "" then
-		local v2199, v2200 = proto.writeTag(buf, n114, 1, proto.wireTypes.lengthDelimited)
+	while n114 < buffer.len(p171) do
+		local v2199, v2200
 
-		buf, n114 = proto.writeString(v2199, v2200, p172.event_id)
-	end
+		v2199, v2200, n114 = proto.readTag(p171, n114)
 
-	if p172.universe_id ~= nil and p172.universe_id ~= "" then
-		local v2201, v2202 = proto.writeTag(buf, n114, 2, proto.wireTypes.lengthDelimited)
+		if v2200 == proto.wireTypes.varint then
+			local v2201
 
-		buf, n114 = proto.writeString(v2201, v2202, p172.universe_id)
-	end
+			v2201, n114 = proto.readVarInt(p171, n114)
+		elseif v2200 == proto.wireTypes.lengthDelimited then
+			if v2199 == 1 then
+				local v2202
 
-	if p172.entry_map ~= nil and next(p172.entry_map) ~= nil then
-		for v2203, v2204 in p172.entry_map do
-			local buf62 = buffer.create(0)
-			local v2206, v2207 = proto.writeTag(buf62, 0, 1, proto.wireTypes.lengthDelimited)
-			local v2208, v2209 = proto.writeString(v2206, v2207, v2203)
-			local v2210 = v2204:encode()
-			local v2211, v2212 = proto.writeTag(v2208, v2209, 2, proto.wireTypes.lengthDelimited)
-			local v2213, v2214 = proto.writeBuffer(v2211, v2212, v2210, buffer.len(v2210))
-			local v2215, v2216 = proto.writeTag(buf, n114, 3, proto.wireTypes.lengthDelimited)
+				v2202, n114 = proto.readBuffer(p171, n114)
+				v2197.tooltip_text = buffer.tostring(v2202)
+			elseif v2199 == 2 then
+				local v2203
 
-			buf, n114 = proto.writeBuffer(v2215, v2216, v2213, v2214)
+				v2203, n114 = proto.readBuffer(p171, n114)
+				v2197.prompt_id = buffer.tostring(v2203)
+			elseif v2199 == 3 then
+				local v2204
+
+				v2204, n114 = proto.readBuffer(p171, n114)
+				v2197.prompt_type = buffer.tostring(v2204)
+			else
+				local v2205, v2206 = proto.readVarInt(p171, n114)
+
+				n114 = v2206 + v2205
+			end
+		elseif v2200 == proto.wireTypes.i32 then
+			local v2207
+
+			v2207, n114 = proto.readFixed32(p171, n114)
+		elseif v2200 == proto.wireTypes.i64 then
+			local v2208
+
+			v2208, n114 = proto.readFixed64(p171, n114)
+		else
+			error("Unsupported wire type: " .. v2200)
 		end
 	end
 
-	if p172.entry_order ~= nil and #p172.entry_order > 0 then
-		for _, v2218 in p172.entry_order do
-			local v2219, v2220 = proto.writeTag(buf, n114, 4, proto.wireTypes.lengthDelimited)
+	return v2197
+end
+function t274.jsonEncode(p172) -- line: 14048
+	local t276 = {}
 
-			buf, n114 = proto.writeString(v2219, v2220, v2218)
+	if p172.tooltip_text ~= nil and p172.tooltip_text ~= "" then
+		t276.tooltipText = p172.tooltip_text
+	end
+
+	if p172.prompt_id ~= nil and p172.prompt_id ~= "" then
+		t276.promptId = p172.prompt_id
+	end
+
+	if p172.prompt_type ~= nil and p172.prompt_type ~= "" then
+		t276.promptType = p172.prompt_type
+	end
+
+	return t276
+end
+function t274.jsonDecode(t277: {[any]: any}) -- line: 14066
+	-- upvalues: t274 (copy)
+	local v2212 = t274.new()
+
+	if t277.tooltip_text ~= nil then
+		v2212.tooltip_text = t277.tooltip_text
+	end
+
+	if t277.tooltipText ~= nil then
+		v2212.tooltip_text = t277.tooltipText
+	end
+
+	if t277.prompt_id ~= nil then
+		v2212.prompt_id = t277.prompt_id
+	end
+
+	if t277.promptId ~= nil then
+		v2212.prompt_id = t277.promptId
+	end
+
+	if t277.prompt_type ~= nil then
+		v2212.prompt_type = t277.prompt_type
+	end
+
+	if t277.promptType ~= nil then
+		v2212.prompt_type = t277.promptType
+	end
+
+	return v2212
+end
+
+t274.descriptor = {
+	name = "TooltipInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.TooltipInputData"
+}
+t1.TooltipInputData = t274
+typeRegistry.default:register(t1.TooltipInputData)
+
+local t278 = {}
+
+t278.__index = t278
+
+function t278.new(t279: {[any]: any}?) -- line: 14110
+	-- upvalues: t278 (copy)
+	return (setmetatable({
+		media_id = if t279 ~= nil and t279.media_id ~= nil then t279.media_id else "",
+		title = if t279 ~= nil and t279.title ~= nil then t279.title else "",
+		description = if t279 ~= nil and t279.description ~= nil then t279.description else "",
+		prompt_id = if t279 ~= nil and t279.prompt_id ~= nil then t279.prompt_id else "",
+		prompt_type = if t279 ~= nil and t279.prompt_type ~= nil then t279.prompt_type else "",
+		anchor_tag = if t279 ~= nil and t279.anchor_tag ~= nil then t279.anchor_tag else ""
+	}, t278))
+end
+function t278.encode(p173) -- line: 14121
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n115 = 0
+
+	if p173.media_id ~= nil and p173.media_id ~= "" then
+		local v2217, v2218 = proto.writeTag(buf, n115, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n115 = proto.writeString(v2217, v2218, p173.media_id)
+	end
+
+	if p173.title ~= nil and p173.title ~= "" then
+		local v2219, v2220 = proto.writeTag(buf, n115, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n115 = proto.writeString(v2219, v2220, p173.title)
+	end
+
+	if p173.description ~= nil and p173.description ~= "" then
+		local v2221, v2222 = proto.writeTag(buf, n115, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n115 = proto.writeString(v2221, v2222, p173.description)
+	end
+
+	if p173.prompt_id ~= nil and p173.prompt_id ~= "" then
+		local v2223, v2224 = proto.writeTag(buf, n115, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n115 = proto.writeString(v2223, v2224, p173.prompt_id)
+	end
+
+	if p173.prompt_type ~= nil and p173.prompt_type ~= "" then
+		local v2225, v2226 = proto.writeTag(buf, n115, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n115 = proto.writeString(v2225, v2226, p173.prompt_type)
+	end
+
+	if p173.anchor_tag ~= nil and p173.anchor_tag ~= "" then
+		local v2227, v2228 = proto.writeTag(buf, n115, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n115 = proto.writeString(v2227, v2228, p173.anchor_tag)
+	end
+
+	local buf62 = buffer.create(n115)
+
+	buffer.copy(buf62, 0, buf, 0, n115)
+
+	return buf62
+end
+function t278.decode(p174: buffer) -- line: 14160
+	-- upvalues: t278 (copy), proto (copy)
+	local v2231 = t278.new()
+	local n116 = 0
+
+	while n116 < buffer.len(p174) do
+		local v2233, v2234
+
+		v2233, v2234, n116 = proto.readTag(p174, n116)
+
+		if v2234 == proto.wireTypes.varint then
+			local v2235
+
+			v2235, n116 = proto.readVarInt(p174, n116)
+		elseif v2234 == proto.wireTypes.lengthDelimited then
+			if v2233 == 1 then
+				local v2236
+
+				v2236, n116 = proto.readBuffer(p174, n116)
+				v2231.media_id = buffer.tostring(v2236)
+			elseif v2233 == 2 then
+				local v2237
+
+				v2237, n116 = proto.readBuffer(p174, n116)
+				v2231.title = buffer.tostring(v2237)
+			elseif v2233 == 3 then
+				local v2238
+
+				v2238, n116 = proto.readBuffer(p174, n116)
+				v2231.description = buffer.tostring(v2238)
+			elseif v2233 == 4 then
+				local v2239
+
+				v2239, n116 = proto.readBuffer(p174, n116)
+				v2231.prompt_id = buffer.tostring(v2239)
+			elseif v2233 == 5 then
+				local v2240
+
+				v2240, n116 = proto.readBuffer(p174, n116)
+				v2231.prompt_type = buffer.tostring(v2240)
+			elseif v2233 == 6 then
+				local v2241
+
+				v2241, n116 = proto.readBuffer(p174, n116)
+				v2231.anchor_tag = buffer.tostring(v2241)
+			else
+				local v2242, v2243 = proto.readVarInt(p174, n116)
+
+				n116 = v2243 + v2242
+			end
+		elseif v2234 == proto.wireTypes.i32 then
+			local v2244
+
+			v2244, n116 = proto.readFixed32(p174, n116)
+		elseif v2234 == proto.wireTypes.i64 then
+			local v2245
+
+			v2245, n116 = proto.readFixed64(p174, n116)
+		else
+			error("Unsupported wire type: " .. v2234)
 		end
 	end
 
-	local buf63 = buffer.create(n114)
+	return v2231
+end
+function t278.jsonEncode(p175) -- line: 14228
+	local t280 = {}
 
-	buffer.copy(buf63, 0, buf, 0, n114)
+	if p175.media_id ~= nil and p175.media_id ~= "" then
+		t280.mediaId = p175.media_id
+	end
+
+	if p175.title ~= nil and p175.title ~= "" then
+		t280.title = p175.title
+	end
+
+	if p175.description ~= nil and p175.description ~= "" then
+		t280.description = p175.description
+	end
+
+	if p175.prompt_id ~= nil and p175.prompt_id ~= "" then
+		t280.promptId = p175.prompt_id
+	end
+
+	if p175.prompt_type ~= nil and p175.prompt_type ~= "" then
+		t280.promptType = p175.prompt_type
+	end
+
+	if p175.anchor_tag ~= nil and p175.anchor_tag ~= "" then
+		t280.anchorTag = p175.anchor_tag
+	end
+
+	return t280
+end
+function t278.jsonDecode(t281: {[any]: any}) -- line: 14258
+	-- upvalues: t278 (copy)
+	local v2249 = t278.new()
+
+	if t281.media_id ~= nil then
+		v2249.media_id = t281.media_id
+	end
+
+	if t281.mediaId ~= nil then
+		v2249.media_id = t281.mediaId
+	end
+
+	if t281.title ~= nil then
+		v2249.title = t281.title
+	end
+
+	if t281.description ~= nil then
+		v2249.description = t281.description
+	end
+
+	if t281.prompt_id ~= nil then
+		v2249.prompt_id = t281.prompt_id
+	end
+
+	if t281.promptId ~= nil then
+		v2249.prompt_id = t281.promptId
+	end
+
+	if t281.prompt_type ~= nil then
+		v2249.prompt_type = t281.prompt_type
+	end
+
+	if t281.promptType ~= nil then
+		v2249.prompt_type = t281.promptType
+	end
+
+	if t281.anchor_tag ~= nil then
+		v2249.anchor_tag = t281.anchor_tag
+	end
+
+	if t281.anchorTag ~= nil then
+		v2249.anchor_tag = t281.anchorTag
+	end
+
+	return v2249
+end
+
+t278.descriptor = {
+	name = "CoachmarkInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CoachmarkInputData"
+}
+t1.CoachmarkInputData = t278
+typeRegistry.default:register(t1.CoachmarkInputData)
+
+local t282 = {}
+
+t282.__index = t282
+
+function t282.new(t283: {[any]: any}?) -- line: 14318
+	-- upvalues: t282 (copy)
+	return (setmetatable({
+		prompt_id = if t283 ~= nil and t283.prompt_id ~= nil then t283.prompt_id else "",
+		prompt_type = if t283 ~= nil and t283.prompt_type ~= nil then t283.prompt_type else ""
+	}, t282))
+end
+function t282.encode(p176) -- line: 14325
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n117 = 0
+
+	if p176.prompt_id ~= nil and p176.prompt_id ~= "" then
+		local v2254, v2255 = proto.writeTag(buf, n117, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n117 = proto.writeString(v2254, v2255, p176.prompt_id)
+	end
+
+	if p176.prompt_type ~= nil and p176.prompt_type ~= "" then
+		local v2256, v2257 = proto.writeTag(buf, n117, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n117 = proto.writeString(v2256, v2257, p176.prompt_type)
+	end
+
+	local buf63 = buffer.create(n117)
+
+	buffer.copy(buf63, 0, buf, 0, n117)
 
 	return buf63
 end
-function t276.decode(p173: buffer) -- line: 13887
-	-- upvalues: t276 (copy), proto (copy), t1 (copy)
-	local v2223 = t276.new()
-	local n115 = 0
+function t282.decode(p177: buffer) -- line: 14344
+	-- upvalues: t282 (copy), proto (copy)
+	local v2260 = t282.new()
+	local n118 = 0
 
-	while n115 < buffer.len(p173) do
-		local v2225, v2226
+	while n118 < buffer.len(p177) do
+		local v2262, v2263
 
-		v2225, v2226, n115 = proto.readTag(p173, n115)
+		v2262, v2263, n118 = proto.readTag(p177, n118)
 
-		if v2226 == proto.wireTypes.varint then
-			local v2227
+		if v2263 == proto.wireTypes.varint then
+			local v2264
 
-			v2227, n115 = proto.readVarInt(p173, n115)
-		elseif v2226 == proto.wireTypes.lengthDelimited then
-			if v2225 == 1 then
-				local v2228
+			v2264, n118 = proto.readVarInt(p177, n118)
+		elseif v2263 == proto.wireTypes.lengthDelimited then
+			if v2262 == 1 then
+				local v2265
 
-				v2228, n115 = proto.readBuffer(p173, n115)
-				v2223.event_id = buffer.tostring(v2228)
-			elseif v2225 == 2 then
-				local v2229
+				v2265, n118 = proto.readBuffer(p177, n118)
+				v2260.prompt_id = buffer.tostring(v2265)
+			elseif v2262 == 2 then
+				local v2266
 
-				v2229, n115 = proto.readBuffer(p173, n115)
-				v2223.universe_id = buffer.tostring(v2229)
-			elseif v2225 == 3 then
-				local v2230
-
-				v2230, n115 = proto.readBuffer(p173, n115)
-
-				local v2231 = t1.EventDetailsFeedInputData_EntryMapEntry.decode(v2230)
-				local v2232 = t1.FeedEntry.new()
-
-				v2223.entry_map[v2231.key or ""] = v2231.value or v2232
-			elseif v2225 == 4 then
-				local v2233
-
-				v2233, n115 = proto.readBuffer(p173, n115)
-				table.insert(v2223.entry_order, buffer.tostring(v2233))
+				v2266, n118 = proto.readBuffer(p177, n118)
+				v2260.prompt_type = buffer.tostring(v2266)
 			else
-				local v2234, v2235 = proto.readVarInt(p173, n115)
+				local v2267, v2268 = proto.readVarInt(p177, n118)
 
-				n115 = v2235 + v2234
+				n118 = v2268 + v2267
 			end
-		elseif v2226 == proto.wireTypes.i32 then
-			local v2236
+		elseif v2263 == proto.wireTypes.i32 then
+			local v2269
 
-			v2236, n115 = proto.readFixed32(p173, n115)
-		elseif v2226 == proto.wireTypes.i64 then
-			local v2237
+			v2269, n118 = proto.readFixed32(p177, n118)
+		elseif v2263 == proto.wireTypes.i64 then
+			local v2270
 
-			v2237, n115 = proto.readFixed64(p173, n115)
+			v2270, n118 = proto.readFixed64(p177, n118)
 		else
-			error("Unsupported wire type: " .. v2226)
+			error("Unsupported wire type: " .. v2263)
 		end
 	end
 
-	return v2223
+	return v2260
 end
-function t276.jsonEncode(p174) -- line: 13952
-	local t278 = {}
+function t282.jsonEncode(p178) -- line: 14392
+	local t284 = {}
 
-	if p174.event_id ~= nil and p174.event_id ~= "" then
-		t278.eventId = p174.event_id
+	if p178.prompt_id ~= nil and p178.prompt_id ~= "" then
+		t284.promptId = p178.prompt_id
 	end
 
-	if p174.universe_id ~= nil and p174.universe_id ~= "" then
-		t278.universeId = p174.universe_id
+	if p178.prompt_type ~= nil and p178.prompt_type ~= "" then
+		t284.promptType = p178.prompt_type
 	end
 
-	if p174.entry_map ~= nil and next(p174.entry_map) ~= nil then
-		local t279 = {}
-
-		for v2241, v2242 in p174.entry_map do
-			t279[v2241] = v2242:jsonEncode()
-		end
-
-		t278.entryMap = t279
-	end
-
-	if p174.entry_order ~= nil and #p174.entry_order > 0 then
-		local t280 = {}
-
-		for _, v2245 in p174.entry_order do
-			table.insert(t280, v2245)
-		end
-
-		t278.entryOrder = t280
-	end
-
-	return t278
+	return t284
 end
-function t276.jsonDecode(t281: {[any]: any}) -- line: 13982
-	-- upvalues: t276 (copy), t1 (copy)
-	local v2247 = t276.new()
+function t282.jsonDecode(t285: {[any]: any}) -- line: 14406
+	-- upvalues: t282 (copy)
+	local v2274 = t282.new()
 
-	if t281.event_id ~= nil then
-		v2247.event_id = t281.event_id
+	if t285.prompt_id ~= nil then
+		v2274.prompt_id = t285.prompt_id
 	end
 
-	if t281.eventId ~= nil then
-		v2247.event_id = t281.eventId
+	if t285.promptId ~= nil then
+		v2274.prompt_id = t285.promptId
 	end
 
-	if t281.universe_id ~= nil then
-		v2247.universe_id = t281.universe_id
+	if t285.prompt_type ~= nil then
+		v2274.prompt_type = t285.prompt_type
 	end
 
-	if t281.universeId ~= nil then
-		v2247.universe_id = t281.universeId
+	if t285.promptType ~= nil then
+		v2274.prompt_type = t285.promptType
 	end
 
-	if t281.entry_map ~= nil then
-		local t282 = {}
-
-		for v2249, v2250 in t281.entry_map do
-			t282[v2249] = t1.FeedEntry.jsonDecode(v2250)
-		end
-
-		v2247.entry_map = t282
-	end
-
-	if t281.entryMap ~= nil then
-		local t283 = {}
-
-		for v2252, v2253 in t281.entryMap do
-			t283[v2252] = t1.FeedEntry.jsonDecode(v2253)
-		end
-
-		v2247.entry_map = t283
-	end
-
-	if t281.entry_order ~= nil then
-		local t284 = {}
-
-		for _, v2256 in t281.entry_order do
-			table.insert(t284, v2256)
-		end
-
-		v2247.entry_order = t284
-	end
-
-	if t281.entryOrder ~= nil then
-		local t285 = {}
-
-		for _, v2259 in t281.entryOrder do
-			table.insert(t285, v2259)
-		end
-
-		v2247.entry_order = t285
-	end
-
-	return v2247
+	return v2274
 end
 
-t276.descriptor = {
-	name = "EventDetailsFeedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventDetailsFeedInputData"
+t282.descriptor = {
+	name = "SystemBannerInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SystemBannerInputData"
 }
-t1.EventDetailsFeedInputData = t276
-typeRegistry.default:register(t1.EventDetailsFeedInputData)
+t1.SystemBannerInputData = t282
+typeRegistry.default:register(t1.SystemBannerInputData)
 
 local t286 = {}
 
 t286.__index = t286
 
-function t286.new(t287: {[any]: any}?) -- line: 14054
+function t286.new(t287: {[any]: any}?) -- line: 14442
 	-- upvalues: t286 (copy)
 	return (setmetatable({
-		key = if t287 ~= nil and t287.key ~= nil then t287.key else "",
-		value = if t287 ~= nil and t287.value ~= nil then t287.value else nil
+		upsell_prompt = if t287 ~= nil and t287.upsell_prompt ~= nil then t287.upsell_prompt else ""
 	}, t286))
 end
-function t286.encode(p175) -- line: 14063
+function t286.encode(p179) -- line: 14448
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n116 = 0
+	local n119 = 0
 
-	if p175.key ~= nil and p175.key ~= "" then
-		local v2264, v2265 = proto.writeTag(buf, n116, 1, proto.wireTypes.lengthDelimited)
+	if p179.upsell_prompt ~= nil and p179.upsell_prompt ~= "" then
+		local v2279, v2280 = proto.writeTag(buf, n119, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n116 = proto.writeString(v2264, v2265, p175.key)
+		buf, n119 = proto.writeString(v2279, v2280, p179.upsell_prompt)
 	end
 
-	if p175.value ~= nil then
-		local v2266 = p175.value:encode()
-		local v2267, v2268 = proto.writeTag(buf, n116, 2, proto.wireTypes.lengthDelimited)
+	local buf64 = buffer.create(n119)
 
-		buf, n116 = proto.writeBuffer(v2267, v2268, v2266, buffer.len(v2266))
-	end
-
-	local buf64 = buffer.create(n116)
-
-	buffer.copy(buf64, 0, buf, 0, n116)
+	buffer.copy(buf64, 0, buf, 0, n119)
 
 	return buf64
 end
-function t286.decode(p176: buffer) -- line: 14083
-	-- upvalues: t286 (copy), proto (copy), t1 (copy)
-	local v2271 = t286.new()
-	local n117 = 0
+function t286.decode(p180: buffer) -- line: 14462
+	-- upvalues: t286 (copy), proto (copy)
+	local v2283 = t286.new()
+	local n120 = 0
 
-	while n117 < buffer.len(p176) do
-		local v2273, v2274
+	while n120 < buffer.len(p180) do
+		local v2285, v2286
 
-		v2273, v2274, n117 = proto.readTag(p176, n117)
+		v2285, v2286, n120 = proto.readTag(p180, n120)
 
-		if v2274 == proto.wireTypes.varint then
-			local v2275
+		if v2286 == proto.wireTypes.varint then
+			local v2287
 
-			v2275, n117 = proto.readVarInt(p176, n117)
-		elseif v2274 == proto.wireTypes.lengthDelimited then
-			if v2273 == 1 then
-				local v2276
+			v2287, n120 = proto.readVarInt(p180, n120)
+		elseif v2286 == proto.wireTypes.lengthDelimited then
+			if v2285 == 1 then
+				local v2288
 
-				v2276, n117 = proto.readBuffer(p176, n117)
-				v2271.key = buffer.tostring(v2276)
-			elseif v2273 == 2 then
-				local v2277
-
-				v2277, n117 = proto.readBuffer(p176, n117)
-				v2271.value = t1.FeedEntry.decode(v2277)
+				v2288, n120 = proto.readBuffer(p180, n120)
+				v2283.upsell_prompt = buffer.tostring(v2288)
 			else
-				local v2278, v2279 = proto.readVarInt(p176, n117)
+				local v2289, v2290 = proto.readVarInt(p180, n120)
 
-				n117 = v2279 + v2278
+				n120 = v2290 + v2289
 			end
-		elseif v2274 == proto.wireTypes.i32 then
-			local v2280
+		elseif v2286 == proto.wireTypes.i32 then
+			local v2291
 
-			v2280, n117 = proto.readFixed32(p176, n117)
-		elseif v2274 == proto.wireTypes.i64 then
-			local v2281
+			v2291, n120 = proto.readFixed32(p180, n120)
+		elseif v2286 == proto.wireTypes.i64 then
+			local v2292
 
-			v2281, n117 = proto.readFixed64(p176, n117)
+			v2292, n120 = proto.readFixed64(p180, n120)
 		else
-			error("Unsupported wire type: " .. v2274)
+			error("Unsupported wire type: " .. v2286)
 		end
 	end
 
-	return v2271
+	return v2283
 end
-function t286.jsonEncode(p177) -- line: 14131
+function t286.jsonEncode(p181) -- line: 14505
 	local t288 = {}
 
-	if p177.key ~= nil and p177.key ~= "" then
-		t288.key = p177.key
-	end
-
-	if p177.value ~= nil then
-		t288.value = p177.value:jsonEncode()
+	if p181.upsell_prompt ~= nil and p181.upsell_prompt ~= "" then
+		t288.upsellPrompt = p181.upsell_prompt
 	end
 
 	return t288
 end
-function t286.jsonDecode(t289: {[any]: any}) -- line: 14145
-	-- upvalues: t286 (copy), t1 (copy)
-	local v2285 = t286.new()
+function t286.jsonDecode(t289: {[any]: any}) -- line: 14515
+	-- upvalues: t286 (copy)
+	local v2296 = t286.new()
 
-	if t289.key ~= nil then
-		v2285.key = t289.key
+	if t289.upsell_prompt ~= nil then
+		v2296.upsell_prompt = t289.upsell_prompt
 	end
 
-	if t289.value ~= nil then
-		v2285.value = t1.FeedEntry.jsonDecode(t289.value)
+	if t289.upsellPrompt ~= nil then
+		v2296.upsell_prompt = t289.upsellPrompt
 	end
 
-	return v2285
+	return v2296
 end
 
 t286.descriptor = {
-	name = "EventDetailsFeedInputData_EntryMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+	name = "AgeCheckUpsellInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.AgeCheckUpsellInputData"
 }
-t1.EventDetailsFeedInputData_EntryMapEntry = t286
-typeRegistry.default:register(t1.EventDetailsFeedInputData_EntryMapEntry)
+t1.AgeCheckUpsellInputData = t286
+typeRegistry.default:register(t1.AgeCheckUpsellInputData)
 
 local t290 = {}
 
 t290.__index = t290
 
-function t290.new(t291: {[any]: any}?) -- line: 14175
+function t290.new(t291: {[any]: any}?) -- line: 14543
 	-- upvalues: t290 (copy)
 	return (setmetatable({
-		event_id = if t291 ~= nil and t291.event_id ~= nil then t291.event_id else "",
-		universe_id = if t291 ~= nil and t291.universe_id ~= nil then t291.universe_id else ""
+		modal_variant = if t291 ~= nil and t291.modal_variant ~= nil then t291.modal_variant else "",
+		modal_sequence = if t291 ~= nil and t291.modal_sequence ~= nil then t291.modal_sequence else "",
+		conversation_id = if t291 ~= nil and t291.conversation_id ~= nil then t291.conversation_id else "",
+		friend_id = if t291 ~= nil and t291.friend_id ~= nil then t291.friend_id else ""
 	}, t290))
 end
-function t290.encode(p178) -- line: 14184
+function t290.encode(p182) -- line: 14554
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n118 = 0
+	local n121 = 0
 
-	if p178.event_id ~= nil and p178.event_id ~= "" then
-		local v2290, v2291 = proto.writeTag(buf, n118, 1, proto.wireTypes.lengthDelimited)
+	if p182.modal_variant ~= nil and p182.modal_variant ~= "" then
+		local v2301, v2302 = proto.writeTag(buf, n121, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n118 = proto.writeString(v2290, v2291, p178.event_id)
+		buf, n121 = proto.writeString(v2301, v2302, p182.modal_variant)
 	end
 
-	if p178.universe_id ~= nil and p178.universe_id ~= "" then
-		local v2292, v2293 = proto.writeTag(buf, n118, 2, proto.wireTypes.lengthDelimited)
+	if p182.modal_sequence ~= nil and p182.modal_sequence ~= "" then
+		local v2303, v2304 = proto.writeTag(buf, n121, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n118 = proto.writeString(v2292, v2293, p178.universe_id)
+		buf, n121 = proto.writeString(v2303, v2304, p182.modal_sequence)
 	end
 
-	local buf65 = buffer.create(n118)
+	if p182.conversation_id ~= nil and p182.conversation_id ~= "" then
+		local v2305, v2306 = proto.writeTag(buf, n121, 3, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf65, 0, buf, 0, n118)
+		buf, n121 = proto.writeString(v2305, v2306, p182.conversation_id)
+	end
+
+	if p182.friend_id ~= nil and p182.friend_id ~= "" then
+		local v2307, v2308 = proto.writeTag(buf, n121, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n121 = proto.writeString(v2307, v2308, p182.friend_id)
+	end
+
+	local buf65 = buffer.create(n121)
+
+	buffer.copy(buf65, 0, buf, 0, n121)
 
 	return buf65
 end
-function t290.decode(p179: buffer) -- line: 14203
+function t290.decode(p183: buffer) -- line: 14583
 	-- upvalues: t290 (copy), proto (copy)
-	local v2296 = t290.new()
-	local n119 = 0
+	local v2311 = t290.new()
+	local n122 = 0
 
-	while n119 < buffer.len(p179) do
-		local v2298, v2299
+	while n122 < buffer.len(p183) do
+		local v2313, v2314
 
-		v2298, v2299, n119 = proto.readTag(p179, n119)
+		v2313, v2314, n122 = proto.readTag(p183, n122)
 
-		if v2299 == proto.wireTypes.varint then
-			local v2300
+		if v2314 == proto.wireTypes.varint then
+			local v2315
 
-			v2300, n119 = proto.readVarInt(p179, n119)
-		elseif v2299 == proto.wireTypes.lengthDelimited then
-			if v2298 == 1 then
-				local v2301
+			v2315, n122 = proto.readVarInt(p183, n122)
+		elseif v2314 == proto.wireTypes.lengthDelimited then
+			if v2313 == 1 then
+				local v2316
 
-				v2301, n119 = proto.readBuffer(p179, n119)
-				v2296.event_id = buffer.tostring(v2301)
-			elseif v2298 == 2 then
-				local v2302
+				v2316, n122 = proto.readBuffer(p183, n122)
+				v2311.modal_variant = buffer.tostring(v2316)
+			elseif v2313 == 2 then
+				local v2317
 
-				v2302, n119 = proto.readBuffer(p179, n119)
-				v2296.universe_id = buffer.tostring(v2302)
+				v2317, n122 = proto.readBuffer(p183, n122)
+				v2311.modal_sequence = buffer.tostring(v2317)
+			elseif v2313 == 3 then
+				local v2318
+
+				v2318, n122 = proto.readBuffer(p183, n122)
+				v2311.conversation_id = buffer.tostring(v2318)
+			elseif v2313 == 4 then
+				local v2319
+
+				v2319, n122 = proto.readBuffer(p183, n122)
+				v2311.friend_id = buffer.tostring(v2319)
 			else
-				local v2303, v2304 = proto.readVarInt(p179, n119)
+				local v2320, v2321 = proto.readVarInt(p183, n122)
 
-				n119 = v2304 + v2303
+				n122 = v2321 + v2320
 			end
-		elseif v2299 == proto.wireTypes.i32 then
-			local v2305
+		elseif v2314 == proto.wireTypes.i32 then
+			local v2322
 
-			v2305, n119 = proto.readFixed32(p179, n119)
-		elseif v2299 == proto.wireTypes.i64 then
-			local v2306
+			v2322, n122 = proto.readFixed32(p183, n122)
+		elseif v2314 == proto.wireTypes.i64 then
+			local v2323
 
-			v2306, n119 = proto.readFixed64(p179, n119)
+			v2323, n122 = proto.readFixed64(p183, n122)
 		else
-			error("Unsupported wire type: " .. v2299)
+			error("Unsupported wire type: " .. v2314)
 		end
 	end
 
-	return v2296
+	return v2311
 end
-function t290.jsonEncode(p180) -- line: 14251
+function t290.jsonEncode(p184) -- line: 14641
 	local t292 = {}
 
-	if p180.event_id ~= nil and p180.event_id ~= "" then
-		t292.eventId = p180.event_id
+	if p184.modal_variant ~= nil and p184.modal_variant ~= "" then
+		t292.modalVariant = p184.modal_variant
 	end
 
-	if p180.universe_id ~= nil and p180.universe_id ~= "" then
-		t292.universeId = p180.universe_id
+	if p184.modal_sequence ~= nil and p184.modal_sequence ~= "" then
+		t292.modalSequence = p184.modal_sequence
+	end
+
+	if p184.conversation_id ~= nil and p184.conversation_id ~= "" then
+		t292.conversationId = p184.conversation_id
+	end
+
+	if p184.friend_id ~= nil and p184.friend_id ~= "" then
+		t292.friendId = p184.friend_id
 	end
 
 	return t292
 end
-function t290.jsonDecode(t293: {[any]: any}) -- line: 14265
+function t290.jsonDecode(t293: {[any]: any}) -- line: 14663
 	-- upvalues: t290 (copy)
-	local v2310 = t290.new()
+	local v2327 = t290.new()
 
-	if t293.event_id ~= nil then
-		v2310.event_id = t293.event_id
+	if t293.modal_variant ~= nil then
+		v2327.modal_variant = t293.modal_variant
 	end
 
-	if t293.eventId ~= nil then
-		v2310.event_id = t293.eventId
+	if t293.modalVariant ~= nil then
+		v2327.modal_variant = t293.modalVariant
 	end
 
-	if t293.universe_id ~= nil then
-		v2310.universe_id = t293.universe_id
+	if t293.modal_sequence ~= nil then
+		v2327.modal_sequence = t293.modal_sequence
 	end
 
-	if t293.universeId ~= nil then
-		v2310.universe_id = t293.universeId
+	if t293.modalSequence ~= nil then
+		v2327.modal_sequence = t293.modalSequence
 	end
 
-	return v2310
+	if t293.conversation_id ~= nil then
+		v2327.conversation_id = t293.conversation_id
+	end
+
+	if t293.conversationId ~= nil then
+		v2327.conversation_id = t293.conversationId
+	end
+
+	if t293.friend_id ~= nil then
+		v2327.friend_id = t293.friend_id
+	end
+
+	if t293.friendId ~= nil then
+		v2327.friend_id = t293.friendId
+	end
+
+	return v2327
 end
 
 t290.descriptor = {
-	name = "EventDetailsActionBarInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventDetailsActionBarInputData"
+	name = "PartyChatConversationUpsellInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.PartyChatConversationUpsellInputData"
 }
-t1.EventDetailsActionBarInputData = t290
-typeRegistry.default:register(t1.EventDetailsActionBarInputData)
+t1.PartyChatConversationUpsellInputData = t290
+typeRegistry.default:register(t1.PartyChatConversationUpsellInputData)
 
 local t294 = {}
 
 t294.__index = t294
 
-function t294.new(t295: {[any]: any}?) -- line: 14301
+function t294.new(t295: {[any]: any}?) -- line: 14717
 	-- upvalues: t294 (copy)
 	return (setmetatable({
-		event_id = if t295 ~= nil and t295.event_id ~= nil then t295.event_id else ""
+		event_id = if t295 ~= nil and t295.event_id ~= nil then t295.event_id else "",
+		universe_id = if t295 ~= nil and t295.universe_id ~= nil then t295.universe_id else "",
+		entry_map = if t295 ~= nil and t295.entry_map ~= nil then t295.entry_map else {},
+		entry_order = if t295 ~= nil and t295.entry_order ~= nil then t295.entry_order else {}
 	}, t294))
 end
-function t294.encode(p181) -- line: 14309
+function t294.encode(p185) -- line: 14728
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n120 = 0
+	local n123 = 0
 
-	if p181.event_id ~= nil and p181.event_id ~= "" then
-		local v2315, v2316 = proto.writeTag(buf, n120, 1, proto.wireTypes.lengthDelimited)
+	if p185.event_id ~= nil and p185.event_id ~= "" then
+		local v2332, v2333 = proto.writeTag(buf, n123, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n120 = proto.writeString(v2315, v2316, p181.event_id)
+		buf, n123 = proto.writeString(v2332, v2333, p185.event_id)
 	end
 
-	local buf66 = buffer.create(n120)
+	if p185.universe_id ~= nil and p185.universe_id ~= "" then
+		local v2334, v2335 = proto.writeTag(buf, n123, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf66, 0, buf, 0, n120)
+		buf, n123 = proto.writeString(v2334, v2335, p185.universe_id)
+	end
 
-	return buf66
-end
-function t294.decode(p182: buffer) -- line: 14323
-	-- upvalues: t294 (copy), proto (copy)
-	local v2319 = t294.new()
-	local n121 = 0
+	if p185.entry_map ~= nil and next(p185.entry_map) ~= nil then
+		for v2336, v2337 in p185.entry_map do
+			local buf66 = buffer.create(0)
+			local v2339, v2340 = proto.writeTag(buf66, 0, 1, proto.wireTypes.lengthDelimited)
+			local v2341, v2342 = proto.writeString(v2339, v2340, v2336)
+			local v2343 = v2337:encode()
+			local v2344, v2345 = proto.writeTag(v2341, v2342, 2, proto.wireTypes.lengthDelimited)
+			local v2346, v2347 = proto.writeBuffer(v2344, v2345, v2343, buffer.len(v2343))
+			local v2348, v2349 = proto.writeTag(buf, n123, 3, proto.wireTypes.lengthDelimited)
 
-	while n121 < buffer.len(p182) do
-		local v2321, v2322
-
-		v2321, v2322, n121 = proto.readTag(p182, n121)
-
-		if v2322 == proto.wireTypes.varint then
-			local v2323
-
-			v2323, n121 = proto.readVarInt(p182, n121)
-		elseif v2322 == proto.wireTypes.lengthDelimited then
-			if v2321 == 1 then
-				local v2324
-
-				v2324, n121 = proto.readBuffer(p182, n121)
-				v2319.event_id = buffer.tostring(v2324)
-			else
-				local v2325, v2326 = proto.readVarInt(p182, n121)
-
-				n121 = v2326 + v2325
-			end
-		elseif v2322 == proto.wireTypes.i32 then
-			local v2327
-
-			v2327, n121 = proto.readFixed32(p182, n121)
-		elseif v2322 == proto.wireTypes.i64 then
-			local v2328
-
-			v2328, n121 = proto.readFixed64(p182, n121)
-		else
-			error("Unsupported wire type: " .. v2322)
+			buf, n123 = proto.writeBuffer(v2348, v2349, v2346, v2347)
 		end
 	end
 
-	return v2319
+	if p185.entry_order ~= nil and #p185.entry_order > 0 then
+		for _, v2351 in p185.entry_order do
+			local v2352, v2353 = proto.writeTag(buf, n123, 4, proto.wireTypes.lengthDelimited)
+
+			buf, n123 = proto.writeString(v2352, v2353, v2351)
+		end
+	end
+
+	local buf67 = buffer.create(n123)
+
+	buffer.copy(buf67, 0, buf, 0, n123)
+
+	return buf67
 end
-function t294.jsonEncode(p183) -- line: 14366
+function t294.decode(p186: buffer) -- line: 14768
+	-- upvalues: t294 (copy), proto (copy), t1 (copy)
+	local v2356 = t294.new()
+	local n124 = 0
+
+	while n124 < buffer.len(p186) do
+		local v2358, v2359
+
+		v2358, v2359, n124 = proto.readTag(p186, n124)
+
+		if v2359 == proto.wireTypes.varint then
+			local v2360
+
+			v2360, n124 = proto.readVarInt(p186, n124)
+		elseif v2359 == proto.wireTypes.lengthDelimited then
+			if v2358 == 1 then
+				local v2361
+
+				v2361, n124 = proto.readBuffer(p186, n124)
+				v2356.event_id = buffer.tostring(v2361)
+			elseif v2358 == 2 then
+				local v2362
+
+				v2362, n124 = proto.readBuffer(p186, n124)
+				v2356.universe_id = buffer.tostring(v2362)
+			elseif v2358 == 3 then
+				local v2363
+
+				v2363, n124 = proto.readBuffer(p186, n124)
+
+				local v2364 = t1.EventDetailsFeedInputData_EntryMapEntry.decode(v2363)
+				local v2365 = t1.FeedEntry.new()
+
+				v2356.entry_map[v2364.key or ""] = v2364.value or v2365
+			elseif v2358 == 4 then
+				local v2366
+
+				v2366, n124 = proto.readBuffer(p186, n124)
+				table.insert(v2356.entry_order, buffer.tostring(v2366))
+			else
+				local v2367, v2368 = proto.readVarInt(p186, n124)
+
+				n124 = v2368 + v2367
+			end
+		elseif v2359 == proto.wireTypes.i32 then
+			local v2369
+
+			v2369, n124 = proto.readFixed32(p186, n124)
+		elseif v2359 == proto.wireTypes.i64 then
+			local v2370
+
+			v2370, n124 = proto.readFixed64(p186, n124)
+		else
+			error("Unsupported wire type: " .. v2359)
+		end
+	end
+
+	return v2356
+end
+function t294.jsonEncode(p187) -- line: 14833
 	local t296 = {}
 
-	if p183.event_id ~= nil and p183.event_id ~= "" then
-		t296.eventId = p183.event_id
+	if p187.event_id ~= nil and p187.event_id ~= "" then
+		t296.eventId = p187.event_id
+	end
+
+	if p187.universe_id ~= nil and p187.universe_id ~= "" then
+		t296.universeId = p187.universe_id
+	end
+
+	if p187.entry_map ~= nil and next(p187.entry_map) ~= nil then
+		local t297 = {}
+
+		for v2374, v2375 in p187.entry_map do
+			t297[v2374] = v2375:jsonEncode()
+		end
+
+		t296.entryMap = t297
+	end
+
+	if p187.entry_order ~= nil and #p187.entry_order > 0 then
+		local t298 = {}
+
+		for _, v2378 in p187.entry_order do
+			table.insert(t298, v2378)
+		end
+
+		t296.entryOrder = t298
 	end
 
 	return t296
 end
-function t294.jsonDecode(t297: {[any]: any}) -- line: 14376
-	-- upvalues: t294 (copy)
-	local v2332 = t294.new()
+function t294.jsonDecode(t299: {[any]: any}) -- line: 14863
+	-- upvalues: t294 (copy), t1 (copy)
+	local v2380 = t294.new()
 
-	if t297.event_id ~= nil then
-		v2332.event_id = t297.event_id
+	if t299.event_id ~= nil then
+		v2380.event_id = t299.event_id
 	end
 
-	if t297.eventId ~= nil then
-		v2332.event_id = t297.eventId
+	if t299.eventId ~= nil then
+		v2380.event_id = t299.eventId
 	end
 
-	return v2332
+	if t299.universe_id ~= nil then
+		v2380.universe_id = t299.universe_id
+	end
+
+	if t299.universeId ~= nil then
+		v2380.universe_id = t299.universeId
+	end
+
+	if t299.entry_map ~= nil then
+		local t300 = {}
+
+		for v2382, v2383 in t299.entry_map do
+			t300[v2382] = t1.FeedEntry.jsonDecode(v2383)
+		end
+
+		v2380.entry_map = t300
+	end
+
+	if t299.entryMap ~= nil then
+		local t301 = {}
+
+		for v2385, v2386 in t299.entryMap do
+			t301[v2385] = t1.FeedEntry.jsonDecode(v2386)
+		end
+
+		v2380.entry_map = t301
+	end
+
+	if t299.entry_order ~= nil then
+		local t302 = {}
+
+		for _, v2389 in t299.entry_order do
+			table.insert(t302, v2389)
+		end
+
+		v2380.entry_order = t302
+	end
+
+	if t299.entryOrder ~= nil then
+		local t303 = {}
+
+		for _, v2392 in t299.entryOrder do
+			table.insert(t303, v2392)
+		end
+
+		v2380.entry_order = t303
+	end
+
+	return v2380
 end
 
 t294.descriptor = {
-	name = "EventDescriptionInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventDescriptionInputData"
+	name = "EventDetailsFeedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventDetailsFeedInputData"
 }
-t1.EventDescriptionInputData = t294
-typeRegistry.default:register(t1.EventDescriptionInputData)
+t1.EventDetailsFeedInputData = t294
+typeRegistry.default:register(t1.EventDetailsFeedInputData)
 
-local t298 = {}
+local t304 = {}
 
-t298.__index = t298
+t304.__index = t304
 
-function t298.new(t299: {[any]: any}?) -- line: 14404
-	-- upvalues: t298 (copy)
+function t304.new(t305: {[any]: any}?) -- line: 14935
+	-- upvalues: t304 (copy)
 	return (setmetatable({
-		event_id = if t299 ~= nil and t299.event_id ~= nil then t299.event_id else "",
-		universe_id = if t299 ~= nil and t299.universe_id ~= nil then t299.universe_id else ""
-	}, t298))
+		key = if t305 ~= nil and t305.key ~= nil then t305.key else "",
+		value = if t305 ~= nil and t305.value ~= nil then t305.value else nil
+	}, t304))
 end
-function t298.encode(p184) -- line: 14413
+function t304.encode(p188) -- line: 14944
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n122 = 0
+	local n125 = 0
 
-	if p184.event_id ~= nil and p184.event_id ~= "" then
-		local v2337, v2338 = proto.writeTag(buf, n122, 1, proto.wireTypes.lengthDelimited)
+	if p188.key ~= nil and p188.key ~= "" then
+		local v2397, v2398 = proto.writeTag(buf, n125, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n122 = proto.writeString(v2337, v2338, p184.event_id)
+		buf, n125 = proto.writeString(v2397, v2398, p188.key)
 	end
 
-	if p184.universe_id ~= nil and p184.universe_id ~= "" then
-		local v2339, v2340 = proto.writeTag(buf, n122, 2, proto.wireTypes.lengthDelimited)
+	if p188.value ~= nil then
+		local v2399 = p188.value:encode()
+		local v2400, v2401 = proto.writeTag(buf, n125, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n122 = proto.writeString(v2339, v2340, p184.universe_id)
+		buf, n125 = proto.writeBuffer(v2400, v2401, v2399, buffer.len(v2399))
 	end
 
-	local buf67 = buffer.create(n122)
+	local buf68 = buffer.create(n125)
 
-	buffer.copy(buf67, 0, buf, 0, n122)
-
-	return buf67
-end
-function t298.decode(p185: buffer) -- line: 14432
-	-- upvalues: t298 (copy), proto (copy)
-	local v2343 = t298.new()
-	local n123 = 0
-
-	while n123 < buffer.len(p185) do
-		local v2345, v2346
-
-		v2345, v2346, n123 = proto.readTag(p185, n123)
-
-		if v2346 == proto.wireTypes.varint then
-			local v2347
-
-			v2347, n123 = proto.readVarInt(p185, n123)
-		elseif v2346 == proto.wireTypes.lengthDelimited then
-			if v2345 == 1 then
-				local v2348
-
-				v2348, n123 = proto.readBuffer(p185, n123)
-				v2343.event_id = buffer.tostring(v2348)
-			elseif v2345 == 2 then
-				local v2349
-
-				v2349, n123 = proto.readBuffer(p185, n123)
-				v2343.universe_id = buffer.tostring(v2349)
-			else
-				local v2350, v2351 = proto.readVarInt(p185, n123)
-
-				n123 = v2351 + v2350
-			end
-		elseif v2346 == proto.wireTypes.i32 then
-			local v2352
-
-			v2352, n123 = proto.readFixed32(p185, n123)
-		elseif v2346 == proto.wireTypes.i64 then
-			local v2353
-
-			v2353, n123 = proto.readFixed64(p185, n123)
-		else
-			error("Unsupported wire type: " .. v2346)
-		end
-	end
-
-	return v2343
-end
-function t298.jsonEncode(p186) -- line: 14480
-	local t300 = {}
-
-	if p186.event_id ~= nil and p186.event_id ~= "" then
-		t300.eventId = p186.event_id
-	end
-
-	if p186.universe_id ~= nil and p186.universe_id ~= "" then
-		t300.universeId = p186.universe_id
-	end
-
-	return t300
-end
-function t298.jsonDecode(t301: {[any]: any}) -- line: 14494
-	-- upvalues: t298 (copy)
-	local v2357 = t298.new()
-
-	if t301.event_id ~= nil then
-		v2357.event_id = t301.event_id
-	end
-
-	if t301.eventId ~= nil then
-		v2357.event_id = t301.eventId
-	end
-
-	if t301.universe_id ~= nil then
-		v2357.universe_id = t301.universe_id
-	end
-
-	if t301.universeId ~= nil then
-		v2357.universe_id = t301.universeId
-	end
-
-	return v2357
-end
-
-t298.descriptor = {
-	name = "EventAttributionRowInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventAttributionRowInputData"
-}
-t1.EventAttributionRowInputData = t298
-typeRegistry.default:register(t1.EventAttributionRowInputData)
-
-local t302 = {}
-
-t302.__index = t302
-
-function t302.new(t303: {[any]: any}?) -- line: 14530
-	-- upvalues: t302 (copy)
-	return (setmetatable({
-		event_id = if t303 ~= nil and t303.event_id ~= nil then t303.event_id else ""
-	}, t302))
-end
-function t302.encode(p187) -- line: 14536
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n124 = 0
-
-	if p187.event_id ~= nil and p187.event_id ~= "" then
-		local v2362, v2363 = proto.writeTag(buf, n124, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n124 = proto.writeString(v2362, v2363, p187.event_id)
-	end
-
-	local buf68 = buffer.create(n124)
-
-	buffer.copy(buf68, 0, buf, 0, n124)
+	buffer.copy(buf68, 0, buf, 0, n125)
 
 	return buf68
 end
-function t302.decode(p188: buffer) -- line: 14550
-	-- upvalues: t302 (copy), proto (copy)
-	local v2366 = t302.new()
-	local n125 = 0
+function t304.decode(p189: buffer) -- line: 14964
+	-- upvalues: t304 (copy), proto (copy), t1 (copy)
+	local v2404 = t304.new()
+	local n126 = 0
 
-	while n125 < buffer.len(p188) do
-		local v2368, v2369
+	while n126 < buffer.len(p189) do
+		local v2406, v2407
 
-		v2368, v2369, n125 = proto.readTag(p188, n125)
+		v2406, v2407, n126 = proto.readTag(p189, n126)
 
-		if v2369 == proto.wireTypes.varint then
-			local v2370
+		if v2407 == proto.wireTypes.varint then
+			local v2408
 
-			v2370, n125 = proto.readVarInt(p188, n125)
-		elseif v2369 == proto.wireTypes.lengthDelimited then
-			if v2368 == 1 then
-				local v2371
+			v2408, n126 = proto.readVarInt(p189, n126)
+		elseif v2407 == proto.wireTypes.lengthDelimited then
+			if v2406 == 1 then
+				local v2409
 
-				v2371, n125 = proto.readBuffer(p188, n125)
-				v2366.event_id = buffer.tostring(v2371)
+				v2409, n126 = proto.readBuffer(p189, n126)
+				v2404.key = buffer.tostring(v2409)
+			elseif v2406 == 2 then
+				local v2410
+
+				v2410, n126 = proto.readBuffer(p189, n126)
+				v2404.value = t1.FeedEntry.decode(v2410)
 			else
-				local v2372, v2373 = proto.readVarInt(p188, n125)
+				local v2411, v2412 = proto.readVarInt(p189, n126)
 
-				n125 = v2373 + v2372
+				n126 = v2412 + v2411
 			end
-		elseif v2369 == proto.wireTypes.i32 then
-			local v2374
+		elseif v2407 == proto.wireTypes.i32 then
+			local v2413
 
-			v2374, n125 = proto.readFixed32(p188, n125)
-		elseif v2369 == proto.wireTypes.i64 then
-			local v2375
+			v2413, n126 = proto.readFixed32(p189, n126)
+		elseif v2407 == proto.wireTypes.i64 then
+			local v2414
 
-			v2375, n125 = proto.readFixed64(p188, n125)
+			v2414, n126 = proto.readFixed64(p189, n126)
 		else
-			error("Unsupported wire type: " .. v2369)
+			error("Unsupported wire type: " .. v2407)
 		end
 	end
 
-	return v2366
+	return v2404
 end
-function t302.jsonEncode(p189) -- line: 14593
-	local t304 = {}
+function t304.jsonEncode(p190) -- line: 15012
+	local t306 = {}
 
-	if p189.event_id ~= nil and p189.event_id ~= "" then
-		t304.eventId = p189.event_id
+	if p190.key ~= nil and p190.key ~= "" then
+		t306.key = p190.key
 	end
 
-	return t304
-end
-function t302.jsonDecode(t305: {[any]: any}) -- line: 14603
-	-- upvalues: t302 (copy)
-	local v2379 = t302.new()
-
-	if t305.event_id ~= nil then
-		v2379.event_id = t305.event_id
+	if p190.value ~= nil then
+		t306.value = p190.value:jsonEncode()
 	end
 
-	if t305.eventId ~= nil then
-		v2379.event_id = t305.eventId
+	return t306
+end
+function t304.jsonDecode(t307: {[any]: any}) -- line: 15026
+	-- upvalues: t304 (copy), t1 (copy)
+	local v2418 = t304.new()
+
+	if t307.key ~= nil then
+		v2418.key = t307.key
 	end
 
-	return v2379
+	if t307.value ~= nil then
+		v2418.value = t1.FeedEntry.jsonDecode(t307.value)
+	end
+
+	return v2418
 end
 
-t302.descriptor = {
-	name = "EventInfoTableInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventInfoTableInputData"
+t304.descriptor = {
+	name = "EventDetailsFeedInputData_EntryMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
 }
-t1.EventInfoTableInputData = t302
-typeRegistry.default:register(t1.EventInfoTableInputData)
+t1.EventDetailsFeedInputData_EntryMapEntry = t304
+typeRegistry.default:register(t1.EventDetailsFeedInputData_EntryMapEntry)
 
-local t306 = {}
+local t308 = {}
 
-t306.__index = t306
+t308.__index = t308
 
-function t306.new(t307: {[any]: any}?) -- line: 14631
-	-- upvalues: t306 (copy)
+function t308.new(t309: {[any]: any}?) -- line: 15056
+	-- upvalues: t308 (copy)
 	return (setmetatable({
-		event_id = if t307 ~= nil and t307.event_id ~= nil then t307.event_id else ""
-	}, t306))
+		event_id = if t309 ~= nil and t309.event_id ~= nil then t309.event_id else "",
+		universe_id = if t309 ~= nil and t309.universe_id ~= nil then t309.universe_id else ""
+	}, t308))
 end
-function t306.encode(p190) -- line: 14639
+function t308.encode(p191) -- line: 15065
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n126 = 0
+	local n127 = 0
 
-	if p190.event_id ~= nil and p190.event_id ~= "" then
-		local v2384, v2385 = proto.writeTag(buf, n126, 1, proto.wireTypes.lengthDelimited)
+	if p191.event_id ~= nil and p191.event_id ~= "" then
+		local v2423, v2424 = proto.writeTag(buf, n127, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n126 = proto.writeString(v2384, v2385, p190.event_id)
+		buf, n127 = proto.writeString(v2423, v2424, p191.event_id)
 	end
 
-	local buf69 = buffer.create(n126)
+	if p191.universe_id ~= nil and p191.universe_id ~= "" then
+		local v2425, v2426 = proto.writeTag(buf, n127, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf69, 0, buf, 0, n126)
+		buf, n127 = proto.writeString(v2425, v2426, p191.universe_id)
+	end
+
+	local buf69 = buffer.create(n127)
+
+	buffer.copy(buf69, 0, buf, 0, n127)
 
 	return buf69
 end
-function t306.decode(p191: buffer) -- line: 14653
-	-- upvalues: t306 (copy), proto (copy)
-	local v2388 = t306.new()
-	local n127 = 0
+function t308.decode(p192: buffer) -- line: 15084
+	-- upvalues: t308 (copy), proto (copy)
+	local v2429 = t308.new()
+	local n128 = 0
 
-	while n127 < buffer.len(p191) do
-		local v2390, v2391
+	while n128 < buffer.len(p192) do
+		local v2431, v2432
 
-		v2390, v2391, n127 = proto.readTag(p191, n127)
+		v2431, v2432, n128 = proto.readTag(p192, n128)
 
-		if v2391 == proto.wireTypes.varint then
-			local v2392
+		if v2432 == proto.wireTypes.varint then
+			local v2433
 
-			v2392, n127 = proto.readVarInt(p191, n127)
-		elseif v2391 == proto.wireTypes.lengthDelimited then
-			if v2390 == 1 then
-				local v2393
+			v2433, n128 = proto.readVarInt(p192, n128)
+		elseif v2432 == proto.wireTypes.lengthDelimited then
+			if v2431 == 1 then
+				local v2434
 
-				v2393, n127 = proto.readBuffer(p191, n127)
-				v2388.event_id = buffer.tostring(v2393)
+				v2434, n128 = proto.readBuffer(p192, n128)
+				v2429.event_id = buffer.tostring(v2434)
+			elseif v2431 == 2 then
+				local v2435
+
+				v2435, n128 = proto.readBuffer(p192, n128)
+				v2429.universe_id = buffer.tostring(v2435)
 			else
-				local v2394, v2395 = proto.readVarInt(p191, n127)
+				local v2436, v2437 = proto.readVarInt(p192, n128)
 
-				n127 = v2395 + v2394
+				n128 = v2437 + v2436
 			end
-		elseif v2391 == proto.wireTypes.i32 then
-			local v2396
+		elseif v2432 == proto.wireTypes.i32 then
+			local v2438
 
-			v2396, n127 = proto.readFixed32(p191, n127)
-		elseif v2391 == proto.wireTypes.i64 then
-			local v2397
+			v2438, n128 = proto.readFixed32(p192, n128)
+		elseif v2432 == proto.wireTypes.i64 then
+			local v2439
 
-			v2397, n127 = proto.readFixed64(p191, n127)
+			v2439, n128 = proto.readFixed64(p192, n128)
 		else
-			error("Unsupported wire type: " .. v2391)
+			error("Unsupported wire type: " .. v2432)
 		end
 	end
 
-	return v2388
+	return v2429
 end
-function t306.jsonEncode(p192) -- line: 14696
-	local t308 = {}
-
-	if p192.event_id ~= nil and p192.event_id ~= "" then
-		t308.eventId = p192.event_id
-	end
-
-	return t308
-end
-function t306.jsonDecode(t309: {[any]: any}) -- line: 14706
-	-- upvalues: t306 (copy)
-	local v2401 = t306.new()
-
-	if t309.event_id ~= nil then
-		v2401.event_id = t309.event_id
-	end
-
-	if t309.eventId ~= nil then
-		v2401.event_id = t309.eventId
-	end
-
-	return v2401
-end
-
-t306.descriptor = {
-	name = "EventDetailsSheetFullBleedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventDetailsSheetFullBleedInputData"
-}
-t1.EventDetailsSheetFullBleedInputData = t306
-typeRegistry.default:register(t1.EventDetailsSheetFullBleedInputData)
-
-local t310 = {}
-
-t310.__index = t310
-
-function t310.new(t311: {[any]: any}?) -- line: 14736
-	-- upvalues: t310 (copy)
-	return (setmetatable({
-		event_id = if t311 ~= nil and t311.event_id ~= nil then t311.event_id else "",
-		universe_id = if t311 ~= nil and t311.universe_id ~= nil then t311.universe_id else ""
-	}, t310))
-end
-function t310.encode(p193) -- line: 14745
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n128 = 0
+function t308.jsonEncode(p193) -- line: 15132
+	local t310 = {}
 
 	if p193.event_id ~= nil and p193.event_id ~= "" then
-		local v2406, v2407 = proto.writeTag(buf, n128, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n128 = proto.writeString(v2406, v2407, p193.event_id)
+		t310.eventId = p193.event_id
 	end
 
 	if p193.universe_id ~= nil and p193.universe_id ~= "" then
-		local v2408, v2409 = proto.writeTag(buf, n128, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n128 = proto.writeString(v2408, v2409, p193.universe_id)
+		t310.universeId = p193.universe_id
 	end
 
-	local buf70 = buffer.create(n128)
+	return t310
+end
+function t308.jsonDecode(t311: {[any]: any}) -- line: 15146
+	-- upvalues: t308 (copy)
+	local v2443 = t308.new()
 
-	buffer.copy(buf70, 0, buf, 0, n128)
+	if t311.event_id ~= nil then
+		v2443.event_id = t311.event_id
+	end
+
+	if t311.eventId ~= nil then
+		v2443.event_id = t311.eventId
+	end
+
+	if t311.universe_id ~= nil then
+		v2443.universe_id = t311.universe_id
+	end
+
+	if t311.universeId ~= nil then
+		v2443.universe_id = t311.universeId
+	end
+
+	return v2443
+end
+
+t308.descriptor = {
+	name = "EventDetailsActionBarInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventDetailsActionBarInputData"
+}
+t1.EventDetailsActionBarInputData = t308
+typeRegistry.default:register(t1.EventDetailsActionBarInputData)
+
+local t312 = {}
+
+t312.__index = t312
+
+function t312.new(t313: {[any]: any}?) -- line: 15182
+	-- upvalues: t312 (copy)
+	return (setmetatable({
+		event_id = if t313 ~= nil and t313.event_id ~= nil then t313.event_id else ""
+	}, t312))
+end
+function t312.encode(p194) -- line: 15190
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n129 = 0
+
+	if p194.event_id ~= nil and p194.event_id ~= "" then
+		local v2448, v2449 = proto.writeTag(buf, n129, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n129 = proto.writeString(v2448, v2449, p194.event_id)
+	end
+
+	local buf70 = buffer.create(n129)
+
+	buffer.copy(buf70, 0, buf, 0, n129)
 
 	return buf70
 end
-function t310.decode(p194: buffer) -- line: 14764
-	-- upvalues: t310 (copy), proto (copy)
-	local v2412 = t310.new()
-	local n129 = 0
-
-	while n129 < buffer.len(p194) do
-		local v2414, v2415
-
-		v2414, v2415, n129 = proto.readTag(p194, n129)
-
-		if v2415 == proto.wireTypes.varint then
-			local v2416
-
-			v2416, n129 = proto.readVarInt(p194, n129)
-		elseif v2415 == proto.wireTypes.lengthDelimited then
-			if v2414 == 1 then
-				local v2417
-
-				v2417, n129 = proto.readBuffer(p194, n129)
-				v2412.event_id = buffer.tostring(v2417)
-			elseif v2414 == 2 then
-				local v2418
-
-				v2418, n129 = proto.readBuffer(p194, n129)
-				v2412.universe_id = buffer.tostring(v2418)
-			else
-				local v2419, v2420 = proto.readVarInt(p194, n129)
-
-				n129 = v2420 + v2419
-			end
-		elseif v2415 == proto.wireTypes.i32 then
-			local v2421
-
-			v2421, n129 = proto.readFixed32(p194, n129)
-		elseif v2415 == proto.wireTypes.i64 then
-			local v2422
-
-			v2422, n129 = proto.readFixed64(p194, n129)
-		else
-			error("Unsupported wire type: " .. v2415)
-		end
-	end
-
-	return v2412
-end
-function t310.jsonEncode(p195) -- line: 14812
-	local t312 = {}
-
-	if p195.event_id ~= nil and p195.event_id ~= "" then
-		t312.eventId = p195.event_id
-	end
-
-	if p195.universe_id ~= nil and p195.universe_id ~= "" then
-		t312.universeId = p195.universe_id
-	end
-
-	return t312
-end
-function t310.jsonDecode(t313: {[any]: any}) -- line: 14826
-	-- upvalues: t310 (copy)
-	local v2426 = t310.new()
-
-	if t313.event_id ~= nil then
-		v2426.event_id = t313.event_id
-	end
-
-	if t313.eventId ~= nil then
-		v2426.event_id = t313.eventId
-	end
-
-	if t313.universe_id ~= nil then
-		v2426.universe_id = t313.universe_id
-	end
-
-	if t313.universeId ~= nil then
-		v2426.universe_id = t313.universeId
-	end
-
-	return v2426
-end
-
-t310.descriptor = {
-	name = "EventNotificationsModalInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EventNotificationsModalInputData"
-}
-t1.EventNotificationsModalInputData = t310
-typeRegistry.default:register(t1.EventNotificationsModalInputData)
-
-local t314 = {}
-
-t314.__index = t314
-
-function t314.new(t315: {[any]: any}?) -- line: 14864
-	-- upvalues: t314 (copy)
-	return (setmetatable({
-		entry_map = if t315 ~= nil and t315.entry_map ~= nil then t315.entry_map else {},
-		entry_order = if t315 ~= nil and t315.entry_order ~= nil then t315.entry_order else {},
-		next_page_token = if t315 ~= nil and t315.next_page_token ~= nil then t315.next_page_token else "",
-		sticky_filter_pills = if t315 ~= nil and t315.sticky_filter_pills ~= nil then t315.sticky_filter_pills else nil,
-		applied_filters = if t315 ~= nil and t315.applied_filters ~= nil then t315.applied_filters else ""
-	}, t314))
-end
-function t314.encode(p196) -- line: 14876
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t312.decode(p195: buffer) -- line: 15204
+	-- upvalues: t312 (copy), proto (copy)
+	local v2452 = t312.new()
 	local n130 = 0
 
-	if p196.entry_map ~= nil and next(p196.entry_map) ~= nil then
-		for v2431, v2432 in p196.entry_map do
-			local buf71 = buffer.create(0)
-			local v2434, v2435 = proto.writeTag(buf71, 0, 1, proto.wireTypes.lengthDelimited)
-			local v2436, v2437 = proto.writeString(v2434, v2435, v2431)
-			local v2438 = v2432:encode()
-			local v2439, v2440 = proto.writeTag(v2436, v2437, 2, proto.wireTypes.lengthDelimited)
-			local v2441, v2442 = proto.writeBuffer(v2439, v2440, v2438, buffer.len(v2438))
-			local v2443, v2444 = proto.writeTag(buf, n130, 1, proto.wireTypes.lengthDelimited)
+	while n130 < buffer.len(p195) do
+		local v2454, v2455
 
-			buf, n130 = proto.writeBuffer(v2443, v2444, v2441, v2442)
+		v2454, v2455, n130 = proto.readTag(p195, n130)
+
+		if v2455 == proto.wireTypes.varint then
+			local v2456
+
+			v2456, n130 = proto.readVarInt(p195, n130)
+		elseif v2455 == proto.wireTypes.lengthDelimited then
+			if v2454 == 1 then
+				local v2457
+
+				v2457, n130 = proto.readBuffer(p195, n130)
+				v2452.event_id = buffer.tostring(v2457)
+			else
+				local v2458, v2459 = proto.readVarInt(p195, n130)
+
+				n130 = v2459 + v2458
+			end
+		elseif v2455 == proto.wireTypes.i32 then
+			local v2460
+
+			v2460, n130 = proto.readFixed32(p195, n130)
+		elseif v2455 == proto.wireTypes.i64 then
+			local v2461
+
+			v2461, n130 = proto.readFixed64(p195, n130)
+		else
+			error("Unsupported wire type: " .. v2455)
 		end
 	end
 
-	if p196.entry_order ~= nil and #p196.entry_order > 0 then
-		for _, v2446 in p196.entry_order do
-			local v2447, v2448 = proto.writeTag(buf, n130, 2, proto.wireTypes.lengthDelimited)
+	return v2452
+end
+function t312.jsonEncode(p196) -- line: 15247
+	local t314 = {}
 
-			buf, n130 = proto.writeString(v2447, v2448, v2446)
+	if p196.event_id ~= nil and p196.event_id ~= "" then
+		t314.eventId = p196.event_id
+	end
+
+	return t314
+end
+function t312.jsonDecode(t315: {[any]: any}) -- line: 15257
+	-- upvalues: t312 (copy)
+	local v2465 = t312.new()
+
+	if t315.event_id ~= nil then
+		v2465.event_id = t315.event_id
+	end
+
+	if t315.eventId ~= nil then
+		v2465.event_id = t315.eventId
+	end
+
+	return v2465
+end
+
+t312.descriptor = {
+	name = "EventDescriptionInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventDescriptionInputData"
+}
+t1.EventDescriptionInputData = t312
+typeRegistry.default:register(t1.EventDescriptionInputData)
+
+local t316 = {}
+
+t316.__index = t316
+
+function t316.new(t317: {[any]: any}?) -- line: 15285
+	-- upvalues: t316 (copy)
+	return (setmetatable({
+		event_id = if t317 ~= nil and t317.event_id ~= nil then t317.event_id else "",
+		universe_id = if t317 ~= nil and t317.universe_id ~= nil then t317.universe_id else ""
+	}, t316))
+end
+function t316.encode(p197) -- line: 15294
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n131 = 0
+
+	if p197.event_id ~= nil and p197.event_id ~= "" then
+		local v2470, v2471 = proto.writeTag(buf, n131, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n131 = proto.writeString(v2470, v2471, p197.event_id)
+	end
+
+	if p197.universe_id ~= nil and p197.universe_id ~= "" then
+		local v2472, v2473 = proto.writeTag(buf, n131, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n131 = proto.writeString(v2472, v2473, p197.universe_id)
+	end
+
+	local buf71 = buffer.create(n131)
+
+	buffer.copy(buf71, 0, buf, 0, n131)
+
+	return buf71
+end
+function t316.decode(p198: buffer) -- line: 15313
+	-- upvalues: t316 (copy), proto (copy)
+	local v2476 = t316.new()
+	local n132 = 0
+
+	while n132 < buffer.len(p198) do
+		local v2478, v2479
+
+		v2478, v2479, n132 = proto.readTag(p198, n132)
+
+		if v2479 == proto.wireTypes.varint then
+			local v2480
+
+			v2480, n132 = proto.readVarInt(p198, n132)
+		elseif v2479 == proto.wireTypes.lengthDelimited then
+			if v2478 == 1 then
+				local v2481
+
+				v2481, n132 = proto.readBuffer(p198, n132)
+				v2476.event_id = buffer.tostring(v2481)
+			elseif v2478 == 2 then
+				local v2482
+
+				v2482, n132 = proto.readBuffer(p198, n132)
+				v2476.universe_id = buffer.tostring(v2482)
+			else
+				local v2483, v2484 = proto.readVarInt(p198, n132)
+
+				n132 = v2484 + v2483
+			end
+		elseif v2479 == proto.wireTypes.i32 then
+			local v2485
+
+			v2485, n132 = proto.readFixed32(p198, n132)
+		elseif v2479 == proto.wireTypes.i64 then
+			local v2486
+
+			v2486, n132 = proto.readFixed64(p198, n132)
+		else
+			error("Unsupported wire type: " .. v2479)
 		end
 	end
 
-	if p196.next_page_token ~= nil and p196.next_page_token ~= "" then
-		local v2449, v2450 = proto.writeTag(buf, n130, 3, proto.wireTypes.lengthDelimited)
+	return v2476
+end
+function t316.jsonEncode(p199) -- line: 15361
+	local t318 = {}
 
-		buf, n130 = proto.writeString(v2449, v2450, p196.next_page_token)
+	if p199.event_id ~= nil and p199.event_id ~= "" then
+		t318.eventId = p199.event_id
 	end
 
-	if p196.sticky_filter_pills ~= nil then
-		local v2451 = p196.sticky_filter_pills:encode()
-		local v2452, v2453 = proto.writeTag(buf, n130, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n130 = proto.writeBuffer(v2452, v2453, v2451, buffer.len(v2451))
+	if p199.universe_id ~= nil and p199.universe_id ~= "" then
+		t318.universeId = p199.universe_id
 	end
 
-	if p196.applied_filters ~= nil and p196.applied_filters ~= "" then
-		local v2454, v2455 = proto.writeTag(buf, n130, 5, proto.wireTypes.lengthDelimited)
+	return t318
+end
+function t316.jsonDecode(t319: {[any]: any}) -- line: 15375
+	-- upvalues: t316 (copy)
+	local v2490 = t316.new()
 
-		buf, n130 = proto.writeString(v2454, v2455, p196.applied_filters)
+	if t319.event_id ~= nil then
+		v2490.event_id = t319.event_id
 	end
 
-	local buf72 = buffer.create(n130)
+	if t319.eventId ~= nil then
+		v2490.event_id = t319.eventId
+	end
 
-	buffer.copy(buf72, 0, buf, 0, n130)
+	if t319.universe_id ~= nil then
+		v2490.universe_id = t319.universe_id
+	end
+
+	if t319.universeId ~= nil then
+		v2490.universe_id = t319.universeId
+	end
+
+	return v2490
+end
+
+t316.descriptor = {
+	name = "EventAttributionRowInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventAttributionRowInputData"
+}
+t1.EventAttributionRowInputData = t316
+typeRegistry.default:register(t1.EventAttributionRowInputData)
+
+local t320 = {}
+
+t320.__index = t320
+
+function t320.new(t321: {[any]: any}?) -- line: 15411
+	-- upvalues: t320 (copy)
+	return (setmetatable({
+		event_id = if t321 ~= nil and t321.event_id ~= nil then t321.event_id else ""
+	}, t320))
+end
+function t320.encode(p200) -- line: 15417
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n133 = 0
+
+	if p200.event_id ~= nil and p200.event_id ~= "" then
+		local v2495, v2496 = proto.writeTag(buf, n133, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n133 = proto.writeString(v2495, v2496, p200.event_id)
+	end
+
+	local buf72 = buffer.create(n133)
+
+	buffer.copy(buf72, 0, buf, 0, n133)
 
 	return buf72
 end
-function t314.decode(p197: buffer) -- line: 14922
-	-- upvalues: t314 (copy), proto (copy), t1 (copy)
-	local v2458 = t314.new()
-	local n131 = 0
+function t320.decode(p201: buffer) -- line: 15431
+	-- upvalues: t320 (copy), proto (copy)
+	local v2499 = t320.new()
+	local n134 = 0
 
-	while n131 < buffer.len(p197) do
-		local v2460, v2461
+	while n134 < buffer.len(p201) do
+		local v2501, v2502
 
-		v2460, v2461, n131 = proto.readTag(p197, n131)
+		v2501, v2502, n134 = proto.readTag(p201, n134)
 
-		if v2461 == proto.wireTypes.varint then
-			local v2462
+		if v2502 == proto.wireTypes.varint then
+			local v2503
 
-			v2462, n131 = proto.readVarInt(p197, n131)
-		elseif v2461 == proto.wireTypes.lengthDelimited then
-			if v2460 == 1 then
-				local v2463
+			v2503, n134 = proto.readVarInt(p201, n134)
+		elseif v2502 == proto.wireTypes.lengthDelimited then
+			if v2501 == 1 then
+				local v2504
 
-				v2463, n131 = proto.readBuffer(p197, n131)
-
-				local v2464 = t1.ChartsFeedInputData_EntryMapEntry.decode(v2463)
-				local v2465 = t1.FeedEntry.new()
-
-				v2458.entry_map[v2464.key or ""] = v2464.value or v2465
-			elseif v2460 == 2 then
-				local v2466
-
-				v2466, n131 = proto.readBuffer(p197, n131)
-				table.insert(v2458.entry_order, buffer.tostring(v2466))
-			elseif v2460 == 3 then
-				local v2467
-
-				v2467, n131 = proto.readBuffer(p197, n131)
-				v2458.next_page_token = buffer.tostring(v2467)
-			elseif v2460 == 4 then
-				local v2468
-
-				v2468, n131 = proto.readBuffer(p197, n131)
-				v2458.sticky_filter_pills = t1.FilterPillsInputData.decode(v2468)
-			elseif v2460 == 5 then
-				local v2469
-
-				v2469, n131 = proto.readBuffer(p197, n131)
-				v2458.applied_filters = buffer.tostring(v2469)
+				v2504, n134 = proto.readBuffer(p201, n134)
+				v2499.event_id = buffer.tostring(v2504)
 			else
-				local v2470, v2471 = proto.readVarInt(p197, n131)
+				local v2505, v2506 = proto.readVarInt(p201, n134)
 
-				n131 = v2471 + v2470
+				n134 = v2506 + v2505
 			end
-		elseif v2461 == proto.wireTypes.i32 then
-			local v2472
+		elseif v2502 == proto.wireTypes.i32 then
+			local v2507
 
-			v2472, n131 = proto.readFixed32(p197, n131)
-		elseif v2461 == proto.wireTypes.i64 then
-			local v2473
+			v2507, n134 = proto.readFixed32(p201, n134)
+		elseif v2502 == proto.wireTypes.i64 then
+			local v2508
 
-			v2473, n131 = proto.readFixed64(p197, n131)
+			v2508, n134 = proto.readFixed64(p201, n134)
 		else
-			error("Unsupported wire type: " .. v2461)
+			error("Unsupported wire type: " .. v2502)
 		end
 	end
 
-	return v2458
+	return v2499
 end
-function t314.jsonEncode(p198) -- line: 14992
-	local t316 = {}
+function t320.jsonEncode(p202) -- line: 15474
+	local t322 = {}
 
-	if p198.entry_map ~= nil and next(p198.entry_map) ~= nil then
-		local t317 = {}
-
-		for v2477, v2478 in p198.entry_map do
-			t317[v2477] = v2478:jsonEncode()
-		end
-
-		t316.entryMap = t317
+	if p202.event_id ~= nil and p202.event_id ~= "" then
+		t322.eventId = p202.event_id
 	end
 
-	if p198.entry_order ~= nil and #p198.entry_order > 0 then
-		local t318 = {}
-
-		for _, v2481 in p198.entry_order do
-			table.insert(t318, v2481)
-		end
-
-		t316.entryOrder = t318
-	end
-
-	if p198.next_page_token ~= nil and p198.next_page_token ~= "" then
-		t316.nextPageToken = p198.next_page_token
-	end
-
-	if p198.sticky_filter_pills ~= nil then
-		t316.stickyFilterPills = p198.sticky_filter_pills:jsonEncode()
-	end
-
-	if p198.applied_filters ~= nil and p198.applied_filters ~= "" then
-		t316.appliedFilters = p198.applied_filters
-	end
-
-	return t316
+	return t322
 end
-function t314.jsonDecode(t319: {[any]: any}) -- line: 15026
-	-- upvalues: t314 (copy), t1 (copy)
-	local v2483 = t314.new()
+function t320.jsonDecode(t323: {[any]: any}) -- line: 15484
+	-- upvalues: t320 (copy)
+	local v2512 = t320.new()
 
-	if t319.entry_map ~= nil then
-		local t320 = {}
-
-		for v2485, v2486 in t319.entry_map do
-			t320[v2485] = t1.FeedEntry.jsonDecode(v2486)
-		end
-
-		v2483.entry_map = t320
+	if t323.event_id ~= nil then
+		v2512.event_id = t323.event_id
 	end
 
-	if t319.entryMap ~= nil then
-		local t321 = {}
-
-		for v2488, v2489 in t319.entryMap do
-			t321[v2488] = t1.FeedEntry.jsonDecode(v2489)
-		end
-
-		v2483.entry_map = t321
+	if t323.eventId ~= nil then
+		v2512.event_id = t323.eventId
 	end
 
-	if t319.entry_order ~= nil then
-		local t322 = {}
-
-		for _, v2492 in t319.entry_order do
-			table.insert(t322, v2492)
-		end
-
-		v2483.entry_order = t322
-	end
-
-	if t319.entryOrder ~= nil then
-		local t323 = {}
-
-		for _, v2495 in t319.entryOrder do
-			table.insert(t323, v2495)
-		end
-
-		v2483.entry_order = t323
-	end
-
-	if t319.next_page_token ~= nil then
-		v2483.next_page_token = t319.next_page_token
-	end
-
-	if t319.nextPageToken ~= nil then
-		v2483.next_page_token = t319.nextPageToken
-	end
-
-	if t319.sticky_filter_pills ~= nil then
-		v2483.sticky_filter_pills = t1.FilterPillsInputData.jsonDecode(t319.sticky_filter_pills)
-	end
-
-	if t319.stickyFilterPills ~= nil then
-		v2483.sticky_filter_pills = t1.FilterPillsInputData.jsonDecode(t319.stickyFilterPills)
-	end
-
-	if t319.applied_filters ~= nil then
-		v2483.applied_filters = t319.applied_filters
-	end
-
-	if t319.appliedFilters ~= nil then
-		v2483.applied_filters = t319.appliedFilters
-	end
-
-	return v2483
+	return v2512
 end
 
-t314.descriptor = {
-	name = "ChartsFeedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ChartsFeedInputData"
+t320.descriptor = {
+	name = "EventInfoTableInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventInfoTableInputData"
 }
-t1.ChartsFeedInputData = t314
-typeRegistry.default:register(t1.ChartsFeedInputData)
+t1.EventInfoTableInputData = t320
+typeRegistry.default:register(t1.EventInfoTableInputData)
 
 local t324 = {}
 
 t324.__index = t324
 
-function t324.new(t325: {[any]: any}?) -- line: 15106
+function t324.new(t325: {[any]: any}?) -- line: 15512
 	-- upvalues: t324 (copy)
 	return (setmetatable({
-		key = if t325 ~= nil and t325.key ~= nil then t325.key else "",
-		value = if t325 ~= nil and t325.value ~= nil then t325.value else nil
+		event_id = if t325 ~= nil and t325.event_id ~= nil then t325.event_id else ""
 	}, t324))
 end
-function t324.encode(p199) -- line: 15115
+function t324.encode(p203) -- line: 15520
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n132 = 0
+	local n135 = 0
 
-	if p199.key ~= nil and p199.key ~= "" then
-		local v2500, v2501 = proto.writeTag(buf, n132, 1, proto.wireTypes.lengthDelimited)
+	if p203.event_id ~= nil and p203.event_id ~= "" then
+		local v2517, v2518 = proto.writeTag(buf, n135, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n132 = proto.writeString(v2500, v2501, p199.key)
+		buf, n135 = proto.writeString(v2517, v2518, p203.event_id)
 	end
 
-	if p199.value ~= nil then
-		local v2502 = p199.value:encode()
-		local v2503, v2504 = proto.writeTag(buf, n132, 2, proto.wireTypes.lengthDelimited)
+	local buf73 = buffer.create(n135)
 
-		buf, n132 = proto.writeBuffer(v2503, v2504, v2502, buffer.len(v2502))
-	end
-
-	local buf73 = buffer.create(n132)
-
-	buffer.copy(buf73, 0, buf, 0, n132)
+	buffer.copy(buf73, 0, buf, 0, n135)
 
 	return buf73
 end
-function t324.decode(p200: buffer) -- line: 15135
-	-- upvalues: t324 (copy), proto (copy), t1 (copy)
-	local v2507 = t324.new()
-	local n133 = 0
-
-	while n133 < buffer.len(p200) do
-		local v2509, v2510
-
-		v2509, v2510, n133 = proto.readTag(p200, n133)
-
-		if v2510 == proto.wireTypes.varint then
-			local v2511
-
-			v2511, n133 = proto.readVarInt(p200, n133)
-		elseif v2510 == proto.wireTypes.lengthDelimited then
-			if v2509 == 1 then
-				local v2512
-
-				v2512, n133 = proto.readBuffer(p200, n133)
-				v2507.key = buffer.tostring(v2512)
-			elseif v2509 == 2 then
-				local v2513
-
-				v2513, n133 = proto.readBuffer(p200, n133)
-				v2507.value = t1.FeedEntry.decode(v2513)
-			else
-				local v2514, v2515 = proto.readVarInt(p200, n133)
-
-				n133 = v2515 + v2514
-			end
-		elseif v2510 == proto.wireTypes.i32 then
-			local v2516
-
-			v2516, n133 = proto.readFixed32(p200, n133)
-		elseif v2510 == proto.wireTypes.i64 then
-			local v2517
-
-			v2517, n133 = proto.readFixed64(p200, n133)
-		else
-			error("Unsupported wire type: " .. v2510)
-		end
-	end
-
-	return v2507
-end
-function t324.jsonEncode(p201) -- line: 15183
-	local t326 = {}
-
-	if p201.key ~= nil and p201.key ~= "" then
-		t326.key = p201.key
-	end
-
-	if p201.value ~= nil then
-		t326.value = p201.value:jsonEncode()
-	end
-
-	return t326
-end
-function t324.jsonDecode(t327: {[any]: any}) -- line: 15197
-	-- upvalues: t324 (copy), t1 (copy)
+function t324.decode(p204: buffer) -- line: 15534
+	-- upvalues: t324 (copy), proto (copy)
 	local v2521 = t324.new()
+	local n136 = 0
 
-	if t327.key ~= nil then
-		v2521.key = t327.key
-	end
+	while n136 < buffer.len(p204) do
+		local v2523, v2524
 
-	if t327.value ~= nil then
-		v2521.value = t1.FeedEntry.jsonDecode(t327.value)
+		v2523, v2524, n136 = proto.readTag(p204, n136)
+
+		if v2524 == proto.wireTypes.varint then
+			local v2525
+
+			v2525, n136 = proto.readVarInt(p204, n136)
+		elseif v2524 == proto.wireTypes.lengthDelimited then
+			if v2523 == 1 then
+				local v2526
+
+				v2526, n136 = proto.readBuffer(p204, n136)
+				v2521.event_id = buffer.tostring(v2526)
+			else
+				local v2527, v2528 = proto.readVarInt(p204, n136)
+
+				n136 = v2528 + v2527
+			end
+		elseif v2524 == proto.wireTypes.i32 then
+			local v2529
+
+			v2529, n136 = proto.readFixed32(p204, n136)
+		elseif v2524 == proto.wireTypes.i64 then
+			local v2530
+
+			v2530, n136 = proto.readFixed64(p204, n136)
+		else
+			error("Unsupported wire type: " .. v2524)
+		end
 	end
 
 	return v2521
 end
+function t324.jsonEncode(p205) -- line: 15577
+	local t326 = {}
+
+	if p205.event_id ~= nil and p205.event_id ~= "" then
+		t326.eventId = p205.event_id
+	end
+
+	return t326
+end
+function t324.jsonDecode(t327: {[any]: any}) -- line: 15587
+	-- upvalues: t324 (copy)
+	local v2534 = t324.new()
+
+	if t327.event_id ~= nil then
+		v2534.event_id = t327.event_id
+	end
+
+	if t327.eventId ~= nil then
+		v2534.event_id = t327.eventId
+	end
+
+	return v2534
+end
 
 t324.descriptor = {
-	name = "ChartsFeedInputData_EntryMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+	name = "EventDetailsSheetFullBleedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventDetailsSheetFullBleedInputData"
 }
-t1.ChartsFeedInputData_EntryMapEntry = t324
-typeRegistry.default:register(t1.ChartsFeedInputData_EntryMapEntry)
+t1.EventDetailsSheetFullBleedInputData = t324
+typeRegistry.default:register(t1.EventDetailsSheetFullBleedInputData)
 
 local t328 = {}
 
 t328.__index = t328
 
-function t328.new(t329: {[any]: any}?) -- line: 15227
+function t328.new(t329: {[any]: any}?) -- line: 15617
 	-- upvalues: t328 (copy)
 	return (setmetatable({
-		filter_groups = if t329 ~= nil and t329.filter_groups ~= nil then t329.filter_groups else {},
-		sort_id = if t329 ~= nil and t329.sort_id ~= nil then t329.sort_id else "",
-		secondary_sort_id = if t329 ~= nil and t329.secondary_sort_id ~= nil then t329.secondary_sort_id else 0,
-		title = if t329 ~= nil and t329.title ~= nil then t329.title else "",
-		primary_sort_id = if t329 ~= nil and t329.primary_sort_id ~= nil then t329.primary_sort_id else nil,
-		applied_filters = if t329 ~= nil and t329.applied_filters ~= nil then t329.applied_filters else nil
+		event_id = if t329 ~= nil and t329.event_id ~= nil then t329.event_id else "",
+		universe_id = if t329 ~= nil and t329.universe_id ~= nil then t329.universe_id else ""
 	}, t328))
 end
-function t328.encode(p202) -- line: 15238
+function t328.encode(p206) -- line: 15626
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n134 = 0
+	local n137 = 0
 
-	if p202.filter_groups ~= nil and #p202.filter_groups > 0 then
-		for _, v2527 in p202.filter_groups do
-			local v2528 = v2527:encode()
-			local v2529, v2530 = proto.writeTag(buf, n134, 1, proto.wireTypes.lengthDelimited)
+	if p206.event_id ~= nil and p206.event_id ~= "" then
+		local v2539, v2540 = proto.writeTag(buf, n137, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n134 = proto.writeBuffer(v2529, v2530, v2528, buffer.len(v2528))
-		end
+		buf, n137 = proto.writeString(v2539, v2540, p206.event_id)
 	end
 
-	if p202.sort_id ~= nil and p202.sort_id ~= "" then
-		local v2531, v2532 = proto.writeTag(buf, n134, 2, proto.wireTypes.lengthDelimited)
+	if p206.universe_id ~= nil and p206.universe_id ~= "" then
+		local v2541, v2542 = proto.writeTag(buf, n137, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n134 = proto.writeString(v2531, v2532, p202.sort_id)
+		buf, n137 = proto.writeString(v2541, v2542, p206.universe_id)
 	end
 
-	if p202.secondary_sort_id ~= nil and p202.secondary_sort_id ~= 0 then
-		local v2533, v2534 = proto.writeTag(buf, n134, 3, proto.wireTypes.varint)
+	local buf74 = buffer.create(n137)
 
-		buf, n134 = proto.writeVarInt(v2533, v2534, p202.secondary_sort_id)
-	end
-
-	if p202.title ~= nil and p202.title ~= "" then
-		local v2535, v2536 = proto.writeTag(buf, n134, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n134 = proto.writeString(v2535, v2536, p202.title)
-	end
-
-	if p202.primary_sort_id ~= nil then
-		local v2537, v2538 = proto.writeTag(buf, n134, 5, proto.wireTypes.varint)
-
-		buf, n134 = proto.writeVarInt(v2537, v2538, p202.primary_sort_id)
-	end
-
-	if p202.applied_filters ~= nil then
-		local v2539, v2540 = proto.writeTag(buf, n134, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n134 = proto.writeString(v2539, v2540, p202.applied_filters)
-	end
-
-	local buf74 = buffer.create(n134)
-
-	buffer.copy(buf74, 0, buf, 0, n134)
+	buffer.copy(buf74, 0, buf, 0, n137)
 
 	return buf74
 end
-function t328.decode(p203: buffer) -- line: 15280
-	-- upvalues: t328 (copy), proto (copy), t1 (copy)
-	local v2543 = t328.new()
-	local n135 = 0
+function t328.decode(p207: buffer) -- line: 15645
+	-- upvalues: t328 (copy), proto (copy)
+	local v2545 = t328.new()
+	local n138 = 0
 
-	while n135 < buffer.len(p203) do
-		local v2545, v2546
+	while n138 < buffer.len(p207) do
+		local v2547, v2548
 
-		v2545, v2546, n135 = proto.readTag(p203, n135)
+		v2547, v2548, n138 = proto.readTag(p207, n138)
 
-		if v2546 == proto.wireTypes.varint then
-			if v2545 == 3 then
-				local v2547
+		if v2548 == proto.wireTypes.varint then
+			local v2549
 
-				v2547, n135 = proto.readVarIntI32(p203, n135)
-				v2543.secondary_sort_id = v2547
-			elseif v2545 == 5 then
-				local v2548
-
-				v2548, n135 = proto.readVarIntI32(p203, n135)
-				v2543.primary_sort_id = v2548
-			else
-				local v2549
-
-				v2549, n135 = proto.readVarInt(p203, n135)
-			end
-		elseif v2546 == proto.wireTypes.lengthDelimited then
-			if v2545 == 1 then
+			v2549, n138 = proto.readVarInt(p207, n138)
+		elseif v2548 == proto.wireTypes.lengthDelimited then
+			if v2547 == 1 then
 				local v2550
 
-				v2550, n135 = proto.readBuffer(p203, n135)
-				table.insert(v2543.filter_groups, t1.FilterPillsInputData_FilterGroup.decode(v2550))
-			elseif v2545 == 2 then
+				v2550, n138 = proto.readBuffer(p207, n138)
+				v2545.event_id = buffer.tostring(v2550)
+			elseif v2547 == 2 then
 				local v2551
 
-				v2551, n135 = proto.readBuffer(p203, n135)
-				v2543.sort_id = buffer.tostring(v2551)
-			elseif v2545 == 4 then
-				local v2552
-
-				v2552, n135 = proto.readBuffer(p203, n135)
-				v2543.title = buffer.tostring(v2552)
-			elseif v2545 == 6 then
-				local v2553
-
-				v2553, n135 = proto.readBuffer(p203, n135)
-				v2543.applied_filters = buffer.tostring(v2553)
+				v2551, n138 = proto.readBuffer(p207, n138)
+				v2545.universe_id = buffer.tostring(v2551)
 			else
-				local v2554, v2555 = proto.readVarInt(p203, n135)
+				local v2552, v2553 = proto.readVarInt(p207, n138)
 
-				n135 = v2555 + v2554
+				n138 = v2553 + v2552
 			end
-		elseif v2546 == proto.wireTypes.i32 then
-			local v2556
+		elseif v2548 == proto.wireTypes.i32 then
+			local v2554
 
-			v2556, n135 = proto.readFixed32(p203, n135)
-		elseif v2546 == proto.wireTypes.i64 then
-			local v2557
+			v2554, n138 = proto.readFixed32(p207, n138)
+		elseif v2548 == proto.wireTypes.i64 then
+			local v2555
 
-			v2557, n135 = proto.readFixed64(p203, n135)
+			v2555, n138 = proto.readFixed64(p207, n138)
 		else
-			error("Unsupported wire type: " .. v2546)
+			error("Unsupported wire type: " .. v2548)
 		end
 	end
 
-	return v2543
+	return v2545
 end
-function t328.jsonEncode(p204) -- line: 15348
+function t328.jsonEncode(p208) -- line: 15693
 	local t330 = {}
 
-	if p204.filter_groups ~= nil and #p204.filter_groups > 0 then
-		local t331 = {}
-
-		for _, v2562 in p204.filter_groups do
-			table.insert(t331, v2562:jsonEncode())
-		end
-
-		t330.filterGroups = t331
+	if p208.event_id ~= nil and p208.event_id ~= "" then
+		t330.eventId = p208.event_id
 	end
 
-	if p204.sort_id ~= nil and p204.sort_id ~= "" then
-		t330.sortId = p204.sort_id
-	end
-
-	if p204.secondary_sort_id ~= nil and p204.secondary_sort_id ~= 0 then
-		t330.secondarySortId = p204.secondary_sort_id
-	end
-
-	if p204.title ~= nil and p204.title ~= "" then
-		t330.title = p204.title
-	end
-
-	if p204.primary_sort_id ~= nil then
-		t330.primarySortId = p204.primary_sort_id
-	end
-
-	if p204.applied_filters ~= nil then
-		t330.appliedFilters = p204.applied_filters
+	if p208.universe_id ~= nil and p208.universe_id ~= "" then
+		t330.universeId = p208.universe_id
 	end
 
 	return t330
 end
-function t328.jsonDecode(t332: {[any]: any}) -- line: 15382
-	-- upvalues: t328 (copy), t1 (copy)
-	local v2564 = t328.new()
+function t328.jsonDecode(t331: {[any]: any}) -- line: 15707
+	-- upvalues: t328 (copy)
+	local v2559 = t328.new()
 
-	if t332.filter_groups ~= nil then
-		local t333 = {}
-
-		for _, v2567 in t332.filter_groups do
-			table.insert(t333, t1.FilterPillsInputData_FilterGroup.jsonDecode(v2567))
-		end
-
-		v2564.filter_groups = t333
+	if t331.event_id ~= nil then
+		v2559.event_id = t331.event_id
 	end
 
-	if t332.filterGroups ~= nil then
-		local t334 = {}
-
-		for _, v2570 in t332.filterGroups do
-			table.insert(t334, t1.FilterPillsInputData_FilterGroup.jsonDecode(v2570))
-		end
-
-		v2564.filter_groups = t334
+	if t331.eventId ~= nil then
+		v2559.event_id = t331.eventId
 	end
 
-	if t332.sort_id ~= nil then
-		v2564.sort_id = t332.sort_id
+	if t331.universe_id ~= nil then
+		v2559.universe_id = t331.universe_id
 	end
 
-	if t332.sortId ~= nil then
-		v2564.sort_id = t332.sortId
+	if t331.universeId ~= nil then
+		v2559.universe_id = t331.universeId
 	end
 
-	if t332.secondary_sort_id ~= nil then
-		v2564.secondary_sort_id = t332.secondary_sort_id
-	end
-
-	if t332.secondarySortId ~= nil then
-		v2564.secondary_sort_id = t332.secondarySortId
-	end
-
-	if t332.title ~= nil then
-		v2564.title = t332.title
-	end
-
-	if t332.primary_sort_id ~= nil then
-		v2564.primary_sort_id = t332.primary_sort_id
-	end
-
-	if t332.primarySortId ~= nil then
-		v2564.primary_sort_id = t332.primarySortId
-	end
-
-	if t332.applied_filters ~= nil then
-		v2564.applied_filters = t332.applied_filters
-	end
-
-	if t332.appliedFilters ~= nil then
-		v2564.applied_filters = t332.appliedFilters
-	end
-
-	return v2564
+	return v2559
 end
 
 t328.descriptor = {
-	name = "FilterPillsInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.FilterPillsInputData"
+	name = "EventNotificationsModalInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EventNotificationsModalInputData"
 }
-t1.FilterPillsInputData = t328
-typeRegistry.default:register(t1.FilterPillsInputData)
+t1.EventNotificationsModalInputData = t328
+typeRegistry.default:register(t1.EventNotificationsModalInputData)
 
-local t335 = {}
+local t332 = {}
 
-t335.__index = t335
+t332.__index = t332
 
-function t335.new(t336: {[any]: any}?) -- line: 15456
-	-- upvalues: t335 (copy)
+function t332.new(t333: {[any]: any}?) -- line: 15745
+	-- upvalues: t332 (copy)
 	return (setmetatable({
-		filter_id = if t336 ~= nil and t336.filter_id ~= nil then t336.filter_id else "",
-		display_name = if t336 ~= nil and t336.display_name ~= nil then t336.display_name else "",
-		options = if t336 ~= nil and t336.options ~= nil then t336.options else {},
-		default_option_id = if t336 ~= nil and t336.default_option_id ~= nil then t336.default_option_id else "",
-		selected_option_id = if t336 ~= nil and t336.selected_option_id ~= nil then t336.selected_option_id else "",
-		filter_type = if t336 ~= nil and t336.filter_type ~= nil then t336.filter_type else "",
-		inactive_option_ids = if t336 ~= nil and t336.inactive_option_ids ~= nil then t336.inactive_option_ids else {},
-		info_text = if t336 ~= nil and t336.info_text ~= nil then t336.info_text else ""
-	}, t335))
+		entry_map = if t333 ~= nil and t333.entry_map ~= nil then t333.entry_map else {},
+		entry_order = if t333 ~= nil and t333.entry_order ~= nil then t333.entry_order else {},
+		next_page_token = if t333 ~= nil and t333.next_page_token ~= nil then t333.next_page_token else "",
+		sticky_filter_pills = if t333 ~= nil and t333.sticky_filter_pills ~= nil then t333.sticky_filter_pills else nil,
+		applied_filters = if t333 ~= nil and t333.applied_filters ~= nil then t333.applied_filters else ""
+	}, t332))
 end
-function t335.encode(p205) -- line: 15473
+function t332.encode(p209) -- line: 15757
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n136 = 0
+	local n139 = 0
 
-	if p205.filter_id ~= nil and p205.filter_id ~= "" then
-		local v2575, v2576 = proto.writeTag(buf, n136, 1, proto.wireTypes.lengthDelimited)
+	if p209.entry_map ~= nil and next(p209.entry_map) ~= nil then
+		for v2564, v2565 in p209.entry_map do
+			local buf75 = buffer.create(0)
+			local v2567, v2568 = proto.writeTag(buf75, 0, 1, proto.wireTypes.lengthDelimited)
+			local v2569, v2570 = proto.writeString(v2567, v2568, v2564)
+			local v2571 = v2565:encode()
+			local v2572, v2573 = proto.writeTag(v2569, v2570, 2, proto.wireTypes.lengthDelimited)
+			local v2574, v2575 = proto.writeBuffer(v2572, v2573, v2571, buffer.len(v2571))
+			local v2576, v2577 = proto.writeTag(buf, n139, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n136 = proto.writeString(v2575, v2576, p205.filter_id)
-	end
-
-	if p205.display_name ~= nil and p205.display_name ~= "" then
-		local v2577, v2578 = proto.writeTag(buf, n136, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n136 = proto.writeString(v2577, v2578, p205.display_name)
-	end
-
-	if p205.options ~= nil and #p205.options > 0 then
-		for _, v2580 in p205.options do
-			local v2581 = v2580:encode()
-			local v2582, v2583 = proto.writeTag(buf, n136, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n136 = proto.writeBuffer(v2582, v2583, v2581, buffer.len(v2581))
+			buf, n139 = proto.writeBuffer(v2576, v2577, v2574, v2575)
 		end
 	end
 
-	if p205.default_option_id ~= nil and p205.default_option_id ~= "" then
-		local v2584, v2585 = proto.writeTag(buf, n136, 4, proto.wireTypes.lengthDelimited)
+	if p209.entry_order ~= nil and #p209.entry_order > 0 then
+		for _, v2579 in p209.entry_order do
+			local v2580, v2581 = proto.writeTag(buf, n139, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n136 = proto.writeString(v2584, v2585, p205.default_option_id)
-	end
-
-	if p205.selected_option_id ~= nil and p205.selected_option_id ~= "" then
-		local v2586, v2587 = proto.writeTag(buf, n136, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n136 = proto.writeString(v2586, v2587, p205.selected_option_id)
-	end
-
-	if p205.filter_type ~= nil and p205.filter_type ~= "" then
-		local v2588, v2589 = proto.writeTag(buf, n136, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n136 = proto.writeString(v2588, v2589, p205.filter_type)
-	end
-
-	if p205.inactive_option_ids ~= nil and #p205.inactive_option_ids > 0 then
-		for _, v2591 in p205.inactive_option_ids do
-			local v2592, v2593 = proto.writeTag(buf, n136, 7, proto.wireTypes.lengthDelimited)
-
-			buf, n136 = proto.writeString(v2592, v2593, v2591)
+			buf, n139 = proto.writeString(v2580, v2581, v2579)
 		end
 	end
 
-	if p205.info_text ~= nil and p205.info_text ~= "" then
-		local v2594, v2595 = proto.writeTag(buf, n136, 8, proto.wireTypes.lengthDelimited)
+	if p209.next_page_token ~= nil and p209.next_page_token ~= "" then
+		local v2582, v2583 = proto.writeTag(buf, n139, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n136 = proto.writeString(v2594, v2595, p205.info_text)
+		buf, n139 = proto.writeString(v2582, v2583, p209.next_page_token)
 	end
 
-	local buf75 = buffer.create(n136)
+	if p209.sticky_filter_pills ~= nil then
+		local v2584 = p209.sticky_filter_pills:encode()
+		local v2585, v2586 = proto.writeTag(buf, n139, 4, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf75, 0, buf, 0, n136)
-
-	return buf75
-end
-function t335.decode(p206: buffer) -- line: 15527
-	-- upvalues: t335 (copy), proto (copy), t1 (copy)
-	local v2598 = t335.new()
-	local n137 = 0
-
-	while n137 < buffer.len(p206) do
-		local v2600, v2601
-
-		v2600, v2601, n137 = proto.readTag(p206, n137)
-
-		if v2601 == proto.wireTypes.varint then
-			local v2602
-
-			v2602, n137 = proto.readVarInt(p206, n137)
-		elseif v2601 == proto.wireTypes.lengthDelimited then
-			if v2600 == 1 then
-				local v2603
-
-				v2603, n137 = proto.readBuffer(p206, n137)
-				v2598.filter_id = buffer.tostring(v2603)
-			elseif v2600 == 2 then
-				local v2604
-
-				v2604, n137 = proto.readBuffer(p206, n137)
-				v2598.display_name = buffer.tostring(v2604)
-			elseif v2600 == 3 then
-				local v2605
-
-				v2605, n137 = proto.readBuffer(p206, n137)
-				table.insert(v2598.options, t1.FilterPillsInputData_FilterOption.decode(v2605))
-			elseif v2600 == 4 then
-				local v2606
-
-				v2606, n137 = proto.readBuffer(p206, n137)
-				v2598.default_option_id = buffer.tostring(v2606)
-			elseif v2600 == 5 then
-				local v2607
-
-				v2607, n137 = proto.readBuffer(p206, n137)
-				v2598.selected_option_id = buffer.tostring(v2607)
-			elseif v2600 == 6 then
-				local v2608
-
-				v2608, n137 = proto.readBuffer(p206, n137)
-				v2598.filter_type = buffer.tostring(v2608)
-			elseif v2600 == 7 then
-				local v2609
-
-				v2609, n137 = proto.readBuffer(p206, n137)
-				table.insert(v2598.inactive_option_ids, buffer.tostring(v2609))
-			elseif v2600 == 8 then
-				local v2610
-
-				v2610, n137 = proto.readBuffer(p206, n137)
-				v2598.info_text = buffer.tostring(v2610)
-			else
-				local v2611, v2612 = proto.readVarInt(p206, n137)
-
-				n137 = v2612 + v2611
-			end
-		elseif v2601 == proto.wireTypes.i32 then
-			local v2613
-
-			v2613, n137 = proto.readFixed32(p206, n137)
-		elseif v2601 == proto.wireTypes.i64 then
-			local v2614
-
-			v2614, n137 = proto.readFixed64(p206, n137)
-		else
-			error("Unsupported wire type: " .. v2601)
-		end
+		buf, n139 = proto.writeBuffer(v2585, v2586, v2584, buffer.len(v2584))
 	end
 
-	return v2598
-end
-function t335.jsonEncode(p207) -- line: 15605
-	local t337 = {}
+	if p209.applied_filters ~= nil and p209.applied_filters ~= "" then
+		local v2587, v2588 = proto.writeTag(buf, n139, 5, proto.wireTypes.lengthDelimited)
 
-	if p207.filter_id ~= nil and p207.filter_id ~= "" then
-		t337.filterId = p207.filter_id
+		buf, n139 = proto.writeString(v2587, v2588, p209.applied_filters)
 	end
 
-	if p207.display_name ~= nil and p207.display_name ~= "" then
-		t337.displayName = p207.display_name
-	end
+	local buf76 = buffer.create(n139)
 
-	if p207.options ~= nil and #p207.options > 0 then
-		local t338 = {}
-
-		for _, v2619 in p207.options do
-			table.insert(t338, v2619:jsonEncode())
-		end
-
-		t337.options = t338
-	end
-
-	if p207.default_option_id ~= nil and p207.default_option_id ~= "" then
-		t337.defaultOptionId = p207.default_option_id
-	end
-
-	if p207.selected_option_id ~= nil and p207.selected_option_id ~= "" then
-		t337.selectedOptionId = p207.selected_option_id
-	end
-
-	if p207.filter_type ~= nil and p207.filter_type ~= "" then
-		t337.filterType = p207.filter_type
-	end
-
-	if p207.inactive_option_ids ~= nil and #p207.inactive_option_ids > 0 then
-		local t339 = {}
-
-		for _, v2622 in p207.inactive_option_ids do
-			table.insert(t339, v2622)
-		end
-
-		t337.inactiveOptionIds = t339
-	end
-
-	if p207.info_text ~= nil and p207.info_text ~= "" then
-		t337.infoText = p207.info_text
-	end
-
-	return t337
-end
-function t335.jsonDecode(t340: {[any]: any}) -- line: 15651
-	-- upvalues: t335 (copy), t1 (copy)
-	local v2624 = t335.new()
-
-	if t340.filter_id ~= nil then
-		v2624.filter_id = t340.filter_id
-	end
-
-	if t340.filterId ~= nil then
-		v2624.filter_id = t340.filterId
-	end
-
-	if t340.display_name ~= nil then
-		v2624.display_name = t340.display_name
-	end
-
-	if t340.displayName ~= nil then
-		v2624.display_name = t340.displayName
-	end
-
-	if t340.options ~= nil then
-		local t341 = {}
-
-		for _, v2627 in t340.options do
-			table.insert(t341, t1.FilterPillsInputData_FilterOption.jsonDecode(v2627))
-		end
-
-		v2624.options = t341
-	end
-
-	if t340.default_option_id ~= nil then
-		v2624.default_option_id = t340.default_option_id
-	end
-
-	if t340.defaultOptionId ~= nil then
-		v2624.default_option_id = t340.defaultOptionId
-	end
-
-	if t340.selected_option_id ~= nil then
-		v2624.selected_option_id = t340.selected_option_id
-	end
-
-	if t340.selectedOptionId ~= nil then
-		v2624.selected_option_id = t340.selectedOptionId
-	end
-
-	if t340.filter_type ~= nil then
-		v2624.filter_type = t340.filter_type
-	end
-
-	if t340.filterType ~= nil then
-		v2624.filter_type = t340.filterType
-	end
-
-	if t340.inactive_option_ids ~= nil then
-		local t342 = {}
-
-		for _, v2630 in t340.inactive_option_ids do
-			table.insert(t342, v2630)
-		end
-
-		v2624.inactive_option_ids = t342
-	end
-
-	if t340.inactiveOptionIds ~= nil then
-		local t343 = {}
-
-		for _, v2633 in t340.inactiveOptionIds do
-			table.insert(t343, v2633)
-		end
-
-		v2624.inactive_option_ids = t343
-	end
-
-	if t340.info_text ~= nil then
-		v2624.info_text = t340.info_text
-	end
-
-	if t340.infoText ~= nil then
-		v2624.info_text = t340.infoText
-	end
-
-	return v2624
-end
-
-t335.descriptor = {
-	name = "FilterPillsInputData_FilterGroup",
-	fullName = "roblox.apppageplatform.shared.v1beta1.FilterGroup"
-}
-t1.FilterPillsInputData_FilterGroup = t335
-typeRegistry.default:register(t1.FilterPillsInputData_FilterGroup)
-
-local t344 = {}
-
-t344.__index = t344
-
-function t344.new(t345: {[any]: any}?) -- line: 15748
-	-- upvalues: t344 (copy)
-	return (setmetatable({
-		option_id = if t345 ~= nil and t345.option_id ~= nil then t345.option_id else "",
-		display_name = if t345 ~= nil and t345.display_name ~= nil then t345.display_name else "",
-		option_context_tag = if t345 ~= nil and t345.option_context_tag ~= nil then t345.option_context_tag else ""
-	}, t344))
-end
-function t344.encode(p208) -- line: 15758
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n138 = 0
-
-	if p208.option_id ~= nil and p208.option_id ~= "" then
-		local v2638, v2639 = proto.writeTag(buf, n138, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n138 = proto.writeString(v2638, v2639, p208.option_id)
-	end
-
-	if p208.display_name ~= nil and p208.display_name ~= "" then
-		local v2640, v2641 = proto.writeTag(buf, n138, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n138 = proto.writeString(v2640, v2641, p208.display_name)
-	end
-
-	if p208.option_context_tag ~= nil and p208.option_context_tag ~= "" then
-		local v2642, v2643 = proto.writeTag(buf, n138, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n138 = proto.writeString(v2642, v2643, p208.option_context_tag)
-	end
-
-	local buf76 = buffer.create(n138)
-
-	buffer.copy(buf76, 0, buf, 0, n138)
+	buffer.copy(buf76, 0, buf, 0, n139)
 
 	return buf76
 end
-function t344.decode(p209: buffer) -- line: 15782
-	-- upvalues: t344 (copy), proto (copy)
-	local v2646 = t344.new()
-	local n139 = 0
-
-	while n139 < buffer.len(p209) do
-		local v2648, v2649
-
-		v2648, v2649, n139 = proto.readTag(p209, n139)
-
-		if v2649 == proto.wireTypes.varint then
-			local v2650
-
-			v2650, n139 = proto.readVarInt(p209, n139)
-		elseif v2649 == proto.wireTypes.lengthDelimited then
-			if v2648 == 1 then
-				local v2651
-
-				v2651, n139 = proto.readBuffer(p209, n139)
-				v2646.option_id = buffer.tostring(v2651)
-			elseif v2648 == 2 then
-				local v2652
-
-				v2652, n139 = proto.readBuffer(p209, n139)
-				v2646.display_name = buffer.tostring(v2652)
-			elseif v2648 == 3 then
-				local v2653
-
-				v2653, n139 = proto.readBuffer(p209, n139)
-				v2646.option_context_tag = buffer.tostring(v2653)
-			else
-				local v2654, v2655 = proto.readVarInt(p209, n139)
-
-				n139 = v2655 + v2654
-			end
-		elseif v2649 == proto.wireTypes.i32 then
-			local v2656
-
-			v2656, n139 = proto.readFixed32(p209, n139)
-		elseif v2649 == proto.wireTypes.i64 then
-			local v2657
-
-			v2657, n139 = proto.readFixed64(p209, n139)
-		else
-			error("Unsupported wire type: " .. v2649)
-		end
-	end
-
-	return v2646
-end
-function t344.jsonEncode(p210) -- line: 15835
-	local t346 = {}
-
-	if p210.option_id ~= nil and p210.option_id ~= "" then
-		t346.optionId = p210.option_id
-	end
-
-	if p210.display_name ~= nil and p210.display_name ~= "" then
-		t346.displayName = p210.display_name
-	end
-
-	if p210.option_context_tag ~= nil and p210.option_context_tag ~= "" then
-		t346.optionContextTag = p210.option_context_tag
-	end
-
-	return t346
-end
-function t344.jsonDecode(t347: {[any]: any}) -- line: 15853
-	-- upvalues: t344 (copy)
-	local v2661 = t344.new()
-
-	if t347.option_id ~= nil then
-		v2661.option_id = t347.option_id
-	end
-
-	if t347.optionId ~= nil then
-		v2661.option_id = t347.optionId
-	end
-
-	if t347.display_name ~= nil then
-		v2661.display_name = t347.display_name
-	end
-
-	if t347.displayName ~= nil then
-		v2661.display_name = t347.displayName
-	end
-
-	if t347.option_context_tag ~= nil then
-		v2661.option_context_tag = t347.option_context_tag
-	end
-
-	if t347.optionContextTag ~= nil then
-		v2661.option_context_tag = t347.optionContextTag
-	end
-
-	return v2661
-end
-
-t344.descriptor = {
-	name = "FilterPillsInputData_FilterOption",
-	fullName = "roblox.apppageplatform.shared.v1beta1.FilterOption"
-}
-t1.FilterPillsInputData_FilterOption = t344
-typeRegistry.default:register(t1.FilterPillsInputData_FilterOption)
-
-local t348 = {}
-
-t348.__index = t348
-
-function t348.new(t349: {[any]: any}?) -- line: 15899
-	-- upvalues: t348 (copy)
-	return (setmetatable({
-		sort_options = if t349 ~= nil and t349.sort_options ~= nil then t349.sort_options else {},
-		selected_sort_id = if t349 ~= nil and t349.selected_sort_id ~= nil then t349.selected_sort_id else ""
-	}, t348))
-end
-function t348.encode(p211) -- line: 15906
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t332.decode(p210: buffer) -- line: 15803
+	-- upvalues: t332 (copy), proto (copy), t1 (copy)
+	local v2591 = t332.new()
 	local n140 = 0
 
-	if p211.sort_options ~= nil and #p211.sort_options > 0 then
-		for _, v2667 in p211.sort_options do
-			local v2668 = v2667:encode()
-			local v2669, v2670 = proto.writeTag(buf, n140, 1, proto.wireTypes.lengthDelimited)
+	while n140 < buffer.len(p210) do
+		local v2593, v2594
 
-			buf, n140 = proto.writeBuffer(v2669, v2670, v2668, buffer.len(v2668))
+		v2593, v2594, n140 = proto.readTag(p210, n140)
+
+		if v2594 == proto.wireTypes.varint then
+			local v2595
+
+			v2595, n140 = proto.readVarInt(p210, n140)
+		elseif v2594 == proto.wireTypes.lengthDelimited then
+			if v2593 == 1 then
+				local v2596
+
+				v2596, n140 = proto.readBuffer(p210, n140)
+
+				local v2597 = t1.ChartsFeedInputData_EntryMapEntry.decode(v2596)
+				local v2598 = t1.FeedEntry.new()
+
+				v2591.entry_map[v2597.key or ""] = v2597.value or v2598
+			elseif v2593 == 2 then
+				local v2599
+
+				v2599, n140 = proto.readBuffer(p210, n140)
+				table.insert(v2591.entry_order, buffer.tostring(v2599))
+			elseif v2593 == 3 then
+				local v2600
+
+				v2600, n140 = proto.readBuffer(p210, n140)
+				v2591.next_page_token = buffer.tostring(v2600)
+			elseif v2593 == 4 then
+				local v2601
+
+				v2601, n140 = proto.readBuffer(p210, n140)
+				v2591.sticky_filter_pills = t1.FilterPillsInputData.decode(v2601)
+			elseif v2593 == 5 then
+				local v2602
+
+				v2602, n140 = proto.readBuffer(p210, n140)
+				v2591.applied_filters = buffer.tostring(v2602)
+			else
+				local v2603, v2604 = proto.readVarInt(p210, n140)
+
+				n140 = v2604 + v2603
+			end
+		elseif v2594 == proto.wireTypes.i32 then
+			local v2605
+
+			v2605, n140 = proto.readFixed32(p210, n140)
+		elseif v2594 == proto.wireTypes.i64 then
+			local v2606
+
+			v2606, n140 = proto.readFixed64(p210, n140)
+		else
+			error("Unsupported wire type: " .. v2594)
 		end
 	end
 
-	if p211.selected_sort_id ~= nil and p211.selected_sort_id ~= "" then
-		local v2671, v2672 = proto.writeTag(buf, n140, 2, proto.wireTypes.lengthDelimited)
+	return v2591
+end
+function t332.jsonEncode(p211) -- line: 15873
+	local t334 = {}
 
-		buf, n140 = proto.writeString(v2671, v2672, p211.selected_sort_id)
+	if p211.entry_map ~= nil and next(p211.entry_map) ~= nil then
+		local t335 = {}
+
+		for v2610, v2611 in p211.entry_map do
+			t335[v2610] = v2611:jsonEncode()
+		end
+
+		t334.entryMap = t335
 	end
 
-	local buf77 = buffer.create(n140)
+	if p211.entry_order ~= nil and #p211.entry_order > 0 then
+		local t336 = {}
 
-	buffer.copy(buf77, 0, buf, 0, n140)
+		for _, v2614 in p211.entry_order do
+			table.insert(t336, v2614)
+		end
+
+		t334.entryOrder = t336
+	end
+
+	if p211.next_page_token ~= nil and p211.next_page_token ~= "" then
+		t334.nextPageToken = p211.next_page_token
+	end
+
+	if p211.sticky_filter_pills ~= nil then
+		t334.stickyFilterPills = p211.sticky_filter_pills:jsonEncode()
+	end
+
+	if p211.applied_filters ~= nil and p211.applied_filters ~= "" then
+		t334.appliedFilters = p211.applied_filters
+	end
+
+	return t334
+end
+function t332.jsonDecode(t337: {[any]: any}) -- line: 15907
+	-- upvalues: t332 (copy), t1 (copy)
+	local v2616 = t332.new()
+
+	if t337.entry_map ~= nil then
+		local t338 = {}
+
+		for v2618, v2619 in t337.entry_map do
+			t338[v2618] = t1.FeedEntry.jsonDecode(v2619)
+		end
+
+		v2616.entry_map = t338
+	end
+
+	if t337.entryMap ~= nil then
+		local t339 = {}
+
+		for v2621, v2622 in t337.entryMap do
+			t339[v2621] = t1.FeedEntry.jsonDecode(v2622)
+		end
+
+		v2616.entry_map = t339
+	end
+
+	if t337.entry_order ~= nil then
+		local t340 = {}
+
+		for _, v2625 in t337.entry_order do
+			table.insert(t340, v2625)
+		end
+
+		v2616.entry_order = t340
+	end
+
+	if t337.entryOrder ~= nil then
+		local t341 = {}
+
+		for _, v2628 in t337.entryOrder do
+			table.insert(t341, v2628)
+		end
+
+		v2616.entry_order = t341
+	end
+
+	if t337.next_page_token ~= nil then
+		v2616.next_page_token = t337.next_page_token
+	end
+
+	if t337.nextPageToken ~= nil then
+		v2616.next_page_token = t337.nextPageToken
+	end
+
+	if t337.sticky_filter_pills ~= nil then
+		v2616.sticky_filter_pills = t1.FilterPillsInputData.jsonDecode(t337.sticky_filter_pills)
+	end
+
+	if t337.stickyFilterPills ~= nil then
+		v2616.sticky_filter_pills = t1.FilterPillsInputData.jsonDecode(t337.stickyFilterPills)
+	end
+
+	if t337.applied_filters ~= nil then
+		v2616.applied_filters = t337.applied_filters
+	end
+
+	if t337.appliedFilters ~= nil then
+		v2616.applied_filters = t337.appliedFilters
+	end
+
+	return v2616
+end
+
+t332.descriptor = {
+	name = "ChartsFeedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ChartsFeedInputData"
+}
+t1.ChartsFeedInputData = t332
+typeRegistry.default:register(t1.ChartsFeedInputData)
+
+local t342 = {}
+
+t342.__index = t342
+
+function t342.new(t343: {[any]: any}?) -- line: 15987
+	-- upvalues: t342 (copy)
+	return (setmetatable({
+		key = if t343 ~= nil and t343.key ~= nil then t343.key else "",
+		value = if t343 ~= nil and t343.value ~= nil then t343.value else nil
+	}, t342))
+end
+function t342.encode(p212) -- line: 15996
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n141 = 0
+
+	if p212.key ~= nil and p212.key ~= "" then
+		local v2633, v2634 = proto.writeTag(buf, n141, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n141 = proto.writeString(v2633, v2634, p212.key)
+	end
+
+	if p212.value ~= nil then
+		local v2635 = p212.value:encode()
+		local v2636, v2637 = proto.writeTag(buf, n141, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n141 = proto.writeBuffer(v2636, v2637, v2635, buffer.len(v2635))
+	end
+
+	local buf77 = buffer.create(n141)
+
+	buffer.copy(buf77, 0, buf, 0, n141)
 
 	return buf77
 end
-function t348.decode(p212: buffer) -- line: 15928
-	-- upvalues: t348 (copy), proto (copy), t1 (copy)
-	local v2675 = t348.new()
-	local n141 = 0
-
-	while n141 < buffer.len(p212) do
-		local v2677, v2678
-
-		v2677, v2678, n141 = proto.readTag(p212, n141)
-
-		if v2678 == proto.wireTypes.varint then
-			local v2679
-
-			v2679, n141 = proto.readVarInt(p212, n141)
-		elseif v2678 == proto.wireTypes.lengthDelimited then
-			if v2677 == 1 then
-				local v2680
-
-				v2680, n141 = proto.readBuffer(p212, n141)
-				table.insert(v2675.sort_options, t1.SortSelectorInputData_SortOption.decode(v2680))
-			elseif v2677 == 2 then
-				local v2681
-
-				v2681, n141 = proto.readBuffer(p212, n141)
-				v2675.selected_sort_id = buffer.tostring(v2681)
-			else
-				local v2682, v2683 = proto.readVarInt(p212, n141)
-
-				n141 = v2683 + v2682
-			end
-		elseif v2678 == proto.wireTypes.i32 then
-			local v2684
-
-			v2684, n141 = proto.readFixed32(p212, n141)
-		elseif v2678 == proto.wireTypes.i64 then
-			local v2685
-
-			v2685, n141 = proto.readFixed64(p212, n141)
-		else
-			error("Unsupported wire type: " .. v2678)
-		end
-	end
-
-	return v2675
-end
-function t348.jsonEncode(p213) -- line: 15976
-	local t350 = {}
-
-	if p213.sort_options ~= nil and #p213.sort_options > 0 then
-		local t351 = {}
-
-		for _, v2690 in p213.sort_options do
-			table.insert(t351, v2690:jsonEncode())
-		end
-
-		t350.sortOptions = t351
-	end
-
-	if p213.selected_sort_id ~= nil and p213.selected_sort_id ~= "" then
-		t350.selectedSortId = p213.selected_sort_id
-	end
-
-	return t350
-end
-function t348.jsonDecode(t352: {[any]: any}) -- line: 15994
-	-- upvalues: t348 (copy), t1 (copy)
-	local v2692 = t348.new()
-
-	if t352.sort_options ~= nil then
-		local t353 = {}
-
-		for _, v2695 in t352.sort_options do
-			table.insert(t353, t1.SortSelectorInputData_SortOption.jsonDecode(v2695))
-		end
-
-		v2692.sort_options = t353
-	end
-
-	if t352.sortOptions ~= nil then
-		local t354 = {}
-
-		for _, v2698 in t352.sortOptions do
-			table.insert(t354, t1.SortSelectorInputData_SortOption.jsonDecode(v2698))
-		end
-
-		v2692.sort_options = t354
-	end
-
-	if t352.selected_sort_id ~= nil then
-		v2692.selected_sort_id = t352.selected_sort_id
-	end
-
-	if t352.selectedSortId ~= nil then
-		v2692.selected_sort_id = t352.selectedSortId
-	end
-
-	return v2692
-end
-
-t348.descriptor = {
-	name = "SortSelectorInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SortSelectorInputData"
-}
-t1.SortSelectorInputData = t348
-typeRegistry.default:register(t1.SortSelectorInputData)
-
-local t355 = {}
-
-t355.__index = t355
-
-function t355.new(t356: {[any]: any}?) -- line: 16040
-	-- upvalues: t355 (copy)
-	return (setmetatable({
-		sort_id = if t356 ~= nil and t356.sort_id ~= nil then t356.sort_id else "",
-		display_name = if t356 ~= nil and t356.display_name ~= nil then t356.display_name else "",
-		content_type = if t356 ~= nil and t356.content_type ~= nil then t356.content_type else ""
-	}, t355))
-end
-function t355.encode(p214) -- line: 16050
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t342.decode(p213: buffer) -- line: 16016
+	-- upvalues: t342 (copy), proto (copy), t1 (copy)
+	local v2640 = t342.new()
 	local n142 = 0
 
-	if p214.sort_id ~= nil and p214.sort_id ~= "" then
-		local v2703, v2704 = proto.writeTag(buf, n142, 1, proto.wireTypes.lengthDelimited)
+	while n142 < buffer.len(p213) do
+		local v2642, v2643
 
-		buf, n142 = proto.writeString(v2703, v2704, p214.sort_id)
+		v2642, v2643, n142 = proto.readTag(p213, n142)
+
+		if v2643 == proto.wireTypes.varint then
+			local v2644
+
+			v2644, n142 = proto.readVarInt(p213, n142)
+		elseif v2643 == proto.wireTypes.lengthDelimited then
+			if v2642 == 1 then
+				local v2645
+
+				v2645, n142 = proto.readBuffer(p213, n142)
+				v2640.key = buffer.tostring(v2645)
+			elseif v2642 == 2 then
+				local v2646
+
+				v2646, n142 = proto.readBuffer(p213, n142)
+				v2640.value = t1.FeedEntry.decode(v2646)
+			else
+				local v2647, v2648 = proto.readVarInt(p213, n142)
+
+				n142 = v2648 + v2647
+			end
+		elseif v2643 == proto.wireTypes.i32 then
+			local v2649
+
+			v2649, n142 = proto.readFixed32(p213, n142)
+		elseif v2643 == proto.wireTypes.i64 then
+			local v2650
+
+			v2650, n142 = proto.readFixed64(p213, n142)
+		else
+			error("Unsupported wire type: " .. v2643)
+		end
 	end
 
-	if p214.display_name ~= nil and p214.display_name ~= "" then
-		local v2705, v2706 = proto.writeTag(buf, n142, 2, proto.wireTypes.lengthDelimited)
+	return v2640
+end
+function t342.jsonEncode(p214) -- line: 16064
+	local t344 = {}
 
-		buf, n142 = proto.writeString(v2705, v2706, p214.display_name)
+	if p214.key ~= nil and p214.key ~= "" then
+		t344.key = p214.key
 	end
 
-	if p214.content_type ~= nil and p214.content_type ~= "" then
-		local v2707, v2708 = proto.writeTag(buf, n142, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n142 = proto.writeString(v2707, v2708, p214.content_type)
+	if p214.value ~= nil then
+		t344.value = p214.value:jsonEncode()
 	end
 
-	local buf78 = buffer.create(n142)
+	return t344
+end
+function t342.jsonDecode(t345: {[any]: any}) -- line: 16078
+	-- upvalues: t342 (copy), t1 (copy)
+	local v2654 = t342.new()
 
-	buffer.copy(buf78, 0, buf, 0, n142)
+	if t345.key ~= nil then
+		v2654.key = t345.key
+	end
+
+	if t345.value ~= nil then
+		v2654.value = t1.FeedEntry.jsonDecode(t345.value)
+	end
+
+	return v2654
+end
+
+t342.descriptor = {
+	name = "ChartsFeedInputData_EntryMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+}
+t1.ChartsFeedInputData_EntryMapEntry = t342
+typeRegistry.default:register(t1.ChartsFeedInputData_EntryMapEntry)
+
+local t346 = {}
+
+t346.__index = t346
+
+function t346.new(t347: {[any]: any}?) -- line: 16108
+	-- upvalues: t346 (copy)
+	return (setmetatable({
+		filter_groups = if t347 ~= nil and t347.filter_groups ~= nil then t347.filter_groups else {},
+		sort_id = if t347 ~= nil and t347.sort_id ~= nil then t347.sort_id else "",
+		secondary_sort_id = if t347 ~= nil and t347.secondary_sort_id ~= nil then t347.secondary_sort_id else 0,
+		title = if t347 ~= nil and t347.title ~= nil then t347.title else "",
+		primary_sort_id = if t347 ~= nil and t347.primary_sort_id ~= nil then t347.primary_sort_id else nil,
+		applied_filters = if t347 ~= nil and t347.applied_filters ~= nil then t347.applied_filters else nil
+	}, t346))
+end
+function t346.encode(p215) -- line: 16119
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n143 = 0
+
+	if p215.filter_groups ~= nil and #p215.filter_groups > 0 then
+		for _, v2660 in p215.filter_groups do
+			local v2661 = v2660:encode()
+			local v2662, v2663 = proto.writeTag(buf, n143, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n143 = proto.writeBuffer(v2662, v2663, v2661, buffer.len(v2661))
+		end
+	end
+
+	if p215.sort_id ~= nil and p215.sort_id ~= "" then
+		local v2664, v2665 = proto.writeTag(buf, n143, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n143 = proto.writeString(v2664, v2665, p215.sort_id)
+	end
+
+	if p215.secondary_sort_id ~= nil and p215.secondary_sort_id ~= 0 then
+		local v2666, v2667 = proto.writeTag(buf, n143, 3, proto.wireTypes.varint)
+
+		buf, n143 = proto.writeVarInt(v2666, v2667, p215.secondary_sort_id)
+	end
+
+	if p215.title ~= nil and p215.title ~= "" then
+		local v2668, v2669 = proto.writeTag(buf, n143, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n143 = proto.writeString(v2668, v2669, p215.title)
+	end
+
+	if p215.primary_sort_id ~= nil then
+		local v2670, v2671 = proto.writeTag(buf, n143, 5, proto.wireTypes.varint)
+
+		buf, n143 = proto.writeVarInt(v2670, v2671, p215.primary_sort_id)
+	end
+
+	if p215.applied_filters ~= nil then
+		local v2672, v2673 = proto.writeTag(buf, n143, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n143 = proto.writeString(v2672, v2673, p215.applied_filters)
+	end
+
+	local buf78 = buffer.create(n143)
+
+	buffer.copy(buf78, 0, buf, 0, n143)
 
 	return buf78
 end
-function t355.decode(p215: buffer) -- line: 16074
-	-- upvalues: t355 (copy), proto (copy)
-	local v2711 = t355.new()
-	local n143 = 0
+function t346.decode(p216: buffer) -- line: 16161
+	-- upvalues: t346 (copy), proto (copy), t1 (copy)
+	local v2676 = t346.new()
+	local n144 = 0
 
-	while n143 < buffer.len(p215) do
-		local v2713, v2714
+	while n144 < buffer.len(p216) do
+		local v2678, v2679
 
-		v2713, v2714, n143 = proto.readTag(p215, n143)
+		v2678, v2679, n144 = proto.readTag(p216, n144)
 
-		if v2714 == proto.wireTypes.varint then
-			local v2715
+		if v2679 == proto.wireTypes.varint then
+			if v2678 == 3 then
+				local v2680
 
-			v2715, n143 = proto.readVarInt(p215, n143)
-		elseif v2714 == proto.wireTypes.lengthDelimited then
-			if v2713 == 1 then
-				local v2716
+				v2680, n144 = proto.readVarIntI32(p216, n144)
+				v2676.secondary_sort_id = v2680
+			elseif v2678 == 5 then
+				local v2681
 
-				v2716, n143 = proto.readBuffer(p215, n143)
-				v2711.sort_id = buffer.tostring(v2716)
-			elseif v2713 == 2 then
-				local v2717
-
-				v2717, n143 = proto.readBuffer(p215, n143)
-				v2711.display_name = buffer.tostring(v2717)
-			elseif v2713 == 3 then
-				local v2718
-
-				v2718, n143 = proto.readBuffer(p215, n143)
-				v2711.content_type = buffer.tostring(v2718)
+				v2681, n144 = proto.readVarIntI32(p216, n144)
+				v2676.primary_sort_id = v2681
 			else
-				local v2719, v2720 = proto.readVarInt(p215, n143)
+				local v2682
 
-				n143 = v2720 + v2719
+				v2682, n144 = proto.readVarInt(p216, n144)
 			end
-		elseif v2714 == proto.wireTypes.i32 then
-			local v2721
+		elseif v2679 == proto.wireTypes.lengthDelimited then
+			if v2678 == 1 then
+				local v2683
 
-			v2721, n143 = proto.readFixed32(p215, n143)
-		elseif v2714 == proto.wireTypes.i64 then
-			local v2722
+				v2683, n144 = proto.readBuffer(p216, n144)
+				table.insert(v2676.filter_groups, t1.FilterPillsInputData_FilterGroup.decode(v2683))
+			elseif v2678 == 2 then
+				local v2684
 
-			v2722, n143 = proto.readFixed64(p215, n143)
+				v2684, n144 = proto.readBuffer(p216, n144)
+				v2676.sort_id = buffer.tostring(v2684)
+			elseif v2678 == 4 then
+				local v2685
+
+				v2685, n144 = proto.readBuffer(p216, n144)
+				v2676.title = buffer.tostring(v2685)
+			elseif v2678 == 6 then
+				local v2686
+
+				v2686, n144 = proto.readBuffer(p216, n144)
+				v2676.applied_filters = buffer.tostring(v2686)
+			else
+				local v2687, v2688 = proto.readVarInt(p216, n144)
+
+				n144 = v2688 + v2687
+			end
+		elseif v2679 == proto.wireTypes.i32 then
+			local v2689
+
+			v2689, n144 = proto.readFixed32(p216, n144)
+		elseif v2679 == proto.wireTypes.i64 then
+			local v2690
+
+			v2690, n144 = proto.readFixed64(p216, n144)
 		else
-			error("Unsupported wire type: " .. v2714)
+			error("Unsupported wire type: " .. v2679)
 		end
 	end
 
-	return v2711
+	return v2676
 end
-function t355.jsonEncode(p216) -- line: 16127
-	local t357 = {}
+function t346.jsonEncode(p217) -- line: 16229
+	local t348 = {}
 
-	if p216.sort_id ~= nil and p216.sort_id ~= "" then
-		t357.sortId = p216.sort_id
+	if p217.filter_groups ~= nil and #p217.filter_groups > 0 then
+		local t349 = {}
+
+		for _, v2695 in p217.filter_groups do
+			table.insert(t349, v2695:jsonEncode())
+		end
+
+		t348.filterGroups = t349
 	end
 
-	if p216.display_name ~= nil and p216.display_name ~= "" then
-		t357.displayName = p216.display_name
+	if p217.sort_id ~= nil and p217.sort_id ~= "" then
+		t348.sortId = p217.sort_id
 	end
 
-	if p216.content_type ~= nil and p216.content_type ~= "" then
-		t357.contentType = p216.content_type
+	if p217.secondary_sort_id ~= nil and p217.secondary_sort_id ~= 0 then
+		t348.secondarySortId = p217.secondary_sort_id
 	end
 
-	return t357
+	if p217.title ~= nil and p217.title ~= "" then
+		t348.title = p217.title
+	end
+
+	if p217.primary_sort_id ~= nil then
+		t348.primarySortId = p217.primary_sort_id
+	end
+
+	if p217.applied_filters ~= nil then
+		t348.appliedFilters = p217.applied_filters
+	end
+
+	return t348
 end
-function t355.jsonDecode(t358: {[any]: any}) -- line: 16145
-	-- upvalues: t355 (copy)
-	local v2726 = t355.new()
+function t346.jsonDecode(t350: {[any]: any}) -- line: 16263
+	-- upvalues: t346 (copy), t1 (copy)
+	local v2697 = t346.new()
 
-	if t358.sort_id ~= nil then
-		v2726.sort_id = t358.sort_id
+	if t350.filter_groups ~= nil then
+		local t351 = {}
+
+		for _, v2700 in t350.filter_groups do
+			table.insert(t351, t1.FilterPillsInputData_FilterGroup.jsonDecode(v2700))
+		end
+
+		v2697.filter_groups = t351
 	end
 
-	if t358.sortId ~= nil then
-		v2726.sort_id = t358.sortId
+	if t350.filterGroups ~= nil then
+		local t352 = {}
+
+		for _, v2703 in t350.filterGroups do
+			table.insert(t352, t1.FilterPillsInputData_FilterGroup.jsonDecode(v2703))
+		end
+
+		v2697.filter_groups = t352
 	end
 
-	if t358.display_name ~= nil then
-		v2726.display_name = t358.display_name
+	if t350.sort_id ~= nil then
+		v2697.sort_id = t350.sort_id
 	end
 
-	if t358.displayName ~= nil then
-		v2726.display_name = t358.displayName
+	if t350.sortId ~= nil then
+		v2697.sort_id = t350.sortId
 	end
 
-	if t358.content_type ~= nil then
-		v2726.content_type = t358.content_type
+	if t350.secondary_sort_id ~= nil then
+		v2697.secondary_sort_id = t350.secondary_sort_id
 	end
 
-	if t358.contentType ~= nil then
-		v2726.content_type = t358.contentType
+	if t350.secondarySortId ~= nil then
+		v2697.secondary_sort_id = t350.secondarySortId
 	end
 
-	return v2726
+	if t350.title ~= nil then
+		v2697.title = t350.title
+	end
+
+	if t350.primary_sort_id ~= nil then
+		v2697.primary_sort_id = t350.primary_sort_id
+	end
+
+	if t350.primarySortId ~= nil then
+		v2697.primary_sort_id = t350.primarySortId
+	end
+
+	if t350.applied_filters ~= nil then
+		v2697.applied_filters = t350.applied_filters
+	end
+
+	if t350.appliedFilters ~= nil then
+		v2697.applied_filters = t350.appliedFilters
+	end
+
+	return v2697
 end
 
-t355.descriptor = {
-	name = "SortSelectorInputData_SortOption",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SortOption"
+t346.descriptor = {
+	name = "FilterPillsInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.FilterPillsInputData"
 }
-t1.SortSelectorInputData_SortOption = t355
-typeRegistry.default:register(t1.SortSelectorInputData_SortOption)
+t1.FilterPillsInputData = t346
+typeRegistry.default:register(t1.FilterPillsInputData)
 
-local t359 = {}
+local t353 = {}
 
-t359.__index = t359
+t353.__index = t353
 
-function t359.new(t360: {[any]: any}?) -- line: 16191
-	-- upvalues: t359 (copy)
+function t353.new(t354: {[any]: any}?) -- line: 16337
+	-- upvalues: t353 (copy)
 	return (setmetatable({
-		id = if t360 ~= nil and t360.id ~= nil then t360.id else "",
-		preview_rows = if t360 ~= nil and t360.preview_rows ~= nil then t360.preview_rows else 0,
-		widget_style = if t360 ~= nil and t360.widget_style ~= nil then t360.widget_style else nil,
-		see_all_button = t360 ~= nil and (t360.see_all_button ~= nil and t360.see_all_button),
-		information_popover_text = if t360 ~= nil and t360.information_popover_text ~= nil then t360.information_popover_text else ""
-	}, t359))
+		filter_id = if t354 ~= nil and t354.filter_id ~= nil then t354.filter_id else "",
+		display_name = if t354 ~= nil and t354.display_name ~= nil then t354.display_name else "",
+		options = if t354 ~= nil and t354.options ~= nil then t354.options else {},
+		default_option_id = if t354 ~= nil and t354.default_option_id ~= nil then t354.default_option_id else "",
+		selected_option_id = if t354 ~= nil and t354.selected_option_id ~= nil then t354.selected_option_id else "",
+		filter_type = if t354 ~= nil and t354.filter_type ~= nil then t354.filter_type else "",
+		inactive_option_ids = if t354 ~= nil and t354.inactive_option_ids ~= nil then t354.inactive_option_ids else {},
+		info_text = if t354 ~= nil and t354.info_text ~= nil then t354.info_text else ""
+	}, t353))
 end
-function t359.encode(p217) -- line: 16205
+function t353.encode(p218) -- line: 16354
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n144 = 0
+	local n145 = 0
 
-	if p217.id ~= nil and p217.id ~= "" then
-		local v2731, v2732 = proto.writeTag(buf, n144, 1, proto.wireTypes.lengthDelimited)
+	if p218.filter_id ~= nil and p218.filter_id ~= "" then
+		local v2708, v2709 = proto.writeTag(buf, n145, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n144 = proto.writeString(v2731, v2732, p217.id)
+		buf, n145 = proto.writeString(v2708, v2709, p218.filter_id)
 	end
 
-	if p217.preview_rows ~= nil and p217.preview_rows ~= 0 then
-		local v2733, v2734 = proto.writeTag(buf, n144, 4, proto.wireTypes.varint)
+	if p218.display_name ~= nil and p218.display_name ~= "" then
+		local v2710, v2711 = proto.writeTag(buf, n145, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n144 = proto.writeVarInt(v2733, v2734, p217.preview_rows)
+		buf, n145 = proto.writeString(v2710, v2711, p218.display_name)
 	end
 
-	if p217.widget_style ~= nil then
-		local v2735 = p217.widget_style:encode()
-		local v2736, v2737 = proto.writeTag(buf, n144, 3, proto.wireTypes.lengthDelimited)
+	if p218.options ~= nil and #p218.options > 0 then
+		for _, v2713 in p218.options do
+			local v2714 = v2713:encode()
+			local v2715, v2716 = proto.writeTag(buf, n145, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n144 = proto.writeBuffer(v2736, v2737, v2735, buffer.len(v2735))
+			buf, n145 = proto.writeBuffer(v2715, v2716, v2714, buffer.len(v2714))
+		end
 	end
 
-	if p217.see_all_button then
-		local v2738, v2739 = proto.writeTag(buf, n144, 5, proto.wireTypes.varint)
+	if p218.default_option_id ~= nil and p218.default_option_id ~= "" then
+		local v2717, v2718 = proto.writeTag(buf, n145, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n144 = proto.writeVarInt(v2738, v2739, not p217.see_all_button and 0 or 1)
+		buf, n145 = proto.writeString(v2717, v2718, p218.default_option_id)
 	end
 
-	if p217.information_popover_text ~= nil and p217.information_popover_text ~= "" then
-		local v2740, v2741 = proto.writeTag(buf, n144, 6, proto.wireTypes.lengthDelimited)
+	if p218.selected_option_id ~= nil and p218.selected_option_id ~= "" then
+		local v2719, v2720 = proto.writeTag(buf, n145, 5, proto.wireTypes.lengthDelimited)
 
-		buf, n144 = proto.writeString(v2740, v2741, p217.information_popover_text)
+		buf, n145 = proto.writeString(v2719, v2720, p218.selected_option_id)
 	end
 
-	local buf79 = buffer.create(n144)
+	if p218.filter_type ~= nil and p218.filter_type ~= "" then
+		local v2721, v2722 = proto.writeTag(buf, n145, 6, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf79, 0, buf, 0, n144)
+		buf, n145 = proto.writeString(v2721, v2722, p218.filter_type)
+	end
+
+	if p218.inactive_option_ids ~= nil and #p218.inactive_option_ids > 0 then
+		for _, v2724 in p218.inactive_option_ids do
+			local v2725, v2726 = proto.writeTag(buf, n145, 7, proto.wireTypes.lengthDelimited)
+
+			buf, n145 = proto.writeString(v2725, v2726, v2724)
+		end
+	end
+
+	if p218.info_text ~= nil and p218.info_text ~= "" then
+		local v2727, v2728 = proto.writeTag(buf, n145, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n145 = proto.writeString(v2727, v2728, p218.info_text)
+	end
+
+	local buf79 = buffer.create(n145)
+
+	buffer.copy(buf79, 0, buf, 0, n145)
 
 	return buf79
 end
-function t359.decode(p218: buffer) -- line: 16240
-	-- upvalues: t359 (copy), proto (copy), t1 (copy)
-	local v2744 = t359.new()
-	local n145 = 0
+function t353.decode(p219: buffer) -- line: 16408
+	-- upvalues: t353 (copy), proto (copy), t1 (copy)
+	local v2731 = t353.new()
+	local n146 = 0
 
-	while n145 < buffer.len(p218) do
-		local v2746, v2747
+	while n146 < buffer.len(p219) do
+		local v2733, v2734
 
-		v2746, v2747, n145 = proto.readTag(p218, n145)
+		v2733, v2734, n146 = proto.readTag(p219, n146)
 
-		if v2747 == proto.wireTypes.varint then
-			if v2746 == 4 then
-				local v2748
+		if v2734 == proto.wireTypes.varint then
+			local v2735
 
-				v2748, n145 = proto.readVarIntI64(p218, n145)
-				v2744.preview_rows = v2748
-			elseif v2746 == 5 then
-				local v2749
+			v2735, n146 = proto.readVarInt(p219, n146)
+		elseif v2734 == proto.wireTypes.lengthDelimited then
+			if v2733 == 1 then
+				local v2736
 
-				v2749, n145 = proto.readVarInt(p218, n145)
-				v2744.see_all_button = v2749 ~= 0
+				v2736, n146 = proto.readBuffer(p219, n146)
+				v2731.filter_id = buffer.tostring(v2736)
+			elseif v2733 == 2 then
+				local v2737
+
+				v2737, n146 = proto.readBuffer(p219, n146)
+				v2731.display_name = buffer.tostring(v2737)
+			elseif v2733 == 3 then
+				local v2738
+
+				v2738, n146 = proto.readBuffer(p219, n146)
+				table.insert(v2731.options, t1.FilterPillsInputData_FilterOption.decode(v2738))
+			elseif v2733 == 4 then
+				local v2739
+
+				v2739, n146 = proto.readBuffer(p219, n146)
+				v2731.default_option_id = buffer.tostring(v2739)
+			elseif v2733 == 5 then
+				local v2740
+
+				v2740, n146 = proto.readBuffer(p219, n146)
+				v2731.selected_option_id = buffer.tostring(v2740)
+			elseif v2733 == 6 then
+				local v2741
+
+				v2741, n146 = proto.readBuffer(p219, n146)
+				v2731.filter_type = buffer.tostring(v2741)
+			elseif v2733 == 7 then
+				local v2742
+
+				v2742, n146 = proto.readBuffer(p219, n146)
+				table.insert(v2731.inactive_option_ids, buffer.tostring(v2742))
+			elseif v2733 == 8 then
+				local v2743
+
+				v2743, n146 = proto.readBuffer(p219, n146)
+				v2731.info_text = buffer.tostring(v2743)
 			else
-				local v2750
+				local v2744, v2745 = proto.readVarInt(p219, n146)
 
-				v2750, n145 = proto.readVarInt(p218, n145)
+				n146 = v2745 + v2744
 			end
-		elseif v2747 == proto.wireTypes.lengthDelimited then
-			if v2746 == 1 then
-				local v2751
+		elseif v2734 == proto.wireTypes.i32 then
+			local v2746
 
-				v2751, n145 = proto.readBuffer(p218, n145)
-				v2744.id = buffer.tostring(v2751)
-			elseif v2746 == 3 then
-				local v2752
+			v2746, n146 = proto.readFixed32(p219, n146)
+		elseif v2734 == proto.wireTypes.i64 then
+			local v2747
 
-				v2752, n145 = proto.readBuffer(p218, n145)
-				v2744.widget_style = t1.WidgetStyleData.decode(v2752)
-			elseif v2746 == 6 then
-				local v2753
-
-				v2753, n145 = proto.readBuffer(p218, n145)
-				v2744.information_popover_text = buffer.tostring(v2753)
-			else
-				local v2754, v2755 = proto.readVarInt(p218, n145)
-
-				n145 = v2755 + v2754
-			end
-		elseif v2747 == proto.wireTypes.i32 then
-			local v2756
-
-			v2756, n145 = proto.readFixed32(p218, n145)
-		elseif v2747 == proto.wireTypes.i64 then
-			local v2757
-
-			v2757, n145 = proto.readFixed64(p218, n145)
+			v2747, n146 = proto.readFixed64(p219, n146)
 		else
-			error("Unsupported wire type: " .. v2747)
+			error("Unsupported wire type: " .. v2734)
 		end
 	end
 
-	return v2744
+	return v2731
 end
-function t359.jsonEncode(p219) -- line: 16303
-	local t361 = {}
+function t353.jsonEncode(p220) -- line: 16486
+	local t355 = {}
 
-	if p219.id ~= nil and p219.id ~= "" then
-		t361.id = p219.id
+	if p220.filter_id ~= nil and p220.filter_id ~= "" then
+		t355.filterId = p220.filter_id
 	end
 
-	if p219.preview_rows ~= nil and p219.preview_rows ~= 0 then
-		t361.previewRows = p219.preview_rows
+	if p220.display_name ~= nil and p220.display_name ~= "" then
+		t355.displayName = p220.display_name
 	end
 
-	if p219.widget_style ~= nil then
-		t361.widgetStyle = p219.widget_style:jsonEncode()
+	if p220.options ~= nil and #p220.options > 0 then
+		local t356 = {}
+
+		for _, v2752 in p220.options do
+			table.insert(t356, v2752:jsonEncode())
+		end
+
+		t355.options = t356
 	end
 
-	if p219.see_all_button then
-		t361.seeAllButton = p219.see_all_button
+	if p220.default_option_id ~= nil and p220.default_option_id ~= "" then
+		t355.defaultOptionId = p220.default_option_id
 	end
 
-	if p219.information_popover_text ~= nil and p219.information_popover_text ~= "" then
-		t361.informationPopoverText = p219.information_popover_text
+	if p220.selected_option_id ~= nil and p220.selected_option_id ~= "" then
+		t355.selectedOptionId = p220.selected_option_id
 	end
 
-	return t361
+	if p220.filter_type ~= nil and p220.filter_type ~= "" then
+		t355.filterType = p220.filter_type
+	end
+
+	if p220.inactive_option_ids ~= nil and #p220.inactive_option_ids > 0 then
+		local t357 = {}
+
+		for _, v2755 in p220.inactive_option_ids do
+			table.insert(t357, v2755)
+		end
+
+		t355.inactiveOptionIds = t357
+	end
+
+	if p220.info_text ~= nil and p220.info_text ~= "" then
+		t355.infoText = p220.info_text
+	end
+
+	return t355
 end
-function t359.jsonDecode(t362: {[any]: any}) -- line: 16329
-	-- upvalues: t359 (copy), t1 (copy)
-	local v2761 = t359.new()
+function t353.jsonDecode(t358: {[any]: any}) -- line: 16532
+	-- upvalues: t353 (copy), t1 (copy)
+	local v2757 = t353.new()
 
-	if t362.id ~= nil then
-		v2761.id = t362.id
+	if t358.filter_id ~= nil then
+		v2757.filter_id = t358.filter_id
 	end
 
-	if t362.preview_rows ~= nil then
-		v2761.preview_rows = t362.preview_rows
+	if t358.filterId ~= nil then
+		v2757.filter_id = t358.filterId
 	end
 
-	if t362.previewRows ~= nil then
-		v2761.preview_rows = t362.previewRows
+	if t358.display_name ~= nil then
+		v2757.display_name = t358.display_name
 	end
 
-	if t362.widget_style ~= nil then
-		v2761.widget_style = t1.WidgetStyleData.jsonDecode(t362.widget_style)
+	if t358.displayName ~= nil then
+		v2757.display_name = t358.displayName
 	end
 
-	if t362.widgetStyle ~= nil then
-		v2761.widget_style = t1.WidgetStyleData.jsonDecode(t362.widgetStyle)
+	if t358.options ~= nil then
+		local t359 = {}
+
+		for _, v2760 in t358.options do
+			table.insert(t359, t1.FilterPillsInputData_FilterOption.jsonDecode(v2760))
+		end
+
+		v2757.options = t359
 	end
 
-	if t362.see_all_button ~= nil then
-		v2761.see_all_button = t362.see_all_button
+	if t358.default_option_id ~= nil then
+		v2757.default_option_id = t358.default_option_id
 	end
 
-	if t362.seeAllButton ~= nil then
-		v2761.see_all_button = t362.seeAllButton
+	if t358.defaultOptionId ~= nil then
+		v2757.default_option_id = t358.defaultOptionId
 	end
 
-	if t362.information_popover_text ~= nil then
-		v2761.information_popover_text = t362.information_popover_text
+	if t358.selected_option_id ~= nil then
+		v2757.selected_option_id = t358.selected_option_id
 	end
 
-	if t362.informationPopoverText ~= nil then
-		v2761.information_popover_text = t362.informationPopoverText
+	if t358.selectedOptionId ~= nil then
+		v2757.selected_option_id = t358.selectedOptionId
 	end
 
-	return v2761
+	if t358.filter_type ~= nil then
+		v2757.filter_type = t358.filter_type
+	end
+
+	if t358.filterType ~= nil then
+		v2757.filter_type = t358.filterType
+	end
+
+	if t358.inactive_option_ids ~= nil then
+		local t360 = {}
+
+		for _, v2763 in t358.inactive_option_ids do
+			table.insert(t360, v2763)
+		end
+
+		v2757.inactive_option_ids = t360
+	end
+
+	if t358.inactiveOptionIds ~= nil then
+		local t361 = {}
+
+		for _, v2766 in t358.inactiveOptionIds do
+			table.insert(t361, v2766)
+		end
+
+		v2757.inactive_option_ids = t361
+	end
+
+	if t358.info_text ~= nil then
+		v2757.info_text = t358.info_text
+	end
+
+	if t358.infoText ~= nil then
+		v2757.info_text = t358.infoText
+	end
+
+	return v2757
 end
 
-t359.descriptor = {
-	name = "UAMarketplaceCatalogItemGroupInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogItemGroupInputData"
+t353.descriptor = {
+	name = "FilterPillsInputData_FilterGroup",
+	fullName = "roblox.apppageplatform.shared.v1beta1.FilterGroup"
 }
-t1.UAMarketplaceCatalogItemGroupInputData = t359
-typeRegistry.default:register(t1.UAMarketplaceCatalogItemGroupInputData)
+t1.FilterPillsInputData_FilterGroup = t353
+typeRegistry.default:register(t1.FilterPillsInputData_FilterGroup)
 
-local t363 = {}
+local t362 = {}
 
-t363.__index = t363
+t362.__index = t362
 
-function t363.new(t364: {[any]: any}?) -- line: 16387
-	-- upvalues: t363 (copy)
+function t362.new(t363: {[any]: any}?) -- line: 16629
+	-- upvalues: t362 (copy)
 	return (setmetatable({
-		id = if t364 ~= nil and t364.id ~= nil then t364.id else "",
-		num_items_to_show = if t364 ~= nil and t364.num_items_to_show ~= nil then t364.num_items_to_show else 0,
-		widget_style = if t364 ~= nil and t364.widget_style ~= nil then t364.widget_style else nil,
-		see_all_button = t364 ~= nil and (t364.see_all_button ~= nil and t364.see_all_button),
-		information_popover_text = if t364 ~= nil and t364.information_popover_text ~= nil then t364.information_popover_text else ""
-	}, t363))
+		option_id = if t363 ~= nil and t363.option_id ~= nil then t363.option_id else "",
+		display_name = if t363 ~= nil and t363.display_name ~= nil then t363.display_name else "",
+		option_context_tag = if t363 ~= nil and t363.option_context_tag ~= nil then t363.option_context_tag else ""
+	}, t362))
 end
-function t363.encode(p220) -- line: 16401
+function t362.encode(p221) -- line: 16639
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n146 = 0
+	local n147 = 0
 
-	if p220.id ~= nil and p220.id ~= "" then
-		local v2766, v2767 = proto.writeTag(buf, n146, 1, proto.wireTypes.lengthDelimited)
+	if p221.option_id ~= nil and p221.option_id ~= "" then
+		local v2771, v2772 = proto.writeTag(buf, n147, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n146 = proto.writeString(v2766, v2767, p220.id)
+		buf, n147 = proto.writeString(v2771, v2772, p221.option_id)
 	end
 
-	if p220.num_items_to_show ~= nil and p220.num_items_to_show ~= 0 then
-		local v2768, v2769 = proto.writeTag(buf, n146, 5, proto.wireTypes.varint)
+	if p221.display_name ~= nil and p221.display_name ~= "" then
+		local v2773, v2774 = proto.writeTag(buf, n147, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n146 = proto.writeVarInt(v2768, v2769, p220.num_items_to_show)
+		buf, n147 = proto.writeString(v2773, v2774, p221.display_name)
 	end
 
-	if p220.widget_style ~= nil then
-		local v2770 = p220.widget_style:encode()
-		local v2771, v2772 = proto.writeTag(buf, n146, 3, proto.wireTypes.lengthDelimited)
+	if p221.option_context_tag ~= nil and p221.option_context_tag ~= "" then
+		local v2775, v2776 = proto.writeTag(buf, n147, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n146 = proto.writeBuffer(v2771, v2772, v2770, buffer.len(v2770))
+		buf, n147 = proto.writeString(v2775, v2776, p221.option_context_tag)
 	end
 
-	if p220.see_all_button then
-		local v2773, v2774 = proto.writeTag(buf, n146, 6, proto.wireTypes.varint)
+	local buf80 = buffer.create(n147)
 
-		buf, n146 = proto.writeVarInt(v2773, v2774, not p220.see_all_button and 0 or 1)
-	end
-
-	if p220.information_popover_text ~= nil and p220.information_popover_text ~= "" then
-		local v2775, v2776 = proto.writeTag(buf, n146, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n146 = proto.writeString(v2775, v2776, p220.information_popover_text)
-	end
-
-	local buf80 = buffer.create(n146)
-
-	buffer.copy(buf80, 0, buf, 0, n146)
+	buffer.copy(buf80, 0, buf, 0, n147)
 
 	return buf80
 end
-function t363.decode(p221: buffer) -- line: 16438
-	-- upvalues: t363 (copy), proto (copy), t1 (copy)
-	local v2779 = t363.new()
-	local n147 = 0
+function t362.decode(p222: buffer) -- line: 16663
+	-- upvalues: t362 (copy), proto (copy)
+	local v2779 = t362.new()
+	local n148 = 0
 
-	while n147 < buffer.len(p221) do
+	while n148 < buffer.len(p222) do
 		local v2781, v2782
 
-		v2781, v2782, n147 = proto.readTag(p221, n147)
+		v2781, v2782, n148 = proto.readTag(p222, n148)
 
 		if v2782 == proto.wireTypes.varint then
-			if v2781 == 5 then
-				local v2783
+			local v2783
 
-				v2783, n147 = proto.readVarIntI64(p221, n147)
-				v2779.num_items_to_show = v2783
-			elseif v2781 == 6 then
-				local v2784
-
-				v2784, n147 = proto.readVarInt(p221, n147)
-				v2779.see_all_button = v2784 ~= 0
-			else
-				local v2785
-
-				v2785, n147 = proto.readVarInt(p221, n147)
-			end
+			v2783, n148 = proto.readVarInt(p222, n148)
 		elseif v2782 == proto.wireTypes.lengthDelimited then
 			if v2781 == 1 then
+				local v2784
+
+				v2784, n148 = proto.readBuffer(p222, n148)
+				v2779.option_id = buffer.tostring(v2784)
+			elseif v2781 == 2 then
+				local v2785
+
+				v2785, n148 = proto.readBuffer(p222, n148)
+				v2779.display_name = buffer.tostring(v2785)
+			elseif v2781 == 3 then
 				local v2786
 
-				v2786, n147 = proto.readBuffer(p221, n147)
-				v2779.id = buffer.tostring(v2786)
-			elseif v2781 == 3 then
-				local v2787
-
-				v2787, n147 = proto.readBuffer(p221, n147)
-				v2779.widget_style = t1.WidgetStyleData.decode(v2787)
-			elseif v2781 == 7 then
-				local v2788
-
-				v2788, n147 = proto.readBuffer(p221, n147)
-				v2779.information_popover_text = buffer.tostring(v2788)
+				v2786, n148 = proto.readBuffer(p222, n148)
+				v2779.option_context_tag = buffer.tostring(v2786)
 			else
-				local v2789, v2790 = proto.readVarInt(p221, n147)
+				local v2787, v2788 = proto.readVarInt(p222, n148)
 
-				n147 = v2790 + v2789
+				n148 = v2788 + v2787
 			end
 		elseif v2782 == proto.wireTypes.i32 then
-			local v2791
+			local v2789
 
-			v2791, n147 = proto.readFixed32(p221, n147)
+			v2789, n148 = proto.readFixed32(p222, n148)
 		elseif v2782 == proto.wireTypes.i64 then
-			local v2792
+			local v2790
 
-			v2792, n147 = proto.readFixed64(p221, n147)
+			v2790, n148 = proto.readFixed64(p222, n148)
 		else
 			error("Unsupported wire type: " .. v2782)
 		end
@@ -13281,144 +13304,136 @@ function t363.decode(p221: buffer) -- line: 16438
 
 	return v2779
 end
-function t363.jsonEncode(p222) -- line: 16503
-	local t365 = {}
+function t362.jsonEncode(p223) -- line: 16716
+	local t364 = {}
 
-	if p222.id ~= nil and p222.id ~= "" then
-		t365.id = p222.id
+	if p223.option_id ~= nil and p223.option_id ~= "" then
+		t364.optionId = p223.option_id
 	end
 
-	if p222.num_items_to_show ~= nil and p222.num_items_to_show ~= 0 then
-		t365.numItemsToShow = p222.num_items_to_show
+	if p223.display_name ~= nil and p223.display_name ~= "" then
+		t364.displayName = p223.display_name
 	end
 
-	if p222.widget_style ~= nil then
-		t365.widgetStyle = p222.widget_style:jsonEncode()
+	if p223.option_context_tag ~= nil and p223.option_context_tag ~= "" then
+		t364.optionContextTag = p223.option_context_tag
 	end
 
-	if p222.see_all_button then
-		t365.seeAllButton = p222.see_all_button
-	end
-
-	if p222.information_popover_text ~= nil and p222.information_popover_text ~= "" then
-		t365.informationPopoverText = p222.information_popover_text
-	end
-
-	return t365
+	return t364
 end
-function t363.jsonDecode(t366: {[any]: any}) -- line: 16531
-	-- upvalues: t363 (copy), t1 (copy)
-	local v2796 = t363.new()
+function t362.jsonDecode(t365: {[any]: any}) -- line: 16734
+	-- upvalues: t362 (copy)
+	local v2794 = t362.new()
 
-	if t366.id ~= nil then
-		v2796.id = t366.id
+	if t365.option_id ~= nil then
+		v2794.option_id = t365.option_id
 	end
 
-	if t366.num_items_to_show ~= nil then
-		v2796.num_items_to_show = t366.num_items_to_show
+	if t365.optionId ~= nil then
+		v2794.option_id = t365.optionId
 	end
 
-	if t366.numItemsToShow ~= nil then
-		v2796.num_items_to_show = t366.numItemsToShow
+	if t365.display_name ~= nil then
+		v2794.display_name = t365.display_name
 	end
 
-	if t366.widget_style ~= nil then
-		v2796.widget_style = t1.WidgetStyleData.jsonDecode(t366.widget_style)
+	if t365.displayName ~= nil then
+		v2794.display_name = t365.displayName
 	end
 
-	if t366.widgetStyle ~= nil then
-		v2796.widget_style = t1.WidgetStyleData.jsonDecode(t366.widgetStyle)
+	if t365.option_context_tag ~= nil then
+		v2794.option_context_tag = t365.option_context_tag
 	end
 
-	if t366.see_all_button ~= nil then
-		v2796.see_all_button = t366.see_all_button
+	if t365.optionContextTag ~= nil then
+		v2794.option_context_tag = t365.optionContextTag
 	end
 
-	if t366.seeAllButton ~= nil then
-		v2796.see_all_button = t366.seeAllButton
-	end
-
-	if t366.information_popover_text ~= nil then
-		v2796.information_popover_text = t366.information_popover_text
-	end
-
-	if t366.informationPopoverText ~= nil then
-		v2796.information_popover_text = t366.informationPopoverText
-	end
-
-	return v2796
+	return v2794
 end
 
-t363.descriptor = {
-	name = "UAMarketplaceCatalogItemCarouselInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogItemCarouselInputData"
+t362.descriptor = {
+	name = "FilterPillsInputData_FilterOption",
+	fullName = "roblox.apppageplatform.shared.v1beta1.FilterOption"
 }
-t1.UAMarketplaceCatalogItemCarouselInputData = t363
-typeRegistry.default:register(t1.UAMarketplaceCatalogItemCarouselInputData)
+t1.FilterPillsInputData_FilterOption = t362
+typeRegistry.default:register(t1.FilterPillsInputData_FilterOption)
 
-local t367 = {}
+local t366 = {}
 
-t367.__index = t367
+t366.__index = t366
 
-function t367.new(t368: {[any]: any}?) -- line: 16589
-	-- upvalues: t367 (copy)
+function t366.new(t367: {[any]: any}?) -- line: 16780
+	-- upvalues: t366 (copy)
 	return (setmetatable({
-		background_layers = if t368 ~= nil and t368.background_layers ~= nil then t368.background_layers else {}
-	}, t367))
+		sort_options = if t367 ~= nil and t367.sort_options ~= nil then t367.sort_options else {},
+		selected_sort_id = if t367 ~= nil and t367.selected_sort_id ~= nil then t367.selected_sort_id else ""
+	}, t366))
 end
-function t367.encode(p223) -- line: 16595
+function t366.encode(p224) -- line: 16787
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n148 = 0
+	local n149 = 0
 
-	if p223.background_layers ~= nil and #p223.background_layers > 0 then
-		for _, v2802 in p223.background_layers do
-			local v2803 = v2802:encode()
-			local v2804, v2805 = proto.writeTag(buf, n148, 1, proto.wireTypes.lengthDelimited)
+	if p224.sort_options ~= nil and #p224.sort_options > 0 then
+		for _, v2800 in p224.sort_options do
+			local v2801 = v2800:encode()
+			local v2802, v2803 = proto.writeTag(buf, n149, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n148 = proto.writeBuffer(v2804, v2805, v2803, buffer.len(v2803))
+			buf, n149 = proto.writeBuffer(v2802, v2803, v2801, buffer.len(v2801))
 		end
 	end
 
-	local buf81 = buffer.create(n148)
+	if p224.selected_sort_id ~= nil and p224.selected_sort_id ~= "" then
+		local v2804, v2805 = proto.writeTag(buf, n149, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf81, 0, buf, 0, n148)
+		buf, n149 = proto.writeString(v2804, v2805, p224.selected_sort_id)
+	end
+
+	local buf81 = buffer.create(n149)
+
+	buffer.copy(buf81, 0, buf, 0, n149)
 
 	return buf81
 end
-function t367.decode(p224: buffer) -- line: 16612
-	-- upvalues: t367 (copy), proto (copy), background_layer (copy)
-	local v2808 = t367.new()
-	local n149 = 0
+function t366.decode(p225: buffer) -- line: 16809
+	-- upvalues: t366 (copy), proto (copy), t1 (copy)
+	local v2808 = t366.new()
+	local n150 = 0
 
-	while n149 < buffer.len(p224) do
+	while n150 < buffer.len(p225) do
 		local v2810, v2811
 
-		v2810, v2811, n149 = proto.readTag(p224, n149)
+		v2810, v2811, n150 = proto.readTag(p225, n150)
 
 		if v2811 == proto.wireTypes.varint then
 			local v2812
 
-			v2812, n149 = proto.readVarInt(p224, n149)
+			v2812, n150 = proto.readVarInt(p225, n150)
 		elseif v2811 == proto.wireTypes.lengthDelimited then
 			if v2810 == 1 then
 				local v2813
 
-				v2813, n149 = proto.readBuffer(p224, n149)
-				table.insert(v2808.background_layers, background_layer.BackgroundLayer.decode(v2813))
-			else
-				local v2814, v2815 = proto.readVarInt(p224, n149)
+				v2813, n150 = proto.readBuffer(p225, n150)
+				table.insert(v2808.sort_options, t1.SortSelectorInputData_SortOption.decode(v2813))
+			elseif v2810 == 2 then
+				local v2814
 
-				n149 = v2815 + v2814
+				v2814, n150 = proto.readBuffer(p225, n150)
+				v2808.selected_sort_id = buffer.tostring(v2814)
+			else
+				local v2815, v2816 = proto.readVarInt(p225, n150)
+
+				n150 = v2816 + v2815
 			end
 		elseif v2811 == proto.wireTypes.i32 then
-			local v2816
-
-			v2816, n149 = proto.readFixed32(p224, n149)
-		elseif v2811 == proto.wireTypes.i64 then
 			local v2817
 
-			v2817, n149 = proto.readFixed64(p224, n149)
+			v2817, n150 = proto.readFixed32(p225, n150)
+		elseif v2811 == proto.wireTypes.i64 then
+			local v2818
+
+			v2818, n150 = proto.readFixed64(p225, n150)
 		else
 			error("Unsupported wire type: " .. v2811)
 		end
@@ -13426,140 +13441,151 @@ function t367.decode(p224: buffer) -- line: 16612
 
 	return v2808
 end
-function t367.jsonEncode(p225) -- line: 16658
-	local t369 = {}
+function t366.jsonEncode(p226) -- line: 16857
+	local t368 = {}
 
-	if p225.background_layers ~= nil and #p225.background_layers > 0 then
-		local t370 = {}
+	if p226.sort_options ~= nil and #p226.sort_options > 0 then
+		local t369 = {}
 
-		for _, v2822 in p225.background_layers do
-			table.insert(t370, v2822:jsonEncode())
+		for _, v2823 in p226.sort_options do
+			table.insert(t369, v2823:jsonEncode())
 		end
 
-		t369.backgroundLayers = t370
+		t368.sortOptions = t369
 	end
 
-	return t369
-end
-function t367.jsonDecode(t371: {[any]: any}) -- line: 16672
-	-- upvalues: t367 (copy), background_layer (copy)
-	local v2824 = t367.new()
+	if p226.selected_sort_id ~= nil and p226.selected_sort_id ~= "" then
+		t368.selectedSortId = p226.selected_sort_id
+	end
 
-	if t371.background_layers ~= nil then
+	return t368
+end
+function t366.jsonDecode(t370: {[any]: any}) -- line: 16875
+	-- upvalues: t366 (copy), t1 (copy)
+	local v2825 = t366.new()
+
+	if t370.sort_options ~= nil then
+		local t371 = {}
+
+		for _, v2828 in t370.sort_options do
+			table.insert(t371, t1.SortSelectorInputData_SortOption.jsonDecode(v2828))
+		end
+
+		v2825.sort_options = t371
+	end
+
+	if t370.sortOptions ~= nil then
 		local t372 = {}
 
-		for _, v2827 in t371.background_layers do
-			table.insert(t372, background_layer.BackgroundLayer.jsonDecode(v2827))
+		for _, v2831 in t370.sortOptions do
+			table.insert(t372, t1.SortSelectorInputData_SortOption.jsonDecode(v2831))
 		end
 
-		v2824.background_layers = t372
+		v2825.sort_options = t372
 	end
 
-	if t371.backgroundLayers ~= nil then
-		local t373 = {}
-
-		for _, v2830 in t371.backgroundLayers do
-			table.insert(t373, background_layer.BackgroundLayer.jsonDecode(v2830))
-		end
-
-		v2824.background_layers = t373
+	if t370.selected_sort_id ~= nil then
+		v2825.selected_sort_id = t370.selected_sort_id
 	end
 
-	return v2824
+	if t370.selectedSortId ~= nil then
+		v2825.selected_sort_id = t370.selectedSortId
+	end
+
+	return v2825
 end
 
-t367.descriptor = {
-	name = "WidgetStyleData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.WidgetStyleData"
+t366.descriptor = {
+	name = "SortSelectorInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SortSelectorInputData"
 }
-t1.WidgetStyleData = t367
-typeRegistry.default:register(t1.WidgetStyleData)
+t1.SortSelectorInputData = t366
+typeRegistry.default:register(t1.SortSelectorInputData)
 
-local t374 = {}
+local t373 = {}
 
-t374.__index = t374
+t373.__index = t373
 
-function t374.new(t375: {[any]: any}?) -- line: 16716
-	-- upvalues: t374 (copy)
+function t373.new(t374: {[any]: any}?) -- line: 16921
+	-- upvalues: t373 (copy)
 	return (setmetatable({
-		id = if t375 ~= nil and t375.id ~= nil then t375.id else "",
-		available_until = if t375 ~= nil and t375.available_until ~= nil then t375.available_until else "",
-		widget_style = if t375 ~= nil and t375.widget_style ~= nil then t375.widget_style else nil
-	}, t374))
+		sort_id = if t374 ~= nil and t374.sort_id ~= nil then t374.sort_id else "",
+		display_name = if t374 ~= nil and t374.display_name ~= nil then t374.display_name else "",
+		content_type = if t374 ~= nil and t374.content_type ~= nil then t374.content_type else ""
+	}, t373))
 end
-function t374.encode(p226) -- line: 16726
+function t373.encode(p227) -- line: 16931
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n150 = 0
+	local n151 = 0
 
-	if p226.id ~= nil and p226.id ~= "" then
-		local v2835, v2836 = proto.writeTag(buf, n150, 1, proto.wireTypes.lengthDelimited)
+	if p227.sort_id ~= nil and p227.sort_id ~= "" then
+		local v2836, v2837 = proto.writeTag(buf, n151, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n150 = proto.writeString(v2835, v2836, p226.id)
+		buf, n151 = proto.writeString(v2836, v2837, p227.sort_id)
 	end
 
-	if p226.available_until ~= nil and p226.available_until ~= "" then
-		local v2837, v2838 = proto.writeTag(buf, n150, 2, proto.wireTypes.lengthDelimited)
+	if p227.display_name ~= nil and p227.display_name ~= "" then
+		local v2838, v2839 = proto.writeTag(buf, n151, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n150 = proto.writeString(v2837, v2838, p226.available_until)
+		buf, n151 = proto.writeString(v2838, v2839, p227.display_name)
 	end
 
-	if p226.widget_style ~= nil then
-		local v2839 = p226.widget_style:encode()
-		local v2840, v2841 = proto.writeTag(buf, n150, 3, proto.wireTypes.lengthDelimited)
+	if p227.content_type ~= nil and p227.content_type ~= "" then
+		local v2840, v2841 = proto.writeTag(buf, n151, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n150 = proto.writeBuffer(v2840, v2841, v2839, buffer.len(v2839))
+		buf, n151 = proto.writeString(v2840, v2841, p227.content_type)
 	end
 
-	local buf82 = buffer.create(n150)
+	local buf82 = buffer.create(n151)
 
-	buffer.copy(buf82, 0, buf, 0, n150)
+	buffer.copy(buf82, 0, buf, 0, n151)
 
 	return buf82
 end
-function t374.decode(p227: buffer) -- line: 16751
-	-- upvalues: t374 (copy), proto (copy), t1 (copy)
-	local v2844 = t374.new()
-	local n151 = 0
+function t373.decode(p228: buffer) -- line: 16955
+	-- upvalues: t373 (copy), proto (copy)
+	local v2844 = t373.new()
+	local n152 = 0
 
-	while n151 < buffer.len(p227) do
+	while n152 < buffer.len(p228) do
 		local v2846, v2847
 
-		v2846, v2847, n151 = proto.readTag(p227, n151)
+		v2846, v2847, n152 = proto.readTag(p228, n152)
 
 		if v2847 == proto.wireTypes.varint then
 			local v2848
 
-			v2848, n151 = proto.readVarInt(p227, n151)
+			v2848, n152 = proto.readVarInt(p228, n152)
 		elseif v2847 == proto.wireTypes.lengthDelimited then
 			if v2846 == 1 then
 				local v2849
 
-				v2849, n151 = proto.readBuffer(p227, n151)
-				v2844.id = buffer.tostring(v2849)
+				v2849, n152 = proto.readBuffer(p228, n152)
+				v2844.sort_id = buffer.tostring(v2849)
 			elseif v2846 == 2 then
 				local v2850
 
-				v2850, n151 = proto.readBuffer(p227, n151)
-				v2844.available_until = buffer.tostring(v2850)
+				v2850, n152 = proto.readBuffer(p228, n152)
+				v2844.display_name = buffer.tostring(v2850)
 			elseif v2846 == 3 then
 				local v2851
 
-				v2851, n151 = proto.readBuffer(p227, n151)
-				v2844.widget_style = t1.WidgetStyleData.decode(v2851)
+				v2851, n152 = proto.readBuffer(p228, n152)
+				v2844.content_type = buffer.tostring(v2851)
 			else
-				local v2852, v2853 = proto.readVarInt(p227, n151)
+				local v2852, v2853 = proto.readVarInt(p228, n152)
 
-				n151 = v2853 + v2852
+				n152 = v2853 + v2852
 			end
 		elseif v2847 == proto.wireTypes.i32 then
 			local v2854
 
-			v2854, n151 = proto.readFixed32(p227, n151)
+			v2854, n152 = proto.readFixed32(p228, n152)
 		elseif v2847 == proto.wireTypes.i64 then
 			local v2855
 
-			v2855, n151 = proto.readFixed64(p227, n151)
+			v2855, n152 = proto.readFixed64(p228, n152)
 		else
 			error("Unsupported wire type: " .. v2847)
 		end
@@ -13567,3050 +13593,3049 @@ function t374.decode(p227: buffer) -- line: 16751
 
 	return v2844
 end
-function t374.jsonEncode(p228) -- line: 16804
-	local t376 = {}
+function t373.jsonEncode(p229) -- line: 17008
+	local t375 = {}
 
-	if p228.id ~= nil and p228.id ~= "" then
-		t376.id = p228.id
+	if p229.sort_id ~= nil and p229.sort_id ~= "" then
+		t375.sortId = p229.sort_id
 	end
 
-	if p228.available_until ~= nil and p228.available_until ~= "" then
-		t376.availableUntil = p228.available_until
+	if p229.display_name ~= nil and p229.display_name ~= "" then
+		t375.displayName = p229.display_name
 	end
 
-	if p228.widget_style ~= nil then
-		t376.widgetStyle = p228.widget_style:jsonEncode()
+	if p229.content_type ~= nil and p229.content_type ~= "" then
+		t375.contentType = p229.content_type
 	end
 
-	return t376
+	return t375
 end
-function t374.jsonDecode(t377: {[any]: any}) -- line: 16822
-	-- upvalues: t374 (copy), t1 (copy)
-	local v2859 = t374.new()
+function t373.jsonDecode(t376: {[any]: any}) -- line: 17026
+	-- upvalues: t373 (copy)
+	local v2859 = t373.new()
 
-	if t377.id ~= nil then
-		v2859.id = t377.id
+	if t376.sort_id ~= nil then
+		v2859.sort_id = t376.sort_id
 	end
 
-	if t377.available_until ~= nil then
-		v2859.available_until = t377.available_until
+	if t376.sortId ~= nil then
+		v2859.sort_id = t376.sortId
 	end
 
-	if t377.availableUntil ~= nil then
-		v2859.available_until = t377.availableUntil
+	if t376.display_name ~= nil then
+		v2859.display_name = t376.display_name
 	end
 
-	if t377.widget_style ~= nil then
-		v2859.widget_style = t1.WidgetStyleData.jsonDecode(t377.widget_style)
+	if t376.displayName ~= nil then
+		v2859.display_name = t376.displayName
 	end
 
-	if t377.widgetStyle ~= nil then
-		v2859.widget_style = t1.WidgetStyleData.jsonDecode(t377.widgetStyle)
+	if t376.content_type ~= nil then
+		v2859.content_type = t376.content_type
+	end
+
+	if t376.contentType ~= nil then
+		v2859.content_type = t376.contentType
 	end
 
 	return v2859
 end
 
-t374.descriptor = {
-	name = "UAMarketplaceCatalogHeroUnitInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogHeroUnitInputData"
+t373.descriptor = {
+	name = "SortSelectorInputData_SortOption",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SortOption"
 }
-t1.UAMarketplaceCatalogHeroUnitInputData = t374
-typeRegistry.default:register(t1.UAMarketplaceCatalogHeroUnitInputData)
+t1.SortSelectorInputData_SortOption = t373
+typeRegistry.default:register(t1.SortSelectorInputData_SortOption)
 
-local t378 = {}
+local t377 = {}
 
-t378.__index = t378
+t377.__index = t377
 
-function t378.new(t379: {[any]: any}?) -- line: 16864
-	-- upvalues: t378 (copy)
+function t377.new(t378: {[any]: any}?) -- line: 17072
+	-- upvalues: t377 (copy)
 	return (setmetatable({
-		entry_map = if t379 ~= nil and t379.entry_map ~= nil then t379.entry_map else {},
-		entry_order = if t379 ~= nil and t379.entry_order ~= nil then t379.entry_order else {}
-	}, t378))
+		selected_option = if t378 ~= nil and t378.selected_option ~= nil then t378.selected_option else "",
+		options = if t378 ~= nil and t378.options ~= nil then t378.options else {},
+		experience_carousel = if t378 ~= nil and t378.experience_carousel ~= nil then t378.experience_carousel else nil
+	}, t377))
 end
-function t378.encode(p229) -- line: 16873
+function t377.encode(p230) -- line: 17084
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n152 = 0
+	local n153 = 0
 
-	if p229.entry_map ~= nil and next(p229.entry_map) ~= nil then
-		for v2864, v2865 in p229.entry_map do
-			local buf83 = buffer.create(0)
-			local v2867, v2868 = proto.writeTag(buf83, 0, 1, proto.wireTypes.lengthDelimited)
-			local v2869, v2870 = proto.writeString(v2867, v2868, v2864)
-			local v2871 = v2865:encode()
-			local v2872, v2873 = proto.writeTag(v2869, v2870, 2, proto.wireTypes.lengthDelimited)
-			local v2874, v2875 = proto.writeBuffer(v2872, v2873, v2871, buffer.len(v2871))
-			local v2876, v2877 = proto.writeTag(buf, n152, 1, proto.wireTypes.lengthDelimited)
+	if p230.selected_option ~= nil and p230.selected_option ~= "" then
+		local v2864, v2865 = proto.writeTag(buf, n153, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n152 = proto.writeBuffer(v2876, v2877, v2874, v2875)
+		buf, n153 = proto.writeString(v2864, v2865, p230.selected_option)
+	end
+
+	if p230.options ~= nil and #p230.options > 0 then
+		for _, v2867 in p230.options do
+			local v2868 = v2867:encode()
+			local v2869, v2870 = proto.writeTag(buf, n153, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n153 = proto.writeBuffer(v2869, v2870, v2868, buffer.len(v2868))
 		end
 	end
 
-	if p229.entry_order ~= nil and #p229.entry_order > 0 then
-		for _, v2879 in p229.entry_order do
-			local v2880, v2881 = proto.writeTag(buf, n152, 2, proto.wireTypes.lengthDelimited)
+	if p230.experience_carousel ~= nil then
+		local v2871 = p230.experience_carousel:encode()
+		local v2872, v2873 = proto.writeTag(buf, n153, 3, proto.wireTypes.lengthDelimited)
 
-			buf, n152 = proto.writeString(v2880, v2881, v2879)
+		buf, n153 = proto.writeBuffer(v2872, v2873, v2871, buffer.len(v2871))
+	end
+
+	local buf83 = buffer.create(n153)
+
+	buffer.copy(buf83, 0, buf, 0, n153)
+
+	return buf83
+end
+function t377.decode(p231: buffer) -- line: 17112
+	-- upvalues: t377 (copy), proto (copy), t1 (copy)
+	local v2876 = t377.new()
+	local n154 = 0
+
+	while n154 < buffer.len(p231) do
+		local v2878, v2879
+
+		v2878, v2879, n154 = proto.readTag(p231, n154)
+
+		if v2879 == proto.wireTypes.varint then
+			local v2880
+
+			v2880, n154 = proto.readVarInt(p231, n154)
+		elseif v2879 == proto.wireTypes.lengthDelimited then
+			if v2878 == 1 then
+				local v2881
+
+				v2881, n154 = proto.readBuffer(p231, n154)
+				v2876.selected_option = buffer.tostring(v2881)
+			elseif v2878 == 2 then
+				local v2882
+
+				v2882, n154 = proto.readBuffer(p231, n154)
+				table.insert(v2876.options, t1.SelectorOption.decode(v2882))
+			elseif v2878 == 3 then
+				local v2883
+
+				v2883, n154 = proto.readBuffer(p231, n154)
+				v2876.experience_carousel = t1.ExperienceCarouselInputData.decode(v2883)
+			else
+				local v2884, v2885 = proto.readVarInt(p231, n154)
+
+				n154 = v2885 + v2884
+			end
+		elseif v2879 == proto.wireTypes.i32 then
+			local v2886
+
+			v2886, n154 = proto.readFixed32(p231, n154)
+		elseif v2879 == proto.wireTypes.i64 then
+			local v2887
+
+			v2887, n154 = proto.readFixed64(p231, n154)
+		else
+			error("Unsupported wire type: " .. v2879)
 		end
 	end
 
-	local buf84 = buffer.create(n152)
+	return v2876
+end
+function t377.jsonEncode(p232) -- line: 17165
+	local t379 = {}
 
-	buffer.copy(buf84, 0, buf, 0, n152)
+	if p232.selected_option ~= nil and p232.selected_option ~= "" then
+		t379.selectedOption = p232.selected_option
+	end
+
+	if p232.options ~= nil and #p232.options > 0 then
+		local t380 = {}
+
+		for _, v2892 in p232.options do
+			table.insert(t380, v2892:jsonEncode())
+		end
+
+		t379.options = t380
+	end
+
+	if p232.experience_carousel ~= nil then
+		t379.experienceCarousel = p232.experience_carousel:jsonEncode()
+	end
+
+	return t379
+end
+function t377.jsonDecode(t381: {[any]: any}) -- line: 17187
+	-- upvalues: t377 (copy), t1 (copy)
+	local v2894 = t377.new()
+
+	if t381.selected_option ~= nil then
+		v2894.selected_option = t381.selected_option
+	end
+
+	if t381.selectedOption ~= nil then
+		v2894.selected_option = t381.selectedOption
+	end
+
+	if t381.options ~= nil then
+		local t382 = {}
+
+		for _, v2897 in t381.options do
+			table.insert(t382, t1.SelectorOption.jsonDecode(v2897))
+		end
+
+		v2894.options = t382
+	end
+
+	if t381.experience_carousel ~= nil then
+		v2894.experience_carousel = t1.ExperienceCarouselInputData.jsonDecode(t381.experience_carousel)
+	end
+
+	if t381.experienceCarousel ~= nil then
+		v2894.experience_carousel = t1.ExperienceCarouselInputData.jsonDecode(t381.experienceCarousel)
+	end
+
+	return v2894
+end
+
+t377.descriptor = {
+	name = "ChartsGenreSelectorInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ChartsGenreSelectorInputData"
+}
+t1.ChartsGenreSelectorInputData = t377
+typeRegistry.default:register(t1.ChartsGenreSelectorInputData)
+
+local t383 = {}
+
+t383.__index = t383
+
+function t383.new(t384: {[any]: any}?) -- line: 17232
+	-- upvalues: t383 (copy)
+	return (setmetatable({
+		id = if t384 ~= nil and t384.id ~= nil then t384.id else "",
+		preview_rows = if t384 ~= nil and t384.preview_rows ~= nil then t384.preview_rows else 0,
+		widget_style = if t384 ~= nil and t384.widget_style ~= nil then t384.widget_style else nil,
+		see_all_button = t384 ~= nil and (t384.see_all_button ~= nil and t384.see_all_button),
+		information_popover_text = if t384 ~= nil and t384.information_popover_text ~= nil then t384.information_popover_text else ""
+	}, t383))
+end
+function t383.encode(p233) -- line: 17246
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n155 = 0
+
+	if p233.id ~= nil and p233.id ~= "" then
+		local v2902, v2903 = proto.writeTag(buf, n155, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n155 = proto.writeString(v2902, v2903, p233.id)
+	end
+
+	if p233.preview_rows ~= nil and p233.preview_rows ~= 0 then
+		local v2904, v2905 = proto.writeTag(buf, n155, 4, proto.wireTypes.varint)
+
+		buf, n155 = proto.writeVarInt(v2904, v2905, p233.preview_rows)
+	end
+
+	if p233.widget_style ~= nil then
+		local v2906 = p233.widget_style:encode()
+		local v2907, v2908 = proto.writeTag(buf, n155, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n155 = proto.writeBuffer(v2907, v2908, v2906, buffer.len(v2906))
+	end
+
+	if p233.see_all_button then
+		local v2909, v2910 = proto.writeTag(buf, n155, 5, proto.wireTypes.varint)
+
+		buf, n155 = proto.writeVarInt(v2909, v2910, not p233.see_all_button and 0 or 1)
+	end
+
+	if p233.information_popover_text ~= nil and p233.information_popover_text ~= "" then
+		local v2911, v2912 = proto.writeTag(buf, n155, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n155 = proto.writeString(v2911, v2912, p233.information_popover_text)
+	end
+
+	local buf84 = buffer.create(n155)
+
+	buffer.copy(buf84, 0, buf, 0, n155)
 
 	return buf84
 end
-function t378.decode(p230: buffer) -- line: 16903
-	-- upvalues: t378 (copy), proto (copy), t1 (copy)
-	local v2884 = t378.new()
-	local n153 = 0
+function t383.decode(p234: buffer) -- line: 17281
+	-- upvalues: t383 (copy), proto (copy), t1 (copy)
+	local v2915 = t383.new()
+	local n156 = 0
 
-	while n153 < buffer.len(p230) do
-		local v2886, v2887
+	while n156 < buffer.len(p234) do
+		local v2917, v2918
 
-		v2886, v2887, n153 = proto.readTag(p230, n153)
+		v2917, v2918, n156 = proto.readTag(p234, n156)
 
-		if v2887 == proto.wireTypes.varint then
-			local v2888
+		if v2918 == proto.wireTypes.varint then
+			if v2917 == 4 then
+				local v2919
 
-			v2888, n153 = proto.readVarInt(p230, n153)
-		elseif v2887 == proto.wireTypes.lengthDelimited then
-			if v2886 == 1 then
-				local v2889
+				v2919, n156 = proto.readVarIntI64(p234, n156)
+				v2915.preview_rows = v2919
+			elseif v2917 == 5 then
+				local v2920
 
-				v2889, n153 = proto.readBuffer(p230, n153)
-
-				local v2890 = t1.UAMarketplaceCatalogFeedInputData_EntryMapEntry.decode(v2889)
-				local v2891 = t1.FeedEntry.new()
-
-				v2884.entry_map[v2890.key or ""] = v2890.value or v2891
-			elseif v2886 == 2 then
-				local v2892
-
-				v2892, n153 = proto.readBuffer(p230, n153)
-				table.insert(v2884.entry_order, buffer.tostring(v2892))
+				v2920, n156 = proto.readVarInt(p234, n156)
+				v2915.see_all_button = v2920 ~= 0
 			else
-				local v2893, v2894 = proto.readVarInt(p230, n153)
+				local v2921
 
-				n153 = v2894 + v2893
+				v2921, n156 = proto.readVarInt(p234, n156)
 			end
-		elseif v2887 == proto.wireTypes.i32 then
-			local v2895
+		elseif v2918 == proto.wireTypes.lengthDelimited then
+			if v2917 == 1 then
+				local v2922
 
-			v2895, n153 = proto.readFixed32(p230, n153)
-		elseif v2887 == proto.wireTypes.i64 then
-			local v2896
+				v2922, n156 = proto.readBuffer(p234, n156)
+				v2915.id = buffer.tostring(v2922)
+			elseif v2917 == 3 then
+				local v2923
 
-			v2896, n153 = proto.readFixed64(p230, n153)
+				v2923, n156 = proto.readBuffer(p234, n156)
+				v2915.widget_style = t1.WidgetStyleData.decode(v2923)
+			elseif v2917 == 6 then
+				local v2924
+
+				v2924, n156 = proto.readBuffer(p234, n156)
+				v2915.information_popover_text = buffer.tostring(v2924)
+			else
+				local v2925, v2926 = proto.readVarInt(p234, n156)
+
+				n156 = v2926 + v2925
+			end
+		elseif v2918 == proto.wireTypes.i32 then
+			local v2927
+
+			v2927, n156 = proto.readFixed32(p234, n156)
+		elseif v2918 == proto.wireTypes.i64 then
+			local v2928
+
+			v2928, n156 = proto.readFixed64(p234, n156)
 		else
-			error("Unsupported wire type: " .. v2887)
+			error("Unsupported wire type: " .. v2918)
 		end
 	end
 
-	return v2884
+	return v2915
 end
-function t378.jsonEncode(p231) -- line: 16958
-	local t380 = {}
+function t383.jsonEncode(p235) -- line: 17344
+	local t385 = {}
 
-	if p231.entry_map ~= nil and next(p231.entry_map) ~= nil then
-		local t381 = {}
-
-		for v2900, v2901 in p231.entry_map do
-			t381[v2900] = v2901:jsonEncode()
-		end
-
-		t380.entryMap = t381
+	if p235.id ~= nil and p235.id ~= "" then
+		t385.id = p235.id
 	end
 
-	if p231.entry_order ~= nil and #p231.entry_order > 0 then
-		local t382 = {}
-
-		for _, v2904 in p231.entry_order do
-			table.insert(t382, v2904)
-		end
-
-		t380.entryOrder = t382
+	if p235.preview_rows ~= nil and p235.preview_rows ~= 0 then
+		t385.previewRows = p235.preview_rows
 	end
 
-	return t380
+	if p235.widget_style ~= nil then
+		t385.widgetStyle = p235.widget_style:jsonEncode()
+	end
+
+	if p235.see_all_button then
+		t385.seeAllButton = p235.see_all_button
+	end
+
+	if p235.information_popover_text ~= nil and p235.information_popover_text ~= "" then
+		t385.informationPopoverText = p235.information_popover_text
+	end
+
+	return t385
 end
-function t378.jsonDecode(t383: {[any]: any}) -- line: 16980
-	-- upvalues: t378 (copy), t1 (copy)
-	local v2906 = t378.new()
+function t383.jsonDecode(t386: {[any]: any}) -- line: 17370
+	-- upvalues: t383 (copy), t1 (copy)
+	local v2932 = t383.new()
 
-	if t383.entry_map ~= nil then
-		local t384 = {}
-
-		for v2908, v2909 in t383.entry_map do
-			t384[v2908] = t1.FeedEntry.jsonDecode(v2909)
-		end
-
-		v2906.entry_map = t384
+	if t386.id ~= nil then
+		v2932.id = t386.id
 	end
 
-	if t383.entryMap ~= nil then
-		local t385 = {}
-
-		for v2911, v2912 in t383.entryMap do
-			t385[v2911] = t1.FeedEntry.jsonDecode(v2912)
-		end
-
-		v2906.entry_map = t385
+	if t386.preview_rows ~= nil then
+		v2932.preview_rows = t386.preview_rows
 	end
 
-	if t383.entry_order ~= nil then
-		local t386 = {}
-
-		for _, v2915 in t383.entry_order do
-			table.insert(t386, v2915)
-		end
-
-		v2906.entry_order = t386
+	if t386.previewRows ~= nil then
+		v2932.preview_rows = t386.previewRows
 	end
 
-	if t383.entryOrder ~= nil then
-		local t387 = {}
-
-		for _, v2918 in t383.entryOrder do
-			table.insert(t387, v2918)
-		end
-
-		v2906.entry_order = t387
+	if t386.widget_style ~= nil then
+		v2932.widget_style = t1.WidgetStyleData.jsonDecode(t386.widget_style)
 	end
 
-	return v2906
+	if t386.widgetStyle ~= nil then
+		v2932.widget_style = t1.WidgetStyleData.jsonDecode(t386.widgetStyle)
+	end
+
+	if t386.see_all_button ~= nil then
+		v2932.see_all_button = t386.see_all_button
+	end
+
+	if t386.seeAllButton ~= nil then
+		v2932.see_all_button = t386.seeAllButton
+	end
+
+	if t386.information_popover_text ~= nil then
+		v2932.information_popover_text = t386.information_popover_text
+	end
+
+	if t386.informationPopoverText ~= nil then
+		v2932.information_popover_text = t386.informationPopoverText
+	end
+
+	return v2932
 end
 
-t378.descriptor = {
-	name = "UAMarketplaceCatalogFeedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogFeedInputData"
+t383.descriptor = {
+	name = "UAMarketplaceCatalogItemGroupInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogItemGroupInputData"
 }
-t1.UAMarketplaceCatalogFeedInputData = t378
-typeRegistry.default:register(t1.UAMarketplaceCatalogFeedInputData)
+t1.UAMarketplaceCatalogItemGroupInputData = t383
+typeRegistry.default:register(t1.UAMarketplaceCatalogItemGroupInputData)
 
-local t388 = {}
+local t387 = {}
 
-t388.__index = t388
+t387.__index = t387
 
-function t388.new(t389: {[any]: any}?) -- line: 17038
-	-- upvalues: t388 (copy)
+function t387.new(t388: {[any]: any}?) -- line: 17428
+	-- upvalues: t387 (copy)
 	return (setmetatable({
-		key = if t389 ~= nil and t389.key ~= nil then t389.key else "",
-		value = if t389 ~= nil and t389.value ~= nil then t389.value else nil
-	}, t388))
+		id = if t388 ~= nil and t388.id ~= nil then t388.id else "",
+		num_items_to_show = if t388 ~= nil and t388.num_items_to_show ~= nil then t388.num_items_to_show else 0,
+		widget_style = if t388 ~= nil and t388.widget_style ~= nil then t388.widget_style else nil,
+		see_all_button = t388 ~= nil and (t388.see_all_button ~= nil and t388.see_all_button),
+		information_popover_text = if t388 ~= nil and t388.information_popover_text ~= nil then t388.information_popover_text else ""
+	}, t387))
 end
-function t388.encode(p232) -- line: 17047
+function t387.encode(p236) -- line: 17442
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n154 = 0
+	local n157 = 0
 
-	if p232.key ~= nil and p232.key ~= "" then
-		local v2923, v2924 = proto.writeTag(buf, n154, 1, proto.wireTypes.lengthDelimited)
+	if p236.id ~= nil and p236.id ~= "" then
+		local v2937, v2938 = proto.writeTag(buf, n157, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n154 = proto.writeString(v2923, v2924, p232.key)
+		buf, n157 = proto.writeString(v2937, v2938, p236.id)
 	end
 
-	if p232.value ~= nil then
-		local v2925 = p232.value:encode()
-		local v2926, v2927 = proto.writeTag(buf, n154, 2, proto.wireTypes.lengthDelimited)
+	if p236.num_items_to_show ~= nil and p236.num_items_to_show ~= 0 then
+		local v2939, v2940 = proto.writeTag(buf, n157, 5, proto.wireTypes.varint)
 
-		buf, n154 = proto.writeBuffer(v2926, v2927, v2925, buffer.len(v2925))
+		buf, n157 = proto.writeVarInt(v2939, v2940, p236.num_items_to_show)
 	end
 
-	local buf85 = buffer.create(n154)
+	if p236.widget_style ~= nil then
+		local v2941 = p236.widget_style:encode()
+		local v2942, v2943 = proto.writeTag(buf, n157, 3, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf85, 0, buf, 0, n154)
+		buf, n157 = proto.writeBuffer(v2942, v2943, v2941, buffer.len(v2941))
+	end
+
+	if p236.see_all_button then
+		local v2944, v2945 = proto.writeTag(buf, n157, 6, proto.wireTypes.varint)
+
+		buf, n157 = proto.writeVarInt(v2944, v2945, not p236.see_all_button and 0 or 1)
+	end
+
+	if p236.information_popover_text ~= nil and p236.information_popover_text ~= "" then
+		local v2946, v2947 = proto.writeTag(buf, n157, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n157 = proto.writeString(v2946, v2947, p236.information_popover_text)
+	end
+
+	local buf85 = buffer.create(n157)
+
+	buffer.copy(buf85, 0, buf, 0, n157)
 
 	return buf85
 end
-function t388.decode(p233: buffer) -- line: 17069
-	-- upvalues: t388 (copy), proto (copy), t1 (copy)
-	local v2930 = t388.new()
-	local n155 = 0
+function t387.decode(p237: buffer) -- line: 17479
+	-- upvalues: t387 (copy), proto (copy), t1 (copy)
+	local v2950 = t387.new()
+	local n158 = 0
 
-	while n155 < buffer.len(p233) do
-		local v2932, v2933
+	while n158 < buffer.len(p237) do
+		local v2952, v2953
 
-		v2932, v2933, n155 = proto.readTag(p233, n155)
+		v2952, v2953, n158 = proto.readTag(p237, n158)
 
-		if v2933 == proto.wireTypes.varint then
-			local v2934
+		if v2953 == proto.wireTypes.varint then
+			if v2952 == 5 then
+				local v2954
 
-			v2934, n155 = proto.readVarInt(p233, n155)
-		elseif v2933 == proto.wireTypes.lengthDelimited then
-			if v2932 == 1 then
-				local v2935
+				v2954, n158 = proto.readVarIntI64(p237, n158)
+				v2950.num_items_to_show = v2954
+			elseif v2952 == 6 then
+				local v2955
 
-				v2935, n155 = proto.readBuffer(p233, n155)
-				v2930.key = buffer.tostring(v2935)
-			elseif v2932 == 2 then
-				local v2936
-
-				v2936, n155 = proto.readBuffer(p233, n155)
-				v2930.value = t1.FeedEntry.decode(v2936)
+				v2955, n158 = proto.readVarInt(p237, n158)
+				v2950.see_all_button = v2955 ~= 0
 			else
-				local v2937, v2938 = proto.readVarInt(p233, n155)
+				local v2956
 
-				n155 = v2938 + v2937
+				v2956, n158 = proto.readVarInt(p237, n158)
 			end
-		elseif v2933 == proto.wireTypes.i32 then
-			local v2939
+		elseif v2953 == proto.wireTypes.lengthDelimited then
+			if v2952 == 1 then
+				local v2957
 
-			v2939, n155 = proto.readFixed32(p233, n155)
-		elseif v2933 == proto.wireTypes.i64 then
-			local v2940
+				v2957, n158 = proto.readBuffer(p237, n158)
+				v2950.id = buffer.tostring(v2957)
+			elseif v2952 == 3 then
+				local v2958
 
-			v2940, n155 = proto.readFixed64(p233, n155)
+				v2958, n158 = proto.readBuffer(p237, n158)
+				v2950.widget_style = t1.WidgetStyleData.decode(v2958)
+			elseif v2952 == 7 then
+				local v2959
+
+				v2959, n158 = proto.readBuffer(p237, n158)
+				v2950.information_popover_text = buffer.tostring(v2959)
+			else
+				local v2960, v2961 = proto.readVarInt(p237, n158)
+
+				n158 = v2961 + v2960
+			end
+		elseif v2953 == proto.wireTypes.i32 then
+			local v2962
+
+			v2962, n158 = proto.readFixed32(p237, n158)
+		elseif v2953 == proto.wireTypes.i64 then
+			local v2963
+
+			v2963, n158 = proto.readFixed64(p237, n158)
 		else
-			error("Unsupported wire type: " .. v2933)
+			error("Unsupported wire type: " .. v2953)
 		end
 	end
 
-	return v2930
+	return v2950
 end
-function t388.jsonEncode(p234) -- line: 17119
-	local t390 = {}
+function t387.jsonEncode(p238) -- line: 17544
+	local t389 = {}
 
-	if p234.key ~= nil and p234.key ~= "" then
-		t390.key = p234.key
+	if p238.id ~= nil and p238.id ~= "" then
+		t389.id = p238.id
 	end
 
-	if p234.value ~= nil then
-		t390.value = p234.value:jsonEncode()
+	if p238.num_items_to_show ~= nil and p238.num_items_to_show ~= 0 then
+		t389.numItemsToShow = p238.num_items_to_show
 	end
 
-	return t390
+	if p238.widget_style ~= nil then
+		t389.widgetStyle = p238.widget_style:jsonEncode()
+	end
+
+	if p238.see_all_button then
+		t389.seeAllButton = p238.see_all_button
+	end
+
+	if p238.information_popover_text ~= nil and p238.information_popover_text ~= "" then
+		t389.informationPopoverText = p238.information_popover_text
+	end
+
+	return t389
 end
-function t388.jsonDecode(t391: {[any]: any}) -- line: 17135
-	-- upvalues: t388 (copy), t1 (copy)
-	local v2944 = t388.new()
+function t387.jsonDecode(t390: {[any]: any}) -- line: 17572
+	-- upvalues: t387 (copy), t1 (copy)
+	local v2967 = t387.new()
 
-	if t391.key ~= nil then
-		v2944.key = t391.key
+	if t390.id ~= nil then
+		v2967.id = t390.id
 	end
 
-	if t391.value ~= nil then
-		v2944.value = t1.FeedEntry.jsonDecode(t391.value)
+	if t390.num_items_to_show ~= nil then
+		v2967.num_items_to_show = t390.num_items_to_show
 	end
 
-	return v2944
+	if t390.numItemsToShow ~= nil then
+		v2967.num_items_to_show = t390.numItemsToShow
+	end
+
+	if t390.widget_style ~= nil then
+		v2967.widget_style = t1.WidgetStyleData.jsonDecode(t390.widget_style)
+	end
+
+	if t390.widgetStyle ~= nil then
+		v2967.widget_style = t1.WidgetStyleData.jsonDecode(t390.widgetStyle)
+	end
+
+	if t390.see_all_button ~= nil then
+		v2967.see_all_button = t390.see_all_button
+	end
+
+	if t390.seeAllButton ~= nil then
+		v2967.see_all_button = t390.seeAllButton
+	end
+
+	if t390.information_popover_text ~= nil then
+		v2967.information_popover_text = t390.information_popover_text
+	end
+
+	if t390.informationPopoverText ~= nil then
+		v2967.information_popover_text = t390.informationPopoverText
+	end
+
+	return v2967
 end
 
-t388.descriptor = {
-	name = "UAMarketplaceCatalogFeedInputData_EntryMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+t387.descriptor = {
+	name = "UAMarketplaceCatalogItemCarouselInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogItemCarouselInputData"
 }
-t1.UAMarketplaceCatalogFeedInputData_EntryMapEntry = t388
-typeRegistry.default:register(t1.UAMarketplaceCatalogFeedInputData_EntryMapEntry)
+t1.UAMarketplaceCatalogItemCarouselInputData = t387
+typeRegistry.default:register(t1.UAMarketplaceCatalogItemCarouselInputData)
 
-local t392 = {}
+local t391 = {}
 
-t392.__index = t392
+t391.__index = t391
 
-function t392.new(t393: {[any]: any}?) -- line: 17166
-	-- upvalues: t392 (copy)
+function t391.new(t392: {[any]: any}?) -- line: 17630
+	-- upvalues: t391 (copy)
 	return (setmetatable({
-		marketplace_catalog_category_items = if t393 ~= nil and t393.marketplace_catalog_category_items ~= nil then t393.marketplace_catalog_category_items else {},
-		active_category_id = if t393 ~= nil and t393.active_category_id ~= nil then t393.active_category_id else "",
-		active_tooltip_idx = if t393 ~= nil and t393.active_tooltip_idx ~= nil then t393.active_tooltip_idx else 0
-	}, t392))
+		background_layers = if t392 ~= nil and t392.background_layers ~= nil then t392.background_layers else {}
+	}, t391))
 end
-function t392.encode(p235) -- line: 17179
+function t391.encode(p239) -- line: 17636
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n156 = 0
+	local n159 = 0
 
-	if p235.marketplace_catalog_category_items ~= nil and #p235.marketplace_catalog_category_items > 0 then
-		for _, v2950 in p235.marketplace_catalog_category_items do
-			local v2951 = v2950:encode()
-			local v2952, v2953 = proto.writeTag(buf, n156, 1, proto.wireTypes.lengthDelimited)
+	if p239.background_layers ~= nil and #p239.background_layers > 0 then
+		for _, v2973 in p239.background_layers do
+			local v2974 = v2973:encode()
+			local v2975, v2976 = proto.writeTag(buf, n159, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n156 = proto.writeBuffer(v2952, v2953, v2951, buffer.len(v2951))
+			buf, n159 = proto.writeBuffer(v2975, v2976, v2974, buffer.len(v2974))
 		end
 	end
 
-	if p235.active_category_id ~= nil and p235.active_category_id ~= "" then
-		local v2954, v2955 = proto.writeTag(buf, n156, 2, proto.wireTypes.lengthDelimited)
+	local buf86 = buffer.create(n159)
 
-		buf, n156 = proto.writeString(v2954, v2955, p235.active_category_id)
-	end
-
-	if p235.active_tooltip_idx ~= nil and p235.active_tooltip_idx ~= 0 then
-		local v2956, v2957 = proto.writeTag(buf, n156, 3, proto.wireTypes.varint)
-
-		buf, n156 = proto.writeVarInt(v2956, v2957, p235.active_tooltip_idx)
-	end
-
-	local buf86 = buffer.create(n156)
-
-	buffer.copy(buf86, 0, buf, 0, n156)
+	buffer.copy(buf86, 0, buf, 0, n159)
 
 	return buf86
 end
-function t392.decode(p236: buffer) -- line: 17208
-	-- upvalues: t392 (copy), proto (copy), t1 (copy)
-	local v2960 = t392.new()
-	local n157 = 0
+function t391.decode(p240: buffer) -- line: 17653
+	-- upvalues: t391 (copy), proto (copy), background_layer (copy)
+	local v2979 = t391.new()
+	local n160 = 0
 
-	while n157 < buffer.len(p236) do
-		local v2962, v2963
+	while n160 < buffer.len(p240) do
+		local v2981, v2982
 
-		v2962, v2963, n157 = proto.readTag(p236, n157)
+		v2981, v2982, n160 = proto.readTag(p240, n160)
 
-		if v2963 == proto.wireTypes.varint then
-			if v2962 == 3 then
-				local v2964
+		if v2982 == proto.wireTypes.varint then
+			local v2983
 
-				v2964, n157 = proto.readVarIntI64(p236, n157)
-				v2960.active_tooltip_idx = v2964
+			v2983, n160 = proto.readVarInt(p240, n160)
+		elseif v2982 == proto.wireTypes.lengthDelimited then
+			if v2981 == 1 then
+				local v2984
+
+				v2984, n160 = proto.readBuffer(p240, n160)
+				table.insert(v2979.background_layers, background_layer.BackgroundLayer.decode(v2984))
 			else
-				local v2965
+				local v2985, v2986 = proto.readVarInt(p240, n160)
 
-				v2965, n157 = proto.readVarInt(p236, n157)
+				n160 = v2986 + v2985
 			end
-		elseif v2963 == proto.wireTypes.lengthDelimited then
-			if v2962 == 1 then
-				local v2966
+		elseif v2982 == proto.wireTypes.i32 then
+			local v2987
 
-				v2966, n157 = proto.readBuffer(p236, n157)
-				table.insert(v2960.marketplace_catalog_category_items, t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem.decode(v2966))
-			elseif v2962 == 2 then
-				local v2967
+			v2987, n160 = proto.readFixed32(p240, n160)
+		elseif v2982 == proto.wireTypes.i64 then
+			local v2988
 
-				v2967, n157 = proto.readBuffer(p236, n157)
-				v2960.active_category_id = buffer.tostring(v2967)
-			else
-				local v2968, v2969 = proto.readVarInt(p236, n157)
-
-				n157 = v2969 + v2968
-			end
-		elseif v2963 == proto.wireTypes.i32 then
-			local v2970
-
-			v2970, n157 = proto.readFixed32(p236, n157)
-		elseif v2963 == proto.wireTypes.i64 then
-			local v2971
-
-			v2971, n157 = proto.readFixed64(p236, n157)
+			v2988, n160 = proto.readFixed64(p240, n160)
 		else
-			error("Unsupported wire type: " .. v2963)
+			error("Unsupported wire type: " .. v2982)
 		end
 	end
 
-	return v2960
+	return v2979
 end
-function t392.jsonEncode(p237) -- line: 17266
-	local t394 = {}
+function t391.jsonEncode(p241) -- line: 17699
+	local t393 = {}
 
-	if p237.marketplace_catalog_category_items ~= nil and #p237.marketplace_catalog_category_items > 0 then
-		local t395 = {}
+	if p241.background_layers ~= nil and #p241.background_layers > 0 then
+		local t394 = {}
 
-		for _, v2976 in p237.marketplace_catalog_category_items do
-			table.insert(t395, v2976:jsonEncode())
+		for _, v2993 in p241.background_layers do
+			table.insert(t394, v2993:jsonEncode())
 		end
 
-		t394.marketplaceCatalogCategoryItems = t395
+		t393.backgroundLayers = t394
 	end
 
-	if p237.active_category_id ~= nil and p237.active_category_id ~= "" then
-		t394.activeCategoryId = p237.active_category_id
-	end
-
-	if p237.active_tooltip_idx ~= nil and p237.active_tooltip_idx ~= 0 then
-		t394.activeTooltipIdx = p237.active_tooltip_idx
-	end
-
-	return t394
+	return t393
 end
-function t392.jsonDecode(t396: {[any]: any}) -- line: 17290
-	-- upvalues: t392 (copy), t1 (copy)
-	local v2978 = t392.new()
+function t391.jsonDecode(t395: {[any]: any}) -- line: 17713
+	-- upvalues: t391 (copy), background_layer (copy)
+	local v2995 = t391.new()
 
-	if t396.marketplace_catalog_category_items ~= nil then
+	if t395.background_layers ~= nil then
+		local t396 = {}
+
+		for _, v2998 in t395.background_layers do
+			table.insert(t396, background_layer.BackgroundLayer.jsonDecode(v2998))
+		end
+
+		v2995.background_layers = t396
+	end
+
+	if t395.backgroundLayers ~= nil then
 		local t397 = {}
 
-		for _, v2981 in t396.marketplace_catalog_category_items do
-			table.insert(t397, t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem.jsonDecode(v2981))
+		for _, v3001 in t395.backgroundLayers do
+			table.insert(t397, background_layer.BackgroundLayer.jsonDecode(v3001))
 		end
 
-		v2978.marketplace_catalog_category_items = t397
+		v2995.background_layers = t397
 	end
 
-	if t396.marketplaceCatalogCategoryItems ~= nil then
-		local t398 = {}
-
-		for _, v2984 in t396.marketplaceCatalogCategoryItems do
-			table.insert(t398, t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem.jsonDecode(v2984))
-		end
-
-		v2978.marketplace_catalog_category_items = t398
-	end
-
-	if t396.active_category_id ~= nil then
-		v2978.active_category_id = t396.active_category_id
-	end
-
-	if t396.activeCategoryId ~= nil then
-		v2978.active_category_id = t396.activeCategoryId
-	end
-
-	if t396.active_tooltip_idx ~= nil then
-		v2978.active_tooltip_idx = t396.active_tooltip_idx
-	end
-
-	if t396.activeTooltipIdx ~= nil then
-		v2978.active_tooltip_idx = t396.activeTooltipIdx
-	end
-
-	return v2978
+	return v2995
 end
 
-t392.descriptor = {
-	name = "UAMarketplaceCatalogCategoryMenuInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogCategoryMenuInputData"
+t391.descriptor = {
+	name = "WidgetStyleData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.WidgetStyleData"
 }
-t1.UAMarketplaceCatalogCategoryMenuInputData = t392
-typeRegistry.default:register(t1.UAMarketplaceCatalogCategoryMenuInputData)
+t1.WidgetStyleData = t391
+typeRegistry.default:register(t1.WidgetStyleData)
 
-local t399 = {}
+local t398 = {}
 
-t399.__index = t399
+t398.__index = t398
 
-function t399.new(t400: {[any]: any}?) -- line: 17353
-	-- upvalues: t399 (copy)
+function t398.new(t399: {[any]: any}?) -- line: 17757
+	-- upvalues: t398 (copy)
 	return (setmetatable({
-		marketplace_catalog_category_item_id = if t400 ~= nil and t400.marketplace_catalog_category_item_id ~= nil then t400.marketplace_catalog_category_item_id else ""
-	}, t399))
+		id = if t399 ~= nil and t399.id ~= nil then t399.id else "",
+		available_until = if t399 ~= nil and t399.available_until ~= nil then t399.available_until else "",
+		widget_style = if t399 ~= nil and t399.widget_style ~= nil then t399.widget_style else nil
+	}, t398))
 end
-function t399.encode(p238) -- line: 17367
+function t398.encode(p242) -- line: 17767
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n158 = 0
+	local n161 = 0
 
-	if p238.marketplace_catalog_category_item_id ~= nil and p238.marketplace_catalog_category_item_id ~= "" then
-		local v2989, v2990 = proto.writeTag(buf, n158, 1, proto.wireTypes.lengthDelimited)
+	if p242.id ~= nil and p242.id ~= "" then
+		local v3006, v3007 = proto.writeTag(buf, n161, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n158 = proto.writeString(v2989, v2990, p238.marketplace_catalog_category_item_id)
+		buf, n161 = proto.writeString(v3006, v3007, p242.id)
 	end
 
-	local buf87 = buffer.create(n158)
+	if p242.available_until ~= nil and p242.available_until ~= "" then
+		local v3008, v3009 = proto.writeTag(buf, n161, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf87, 0, buf, 0, n158)
+		buf, n161 = proto.writeString(v3008, v3009, p242.available_until)
+	end
+
+	if p242.widget_style ~= nil then
+		local v3010 = p242.widget_style:encode()
+		local v3011, v3012 = proto.writeTag(buf, n161, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n161 = proto.writeBuffer(v3011, v3012, v3010, buffer.len(v3010))
+	end
+
+	local buf87 = buffer.create(n161)
+
+	buffer.copy(buf87, 0, buf, 0, n161)
 
 	return buf87
 end
-function t399.decode(p239: buffer) -- line: 17383
-	-- upvalues: t399 (copy), proto (copy)
-	local v2993 = t399.new()
-	local n159 = 0
-
-	while n159 < buffer.len(p239) do
-		local v2995, v2996
-
-		v2995, v2996, n159 = proto.readTag(p239, n159)
-
-		if v2996 == proto.wireTypes.varint then
-			local v2997
-
-			v2997, n159 = proto.readVarInt(p239, n159)
-		elseif v2996 == proto.wireTypes.lengthDelimited then
-			if v2995 == 1 then
-				local v2998
-
-				v2998, n159 = proto.readBuffer(p239, n159)
-				v2993.marketplace_catalog_category_item_id = buffer.tostring(v2998)
-			else
-				local v2999, v3000 = proto.readVarInt(p239, n159)
-
-				n159 = v3000 + v2999
-			end
-		elseif v2996 == proto.wireTypes.i32 then
-			local v3001
-
-			v3001, n159 = proto.readFixed32(p239, n159)
-		elseif v2996 == proto.wireTypes.i64 then
-			local v3002
-
-			v3002, n159 = proto.readFixed64(p239, n159)
-		else
-			error("Unsupported wire type: " .. v2996)
-		end
-	end
-
-	return v2993
-end
-function t399.jsonEncode(p240) -- line: 17428
-	local t401 = {}
-
-	if p240.marketplace_catalog_category_item_id ~= nil and p240.marketplace_catalog_category_item_id ~= "" then
-		t401.marketplaceCatalogCategoryItemId = p240.marketplace_catalog_category_item_id
-	end
-
-	return t401
-end
-function t399.jsonDecode(t402: {[any]: any}) -- line: 17440
-	-- upvalues: t399 (copy)
-	local v3006 = t399.new()
-
-	if t402.marketplace_catalog_category_item_id ~= nil then
-		v3006.marketplace_catalog_category_item_id = t402.marketplace_catalog_category_item_id
-	end
-
-	if t402.marketplaceCatalogCategoryItemId ~= nil then
-		v3006.marketplace_catalog_category_item_id = t402.marketplaceCatalogCategoryItemId
-	end
-
-	return v3006
-end
-
-t399.descriptor = {
-	name = "UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceCatalogCategoryItem"
-}
-t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem = t399
-typeRegistry.default:register(t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem)
-
-local t403 = {}
-
-t403.__index = t403
-
-function t403.new(t404: {[any]: any}?) -- line: 17473
-	-- upvalues: t403 (copy)
-	return (setmetatable({
-		items = if t404 ~= nil and t404.items ~= nil then t404.items else {},
-		preview_columns = if t404 ~= nil and t404.preview_columns ~= nil then t404.preview_columns else 0,
-		impression_id = if t404 ~= nil and t404.impression_id ~= nil then t404.impression_id else ""
-	}, t403))
-end
-function t403.encode(p241) -- line: 17481
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n160 = 0
-
-	if p241.items ~= nil and #p241.items > 0 then
-		for _, v3012 in p241.items do
-			local v3013 = v3012:encode()
-			local v3014, v3015 = proto.writeTag(buf, n160, 1, proto.wireTypes.lengthDelimited)
-
-			buf, n160 = proto.writeBuffer(v3014, v3015, v3013, buffer.len(v3013))
-		end
-	end
-
-	if p241.preview_columns ~= nil and p241.preview_columns ~= 0 then
-		local v3016, v3017 = proto.writeTag(buf, n160, 2, proto.wireTypes.varint)
-
-		buf, n160 = proto.writeVarInt(v3016, v3017, p241.preview_columns)
-	end
-
-	if p241.impression_id ~= nil and p241.impression_id ~= "" then
-		local v3018, v3019 = proto.writeTag(buf, n160, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n160 = proto.writeString(v3018, v3019, p241.impression_id)
-	end
-
-	local buf88 = buffer.create(n160)
-
-	buffer.copy(buf88, 0, buf, 0, n160)
-
-	return buf88
-end
-function t403.decode(p242: buffer) -- line: 17508
-	-- upvalues: t403 (copy), proto (copy), t1 (copy)
-	local v3022 = t403.new()
-	local n161 = 0
-
-	while n161 < buffer.len(p242) do
-		local v3024, v3025
-
-		v3024, v3025, n161 = proto.readTag(p242, n161)
-
-		if v3025 == proto.wireTypes.varint then
-			if v3024 == 2 then
-				local v3026
-
-				v3026, n161 = proto.readVarIntI32(p242, n161)
-				v3022.preview_columns = v3026
-			else
-				local v3027
-
-				v3027, n161 = proto.readVarInt(p242, n161)
-			end
-		elseif v3025 == proto.wireTypes.lengthDelimited then
-			if v3024 == 1 then
-				local v3028
-
-				v3028, n161 = proto.readBuffer(p242, n161)
-				table.insert(v3022.items, t1.CatalogItemGridInputData_CatalogItem.decode(v3028))
-			elseif v3024 == 3 then
-				local v3029
-
-				v3029, n161 = proto.readBuffer(p242, n161)
-				v3022.impression_id = buffer.tostring(v3029)
-			else
-				local v3030, v3031 = proto.readVarInt(p242, n161)
-
-				n161 = v3031 + v3030
-			end
-		elseif v3025 == proto.wireTypes.i32 then
-			local v3032
-
-			v3032, n161 = proto.readFixed32(p242, n161)
-		elseif v3025 == proto.wireTypes.i64 then
-			local v3033
-
-			v3033, n161 = proto.readFixed64(p242, n161)
-		else
-			error("Unsupported wire type: " .. v3025)
-		end
-	end
-
-	return v3022
-end
-function t403.jsonEncode(p243) -- line: 17561
-	local t405 = {}
-
-	if p243.items ~= nil and #p243.items > 0 then
-		local t406 = {}
-
-		for _, v3038 in p243.items do
-			table.insert(t406, v3038:jsonEncode())
-		end
-
-		t405.items = t406
-	end
-
-	if p243.preview_columns ~= nil and p243.preview_columns ~= 0 then
-		t405.previewColumns = p243.preview_columns
-	end
-
-	if p243.impression_id ~= nil and p243.impression_id ~= "" then
-		t405.impressionId = p243.impression_id
-	end
-
-	return t405
-end
-function t403.jsonDecode(t407: {[any]: any}) -- line: 17583
-	-- upvalues: t403 (copy), t1 (copy)
-	local v3040 = t403.new()
-
-	if t407.items ~= nil then
-		local t408 = {}
-
-		for _, v3043 in t407.items do
-			table.insert(t408, t1.CatalogItemGridInputData_CatalogItem.jsonDecode(v3043))
-		end
-
-		v3040.items = t408
-	end
-
-	if t407.preview_columns ~= nil then
-		v3040.preview_columns = t407.preview_columns
-	end
-
-	if t407.previewColumns ~= nil then
-		v3040.preview_columns = t407.previewColumns
-	end
-
-	if t407.impression_id ~= nil then
-		v3040.impression_id = t407.impression_id
-	end
-
-	if t407.impressionId ~= nil then
-		v3040.impression_id = t407.impressionId
-	end
-
-	return v3040
-end
-
-t403.descriptor = {
-	name = "CatalogItemGridInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemGridInputData"
-}
-t1.CatalogItemGridInputData = t403
-typeRegistry.default:register(t1.CatalogItemGridInputData)
-
-local t409 = {}
-
-t409.__index = t409
-
-function t409.new(t410: {[any]: any}?) -- line: 17628
-	-- upvalues: t409 (copy)
-	return (setmetatable({
-		id = if t410 ~= nil and t410.id ~= nil then t410.id else "",
-		type = if t410 ~= nil and t410.type ~= nil then t410.type else ""
-	}, t409))
-end
-function t409.encode(p244) -- line: 17637
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t398.decode(p243: buffer) -- line: 17792
+	-- upvalues: t398 (copy), proto (copy), t1 (copy)
+	local v3015 = t398.new()
 	local n162 = 0
 
+	while n162 < buffer.len(p243) do
+		local v3017, v3018
+
+		v3017, v3018, n162 = proto.readTag(p243, n162)
+
+		if v3018 == proto.wireTypes.varint then
+			local v3019
+
+			v3019, n162 = proto.readVarInt(p243, n162)
+		elseif v3018 == proto.wireTypes.lengthDelimited then
+			if v3017 == 1 then
+				local v3020
+
+				v3020, n162 = proto.readBuffer(p243, n162)
+				v3015.id = buffer.tostring(v3020)
+			elseif v3017 == 2 then
+				local v3021
+
+				v3021, n162 = proto.readBuffer(p243, n162)
+				v3015.available_until = buffer.tostring(v3021)
+			elseif v3017 == 3 then
+				local v3022
+
+				v3022, n162 = proto.readBuffer(p243, n162)
+				v3015.widget_style = t1.WidgetStyleData.decode(v3022)
+			else
+				local v3023, v3024 = proto.readVarInt(p243, n162)
+
+				n162 = v3024 + v3023
+			end
+		elseif v3018 == proto.wireTypes.i32 then
+			local v3025
+
+			v3025, n162 = proto.readFixed32(p243, n162)
+		elseif v3018 == proto.wireTypes.i64 then
+			local v3026
+
+			v3026, n162 = proto.readFixed64(p243, n162)
+		else
+			error("Unsupported wire type: " .. v3018)
+		end
+	end
+
+	return v3015
+end
+function t398.jsonEncode(p244) -- line: 17845
+	local t400 = {}
+
 	if p244.id ~= nil and p244.id ~= "" then
-		local v3048, v3049 = proto.writeTag(buf, n162, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n162 = proto.writeString(v3048, v3049, p244.id)
+		t400.id = p244.id
 	end
 
-	if p244.type ~= nil and p244.type ~= "" then
-		local v3050, v3051 = proto.writeTag(buf, n162, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n162 = proto.writeString(v3050, v3051, p244.type)
+	if p244.available_until ~= nil and p244.available_until ~= "" then
+		t400.availableUntil = p244.available_until
 	end
 
-	local buf89 = buffer.create(n162)
+	if p244.widget_style ~= nil then
+		t400.widgetStyle = p244.widget_style:jsonEncode()
+	end
 
-	buffer.copy(buf89, 0, buf, 0, n162)
+	return t400
+end
+function t398.jsonDecode(t401: {[any]: any}) -- line: 17863
+	-- upvalues: t398 (copy), t1 (copy)
+	local v3030 = t398.new()
+
+	if t401.id ~= nil then
+		v3030.id = t401.id
+	end
+
+	if t401.available_until ~= nil then
+		v3030.available_until = t401.available_until
+	end
+
+	if t401.availableUntil ~= nil then
+		v3030.available_until = t401.availableUntil
+	end
+
+	if t401.widget_style ~= nil then
+		v3030.widget_style = t1.WidgetStyleData.jsonDecode(t401.widget_style)
+	end
+
+	if t401.widgetStyle ~= nil then
+		v3030.widget_style = t1.WidgetStyleData.jsonDecode(t401.widgetStyle)
+	end
+
+	return v3030
+end
+
+t398.descriptor = {
+	name = "UAMarketplaceCatalogHeroUnitInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogHeroUnitInputData"
+}
+t1.UAMarketplaceCatalogHeroUnitInputData = t398
+typeRegistry.default:register(t1.UAMarketplaceCatalogHeroUnitInputData)
+
+local t402 = {}
+
+t402.__index = t402
+
+function t402.new(t403: {[any]: any}?) -- line: 17905
+	-- upvalues: t402 (copy)
+	return (setmetatable({
+		entry_map = if t403 ~= nil and t403.entry_map ~= nil then t403.entry_map else {},
+		entry_order = if t403 ~= nil and t403.entry_order ~= nil then t403.entry_order else {}
+	}, t402))
+end
+function t402.encode(p245) -- line: 17914
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n163 = 0
+
+	if p245.entry_map ~= nil and next(p245.entry_map) ~= nil then
+		for v3035, v3036 in p245.entry_map do
+			local buf88 = buffer.create(0)
+			local v3038, v3039 = proto.writeTag(buf88, 0, 1, proto.wireTypes.lengthDelimited)
+			local v3040, v3041 = proto.writeString(v3038, v3039, v3035)
+			local v3042 = v3036:encode()
+			local v3043, v3044 = proto.writeTag(v3040, v3041, 2, proto.wireTypes.lengthDelimited)
+			local v3045, v3046 = proto.writeBuffer(v3043, v3044, v3042, buffer.len(v3042))
+			local v3047, v3048 = proto.writeTag(buf, n163, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n163 = proto.writeBuffer(v3047, v3048, v3045, v3046)
+		end
+	end
+
+	if p245.entry_order ~= nil and #p245.entry_order > 0 then
+		for _, v3050 in p245.entry_order do
+			local v3051, v3052 = proto.writeTag(buf, n163, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n163 = proto.writeString(v3051, v3052, v3050)
+		end
+	end
+
+	local buf89 = buffer.create(n163)
+
+	buffer.copy(buf89, 0, buf, 0, n163)
 
 	return buf89
 end
-function t409.decode(p245: buffer) -- line: 17656
-	-- upvalues: t409 (copy), proto (copy)
-	local v3054 = t409.new()
-	local n163 = 0
-
-	while n163 < buffer.len(p245) do
-		local v3056, v3057
-
-		v3056, v3057, n163 = proto.readTag(p245, n163)
-
-		if v3057 == proto.wireTypes.varint then
-			local v3058
-
-			v3058, n163 = proto.readVarInt(p245, n163)
-		elseif v3057 == proto.wireTypes.lengthDelimited then
-			if v3056 == 1 then
-				local v3059
-
-				v3059, n163 = proto.readBuffer(p245, n163)
-				v3054.id = buffer.tostring(v3059)
-			elseif v3056 == 2 then
-				local v3060
-
-				v3060, n163 = proto.readBuffer(p245, n163)
-				v3054.type = buffer.tostring(v3060)
-			else
-				local v3061, v3062 = proto.readVarInt(p245, n163)
-
-				n163 = v3062 + v3061
-			end
-		elseif v3057 == proto.wireTypes.i32 then
-			local v3063
-
-			v3063, n163 = proto.readFixed32(p245, n163)
-		elseif v3057 == proto.wireTypes.i64 then
-			local v3064
-
-			v3064, n163 = proto.readFixed64(p245, n163)
-		else
-			error("Unsupported wire type: " .. v3057)
-		end
-	end
-
-	return v3054
-end
-function t409.jsonEncode(p246) -- line: 17704
-	local t411 = {}
-
-	if p246.id ~= nil and p246.id ~= "" then
-		t411.id = p246.id
-	end
-
-	if p246.type ~= nil and p246.type ~= "" then
-		t411.type = p246.type
-	end
-
-	return t411
-end
-function t409.jsonDecode(t412: {[any]: any}) -- line: 17718
-	-- upvalues: t409 (copy)
-	local v3068 = t409.new()
-
-	if t412.id ~= nil then
-		v3068.id = t412.id
-	end
-
-	if t412.type ~= nil then
-		v3068.type = t412.type
-	end
-
-	return v3068
-end
-
-t409.descriptor = {
-	name = "CatalogItemGridInputData_CatalogItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItem"
-}
-t1.CatalogItemGridInputData_CatalogItem = t409
-typeRegistry.default:register(t1.CatalogItemGridInputData_CatalogItem)
-
-local t413 = {}
-
-t413.__index = t413
-
-function t413.new(t414: {[any]: any}?) -- line: 17748
-	-- upvalues: t413 (copy)
-	return (setmetatable({
-		entry_map = if t414 ~= nil and t414.entry_map ~= nil then t414.entry_map else {},
-		entry_order = if t414 ~= nil and t414.entry_order ~= nil then t414.entry_order else {},
-		content_pools = if t414 ~= nil and t414.content_pools ~= nil then t414.content_pools else {}
-	}, t413))
-end
-function t413.encode(p247) -- line: 17758
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t402.decode(p246: buffer) -- line: 17944
+	-- upvalues: t402 (copy), proto (copy), t1 (copy)
+	local v3055 = t402.new()
 	local n164 = 0
 
-	if p247.entry_map ~= nil and next(p247.entry_map) ~= nil then
-		for v3073, v3074 in p247.entry_map do
-			local buf90 = buffer.create(0)
-			local v3076, v3077 = proto.writeTag(buf90, 0, 1, proto.wireTypes.lengthDelimited)
-			local v3078, v3079 = proto.writeString(v3076, v3077, v3073)
-			local v3080 = v3074:encode()
-			local v3081, v3082 = proto.writeTag(v3078, v3079, 2, proto.wireTypes.lengthDelimited)
-			local v3083, v3084 = proto.writeBuffer(v3081, v3082, v3080, buffer.len(v3080))
-			local v3085, v3086 = proto.writeTag(buf, n164, 1, proto.wireTypes.lengthDelimited)
+	while n164 < buffer.len(p246) do
+		local v3057, v3058
 
-			buf, n164 = proto.writeBuffer(v3085, v3086, v3083, v3084)
+		v3057, v3058, n164 = proto.readTag(p246, n164)
+
+		if v3058 == proto.wireTypes.varint then
+			local v3059
+
+			v3059, n164 = proto.readVarInt(p246, n164)
+		elseif v3058 == proto.wireTypes.lengthDelimited then
+			if v3057 == 1 then
+				local v3060
+
+				v3060, n164 = proto.readBuffer(p246, n164)
+
+				local v3061 = t1.UAMarketplaceCatalogFeedInputData_EntryMapEntry.decode(v3060)
+				local v3062 = t1.FeedEntry.new()
+
+				v3055.entry_map[v3061.key or ""] = v3061.value or v3062
+			elseif v3057 == 2 then
+				local v3063
+
+				v3063, n164 = proto.readBuffer(p246, n164)
+				table.insert(v3055.entry_order, buffer.tostring(v3063))
+			else
+				local v3064, v3065 = proto.readVarInt(p246, n164)
+
+				n164 = v3065 + v3064
+			end
+		elseif v3058 == proto.wireTypes.i32 then
+			local v3066
+
+			v3066, n164 = proto.readFixed32(p246, n164)
+		elseif v3058 == proto.wireTypes.i64 then
+			local v3067
+
+			v3067, n164 = proto.readFixed64(p246, n164)
+		else
+			error("Unsupported wire type: " .. v3058)
 		end
+	end
+
+	return v3055
+end
+function t402.jsonEncode(p247) -- line: 17999
+	local t404 = {}
+
+	if p247.entry_map ~= nil and next(p247.entry_map) ~= nil then
+		local t405 = {}
+
+		for v3071, v3072 in p247.entry_map do
+			t405[v3071] = v3072:jsonEncode()
+		end
+
+		t404.entryMap = t405
 	end
 
 	if p247.entry_order ~= nil and #p247.entry_order > 0 then
-		for _, v3088 in p247.entry_order do
-			local v3089, v3090 = proto.writeTag(buf, n164, 2, proto.wireTypes.lengthDelimited)
+		local t406 = {}
 
-			buf, n164 = proto.writeString(v3089, v3090, v3088)
+		for _, v3075 in p247.entry_order do
+			table.insert(t406, v3075)
 		end
+
+		t404.entryOrder = t406
 	end
 
-	if p247.content_pools ~= nil and next(p247.content_pools) ~= nil then
-		for v3091, v3092 in p247.content_pools do
-			local buf91 = buffer.create(0)
-			local v3094, v3095 = proto.writeTag(buf91, 0, 1, proto.wireTypes.lengthDelimited)
-			local v3096, v3097 = proto.writeString(v3094, v3095, v3091)
-			local v3098 = v3092:encode()
-			local v3099, v3100 = proto.writeTag(v3096, v3097, 2, proto.wireTypes.lengthDelimited)
-			local v3101, v3102 = proto.writeBuffer(v3099, v3100, v3098, buffer.len(v3098))
-			local v3103, v3104 = proto.writeTag(buf, n164, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n164 = proto.writeBuffer(v3103, v3104, v3101, v3102)
-		end
-	end
-
-	local buf92 = buffer.create(n164)
-
-	buffer.copy(buf92, 0, buf, 0, n164)
-
-	return buf92
+	return t404
 end
-function t413.decode(p248: buffer) -- line: 17802
-	-- upvalues: t413 (copy), proto (copy), t1 (copy)
-	local v3107 = t413.new()
-	local n165 = 0
+function t402.jsonDecode(t407: {[any]: any}) -- line: 18021
+	-- upvalues: t402 (copy), t1 (copy)
+	local v3077 = t402.new()
 
-	while n165 < buffer.len(p248) do
-		local v3109, v3110
+	if t407.entry_map ~= nil then
+		local t408 = {}
 
-		v3109, v3110, n165 = proto.readTag(p248, n165)
-
-		if v3110 == proto.wireTypes.varint then
-			local v3111
-
-			v3111, n165 = proto.readVarInt(p248, n165)
-		elseif v3110 == proto.wireTypes.lengthDelimited then
-			if v3109 == 1 then
-				local v3112
-
-				v3112, n165 = proto.readBuffer(p248, n165)
-
-				local v3113 = t1.SearchResultsFeedInputData_EntryMapEntry.decode(v3112)
-				local v3114 = t1.FeedEntry.new()
-
-				v3107.entry_map[v3113.key or ""] = v3113.value or v3114
-			elseif v3109 == 2 then
-				local v3115
-
-				v3115, n165 = proto.readBuffer(p248, n165)
-				table.insert(v3107.entry_order, buffer.tostring(v3115))
-			elseif v3109 == 3 then
-				local v3116
-
-				v3116, n165 = proto.readBuffer(p248, n165)
-
-				local v3117 = t1.SearchResultsFeedInputData_ContentPoolsEntry.decode(v3116)
-				local v3118 = t1.ContentPool.new()
-
-				v3107.content_pools[v3117.key or ""] = v3117.value or v3118
-			else
-				local v3119, v3120 = proto.readVarInt(p248, n165)
-
-				n165 = v3120 + v3119
-			end
-		elseif v3110 == proto.wireTypes.i32 then
-			local v3121
-
-			v3121, n165 = proto.readFixed32(p248, n165)
-		elseif v3110 == proto.wireTypes.i64 then
-			local v3122
-
-			v3122, n165 = proto.readFixed64(p248, n165)
-		else
-			error("Unsupported wire type: " .. v3110)
-		end
-	end
-
-	return v3107
-end
-function t413.jsonEncode(p249) -- line: 17869
-	local t415 = {}
-
-	if p249.entry_map ~= nil and next(p249.entry_map) ~= nil then
-		local t416 = {}
-
-		for v3126, v3127 in p249.entry_map do
-			t416[v3126] = v3127:jsonEncode()
+		for v3079, v3080 in t407.entry_map do
+			t408[v3079] = t1.FeedEntry.jsonDecode(v3080)
 		end
 
-		t415.entryMap = t416
+		v3077.entry_map = t408
 	end
 
-	if p249.entry_order ~= nil and #p249.entry_order > 0 then
-		local t417 = {}
+	if t407.entryMap ~= nil then
+		local t409 = {}
 
-		for _, v3130 in p249.entry_order do
-			table.insert(t417, v3130)
+		for v3082, v3083 in t407.entryMap do
+			t409[v3082] = t1.FeedEntry.jsonDecode(v3083)
 		end
 
-		t415.entryOrder = t417
+		v3077.entry_map = t409
 	end
 
-	if p249.content_pools ~= nil and next(p249.content_pools) ~= nil then
-		local t418 = {}
+	if t407.entry_order ~= nil then
+		local t410 = {}
 
-		for v3132, v3133 in p249.content_pools do
-			t418[v3132] = v3133:jsonEncode()
+		for _, v3086 in t407.entry_order do
+			table.insert(t410, v3086)
 		end
 
-		t415.contentPools = t418
+		v3077.entry_order = t410
 	end
 
-	return t415
-end
-function t413.jsonDecode(t419: {[any]: any}) -- line: 17899
-	-- upvalues: t413 (copy), t1 (copy)
-	local v3135 = t413.new()
+	if t407.entryOrder ~= nil then
+		local t411 = {}
 
-	if t419.entry_map ~= nil then
-		local t420 = {}
-
-		for v3137, v3138 in t419.entry_map do
-			t420[v3137] = t1.FeedEntry.jsonDecode(v3138)
+		for _, v3089 in t407.entryOrder do
+			table.insert(t411, v3089)
 		end
 
-		v3135.entry_map = t420
+		v3077.entry_order = t411
 	end
 
-	if t419.entryMap ~= nil then
-		local t421 = {}
-
-		for v3140, v3141 in t419.entryMap do
-			t421[v3140] = t1.FeedEntry.jsonDecode(v3141)
-		end
-
-		v3135.entry_map = t421
-	end
-
-	if t419.entry_order ~= nil then
-		local t422 = {}
-
-		for _, v3144 in t419.entry_order do
-			table.insert(t422, v3144)
-		end
-
-		v3135.entry_order = t422
-	end
-
-	if t419.entryOrder ~= nil then
-		local t423 = {}
-
-		for _, v3147 in t419.entryOrder do
-			table.insert(t423, v3147)
-		end
-
-		v3135.entry_order = t423
-	end
-
-	if t419.content_pools ~= nil then
-		local t424 = {}
-
-		for v3149, v3150 in t419.content_pools do
-			t424[v3149] = t1.ContentPool.jsonDecode(v3150)
-		end
-
-		v3135.content_pools = t424
-	end
-
-	if t419.contentPools ~= nil then
-		local t425 = {}
-
-		for v3152, v3153 in t419.contentPools do
-			t425[v3152] = t1.ContentPool.jsonDecode(v3153)
-		end
-
-		v3135.content_pools = t425
-	end
-
-	return v3135
+	return v3077
 end
 
-t413.descriptor = {
-	name = "SearchResultsFeedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SearchResultsFeedInputData"
+t402.descriptor = {
+	name = "UAMarketplaceCatalogFeedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogFeedInputData"
 }
-t1.SearchResultsFeedInputData = t413
-typeRegistry.default:register(t1.SearchResultsFeedInputData)
+t1.UAMarketplaceCatalogFeedInputData = t402
+typeRegistry.default:register(t1.UAMarketplaceCatalogFeedInputData)
 
-local t426 = {}
+local t412 = {}
 
-t426.__index = t426
+t412.__index = t412
 
-function t426.new(t427: {[any]: any}?) -- line: 17973
-	-- upvalues: t426 (copy)
+function t412.new(t413: {[any]: any}?) -- line: 18079
+	-- upvalues: t412 (copy)
 	return (setmetatable({
-		key = if t427 ~= nil and t427.key ~= nil then t427.key else "",
-		value = if t427 ~= nil and t427.value ~= nil then t427.value else nil
-	}, t426))
+		key = if t413 ~= nil and t413.key ~= nil then t413.key else "",
+		value = if t413 ~= nil and t413.value ~= nil then t413.value else nil
+	}, t412))
 end
-function t426.encode(p250) -- line: 17982
+function t412.encode(p248) -- line: 18088
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
+	local n165 = 0
+
+	if p248.key ~= nil and p248.key ~= "" then
+		local v3094, v3095 = proto.writeTag(buf, n165, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n165 = proto.writeString(v3094, v3095, p248.key)
+	end
+
+	if p248.value ~= nil then
+		local v3096 = p248.value:encode()
+		local v3097, v3098 = proto.writeTag(buf, n165, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n165 = proto.writeBuffer(v3097, v3098, v3096, buffer.len(v3096))
+	end
+
+	local buf90 = buffer.create(n165)
+
+	buffer.copy(buf90, 0, buf, 0, n165)
+
+	return buf90
+end
+function t412.decode(p249: buffer) -- line: 18110
+	-- upvalues: t412 (copy), proto (copy), t1 (copy)
+	local v3101 = t412.new()
 	local n166 = 0
 
-	if p250.key ~= nil and p250.key ~= "" then
-		local v3158, v3159 = proto.writeTag(buf, n166, 1, proto.wireTypes.lengthDelimited)
+	while n166 < buffer.len(p249) do
+		local v3103, v3104
 
-		buf, n166 = proto.writeString(v3158, v3159, p250.key)
+		v3103, v3104, n166 = proto.readTag(p249, n166)
+
+		if v3104 == proto.wireTypes.varint then
+			local v3105
+
+			v3105, n166 = proto.readVarInt(p249, n166)
+		elseif v3104 == proto.wireTypes.lengthDelimited then
+			if v3103 == 1 then
+				local v3106
+
+				v3106, n166 = proto.readBuffer(p249, n166)
+				v3101.key = buffer.tostring(v3106)
+			elseif v3103 == 2 then
+				local v3107
+
+				v3107, n166 = proto.readBuffer(p249, n166)
+				v3101.value = t1.FeedEntry.decode(v3107)
+			else
+				local v3108, v3109 = proto.readVarInt(p249, n166)
+
+				n166 = v3109 + v3108
+			end
+		elseif v3104 == proto.wireTypes.i32 then
+			local v3110
+
+			v3110, n166 = proto.readFixed32(p249, n166)
+		elseif v3104 == proto.wireTypes.i64 then
+			local v3111
+
+			v3111, n166 = proto.readFixed64(p249, n166)
+		else
+			error("Unsupported wire type: " .. v3104)
+		end
+	end
+
+	return v3101
+end
+function t412.jsonEncode(p250) -- line: 18160
+	local t414 = {}
+
+	if p250.key ~= nil and p250.key ~= "" then
+		t414.key = p250.key
 	end
 
 	if p250.value ~= nil then
-		local v3160 = p250.value:encode()
-		local v3161, v3162 = proto.writeTag(buf, n166, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n166 = proto.writeBuffer(v3161, v3162, v3160, buffer.len(v3160))
+		t414.value = p250.value:jsonEncode()
 	end
 
-	local buf93 = buffer.create(n166)
+	return t414
+end
+function t412.jsonDecode(t415: {[any]: any}) -- line: 18176
+	-- upvalues: t412 (copy), t1 (copy)
+	local v3115 = t412.new()
 
-	buffer.copy(buf93, 0, buf, 0, n166)
+	if t415.key ~= nil then
+		v3115.key = t415.key
+	end
+
+	if t415.value ~= nil then
+		v3115.value = t1.FeedEntry.jsonDecode(t415.value)
+	end
+
+	return v3115
+end
+
+t412.descriptor = {
+	name = "UAMarketplaceCatalogFeedInputData_EntryMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+}
+t1.UAMarketplaceCatalogFeedInputData_EntryMapEntry = t412
+typeRegistry.default:register(t1.UAMarketplaceCatalogFeedInputData_EntryMapEntry)
+
+local t416 = {}
+
+t416.__index = t416
+
+function t416.new(t417: {[any]: any}?) -- line: 18207
+	-- upvalues: t416 (copy)
+	return (setmetatable({
+		marketplace_catalog_category_items = if t417 ~= nil and t417.marketplace_catalog_category_items ~= nil then t417.marketplace_catalog_category_items else {},
+		active_category_id = if t417 ~= nil and t417.active_category_id ~= nil then t417.active_category_id else "",
+		active_tooltip_idx = if t417 ~= nil and t417.active_tooltip_idx ~= nil then t417.active_tooltip_idx else 0
+	}, t416))
+end
+function t416.encode(p251) -- line: 18220
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n167 = 0
+
+	if p251.marketplace_catalog_category_items ~= nil and #p251.marketplace_catalog_category_items > 0 then
+		for _, v3121 in p251.marketplace_catalog_category_items do
+			local v3122 = v3121:encode()
+			local v3123, v3124 = proto.writeTag(buf, n167, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n167 = proto.writeBuffer(v3123, v3124, v3122, buffer.len(v3122))
+		end
+	end
+
+	if p251.active_category_id ~= nil and p251.active_category_id ~= "" then
+		local v3125, v3126 = proto.writeTag(buf, n167, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n167 = proto.writeString(v3125, v3126, p251.active_category_id)
+	end
+
+	if p251.active_tooltip_idx ~= nil and p251.active_tooltip_idx ~= 0 then
+		local v3127, v3128 = proto.writeTag(buf, n167, 3, proto.wireTypes.varint)
+
+		buf, n167 = proto.writeVarInt(v3127, v3128, p251.active_tooltip_idx)
+	end
+
+	local buf91 = buffer.create(n167)
+
+	buffer.copy(buf91, 0, buf, 0, n167)
+
+	return buf91
+end
+function t416.decode(p252: buffer) -- line: 18249
+	-- upvalues: t416 (copy), proto (copy), t1 (copy)
+	local v3131 = t416.new()
+	local n168 = 0
+
+	while n168 < buffer.len(p252) do
+		local v3133, v3134
+
+		v3133, v3134, n168 = proto.readTag(p252, n168)
+
+		if v3134 == proto.wireTypes.varint then
+			if v3133 == 3 then
+				local v3135
+
+				v3135, n168 = proto.readVarIntI64(p252, n168)
+				v3131.active_tooltip_idx = v3135
+			else
+				local v3136
+
+				v3136, n168 = proto.readVarInt(p252, n168)
+			end
+		elseif v3134 == proto.wireTypes.lengthDelimited then
+			if v3133 == 1 then
+				local v3137
+
+				v3137, n168 = proto.readBuffer(p252, n168)
+				table.insert(v3131.marketplace_catalog_category_items, t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem.decode(v3137))
+			elseif v3133 == 2 then
+				local v3138
+
+				v3138, n168 = proto.readBuffer(p252, n168)
+				v3131.active_category_id = buffer.tostring(v3138)
+			else
+				local v3139, v3140 = proto.readVarInt(p252, n168)
+
+				n168 = v3140 + v3139
+			end
+		elseif v3134 == proto.wireTypes.i32 then
+			local v3141
+
+			v3141, n168 = proto.readFixed32(p252, n168)
+		elseif v3134 == proto.wireTypes.i64 then
+			local v3142
+
+			v3142, n168 = proto.readFixed64(p252, n168)
+		else
+			error("Unsupported wire type: " .. v3134)
+		end
+	end
+
+	return v3131
+end
+function t416.jsonEncode(p253) -- line: 18307
+	local t418 = {}
+
+	if p253.marketplace_catalog_category_items ~= nil and #p253.marketplace_catalog_category_items > 0 then
+		local t419 = {}
+
+		for _, v3147 in p253.marketplace_catalog_category_items do
+			table.insert(t419, v3147:jsonEncode())
+		end
+
+		t418.marketplaceCatalogCategoryItems = t419
+	end
+
+	if p253.active_category_id ~= nil and p253.active_category_id ~= "" then
+		t418.activeCategoryId = p253.active_category_id
+	end
+
+	if p253.active_tooltip_idx ~= nil and p253.active_tooltip_idx ~= 0 then
+		t418.activeTooltipIdx = p253.active_tooltip_idx
+	end
+
+	return t418
+end
+function t416.jsonDecode(t420: {[any]: any}) -- line: 18331
+	-- upvalues: t416 (copy), t1 (copy)
+	local v3149 = t416.new()
+
+	if t420.marketplace_catalog_category_items ~= nil then
+		local t421 = {}
+
+		for _, v3152 in t420.marketplace_catalog_category_items do
+			table.insert(t421, t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem.jsonDecode(v3152))
+		end
+
+		v3149.marketplace_catalog_category_items = t421
+	end
+
+	if t420.marketplaceCatalogCategoryItems ~= nil then
+		local t422 = {}
+
+		for _, v3155 in t420.marketplaceCatalogCategoryItems do
+			table.insert(t422, t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem.jsonDecode(v3155))
+		end
+
+		v3149.marketplace_catalog_category_items = t422
+	end
+
+	if t420.active_category_id ~= nil then
+		v3149.active_category_id = t420.active_category_id
+	end
+
+	if t420.activeCategoryId ~= nil then
+		v3149.active_category_id = t420.activeCategoryId
+	end
+
+	if t420.active_tooltip_idx ~= nil then
+		v3149.active_tooltip_idx = t420.active_tooltip_idx
+	end
+
+	if t420.activeTooltipIdx ~= nil then
+		v3149.active_tooltip_idx = t420.activeTooltipIdx
+	end
+
+	return v3149
+end
+
+t416.descriptor = {
+	name = "UAMarketplaceCatalogCategoryMenuInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UAMarketplaceCatalogCategoryMenuInputData"
+}
+t1.UAMarketplaceCatalogCategoryMenuInputData = t416
+typeRegistry.default:register(t1.UAMarketplaceCatalogCategoryMenuInputData)
+
+local t423 = {}
+
+t423.__index = t423
+
+function t423.new(t424: {[any]: any}?) -- line: 18394
+	-- upvalues: t423 (copy)
+	return (setmetatable({
+		marketplace_catalog_category_item_id = if t424 ~= nil and t424.marketplace_catalog_category_item_id ~= nil then t424.marketplace_catalog_category_item_id else ""
+	}, t423))
+end
+function t423.encode(p254) -- line: 18408
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n169 = 0
+
+	if p254.marketplace_catalog_category_item_id ~= nil and p254.marketplace_catalog_category_item_id ~= "" then
+		local v3160, v3161 = proto.writeTag(buf, n169, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n169 = proto.writeString(v3160, v3161, p254.marketplace_catalog_category_item_id)
+	end
+
+	local buf92 = buffer.create(n169)
+
+	buffer.copy(buf92, 0, buf, 0, n169)
+
+	return buf92
+end
+function t423.decode(p255: buffer) -- line: 18424
+	-- upvalues: t423 (copy), proto (copy)
+	local v3164 = t423.new()
+	local n170 = 0
+
+	while n170 < buffer.len(p255) do
+		local v3166, v3167
+
+		v3166, v3167, n170 = proto.readTag(p255, n170)
+
+		if v3167 == proto.wireTypes.varint then
+			local v3168
+
+			v3168, n170 = proto.readVarInt(p255, n170)
+		elseif v3167 == proto.wireTypes.lengthDelimited then
+			if v3166 == 1 then
+				local v3169
+
+				v3169, n170 = proto.readBuffer(p255, n170)
+				v3164.marketplace_catalog_category_item_id = buffer.tostring(v3169)
+			else
+				local v3170, v3171 = proto.readVarInt(p255, n170)
+
+				n170 = v3171 + v3170
+			end
+		elseif v3167 == proto.wireTypes.i32 then
+			local v3172
+
+			v3172, n170 = proto.readFixed32(p255, n170)
+		elseif v3167 == proto.wireTypes.i64 then
+			local v3173
+
+			v3173, n170 = proto.readFixed64(p255, n170)
+		else
+			error("Unsupported wire type: " .. v3167)
+		end
+	end
+
+	return v3164
+end
+function t423.jsonEncode(p256) -- line: 18469
+	local t425 = {}
+
+	if p256.marketplace_catalog_category_item_id ~= nil and p256.marketplace_catalog_category_item_id ~= "" then
+		t425.marketplaceCatalogCategoryItemId = p256.marketplace_catalog_category_item_id
+	end
+
+	return t425
+end
+function t423.jsonDecode(t426: {[any]: any}) -- line: 18481
+	-- upvalues: t423 (copy)
+	local v3177 = t423.new()
+
+	if t426.marketplace_catalog_category_item_id ~= nil then
+		v3177.marketplace_catalog_category_item_id = t426.marketplace_catalog_category_item_id
+	end
+
+	if t426.marketplaceCatalogCategoryItemId ~= nil then
+		v3177.marketplace_catalog_category_item_id = t426.marketplaceCatalogCategoryItemId
+	end
+
+	return v3177
+end
+
+t423.descriptor = {
+	name = "UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceCatalogCategoryItem"
+}
+t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem = t423
+typeRegistry.default:register(t1.UAMarketplaceCatalogCategoryMenuInputData_MarketplaceCatalogCategoryItem)
+
+local t427 = {}
+
+t427.__index = t427
+
+function t427.new(t428: {[any]: any}?) -- line: 18514
+	-- upvalues: t427 (copy)
+	return (setmetatable({
+		items = if t428 ~= nil and t428.items ~= nil then t428.items else {},
+		preview_columns = if t428 ~= nil and t428.preview_columns ~= nil then t428.preview_columns else 0,
+		impression_id = if t428 ~= nil and t428.impression_id ~= nil then t428.impression_id else ""
+	}, t427))
+end
+function t427.encode(p257) -- line: 18522
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n171 = 0
+
+	if p257.items ~= nil and #p257.items > 0 then
+		for _, v3183 in p257.items do
+			local v3184 = v3183:encode()
+			local v3185, v3186 = proto.writeTag(buf, n171, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n171 = proto.writeBuffer(v3185, v3186, v3184, buffer.len(v3184))
+		end
+	end
+
+	if p257.preview_columns ~= nil and p257.preview_columns ~= 0 then
+		local v3187, v3188 = proto.writeTag(buf, n171, 2, proto.wireTypes.varint)
+
+		buf, n171 = proto.writeVarInt(v3187, v3188, p257.preview_columns)
+	end
+
+	if p257.impression_id ~= nil and p257.impression_id ~= "" then
+		local v3189, v3190 = proto.writeTag(buf, n171, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n171 = proto.writeString(v3189, v3190, p257.impression_id)
+	end
+
+	local buf93 = buffer.create(n171)
+
+	buffer.copy(buf93, 0, buf, 0, n171)
 
 	return buf93
 end
-function t426.decode(p251: buffer) -- line: 18004
-	-- upvalues: t426 (copy), proto (copy), t1 (copy)
-	local v3165 = t426.new()
-	local n167 = 0
+function t427.decode(p258: buffer) -- line: 18549
+	-- upvalues: t427 (copy), proto (copy), t1 (copy)
+	local v3193 = t427.new()
+	local n172 = 0
 
-	while n167 < buffer.len(p251) do
-		local v3167, v3168
+	while n172 < buffer.len(p258) do
+		local v3195, v3196
 
-		v3167, v3168, n167 = proto.readTag(p251, n167)
+		v3195, v3196, n172 = proto.readTag(p258, n172)
 
-		if v3168 == proto.wireTypes.varint then
-			local v3169
+		if v3196 == proto.wireTypes.varint then
+			if v3195 == 2 then
+				local v3197
 
-			v3169, n167 = proto.readVarInt(p251, n167)
-		elseif v3168 == proto.wireTypes.lengthDelimited then
-			if v3167 == 1 then
-				local v3170
-
-				v3170, n167 = proto.readBuffer(p251, n167)
-				v3165.key = buffer.tostring(v3170)
-			elseif v3167 == 2 then
-				local v3171
-
-				v3171, n167 = proto.readBuffer(p251, n167)
-				v3165.value = t1.FeedEntry.decode(v3171)
+				v3197, n172 = proto.readVarIntI32(p258, n172)
+				v3193.preview_columns = v3197
 			else
-				local v3172, v3173 = proto.readVarInt(p251, n167)
+				local v3198
 
-				n167 = v3173 + v3172
+				v3198, n172 = proto.readVarInt(p258, n172)
 			end
-		elseif v3168 == proto.wireTypes.i32 then
-			local v3174
+		elseif v3196 == proto.wireTypes.lengthDelimited then
+			if v3195 == 1 then
+				local v3199
 
-			v3174, n167 = proto.readFixed32(p251, n167)
-		elseif v3168 == proto.wireTypes.i64 then
-			local v3175
+				v3199, n172 = proto.readBuffer(p258, n172)
+				table.insert(v3193.items, t1.CatalogItemGridInputData_CatalogItem.decode(v3199))
+			elseif v3195 == 3 then
+				local v3200
 
-			v3175, n167 = proto.readFixed64(p251, n167)
+				v3200, n172 = proto.readBuffer(p258, n172)
+				v3193.impression_id = buffer.tostring(v3200)
+			else
+				local v3201, v3202 = proto.readVarInt(p258, n172)
+
+				n172 = v3202 + v3201
+			end
+		elseif v3196 == proto.wireTypes.i32 then
+			local v3203
+
+			v3203, n172 = proto.readFixed32(p258, n172)
+		elseif v3196 == proto.wireTypes.i64 then
+			local v3204
+
+			v3204, n172 = proto.readFixed64(p258, n172)
 		else
-			error("Unsupported wire type: " .. v3168)
+			error("Unsupported wire type: " .. v3196)
 		end
 	end
 
-	return v3165
+	return v3193
 end
-function t426.jsonEncode(p252) -- line: 18054
-	local t428 = {}
+function t427.jsonEncode(p259) -- line: 18602
+	local t429 = {}
 
-	if p252.key ~= nil and p252.key ~= "" then
-		t428.key = p252.key
+	if p259.items ~= nil and #p259.items > 0 then
+		local t430 = {}
+
+		for _, v3209 in p259.items do
+			table.insert(t430, v3209:jsonEncode())
+		end
+
+		t429.items = t430
 	end
 
-	if p252.value ~= nil then
-		t428.value = p252.value:jsonEncode()
+	if p259.preview_columns ~= nil and p259.preview_columns ~= 0 then
+		t429.previewColumns = p259.preview_columns
 	end
 
-	return t428
+	if p259.impression_id ~= nil and p259.impression_id ~= "" then
+		t429.impressionId = p259.impression_id
+	end
+
+	return t429
 end
-function t426.jsonDecode(t429: {[any]: any}) -- line: 18070
-	-- upvalues: t426 (copy), t1 (copy)
-	local v3179 = t426.new()
+function t427.jsonDecode(t431: {[any]: any}) -- line: 18624
+	-- upvalues: t427 (copy), t1 (copy)
+	local v3211 = t427.new()
 
-	if t429.key ~= nil then
-		v3179.key = t429.key
+	if t431.items ~= nil then
+		local t432 = {}
+
+		for _, v3214 in t431.items do
+			table.insert(t432, t1.CatalogItemGridInputData_CatalogItem.jsonDecode(v3214))
+		end
+
+		v3211.items = t432
 	end
 
-	if t429.value ~= nil then
-		v3179.value = t1.FeedEntry.jsonDecode(t429.value)
+	if t431.preview_columns ~= nil then
+		v3211.preview_columns = t431.preview_columns
 	end
 
-	return v3179
+	if t431.previewColumns ~= nil then
+		v3211.preview_columns = t431.previewColumns
+	end
+
+	if t431.impression_id ~= nil then
+		v3211.impression_id = t431.impression_id
+	end
+
+	if t431.impressionId ~= nil then
+		v3211.impression_id = t431.impressionId
+	end
+
+	return v3211
 end
 
-t426.descriptor = {
-	name = "SearchResultsFeedInputData_EntryMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+t427.descriptor = {
+	name = "CatalogItemGridInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemGridInputData"
 }
-t1.SearchResultsFeedInputData_EntryMapEntry = t426
-typeRegistry.default:register(t1.SearchResultsFeedInputData_EntryMapEntry)
+t1.CatalogItemGridInputData = t427
+typeRegistry.default:register(t1.CatalogItemGridInputData)
 
-local t430 = {}
+local t433 = {}
 
-t430.__index = t430
+t433.__index = t433
 
-function t430.new(t431: {[any]: any}?) -- line: 18100
-	-- upvalues: t430 (copy)
+function t433.new(t434: {[any]: any}?) -- line: 18669
+	-- upvalues: t433 (copy)
 	return (setmetatable({
-		key = if t431 ~= nil and t431.key ~= nil then t431.key else "",
-		value = if t431 ~= nil and t431.value ~= nil then t431.value else nil
-	}, t430))
+		id = if t434 ~= nil and t434.id ~= nil then t434.id else "",
+		type = if t434 ~= nil and t434.type ~= nil then t434.type else ""
+	}, t433))
 end
-function t430.encode(p253) -- line: 18109
+function t433.encode(p260) -- line: 18678
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n168 = 0
+	local n173 = 0
 
-	if p253.key ~= nil and p253.key ~= "" then
-		local v3184, v3185 = proto.writeTag(buf, n168, 1, proto.wireTypes.lengthDelimited)
+	if p260.id ~= nil and p260.id ~= "" then
+		local v3219, v3220 = proto.writeTag(buf, n173, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n168 = proto.writeString(v3184, v3185, p253.key)
+		buf, n173 = proto.writeString(v3219, v3220, p260.id)
 	end
 
-	if p253.value ~= nil then
-		local v3186 = p253.value:encode()
-		local v3187, v3188 = proto.writeTag(buf, n168, 2, proto.wireTypes.lengthDelimited)
+	if p260.type ~= nil and p260.type ~= "" then
+		local v3221, v3222 = proto.writeTag(buf, n173, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n168 = proto.writeBuffer(v3187, v3188, v3186, buffer.len(v3186))
+		buf, n173 = proto.writeString(v3221, v3222, p260.type)
 	end
 
-	local buf94 = buffer.create(n168)
+	local buf94 = buffer.create(n173)
 
-	buffer.copy(buf94, 0, buf, 0, n168)
+	buffer.copy(buf94, 0, buf, 0, n173)
 
 	return buf94
 end
-function t430.decode(p254: buffer) -- line: 18131
-	-- upvalues: t430 (copy), proto (copy), t1 (copy)
-	local v3191 = t430.new()
-	local n169 = 0
-
-	while n169 < buffer.len(p254) do
-		local v3193, v3194
-
-		v3193, v3194, n169 = proto.readTag(p254, n169)
-
-		if v3194 == proto.wireTypes.varint then
-			local v3195
-
-			v3195, n169 = proto.readVarInt(p254, n169)
-		elseif v3194 == proto.wireTypes.lengthDelimited then
-			if v3193 == 1 then
-				local v3196
-
-				v3196, n169 = proto.readBuffer(p254, n169)
-				v3191.key = buffer.tostring(v3196)
-			elseif v3193 == 2 then
-				local v3197
-
-				v3197, n169 = proto.readBuffer(p254, n169)
-				v3191.value = t1.ContentPool.decode(v3197)
-			else
-				local v3198, v3199 = proto.readVarInt(p254, n169)
-
-				n169 = v3199 + v3198
-			end
-		elseif v3194 == proto.wireTypes.i32 then
-			local v3200
-
-			v3200, n169 = proto.readFixed32(p254, n169)
-		elseif v3194 == proto.wireTypes.i64 then
-			local v3201
-
-			v3201, n169 = proto.readFixed64(p254, n169)
-		else
-			error("Unsupported wire type: " .. v3194)
-		end
-	end
-
-	return v3191
-end
-function t430.jsonEncode(p255) -- line: 18181
-	local t432 = {}
-
-	if p255.key ~= nil and p255.key ~= "" then
-		t432.key = p255.key
-	end
-
-	if p255.value ~= nil then
-		t432.value = p255.value:jsonEncode()
-	end
-
-	return t432
-end
-function t430.jsonDecode(t433: {[any]: any}) -- line: 18197
-	-- upvalues: t430 (copy), t1 (copy)
-	local v3205 = t430.new()
-
-	if t433.key ~= nil then
-		v3205.key = t433.key
-	end
-
-	if t433.value ~= nil then
-		v3205.value = t1.ContentPool.jsonDecode(t433.value)
-	end
-
-	return v3205
-end
-
-t430.descriptor = {
-	name = "SearchResultsFeedInputData_ContentPoolsEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ContentPoolsEntry"
-}
-t1.SearchResultsFeedInputData_ContentPoolsEntry = t430
-typeRegistry.default:register(t1.SearchResultsFeedInputData_ContentPoolsEntry)
-
-local t434 = {}
-
-t434.__index = t434
-
-function t434.new(t435: {[any]: any}?) -- line: 18227
-	-- upvalues: t434 (copy)
-	return (setmetatable({
-		universe_id = if t435 ~= nil and t435.universe_id ~= nil then t435.universe_id else "",
-		is_content_locked = t435 ~= nil and (t435.is_content_locked ~= nil and t435.is_content_locked)
-	}, t434))
-end
-function t434.encode(p256) -- line: 18236
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n170 = 0
-
-	if p256.universe_id ~= nil and p256.universe_id ~= "" then
-		local v3210, v3211 = proto.writeTag(buf, n170, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n170 = proto.writeString(v3210, v3211, p256.universe_id)
-	end
-
-	if p256.is_content_locked then
-		local v3212, v3213 = proto.writeTag(buf, n170, 2, proto.wireTypes.varint)
-
-		buf, n170 = proto.writeVarInt(v3212, v3213, not p256.is_content_locked and 0 or 1)
-	end
-
-	local buf95 = buffer.create(n170)
-
-	buffer.copy(buf95, 0, buf, 0, n170)
-
-	return buf95
-end
-function t434.decode(p257: buffer) -- line: 18255
-	-- upvalues: t434 (copy), proto (copy)
-	local v3216 = t434.new()
-	local n171 = 0
-
-	while n171 < buffer.len(p257) do
-		local v3218, v3219
-
-		v3218, v3219, n171 = proto.readTag(p257, n171)
-
-		if v3219 == proto.wireTypes.varint then
-			if v3218 == 2 then
-				local v3220
-
-				v3220, n171 = proto.readVarInt(p257, n171)
-				v3216.is_content_locked = v3220 ~= 0
-			else
-				local v3221
-
-				v3221, n171 = proto.readVarInt(p257, n171)
-			end
-		elseif v3219 == proto.wireTypes.lengthDelimited then
-			if v3218 == 1 then
-				local v3222
-
-				v3222, n171 = proto.readBuffer(p257, n171)
-				v3216.universe_id = buffer.tostring(v3222)
-			else
-				local v3223, v3224 = proto.readVarInt(p257, n171)
-
-				n171 = v3224 + v3223
-			end
-		elseif v3219 == proto.wireTypes.i32 then
-			local v3225
-
-			v3225, n171 = proto.readFixed32(p257, n171)
-		elseif v3219 == proto.wireTypes.i64 then
-			local v3226
-
-			v3226, n171 = proto.readFixed64(p257, n171)
-		else
-			error("Unsupported wire type: " .. v3219)
-		end
-	end
-
-	return v3216
-end
-function t434.jsonEncode(p258) -- line: 18303
-	local t436 = {}
-
-	if p258.universe_id ~= nil and p258.universe_id ~= "" then
-		t436.universeId = p258.universe_id
-	end
-
-	if p258.is_content_locked then
-		t436.isContentLocked = p258.is_content_locked
-	end
-
-	return t436
-end
-function t434.jsonDecode(t437: {[any]: any}) -- line: 18317
-	-- upvalues: t434 (copy)
-	local v3230 = t434.new()
-
-	if t437.universe_id ~= nil then
-		v3230.universe_id = t437.universe_id
-	end
-
-	if t437.universeId ~= nil then
-		v3230.universe_id = t437.universeId
-	end
-
-	if t437.is_content_locked ~= nil then
-		v3230.is_content_locked = t437.is_content_locked
-	end
-
-	if t437.isContentLocked ~= nil then
-		v3230.is_content_locked = t437.isContentLocked
-	end
-
-	return v3230
-end
-
-t434.descriptor = {
-	name = "ExperienceEmphasisTileInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceEmphasisTileInputData"
-}
-t1.ExperienceEmphasisTileInputData = t434
-typeRegistry.default:register(t1.ExperienceEmphasisTileInputData)
-
-local t438 = {}
-
-t438.__index = t438
-
-function t438.new(t439: {[any]: any}?) -- line: 18353
-	-- upvalues: t438 (copy)
-	return (setmetatable({
-		overview_rich_text = if t439 ~= nil and t439.overview_rich_text ~= nil then t439.overview_rich_text else "",
-		result_entry = if t439 ~= nil and t439.result_entry ~= nil then t439.result_entry else nil,
-		follow_up_queries = if t439 ~= nil and t439.follow_up_queries ~= nil then t439.follow_up_queries else {},
-		show_loading = t439 ~= nil and (t439.show_loading ~= nil and t439.show_loading),
-		title = if t439 ~= nil and t439.title ~= nil then t439.title else "",
-		search_query = if t439 ~= nil and t439.search_query ~= nil then t439.search_query else "",
-		search_session_id = if t439 ~= nil and t439.search_session_id ~= nil then t439.search_session_id else "",
-		universe_ids = if t439 ~= nil and t439.universe_ids ~= nil then t439.universe_ids else ""
-	}, t438))
-end
-function t438.encode(p259) -- line: 18368
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n172 = 0
-
-	if p259.overview_rich_text ~= nil and p259.overview_rich_text ~= "" then
-		local v3235, v3236 = proto.writeTag(buf, n172, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n172 = proto.writeString(v3235, v3236, p259.overview_rich_text)
-	end
-
-	if p259.result_entry ~= nil then
-		local v3237 = p259.result_entry:encode()
-		local v3238, v3239 = proto.writeTag(buf, n172, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n172 = proto.writeBuffer(v3238, v3239, v3237, buffer.len(v3237))
-	end
-
-	if p259.follow_up_queries ~= nil and #p259.follow_up_queries > 0 then
-		for _, v3241 in p259.follow_up_queries do
-			local v3242, v3243 = proto.writeTag(buf, n172, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n172 = proto.writeString(v3242, v3243, v3241)
-		end
-	end
-
-	if p259.show_loading then
-		local v3244, v3245 = proto.writeTag(buf, n172, 4, proto.wireTypes.varint)
-
-		buf, n172 = proto.writeVarInt(v3244, v3245, not p259.show_loading and 0 or 1)
-	end
-
-	if p259.title ~= nil and p259.title ~= "" then
-		local v3246, v3247 = proto.writeTag(buf, n172, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n172 = proto.writeString(v3246, v3247, p259.title)
-	end
-
-	if p259.search_query ~= nil and p259.search_query ~= "" then
-		local v3248, v3249 = proto.writeTag(buf, n172, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n172 = proto.writeString(v3248, v3249, p259.search_query)
-	end
-
-	if p259.search_session_id ~= nil and p259.search_session_id ~= "" then
-		local v3250, v3251 = proto.writeTag(buf, n172, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n172 = proto.writeString(v3250, v3251, p259.search_session_id)
-	end
-
-	if p259.universe_ids ~= nil and p259.universe_ids ~= "" then
-		local v3252, v3253 = proto.writeTag(buf, n172, 8, proto.wireTypes.lengthDelimited)
-
-		buf, n172 = proto.writeString(v3252, v3253, p259.universe_ids)
-	end
-
-	local buf96 = buffer.create(n172)
-
-	buffer.copy(buf96, 0, buf, 0, n172)
-
-	return buf96
-end
-function t438.decode(p260: buffer) -- line: 18420
-	-- upvalues: t438 (copy), proto (copy), t1 (copy)
-	local v3256 = t438.new()
-	local n173 = 0
-
-	while n173 < buffer.len(p260) do
-		local v3258, v3259
-
-		v3258, v3259, n173 = proto.readTag(p260, n173)
-
-		if v3259 == proto.wireTypes.varint then
-			if v3258 == 4 then
-				local v3260
-
-				v3260, n173 = proto.readVarInt(p260, n173)
-				v3256.show_loading = v3260 ~= 0
-			else
-				local v3261
-
-				v3261, n173 = proto.readVarInt(p260, n173)
-			end
-		elseif v3259 == proto.wireTypes.lengthDelimited then
-			if v3258 == 1 then
-				local v3262
-
-				v3262, n173 = proto.readBuffer(p260, n173)
-				v3256.overview_rich_text = buffer.tostring(v3262)
-			elseif v3258 == 2 then
-				local v3263
-
-				v3263, n173 = proto.readBuffer(p260, n173)
-				v3256.result_entry = t1.FeedEntry.decode(v3263)
-			elseif v3258 == 3 then
-				local v3264
-
-				v3264, n173 = proto.readBuffer(p260, n173)
-				table.insert(v3256.follow_up_queries, buffer.tostring(v3264))
-			elseif v3258 == 5 then
-				local v3265
-
-				v3265, n173 = proto.readBuffer(p260, n173)
-				v3256.title = buffer.tostring(v3265)
-			elseif v3258 == 6 then
-				local v3266
-
-				v3266, n173 = proto.readBuffer(p260, n173)
-				v3256.search_query = buffer.tostring(v3266)
-			elseif v3258 == 7 then
-				local v3267
-
-				v3267, n173 = proto.readBuffer(p260, n173)
-				v3256.search_session_id = buffer.tostring(v3267)
-			elseif v3258 == 8 then
-				local v3268
-
-				v3268, n173 = proto.readBuffer(p260, n173)
-				v3256.universe_ids = buffer.tostring(v3268)
-			else
-				local v3269, v3270 = proto.readVarInt(p260, n173)
-
-				n173 = v3270 + v3269
-			end
-		elseif v3259 == proto.wireTypes.i32 then
-			local v3271
-
-			v3271, n173 = proto.readFixed32(p260, n173)
-		elseif v3259 == proto.wireTypes.i64 then
-			local v3272
-
-			v3272, n173 = proto.readFixed64(p260, n173)
-		else
-			error("Unsupported wire type: " .. v3259)
-		end
-	end
-
-	return v3256
-end
-function t438.jsonEncode(p261) -- line: 18498
-	local t440 = {}
-
-	if p261.overview_rich_text ~= nil and p261.overview_rich_text ~= "" then
-		t440.overviewRichText = p261.overview_rich_text
-	end
-
-	if p261.result_entry ~= nil then
-		t440.resultEntry = p261.result_entry:jsonEncode()
-	end
-
-	if p261.follow_up_queries ~= nil and #p261.follow_up_queries > 0 then
-		local t441 = {}
-
-		for _, v3277 in p261.follow_up_queries do
-			table.insert(t441, v3277)
-		end
-
-		t440.followUpQueries = t441
-	end
-
-	if p261.show_loading then
-		t440.showLoading = p261.show_loading
-	end
-
-	if p261.title ~= nil and p261.title ~= "" then
-		t440.title = p261.title
-	end
-
-	if p261.search_query ~= nil and p261.search_query ~= "" then
-		t440.searchQuery = p261.search_query
-	end
-
-	if p261.search_session_id ~= nil and p261.search_session_id ~= "" then
-		t440.searchSessionId = p261.search_session_id
-	end
-
-	if p261.universe_ids ~= nil and p261.universe_ids ~= "" then
-		t440.universeIds = p261.universe_ids
-	end
-
-	return t440
-end
-function t438.jsonDecode(t442: {[any]: any}) -- line: 18540
-	-- upvalues: t438 (copy), t1 (copy)
-	local v3279 = t438.new()
-
-	if t442.overview_rich_text ~= nil then
-		v3279.overview_rich_text = t442.overview_rich_text
-	end
-
-	if t442.overviewRichText ~= nil then
-		v3279.overview_rich_text = t442.overviewRichText
-	end
-
-	if t442.result_entry ~= nil then
-		v3279.result_entry = t1.FeedEntry.jsonDecode(t442.result_entry)
-	end
-
-	if t442.resultEntry ~= nil then
-		v3279.result_entry = t1.FeedEntry.jsonDecode(t442.resultEntry)
-	end
-
-	if t442.follow_up_queries ~= nil then
-		local t443 = {}
-
-		for _, v3282 in t442.follow_up_queries do
-			table.insert(t443, v3282)
-		end
-
-		v3279.follow_up_queries = t443
-	end
-
-	if t442.followUpQueries ~= nil then
-		local t444 = {}
-
-		for _, v3285 in t442.followUpQueries do
-			table.insert(t444, v3285)
-		end
-
-		v3279.follow_up_queries = t444
-	end
-
-	if t442.show_loading ~= nil then
-		v3279.show_loading = t442.show_loading
-	end
-
-	if t442.showLoading ~= nil then
-		v3279.show_loading = t442.showLoading
-	end
-
-	if t442.title ~= nil then
-		v3279.title = t442.title
-	end
-
-	if t442.search_query ~= nil then
-		v3279.search_query = t442.search_query
-	end
-
-	if t442.searchQuery ~= nil then
-		v3279.search_query = t442.searchQuery
-	end
-
-	if t442.search_session_id ~= nil then
-		v3279.search_session_id = t442.search_session_id
-	end
-
-	if t442.searchSessionId ~= nil then
-		v3279.search_session_id = t442.searchSessionId
-	end
-
-	if t442.universe_ids ~= nil then
-		v3279.universe_ids = t442.universe_ids
-	end
-
-	if t442.universeIds ~= nil then
-		v3279.universe_ids = t442.universeIds
-	end
-
-	return v3279
-end
-
-t438.descriptor = {
-	name = "PowerSearchAIOverviewInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.PowerSearchAIOverviewInputData"
-}
-t1.PowerSearchAIOverviewInputData = t438
-typeRegistry.default:register(t1.PowerSearchAIOverviewInputData)
-
-local t445 = {}
-
-t445.__index = t445
-
-function t445.new(t446: {[any]: any}?) -- line: 18630
-	-- upvalues: t445 (copy)
-	return (setmetatable({
-		title = if t446 ~= nil and t446.title ~= nil then t446.title else "",
-		user_items = if t446 ~= nil and t446.user_items ~= nil then t446.user_items else {},
-		max_visible_rows = if t446 ~= nil and t446.max_visible_rows ~= nil then t446.max_visible_rows else 0
-	}, t445))
-end
-function t445.encode(p262) -- line: 18638
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t433.decode(p261: buffer) -- line: 18697
+	-- upvalues: t433 (copy), proto (copy)
+	local v3225 = t433.new()
 	local n174 = 0
 
-	if p262.title ~= nil and p262.title ~= "" then
-		local v3290, v3291 = proto.writeTag(buf, n174, 1, proto.wireTypes.lengthDelimited)
+	while n174 < buffer.len(p261) do
+		local v3227, v3228
 
-		buf, n174 = proto.writeString(v3290, v3291, p262.title)
-	end
+		v3227, v3228, n174 = proto.readTag(p261, n174)
 
-	if p262.user_items ~= nil and #p262.user_items > 0 then
-		for _, v3293 in p262.user_items do
-			local v3294 = v3293:encode()
-			local v3295, v3296 = proto.writeTag(buf, n174, 2, proto.wireTypes.lengthDelimited)
+		if v3228 == proto.wireTypes.varint then
+			local v3229
 
-			buf, n174 = proto.writeBuffer(v3295, v3296, v3294, buffer.len(v3294))
+			v3229, n174 = proto.readVarInt(p261, n174)
+		elseif v3228 == proto.wireTypes.lengthDelimited then
+			if v3227 == 1 then
+				local v3230
+
+				v3230, n174 = proto.readBuffer(p261, n174)
+				v3225.id = buffer.tostring(v3230)
+			elseif v3227 == 2 then
+				local v3231
+
+				v3231, n174 = proto.readBuffer(p261, n174)
+				v3225.type = buffer.tostring(v3231)
+			else
+				local v3232, v3233 = proto.readVarInt(p261, n174)
+
+				n174 = v3233 + v3232
+			end
+		elseif v3228 == proto.wireTypes.i32 then
+			local v3234
+
+			v3234, n174 = proto.readFixed32(p261, n174)
+		elseif v3228 == proto.wireTypes.i64 then
+			local v3235
+
+			v3235, n174 = proto.readFixed64(p261, n174)
+		else
+			error("Unsupported wire type: " .. v3228)
 		end
 	end
 
-	if p262.max_visible_rows ~= nil and p262.max_visible_rows ~= 0 then
-		local v3297, v3298 = proto.writeTag(buf, n174, 3, proto.wireTypes.varint)
+	return v3225
+end
+function t433.jsonEncode(p262) -- line: 18745
+	local t435 = {}
 
-		buf, n174 = proto.writeVarInt(v3297, v3298, p262.max_visible_rows)
+	if p262.id ~= nil and p262.id ~= "" then
+		t435.id = p262.id
 	end
 
-	local buf97 = buffer.create(n174)
+	if p262.type ~= nil and p262.type ~= "" then
+		t435.type = p262.type
+	end
 
-	buffer.copy(buf97, 0, buf, 0, n174)
+	return t435
+end
+function t433.jsonDecode(t436: {[any]: any}) -- line: 18759
+	-- upvalues: t433 (copy)
+	local v3239 = t433.new()
+
+	if t436.id ~= nil then
+		v3239.id = t436.id
+	end
+
+	if t436.type ~= nil then
+		v3239.type = t436.type
+	end
+
+	return v3239
+end
+
+t433.descriptor = {
+	name = "CatalogItemGridInputData_CatalogItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItem"
+}
+t1.CatalogItemGridInputData_CatalogItem = t433
+typeRegistry.default:register(t1.CatalogItemGridInputData_CatalogItem)
+
+local t437 = {}
+
+t437.__index = t437
+
+function t437.new(t438: {[any]: any}?) -- line: 18789
+	-- upvalues: t437 (copy)
+	return (setmetatable({
+		entry_map = if t438 ~= nil and t438.entry_map ~= nil then t438.entry_map else {},
+		entry_order = if t438 ~= nil and t438.entry_order ~= nil then t438.entry_order else {},
+		content_pools = if t438 ~= nil and t438.content_pools ~= nil then t438.content_pools else {}
+	}, t437))
+end
+function t437.encode(p263) -- line: 18799
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n175 = 0
+
+	if p263.entry_map ~= nil and next(p263.entry_map) ~= nil then
+		for v3244, v3245 in p263.entry_map do
+			local buf95 = buffer.create(0)
+			local v3247, v3248 = proto.writeTag(buf95, 0, 1, proto.wireTypes.lengthDelimited)
+			local v3249, v3250 = proto.writeString(v3247, v3248, v3244)
+			local v3251 = v3245:encode()
+			local v3252, v3253 = proto.writeTag(v3249, v3250, 2, proto.wireTypes.lengthDelimited)
+			local v3254, v3255 = proto.writeBuffer(v3252, v3253, v3251, buffer.len(v3251))
+			local v3256, v3257 = proto.writeTag(buf, n175, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n175 = proto.writeBuffer(v3256, v3257, v3254, v3255)
+		end
+	end
+
+	if p263.entry_order ~= nil and #p263.entry_order > 0 then
+		for _, v3259 in p263.entry_order do
+			local v3260, v3261 = proto.writeTag(buf, n175, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n175 = proto.writeString(v3260, v3261, v3259)
+		end
+	end
+
+	if p263.content_pools ~= nil and next(p263.content_pools) ~= nil then
+		for v3262, v3263 in p263.content_pools do
+			local buf96 = buffer.create(0)
+			local v3265, v3266 = proto.writeTag(buf96, 0, 1, proto.wireTypes.lengthDelimited)
+			local v3267, v3268 = proto.writeString(v3265, v3266, v3262)
+			local v3269 = v3263:encode()
+			local v3270, v3271 = proto.writeTag(v3267, v3268, 2, proto.wireTypes.lengthDelimited)
+			local v3272, v3273 = proto.writeBuffer(v3270, v3271, v3269, buffer.len(v3269))
+			local v3274, v3275 = proto.writeTag(buf, n175, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n175 = proto.writeBuffer(v3274, v3275, v3272, v3273)
+		end
+	end
+
+	local buf97 = buffer.create(n175)
+
+	buffer.copy(buf97, 0, buf, 0, n175)
 
 	return buf97
 end
-function t445.decode(p263: buffer) -- line: 18665
-	-- upvalues: t445 (copy), proto (copy), t1 (copy)
-	local v3301 = t445.new()
-	local n175 = 0
-
-	while n175 < buffer.len(p263) do
-		local v3303, v3304
-
-		v3303, v3304, n175 = proto.readTag(p263, n175)
-
-		if v3304 == proto.wireTypes.varint then
-			if v3303 == 3 then
-				local v3305
-
-				v3305, n175 = proto.readVarIntI32(p263, n175)
-				v3301.max_visible_rows = v3305
-			else
-				local v3306
-
-				v3306, n175 = proto.readVarInt(p263, n175)
-			end
-		elseif v3304 == proto.wireTypes.lengthDelimited then
-			if v3303 == 1 then
-				local v3307
-
-				v3307, n175 = proto.readBuffer(p263, n175)
-				v3301.title = buffer.tostring(v3307)
-			elseif v3303 == 2 then
-				local v3308
-
-				v3308, n175 = proto.readBuffer(p263, n175)
-				table.insert(v3301.user_items, t1.UserListInputData_UserItem.decode(v3308))
-			else
-				local v3309, v3310 = proto.readVarInt(p263, n175)
-
-				n175 = v3310 + v3309
-			end
-		elseif v3304 == proto.wireTypes.i32 then
-			local v3311
-
-			v3311, n175 = proto.readFixed32(p263, n175)
-		elseif v3304 == proto.wireTypes.i64 then
-			local v3312
-
-			v3312, n175 = proto.readFixed64(p263, n175)
-		else
-			error("Unsupported wire type: " .. v3304)
-		end
-	end
-
-	return v3301
-end
-function t445.jsonEncode(p264) -- line: 18718
-	local t447 = {}
-
-	if p264.title ~= nil and p264.title ~= "" then
-		t447.title = p264.title
-	end
-
-	if p264.user_items ~= nil and #p264.user_items > 0 then
-		local t448 = {}
-
-		for _, v3317 in p264.user_items do
-			table.insert(t448, v3317:jsonEncode())
-		end
-
-		t447.userItems = t448
-	end
-
-	if p264.max_visible_rows ~= nil and p264.max_visible_rows ~= 0 then
-		t447.maxVisibleRows = p264.max_visible_rows
-	end
-
-	return t447
-end
-function t445.jsonDecode(t449: {[any]: any}) -- line: 18740
-	-- upvalues: t445 (copy), t1 (copy)
-	local v3319 = t445.new()
-
-	if t449.title ~= nil then
-		v3319.title = t449.title
-	end
-
-	if t449.user_items ~= nil then
-		local t450 = {}
-
-		for _, v3322 in t449.user_items do
-			table.insert(t450, t1.UserListInputData_UserItem.jsonDecode(v3322))
-		end
-
-		v3319.user_items = t450
-	end
-
-	if t449.userItems ~= nil then
-		local t451 = {}
-
-		for _, v3325 in t449.userItems do
-			table.insert(t451, t1.UserListInputData_UserItem.jsonDecode(v3325))
-		end
-
-		v3319.user_items = t451
-	end
-
-	if t449.max_visible_rows ~= nil then
-		v3319.max_visible_rows = t449.max_visible_rows
-	end
-
-	if t449.maxVisibleRows ~= nil then
-		v3319.max_visible_rows = t449.maxVisibleRows
-	end
-
-	return v3319
-end
-
-t445.descriptor = {
-	name = "UserListInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UserListInputData"
-}
-t1.UserListInputData = t445
-typeRegistry.default:register(t1.UserListInputData)
-
-local t452 = {}
-
-t452.__index = t452
-
-function t452.new(t453: {[any]: any}?) -- line: 18790
-	-- upvalues: t452 (copy)
-	return (setmetatable({
-		user_id = if t453 ~= nil and t453.user_id ~= nil then t453.user_id else ""
-	}, t452))
-end
-function t452.encode(p265) -- line: 18798
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t437.decode(p264: buffer) -- line: 18843
+	-- upvalues: t437 (copy), proto (copy), t1 (copy)
+	local v3278 = t437.new()
 	local n176 = 0
 
-	if p265.user_id ~= nil and p265.user_id ~= "" then
-		local v3330, v3331 = proto.writeTag(buf, n176, 1, proto.wireTypes.lengthDelimited)
+	while n176 < buffer.len(p264) do
+		local v3280, v3281
 
-		buf, n176 = proto.writeString(v3330, v3331, p265.user_id)
+		v3280, v3281, n176 = proto.readTag(p264, n176)
+
+		if v3281 == proto.wireTypes.varint then
+			local v3282
+
+			v3282, n176 = proto.readVarInt(p264, n176)
+		elseif v3281 == proto.wireTypes.lengthDelimited then
+			if v3280 == 1 then
+				local v3283
+
+				v3283, n176 = proto.readBuffer(p264, n176)
+
+				local v3284 = t1.SearchResultsFeedInputData_EntryMapEntry.decode(v3283)
+				local v3285 = t1.FeedEntry.new()
+
+				v3278.entry_map[v3284.key or ""] = v3284.value or v3285
+			elseif v3280 == 2 then
+				local v3286
+
+				v3286, n176 = proto.readBuffer(p264, n176)
+				table.insert(v3278.entry_order, buffer.tostring(v3286))
+			elseif v3280 == 3 then
+				local v3287
+
+				v3287, n176 = proto.readBuffer(p264, n176)
+
+				local v3288 = t1.SearchResultsFeedInputData_ContentPoolsEntry.decode(v3287)
+				local v3289 = t1.ContentPool.new()
+
+				v3278.content_pools[v3288.key or ""] = v3288.value or v3289
+			else
+				local v3290, v3291 = proto.readVarInt(p264, n176)
+
+				n176 = v3291 + v3290
+			end
+		elseif v3281 == proto.wireTypes.i32 then
+			local v3292
+
+			v3292, n176 = proto.readFixed32(p264, n176)
+		elseif v3281 == proto.wireTypes.i64 then
+			local v3293
+
+			v3293, n176 = proto.readFixed64(p264, n176)
+		else
+			error("Unsupported wire type: " .. v3281)
+		end
 	end
 
-	local buf98 = buffer.create(n176)
+	return v3278
+end
+function t437.jsonEncode(p265) -- line: 18910
+	local t439 = {}
 
-	buffer.copy(buf98, 0, buf, 0, n176)
+	if p265.entry_map ~= nil and next(p265.entry_map) ~= nil then
+		local t440 = {}
+
+		for v3297, v3298 in p265.entry_map do
+			t440[v3297] = v3298:jsonEncode()
+		end
+
+		t439.entryMap = t440
+	end
+
+	if p265.entry_order ~= nil and #p265.entry_order > 0 then
+		local t441 = {}
+
+		for _, v3301 in p265.entry_order do
+			table.insert(t441, v3301)
+		end
+
+		t439.entryOrder = t441
+	end
+
+	if p265.content_pools ~= nil and next(p265.content_pools) ~= nil then
+		local t442 = {}
+
+		for v3303, v3304 in p265.content_pools do
+			t442[v3303] = v3304:jsonEncode()
+		end
+
+		t439.contentPools = t442
+	end
+
+	return t439
+end
+function t437.jsonDecode(t443: {[any]: any}) -- line: 18940
+	-- upvalues: t437 (copy), t1 (copy)
+	local v3306 = t437.new()
+
+	if t443.entry_map ~= nil then
+		local t444 = {}
+
+		for v3308, v3309 in t443.entry_map do
+			t444[v3308] = t1.FeedEntry.jsonDecode(v3309)
+		end
+
+		v3306.entry_map = t444
+	end
+
+	if t443.entryMap ~= nil then
+		local t445 = {}
+
+		for v3311, v3312 in t443.entryMap do
+			t445[v3311] = t1.FeedEntry.jsonDecode(v3312)
+		end
+
+		v3306.entry_map = t445
+	end
+
+	if t443.entry_order ~= nil then
+		local t446 = {}
+
+		for _, v3315 in t443.entry_order do
+			table.insert(t446, v3315)
+		end
+
+		v3306.entry_order = t446
+	end
+
+	if t443.entryOrder ~= nil then
+		local t447 = {}
+
+		for _, v3318 in t443.entryOrder do
+			table.insert(t447, v3318)
+		end
+
+		v3306.entry_order = t447
+	end
+
+	if t443.content_pools ~= nil then
+		local t448 = {}
+
+		for v3320, v3321 in t443.content_pools do
+			t448[v3320] = t1.ContentPool.jsonDecode(v3321)
+		end
+
+		v3306.content_pools = t448
+	end
+
+	if t443.contentPools ~= nil then
+		local t449 = {}
+
+		for v3323, v3324 in t443.contentPools do
+			t449[v3323] = t1.ContentPool.jsonDecode(v3324)
+		end
+
+		v3306.content_pools = t449
+	end
+
+	return v3306
+end
+
+t437.descriptor = {
+	name = "SearchResultsFeedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SearchResultsFeedInputData"
+}
+t1.SearchResultsFeedInputData = t437
+typeRegistry.default:register(t1.SearchResultsFeedInputData)
+
+local t450 = {}
+
+t450.__index = t450
+
+function t450.new(t451: {[any]: any}?) -- line: 19014
+	-- upvalues: t450 (copy)
+	return (setmetatable({
+		key = if t451 ~= nil and t451.key ~= nil then t451.key else "",
+		value = if t451 ~= nil and t451.value ~= nil then t451.value else nil
+	}, t450))
+end
+function t450.encode(p266) -- line: 19023
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n177 = 0
+
+	if p266.key ~= nil and p266.key ~= "" then
+		local v3329, v3330 = proto.writeTag(buf, n177, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n177 = proto.writeString(v3329, v3330, p266.key)
+	end
+
+	if p266.value ~= nil then
+		local v3331 = p266.value:encode()
+		local v3332, v3333 = proto.writeTag(buf, n177, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n177 = proto.writeBuffer(v3332, v3333, v3331, buffer.len(v3331))
+	end
+
+	local buf98 = buffer.create(n177)
+
+	buffer.copy(buf98, 0, buf, 0, n177)
 
 	return buf98
 end
-function t452.decode(p266: buffer) -- line: 18812
-	-- upvalues: t452 (copy), proto (copy)
-	local v3334 = t452.new()
-	local n177 = 0
-
-	while n177 < buffer.len(p266) do
-		local v3336, v3337
-
-		v3336, v3337, n177 = proto.readTag(p266, n177)
-
-		if v3337 == proto.wireTypes.varint then
-			local v3338
-
-			v3338, n177 = proto.readVarInt(p266, n177)
-		elseif v3337 == proto.wireTypes.lengthDelimited then
-			if v3336 == 1 then
-				local v3339
-
-				v3339, n177 = proto.readBuffer(p266, n177)
-				v3334.user_id = buffer.tostring(v3339)
-			else
-				local v3340, v3341 = proto.readVarInt(p266, n177)
-
-				n177 = v3341 + v3340
-			end
-		elseif v3337 == proto.wireTypes.i32 then
-			local v3342
-
-			v3342, n177 = proto.readFixed32(p266, n177)
-		elseif v3337 == proto.wireTypes.i64 then
-			local v3343
-
-			v3343, n177 = proto.readFixed64(p266, n177)
-		else
-			error("Unsupported wire type: " .. v3337)
-		end
-	end
-
-	return v3334
-end
-function t452.jsonEncode(p267) -- line: 18855
-	local t454 = {}
-
-	if p267.user_id ~= nil and p267.user_id ~= "" then
-		t454.userId = p267.user_id
-	end
-
-	return t454
-end
-function t452.jsonDecode(t455: {[any]: any}) -- line: 18865
-	-- upvalues: t452 (copy)
-	local v3347 = t452.new()
-
-	if t455.user_id ~= nil then
-		v3347.user_id = t455.user_id
-	end
-
-	if t455.userId ~= nil then
-		v3347.user_id = t455.userId
-	end
-
-	return v3347
-end
-
-t452.descriptor = {
-	name = "UserListInputData_UserItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.UserItem"
-}
-t1.UserListInputData_UserItem = t452
-typeRegistry.default:register(t1.UserListInputData_UserItem)
-
-local t456 = {}
-
-t456.__index = t456
-
-function t456.new(t457: {[any]: any}?) -- line: 18893
-	-- upvalues: t456 (copy)
-	return (setmetatable({
-		title = if t457 ~= nil and t457.title ~= nil then t457.title else "",
-		items = if t457 ~= nil and t457.items ~= nil then t457.items else {},
-		max_visible_rows = if t457 ~= nil and t457.max_visible_rows ~= nil then t457.max_visible_rows else 0
-	}, t456))
-end
-function t456.encode(p268) -- line: 18901
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t450.decode(p267: buffer) -- line: 19045
+	-- upvalues: t450 (copy), proto (copy), t1 (copy)
+	local v3336 = t450.new()
 	local n178 = 0
 
-	if p268.title ~= nil and p268.title ~= "" then
-		local v3352, v3353 = proto.writeTag(buf, n178, 1, proto.wireTypes.lengthDelimited)
+	while n178 < buffer.len(p267) do
+		local v3338, v3339
 
-		buf, n178 = proto.writeString(v3352, v3353, p268.title)
-	end
+		v3338, v3339, n178 = proto.readTag(p267, n178)
 
-	if p268.items ~= nil and #p268.items > 0 then
-		for _, v3355 in p268.items do
-			local v3356 = v3355:encode()
-			local v3357, v3358 = proto.writeTag(buf, n178, 2, proto.wireTypes.lengthDelimited)
+		if v3339 == proto.wireTypes.varint then
+			local v3340
 
-			buf, n178 = proto.writeBuffer(v3357, v3358, v3356, buffer.len(v3356))
+			v3340, n178 = proto.readVarInt(p267, n178)
+		elseif v3339 == proto.wireTypes.lengthDelimited then
+			if v3338 == 1 then
+				local v3341
+
+				v3341, n178 = proto.readBuffer(p267, n178)
+				v3336.key = buffer.tostring(v3341)
+			elseif v3338 == 2 then
+				local v3342
+
+				v3342, n178 = proto.readBuffer(p267, n178)
+				v3336.value = t1.FeedEntry.decode(v3342)
+			else
+				local v3343, v3344 = proto.readVarInt(p267, n178)
+
+				n178 = v3344 + v3343
+			end
+		elseif v3339 == proto.wireTypes.i32 then
+			local v3345
+
+			v3345, n178 = proto.readFixed32(p267, n178)
+		elseif v3339 == proto.wireTypes.i64 then
+			local v3346
+
+			v3346, n178 = proto.readFixed64(p267, n178)
+		else
+			error("Unsupported wire type: " .. v3339)
 		end
 	end
 
-	if p268.max_visible_rows ~= nil and p268.max_visible_rows ~= 0 then
-		local v3359, v3360 = proto.writeTag(buf, n178, 3, proto.wireTypes.varint)
+	return v3336
+end
+function t450.jsonEncode(p268) -- line: 19095
+	local t452 = {}
 
-		buf, n178 = proto.writeVarInt(v3359, v3360, p268.max_visible_rows)
+	if p268.key ~= nil and p268.key ~= "" then
+		t452.key = p268.key
 	end
 
-	local buf99 = buffer.create(n178)
+	if p268.value ~= nil then
+		t452.value = p268.value:jsonEncode()
+	end
 
-	buffer.copy(buf99, 0, buf, 0, n178)
+	return t452
+end
+function t450.jsonDecode(t453: {[any]: any}) -- line: 19111
+	-- upvalues: t450 (copy), t1 (copy)
+	local v3350 = t450.new()
+
+	if t453.key ~= nil then
+		v3350.key = t453.key
+	end
+
+	if t453.value ~= nil then
+		v3350.value = t1.FeedEntry.jsonDecode(t453.value)
+	end
+
+	return v3350
+end
+
+t450.descriptor = {
+	name = "SearchResultsFeedInputData_EntryMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+}
+t1.SearchResultsFeedInputData_EntryMapEntry = t450
+typeRegistry.default:register(t1.SearchResultsFeedInputData_EntryMapEntry)
+
+local t454 = {}
+
+t454.__index = t454
+
+function t454.new(t455: {[any]: any}?) -- line: 19141
+	-- upvalues: t454 (copy)
+	return (setmetatable({
+		key = if t455 ~= nil and t455.key ~= nil then t455.key else "",
+		value = if t455 ~= nil and t455.value ~= nil then t455.value else nil
+	}, t454))
+end
+function t454.encode(p269) -- line: 19150
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n179 = 0
+
+	if p269.key ~= nil and p269.key ~= "" then
+		local v3355, v3356 = proto.writeTag(buf, n179, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n179 = proto.writeString(v3355, v3356, p269.key)
+	end
+
+	if p269.value ~= nil then
+		local v3357 = p269.value:encode()
+		local v3358, v3359 = proto.writeTag(buf, n179, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n179 = proto.writeBuffer(v3358, v3359, v3357, buffer.len(v3357))
+	end
+
+	local buf99 = buffer.create(n179)
+
+	buffer.copy(buf99, 0, buf, 0, n179)
 
 	return buf99
 end
-function t456.decode(p269: buffer) -- line: 18928
-	-- upvalues: t456 (copy), proto (copy), t1 (copy)
-	local v3363 = t456.new()
-	local n179 = 0
+function t454.decode(p270: buffer) -- line: 19172
+	-- upvalues: t454 (copy), proto (copy), t1 (copy)
+	local v3362 = t454.new()
+	local n180 = 0
 
-	while n179 < buffer.len(p269) do
-		local v3365, v3366
+	while n180 < buffer.len(p270) do
+		local v3364, v3365
 
-		v3365, v3366, n179 = proto.readTag(p269, n179)
+		v3364, v3365, n180 = proto.readTag(p270, n180)
 
-		if v3366 == proto.wireTypes.varint then
-			if v3365 == 3 then
+		if v3365 == proto.wireTypes.varint then
+			local v3366
+
+			v3366, n180 = proto.readVarInt(p270, n180)
+		elseif v3365 == proto.wireTypes.lengthDelimited then
+			if v3364 == 1 then
 				local v3367
 
-				v3367, n179 = proto.readVarIntI32(p269, n179)
-				v3363.max_visible_rows = v3367
-			else
+				v3367, n180 = proto.readBuffer(p270, n180)
+				v3362.key = buffer.tostring(v3367)
+			elseif v3364 == 2 then
 				local v3368
 
-				v3368, n179 = proto.readVarInt(p269, n179)
-			end
-		elseif v3366 == proto.wireTypes.lengthDelimited then
-			if v3365 == 1 then
-				local v3369
-
-				v3369, n179 = proto.readBuffer(p269, n179)
-				v3363.title = buffer.tostring(v3369)
-			elseif v3365 == 2 then
-				local v3370
-
-				v3370, n179 = proto.readBuffer(p269, n179)
-				table.insert(v3363.items, t1.CatalogItemListInputData_CatalogItem.decode(v3370))
+				v3368, n180 = proto.readBuffer(p270, n180)
+				v3362.value = t1.ContentPool.decode(v3368)
 			else
-				local v3371, v3372 = proto.readVarInt(p269, n179)
+				local v3369, v3370 = proto.readVarInt(p270, n180)
 
-				n179 = v3372 + v3371
+				n180 = v3370 + v3369
 			end
-		elseif v3366 == proto.wireTypes.i32 then
-			local v3373
+		elseif v3365 == proto.wireTypes.i32 then
+			local v3371
 
-			v3373, n179 = proto.readFixed32(p269, n179)
-		elseif v3366 == proto.wireTypes.i64 then
-			local v3374
+			v3371, n180 = proto.readFixed32(p270, n180)
+		elseif v3365 == proto.wireTypes.i64 then
+			local v3372
 
-			v3374, n179 = proto.readFixed64(p269, n179)
+			v3372, n180 = proto.readFixed64(p270, n180)
 		else
-			error("Unsupported wire type: " .. v3366)
+			error("Unsupported wire type: " .. v3365)
 		end
 	end
 
-	return v3363
+	return v3362
 end
-function t456.jsonEncode(p270) -- line: 18981
-	local t458 = {}
+function t454.jsonEncode(p271) -- line: 19222
+	local t456 = {}
 
-	if p270.title ~= nil and p270.title ~= "" then
-		t458.title = p270.title
+	if p271.key ~= nil and p271.key ~= "" then
+		t456.key = p271.key
 	end
 
-	if p270.items ~= nil and #p270.items > 0 then
-		local t459 = {}
-
-		for _, v3379 in p270.items do
-			table.insert(t459, v3379:jsonEncode())
-		end
-
-		t458.items = t459
+	if p271.value ~= nil then
+		t456.value = p271.value:jsonEncode()
 	end
 
-	if p270.max_visible_rows ~= nil and p270.max_visible_rows ~= 0 then
-		t458.maxVisibleRows = p270.max_visible_rows
-	end
-
-	return t458
+	return t456
 end
-function t456.jsonDecode(t460: {[any]: any}) -- line: 19003
-	-- upvalues: t456 (copy), t1 (copy)
-	local v3381 = t456.new()
+function t454.jsonDecode(t457: {[any]: any}) -- line: 19238
+	-- upvalues: t454 (copy), t1 (copy)
+	local v3376 = t454.new()
 
-	if t460.title ~= nil then
-		v3381.title = t460.title
+	if t457.key ~= nil then
+		v3376.key = t457.key
 	end
 
-	if t460.items ~= nil then
-		local t461 = {}
-
-		for _, v3384 in t460.items do
-			table.insert(t461, t1.CatalogItemListInputData_CatalogItem.jsonDecode(v3384))
-		end
-
-		v3381.items = t461
+	if t457.value ~= nil then
+		v3376.value = t1.ContentPool.jsonDecode(t457.value)
 	end
 
-	if t460.max_visible_rows ~= nil then
-		v3381.max_visible_rows = t460.max_visible_rows
-	end
-
-	if t460.maxVisibleRows ~= nil then
-		v3381.max_visible_rows = t460.maxVisibleRows
-	end
-
-	return v3381
+	return v3376
 end
 
-t456.descriptor = {
-	name = "CatalogItemListInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemListInputData"
+t454.descriptor = {
+	name = "SearchResultsFeedInputData_ContentPoolsEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ContentPoolsEntry"
 }
-t1.CatalogItemListInputData = t456
-typeRegistry.default:register(t1.CatalogItemListInputData)
+t1.SearchResultsFeedInputData_ContentPoolsEntry = t454
+typeRegistry.default:register(t1.SearchResultsFeedInputData_ContentPoolsEntry)
+
+local t458 = {}
+
+t458.__index = t458
+
+function t458.new(t459: {[any]: any}?) -- line: 19268
+	-- upvalues: t458 (copy)
+	return (setmetatable({
+		universe_id = if t459 ~= nil and t459.universe_id ~= nil then t459.universe_id else "",
+		is_content_locked = t459 ~= nil and (t459.is_content_locked ~= nil and t459.is_content_locked)
+	}, t458))
+end
+function t458.encode(p272) -- line: 19277
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n181 = 0
+
+	if p272.universe_id ~= nil and p272.universe_id ~= "" then
+		local v3381, v3382 = proto.writeTag(buf, n181, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n181 = proto.writeString(v3381, v3382, p272.universe_id)
+	end
+
+	if p272.is_content_locked then
+		local v3383, v3384 = proto.writeTag(buf, n181, 2, proto.wireTypes.varint)
+
+		buf, n181 = proto.writeVarInt(v3383, v3384, not p272.is_content_locked and 0 or 1)
+	end
+
+	local buf100 = buffer.create(n181)
+
+	buffer.copy(buf100, 0, buf, 0, n181)
+
+	return buf100
+end
+function t458.decode(p273: buffer) -- line: 19296
+	-- upvalues: t458 (copy), proto (copy)
+	local v3387 = t458.new()
+	local n182 = 0
+
+	while n182 < buffer.len(p273) do
+		local v3389, v3390
+
+		v3389, v3390, n182 = proto.readTag(p273, n182)
+
+		if v3390 == proto.wireTypes.varint then
+			if v3389 == 2 then
+				local v3391
+
+				v3391, n182 = proto.readVarInt(p273, n182)
+				v3387.is_content_locked = v3391 ~= 0
+			else
+				local v3392
+
+				v3392, n182 = proto.readVarInt(p273, n182)
+			end
+		elseif v3390 == proto.wireTypes.lengthDelimited then
+			if v3389 == 1 then
+				local v3393
+
+				v3393, n182 = proto.readBuffer(p273, n182)
+				v3387.universe_id = buffer.tostring(v3393)
+			else
+				local v3394, v3395 = proto.readVarInt(p273, n182)
+
+				n182 = v3395 + v3394
+			end
+		elseif v3390 == proto.wireTypes.i32 then
+			local v3396
+
+			v3396, n182 = proto.readFixed32(p273, n182)
+		elseif v3390 == proto.wireTypes.i64 then
+			local v3397
+
+			v3397, n182 = proto.readFixed64(p273, n182)
+		else
+			error("Unsupported wire type: " .. v3390)
+		end
+	end
+
+	return v3387
+end
+function t458.jsonEncode(p274) -- line: 19344
+	local t460 = {}
+
+	if p274.universe_id ~= nil and p274.universe_id ~= "" then
+		t460.universeId = p274.universe_id
+	end
+
+	if p274.is_content_locked then
+		t460.isContentLocked = p274.is_content_locked
+	end
+
+	return t460
+end
+function t458.jsonDecode(t461: {[any]: any}) -- line: 19358
+	-- upvalues: t458 (copy)
+	local v3401 = t458.new()
+
+	if t461.universe_id ~= nil then
+		v3401.universe_id = t461.universe_id
+	end
+
+	if t461.universeId ~= nil then
+		v3401.universe_id = t461.universeId
+	end
+
+	if t461.is_content_locked ~= nil then
+		v3401.is_content_locked = t461.is_content_locked
+	end
+
+	if t461.isContentLocked ~= nil then
+		v3401.is_content_locked = t461.isContentLocked
+	end
+
+	return v3401
+end
+
+t458.descriptor = {
+	name = "ExperienceEmphasisTileInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceEmphasisTileInputData"
+}
+t1.ExperienceEmphasisTileInputData = t458
+typeRegistry.default:register(t1.ExperienceEmphasisTileInputData)
 
 local t462 = {}
 
 t462.__index = t462
 
-function t462.new(t463: {[any]: any}?) -- line: 19044
+function t462.new(t463: {[any]: any}?) -- line: 19394
 	-- upvalues: t462 (copy)
 	return (setmetatable({
-		item_id = if t463 ~= nil and t463.item_id ~= nil then t463.item_id else "",
-		item_type = if t463 ~= nil and t463.item_type ~= nil then t463.item_type else ""
+		overview_rich_text = if t463 ~= nil and t463.overview_rich_text ~= nil then t463.overview_rich_text else "",
+		result_entry = if t463 ~= nil and t463.result_entry ~= nil then t463.result_entry else nil,
+		follow_up_queries = if t463 ~= nil and t463.follow_up_queries ~= nil then t463.follow_up_queries else {},
+		show_loading = t463 ~= nil and (t463.show_loading ~= nil and t463.show_loading),
+		title = if t463 ~= nil and t463.title ~= nil then t463.title else "",
+		search_query = if t463 ~= nil and t463.search_query ~= nil then t463.search_query else "",
+		search_session_id = if t463 ~= nil and t463.search_session_id ~= nil then t463.search_session_id else "",
+		universe_ids = if t463 ~= nil and t463.universe_ids ~= nil then t463.universe_ids else ""
 	}, t462))
 end
-function t462.encode(p271) -- line: 19053
+function t462.encode(p275) -- line: 19409
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n180 = 0
+	local n183 = 0
 
-	if p271.item_id ~= nil and p271.item_id ~= "" then
-		local v3389, v3390 = proto.writeTag(buf, n180, 1, proto.wireTypes.lengthDelimited)
+	if p275.overview_rich_text ~= nil and p275.overview_rich_text ~= "" then
+		local v3406, v3407 = proto.writeTag(buf, n183, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n180 = proto.writeString(v3389, v3390, p271.item_id)
+		buf, n183 = proto.writeString(v3406, v3407, p275.overview_rich_text)
 	end
 
-	if p271.item_type ~= nil and p271.item_type ~= "" then
-		local v3391, v3392 = proto.writeTag(buf, n180, 2, proto.wireTypes.lengthDelimited)
+	if p275.result_entry ~= nil then
+		local v3408 = p275.result_entry:encode()
+		local v3409, v3410 = proto.writeTag(buf, n183, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n180 = proto.writeString(v3391, v3392, p271.item_type)
+		buf, n183 = proto.writeBuffer(v3409, v3410, v3408, buffer.len(v3408))
 	end
 
-	local buf100 = buffer.create(n180)
+	if p275.follow_up_queries ~= nil and #p275.follow_up_queries > 0 then
+		for _, v3412 in p275.follow_up_queries do
+			local v3413, v3414 = proto.writeTag(buf, n183, 3, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf100, 0, buf, 0, n180)
-
-	return buf100
-end
-function t462.decode(p272: buffer) -- line: 19072
-	-- upvalues: t462 (copy), proto (copy)
-	local v3395 = t462.new()
-	local n181 = 0
-
-	while n181 < buffer.len(p272) do
-		local v3397, v3398
-
-		v3397, v3398, n181 = proto.readTag(p272, n181)
-
-		if v3398 == proto.wireTypes.varint then
-			local v3399
-
-			v3399, n181 = proto.readVarInt(p272, n181)
-		elseif v3398 == proto.wireTypes.lengthDelimited then
-			if v3397 == 1 then
-				local v3400
-
-				v3400, n181 = proto.readBuffer(p272, n181)
-				v3395.item_id = buffer.tostring(v3400)
-			elseif v3397 == 2 then
-				local v3401
-
-				v3401, n181 = proto.readBuffer(p272, n181)
-				v3395.item_type = buffer.tostring(v3401)
-			else
-				local v3402, v3403 = proto.readVarInt(p272, n181)
-
-				n181 = v3403 + v3402
-			end
-		elseif v3398 == proto.wireTypes.i32 then
-			local v3404
-
-			v3404, n181 = proto.readFixed32(p272, n181)
-		elseif v3398 == proto.wireTypes.i64 then
-			local v3405
-
-			v3405, n181 = proto.readFixed64(p272, n181)
-		else
-			error("Unsupported wire type: " .. v3398)
+			buf, n183 = proto.writeString(v3413, v3414, v3412)
 		end
 	end
 
-	return v3395
-end
-function t462.jsonEncode(p273) -- line: 19120
-	local t464 = {}
+	if p275.show_loading then
+		local v3415, v3416 = proto.writeTag(buf, n183, 4, proto.wireTypes.varint)
 
-	if p273.item_id ~= nil and p273.item_id ~= "" then
-		t464.itemId = p273.item_id
+		buf, n183 = proto.writeVarInt(v3415, v3416, not p275.show_loading and 0 or 1)
 	end
 
-	if p273.item_type ~= nil and p273.item_type ~= "" then
-		t464.itemType = p273.item_type
+	if p275.title ~= nil and p275.title ~= "" then
+		local v3417, v3418 = proto.writeTag(buf, n183, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n183 = proto.writeString(v3417, v3418, p275.title)
+	end
+
+	if p275.search_query ~= nil and p275.search_query ~= "" then
+		local v3419, v3420 = proto.writeTag(buf, n183, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n183 = proto.writeString(v3419, v3420, p275.search_query)
+	end
+
+	if p275.search_session_id ~= nil and p275.search_session_id ~= "" then
+		local v3421, v3422 = proto.writeTag(buf, n183, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n183 = proto.writeString(v3421, v3422, p275.search_session_id)
+	end
+
+	if p275.universe_ids ~= nil and p275.universe_ids ~= "" then
+		local v3423, v3424 = proto.writeTag(buf, n183, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n183 = proto.writeString(v3423, v3424, p275.universe_ids)
+	end
+
+	local buf101 = buffer.create(n183)
+
+	buffer.copy(buf101, 0, buf, 0, n183)
+
+	return buf101
+end
+function t462.decode(p276: buffer) -- line: 19461
+	-- upvalues: t462 (copy), proto (copy), t1 (copy)
+	local v3427 = t462.new()
+	local n184 = 0
+
+	while n184 < buffer.len(p276) do
+		local v3429, v3430
+
+		v3429, v3430, n184 = proto.readTag(p276, n184)
+
+		if v3430 == proto.wireTypes.varint then
+			if v3429 == 4 then
+				local v3431
+
+				v3431, n184 = proto.readVarInt(p276, n184)
+				v3427.show_loading = v3431 ~= 0
+			else
+				local v3432
+
+				v3432, n184 = proto.readVarInt(p276, n184)
+			end
+		elseif v3430 == proto.wireTypes.lengthDelimited then
+			if v3429 == 1 then
+				local v3433
+
+				v3433, n184 = proto.readBuffer(p276, n184)
+				v3427.overview_rich_text = buffer.tostring(v3433)
+			elseif v3429 == 2 then
+				local v3434
+
+				v3434, n184 = proto.readBuffer(p276, n184)
+				v3427.result_entry = t1.FeedEntry.decode(v3434)
+			elseif v3429 == 3 then
+				local v3435
+
+				v3435, n184 = proto.readBuffer(p276, n184)
+				table.insert(v3427.follow_up_queries, buffer.tostring(v3435))
+			elseif v3429 == 5 then
+				local v3436
+
+				v3436, n184 = proto.readBuffer(p276, n184)
+				v3427.title = buffer.tostring(v3436)
+			elseif v3429 == 6 then
+				local v3437
+
+				v3437, n184 = proto.readBuffer(p276, n184)
+				v3427.search_query = buffer.tostring(v3437)
+			elseif v3429 == 7 then
+				local v3438
+
+				v3438, n184 = proto.readBuffer(p276, n184)
+				v3427.search_session_id = buffer.tostring(v3438)
+			elseif v3429 == 8 then
+				local v3439
+
+				v3439, n184 = proto.readBuffer(p276, n184)
+				v3427.universe_ids = buffer.tostring(v3439)
+			else
+				local v3440, v3441 = proto.readVarInt(p276, n184)
+
+				n184 = v3441 + v3440
+			end
+		elseif v3430 == proto.wireTypes.i32 then
+			local v3442
+
+			v3442, n184 = proto.readFixed32(p276, n184)
+		elseif v3430 == proto.wireTypes.i64 then
+			local v3443
+
+			v3443, n184 = proto.readFixed64(p276, n184)
+		else
+			error("Unsupported wire type: " .. v3430)
+		end
+	end
+
+	return v3427
+end
+function t462.jsonEncode(p277) -- line: 19539
+	local t464 = {}
+
+	if p277.overview_rich_text ~= nil and p277.overview_rich_text ~= "" then
+		t464.overviewRichText = p277.overview_rich_text
+	end
+
+	if p277.result_entry ~= nil then
+		t464.resultEntry = p277.result_entry:jsonEncode()
+	end
+
+	if p277.follow_up_queries ~= nil and #p277.follow_up_queries > 0 then
+		local t465 = {}
+
+		for _, v3448 in p277.follow_up_queries do
+			table.insert(t465, v3448)
+		end
+
+		t464.followUpQueries = t465
+	end
+
+	if p277.show_loading then
+		t464.showLoading = p277.show_loading
+	end
+
+	if p277.title ~= nil and p277.title ~= "" then
+		t464.title = p277.title
+	end
+
+	if p277.search_query ~= nil and p277.search_query ~= "" then
+		t464.searchQuery = p277.search_query
+	end
+
+	if p277.search_session_id ~= nil and p277.search_session_id ~= "" then
+		t464.searchSessionId = p277.search_session_id
+	end
+
+	if p277.universe_ids ~= nil and p277.universe_ids ~= "" then
+		t464.universeIds = p277.universe_ids
 	end
 
 	return t464
 end
-function t462.jsonDecode(t465: {[any]: any}) -- line: 19134
-	-- upvalues: t462 (copy)
-	local v3409 = t462.new()
+function t462.jsonDecode(t466: {[any]: any}) -- line: 19581
+	-- upvalues: t462 (copy), t1 (copy)
+	local v3450 = t462.new()
 
-	if t465.item_id ~= nil then
-		v3409.item_id = t465.item_id
+	if t466.overview_rich_text ~= nil then
+		v3450.overview_rich_text = t466.overview_rich_text
 	end
 
-	if t465.itemId ~= nil then
-		v3409.item_id = t465.itemId
+	if t466.overviewRichText ~= nil then
+		v3450.overview_rich_text = t466.overviewRichText
 	end
 
-	if t465.item_type ~= nil then
-		v3409.item_type = t465.item_type
+	if t466.result_entry ~= nil then
+		v3450.result_entry = t1.FeedEntry.jsonDecode(t466.result_entry)
 	end
 
-	if t465.itemType ~= nil then
-		v3409.item_type = t465.itemType
+	if t466.resultEntry ~= nil then
+		v3450.result_entry = t1.FeedEntry.jsonDecode(t466.resultEntry)
 	end
 
-	return v3409
+	if t466.follow_up_queries ~= nil then
+		local t467 = {}
+
+		for _, v3453 in t466.follow_up_queries do
+			table.insert(t467, v3453)
+		end
+
+		v3450.follow_up_queries = t467
+	end
+
+	if t466.followUpQueries ~= nil then
+		local t468 = {}
+
+		for _, v3456 in t466.followUpQueries do
+			table.insert(t468, v3456)
+		end
+
+		v3450.follow_up_queries = t468
+	end
+
+	if t466.show_loading ~= nil then
+		v3450.show_loading = t466.show_loading
+	end
+
+	if t466.showLoading ~= nil then
+		v3450.show_loading = t466.showLoading
+	end
+
+	if t466.title ~= nil then
+		v3450.title = t466.title
+	end
+
+	if t466.search_query ~= nil then
+		v3450.search_query = t466.search_query
+	end
+
+	if t466.searchQuery ~= nil then
+		v3450.search_query = t466.searchQuery
+	end
+
+	if t466.search_session_id ~= nil then
+		v3450.search_session_id = t466.search_session_id
+	end
+
+	if t466.searchSessionId ~= nil then
+		v3450.search_session_id = t466.searchSessionId
+	end
+
+	if t466.universe_ids ~= nil then
+		v3450.universe_ids = t466.universe_ids
+	end
+
+	if t466.universeIds ~= nil then
+		v3450.universe_ids = t466.universeIds
+	end
+
+	return v3450
 end
 
 t462.descriptor = {
-	name = "CatalogItemListInputData_CatalogItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItem"
+	name = "PowerSearchAIOverviewInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.PowerSearchAIOverviewInputData"
 }
-t1.CatalogItemListInputData_CatalogItem = t462
-typeRegistry.default:register(t1.CatalogItemListInputData_CatalogItem)
+t1.PowerSearchAIOverviewInputData = t462
+typeRegistry.default:register(t1.PowerSearchAIOverviewInputData)
 
-local t466 = {}
+local t469 = {}
 
-t466.__index = t466
+t469.__index = t469
 
-function t466.new(t467: {[any]: any}?) -- line: 19172
-	-- upvalues: t466 (copy)
+function t469.new(t470: {[any]: any}?) -- line: 19671
+	-- upvalues: t469 (copy)
 	return (setmetatable({
-		universe_id = if t467 ~= nil and t467.universe_id ~= nil then t467.universe_id else ""
-	}, t466))
+		title = if t470 ~= nil and t470.title ~= nil then t470.title else "",
+		user_items = if t470 ~= nil and t470.user_items ~= nil then t470.user_items else {},
+		max_visible_rows = if t470 ~= nil and t470.max_visible_rows ~= nil then t470.max_visible_rows else 0
+	}, t469))
 end
-function t466.encode(p274) -- line: 19180
+function t469.encode(p278) -- line: 19679
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n182 = 0
+	local n185 = 0
 
-	if p274.universe_id ~= nil and p274.universe_id ~= "" then
-		local v3414, v3415 = proto.writeTag(buf, n182, 1, proto.wireTypes.lengthDelimited)
+	if p278.title ~= nil and p278.title ~= "" then
+		local v3461, v3462 = proto.writeTag(buf, n185, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n182 = proto.writeString(v3414, v3415, p274.universe_id)
+		buf, n185 = proto.writeString(v3461, v3462, p278.title)
 	end
 
-	local buf101 = buffer.create(n182)
+	if p278.user_items ~= nil and #p278.user_items > 0 then
+		for _, v3464 in p278.user_items do
+			local v3465 = v3464:encode()
+			local v3466, v3467 = proto.writeTag(buf, n185, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf101, 0, buf, 0, n182)
-
-	return buf101
-end
-function t466.decode(p275: buffer) -- line: 19194
-	-- upvalues: t466 (copy), proto (copy)
-	local v3418 = t466.new()
-	local n183 = 0
-
-	while n183 < buffer.len(p275) do
-		local v3420, v3421
-
-		v3420, v3421, n183 = proto.readTag(p275, n183)
-
-		if v3421 == proto.wireTypes.varint then
-			local v3422
-
-			v3422, n183 = proto.readVarInt(p275, n183)
-		elseif v3421 == proto.wireTypes.lengthDelimited then
-			if v3420 == 1 then
-				local v3423
-
-				v3423, n183 = proto.readBuffer(p275, n183)
-				v3418.universe_id = buffer.tostring(v3423)
-			else
-				local v3424, v3425 = proto.readVarInt(p275, n183)
-
-				n183 = v3425 + v3424
-			end
-		elseif v3421 == proto.wireTypes.i32 then
-			local v3426
-
-			v3426, n183 = proto.readFixed32(p275, n183)
-		elseif v3421 == proto.wireTypes.i64 then
-			local v3427
-
-			v3427, n183 = proto.readFixed64(p275, n183)
-		else
-			error("Unsupported wire type: " .. v3421)
+			buf, n185 = proto.writeBuffer(v3466, v3467, v3465, buffer.len(v3465))
 		end
 	end
 
-	return v3418
-end
-function t466.jsonEncode(p276) -- line: 19237
-	local t468 = {}
+	if p278.max_visible_rows ~= nil and p278.max_visible_rows ~= 0 then
+		local v3468, v3469 = proto.writeTag(buf, n185, 3, proto.wireTypes.varint)
 
-	if p276.universe_id ~= nil and p276.universe_id ~= "" then
-		t468.universeId = p276.universe_id
+		buf, n185 = proto.writeVarInt(v3468, v3469, p278.max_visible_rows)
 	end
 
-	return t468
-end
-function t466.jsonDecode(t469: {[any]: any}) -- line: 19247
-	-- upvalues: t466 (copy)
-	local v3431 = t466.new()
+	local buf102 = buffer.create(n185)
 
-	if t469.universe_id ~= nil then
-		v3431.universe_id = t469.universe_id
-	end
-
-	if t469.universeId ~= nil then
-		v3431.universe_id = t469.universeId
-	end
-
-	return v3431
-end
-
-t466.descriptor = {
-	name = "ExperienceGuidelinesDialogInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceGuidelinesDialogInputData"
-}
-t1.ExperienceGuidelinesDialogInputData = t466
-typeRegistry.default:register(t1.ExperienceGuidelinesDialogInputData)
-
-local t470 = {}
-
-t470.__index = t470
-
-function t470.new(t471: {[any]: any}?) -- line: 19277
-	-- upvalues: t470 (copy)
-	return (setmetatable({
-		title = if t471 ~= nil and t471.title ~= nil then t471.title else "",
-		subtitle = if t471 ~= nil and t471.subtitle ~= nil then t471.subtitle else "",
-		moment_items = if t471 ~= nil and t471.moment_items ~= nil then t471.moment_items else {}
-	}, t470))
-end
-function t470.encode(p277) -- line: 19285
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n184 = 0
-
-	if p277.title ~= nil and p277.title ~= "" then
-		local v3436, v3437 = proto.writeTag(buf, n184, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n184 = proto.writeString(v3436, v3437, p277.title)
-	end
-
-	if p277.subtitle ~= nil and p277.subtitle ~= "" then
-		local v3438, v3439 = proto.writeTag(buf, n184, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n184 = proto.writeString(v3438, v3439, p277.subtitle)
-	end
-
-	if p277.moment_items ~= nil and #p277.moment_items > 0 then
-		for _, v3441 in p277.moment_items do
-			local v3442 = v3441:encode()
-			local v3443, v3444 = proto.writeTag(buf, n184, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n184 = proto.writeBuffer(v3443, v3444, v3442, buffer.len(v3442))
-		end
-	end
-
-	local buf102 = buffer.create(n184)
-
-	buffer.copy(buf102, 0, buf, 0, n184)
+	buffer.copy(buf102, 0, buf, 0, n185)
 
 	return buf102
 end
-function t470.decode(p278: buffer) -- line: 19312
-	-- upvalues: t470 (copy), proto (copy), t1 (copy)
-	local v3447 = t470.new()
-	local n185 = 0
-
-	while n185 < buffer.len(p278) do
-		local v3449, v3450
-
-		v3449, v3450, n185 = proto.readTag(p278, n185)
-
-		if v3450 == proto.wireTypes.varint then
-			local v3451
-
-			v3451, n185 = proto.readVarInt(p278, n185)
-		elseif v3450 == proto.wireTypes.lengthDelimited then
-			if v3449 == 1 then
-				local v3452
-
-				v3452, n185 = proto.readBuffer(p278, n185)
-				v3447.title = buffer.tostring(v3452)
-			elseif v3449 == 2 then
-				local v3453
-
-				v3453, n185 = proto.readBuffer(p278, n185)
-				v3447.subtitle = buffer.tostring(v3453)
-			elseif v3449 == 3 then
-				local v3454
-
-				v3454, n185 = proto.readBuffer(p278, n185)
-				table.insert(v3447.moment_items, t1.MomentsCarouselInputData_MomentItem.decode(v3454))
-			else
-				local v3455, v3456 = proto.readVarInt(p278, n185)
-
-				n185 = v3456 + v3455
-			end
-		elseif v3450 == proto.wireTypes.i32 then
-			local v3457
-
-			v3457, n185 = proto.readFixed32(p278, n185)
-		elseif v3450 == proto.wireTypes.i64 then
-			local v3458
-
-			v3458, n185 = proto.readFixed64(p278, n185)
-		else
-			error("Unsupported wire type: " .. v3450)
-		end
-	end
-
-	return v3447
-end
-function t470.jsonEncode(p279) -- line: 19365
-	local t472 = {}
-
-	if p279.title ~= nil and p279.title ~= "" then
-		t472.title = p279.title
-	end
-
-	if p279.subtitle ~= nil and p279.subtitle ~= "" then
-		t472.subtitle = p279.subtitle
-	end
-
-	if p279.moment_items ~= nil and #p279.moment_items > 0 then
-		local t473 = {}
-
-		for _, v3463 in p279.moment_items do
-			table.insert(t473, v3463:jsonEncode())
-		end
-
-		t472.momentItems = t473
-	end
-
-	return t472
-end
-function t470.jsonDecode(t474: {[any]: any}) -- line: 19387
-	-- upvalues: t470 (copy), t1 (copy)
-	local v3465 = t470.new()
-
-	if t474.title ~= nil then
-		v3465.title = t474.title
-	end
-
-	if t474.subtitle ~= nil then
-		v3465.subtitle = t474.subtitle
-	end
-
-	if t474.moment_items ~= nil then
-		local t475 = {}
-
-		for _, v3468 in t474.moment_items do
-			table.insert(t475, t1.MomentsCarouselInputData_MomentItem.jsonDecode(v3468))
-		end
-
-		v3465.moment_items = t475
-	end
-
-	if t474.momentItems ~= nil then
-		local t476 = {}
-
-		for _, v3471 in t474.momentItems do
-			table.insert(t476, t1.MomentsCarouselInputData_MomentItem.jsonDecode(v3471))
-		end
-
-		v3465.moment_items = t476
-	end
-
-	return v3465
-end
-
-t470.descriptor = {
-	name = "MomentsCarouselInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.MomentsCarouselInputData"
-}
-t1.MomentsCarouselInputData = t470
-typeRegistry.default:register(t1.MomentsCarouselInputData)
-
-local t477 = {}
-
-t477.__index = t477
-
-function t477.new(t478: {[any]: any}?) -- line: 19433
-	-- upvalues: t477 (copy)
-	return (setmetatable({
-		moment_id = if t478 ~= nil and t478.moment_id ~= nil then t478.moment_id else "",
-		video_asset_id = if t478 ~= nil and t478.video_asset_id ~= nil then t478.video_asset_id else "",
-		target_universe_id = if t478 ~= nil and t478.target_universe_id ~= nil then t478.target_universe_id else "",
-		target_place_id = if t478 ~= nil and t478.target_place_id ~= nil then t478.target_place_id else "",
-		feed_item_id = if t478 ~= nil and t478.feed_item_id ~= nil then t478.feed_item_id else "",
-		capture_universe_id = if t478 ~= nil and t478.capture_universe_id ~= nil then t478.capture_universe_id else ""
-	}, t477))
-end
-function t477.encode(p280) -- line: 19448
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t469.decode(p279: buffer) -- line: 19706
+	-- upvalues: t469 (copy), proto (copy), t1 (copy)
+	local v3472 = t469.new()
 	local n186 = 0
 
-	if p280.moment_id ~= nil and p280.moment_id ~= "" then
-		local v3476, v3477 = proto.writeTag(buf, n186, 1, proto.wireTypes.lengthDelimited)
+	while n186 < buffer.len(p279) do
+		local v3474, v3475
 
-		buf, n186 = proto.writeString(v3476, v3477, p280.moment_id)
-	end
+		v3474, v3475, n186 = proto.readTag(p279, n186)
 
-	if p280.video_asset_id ~= nil and p280.video_asset_id ~= "" then
-		local v3478, v3479 = proto.writeTag(buf, n186, 2, proto.wireTypes.lengthDelimited)
+		if v3475 == proto.wireTypes.varint then
+			if v3474 == 3 then
+				local v3476
 
-		buf, n186 = proto.writeString(v3478, v3479, p280.video_asset_id)
-	end
-
-	if p280.target_universe_id ~= nil and p280.target_universe_id ~= "" then
-		local v3480, v3481 = proto.writeTag(buf, n186, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n186 = proto.writeString(v3480, v3481, p280.target_universe_id)
-	end
-
-	if p280.target_place_id ~= nil and p280.target_place_id ~= "" then
-		local v3482, v3483 = proto.writeTag(buf, n186, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n186 = proto.writeString(v3482, v3483, p280.target_place_id)
-	end
-
-	if p280.feed_item_id ~= nil and p280.feed_item_id ~= "" then
-		local v3484, v3485 = proto.writeTag(buf, n186, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n186 = proto.writeString(v3484, v3485, p280.feed_item_id)
-	end
-
-	if p280.capture_universe_id ~= nil and p280.capture_universe_id ~= "" then
-		local v3486, v3487 = proto.writeTag(buf, n186, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n186 = proto.writeString(v3486, v3487, p280.capture_universe_id)
-	end
-
-	local buf103 = buffer.create(n186)
-
-	buffer.copy(buf103, 0, buf, 0, n186)
-
-	return buf103
-end
-function t477.decode(p281: buffer) -- line: 19487
-	-- upvalues: t477 (copy), proto (copy)
-	local v3490 = t477.new()
-	local n187 = 0
-
-	while n187 < buffer.len(p281) do
-		local v3492, v3493
-
-		v3492, v3493, n187 = proto.readTag(p281, n187)
-
-		if v3493 == proto.wireTypes.varint then
-			local v3494
-
-			v3494, n187 = proto.readVarInt(p281, n187)
-		elseif v3493 == proto.wireTypes.lengthDelimited then
-			if v3492 == 1 then
-				local v3495
-
-				v3495, n187 = proto.readBuffer(p281, n187)
-				v3490.moment_id = buffer.tostring(v3495)
-			elseif v3492 == 2 then
-				local v3496
-
-				v3496, n187 = proto.readBuffer(p281, n187)
-				v3490.video_asset_id = buffer.tostring(v3496)
-			elseif v3492 == 3 then
-				local v3497
-
-				v3497, n187 = proto.readBuffer(p281, n187)
-				v3490.target_universe_id = buffer.tostring(v3497)
-			elseif v3492 == 4 then
-				local v3498
-
-				v3498, n187 = proto.readBuffer(p281, n187)
-				v3490.target_place_id = buffer.tostring(v3498)
-			elseif v3492 == 5 then
-				local v3499
-
-				v3499, n187 = proto.readBuffer(p281, n187)
-				v3490.feed_item_id = buffer.tostring(v3499)
-			elseif v3492 == 6 then
-				local v3500
-
-				v3500, n187 = proto.readBuffer(p281, n187)
-				v3490.capture_universe_id = buffer.tostring(v3500)
+				v3476, n186 = proto.readVarIntI32(p279, n186)
+				v3472.max_visible_rows = v3476
 			else
-				local v3501, v3502 = proto.readVarInt(p281, n187)
+				local v3477
 
-				n187 = v3502 + v3501
+				v3477, n186 = proto.readVarInt(p279, n186)
 			end
-		elseif v3493 == proto.wireTypes.i32 then
-			local v3503
+		elseif v3475 == proto.wireTypes.lengthDelimited then
+			if v3474 == 1 then
+				local v3478
 
-			v3503, n187 = proto.readFixed32(p281, n187)
-		elseif v3493 == proto.wireTypes.i64 then
-			local v3504
+				v3478, n186 = proto.readBuffer(p279, n186)
+				v3472.title = buffer.tostring(v3478)
+			elseif v3474 == 2 then
+				local v3479
 
-			v3504, n187 = proto.readFixed64(p281, n187)
+				v3479, n186 = proto.readBuffer(p279, n186)
+				table.insert(v3472.user_items, t1.UserListInputData_UserItem.decode(v3479))
+			else
+				local v3480, v3481 = proto.readVarInt(p279, n186)
+
+				n186 = v3481 + v3480
+			end
+		elseif v3475 == proto.wireTypes.i32 then
+			local v3482
+
+			v3482, n186 = proto.readFixed32(p279, n186)
+		elseif v3475 == proto.wireTypes.i64 then
+			local v3483
+
+			v3483, n186 = proto.readFixed64(p279, n186)
 		else
-			error("Unsupported wire type: " .. v3493)
+			error("Unsupported wire type: " .. v3475)
 		end
+	end
+
+	return v3472
+end
+function t469.jsonEncode(p280) -- line: 19759
+	local t471 = {}
+
+	if p280.title ~= nil and p280.title ~= "" then
+		t471.title = p280.title
+	end
+
+	if p280.user_items ~= nil and #p280.user_items > 0 then
+		local t472 = {}
+
+		for _, v3488 in p280.user_items do
+			table.insert(t472, v3488:jsonEncode())
+		end
+
+		t471.userItems = t472
+	end
+
+	if p280.max_visible_rows ~= nil and p280.max_visible_rows ~= 0 then
+		t471.maxVisibleRows = p280.max_visible_rows
+	end
+
+	return t471
+end
+function t469.jsonDecode(t473: {[any]: any}) -- line: 19781
+	-- upvalues: t469 (copy), t1 (copy)
+	local v3490 = t469.new()
+
+	if t473.title ~= nil then
+		v3490.title = t473.title
+	end
+
+	if t473.user_items ~= nil then
+		local t474 = {}
+
+		for _, v3493 in t473.user_items do
+			table.insert(t474, t1.UserListInputData_UserItem.jsonDecode(v3493))
+		end
+
+		v3490.user_items = t474
+	end
+
+	if t473.userItems ~= nil then
+		local t475 = {}
+
+		for _, v3496 in t473.userItems do
+			table.insert(t475, t1.UserListInputData_UserItem.jsonDecode(v3496))
+		end
+
+		v3490.user_items = t475
+	end
+
+	if t473.max_visible_rows ~= nil then
+		v3490.max_visible_rows = t473.max_visible_rows
+	end
+
+	if t473.maxVisibleRows ~= nil then
+		v3490.max_visible_rows = t473.maxVisibleRows
 	end
 
 	return v3490
 end
-function t477.jsonEncode(p282) -- line: 19555
-	local t479 = {}
 
-	if p282.moment_id ~= nil and p282.moment_id ~= "" then
-		t479.momentId = p282.moment_id
-	end
-
-	if p282.video_asset_id ~= nil and p282.video_asset_id ~= "" then
-		t479.videoAssetId = p282.video_asset_id
-	end
-
-	if p282.target_universe_id ~= nil and p282.target_universe_id ~= "" then
-		t479.targetUniverseId = p282.target_universe_id
-	end
-
-	if p282.target_place_id ~= nil and p282.target_place_id ~= "" then
-		t479.targetPlaceId = p282.target_place_id
-	end
-
-	if p282.feed_item_id ~= nil and p282.feed_item_id ~= "" then
-		t479.feedItemId = p282.feed_item_id
-	end
-
-	if p282.capture_universe_id ~= nil and p282.capture_universe_id ~= "" then
-		t479.captureUniverseId = p282.capture_universe_id
-	end
-
-	return t479
-end
-function t477.jsonDecode(t480: {[any]: any}) -- line: 19585
-	-- upvalues: t477 (copy)
-	local v3508 = t477.new()
-
-	if t480.moment_id ~= nil then
-		v3508.moment_id = t480.moment_id
-	end
-
-	if t480.momentId ~= nil then
-		v3508.moment_id = t480.momentId
-	end
-
-	if t480.video_asset_id ~= nil then
-		v3508.video_asset_id = t480.video_asset_id
-	end
-
-	if t480.videoAssetId ~= nil then
-		v3508.video_asset_id = t480.videoAssetId
-	end
-
-	if t480.target_universe_id ~= nil then
-		v3508.target_universe_id = t480.target_universe_id
-	end
-
-	if t480.targetUniverseId ~= nil then
-		v3508.target_universe_id = t480.targetUniverseId
-	end
-
-	if t480.target_place_id ~= nil then
-		v3508.target_place_id = t480.target_place_id
-	end
-
-	if t480.targetPlaceId ~= nil then
-		v3508.target_place_id = t480.targetPlaceId
-	end
-
-	if t480.feed_item_id ~= nil then
-		v3508.feed_item_id = t480.feed_item_id
-	end
-
-	if t480.feedItemId ~= nil then
-		v3508.feed_item_id = t480.feedItemId
-	end
-
-	if t480.capture_universe_id ~= nil then
-		v3508.capture_universe_id = t480.capture_universe_id
-	end
-
-	if t480.captureUniverseId ~= nil then
-		v3508.capture_universe_id = t480.captureUniverseId
-	end
-
-	return v3508
-end
-
-t477.descriptor = {
-	name = "MomentsCarouselInputData_MomentItem",
-	fullName = "roblox.apppageplatform.shared.v1beta1.MomentItem"
+t469.descriptor = {
+	name = "UserListInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UserListInputData"
 }
-t1.MomentsCarouselInputData_MomentItem = t477
-typeRegistry.default:register(t1.MomentsCarouselInputData_MomentItem)
+t1.UserListInputData = t469
+typeRegistry.default:register(t1.UserListInputData)
 
-local t481 = {}
+local t476 = {}
 
-t481.__index = t481
+t476.__index = t476
 
-function t481.new(t482: {[any]: any}?) -- line: 19655
-	-- upvalues: t481 (copy)
+function t476.new(t477: {[any]: any}?) -- line: 19831
+	-- upvalues: t476 (copy)
 	return (setmetatable({
-		title = if t482 ~= nil and t482.title ~= nil then t482.title else "",
-		subtitle = if t482 ~= nil and t482.subtitle ~= nil then t482.subtitle else ""
-	}, t481))
+		user_id = if t477 ~= nil and t477.user_id ~= nil then t477.user_id else ""
+	}, t476))
 end
-function t481.encode(p283) -- line: 19662
+function t476.encode(p281) -- line: 19839
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
+	local n187 = 0
+
+	if p281.user_id ~= nil and p281.user_id ~= "" then
+		local v3501, v3502 = proto.writeTag(buf, n187, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n187 = proto.writeString(v3501, v3502, p281.user_id)
+	end
+
+	local buf103 = buffer.create(n187)
+
+	buffer.copy(buf103, 0, buf, 0, n187)
+
+	return buf103
+end
+function t476.decode(p282: buffer) -- line: 19853
+	-- upvalues: t476 (copy), proto (copy)
+	local v3505 = t476.new()
 	local n188 = 0
 
-	if p283.title ~= nil and p283.title ~= "" then
-		local v3513, v3514 = proto.writeTag(buf, n188, 1, proto.wireTypes.lengthDelimited)
+	while n188 < buffer.len(p282) do
+		local v3507, v3508
 
-		buf, n188 = proto.writeString(v3513, v3514, p283.title)
+		v3507, v3508, n188 = proto.readTag(p282, n188)
+
+		if v3508 == proto.wireTypes.varint then
+			local v3509
+
+			v3509, n188 = proto.readVarInt(p282, n188)
+		elseif v3508 == proto.wireTypes.lengthDelimited then
+			if v3507 == 1 then
+				local v3510
+
+				v3510, n188 = proto.readBuffer(p282, n188)
+				v3505.user_id = buffer.tostring(v3510)
+			else
+				local v3511, v3512 = proto.readVarInt(p282, n188)
+
+				n188 = v3512 + v3511
+			end
+		elseif v3508 == proto.wireTypes.i32 then
+			local v3513
+
+			v3513, n188 = proto.readFixed32(p282, n188)
+		elseif v3508 == proto.wireTypes.i64 then
+			local v3514
+
+			v3514, n188 = proto.readFixed64(p282, n188)
+		else
+			error("Unsupported wire type: " .. v3508)
+		end
 	end
 
-	if p283.subtitle ~= nil and p283.subtitle ~= "" then
-		local v3515, v3516 = proto.writeTag(buf, n188, 2, proto.wireTypes.lengthDelimited)
+	return v3505
+end
+function t476.jsonEncode(p283) -- line: 19896
+	local t478 = {}
 
-		buf, n188 = proto.writeString(v3515, v3516, p283.subtitle)
+	if p283.user_id ~= nil and p283.user_id ~= "" then
+		t478.userId = p283.user_id
 	end
 
-	local buf104 = buffer.create(n188)
+	return t478
+end
+function t476.jsonDecode(t479: {[any]: any}) -- line: 19906
+	-- upvalues: t476 (copy)
+	local v3518 = t476.new()
 
-	buffer.copy(buf104, 0, buf, 0, n188)
+	if t479.user_id ~= nil then
+		v3518.user_id = t479.user_id
+	end
+
+	if t479.userId ~= nil then
+		v3518.user_id = t479.userId
+	end
+
+	return v3518
+end
+
+t476.descriptor = {
+	name = "UserListInputData_UserItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UserItem"
+}
+t1.UserListInputData_UserItem = t476
+typeRegistry.default:register(t1.UserListInputData_UserItem)
+
+local t480 = {}
+
+t480.__index = t480
+
+function t480.new(t481: {[any]: any}?) -- line: 19934
+	-- upvalues: t480 (copy)
+	return (setmetatable({
+		title = if t481 ~= nil and t481.title ~= nil then t481.title else "",
+		items = if t481 ~= nil and t481.items ~= nil then t481.items else {},
+		max_visible_rows = if t481 ~= nil and t481.max_visible_rows ~= nil then t481.max_visible_rows else 0
+	}, t480))
+end
+function t480.encode(p284) -- line: 19942
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n189 = 0
+
+	if p284.title ~= nil and p284.title ~= "" then
+		local v3523, v3524 = proto.writeTag(buf, n189, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n189 = proto.writeString(v3523, v3524, p284.title)
+	end
+
+	if p284.items ~= nil and #p284.items > 0 then
+		for _, v3526 in p284.items do
+			local v3527 = v3526:encode()
+			local v3528, v3529 = proto.writeTag(buf, n189, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n189 = proto.writeBuffer(v3528, v3529, v3527, buffer.len(v3527))
+		end
+	end
+
+	if p284.max_visible_rows ~= nil and p284.max_visible_rows ~= 0 then
+		local v3530, v3531 = proto.writeTag(buf, n189, 3, proto.wireTypes.varint)
+
+		buf, n189 = proto.writeVarInt(v3530, v3531, p284.max_visible_rows)
+	end
+
+	local buf104 = buffer.create(n189)
+
+	buffer.copy(buf104, 0, buf, 0, n189)
 
 	return buf104
 end
-function t481.decode(p284: buffer) -- line: 19681
-	-- upvalues: t481 (copy), proto (copy)
-	local v3519 = t481.new()
-	local n189 = 0
+function t480.decode(p285: buffer) -- line: 19969
+	-- upvalues: t480 (copy), proto (copy), t1 (copy)
+	local v3534 = t480.new()
+	local n190 = 0
 
-	while n189 < buffer.len(p284) do
-		local v3521, v3522
+	while n190 < buffer.len(p285) do
+		local v3536, v3537
 
-		v3521, v3522, n189 = proto.readTag(p284, n189)
+		v3536, v3537, n190 = proto.readTag(p285, n190)
 
-		if v3522 == proto.wireTypes.varint then
-			local v3523
+		if v3537 == proto.wireTypes.varint then
+			if v3536 == 3 then
+				local v3538
 
-			v3523, n189 = proto.readVarInt(p284, n189)
-		elseif v3522 == proto.wireTypes.lengthDelimited then
-			if v3521 == 1 then
-				local v3524
-
-				v3524, n189 = proto.readBuffer(p284, n189)
-				v3519.title = buffer.tostring(v3524)
-			elseif v3521 == 2 then
-				local v3525
-
-				v3525, n189 = proto.readBuffer(p284, n189)
-				v3519.subtitle = buffer.tostring(v3525)
+				v3538, n190 = proto.readVarIntI32(p285, n190)
+				v3534.max_visible_rows = v3538
 			else
-				local v3526, v3527 = proto.readVarInt(p284, n189)
+				local v3539
 
-				n189 = v3527 + v3526
+				v3539, n190 = proto.readVarInt(p285, n190)
 			end
-		elseif v3522 == proto.wireTypes.i32 then
-			local v3528
+		elseif v3537 == proto.wireTypes.lengthDelimited then
+			if v3536 == 1 then
+				local v3540
 
-			v3528, n189 = proto.readFixed32(p284, n189)
-		elseif v3522 == proto.wireTypes.i64 then
-			local v3529
+				v3540, n190 = proto.readBuffer(p285, n190)
+				v3534.title = buffer.tostring(v3540)
+			elseif v3536 == 2 then
+				local v3541
 
-			v3529, n189 = proto.readFixed64(p284, n189)
+				v3541, n190 = proto.readBuffer(p285, n190)
+				table.insert(v3534.items, t1.CatalogItemListInputData_CatalogItem.decode(v3541))
+			else
+				local v3542, v3543 = proto.readVarInt(p285, n190)
+
+				n190 = v3543 + v3542
+			end
+		elseif v3537 == proto.wireTypes.i32 then
+			local v3544
+
+			v3544, n190 = proto.readFixed32(p285, n190)
+		elseif v3537 == proto.wireTypes.i64 then
+			local v3545
+
+			v3545, n190 = proto.readFixed64(p285, n190)
 		else
-			error("Unsupported wire type: " .. v3522)
+			error("Unsupported wire type: " .. v3537)
 		end
 	end
 
-	return v3519
+	return v3534
 end
-function t481.jsonEncode(p285) -- line: 19729
-	local t483 = {}
+function t480.jsonEncode(p286) -- line: 20022
+	local t482 = {}
 
-	if p285.title ~= nil and p285.title ~= "" then
-		t483.title = p285.title
+	if p286.title ~= nil and p286.title ~= "" then
+		t482.title = p286.title
 	end
 
-	if p285.subtitle ~= nil and p285.subtitle ~= "" then
-		t483.subtitle = p285.subtitle
+	if p286.items ~= nil and #p286.items > 0 then
+		local t483 = {}
+
+		for _, v3550 in p286.items do
+			table.insert(t483, v3550:jsonEncode())
+		end
+
+		t482.items = t483
 	end
 
-	return t483
+	if p286.max_visible_rows ~= nil and p286.max_visible_rows ~= 0 then
+		t482.maxVisibleRows = p286.max_visible_rows
+	end
+
+	return t482
 end
-function t481.jsonDecode(t484: {[any]: any}) -- line: 19743
-	-- upvalues: t481 (copy)
-	local v3533 = t481.new()
+function t480.jsonDecode(t484: {[any]: any}) -- line: 20044
+	-- upvalues: t480 (copy), t1 (copy)
+	local v3552 = t480.new()
 
 	if t484.title ~= nil then
-		v3533.title = t484.title
+		v3552.title = t484.title
 	end
 
-	if t484.subtitle ~= nil then
-		v3533.subtitle = t484.subtitle
+	if t484.items ~= nil then
+		local t485 = {}
+
+		for _, v3555 in t484.items do
+			table.insert(t485, t1.CatalogItemListInputData_CatalogItem.jsonDecode(v3555))
+		end
+
+		v3552.items = t485
 	end
 
-	return v3533
+	if t484.max_visible_rows ~= nil then
+		v3552.max_visible_rows = t484.max_visible_rows
+	end
+
+	if t484.maxVisibleRows ~= nil then
+		v3552.max_visible_rows = t484.maxVisibleRows
+	end
+
+	return v3552
 end
 
-t481.descriptor = {
-	name = "AttributionRowInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.AttributionRowInputData"
+t480.descriptor = {
+	name = "CatalogItemListInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItemListInputData"
 }
-t1.AttributionRowInputData = t481
-typeRegistry.default:register(t1.AttributionRowInputData)
+t1.CatalogItemListInputData = t480
+typeRegistry.default:register(t1.CatalogItemListInputData)
 
-local t485 = {}
+local t486 = {}
 
-t485.__index = t485
+t486.__index = t486
 
-function t485.new(t486: {[any]: any}?) -- line: 19771
-	-- upvalues: t485 (copy)
+function t486.new(t487: {[any]: any}?) -- line: 20085
+	-- upvalues: t486 (copy)
 	return (setmetatable({
-		image_asset_id = if t486 ~= nil and t486.image_asset_id ~= nil then t486.image_asset_id else ""
-	}, t485))
+		item_id = if t487 ~= nil and t487.item_id ~= nil then t487.item_id else "",
+		item_type = if t487 ~= nil and t487.item_type ~= nil then t487.item_type else ""
+	}, t486))
 end
-function t485.encode(p286) -- line: 19777
+function t486.encode(p287) -- line: 20094
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n190 = 0
+	local n191 = 0
 
-	if p286.image_asset_id ~= nil and p286.image_asset_id ~= "" then
-		local v3538, v3539 = proto.writeTag(buf, n190, 1, proto.wireTypes.lengthDelimited)
+	if p287.item_id ~= nil and p287.item_id ~= "" then
+		local v3560, v3561 = proto.writeTag(buf, n191, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n190 = proto.writeString(v3538, v3539, p286.image_asset_id)
+		buf, n191 = proto.writeString(v3560, v3561, p287.item_id)
 	end
 
-	local buf105 = buffer.create(n190)
+	if p287.item_type ~= nil and p287.item_type ~= "" then
+		local v3562, v3563 = proto.writeTag(buf, n191, 2, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf105, 0, buf, 0, n190)
+		buf, n191 = proto.writeString(v3562, v3563, p287.item_type)
+	end
+
+	local buf105 = buffer.create(n191)
+
+	buffer.copy(buf105, 0, buf, 0, n191)
 
 	return buf105
 end
-function t485.decode(p287: buffer) -- line: 19791
-	-- upvalues: t485 (copy), proto (copy)
-	local v3542 = t485.new()
-	local n191 = 0
-
-	while n191 < buffer.len(p287) do
-		local v3544, v3545
-
-		v3544, v3545, n191 = proto.readTag(p287, n191)
-
-		if v3545 == proto.wireTypes.varint then
-			local v3546
-
-			v3546, n191 = proto.readVarInt(p287, n191)
-		elseif v3545 == proto.wireTypes.lengthDelimited then
-			if v3544 == 1 then
-				local v3547
-
-				v3547, n191 = proto.readBuffer(p287, n191)
-				v3542.image_asset_id = buffer.tostring(v3547)
-			else
-				local v3548, v3549 = proto.readVarInt(p287, n191)
-
-				n191 = v3549 + v3548
-			end
-		elseif v3545 == proto.wireTypes.i32 then
-			local v3550
-
-			v3550, n191 = proto.readFixed32(p287, n191)
-		elseif v3545 == proto.wireTypes.i64 then
-			local v3551
-
-			v3551, n191 = proto.readFixed64(p287, n191)
-		else
-			error("Unsupported wire type: " .. v3545)
-		end
-	end
-
-	return v3542
-end
-function t485.jsonEncode(p288) -- line: 19834
-	local t487 = {}
-
-	if p288.image_asset_id ~= nil and p288.image_asset_id ~= "" then
-		t487.imageAssetId = p288.image_asset_id
-	end
-
-	return t487
-end
-function t485.jsonDecode(t488: {[any]: any}) -- line: 19844
-	-- upvalues: t485 (copy)
-	local v3555 = t485.new()
-
-	if t488.image_asset_id ~= nil then
-		v3555.image_asset_id = t488.image_asset_id
-	end
-
-	if t488.imageAssetId ~= nil then
-		v3555.image_asset_id = t488.imageAssetId
-	end
-
-	return v3555
-end
-
-t485.descriptor = {
-	name = "ImageInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ImageInputData"
-}
-t1.ImageInputData = t485
-typeRegistry.default:register(t1.ImageInputData)
-
-local t489 = {}
-
-t489.__index = t489
-
-function t489.new(t490: {[any]: any}?) -- line: 19872
-	-- upvalues: t489 (copy)
-	return (setmetatable({
-		text = if t490 ~= nil and t490.text ~= nil then t490.text else "",
-		is_rendered_text = t490 ~= nil and (t490.is_rendered_text ~= nil and t490.is_rendered_text)
-	}, t489))
-end
-function t489.encode(p289) -- line: 19879
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t486.decode(p288: buffer) -- line: 20113
+	-- upvalues: t486 (copy), proto (copy)
+	local v3566 = t486.new()
 	local n192 = 0
 
-	if p289.text ~= nil and p289.text ~= "" then
-		local v3560, v3561 = proto.writeTag(buf, n192, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n192 = proto.writeString(v3560, v3561, p289.text)
-	end
-
-	if p289.is_rendered_text then
-		local v3562, v3563 = proto.writeTag(buf, n192, 2, proto.wireTypes.varint)
-
-		buf, n192 = proto.writeVarInt(v3562, v3563, not p289.is_rendered_text and 0 or 1)
-	end
-
-	local buf106 = buffer.create(n192)
-
-	buffer.copy(buf106, 0, buf, 0, n192)
-
-	return buf106
-end
-function t489.decode(p290: buffer) -- line: 19898
-	-- upvalues: t489 (copy), proto (copy)
-	local v3566 = t489.new()
-	local n193 = 0
-
-	while n193 < buffer.len(p290) do
+	while n192 < buffer.len(p288) do
 		local v3568, v3569
 
-		v3568, v3569, n193 = proto.readTag(p290, n193)
+		v3568, v3569, n192 = proto.readTag(p288, n192)
 
 		if v3569 == proto.wireTypes.varint then
-			if v3568 == 2 then
-				local v3570
+			local v3570
 
-				v3570, n193 = proto.readVarInt(p290, n193)
-				v3566.is_rendered_text = v3570 ~= 0
-			else
-				local v3571
-
-				v3571, n193 = proto.readVarInt(p290, n193)
-			end
+			v3570, n192 = proto.readVarInt(p288, n192)
 		elseif v3569 == proto.wireTypes.lengthDelimited then
 			if v3568 == 1 then
+				local v3571
+
+				v3571, n192 = proto.readBuffer(p288, n192)
+				v3566.item_id = buffer.tostring(v3571)
+			elseif v3568 == 2 then
 				local v3572
 
-				v3572, n193 = proto.readBuffer(p290, n193)
-				v3566.text = buffer.tostring(v3572)
+				v3572, n192 = proto.readBuffer(p288, n192)
+				v3566.item_type = buffer.tostring(v3572)
 			else
-				local v3573, v3574 = proto.readVarInt(p290, n193)
+				local v3573, v3574 = proto.readVarInt(p288, n192)
 
-				n193 = v3574 + v3573
+				n192 = v3574 + v3573
 			end
 		elseif v3569 == proto.wireTypes.i32 then
 			local v3575
 
-			v3575, n193 = proto.readFixed32(p290, n193)
+			v3575, n192 = proto.readFixed32(p288, n192)
 		elseif v3569 == proto.wireTypes.i64 then
 			local v3576
 
-			v3576, n193 = proto.readFixed64(p290, n193)
+			v3576, n192 = proto.readFixed64(p288, n192)
 		else
 			error("Unsupported wire type: " .. v3569)
 		end
@@ -16618,1599 +16643,2410 @@ function t489.decode(p290: buffer) -- line: 19898
 
 	return v3566
 end
-function t489.jsonEncode(p291) -- line: 19946
-	local t491 = {}
+function t486.jsonEncode(p289) -- line: 20161
+	local t488 = {}
 
-	if p291.text ~= nil and p291.text ~= "" then
-		t491.text = p291.text
+	if p289.item_id ~= nil and p289.item_id ~= "" then
+		t488.itemId = p289.item_id
 	end
 
-	if p291.is_rendered_text then
-		t491.isRenderedText = p291.is_rendered_text
+	if p289.item_type ~= nil and p289.item_type ~= "" then
+		t488.itemType = p289.item_type
 	end
 
-	return t491
+	return t488
 end
-function t489.jsonDecode(t492: {[any]: any}) -- line: 19960
-	-- upvalues: t489 (copy)
-	local v3580 = t489.new()
+function t486.jsonDecode(t489: {[any]: any}) -- line: 20175
+	-- upvalues: t486 (copy)
+	local v3580 = t486.new()
 
-	if t492.text ~= nil then
-		v3580.text = t492.text
+	if t489.item_id ~= nil then
+		v3580.item_id = t489.item_id
 	end
 
-	if t492.is_rendered_text ~= nil then
-		v3580.is_rendered_text = t492.is_rendered_text
+	if t489.itemId ~= nil then
+		v3580.item_id = t489.itemId
 	end
 
-	if t492.isRenderedText ~= nil then
-		v3580.is_rendered_text = t492.isRenderedText
+	if t489.item_type ~= nil then
+		v3580.item_type = t489.item_type
+	end
+
+	if t489.itemType ~= nil then
+		v3580.item_type = t489.itemType
 	end
 
 	return v3580
 end
 
-t489.descriptor = {
-	name = "TextInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.TextInputData"
+t486.descriptor = {
+	name = "CatalogItemListInputData_CatalogItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogItem"
 }
-t1.TextInputData = t489
-typeRegistry.default:register(t1.TextInputData)
+t1.CatalogItemListInputData_CatalogItem = t486
+typeRegistry.default:register(t1.CatalogItemListInputData_CatalogItem)
 
-local t493 = {}
+local t490 = {}
 
-t493.__index = t493
+t490.__index = t490
 
-function t493.new(t494: {[any]: any}?) -- line: 19992
-	-- upvalues: t493 (copy)
+function t490.new(t491: {[any]: any}?) -- line: 20213
+	-- upvalues: t490 (copy)
 	return (setmetatable({
-		entry_map = if t494 ~= nil and t494.entry_map ~= nil then t494.entry_map else {},
-		entry_order = if t494 ~= nil and t494.entry_order ~= nil then t494.entry_order else {},
-		entry_order_map = if t494 ~= nil and t494.entry_order_map ~= nil then t494.entry_order_map else {},
-		content_pools = if t494 ~= nil and t494.content_pools ~= nil then t494.content_pools else {}
-	}, t493))
+		universe_id = if t491 ~= nil and t491.universe_id ~= nil then t491.universe_id else ""
+	}, t490))
 end
-function t493.encode(p292) -- line: 20001
+function t490.encode(p290) -- line: 20221
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
+	local n193 = 0
+
+	if p290.universe_id ~= nil and p290.universe_id ~= "" then
+		local v3585, v3586 = proto.writeTag(buf, n193, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n193 = proto.writeString(v3585, v3586, p290.universe_id)
+	end
+
+	local buf106 = buffer.create(n193)
+
+	buffer.copy(buf106, 0, buf, 0, n193)
+
+	return buf106
+end
+function t490.decode(p291: buffer) -- line: 20235
+	-- upvalues: t490 (copy), proto (copy)
+	local v3589 = t490.new()
 	local n194 = 0
 
-	if p292.entry_map ~= nil and next(p292.entry_map) ~= nil then
-		for v3585, v3586 in p292.entry_map do
-			local buf107 = buffer.create(0)
-			local v3588, v3589 = proto.writeTag(buf107, 0, 1, proto.wireTypes.lengthDelimited)
-			local v3590, v3591 = proto.writeString(v3588, v3589, v3585)
-			local v3592 = v3586:encode()
-			local v3593, v3594 = proto.writeTag(v3590, v3591, 2, proto.wireTypes.lengthDelimited)
-			local v3595, v3596 = proto.writeBuffer(v3593, v3594, v3592, buffer.len(v3592))
-			local v3597, v3598 = proto.writeTag(buf, n194, 1, proto.wireTypes.lengthDelimited)
+	while n194 < buffer.len(p291) do
+		local v3591, v3592
 
-			buf, n194 = proto.writeBuffer(v3597, v3598, v3595, v3596)
+		v3591, v3592, n194 = proto.readTag(p291, n194)
+
+		if v3592 == proto.wireTypes.varint then
+			local v3593
+
+			v3593, n194 = proto.readVarInt(p291, n194)
+		elseif v3592 == proto.wireTypes.lengthDelimited then
+			if v3591 == 1 then
+				local v3594
+
+				v3594, n194 = proto.readBuffer(p291, n194)
+				v3589.universe_id = buffer.tostring(v3594)
+			else
+				local v3595, v3596 = proto.readVarInt(p291, n194)
+
+				n194 = v3596 + v3595
+			end
+		elseif v3592 == proto.wireTypes.i32 then
+			local v3597
+
+			v3597, n194 = proto.readFixed32(p291, n194)
+		elseif v3592 == proto.wireTypes.i64 then
+			local v3598
+
+			v3598, n194 = proto.readFixed64(p291, n194)
+		else
+			error("Unsupported wire type: " .. v3592)
 		end
 	end
 
-	if p292.entry_order ~= nil and #p292.entry_order > 0 then
-		for _, v3600 in p292.entry_order do
-			local v3601, v3602 = proto.writeTag(buf, n194, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n194 = proto.writeString(v3601, v3602, v3600)
-		end
-	end
-
-	if p292.entry_order_map ~= nil and next(p292.entry_order_map) ~= nil then
-		for v3603, v3604 in p292.entry_order_map do
-			local buf108 = buffer.create(0)
-			local v3606, v3607 = proto.writeTag(buf108, 0, 1, proto.wireTypes.lengthDelimited)
-			local v3608, v3609 = proto.writeString(v3606, v3607, v3603)
-			local v3610 = v3604:encode()
-			local v3611, v3612 = proto.writeTag(v3608, v3609, 2, proto.wireTypes.lengthDelimited)
-			local v3613, v3614 = proto.writeBuffer(v3611, v3612, v3610, buffer.len(v3610))
-			local v3615, v3616 = proto.writeTag(buf, n194, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n194 = proto.writeBuffer(v3615, v3616, v3613, v3614)
-		end
-	end
-
-	if p292.content_pools ~= nil and next(p292.content_pools) ~= nil then
-		for v3617, v3618 in p292.content_pools do
-			local buf109 = buffer.create(0)
-			local v3620, v3621 = proto.writeTag(buf109, 0, 1, proto.wireTypes.lengthDelimited)
-			local v3622, v3623 = proto.writeString(v3620, v3621, v3617)
-			local v3624 = v3618:encode()
-			local v3625, v3626 = proto.writeTag(v3622, v3623, 2, proto.wireTypes.lengthDelimited)
-			local v3627, v3628 = proto.writeBuffer(v3625, v3626, v3624, buffer.len(v3624))
-			local v3629, v3630 = proto.writeTag(buf, n194, 4, proto.wireTypes.lengthDelimited)
-
-			buf, n194 = proto.writeBuffer(v3629, v3630, v3627, v3628)
-		end
-	end
-
-	local buf110 = buffer.create(n194)
-
-	buffer.copy(buf110, 0, buf, 0, n194)
-
-	return buf110
+	return v3589
 end
-function t493.decode(p293: buffer) -- line: 20059
-	-- upvalues: t493 (copy), proto (copy), t1 (copy)
-	local v3633 = t493.new()
+function t490.jsonEncode(p292) -- line: 20278
+	local t492 = {}
+
+	if p292.universe_id ~= nil and p292.universe_id ~= "" then
+		t492.universeId = p292.universe_id
+	end
+
+	return t492
+end
+function t490.jsonDecode(t493: {[any]: any}) -- line: 20288
+	-- upvalues: t490 (copy)
+	local v3602 = t490.new()
+
+	if t493.universe_id ~= nil then
+		v3602.universe_id = t493.universe_id
+	end
+
+	if t493.universeId ~= nil then
+		v3602.universe_id = t493.universeId
+	end
+
+	return v3602
+end
+
+t490.descriptor = {
+	name = "ExperienceGuidelinesDialogInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ExperienceGuidelinesDialogInputData"
+}
+t1.ExperienceGuidelinesDialogInputData = t490
+typeRegistry.default:register(t1.ExperienceGuidelinesDialogInputData)
+
+local t494 = {}
+
+t494.__index = t494
+
+function t494.new(t495: {[any]: any}?) -- line: 20318
+	-- upvalues: t494 (copy)
+	return (setmetatable({
+		title = if t495 ~= nil and t495.title ~= nil then t495.title else "",
+		subtitle = if t495 ~= nil and t495.subtitle ~= nil then t495.subtitle else "",
+		moment_items = if t495 ~= nil and t495.moment_items ~= nil then t495.moment_items else {}
+	}, t494))
+end
+function t494.encode(p293) -- line: 20326
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
 	local n195 = 0
 
-	while n195 < buffer.len(p293) do
-		local v3635, v3636
+	if p293.title ~= nil and p293.title ~= "" then
+		local v3607, v3608 = proto.writeTag(buf, n195, 1, proto.wireTypes.lengthDelimited)
 
-		v3635, v3636, n195 = proto.readTag(p293, n195)
+		buf, n195 = proto.writeString(v3607, v3608, p293.title)
+	end
 
-		if v3636 == proto.wireTypes.varint then
-			local v3637
+	if p293.subtitle ~= nil and p293.subtitle ~= "" then
+		local v3609, v3610 = proto.writeTag(buf, n195, 2, proto.wireTypes.lengthDelimited)
 
-			v3637, n195 = proto.readVarInt(p293, n195)
-		elseif v3636 == proto.wireTypes.lengthDelimited then
-			if v3635 == 1 then
-				local v3638
+		buf, n195 = proto.writeString(v3609, v3610, p293.subtitle)
+	end
 
-				v3638, n195 = proto.readBuffer(p293, n195)
+	if p293.moment_items ~= nil and #p293.moment_items > 0 then
+		for _, v3612 in p293.moment_items do
+			local v3613 = v3612:encode()
+			local v3614, v3615 = proto.writeTag(buf, n195, 3, proto.wireTypes.lengthDelimited)
 
-				local v3639 = t1.VerticalFeedInputData_EntryMapEntry.decode(v3638)
-				local v3640 = t1.FeedEntry.new()
-
-				v3633.entry_map[v3639.key or ""] = v3639.value or v3640
-			elseif v3635 == 2 then
-				local v3641
-
-				v3641, n195 = proto.readBuffer(p293, n195)
-				table.insert(v3633.entry_order, buffer.tostring(v3641))
-			elseif v3635 == 3 then
-				local v3642
-
-				v3642, n195 = proto.readBuffer(p293, n195)
-
-				local v3643 = t1.VerticalFeedInputData_EntryOrderMapEntry.decode(v3642)
-				local v3644 = t1.EntryOrder.new()
-
-				v3633.entry_order_map[v3643.key or ""] = v3643.value or v3644
-			elseif v3635 == 4 then
-				local v3645
-
-				v3645, n195 = proto.readBuffer(p293, n195)
-
-				local v3646 = t1.VerticalFeedInputData_ContentPoolsEntry.decode(v3645)
-				local v3647 = t1.ContentPool.new()
-
-				v3633.content_pools[v3646.key or ""] = v3646.value or v3647
-			else
-				local v3648, v3649 = proto.readVarInt(p293, n195)
-
-				n195 = v3649 + v3648
-			end
-		elseif v3636 == proto.wireTypes.i32 then
-			local v3650
-
-			v3650, n195 = proto.readFixed32(p293, n195)
-		elseif v3636 == proto.wireTypes.i64 then
-			local v3651
-
-			v3651, n195 = proto.readFixed64(p293, n195)
-		else
-			error("Unsupported wire type: " .. v3636)
+			buf, n195 = proto.writeBuffer(v3614, v3615, v3613, buffer.len(v3613))
 		end
 	end
 
-	return v3633
+	local buf107 = buffer.create(n195)
+
+	buffer.copy(buf107, 0, buf, 0, n195)
+
+	return buf107
 end
-function t493.jsonEncode(p294) -- line: 20138
-	local t495 = {}
+function t494.decode(p294: buffer) -- line: 20353
+	-- upvalues: t494 (copy), proto (copy), t1 (copy)
+	local v3618 = t494.new()
+	local n196 = 0
 
-	if p294.entry_map ~= nil and next(p294.entry_map) ~= nil then
-		local t496 = {}
+	while n196 < buffer.len(p294) do
+		local v3620, v3621
 
-		for v3655, v3656 in p294.entry_map do
-			t496[v3655] = v3656:jsonEncode()
+		v3620, v3621, n196 = proto.readTag(p294, n196)
+
+		if v3621 == proto.wireTypes.varint then
+			local v3622
+
+			v3622, n196 = proto.readVarInt(p294, n196)
+		elseif v3621 == proto.wireTypes.lengthDelimited then
+			if v3620 == 1 then
+				local v3623
+
+				v3623, n196 = proto.readBuffer(p294, n196)
+				v3618.title = buffer.tostring(v3623)
+			elseif v3620 == 2 then
+				local v3624
+
+				v3624, n196 = proto.readBuffer(p294, n196)
+				v3618.subtitle = buffer.tostring(v3624)
+			elseif v3620 == 3 then
+				local v3625
+
+				v3625, n196 = proto.readBuffer(p294, n196)
+				table.insert(v3618.moment_items, t1.MomentsCarouselInputData_MomentItem.decode(v3625))
+			else
+				local v3626, v3627 = proto.readVarInt(p294, n196)
+
+				n196 = v3627 + v3626
+			end
+		elseif v3621 == proto.wireTypes.i32 then
+			local v3628
+
+			v3628, n196 = proto.readFixed32(p294, n196)
+		elseif v3621 == proto.wireTypes.i64 then
+			local v3629
+
+			v3629, n196 = proto.readFixed64(p294, n196)
+		else
+			error("Unsupported wire type: " .. v3621)
 		end
-
-		t495.entryMap = t496
 	end
 
-	if p294.entry_order ~= nil and #p294.entry_order > 0 then
+	return v3618
+end
+function t494.jsonEncode(p295) -- line: 20406
+	local t496 = {}
+
+	if p295.title ~= nil and p295.title ~= "" then
+		t496.title = p295.title
+	end
+
+	if p295.subtitle ~= nil and p295.subtitle ~= "" then
+		t496.subtitle = p295.subtitle
+	end
+
+	if p295.moment_items ~= nil and #p295.moment_items > 0 then
 		local t497 = {}
 
-		for _, v3659 in p294.entry_order do
-			table.insert(t497, v3659)
+		for _, v3634 in p295.moment_items do
+			table.insert(t497, v3634:jsonEncode())
 		end
 
-		t495.entryOrder = t497
+		t496.momentItems = t497
 	end
 
-	if p294.entry_order_map ~= nil and next(p294.entry_order_map) ~= nil then
-		local t498 = {}
+	return t496
+end
+function t494.jsonDecode(t498: {[any]: any}) -- line: 20428
+	-- upvalues: t494 (copy), t1 (copy)
+	local v3636 = t494.new()
 
-		for v3661, v3662 in p294.entry_order_map do
-			t498[v3661] = v3662:jsonEncode()
-		end
-
-		t495.entryOrderMap = t498
+	if t498.title ~= nil then
+		v3636.title = t498.title
 	end
 
-	if p294.content_pools ~= nil and next(p294.content_pools) ~= nil then
+	if t498.subtitle ~= nil then
+		v3636.subtitle = t498.subtitle
+	end
+
+	if t498.moment_items ~= nil then
 		local t499 = {}
 
-		for v3664, v3665 in p294.content_pools do
-			t499[v3664] = v3665:jsonEncode()
+		for _, v3639 in t498.moment_items do
+			table.insert(t499, t1.MomentsCarouselInputData_MomentItem.jsonDecode(v3639))
 		end
 
-		t495.contentPools = t499
+		v3636.moment_items = t499
 	end
 
-	return t495
-end
-function t493.jsonDecode(t500: {[any]: any}) -- line: 20176
-	-- upvalues: t493 (copy), t1 (copy)
-	local v3667 = t493.new()
+	if t498.momentItems ~= nil then
+		local t500 = {}
 
-	if t500.entry_map ~= nil then
-		local t501 = {}
-
-		for v3669, v3670 in t500.entry_map do
-			t501[v3669] = t1.FeedEntry.jsonDecode(v3670)
+		for _, v3642 in t498.momentItems do
+			table.insert(t500, t1.MomentsCarouselInputData_MomentItem.jsonDecode(v3642))
 		end
 
-		v3667.entry_map = t501
+		v3636.moment_items = t500
 	end
 
-	if t500.entryMap ~= nil then
-		local t502 = {}
-
-		for v3672, v3673 in t500.entryMap do
-			t502[v3672] = t1.FeedEntry.jsonDecode(v3673)
-		end
-
-		v3667.entry_map = t502
-	end
-
-	if t500.entry_order ~= nil then
-		local t503 = {}
-
-		for _, v3676 in t500.entry_order do
-			table.insert(t503, v3676)
-		end
-
-		v3667.entry_order = t503
-	end
-
-	if t500.entryOrder ~= nil then
-		local t504 = {}
-
-		for _, v3679 in t500.entryOrder do
-			table.insert(t504, v3679)
-		end
-
-		v3667.entry_order = t504
-	end
-
-	if t500.entry_order_map ~= nil then
-		local t505 = {}
-
-		for v3681, v3682 in t500.entry_order_map do
-			t505[v3681] = t1.EntryOrder.jsonDecode(v3682)
-		end
-
-		v3667.entry_order_map = t505
-	end
-
-	if t500.entryOrderMap ~= nil then
-		local t506 = {}
-
-		for v3684, v3685 in t500.entryOrderMap do
-			t506[v3684] = t1.EntryOrder.jsonDecode(v3685)
-		end
-
-		v3667.entry_order_map = t506
-	end
-
-	if t500.content_pools ~= nil then
-		local t507 = {}
-
-		for v3687, v3688 in t500.content_pools do
-			t507[v3687] = t1.ContentPool.jsonDecode(v3688)
-		end
-
-		v3667.content_pools = t507
-	end
-
-	if t500.contentPools ~= nil then
-		local t508 = {}
-
-		for v3690, v3691 in t500.contentPools do
-			t508[v3690] = t1.ContentPool.jsonDecode(v3691)
-		end
-
-		v3667.content_pools = t508
-	end
-
-	return v3667
+	return v3636
 end
 
-t493.descriptor = {
-	name = "VerticalFeedInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.VerticalFeedInputData"
+t494.descriptor = {
+	name = "MomentsCarouselInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.MomentsCarouselInputData"
 }
-t1.VerticalFeedInputData = t493
-typeRegistry.default:register(t1.VerticalFeedInputData)
+t1.MomentsCarouselInputData = t494
+typeRegistry.default:register(t1.MomentsCarouselInputData)
+
+local t501 = {}
+
+t501.__index = t501
+
+function t501.new(t502: {[any]: any}?) -- line: 20474
+	-- upvalues: t501 (copy)
+	return (setmetatable({
+		moment_id = if t502 ~= nil and t502.moment_id ~= nil then t502.moment_id else "",
+		video_asset_id = if t502 ~= nil and t502.video_asset_id ~= nil then t502.video_asset_id else "",
+		target_universe_id = if t502 ~= nil and t502.target_universe_id ~= nil then t502.target_universe_id else "",
+		target_place_id = if t502 ~= nil and t502.target_place_id ~= nil then t502.target_place_id else "",
+		feed_item_id = if t502 ~= nil and t502.feed_item_id ~= nil then t502.feed_item_id else "",
+		capture_universe_id = if t502 ~= nil and t502.capture_universe_id ~= nil then t502.capture_universe_id else ""
+	}, t501))
+end
+function t501.encode(p296) -- line: 20489
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n197 = 0
+
+	if p296.moment_id ~= nil and p296.moment_id ~= "" then
+		local v3647, v3648 = proto.writeTag(buf, n197, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n197 = proto.writeString(v3647, v3648, p296.moment_id)
+	end
+
+	if p296.video_asset_id ~= nil and p296.video_asset_id ~= "" then
+		local v3649, v3650 = proto.writeTag(buf, n197, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n197 = proto.writeString(v3649, v3650, p296.video_asset_id)
+	end
+
+	if p296.target_universe_id ~= nil and p296.target_universe_id ~= "" then
+		local v3651, v3652 = proto.writeTag(buf, n197, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n197 = proto.writeString(v3651, v3652, p296.target_universe_id)
+	end
+
+	if p296.target_place_id ~= nil and p296.target_place_id ~= "" then
+		local v3653, v3654 = proto.writeTag(buf, n197, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n197 = proto.writeString(v3653, v3654, p296.target_place_id)
+	end
+
+	if p296.feed_item_id ~= nil and p296.feed_item_id ~= "" then
+		local v3655, v3656 = proto.writeTag(buf, n197, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n197 = proto.writeString(v3655, v3656, p296.feed_item_id)
+	end
+
+	if p296.capture_universe_id ~= nil and p296.capture_universe_id ~= "" then
+		local v3657, v3658 = proto.writeTag(buf, n197, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n197 = proto.writeString(v3657, v3658, p296.capture_universe_id)
+	end
+
+	local buf108 = buffer.create(n197)
+
+	buffer.copy(buf108, 0, buf, 0, n197)
+
+	return buf108
+end
+function t501.decode(p297: buffer) -- line: 20528
+	-- upvalues: t501 (copy), proto (copy)
+	local v3661 = t501.new()
+	local n198 = 0
+
+	while n198 < buffer.len(p297) do
+		local v3663, v3664
+
+		v3663, v3664, n198 = proto.readTag(p297, n198)
+
+		if v3664 == proto.wireTypes.varint then
+			local v3665
+
+			v3665, n198 = proto.readVarInt(p297, n198)
+		elseif v3664 == proto.wireTypes.lengthDelimited then
+			if v3663 == 1 then
+				local v3666
+
+				v3666, n198 = proto.readBuffer(p297, n198)
+				v3661.moment_id = buffer.tostring(v3666)
+			elseif v3663 == 2 then
+				local v3667
+
+				v3667, n198 = proto.readBuffer(p297, n198)
+				v3661.video_asset_id = buffer.tostring(v3667)
+			elseif v3663 == 3 then
+				local v3668
+
+				v3668, n198 = proto.readBuffer(p297, n198)
+				v3661.target_universe_id = buffer.tostring(v3668)
+			elseif v3663 == 4 then
+				local v3669
+
+				v3669, n198 = proto.readBuffer(p297, n198)
+				v3661.target_place_id = buffer.tostring(v3669)
+			elseif v3663 == 5 then
+				local v3670
+
+				v3670, n198 = proto.readBuffer(p297, n198)
+				v3661.feed_item_id = buffer.tostring(v3670)
+			elseif v3663 == 6 then
+				local v3671
+
+				v3671, n198 = proto.readBuffer(p297, n198)
+				v3661.capture_universe_id = buffer.tostring(v3671)
+			else
+				local v3672, v3673 = proto.readVarInt(p297, n198)
+
+				n198 = v3673 + v3672
+			end
+		elseif v3664 == proto.wireTypes.i32 then
+			local v3674
+
+			v3674, n198 = proto.readFixed32(p297, n198)
+		elseif v3664 == proto.wireTypes.i64 then
+			local v3675
+
+			v3675, n198 = proto.readFixed64(p297, n198)
+		else
+			error("Unsupported wire type: " .. v3664)
+		end
+	end
+
+	return v3661
+end
+function t501.jsonEncode(p298) -- line: 20596
+	local t503 = {}
+
+	if p298.moment_id ~= nil and p298.moment_id ~= "" then
+		t503.momentId = p298.moment_id
+	end
+
+	if p298.video_asset_id ~= nil and p298.video_asset_id ~= "" then
+		t503.videoAssetId = p298.video_asset_id
+	end
+
+	if p298.target_universe_id ~= nil and p298.target_universe_id ~= "" then
+		t503.targetUniverseId = p298.target_universe_id
+	end
+
+	if p298.target_place_id ~= nil and p298.target_place_id ~= "" then
+		t503.targetPlaceId = p298.target_place_id
+	end
+
+	if p298.feed_item_id ~= nil and p298.feed_item_id ~= "" then
+		t503.feedItemId = p298.feed_item_id
+	end
+
+	if p298.capture_universe_id ~= nil and p298.capture_universe_id ~= "" then
+		t503.captureUniverseId = p298.capture_universe_id
+	end
+
+	return t503
+end
+function t501.jsonDecode(t504: {[any]: any}) -- line: 20626
+	-- upvalues: t501 (copy)
+	local v3679 = t501.new()
+
+	if t504.moment_id ~= nil then
+		v3679.moment_id = t504.moment_id
+	end
+
+	if t504.momentId ~= nil then
+		v3679.moment_id = t504.momentId
+	end
+
+	if t504.video_asset_id ~= nil then
+		v3679.video_asset_id = t504.video_asset_id
+	end
+
+	if t504.videoAssetId ~= nil then
+		v3679.video_asset_id = t504.videoAssetId
+	end
+
+	if t504.target_universe_id ~= nil then
+		v3679.target_universe_id = t504.target_universe_id
+	end
+
+	if t504.targetUniverseId ~= nil then
+		v3679.target_universe_id = t504.targetUniverseId
+	end
+
+	if t504.target_place_id ~= nil then
+		v3679.target_place_id = t504.target_place_id
+	end
+
+	if t504.targetPlaceId ~= nil then
+		v3679.target_place_id = t504.targetPlaceId
+	end
+
+	if t504.feed_item_id ~= nil then
+		v3679.feed_item_id = t504.feed_item_id
+	end
+
+	if t504.feedItemId ~= nil then
+		v3679.feed_item_id = t504.feedItemId
+	end
+
+	if t504.capture_universe_id ~= nil then
+		v3679.capture_universe_id = t504.capture_universe_id
+	end
+
+	if t504.captureUniverseId ~= nil then
+		v3679.capture_universe_id = t504.captureUniverseId
+	end
+
+	return v3679
+end
+
+t501.descriptor = {
+	name = "MomentsCarouselInputData_MomentItem",
+	fullName = "roblox.apppageplatform.shared.v1beta1.MomentItem"
+}
+t1.MomentsCarouselInputData_MomentItem = t501
+typeRegistry.default:register(t1.MomentsCarouselInputData_MomentItem)
+
+local t505 = {}
+
+t505.__index = t505
+
+function t505.new(t506: {[any]: any}?) -- line: 20696
+	-- upvalues: t505 (copy)
+	return (setmetatable({
+		title = if t506 ~= nil and t506.title ~= nil then t506.title else "",
+		subtitle = if t506 ~= nil and t506.subtitle ~= nil then t506.subtitle else ""
+	}, t505))
+end
+function t505.encode(p299) -- line: 20703
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n199 = 0
+
+	if p299.title ~= nil and p299.title ~= "" then
+		local v3684, v3685 = proto.writeTag(buf, n199, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n199 = proto.writeString(v3684, v3685, p299.title)
+	end
+
+	if p299.subtitle ~= nil and p299.subtitle ~= "" then
+		local v3686, v3687 = proto.writeTag(buf, n199, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n199 = proto.writeString(v3686, v3687, p299.subtitle)
+	end
+
+	local buf109 = buffer.create(n199)
+
+	buffer.copy(buf109, 0, buf, 0, n199)
+
+	return buf109
+end
+function t505.decode(p300: buffer) -- line: 20722
+	-- upvalues: t505 (copy), proto (copy)
+	local v3690 = t505.new()
+	local n200 = 0
+
+	while n200 < buffer.len(p300) do
+		local v3692, v3693
+
+		v3692, v3693, n200 = proto.readTag(p300, n200)
+
+		if v3693 == proto.wireTypes.varint then
+			local v3694
+
+			v3694, n200 = proto.readVarInt(p300, n200)
+		elseif v3693 == proto.wireTypes.lengthDelimited then
+			if v3692 == 1 then
+				local v3695
+
+				v3695, n200 = proto.readBuffer(p300, n200)
+				v3690.title = buffer.tostring(v3695)
+			elseif v3692 == 2 then
+				local v3696
+
+				v3696, n200 = proto.readBuffer(p300, n200)
+				v3690.subtitle = buffer.tostring(v3696)
+			else
+				local v3697, v3698 = proto.readVarInt(p300, n200)
+
+				n200 = v3698 + v3697
+			end
+		elseif v3693 == proto.wireTypes.i32 then
+			local v3699
+
+			v3699, n200 = proto.readFixed32(p300, n200)
+		elseif v3693 == proto.wireTypes.i64 then
+			local v3700
+
+			v3700, n200 = proto.readFixed64(p300, n200)
+		else
+			error("Unsupported wire type: " .. v3693)
+		end
+	end
+
+	return v3690
+end
+function t505.jsonEncode(p301) -- line: 20770
+	local t507 = {}
+
+	if p301.title ~= nil and p301.title ~= "" then
+		t507.title = p301.title
+	end
+
+	if p301.subtitle ~= nil and p301.subtitle ~= "" then
+		t507.subtitle = p301.subtitle
+	end
+
+	return t507
+end
+function t505.jsonDecode(t508: {[any]: any}) -- line: 20784
+	-- upvalues: t505 (copy)
+	local v3704 = t505.new()
+
+	if t508.title ~= nil then
+		v3704.title = t508.title
+	end
+
+	if t508.subtitle ~= nil then
+		v3704.subtitle = t508.subtitle
+	end
+
+	return v3704
+end
+
+t505.descriptor = {
+	name = "AttributionRowInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.AttributionRowInputData"
+}
+t1.AttributionRowInputData = t505
+typeRegistry.default:register(t1.AttributionRowInputData)
 
 local t509 = {}
 
 t509.__index = t509
 
-function t509.new(t510: {[any]: any}?) -- line: 20268
+function t509.new(t510: {[any]: any}?) -- line: 20812
 	-- upvalues: t509 (copy)
 	return (setmetatable({
-		key = if t510 ~= nil and t510.key ~= nil then t510.key else "",
-		value = if t510 ~= nil and t510.value ~= nil then t510.value else nil
+		image_asset_id = if t510 ~= nil and t510.image_asset_id ~= nil then t510.image_asset_id else ""
 	}, t509))
 end
-function t509.encode(p295) -- line: 20277
+function t509.encode(p302) -- line: 20818
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n196 = 0
+	local n201 = 0
 
-	if p295.key ~= nil and p295.key ~= "" then
-		local v3696, v3697 = proto.writeTag(buf, n196, 1, proto.wireTypes.lengthDelimited)
+	if p302.image_asset_id ~= nil and p302.image_asset_id ~= "" then
+		local v3709, v3710 = proto.writeTag(buf, n201, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n196 = proto.writeString(v3696, v3697, p295.key)
+		buf, n201 = proto.writeString(v3709, v3710, p302.image_asset_id)
 	end
 
-	if p295.value ~= nil then
-		local v3698 = p295.value:encode()
-		local v3699, v3700 = proto.writeTag(buf, n196, 2, proto.wireTypes.lengthDelimited)
+	local buf110 = buffer.create(n201)
 
-		buf, n196 = proto.writeBuffer(v3699, v3700, v3698, buffer.len(v3698))
-	end
+	buffer.copy(buf110, 0, buf, 0, n201)
 
-	local buf111 = buffer.create(n196)
-
-	buffer.copy(buf111, 0, buf, 0, n196)
-
-	return buf111
+	return buf110
 end
-function t509.decode(p296: buffer) -- line: 20297
-	-- upvalues: t509 (copy), proto (copy), t1 (copy)
-	local v3703 = t509.new()
-	local n197 = 0
+function t509.decode(p303: buffer) -- line: 20832
+	-- upvalues: t509 (copy), proto (copy)
+	local v3713 = t509.new()
+	local n202 = 0
 
-	while n197 < buffer.len(p296) do
-		local v3705, v3706
+	while n202 < buffer.len(p303) do
+		local v3715, v3716
 
-		v3705, v3706, n197 = proto.readTag(p296, n197)
+		v3715, v3716, n202 = proto.readTag(p303, n202)
 
-		if v3706 == proto.wireTypes.varint then
-			local v3707
+		if v3716 == proto.wireTypes.varint then
+			local v3717
 
-			v3707, n197 = proto.readVarInt(p296, n197)
-		elseif v3706 == proto.wireTypes.lengthDelimited then
-			if v3705 == 1 then
-				local v3708
+			v3717, n202 = proto.readVarInt(p303, n202)
+		elseif v3716 == proto.wireTypes.lengthDelimited then
+			if v3715 == 1 then
+				local v3718
 
-				v3708, n197 = proto.readBuffer(p296, n197)
-				v3703.key = buffer.tostring(v3708)
-			elseif v3705 == 2 then
-				local v3709
-
-				v3709, n197 = proto.readBuffer(p296, n197)
-				v3703.value = t1.FeedEntry.decode(v3709)
+				v3718, n202 = proto.readBuffer(p303, n202)
+				v3713.image_asset_id = buffer.tostring(v3718)
 			else
-				local v3710, v3711 = proto.readVarInt(p296, n197)
+				local v3719, v3720 = proto.readVarInt(p303, n202)
 
-				n197 = v3711 + v3710
+				n202 = v3720 + v3719
 			end
-		elseif v3706 == proto.wireTypes.i32 then
-			local v3712
+		elseif v3716 == proto.wireTypes.i32 then
+			local v3721
 
-			v3712, n197 = proto.readFixed32(p296, n197)
-		elseif v3706 == proto.wireTypes.i64 then
-			local v3713
+			v3721, n202 = proto.readFixed32(p303, n202)
+		elseif v3716 == proto.wireTypes.i64 then
+			local v3722
 
-			v3713, n197 = proto.readFixed64(p296, n197)
+			v3722, n202 = proto.readFixed64(p303, n202)
 		else
-			error("Unsupported wire type: " .. v3706)
+			error("Unsupported wire type: " .. v3716)
 		end
 	end
 
-	return v3703
+	return v3713
 end
-function t509.jsonEncode(p297) -- line: 20345
+function t509.jsonEncode(p304) -- line: 20875
 	local t511 = {}
 
-	if p297.key ~= nil and p297.key ~= "" then
-		t511.key = p297.key
-	end
-
-	if p297.value ~= nil then
-		t511.value = p297.value:jsonEncode()
+	if p304.image_asset_id ~= nil and p304.image_asset_id ~= "" then
+		t511.imageAssetId = p304.image_asset_id
 	end
 
 	return t511
 end
-function t509.jsonDecode(t512: {[any]: any}) -- line: 20359
-	-- upvalues: t509 (copy), t1 (copy)
-	local v3717 = t509.new()
+function t509.jsonDecode(t512: {[any]: any}) -- line: 20885
+	-- upvalues: t509 (copy)
+	local v3726 = t509.new()
 
-	if t512.key ~= nil then
-		v3717.key = t512.key
+	if t512.image_asset_id ~= nil then
+		v3726.image_asset_id = t512.image_asset_id
 	end
 
-	if t512.value ~= nil then
-		v3717.value = t1.FeedEntry.jsonDecode(t512.value)
+	if t512.imageAssetId ~= nil then
+		v3726.image_asset_id = t512.imageAssetId
 	end
 
-	return v3717
+	return v3726
 end
 
 t509.descriptor = {
-	name = "VerticalFeedInputData_EntryMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
+	name = "ImageInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ImageInputData"
 }
-t1.VerticalFeedInputData_EntryMapEntry = t509
-typeRegistry.default:register(t1.VerticalFeedInputData_EntryMapEntry)
+t1.ImageInputData = t509
+typeRegistry.default:register(t1.ImageInputData)
 
 local t513 = {}
 
 t513.__index = t513
 
-function t513.new(t514: {[any]: any}?) -- line: 20389
+function t513.new(t514: {[any]: any}?) -- line: 20913
 	-- upvalues: t513 (copy)
 	return (setmetatable({
-		key = if t514 ~= nil and t514.key ~= nil then t514.key else "",
-		value = if t514 ~= nil and t514.value ~= nil then t514.value else nil
+		text = if t514 ~= nil and t514.text ~= nil then t514.text else "",
+		is_rendered_text = t514 ~= nil and (t514.is_rendered_text ~= nil and t514.is_rendered_text)
 	}, t513))
 end
-function t513.encode(p298) -- line: 20398
+function t513.encode(p305) -- line: 20920
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n198 = 0
+	local n203 = 0
 
-	if p298.key ~= nil and p298.key ~= "" then
-		local v3722, v3723 = proto.writeTag(buf, n198, 1, proto.wireTypes.lengthDelimited)
+	if p305.text ~= nil and p305.text ~= "" then
+		local v3731, v3732 = proto.writeTag(buf, n203, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n198 = proto.writeString(v3722, v3723, p298.key)
+		buf, n203 = proto.writeString(v3731, v3732, p305.text)
 	end
 
-	if p298.value ~= nil then
-		local v3724 = p298.value:encode()
-		local v3725, v3726 = proto.writeTag(buf, n198, 2, proto.wireTypes.lengthDelimited)
+	if p305.is_rendered_text then
+		local v3733, v3734 = proto.writeTag(buf, n203, 2, proto.wireTypes.varint)
 
-		buf, n198 = proto.writeBuffer(v3725, v3726, v3724, buffer.len(v3724))
+		buf, n203 = proto.writeVarInt(v3733, v3734, not p305.is_rendered_text and 0 or 1)
 	end
 
-	local buf112 = buffer.create(n198)
+	local buf111 = buffer.create(n203)
 
-	buffer.copy(buf112, 0, buf, 0, n198)
+	buffer.copy(buf111, 0, buf, 0, n203)
 
-	return buf112
+	return buf111
 end
-function t513.decode(p299: buffer) -- line: 20420
-	-- upvalues: t513 (copy), proto (copy), t1 (copy)
-	local v3729 = t513.new()
-	local n199 = 0
+function t513.decode(p306: buffer) -- line: 20939
+	-- upvalues: t513 (copy), proto (copy)
+	local v3737 = t513.new()
+	local n204 = 0
 
-	while n199 < buffer.len(p299) do
-		local v3731, v3732
+	while n204 < buffer.len(p306) do
+		local v3739, v3740
 
-		v3731, v3732, n199 = proto.readTag(p299, n199)
+		v3739, v3740, n204 = proto.readTag(p306, n204)
 
-		if v3732 == proto.wireTypes.varint then
-			local v3733
+		if v3740 == proto.wireTypes.varint then
+			if v3739 == 2 then
+				local v3741
 
-			v3733, n199 = proto.readVarInt(p299, n199)
-		elseif v3732 == proto.wireTypes.lengthDelimited then
-			if v3731 == 1 then
-				local v3734
-
-				v3734, n199 = proto.readBuffer(p299, n199)
-				v3729.key = buffer.tostring(v3734)
-			elseif v3731 == 2 then
-				local v3735
-
-				v3735, n199 = proto.readBuffer(p299, n199)
-				v3729.value = t1.EntryOrder.decode(v3735)
+				v3741, n204 = proto.readVarInt(p306, n204)
+				v3737.is_rendered_text = v3741 ~= 0
 			else
-				local v3736, v3737 = proto.readVarInt(p299, n199)
+				local v3742
 
-				n199 = v3737 + v3736
+				v3742, n204 = proto.readVarInt(p306, n204)
 			end
-		elseif v3732 == proto.wireTypes.i32 then
-			local v3738
+		elseif v3740 == proto.wireTypes.lengthDelimited then
+			if v3739 == 1 then
+				local v3743
 
-			v3738, n199 = proto.readFixed32(p299, n199)
-		elseif v3732 == proto.wireTypes.i64 then
-			local v3739
+				v3743, n204 = proto.readBuffer(p306, n204)
+				v3737.text = buffer.tostring(v3743)
+			else
+				local v3744, v3745 = proto.readVarInt(p306, n204)
 
-			v3739, n199 = proto.readFixed64(p299, n199)
+				n204 = v3745 + v3744
+			end
+		elseif v3740 == proto.wireTypes.i32 then
+			local v3746
+
+			v3746, n204 = proto.readFixed32(p306, n204)
+		elseif v3740 == proto.wireTypes.i64 then
+			local v3747
+
+			v3747, n204 = proto.readFixed64(p306, n204)
 		else
-			error("Unsupported wire type: " .. v3732)
+			error("Unsupported wire type: " .. v3740)
 		end
 	end
 
-	return v3729
+	return v3737
 end
-function t513.jsonEncode(p300) -- line: 20470
+function t513.jsonEncode(p307) -- line: 20987
 	local t515 = {}
 
-	if p300.key ~= nil and p300.key ~= "" then
-		t515.key = p300.key
+	if p307.text ~= nil and p307.text ~= "" then
+		t515.text = p307.text
 	end
 
-	if p300.value ~= nil then
-		t515.value = p300.value:jsonEncode()
+	if p307.is_rendered_text then
+		t515.isRenderedText = p307.is_rendered_text
 	end
 
 	return t515
 end
-function t513.jsonDecode(t516: {[any]: any}) -- line: 20486
-	-- upvalues: t513 (copy), t1 (copy)
-	local v3743 = t513.new()
+function t513.jsonDecode(t516: {[any]: any}) -- line: 21001
+	-- upvalues: t513 (copy)
+	local v3751 = t513.new()
 
-	if t516.key ~= nil then
-		v3743.key = t516.key
+	if t516.text ~= nil then
+		v3751.text = t516.text
 	end
 
-	if t516.value ~= nil then
-		v3743.value = t1.EntryOrder.jsonDecode(t516.value)
+	if t516.is_rendered_text ~= nil then
+		v3751.is_rendered_text = t516.is_rendered_text
 	end
 
-	return v3743
+	if t516.isRenderedText ~= nil then
+		v3751.is_rendered_text = t516.isRenderedText
+	end
+
+	return v3751
 end
 
 t513.descriptor = {
-	name = "VerticalFeedInputData_EntryOrderMapEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.EntryOrderMapEntry"
+	name = "TextInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.TextInputData"
 }
-t1.VerticalFeedInputData_EntryOrderMapEntry = t513
-typeRegistry.default:register(t1.VerticalFeedInputData_EntryOrderMapEntry)
+t1.TextInputData = t513
+typeRegistry.default:register(t1.TextInputData)
 
 local t517 = {}
 
 t517.__index = t517
 
-function t517.new(t518: {[any]: any}?) -- line: 20516
+function t517.new(t518: {[any]: any}?) -- line: 21033
 	-- upvalues: t517 (copy)
 	return (setmetatable({
-		key = if t518 ~= nil and t518.key ~= nil then t518.key else "",
-		value = if t518 ~= nil and t518.value ~= nil then t518.value else nil
+		entry_map = if t518 ~= nil and t518.entry_map ~= nil then t518.entry_map else {},
+		entry_order = if t518 ~= nil and t518.entry_order ~= nil then t518.entry_order else {},
+		entry_order_map = if t518 ~= nil and t518.entry_order_map ~= nil then t518.entry_order_map else {},
+		content_pools = if t518 ~= nil and t518.content_pools ~= nil then t518.content_pools else {}
 	}, t517))
 end
-function t517.encode(p301) -- line: 20525
+function t517.encode(p308) -- line: 21042
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n200 = 0
+	local n205 = 0
 
-	if p301.key ~= nil and p301.key ~= "" then
-		local v3748, v3749 = proto.writeTag(buf, n200, 1, proto.wireTypes.lengthDelimited)
+	if p308.entry_map ~= nil and next(p308.entry_map) ~= nil then
+		for v3756, v3757 in p308.entry_map do
+			local buf112 = buffer.create(0)
+			local v3759, v3760 = proto.writeTag(buf112, 0, 1, proto.wireTypes.lengthDelimited)
+			local v3761, v3762 = proto.writeString(v3759, v3760, v3756)
+			local v3763 = v3757:encode()
+			local v3764, v3765 = proto.writeTag(v3761, v3762, 2, proto.wireTypes.lengthDelimited)
+			local v3766, v3767 = proto.writeBuffer(v3764, v3765, v3763, buffer.len(v3763))
+			local v3768, v3769 = proto.writeTag(buf, n205, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n200 = proto.writeString(v3748, v3749, p301.key)
-	end
-
-	if p301.value ~= nil then
-		local v3750 = p301.value:encode()
-		local v3751, v3752 = proto.writeTag(buf, n200, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n200 = proto.writeBuffer(v3751, v3752, v3750, buffer.len(v3750))
-	end
-
-	local buf113 = buffer.create(n200)
-
-	buffer.copy(buf113, 0, buf, 0, n200)
-
-	return buf113
-end
-function t517.decode(p302: buffer) -- line: 20545
-	-- upvalues: t517 (copy), proto (copy), t1 (copy)
-	local v3755 = t517.new()
-	local n201 = 0
-
-	while n201 < buffer.len(p302) do
-		local v3757, v3758
-
-		v3757, v3758, n201 = proto.readTag(p302, n201)
-
-		if v3758 == proto.wireTypes.varint then
-			local v3759
-
-			v3759, n201 = proto.readVarInt(p302, n201)
-		elseif v3758 == proto.wireTypes.lengthDelimited then
-			if v3757 == 1 then
-				local v3760
-
-				v3760, n201 = proto.readBuffer(p302, n201)
-				v3755.key = buffer.tostring(v3760)
-			elseif v3757 == 2 then
-				local v3761
-
-				v3761, n201 = proto.readBuffer(p302, n201)
-				v3755.value = t1.ContentPool.decode(v3761)
-			else
-				local v3762, v3763 = proto.readVarInt(p302, n201)
-
-				n201 = v3763 + v3762
-			end
-		elseif v3758 == proto.wireTypes.i32 then
-			local v3764
-
-			v3764, n201 = proto.readFixed32(p302, n201)
-		elseif v3758 == proto.wireTypes.i64 then
-			local v3765
-
-			v3765, n201 = proto.readFixed64(p302, n201)
-		else
-			error("Unsupported wire type: " .. v3758)
+			buf, n205 = proto.writeBuffer(v3768, v3769, v3766, v3767)
 		end
 	end
 
-	return v3755
-end
-function t517.jsonEncode(p303) -- line: 20593
-	local t519 = {}
+	if p308.entry_order ~= nil and #p308.entry_order > 0 then
+		for _, v3771 in p308.entry_order do
+			local v3772, v3773 = proto.writeTag(buf, n205, 2, proto.wireTypes.lengthDelimited)
 
-	if p303.key ~= nil and p303.key ~= "" then
-		t519.key = p303.key
+			buf, n205 = proto.writeString(v3772, v3773, v3771)
+		end
 	end
 
-	if p303.value ~= nil then
-		t519.value = p303.value:jsonEncode()
+	if p308.entry_order_map ~= nil and next(p308.entry_order_map) ~= nil then
+		for v3774, v3775 in p308.entry_order_map do
+			local buf113 = buffer.create(0)
+			local v3777, v3778 = proto.writeTag(buf113, 0, 1, proto.wireTypes.lengthDelimited)
+			local v3779, v3780 = proto.writeString(v3777, v3778, v3774)
+			local v3781 = v3775:encode()
+			local v3782, v3783 = proto.writeTag(v3779, v3780, 2, proto.wireTypes.lengthDelimited)
+			local v3784, v3785 = proto.writeBuffer(v3782, v3783, v3781, buffer.len(v3781))
+			local v3786, v3787 = proto.writeTag(buf, n205, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n205 = proto.writeBuffer(v3786, v3787, v3784, v3785)
+		end
+	end
+
+	if p308.content_pools ~= nil and next(p308.content_pools) ~= nil then
+		for v3788, v3789 in p308.content_pools do
+			local buf114 = buffer.create(0)
+			local v3791, v3792 = proto.writeTag(buf114, 0, 1, proto.wireTypes.lengthDelimited)
+			local v3793, v3794 = proto.writeString(v3791, v3792, v3788)
+			local v3795 = v3789:encode()
+			local v3796, v3797 = proto.writeTag(v3793, v3794, 2, proto.wireTypes.lengthDelimited)
+			local v3798, v3799 = proto.writeBuffer(v3796, v3797, v3795, buffer.len(v3795))
+			local v3800, v3801 = proto.writeTag(buf, n205, 4, proto.wireTypes.lengthDelimited)
+
+			buf, n205 = proto.writeBuffer(v3800, v3801, v3798, v3799)
+		end
+	end
+
+	local buf115 = buffer.create(n205)
+
+	buffer.copy(buf115, 0, buf, 0, n205)
+
+	return buf115
+end
+function t517.decode(p309: buffer) -- line: 21100
+	-- upvalues: t517 (copy), proto (copy), t1 (copy)
+	local v3804 = t517.new()
+	local n206 = 0
+
+	while n206 < buffer.len(p309) do
+		local v3806, v3807
+
+		v3806, v3807, n206 = proto.readTag(p309, n206)
+
+		if v3807 == proto.wireTypes.varint then
+			local v3808
+
+			v3808, n206 = proto.readVarInt(p309, n206)
+		elseif v3807 == proto.wireTypes.lengthDelimited then
+			if v3806 == 1 then
+				local v3809
+
+				v3809, n206 = proto.readBuffer(p309, n206)
+
+				local v3810 = t1.VerticalFeedInputData_EntryMapEntry.decode(v3809)
+				local v3811 = t1.FeedEntry.new()
+
+				v3804.entry_map[v3810.key or ""] = v3810.value or v3811
+			elseif v3806 == 2 then
+				local v3812
+
+				v3812, n206 = proto.readBuffer(p309, n206)
+				table.insert(v3804.entry_order, buffer.tostring(v3812))
+			elseif v3806 == 3 then
+				local v3813
+
+				v3813, n206 = proto.readBuffer(p309, n206)
+
+				local v3814 = t1.VerticalFeedInputData_EntryOrderMapEntry.decode(v3813)
+				local v3815 = t1.EntryOrder.new()
+
+				v3804.entry_order_map[v3814.key or ""] = v3814.value or v3815
+			elseif v3806 == 4 then
+				local v3816
+
+				v3816, n206 = proto.readBuffer(p309, n206)
+
+				local v3817 = t1.VerticalFeedInputData_ContentPoolsEntry.decode(v3816)
+				local v3818 = t1.ContentPool.new()
+
+				v3804.content_pools[v3817.key or ""] = v3817.value or v3818
+			else
+				local v3819, v3820 = proto.readVarInt(p309, n206)
+
+				n206 = v3820 + v3819
+			end
+		elseif v3807 == proto.wireTypes.i32 then
+			local v3821
+
+			v3821, n206 = proto.readFixed32(p309, n206)
+		elseif v3807 == proto.wireTypes.i64 then
+			local v3822
+
+			v3822, n206 = proto.readFixed64(p309, n206)
+		else
+			error("Unsupported wire type: " .. v3807)
+		end
+	end
+
+	return v3804
+end
+function t517.jsonEncode(p310) -- line: 21179
+	local t519 = {}
+
+	if p310.entry_map ~= nil and next(p310.entry_map) ~= nil then
+		local t520 = {}
+
+		for v3826, v3827 in p310.entry_map do
+			t520[v3826] = v3827:jsonEncode()
+		end
+
+		t519.entryMap = t520
+	end
+
+	if p310.entry_order ~= nil and #p310.entry_order > 0 then
+		local t521 = {}
+
+		for _, v3830 in p310.entry_order do
+			table.insert(t521, v3830)
+		end
+
+		t519.entryOrder = t521
+	end
+
+	if p310.entry_order_map ~= nil and next(p310.entry_order_map) ~= nil then
+		local t522 = {}
+
+		for v3832, v3833 in p310.entry_order_map do
+			t522[v3832] = v3833:jsonEncode()
+		end
+
+		t519.entryOrderMap = t522
+	end
+
+	if p310.content_pools ~= nil and next(p310.content_pools) ~= nil then
+		local t523 = {}
+
+		for v3835, v3836 in p310.content_pools do
+			t523[v3835] = v3836:jsonEncode()
+		end
+
+		t519.contentPools = t523
 	end
 
 	return t519
 end
-function t517.jsonDecode(t520: {[any]: any}) -- line: 20607
+function t517.jsonDecode(t524: {[any]: any}) -- line: 21217
 	-- upvalues: t517 (copy), t1 (copy)
-	local v3769 = t517.new()
+	local v3838 = t517.new()
 
-	if t520.key ~= nil then
-		v3769.key = t520.key
+	if t524.entry_map ~= nil then
+		local t525 = {}
+
+		for v3840, v3841 in t524.entry_map do
+			t525[v3840] = t1.FeedEntry.jsonDecode(v3841)
+		end
+
+		v3838.entry_map = t525
 	end
 
-	if t520.value ~= nil then
-		v3769.value = t1.ContentPool.jsonDecode(t520.value)
+	if t524.entryMap ~= nil then
+		local t526 = {}
+
+		for v3843, v3844 in t524.entryMap do
+			t526[v3843] = t1.FeedEntry.jsonDecode(v3844)
+		end
+
+		v3838.entry_map = t526
 	end
 
-	return v3769
+	if t524.entry_order ~= nil then
+		local t527 = {}
+
+		for _, v3847 in t524.entry_order do
+			table.insert(t527, v3847)
+		end
+
+		v3838.entry_order = t527
+	end
+
+	if t524.entryOrder ~= nil then
+		local t528 = {}
+
+		for _, v3850 in t524.entryOrder do
+			table.insert(t528, v3850)
+		end
+
+		v3838.entry_order = t528
+	end
+
+	if t524.entry_order_map ~= nil then
+		local t529 = {}
+
+		for v3852, v3853 in t524.entry_order_map do
+			t529[v3852] = t1.EntryOrder.jsonDecode(v3853)
+		end
+
+		v3838.entry_order_map = t529
+	end
+
+	if t524.entryOrderMap ~= nil then
+		local t530 = {}
+
+		for v3855, v3856 in t524.entryOrderMap do
+			t530[v3855] = t1.EntryOrder.jsonDecode(v3856)
+		end
+
+		v3838.entry_order_map = t530
+	end
+
+	if t524.content_pools ~= nil then
+		local t531 = {}
+
+		for v3858, v3859 in t524.content_pools do
+			t531[v3858] = t1.ContentPool.jsonDecode(v3859)
+		end
+
+		v3838.content_pools = t531
+	end
+
+	if t524.contentPools ~= nil then
+		local t532 = {}
+
+		for v3861, v3862 in t524.contentPools do
+			t532[v3861] = t1.ContentPool.jsonDecode(v3862)
+		end
+
+		v3838.content_pools = t532
+	end
+
+	return v3838
 end
 
 t517.descriptor = {
-	name = "VerticalFeedInputData_ContentPoolsEntry",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ContentPoolsEntry"
+	name = "VerticalFeedInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.VerticalFeedInputData"
 }
-t1.VerticalFeedInputData_ContentPoolsEntry = t517
-typeRegistry.default:register(t1.VerticalFeedInputData_ContentPoolsEntry)
+t1.VerticalFeedInputData = t517
+typeRegistry.default:register(t1.VerticalFeedInputData)
 
-local t521 = {}
+local t533 = {}
 
-t521.__index = t521
+t533.__index = t533
 
-function t521.new(t522: {[any]: any}?) -- line: 20637
-	-- upvalues: t521 (copy)
+function t533.new(t534: {[any]: any}?) -- line: 21309
+	-- upvalues: t533 (copy)
 	return (setmetatable({
-		foreground_header_entry = if t522 ~= nil and t522.foreground_header_entry ~= nil then t522.foreground_header_entry else nil,
-		background_header_entry = if t522 ~= nil and t522.background_header_entry ~= nil then t522.background_header_entry else nil
-	}, t521))
+		key = if t534 ~= nil and t534.key ~= nil then t534.key else "",
+		value = if t534 ~= nil and t534.value ~= nil then t534.value else nil
+	}, t533))
 end
-function t521.encode(p304) -- line: 20648
+function t533.encode(p311) -- line: 21318
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n202 = 0
+	local n207 = 0
 
-	if p304.foreground_header_entry ~= nil then
-		local v3774 = p304.foreground_header_entry:encode()
-		local v3775, v3776 = proto.writeTag(buf, n202, 1, proto.wireTypes.lengthDelimited)
+	if p311.key ~= nil and p311.key ~= "" then
+		local v3867, v3868 = proto.writeTag(buf, n207, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n202 = proto.writeBuffer(v3775, v3776, v3774, buffer.len(v3774))
+		buf, n207 = proto.writeString(v3867, v3868, p311.key)
 	end
 
-	if p304.background_header_entry ~= nil then
-		local v3777 = p304.background_header_entry:encode()
-		local v3778, v3779 = proto.writeTag(buf, n202, 2, proto.wireTypes.lengthDelimited)
+	if p311.value ~= nil then
+		local v3869 = p311.value:encode()
+		local v3870, v3871 = proto.writeTag(buf, n207, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n202 = proto.writeBuffer(v3778, v3779, v3777, buffer.len(v3777))
+		buf, n207 = proto.writeBuffer(v3870, v3871, v3869, buffer.len(v3869))
 	end
 
-	local buf114 = buffer.create(n202)
+	local buf116 = buffer.create(n207)
 
-	buffer.copy(buf114, 0, buf, 0, n202)
-
-	return buf114
-end
-function t521.decode(p305: buffer) -- line: 20669
-	-- upvalues: t521 (copy), proto (copy), t1 (copy)
-	local v3782 = t521.new()
-	local n203 = 0
-
-	while n203 < buffer.len(p305) do
-		local v3784, v3785
-
-		v3784, v3785, n203 = proto.readTag(p305, n203)
-
-		if v3785 == proto.wireTypes.varint then
-			local v3786
-
-			v3786, n203 = proto.readVarInt(p305, n203)
-		elseif v3785 == proto.wireTypes.lengthDelimited then
-			if v3784 == 1 then
-				local v3787
-
-				v3787, n203 = proto.readBuffer(p305, n203)
-				v3782.foreground_header_entry = t1.ForegroundHeaderEntry.decode(v3787)
-			elseif v3784 == 2 then
-				local v3788
-
-				v3788, n203 = proto.readBuffer(p305, n203)
-				v3782.background_header_entry = t1.BackgroundHeaderEntry.decode(v3788)
-			else
-				local v3789, v3790 = proto.readVarInt(p305, n203)
-
-				n203 = v3790 + v3789
-			end
-		elseif v3785 == proto.wireTypes.i32 then
-			local v3791
-
-			v3791, n203 = proto.readFixed32(p305, n203)
-		elseif v3785 == proto.wireTypes.i64 then
-			local v3792
-
-			v3792, n203 = proto.readFixed64(p305, n203)
-		else
-			error("Unsupported wire type: " .. v3785)
-		end
-	end
-
-	return v3782
-end
-function t521.jsonEncode(p306) -- line: 20717
-	local t523 = {}
-
-	if p306.foreground_header_entry ~= nil then
-		t523.foregroundHeaderEntry = p306.foreground_header_entry:jsonEncode()
-	end
-
-	if p306.background_header_entry ~= nil then
-		t523.backgroundHeaderEntry = p306.background_header_entry:jsonEncode()
-	end
-
-	return t523
-end
-function t521.jsonDecode(t524: {[any]: any}) -- line: 20731
-	-- upvalues: t521 (copy), t1 (copy)
-	local v3796 = t521.new()
-
-	if t524.foreground_header_entry ~= nil then
-		v3796.foreground_header_entry = t1.ForegroundHeaderEntry.jsonDecode(t524.foreground_header_entry)
-	end
-
-	if t524.foregroundHeaderEntry ~= nil then
-		v3796.foreground_header_entry = t1.ForegroundHeaderEntry.jsonDecode(t524.foregroundHeaderEntry)
-	end
-
-	if t524.background_header_entry ~= nil then
-		v3796.background_header_entry = t1.BackgroundHeaderEntry.jsonDecode(t524.background_header_entry)
-	end
-
-	if t524.backgroundHeaderEntry ~= nil then
-		v3796.background_header_entry = t1.BackgroundHeaderEntry.jsonDecode(t524.backgroundHeaderEntry)
-	end
-
-	return v3796
-end
-
-t521.descriptor = {
-	name = "PageHeaderInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.PageHeaderInputData"
-}
-t1.PageHeaderInputData = t521
-typeRegistry.default:register(t1.PageHeaderInputData)
-
-local t525 = {}
-
-t525.__index = t525
-
-function t525.new(t526: {[any]: any}?) -- line: 20767
-	-- upvalues: t525 (copy)
-	return (setmetatable({
-		selected_option = if t526 ~= nil and t526.selected_option ~= nil then t526.selected_option else "",
-		sort_id = if t526 ~= nil and t526.sort_id ~= nil then t526.sort_id else "",
-		options = if t526 ~= nil and t526.options ~= nil then t526.options else {},
-		experience_carousel = if t526 ~= nil and t526.experience_carousel ~= nil then t526.experience_carousel else nil,
-		feed_item_key = if t526 ~= nil and t526.feed_item_key ~= nil then t526.feed_item_key else ""
-	}, t525))
-end
-function t525.encode(p307) -- line: 20781
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n204 = 0
-
-	if p307.selected_option ~= nil and p307.selected_option ~= "" then
-		local v3801, v3802 = proto.writeTag(buf, n204, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n204 = proto.writeString(v3801, v3802, p307.selected_option)
-	end
-
-	if p307.sort_id ~= nil and p307.sort_id ~= "" then
-		local v3803, v3804 = proto.writeTag(buf, n204, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n204 = proto.writeString(v3803, v3804, p307.sort_id)
-	end
-
-	if p307.options ~= nil and #p307.options > 0 then
-		for _, v3806 in p307.options do
-			local v3807 = v3806:encode()
-			local v3808, v3809 = proto.writeTag(buf, n204, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n204 = proto.writeBuffer(v3808, v3809, v3807, buffer.len(v3807))
-		end
-	end
-
-	if p307.experience_carousel ~= nil then
-		local v3810 = p307.experience_carousel:encode()
-		local v3811, v3812 = proto.writeTag(buf, n204, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n204 = proto.writeBuffer(v3811, v3812, v3810, buffer.len(v3810))
-	end
-
-	if p307.feed_item_key ~= nil and p307.feed_item_key ~= "" then
-		local v3813, v3814 = proto.writeTag(buf, n204, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n204 = proto.writeString(v3813, v3814, p307.feed_item_key)
-	end
-
-	local buf115 = buffer.create(n204)
-
-	buffer.copy(buf115, 0, buf, 0, n204)
-
-	return buf115
-end
-function t525.decode(p308: buffer) -- line: 20819
-	-- upvalues: t525 (copy), proto (copy), t1 (copy)
-	local v3817 = t525.new()
-	local n205 = 0
-
-	while n205 < buffer.len(p308) do
-		local v3819, v3820
-
-		v3819, v3820, n205 = proto.readTag(p308, n205)
-
-		if v3820 == proto.wireTypes.varint then
-			local v3821
-
-			v3821, n205 = proto.readVarInt(p308, n205)
-		elseif v3820 == proto.wireTypes.lengthDelimited then
-			if v3819 == 1 then
-				local v3822
-
-				v3822, n205 = proto.readBuffer(p308, n205)
-				v3817.selected_option = buffer.tostring(v3822)
-			elseif v3819 == 2 then
-				local v3823
-
-				v3823, n205 = proto.readBuffer(p308, n205)
-				v3817.sort_id = buffer.tostring(v3823)
-			elseif v3819 == 3 then
-				local v3824
-
-				v3824, n205 = proto.readBuffer(p308, n205)
-				table.insert(v3817.options, t1.SelectorOption.decode(v3824))
-			elseif v3819 == 4 then
-				local v3825
-
-				v3825, n205 = proto.readBuffer(p308, n205)
-				v3817.experience_carousel = t1.ExperienceCarouselInputData.decode(v3825)
-			elseif v3819 == 5 then
-				local v3826
-
-				v3826, n205 = proto.readBuffer(p308, n205)
-				v3817.feed_item_key = buffer.tostring(v3826)
-			else
-				local v3827, v3828 = proto.readVarInt(p308, n205)
-
-				n205 = v3828 + v3827
-			end
-		elseif v3820 == proto.wireTypes.i32 then
-			local v3829
-
-			v3829, n205 = proto.readFixed32(p308, n205)
-		elseif v3820 == proto.wireTypes.i64 then
-			local v3830
-
-			v3830, n205 = proto.readFixed64(p308, n205)
-		else
-			error("Unsupported wire type: " .. v3820)
-		end
-	end
-
-	return v3817
-end
-function t525.jsonEncode(p309) -- line: 20882
-	local t527 = {}
-
-	if p309.selected_option ~= nil and p309.selected_option ~= "" then
-		t527.selectedOption = p309.selected_option
-	end
-
-	if p309.sort_id ~= nil and p309.sort_id ~= "" then
-		t527.sortId = p309.sort_id
-	end
-
-	if p309.options ~= nil and #p309.options > 0 then
-		local t528 = {}
-
-		for _, v3835 in p309.options do
-			table.insert(t528, v3835:jsonEncode())
-		end
-
-		t527.options = t528
-	end
-
-	if p309.experience_carousel ~= nil then
-		t527.experienceCarousel = p309.experience_carousel:jsonEncode()
-	end
-
-	if p309.feed_item_key ~= nil and p309.feed_item_key ~= "" then
-		t527.feedItemKey = p309.feed_item_key
-	end
-
-	return t527
-end
-function t525.jsonDecode(t529: {[any]: any}) -- line: 20912
-	-- upvalues: t525 (copy), t1 (copy)
-	local v3837 = t525.new()
-
-	if t529.selected_option ~= nil then
-		v3837.selected_option = t529.selected_option
-	end
-
-	if t529.selectedOption ~= nil then
-		v3837.selected_option = t529.selectedOption
-	end
-
-	if t529.sort_id ~= nil then
-		v3837.sort_id = t529.sort_id
-	end
-
-	if t529.sortId ~= nil then
-		v3837.sort_id = t529.sortId
-	end
-
-	if t529.options ~= nil then
-		local t530 = {}
-
-		for _, v3840 in t529.options do
-			table.insert(t530, t1.SelectorOption.jsonDecode(v3840))
-		end
-
-		v3837.options = t530
-	end
-
-	if t529.experience_carousel ~= nil then
-		v3837.experience_carousel = t1.ExperienceCarouselInputData.jsonDecode(t529.experience_carousel)
-	end
-
-	if t529.experienceCarousel ~= nil then
-		v3837.experience_carousel = t1.ExperienceCarouselInputData.jsonDecode(t529.experienceCarousel)
-	end
-
-	if t529.feed_item_key ~= nil then
-		v3837.feed_item_key = t529.feed_item_key
-	end
-
-	if t529.feedItemKey ~= nil then
-		v3837.feed_item_key = t529.feedItemKey
-	end
-
-	return v3837
-end
-
-t525.descriptor = {
-	name = "OptionSelectorCarouselInputData",
-	fullName = "roblox.apppageplatform.shared.v1beta1.OptionSelectorCarouselInputData"
-}
-t1.OptionSelectorCarouselInputData = t525
-typeRegistry.default:register(t1.OptionSelectorCarouselInputData)
-
-local t531 = {}
-
-t531.__index = t531
-
-function t531.new(t532: {[any]: any}?) -- line: 20973
-	-- upvalues: t531 (copy)
-	return (setmetatable({
-		id = if t532 ~= nil and t532.id ~= nil then t532.id else "",
-		display_name = if t532 ~= nil and t532.display_name ~= nil then t532.display_name else "",
-		is_selected = t532 ~= nil and (t532.is_selected ~= nil and t532.is_selected)
-	}, t531))
-end
-function t531.encode(p310) -- line: 20981
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n206 = 0
-
-	if p310.id ~= nil and p310.id ~= "" then
-		local v3845, v3846 = proto.writeTag(buf, n206, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n206 = proto.writeString(v3845, v3846, p310.id)
-	end
-
-	if p310.display_name ~= nil and p310.display_name ~= "" then
-		local v3847, v3848 = proto.writeTag(buf, n206, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n206 = proto.writeString(v3847, v3848, p310.display_name)
-	end
-
-	if p310.is_selected then
-		local v3849, v3850 = proto.writeTag(buf, n206, 3, proto.wireTypes.varint)
-
-		buf, n206 = proto.writeVarInt(v3849, v3850, not p310.is_selected and 0 or 1)
-	end
-
-	local buf116 = buffer.create(n206)
-
-	buffer.copy(buf116, 0, buf, 0, n206)
+	buffer.copy(buf116, 0, buf, 0, n207)
 
 	return buf116
 end
-function t531.decode(p311: buffer) -- line: 21005
-	-- upvalues: t531 (copy), proto (copy)
-	local v3853 = t531.new()
-	local n207 = 0
+function t533.decode(p312: buffer) -- line: 21338
+	-- upvalues: t533 (copy), proto (copy), t1 (copy)
+	local v3874 = t533.new()
+	local n208 = 0
 
-	while n207 < buffer.len(p311) do
-		local v3855, v3856
+	while n208 < buffer.len(p312) do
+		local v3876, v3877
 
-		v3855, v3856, n207 = proto.readTag(p311, n207)
+		v3876, v3877, n208 = proto.readTag(p312, n208)
 
-		if v3856 == proto.wireTypes.varint then
-			if v3855 == 3 then
-				local v3857
+		if v3877 == proto.wireTypes.varint then
+			local v3878
 
-				v3857, n207 = proto.readVarInt(p311, n207)
-				v3853.is_selected = v3857 ~= 0
+			v3878, n208 = proto.readVarInt(p312, n208)
+		elseif v3877 == proto.wireTypes.lengthDelimited then
+			if v3876 == 1 then
+				local v3879
+
+				v3879, n208 = proto.readBuffer(p312, n208)
+				v3874.key = buffer.tostring(v3879)
+			elseif v3876 == 2 then
+				local v3880
+
+				v3880, n208 = proto.readBuffer(p312, n208)
+				v3874.value = t1.FeedEntry.decode(v3880)
 			else
-				local v3858
+				local v3881, v3882 = proto.readVarInt(p312, n208)
 
-				v3858, n207 = proto.readVarInt(p311, n207)
+				n208 = v3882 + v3881
 			end
-		elseif v3856 == proto.wireTypes.lengthDelimited then
-			if v3855 == 1 then
-				local v3859
+		elseif v3877 == proto.wireTypes.i32 then
+			local v3883
 
-				v3859, n207 = proto.readBuffer(p311, n207)
-				v3853.id = buffer.tostring(v3859)
-			elseif v3855 == 2 then
-				local v3860
+			v3883, n208 = proto.readFixed32(p312, n208)
+		elseif v3877 == proto.wireTypes.i64 then
+			local v3884
 
-				v3860, n207 = proto.readBuffer(p311, n207)
-				v3853.display_name = buffer.tostring(v3860)
-			else
-				local v3861, v3862 = proto.readVarInt(p311, n207)
-
-				n207 = v3862 + v3861
-			end
-		elseif v3856 == proto.wireTypes.i32 then
-			local v3863
-
-			v3863, n207 = proto.readFixed32(p311, n207)
-		elseif v3856 == proto.wireTypes.i64 then
-			local v3864
-
-			v3864, n207 = proto.readFixed64(p311, n207)
+			v3884, n208 = proto.readFixed64(p312, n208)
 		else
-			error("Unsupported wire type: " .. v3856)
+			error("Unsupported wire type: " .. v3877)
 		end
 	end
 
-	return v3853
+	return v3874
 end
-function t531.jsonEncode(p312) -- line: 21058
-	local t533 = {}
+function t533.jsonEncode(p313) -- line: 21386
+	local t535 = {}
 
-	if p312.id ~= nil and p312.id ~= "" then
-		t533.id = p312.id
+	if p313.key ~= nil and p313.key ~= "" then
+		t535.key = p313.key
 	end
 
-	if p312.display_name ~= nil and p312.display_name ~= "" then
-		t533.displayName = p312.display_name
+	if p313.value ~= nil then
+		t535.value = p313.value:jsonEncode()
 	end
 
-	if p312.is_selected then
-		t533.isSelected = p312.is_selected
-	end
-
-	return t533
+	return t535
 end
-function t531.jsonDecode(t534: {[any]: any}) -- line: 21076
-	-- upvalues: t531 (copy)
-	local v3868 = t531.new()
+function t533.jsonDecode(t536: {[any]: any}) -- line: 21400
+	-- upvalues: t533 (copy), t1 (copy)
+	local v3888 = t533.new()
 
-	if t534.id ~= nil then
-		v3868.id = t534.id
+	if t536.key ~= nil then
+		v3888.key = t536.key
 	end
 
-	if t534.display_name ~= nil then
-		v3868.display_name = t534.display_name
+	if t536.value ~= nil then
+		v3888.value = t1.FeedEntry.jsonDecode(t536.value)
 	end
 
-	if t534.displayName ~= nil then
-		v3868.display_name = t534.displayName
-	end
-
-	if t534.is_selected ~= nil then
-		v3868.is_selected = t534.is_selected
-	end
-
-	if t534.isSelected ~= nil then
-		v3868.is_selected = t534.isSelected
-	end
-
-	return v3868
+	return v3888
 end
 
-t531.descriptor = {
-	name = "SelectorOption",
-	fullName = "roblox.apppageplatform.shared.v1beta1.SelectorOption"
+t533.descriptor = {
+	name = "VerticalFeedInputData_EntryMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryMapEntry"
 }
-t1.SelectorOption = t531
-typeRegistry.default:register(t1.SelectorOption)
+t1.VerticalFeedInputData_EntryMapEntry = t533
+typeRegistry.default:register(t1.VerticalFeedInputData_EntryMapEntry)
 
-local t535 = {}
+local t537 = {}
 
-t535.__index = t535
+t537.__index = t537
 
-function t535.new(t536: {[any]: any}?) -- line: 21116
-	-- upvalues: t535 (copy)
+function t537.new(t538: {[any]: any}?) -- line: 21430
+	-- upvalues: t537 (copy)
 	return (setmetatable({
-		layout = if t536 ~= nil and t536.layout ~= nil then t536.layout else nil,
-		kind = if t536 ~= nil and t536.kind ~= nil then t536.kind else nil
-	}, t535))
+		key = if t538 ~= nil and t538.key ~= nil then t538.key else "",
+		value = if t538 ~= nil and t538.value ~= nil then t538.value else nil
+	}, t537))
 end
-function t535.encode(p313) -- line: 21123
+function t537.encode(p314) -- line: 21439
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n208 = 0
+	local n209 = 0
 
-	if p313.layout ~= nil then
-		local v3873 = p313.layout:encode()
-		local v3874, v3875 = proto.writeTag(buf, n208, 1, proto.wireTypes.lengthDelimited)
+	if p314.key ~= nil and p314.key ~= "" then
+		local v3893, v3894 = proto.writeTag(buf, n209, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n208 = proto.writeBuffer(v3874, v3875, v3873, buffer.len(v3873))
+		buf, n209 = proto.writeString(v3893, v3894, p314.key)
 	end
 
-	if p313.kind ~= nil and p313.kind.type == "universe" then
-		local v3876 = p313.kind.value:encode()
-		local v3877, v3878 = proto.writeTag(buf, n208, 2, proto.wireTypes.lengthDelimited)
+	if p314.value ~= nil then
+		local v3895 = p314.value:encode()
+		local v3896, v3897 = proto.writeTag(buf, n209, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n208 = proto.writeBuffer(v3877, v3878, v3876, buffer.len(v3876))
+		buf, n209 = proto.writeBuffer(v3896, v3897, v3895, buffer.len(v3895))
 	end
 
-	local buf117 = buffer.create(n208)
+	local buf117 = buffer.create(n209)
 
-	buffer.copy(buf117, 0, buf, 0, n208)
+	buffer.copy(buf117, 0, buf, 0, n209)
 
 	return buf117
 end
-function t535.decode(p314: buffer) -- line: 21146
-	-- upvalues: t535 (copy), proto (copy), t1 (copy)
-	local v3881 = t535.new()
-	local n209 = 0
-
-	while n209 < buffer.len(p314) do
-		local v3883, v3884
-
-		v3883, v3884, n209 = proto.readTag(p314, n209)
-
-		if v3884 == proto.wireTypes.varint then
-			local v3885
-
-			v3885, n209 = proto.readVarInt(p314, n209)
-		elseif v3884 == proto.wireTypes.lengthDelimited then
-			if v3883 == 1 then
-				local v3886
-
-				v3886, n209 = proto.readBuffer(p314, n209)
-				v3881.layout = t1.ItemLayout.decode(v3886)
-			elseif v3883 == 2 then
-				local v3887
-
-				v3887, n209 = proto.readBuffer(p314, n209)
-				v3881.kind = {
-					type = "universe",
-					value = t1.ExperienceCarouselInputData_UniverseItem.decode(v3887)
-				}
-			else
-				local v3888, v3889 = proto.readVarInt(p314, n209)
-
-				n209 = v3889 + v3888
-			end
-		elseif v3884 == proto.wireTypes.i32 then
-			local v3890
-
-			v3890, n209 = proto.readFixed32(p314, n209)
-		elseif v3884 == proto.wireTypes.i64 then
-			local v3891
-
-			v3891, n209 = proto.readFixed64(p314, n209)
-		else
-			error("Unsupported wire type: " .. v3884)
-		end
-	end
-
-	return v3881
-end
-function t535.jsonEncode(p315) -- line: 21195
-	local t537 = {}
-
-	if p315.layout ~= nil then
-		t537.layout = p315.layout:jsonEncode()
-	end
-
-	if p315.kind ~= nil and p315.kind.type == "universe" then
-		t537.universe = p315.kind.value:jsonEncode()
-	end
-
-	return t537
-end
-function t535.jsonDecode(t538: {[any]: any}) -- line: 21211
-	-- upvalues: t535 (copy), t1 (copy)
-	local v3895 = t535.new()
-
-	if t538.layout ~= nil then
-		v3895.layout = t1.ItemLayout.jsonDecode(t538.layout)
-	end
-
-	if t538.universe ~= nil then
-		v3895.kind = {
-			type = "universe",
-			value = t1.ExperienceCarouselInputData_UniverseItem.jsonDecode(t538.universe)
-		}
-	end
-
-	return v3895
-end
-
-t535.descriptor = {
-	name = "ItemWithLayout",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ItemWithLayout"
-}
-t1.ItemWithLayout = t535
-typeRegistry.default:register(t1.ItemWithLayout)
-
-local t539 = {}
-
-t539.__index = t539
-
-function t539.new(t540: {[any]: any}?) -- line: 21242
-	-- upvalues: t539 (copy)
-	return (setmetatable({
-		items = if t540 ~= nil and t540.items ~= nil then t540.items else {},
-		collection_item_size = if t540 ~= nil and t540.collection_item_size ~= nil then t540.collection_item_size else nil
-	}, t539))
-end
-function t539.encode(p316) -- line: 21251
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
+function t537.decode(p315: buffer) -- line: 21461
+	-- upvalues: t537 (copy), proto (copy), t1 (copy)
+	local v3900 = t537.new()
 	local n210 = 0
 
-	if p316.items ~= nil and #p316.items > 0 then
-		for _, v3901 in p316.items do
-			local v3902 = v3901:encode()
-			local v3903, v3904 = proto.writeTag(buf, n210, 1, proto.wireTypes.lengthDelimited)
+	while n210 < buffer.len(p315) do
+		local v3902, v3903
 
-			buf, n210 = proto.writeBuffer(v3903, v3904, v3902, buffer.len(v3902))
+		v3902, v3903, n210 = proto.readTag(p315, n210)
+
+		if v3903 == proto.wireTypes.varint then
+			local v3904
+
+			v3904, n210 = proto.readVarInt(p315, n210)
+		elseif v3903 == proto.wireTypes.lengthDelimited then
+			if v3902 == 1 then
+				local v3905
+
+				v3905, n210 = proto.readBuffer(p315, n210)
+				v3900.key = buffer.tostring(v3905)
+			elseif v3902 == 2 then
+				local v3906
+
+				v3906, n210 = proto.readBuffer(p315, n210)
+				v3900.value = t1.EntryOrder.decode(v3906)
+			else
+				local v3907, v3908 = proto.readVarInt(p315, n210)
+
+				n210 = v3908 + v3907
+			end
+		elseif v3903 == proto.wireTypes.i32 then
+			local v3909
+
+			v3909, n210 = proto.readFixed32(p315, n210)
+		elseif v3903 == proto.wireTypes.i64 then
+			local v3910
+
+			v3910, n210 = proto.readFixed64(p315, n210)
+		else
+			error("Unsupported wire type: " .. v3903)
 		end
 	end
 
-	if p316.collection_item_size ~= nil then
-		local v3905, v3906 = proto.writeTag(buf, n210, 2, proto.wireTypes.lengthDelimited)
+	return v3900
+end
+function t537.jsonEncode(p316) -- line: 21511
+	local t539 = {}
 
-		buf, n210 = proto.writeString(v3905, v3906, p316.collection_item_size)
+	if p316.key ~= nil and p316.key ~= "" then
+		t539.key = p316.key
 	end
 
-	local buf118 = buffer.create(n210)
+	if p316.value ~= nil then
+		t539.value = p316.value:jsonEncode()
+	end
 
-	buffer.copy(buf118, 0, buf, 0, n210)
+	return t539
+end
+function t537.jsonDecode(t540: {[any]: any}) -- line: 21527
+	-- upvalues: t537 (copy), t1 (copy)
+	local v3914 = t537.new()
+
+	if t540.key ~= nil then
+		v3914.key = t540.key
+	end
+
+	if t540.value ~= nil then
+		v3914.value = t1.EntryOrder.jsonDecode(t540.value)
+	end
+
+	return v3914
+end
+
+t537.descriptor = {
+	name = "VerticalFeedInputData_EntryOrderMapEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.EntryOrderMapEntry"
+}
+t1.VerticalFeedInputData_EntryOrderMapEntry = t537
+typeRegistry.default:register(t1.VerticalFeedInputData_EntryOrderMapEntry)
+
+local t541 = {}
+
+t541.__index = t541
+
+function t541.new(t542: {[any]: any}?) -- line: 21557
+	-- upvalues: t541 (copy)
+	return (setmetatable({
+		key = if t542 ~= nil and t542.key ~= nil then t542.key else "",
+		value = if t542 ~= nil and t542.value ~= nil then t542.value else nil
+	}, t541))
+end
+function t541.encode(p317) -- line: 21566
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n211 = 0
+
+	if p317.key ~= nil and p317.key ~= "" then
+		local v3919, v3920 = proto.writeTag(buf, n211, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n211 = proto.writeString(v3919, v3920, p317.key)
+	end
+
+	if p317.value ~= nil then
+		local v3921 = p317.value:encode()
+		local v3922, v3923 = proto.writeTag(buf, n211, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n211 = proto.writeBuffer(v3922, v3923, v3921, buffer.len(v3921))
+	end
+
+	local buf118 = buffer.create(n211)
+
+	buffer.copy(buf118, 0, buf, 0, n211)
 
 	return buf118
 end
-function t539.decode(p317: buffer) -- line: 21273
-	-- upvalues: t539 (copy), proto (copy), t1 (copy)
-	local v3909 = t539.new()
-	local n211 = 0
+function t541.decode(p318: buffer) -- line: 21586
+	-- upvalues: t541 (copy), proto (copy), t1 (copy)
+	local v3926 = t541.new()
+	local n212 = 0
 
-	while n211 < buffer.len(p317) do
-		local v3911, v3912
+	while n212 < buffer.len(p318) do
+		local v3928, v3929
 
-		v3911, v3912, n211 = proto.readTag(p317, n211)
+		v3928, v3929, n212 = proto.readTag(p318, n212)
 
-		if v3912 == proto.wireTypes.varint then
-			local v3913
+		if v3929 == proto.wireTypes.varint then
+			local v3930
 
-			v3913, n211 = proto.readVarInt(p317, n211)
-		elseif v3912 == proto.wireTypes.lengthDelimited then
-			if v3911 == 1 then
-				local v3914
+			v3930, n212 = proto.readVarInt(p318, n212)
+		elseif v3929 == proto.wireTypes.lengthDelimited then
+			if v3928 == 1 then
+				local v3931
 
-				v3914, n211 = proto.readBuffer(p317, n211)
-				table.insert(v3909.items, t1.ItemWithLayout.decode(v3914))
-			elseif v3911 == 2 then
-				local v3915
+				v3931, n212 = proto.readBuffer(p318, n212)
+				v3926.key = buffer.tostring(v3931)
+			elseif v3928 == 2 then
+				local v3932
 
-				v3915, n211 = proto.readBuffer(p317, n211)
-				v3909.collection_item_size = buffer.tostring(v3915)
+				v3932, n212 = proto.readBuffer(p318, n212)
+				v3926.value = t1.ContentPool.decode(v3932)
 			else
-				local v3916, v3917 = proto.readVarInt(p317, n211)
+				local v3933, v3934 = proto.readVarInt(p318, n212)
 
-				n211 = v3917 + v3916
+				n212 = v3934 + v3933
 			end
-		elseif v3912 == proto.wireTypes.i32 then
-			local v3918
+		elseif v3929 == proto.wireTypes.i32 then
+			local v3935
 
-			v3918, n211 = proto.readFixed32(p317, n211)
-		elseif v3912 == proto.wireTypes.i64 then
-			local v3919
+			v3935, n212 = proto.readFixed32(p318, n212)
+		elseif v3929 == proto.wireTypes.i64 then
+			local v3936
 
-			v3919, n211 = proto.readFixed64(p317, n211)
+			v3936, n212 = proto.readFixed64(p318, n212)
 		else
-			error("Unsupported wire type: " .. v3912)
+			error("Unsupported wire type: " .. v3929)
 		end
-	end
-
-	return v3909
-end
-function t539.jsonEncode(p318) -- line: 21321
-	local t541 = {}
-
-	if p318.items ~= nil and #p318.items > 0 then
-		local t542 = {}
-
-		for _, v3924 in p318.items do
-			table.insert(t542, v3924:jsonEncode())
-		end
-
-		t541.items = t542
-	end
-
-	if p318.collection_item_size ~= nil then
-		t541.collectionItemSize = p318.collection_item_size
-	end
-
-	return t541
-end
-function t539.jsonDecode(t543: {[any]: any}) -- line: 21339
-	-- upvalues: t539 (copy), t1 (copy)
-	local v3926 = t539.new()
-
-	if t543.items ~= nil then
-		local t544 = {}
-
-		for _, v3929 in t543.items do
-			table.insert(t544, t1.ItemWithLayout.jsonDecode(v3929))
-		end
-
-		v3926.items = t544
-	end
-
-	if t543.collection_item_size ~= nil then
-		v3926.collection_item_size = t543.collection_item_size
-	end
-
-	if t543.collectionItemSize ~= nil then
-		v3926.collection_item_size = t543.collectionItemSize
 	end
 
 	return v3926
 end
+function t541.jsonEncode(p319) -- line: 21634
+	local t543 = {}
 
-t539.descriptor = {
-	name = "ContentPool",
-	fullName = "roblox.apppageplatform.shared.v1beta1.ContentPool"
+	if p319.key ~= nil and p319.key ~= "" then
+		t543.key = p319.key
+	end
+
+	if p319.value ~= nil then
+		t543.value = p319.value:jsonEncode()
+	end
+
+	return t543
+end
+function t541.jsonDecode(t544: {[any]: any}) -- line: 21648
+	-- upvalues: t541 (copy), t1 (copy)
+	local v3940 = t541.new()
+
+	if t544.key ~= nil then
+		v3940.key = t544.key
+	end
+
+	if t544.value ~= nil then
+		v3940.value = t1.ContentPool.jsonDecode(t544.value)
+	end
+
+	return v3940
+end
+
+t541.descriptor = {
+	name = "VerticalFeedInputData_ContentPoolsEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ContentPoolsEntry"
 }
-t1.ContentPool = t539
-typeRegistry.default:register(t1.ContentPool)
+t1.VerticalFeedInputData_ContentPoolsEntry = t541
+typeRegistry.default:register(t1.VerticalFeedInputData_ContentPoolsEntry)
 
 local t545 = {}
 
 t545.__index = t545
 
-function t545.new(t546: {[any]: any}?) -- line: 21376
+function t545.new(t546: {[any]: any}?) -- line: 21678
 	-- upvalues: t545 (copy)
 	return (setmetatable({
-		col_span = if t546 ~= nil and t546.col_span ~= nil then t546.col_span else 0,
-		row_span = if t546 ~= nil and t546.row_span ~= nil then t546.row_span else 0,
-		alignment_type = if t546 ~= nil and t546.alignment_type ~= nil then t546.alignment_type else "",
-		min_row_padding = if t546 ~= nil and t546.min_row_padding ~= nil then t546.min_row_padding else 0
+		foreground_header_entry = if t546 ~= nil and t546.foreground_header_entry ~= nil then t546.foreground_header_entry else nil,
+		background_header_entry = if t546 ~= nil and t546.background_header_entry ~= nil then t546.background_header_entry else nil
 	}, t545))
 end
-function t545.encode(p319) -- line: 21385
+function t545.encode(p320) -- line: 21689
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
-	local n212 = 0
+	local n213 = 0
 
-	if p319.col_span ~= nil and p319.col_span ~= 0 then
-		local v3934, v3935 = proto.writeTag(buf, n212, 1, proto.wireTypes.varint)
+	if p320.foreground_header_entry ~= nil then
+		local v3945 = p320.foreground_header_entry:encode()
+		local v3946, v3947 = proto.writeTag(buf, n213, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n212 = proto.writeVarInt(v3934, v3935, p319.col_span)
+		buf, n213 = proto.writeBuffer(v3946, v3947, v3945, buffer.len(v3945))
 	end
 
-	if p319.row_span ~= nil and p319.row_span ~= 0 then
-		local v3936, v3937 = proto.writeTag(buf, n212, 2, proto.wireTypes.varint)
+	if p320.background_header_entry ~= nil then
+		local v3948 = p320.background_header_entry:encode()
+		local v3949, v3950 = proto.writeTag(buf, n213, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n212 = proto.writeVarInt(v3936, v3937, p319.row_span)
+		buf, n213 = proto.writeBuffer(v3949, v3950, v3948, buffer.len(v3948))
 	end
 
-	if p319.alignment_type ~= nil and p319.alignment_type ~= "" then
-		local v3938, v3939 = proto.writeTag(buf, n212, 3, proto.wireTypes.lengthDelimited)
+	local buf119 = buffer.create(n213)
 
-		buf, n212 = proto.writeString(v3938, v3939, p319.alignment_type)
-	end
-
-	if p319.min_row_padding ~= nil and p319.min_row_padding ~= 0 then
-		local v3940, v3941 = proto.writeTag(buf, n212, 4, proto.wireTypes.varint)
-
-		buf, n212 = proto.writeVarInt(v3940, v3941, p319.min_row_padding)
-	end
-
-	local buf119 = buffer.create(n212)
-
-	buffer.copy(buf119, 0, buf, 0, n212)
+	buffer.copy(buf119, 0, buf, 0, n213)
 
 	return buf119
 end
-function t545.decode(p320: buffer) -- line: 21414
-	-- upvalues: t545 (copy), proto (copy)
-	local v3944 = t545.new()
-	local n213 = 0
+function t545.decode(p321: buffer) -- line: 21710
+	-- upvalues: t545 (copy), proto (copy), t1 (copy)
+	local v3953 = t545.new()
+	local n214 = 0
 
-	while n213 < buffer.len(p320) do
-		local v3946, v3947
+	while n214 < buffer.len(p321) do
+		local v3955, v3956
 
-		v3946, v3947, n213 = proto.readTag(p320, n213)
+		v3955, v3956, n214 = proto.readTag(p321, n214)
 
-		if v3947 == proto.wireTypes.varint then
-			if v3946 == 1 then
-				local v3948
+		if v3956 == proto.wireTypes.varint then
+			local v3957
 
-				v3948, n213 = proto.readVarIntI32(p320, n213)
-				v3944.col_span = v3948
-			elseif v3946 == 2 then
-				local v3949
+			v3957, n214 = proto.readVarInt(p321, n214)
+		elseif v3956 == proto.wireTypes.lengthDelimited then
+			if v3955 == 1 then
+				local v3958
 
-				v3949, n213 = proto.readVarIntI32(p320, n213)
-				v3944.row_span = v3949
-			elseif v3946 == 4 then
-				local v3950
+				v3958, n214 = proto.readBuffer(p321, n214)
+				v3953.foreground_header_entry = t1.ForegroundHeaderEntry.decode(v3958)
+			elseif v3955 == 2 then
+				local v3959
 
-				v3950, n213 = proto.readVarIntI32(p320, n213)
-				v3944.min_row_padding = v3950
+				v3959, n214 = proto.readBuffer(p321, n214)
+				v3953.background_header_entry = t1.BackgroundHeaderEntry.decode(v3959)
 			else
-				local v3951
+				local v3960, v3961 = proto.readVarInt(p321, n214)
 
-				v3951, n213 = proto.readVarInt(p320, n213)
+				n214 = v3961 + v3960
 			end
-		elseif v3947 == proto.wireTypes.lengthDelimited then
-			if v3946 == 3 then
-				local v3952
+		elseif v3956 == proto.wireTypes.i32 then
+			local v3962
 
-				v3952, n213 = proto.readBuffer(p320, n213)
-				v3944.alignment_type = buffer.tostring(v3952)
-			else
-				local v3953, v3954 = proto.readVarInt(p320, n213)
+			v3962, n214 = proto.readFixed32(p321, n214)
+		elseif v3956 == proto.wireTypes.i64 then
+			local v3963
 
-				n213 = v3954 + v3953
-			end
-		elseif v3947 == proto.wireTypes.i32 then
-			local v3955
-
-			v3955, n213 = proto.readFixed32(p320, n213)
-		elseif v3947 == proto.wireTypes.i64 then
-			local v3956
-
-			v3956, n213 = proto.readFixed64(p320, n213)
+			v3963, n214 = proto.readFixed64(p321, n214)
 		else
-			error("Unsupported wire type: " .. v3947)
+			error("Unsupported wire type: " .. v3956)
 		end
 	end
 
-	return v3944
+	return v3953
 end
-function t545.jsonEncode(p321) -- line: 21472
+function t545.jsonEncode(p322) -- line: 21758
 	local t547 = {}
 
-	if p321.col_span ~= nil and p321.col_span ~= 0 then
-		t547.colSpan = p321.col_span
+	if p322.foreground_header_entry ~= nil then
+		t547.foregroundHeaderEntry = p322.foreground_header_entry:jsonEncode()
 	end
 
-	if p321.row_span ~= nil and p321.row_span ~= 0 then
-		t547.rowSpan = p321.row_span
-	end
-
-	if p321.alignment_type ~= nil and p321.alignment_type ~= "" then
-		t547.alignmentType = p321.alignment_type
-	end
-
-	if p321.min_row_padding ~= nil and p321.min_row_padding ~= 0 then
-		t547.minRowPadding = p321.min_row_padding
+	if p322.background_header_entry ~= nil then
+		t547.backgroundHeaderEntry = p322.background_header_entry:jsonEncode()
 	end
 
 	return t547
 end
-function t545.jsonDecode(t548: {[any]: any}) -- line: 21494
-	-- upvalues: t545 (copy)
-	local v3960 = t545.new()
+function t545.jsonDecode(t548: {[any]: any}) -- line: 21772
+	-- upvalues: t545 (copy), t1 (copy)
+	local v3967 = t545.new()
 
-	if t548.col_span ~= nil then
-		v3960.col_span = t548.col_span
+	if t548.foreground_header_entry ~= nil then
+		v3967.foreground_header_entry = t1.ForegroundHeaderEntry.jsonDecode(t548.foreground_header_entry)
 	end
 
-	if t548.colSpan ~= nil then
-		v3960.col_span = t548.colSpan
+	if t548.foregroundHeaderEntry ~= nil then
+		v3967.foreground_header_entry = t1.ForegroundHeaderEntry.jsonDecode(t548.foregroundHeaderEntry)
 	end
 
-	if t548.row_span ~= nil then
-		v3960.row_span = t548.row_span
+	if t548.background_header_entry ~= nil then
+		v3967.background_header_entry = t1.BackgroundHeaderEntry.jsonDecode(t548.background_header_entry)
 	end
 
-	if t548.rowSpan ~= nil then
-		v3960.row_span = t548.rowSpan
+	if t548.backgroundHeaderEntry ~= nil then
+		v3967.background_header_entry = t1.BackgroundHeaderEntry.jsonDecode(t548.backgroundHeaderEntry)
 	end
 
-	if t548.alignment_type ~= nil then
-		v3960.alignment_type = t548.alignment_type
-	end
-
-	if t548.alignmentType ~= nil then
-		v3960.alignment_type = t548.alignmentType
-	end
-
-	if t548.min_row_padding ~= nil then
-		v3960.min_row_padding = t548.min_row_padding
-	end
-
-	if t548.minRowPadding ~= nil then
-		v3960.min_row_padding = t548.minRowPadding
-	end
-
-	return v3960
+	return v3967
 end
 
 t545.descriptor = {
+	name = "PageHeaderInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.PageHeaderInputData"
+}
+t1.PageHeaderInputData = t545
+typeRegistry.default:register(t1.PageHeaderInputData)
+
+local t549 = {}
+
+t549.__index = t549
+
+function t549.new(t550: {[any]: any}?) -- line: 21808
+	-- upvalues: t549 (copy)
+	return (setmetatable({
+		selected_option = if t550 ~= nil and t550.selected_option ~= nil then t550.selected_option else "",
+		sort_id = if t550 ~= nil and t550.sort_id ~= nil then t550.sort_id else "",
+		options = if t550 ~= nil and t550.options ~= nil then t550.options else {},
+		experience_carousel = if t550 ~= nil and t550.experience_carousel ~= nil then t550.experience_carousel else nil,
+		feed_item_key = if t550 ~= nil and t550.feed_item_key ~= nil then t550.feed_item_key else ""
+	}, t549))
+end
+function t549.encode(p323) -- line: 21822
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n215 = 0
+
+	if p323.selected_option ~= nil and p323.selected_option ~= "" then
+		local v3972, v3973 = proto.writeTag(buf, n215, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n215 = proto.writeString(v3972, v3973, p323.selected_option)
+	end
+
+	if p323.sort_id ~= nil and p323.sort_id ~= "" then
+		local v3974, v3975 = proto.writeTag(buf, n215, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n215 = proto.writeString(v3974, v3975, p323.sort_id)
+	end
+
+	if p323.options ~= nil and #p323.options > 0 then
+		for _, v3977 in p323.options do
+			local v3978 = v3977:encode()
+			local v3979, v3980 = proto.writeTag(buf, n215, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n215 = proto.writeBuffer(v3979, v3980, v3978, buffer.len(v3978))
+		end
+	end
+
+	if p323.experience_carousel ~= nil then
+		local v3981 = p323.experience_carousel:encode()
+		local v3982, v3983 = proto.writeTag(buf, n215, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n215 = proto.writeBuffer(v3982, v3983, v3981, buffer.len(v3981))
+	end
+
+	if p323.feed_item_key ~= nil and p323.feed_item_key ~= "" then
+		local v3984, v3985 = proto.writeTag(buf, n215, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n215 = proto.writeString(v3984, v3985, p323.feed_item_key)
+	end
+
+	local buf120 = buffer.create(n215)
+
+	buffer.copy(buf120, 0, buf, 0, n215)
+
+	return buf120
+end
+function t549.decode(p324: buffer) -- line: 21860
+	-- upvalues: t549 (copy), proto (copy), t1 (copy)
+	local v3988 = t549.new()
+	local n216 = 0
+
+	while n216 < buffer.len(p324) do
+		local v3990, v3991
+
+		v3990, v3991, n216 = proto.readTag(p324, n216)
+
+		if v3991 == proto.wireTypes.varint then
+			local v3992
+
+			v3992, n216 = proto.readVarInt(p324, n216)
+		elseif v3991 == proto.wireTypes.lengthDelimited then
+			if v3990 == 1 then
+				local v3993
+
+				v3993, n216 = proto.readBuffer(p324, n216)
+				v3988.selected_option = buffer.tostring(v3993)
+			elseif v3990 == 2 then
+				local v3994
+
+				v3994, n216 = proto.readBuffer(p324, n216)
+				v3988.sort_id = buffer.tostring(v3994)
+			elseif v3990 == 3 then
+				local v3995
+
+				v3995, n216 = proto.readBuffer(p324, n216)
+				table.insert(v3988.options, t1.SelectorOption.decode(v3995))
+			elseif v3990 == 4 then
+				local v3996
+
+				v3996, n216 = proto.readBuffer(p324, n216)
+				v3988.experience_carousel = t1.ExperienceCarouselInputData.decode(v3996)
+			elseif v3990 == 5 then
+				local v3997
+
+				v3997, n216 = proto.readBuffer(p324, n216)
+				v3988.feed_item_key = buffer.tostring(v3997)
+			else
+				local v3998, v3999 = proto.readVarInt(p324, n216)
+
+				n216 = v3999 + v3998
+			end
+		elseif v3991 == proto.wireTypes.i32 then
+			local v4000
+
+			v4000, n216 = proto.readFixed32(p324, n216)
+		elseif v3991 == proto.wireTypes.i64 then
+			local v4001
+
+			v4001, n216 = proto.readFixed64(p324, n216)
+		else
+			error("Unsupported wire type: " .. v3991)
+		end
+	end
+
+	return v3988
+end
+function t549.jsonEncode(p325) -- line: 21923
+	local t551 = {}
+
+	if p325.selected_option ~= nil and p325.selected_option ~= "" then
+		t551.selectedOption = p325.selected_option
+	end
+
+	if p325.sort_id ~= nil and p325.sort_id ~= "" then
+		t551.sortId = p325.sort_id
+	end
+
+	if p325.options ~= nil and #p325.options > 0 then
+		local t552 = {}
+
+		for _, v4006 in p325.options do
+			table.insert(t552, v4006:jsonEncode())
+		end
+
+		t551.options = t552
+	end
+
+	if p325.experience_carousel ~= nil then
+		t551.experienceCarousel = p325.experience_carousel:jsonEncode()
+	end
+
+	if p325.feed_item_key ~= nil and p325.feed_item_key ~= "" then
+		t551.feedItemKey = p325.feed_item_key
+	end
+
+	return t551
+end
+function t549.jsonDecode(t553: {[any]: any}) -- line: 21953
+	-- upvalues: t549 (copy), t1 (copy)
+	local v4008 = t549.new()
+
+	if t553.selected_option ~= nil then
+		v4008.selected_option = t553.selected_option
+	end
+
+	if t553.selectedOption ~= nil then
+		v4008.selected_option = t553.selectedOption
+	end
+
+	if t553.sort_id ~= nil then
+		v4008.sort_id = t553.sort_id
+	end
+
+	if t553.sortId ~= nil then
+		v4008.sort_id = t553.sortId
+	end
+
+	if t553.options ~= nil then
+		local t554 = {}
+
+		for _, v4011 in t553.options do
+			table.insert(t554, t1.SelectorOption.jsonDecode(v4011))
+		end
+
+		v4008.options = t554
+	end
+
+	if t553.experience_carousel ~= nil then
+		v4008.experience_carousel = t1.ExperienceCarouselInputData.jsonDecode(t553.experience_carousel)
+	end
+
+	if t553.experienceCarousel ~= nil then
+		v4008.experience_carousel = t1.ExperienceCarouselInputData.jsonDecode(t553.experienceCarousel)
+	end
+
+	if t553.feed_item_key ~= nil then
+		v4008.feed_item_key = t553.feed_item_key
+	end
+
+	if t553.feedItemKey ~= nil then
+		v4008.feed_item_key = t553.feedItemKey
+	end
+
+	return v4008
+end
+
+t549.descriptor = {
+	name = "OptionSelectorCarouselInputData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.OptionSelectorCarouselInputData"
+}
+t1.OptionSelectorCarouselInputData = t549
+typeRegistry.default:register(t1.OptionSelectorCarouselInputData)
+
+local t555 = {}
+
+t555.__index = t555
+
+function t555.new(t556: {[any]: any}?) -- line: 22014
+	-- upvalues: t555 (copy)
+	return (setmetatable({
+		id = if t556 ~= nil and t556.id ~= nil then t556.id else "",
+		display_name = if t556 ~= nil and t556.display_name ~= nil then t556.display_name else "",
+		is_selected = t556 ~= nil and (t556.is_selected ~= nil and t556.is_selected)
+	}, t555))
+end
+function t555.encode(p326) -- line: 22022
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n217 = 0
+
+	if p326.id ~= nil and p326.id ~= "" then
+		local v4016, v4017 = proto.writeTag(buf, n217, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n217 = proto.writeString(v4016, v4017, p326.id)
+	end
+
+	if p326.display_name ~= nil and p326.display_name ~= "" then
+		local v4018, v4019 = proto.writeTag(buf, n217, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n217 = proto.writeString(v4018, v4019, p326.display_name)
+	end
+
+	if p326.is_selected then
+		local v4020, v4021 = proto.writeTag(buf, n217, 3, proto.wireTypes.varint)
+
+		buf, n217 = proto.writeVarInt(v4020, v4021, not p326.is_selected and 0 or 1)
+	end
+
+	local buf121 = buffer.create(n217)
+
+	buffer.copy(buf121, 0, buf, 0, n217)
+
+	return buf121
+end
+function t555.decode(p327: buffer) -- line: 22046
+	-- upvalues: t555 (copy), proto (copy)
+	local v4024 = t555.new()
+	local n218 = 0
+
+	while n218 < buffer.len(p327) do
+		local v4026, v4027
+
+		v4026, v4027, n218 = proto.readTag(p327, n218)
+
+		if v4027 == proto.wireTypes.varint then
+			if v4026 == 3 then
+				local v4028
+
+				v4028, n218 = proto.readVarInt(p327, n218)
+				v4024.is_selected = v4028 ~= 0
+			else
+				local v4029
+
+				v4029, n218 = proto.readVarInt(p327, n218)
+			end
+		elseif v4027 == proto.wireTypes.lengthDelimited then
+			if v4026 == 1 then
+				local v4030
+
+				v4030, n218 = proto.readBuffer(p327, n218)
+				v4024.id = buffer.tostring(v4030)
+			elseif v4026 == 2 then
+				local v4031
+
+				v4031, n218 = proto.readBuffer(p327, n218)
+				v4024.display_name = buffer.tostring(v4031)
+			else
+				local v4032, v4033 = proto.readVarInt(p327, n218)
+
+				n218 = v4033 + v4032
+			end
+		elseif v4027 == proto.wireTypes.i32 then
+			local v4034
+
+			v4034, n218 = proto.readFixed32(p327, n218)
+		elseif v4027 == proto.wireTypes.i64 then
+			local v4035
+
+			v4035, n218 = proto.readFixed64(p327, n218)
+		else
+			error("Unsupported wire type: " .. v4027)
+		end
+	end
+
+	return v4024
+end
+function t555.jsonEncode(p328) -- line: 22099
+	local t557 = {}
+
+	if p328.id ~= nil and p328.id ~= "" then
+		t557.id = p328.id
+	end
+
+	if p328.display_name ~= nil and p328.display_name ~= "" then
+		t557.displayName = p328.display_name
+	end
+
+	if p328.is_selected then
+		t557.isSelected = p328.is_selected
+	end
+
+	return t557
+end
+function t555.jsonDecode(t558: {[any]: any}) -- line: 22117
+	-- upvalues: t555 (copy)
+	local v4039 = t555.new()
+
+	if t558.id ~= nil then
+		v4039.id = t558.id
+	end
+
+	if t558.display_name ~= nil then
+		v4039.display_name = t558.display_name
+	end
+
+	if t558.displayName ~= nil then
+		v4039.display_name = t558.displayName
+	end
+
+	if t558.is_selected ~= nil then
+		v4039.is_selected = t558.is_selected
+	end
+
+	if t558.isSelected ~= nil then
+		v4039.is_selected = t558.isSelected
+	end
+
+	return v4039
+end
+
+t555.descriptor = {
+	name = "SelectorOption",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SelectorOption"
+}
+t1.SelectorOption = t555
+typeRegistry.default:register(t1.SelectorOption)
+
+local t559 = {}
+
+t559.__index = t559
+
+function t559.new(t560: {[any]: any}?) -- line: 22157
+	-- upvalues: t559 (copy)
+	return (setmetatable({
+		layout = if t560 ~= nil and t560.layout ~= nil then t560.layout else nil,
+		kind = if t560 ~= nil and t560.kind ~= nil then t560.kind else nil
+	}, t559))
+end
+function t559.encode(p329) -- line: 22164
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n219 = 0
+
+	if p329.layout ~= nil then
+		local v4044 = p329.layout:encode()
+		local v4045, v4046 = proto.writeTag(buf, n219, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n219 = proto.writeBuffer(v4045, v4046, v4044, buffer.len(v4044))
+	end
+
+	if p329.kind ~= nil and p329.kind.type == "universe" then
+		local v4047 = p329.kind.value:encode()
+		local v4048, v4049 = proto.writeTag(buf, n219, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n219 = proto.writeBuffer(v4048, v4049, v4047, buffer.len(v4047))
+	end
+
+	local buf122 = buffer.create(n219)
+
+	buffer.copy(buf122, 0, buf, 0, n219)
+
+	return buf122
+end
+function t559.decode(p330: buffer) -- line: 22187
+	-- upvalues: t559 (copy), proto (copy), t1 (copy)
+	local v4052 = t559.new()
+	local n220 = 0
+
+	while n220 < buffer.len(p330) do
+		local v4054, v4055
+
+		v4054, v4055, n220 = proto.readTag(p330, n220)
+
+		if v4055 == proto.wireTypes.varint then
+			local v4056
+
+			v4056, n220 = proto.readVarInt(p330, n220)
+		elseif v4055 == proto.wireTypes.lengthDelimited then
+			if v4054 == 1 then
+				local v4057
+
+				v4057, n220 = proto.readBuffer(p330, n220)
+				v4052.layout = t1.ItemLayout.decode(v4057)
+			elseif v4054 == 2 then
+				local v4058
+
+				v4058, n220 = proto.readBuffer(p330, n220)
+				v4052.kind = {
+					type = "universe",
+					value = t1.ExperienceCarouselInputData_UniverseItem.decode(v4058)
+				}
+			else
+				local v4059, v4060 = proto.readVarInt(p330, n220)
+
+				n220 = v4060 + v4059
+			end
+		elseif v4055 == proto.wireTypes.i32 then
+			local v4061
+
+			v4061, n220 = proto.readFixed32(p330, n220)
+		elseif v4055 == proto.wireTypes.i64 then
+			local v4062
+
+			v4062, n220 = proto.readFixed64(p330, n220)
+		else
+			error("Unsupported wire type: " .. v4055)
+		end
+	end
+
+	return v4052
+end
+function t559.jsonEncode(p331) -- line: 22236
+	local t561 = {}
+
+	if p331.layout ~= nil then
+		t561.layout = p331.layout:jsonEncode()
+	end
+
+	if p331.kind ~= nil and p331.kind.type == "universe" then
+		t561.universe = p331.kind.value:jsonEncode()
+	end
+
+	return t561
+end
+function t559.jsonDecode(t562: {[any]: any}) -- line: 22252
+	-- upvalues: t559 (copy), t1 (copy)
+	local v4066 = t559.new()
+
+	if t562.layout ~= nil then
+		v4066.layout = t1.ItemLayout.jsonDecode(t562.layout)
+	end
+
+	if t562.universe ~= nil then
+		v4066.kind = {
+			type = "universe",
+			value = t1.ExperienceCarouselInputData_UniverseItem.jsonDecode(t562.universe)
+		}
+	end
+
+	return v4066
+end
+
+t559.descriptor = {
+	name = "ItemWithLayout",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ItemWithLayout"
+}
+t1.ItemWithLayout = t559
+typeRegistry.default:register(t1.ItemWithLayout)
+
+local t563 = {}
+
+t563.__index = t563
+
+function t563.new(t564: {[any]: any}?) -- line: 22283
+	-- upvalues: t563 (copy)
+	return (setmetatable({
+		items = if t564 ~= nil and t564.items ~= nil then t564.items else {},
+		collection_item_size = if t564 ~= nil and t564.collection_item_size ~= nil then t564.collection_item_size else nil
+	}, t563))
+end
+function t563.encode(p332) -- line: 22292
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n221 = 0
+
+	if p332.items ~= nil and #p332.items > 0 then
+		for _, v4072 in p332.items do
+			local v4073 = v4072:encode()
+			local v4074, v4075 = proto.writeTag(buf, n221, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n221 = proto.writeBuffer(v4074, v4075, v4073, buffer.len(v4073))
+		end
+	end
+
+	if p332.collection_item_size ~= nil then
+		local v4076, v4077 = proto.writeTag(buf, n221, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n221 = proto.writeString(v4076, v4077, p332.collection_item_size)
+	end
+
+	local buf123 = buffer.create(n221)
+
+	buffer.copy(buf123, 0, buf, 0, n221)
+
+	return buf123
+end
+function t563.decode(p333: buffer) -- line: 22314
+	-- upvalues: t563 (copy), proto (copy), t1 (copy)
+	local v4080 = t563.new()
+	local n222 = 0
+
+	while n222 < buffer.len(p333) do
+		local v4082, v4083
+
+		v4082, v4083, n222 = proto.readTag(p333, n222)
+
+		if v4083 == proto.wireTypes.varint then
+			local v4084
+
+			v4084, n222 = proto.readVarInt(p333, n222)
+		elseif v4083 == proto.wireTypes.lengthDelimited then
+			if v4082 == 1 then
+				local v4085
+
+				v4085, n222 = proto.readBuffer(p333, n222)
+				table.insert(v4080.items, t1.ItemWithLayout.decode(v4085))
+			elseif v4082 == 2 then
+				local v4086
+
+				v4086, n222 = proto.readBuffer(p333, n222)
+				v4080.collection_item_size = buffer.tostring(v4086)
+			else
+				local v4087, v4088 = proto.readVarInt(p333, n222)
+
+				n222 = v4088 + v4087
+			end
+		elseif v4083 == proto.wireTypes.i32 then
+			local v4089
+
+			v4089, n222 = proto.readFixed32(p333, n222)
+		elseif v4083 == proto.wireTypes.i64 then
+			local v4090
+
+			v4090, n222 = proto.readFixed64(p333, n222)
+		else
+			error("Unsupported wire type: " .. v4083)
+		end
+	end
+
+	return v4080
+end
+function t563.jsonEncode(p334) -- line: 22362
+	local t565 = {}
+
+	if p334.items ~= nil and #p334.items > 0 then
+		local t566 = {}
+
+		for _, v4095 in p334.items do
+			table.insert(t566, v4095:jsonEncode())
+		end
+
+		t565.items = t566
+	end
+
+	if p334.collection_item_size ~= nil then
+		t565.collectionItemSize = p334.collection_item_size
+	end
+
+	return t565
+end
+function t563.jsonDecode(t567: {[any]: any}) -- line: 22380
+	-- upvalues: t563 (copy), t1 (copy)
+	local v4097 = t563.new()
+
+	if t567.items ~= nil then
+		local t568 = {}
+
+		for _, v4100 in t567.items do
+			table.insert(t568, t1.ItemWithLayout.jsonDecode(v4100))
+		end
+
+		v4097.items = t568
+	end
+
+	if t567.collection_item_size ~= nil then
+		v4097.collection_item_size = t567.collection_item_size
+	end
+
+	if t567.collectionItemSize ~= nil then
+		v4097.collection_item_size = t567.collectionItemSize
+	end
+
+	return v4097
+end
+
+t563.descriptor = {
+	name = "ContentPool",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ContentPool"
+}
+t1.ContentPool = t563
+typeRegistry.default:register(t1.ContentPool)
+
+local t569 = {}
+
+t569.__index = t569
+
+function t569.new(t570: {[any]: any}?) -- line: 22417
+	-- upvalues: t569 (copy)
+	return (setmetatable({
+		col_span = if t570 ~= nil and t570.col_span ~= nil then t570.col_span else 0,
+		row_span = if t570 ~= nil and t570.row_span ~= nil then t570.row_span else 0,
+		alignment_type = if t570 ~= nil and t570.alignment_type ~= nil then t570.alignment_type else "",
+		min_row_padding = if t570 ~= nil and t570.min_row_padding ~= nil then t570.min_row_padding else 0
+	}, t569))
+end
+function t569.encode(p335) -- line: 22426
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n223 = 0
+
+	if p335.col_span ~= nil and p335.col_span ~= 0 then
+		local v4105, v4106 = proto.writeTag(buf, n223, 1, proto.wireTypes.varint)
+
+		buf, n223 = proto.writeVarInt(v4105, v4106, p335.col_span)
+	end
+
+	if p335.row_span ~= nil and p335.row_span ~= 0 then
+		local v4107, v4108 = proto.writeTag(buf, n223, 2, proto.wireTypes.varint)
+
+		buf, n223 = proto.writeVarInt(v4107, v4108, p335.row_span)
+	end
+
+	if p335.alignment_type ~= nil and p335.alignment_type ~= "" then
+		local v4109, v4110 = proto.writeTag(buf, n223, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n223 = proto.writeString(v4109, v4110, p335.alignment_type)
+	end
+
+	if p335.min_row_padding ~= nil and p335.min_row_padding ~= 0 then
+		local v4111, v4112 = proto.writeTag(buf, n223, 4, proto.wireTypes.varint)
+
+		buf, n223 = proto.writeVarInt(v4111, v4112, p335.min_row_padding)
+	end
+
+	local buf124 = buffer.create(n223)
+
+	buffer.copy(buf124, 0, buf, 0, n223)
+
+	return buf124
+end
+function t569.decode(p336: buffer) -- line: 22455
+	-- upvalues: t569 (copy), proto (copy)
+	local v4115 = t569.new()
+	local n224 = 0
+
+	while n224 < buffer.len(p336) do
+		local v4117, v4118
+
+		v4117, v4118, n224 = proto.readTag(p336, n224)
+
+		if v4118 == proto.wireTypes.varint then
+			if v4117 == 1 then
+				local v4119
+
+				v4119, n224 = proto.readVarIntI32(p336, n224)
+				v4115.col_span = v4119
+			elseif v4117 == 2 then
+				local v4120
+
+				v4120, n224 = proto.readVarIntI32(p336, n224)
+				v4115.row_span = v4120
+			elseif v4117 == 4 then
+				local v4121
+
+				v4121, n224 = proto.readVarIntI32(p336, n224)
+				v4115.min_row_padding = v4121
+			else
+				local v4122
+
+				v4122, n224 = proto.readVarInt(p336, n224)
+			end
+		elseif v4118 == proto.wireTypes.lengthDelimited then
+			if v4117 == 3 then
+				local v4123
+
+				v4123, n224 = proto.readBuffer(p336, n224)
+				v4115.alignment_type = buffer.tostring(v4123)
+			else
+				local v4124, v4125 = proto.readVarInt(p336, n224)
+
+				n224 = v4125 + v4124
+			end
+		elseif v4118 == proto.wireTypes.i32 then
+			local v4126
+
+			v4126, n224 = proto.readFixed32(p336, n224)
+		elseif v4118 == proto.wireTypes.i64 then
+			local v4127
+
+			v4127, n224 = proto.readFixed64(p336, n224)
+		else
+			error("Unsupported wire type: " .. v4118)
+		end
+	end
+
+	return v4115
+end
+function t569.jsonEncode(p337) -- line: 22513
+	local t571 = {}
+
+	if p337.col_span ~= nil and p337.col_span ~= 0 then
+		t571.colSpan = p337.col_span
+	end
+
+	if p337.row_span ~= nil and p337.row_span ~= 0 then
+		t571.rowSpan = p337.row_span
+	end
+
+	if p337.alignment_type ~= nil and p337.alignment_type ~= "" then
+		t571.alignmentType = p337.alignment_type
+	end
+
+	if p337.min_row_padding ~= nil and p337.min_row_padding ~= 0 then
+		t571.minRowPadding = p337.min_row_padding
+	end
+
+	return t571
+end
+function t569.jsonDecode(t572: {[any]: any}) -- line: 22535
+	-- upvalues: t569 (copy)
+	local v4131 = t569.new()
+
+	if t572.col_span ~= nil then
+		v4131.col_span = t572.col_span
+	end
+
+	if t572.colSpan ~= nil then
+		v4131.col_span = t572.colSpan
+	end
+
+	if t572.row_span ~= nil then
+		v4131.row_span = t572.row_span
+	end
+
+	if t572.rowSpan ~= nil then
+		v4131.row_span = t572.rowSpan
+	end
+
+	if t572.alignment_type ~= nil then
+		v4131.alignment_type = t572.alignment_type
+	end
+
+	if t572.alignmentType ~= nil then
+		v4131.alignment_type = t572.alignmentType
+	end
+
+	if t572.min_row_padding ~= nil then
+		v4131.min_row_padding = t572.min_row_padding
+	end
+
+	if t572.minRowPadding ~= nil then
+		v4131.min_row_padding = t572.minRowPadding
+	end
+
+	return v4131
+end
+
+t569.descriptor = {
 	name = "ItemLayout",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ItemLayout"
 }
-t1.ItemLayout = t545
+t1.ItemLayout = t569
 typeRegistry.default:register(t1.ItemLayout)
 t1.PageEntryFormat = {
-	fromNumber = function(n214: number) -- line: 21543
-		if n214 == 0 then
+	fromNumber = function(n225: number) -- line: 22584
+		if n225 == 0 then
 			return "PAGE_ENTRY_FORMAT_INVALID"
 		end
 
-		if n214 == 1 then
+		if n225 == 1 then
 			return "PAGE_ENTRY_FORMAT_UNIVERSAL"
 		end
 
 		return nil
 	end,
-	toNumber = function(p322) -- line: 21553
-		if p322 == "PAGE_ENTRY_FORMAT_INVALID" then
+	toNumber = function(p338) -- line: 22594
+		if p338 == "PAGE_ENTRY_FORMAT_INVALID" then
 			return 0
 		end
 
-		if p322 == "PAGE_ENTRY_FORMAT_UNIVERSAL" then
+		if p338 == "PAGE_ENTRY_FORMAT_UNIVERSAL" then
 			return 1
 		end
 
-		return p322
+		return p338
 	end,
-	fromName = function(s1: string) -- line: 21563
-		if s1 == "PAGE_ENTRY_FORMAT_INVALID" then
+	fromName = function(s2: string) -- line: 22604
+		if s2 == "PAGE_ENTRY_FORMAT_INVALID" then
 			return "PAGE_ENTRY_FORMAT_INVALID"
 		end
 
-		if s1 == "PAGE_ENTRY_FORMAT_UNIVERSAL" then
+		if s2 == "PAGE_ENTRY_FORMAT_UNIVERSAL" then
 			return "PAGE_ENTRY_FORMAT_UNIVERSAL"
 		end
 
@@ -18248,6 +19084,7 @@ return {
 	ExperienceContentRatingLabelInputData = t1.ExperienceContentRatingLabelInputData,
 	ExperienceRefundPolicyInputData = t1.ExperienceRefundPolicyInputData,
 	ExperiencePlayWithRewardInputData = t1.ExperiencePlayWithRewardInputData,
+	CommunitySectionInputData = t1.CommunitySectionInputData,
 	SocialLinkRowInputData = t1.SocialLinkRowInputData,
 	SocialLinkRowInputData_SocialLinkItem = t1.SocialLinkRowInputData_SocialLinkItem,
 	ExperienceCarouselInputData = t1.ExperienceCarouselInputData,
@@ -18263,10 +19100,14 @@ return {
 	DeveloperProductCollectionInputData_DeveloperProductItem = t1.DeveloperProductCollectionInputData_DeveloperProductItem,
 	SubscriptionCollectionInputData = t1.SubscriptionCollectionInputData,
 	SubscriptionCollectionInputData_SubscriptionItem = t1.SubscriptionCollectionInputData_SubscriptionItem,
+	DynamicStoreCategoryInputData = t1.DynamicStoreCategoryInputData,
+	DynamicStoreCategoryInputData_DynamicStoreCategoryItem = t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItem,
+	DynamicStoreCategoryInputData_DynamicStoreCategoryItemType = t1.DynamicStoreCategoryInputData_DynamicStoreCategoryItemType,
 	CardContainerCardInputData = t1.CardContainerCardInputData,
 	CardContainerInputData = t1.CardContainerInputData,
 	CardInputData = t1.CardInputData,
 	DialogInputData = t1.DialogInputData,
+	IncomingTransferContent = t1.IncomingTransferContent,
 	BannerInputData = t1.BannerInputData,
 	TooltipInputData = t1.TooltipInputData,
 	CoachmarkInputData = t1.CoachmarkInputData,
@@ -18286,6 +19127,7 @@ return {
 	FilterPillsInputData_FilterOption = t1.FilterPillsInputData_FilterOption,
 	SortSelectorInputData = t1.SortSelectorInputData,
 	SortSelectorInputData_SortOption = t1.SortSelectorInputData_SortOption,
+	ChartsGenreSelectorInputData = t1.ChartsGenreSelectorInputData,
 	UAMarketplaceCatalogItemGroupInputData = t1.UAMarketplaceCatalogItemGroupInputData,
 	UAMarketplaceCatalogItemCarouselInputData = t1.UAMarketplaceCatalogItemCarouselInputData,
 	WidgetStyleData = t1.WidgetStyleData,

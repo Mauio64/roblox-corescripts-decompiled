@@ -19,14 +19,16 @@ local ArgusExperiment = require(script.Flags.ArgusExperiment)
 local GetFFlagMomentsAnalyticsProducerPrereqs = require(script.Flags.GetFFlagMomentsAnalyticsProducerPrereqs)
 local GetFFlagMomentsStickerButton = require(script.Flags.GetFFlagMomentsStickerButton)
 local GetFFlagMomentsAnalyticsSchemaIdentity = require(script.Flags.GetFFlagMomentsAnalyticsSchemaIdentity)
+local FFlagMomentsFeedHealthAnalytics = require(script.Flags.FFlagMomentsFeedHealthAnalytics)
 local t1 = {
 	useDeviceInsets = require(script.Hooks.useDeviceInsets),
 	useFormFactor = require(script.Hooks.useFormFactor),
 	useImageLoadingState = require(script.Hooks.useImageLoadingState),
-	useMomentsGating = function(...) -- line: 70
+	useMomentsGating = function(...) -- line: 71
 		return require(script.Hooks.useMomentsGating)(...)
 	end,
 	useScreenSize = require(script.Hooks.useScreenSize),
+	useStatusBarHeight = require(script.Hooks.useStatusBarHeight),
 	useToggleState = require(script.Hooks.useToggleState)
 }
 
@@ -36,7 +38,8 @@ return {
 		ArgusExperiment = ArgusExperiment,
 		GetFFlagMomentsAnalyticsProducerPrereqs = GetFFlagMomentsAnalyticsProducerPrereqs,
 		GetFFlagMomentsStickerButton = GetFFlagMomentsStickerButton,
-		GetFFlagMomentsAnalyticsSchemaIdentity = GetFFlagMomentsAnalyticsSchemaIdentity
+		GetFFlagMomentsAnalyticsSchemaIdentity = GetFFlagMomentsAnalyticsSchemaIdentity,
+		FFlagMomentsFeedHealthAnalytics = FFlagMomentsFeedHealthAnalytics
 	},
 	Components = {
 		GradientBackdrop = GradientBackdrop,

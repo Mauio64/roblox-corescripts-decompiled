@@ -25,7 +25,6 @@ local v24 = game:DefineFastInt("LuaAppGameTileVideoMaxMemoryThresholdMb", -1)
 local v25 = game:DefineFastInt("LuaAppGameTileVideoAvailableRamThresholdMb", -1)
 local v26 = game:DefineFastString("LuaAppGameTileVideoManufacturerPipeDenyList", "")
 local v27 = game:DefineFastString("LuaAppGameTileVideoDevicePipeDenyList", "")
-local FFlagLuaAppHomeTouchAutoplay = require(GameTileParent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
 local FFlagLuaAppUsePrevalidatedVideoGamePlayability = require(GameTileParent.SharedFlags).FFlagLuaAppUsePrevalidatedVideoGamePlayability
 local FFlagLuaAppGameTileSelectionVideoPlayback = require(GameTileParent.SharedFlags).FFlagLuaAppGameTileSelectionVideoPlayback
 local t1 = nil
@@ -43,79 +42,79 @@ if FFlagLuaAppTileVideoDeviceMemoryBlocking then
 	}
 end
 
-local function GameVideoPlaybackDetector(t2: {[any]: any}) -- line: 80
-	-- upvalues: useDispatch (copy), useRoactService (copy), RoactNetworking (copy), useSelector (copy), FetchGamePlayabilityAndProductInfo (copy), useIsVideoEligible (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), FFlagLuaAppTileVideoDeviceMemoryBlocking (copy), React (copy), useCanDevicePlayVideoPreview (copy), t1 (ref), RetrievalStatus (copy), VideoEndReason (copy), FFlagLuaAppGameTileSelectionVideoPlayback (copy), usePreferredInput (copy), getPlaybackDetectionMethod (copy), VideoPlaybackDetector (copy), FFlagLuaAppEdpMediaGalleryVideoPreview (copy), FFlagLuaAppHomeTouchAutoplay (copy)
-	local v34 = useDispatch()
-	local v35 = useRoactService(RoactNetworking)
-	local v36 = useSelector(function(p1) -- line: 84
+local function GameVideoPlaybackDetector(t2: {[any]: any}) -- line: 78
+	-- upvalues: useDispatch (copy), useRoactService (copy), RoactNetworking (copy), useSelector (copy), FetchGamePlayabilityAndProductInfo (copy), useIsVideoEligible (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), FFlagLuaAppTileVideoDeviceMemoryBlocking (copy), React (copy), useCanDevicePlayVideoPreview (copy), t1 (ref), RetrievalStatus (copy), VideoEndReason (copy), FFlagLuaAppGameTileSelectionVideoPlayback (copy), usePreferredInput (copy), getPlaybackDetectionMethod (copy), VideoPlaybackDetector (copy), FFlagLuaAppEdpMediaGalleryVideoPreview (copy)
+	local v33 = useDispatch()
+	local v34 = useRoactService(RoactNetworking)
+	local v35 = useSelector(function(p1) -- line: 82
 		-- upvalues: FetchGamePlayabilityAndProductInfo (copy), t2 (copy)
 		return FetchGamePlayabilityAndProductInfo.GetFetchingStatus(p1, t2.universeId)
 	end)
-	local v37 = useIsVideoEligible(t2.universeId, if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else t2.hasPrevalidatedVideoGamePlayability)
+	local v36 = useIsVideoEligible(t2.universeId, if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else t2.hasPrevalidatedVideoGamePlayability)
+	local u37 = nil
 	local u38 = nil
-	local u39 = nil
-	local v40 = nil
+	local v39 = nil
 
 	if FFlagLuaAppTileVideoDeviceMemoryBlocking then
-		local v41, v42 = React.useState(false)
+		local v40, v41 = React.useState(false)
 
-		u38 = v42
-		u39 = useCanDevicePlayVideoPreview(t1, t2.universeId, t2.pageContext)
-		v40 = v37 and v41
+		u37 = v41
+		u38 = useCanDevicePlayVideoPreview(t1, t2.universeId, t2.pageContext)
+		v39 = v36 and v40
 	end
 
-	local v43 = React.useCallback(function(p2) -- line: 105
-		-- upvalues: t2 (copy), v36 (copy), RetrievalStatus (copy), VideoEndReason (copy)
-		if t2.videoAnalytics and v36 == RetrievalStatus.Done then
+	local v42 = React.useCallback(function(p2) -- line: 103
+		-- upvalues: t2 (copy), v35 (copy), RetrievalStatus (copy), VideoEndReason (copy)
+		if t2.videoAnalytics and v35 == RetrievalStatus.Done then
 			t2.videoAnalytics.reportVideoEnd(t2.itemIndex, VideoEndReason.PlayabilityCheckFailed, p2, -1)
 		end
 	end, {
 		t2.videoAnalytics,
-		v36
+		v35
 	})
-	local v44 = React.useCallback(function() -- line: 112
-		-- upvalues: v36 (copy), RetrievalStatus (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), t2 (copy), v34 (copy), FetchGamePlayabilityAndProductInfo (copy), v35 (copy), FFlagLuaAppTileVideoDeviceMemoryBlocking (copy), u38 (ref), u39 (ref)
-		if (v36 == RetrievalStatus.NotStarted or v36 == RetrievalStatus.Failed) and (not FFlagLuaAppUsePrevalidatedVideoGamePlayability or not t2.hasPrevalidatedVideoGamePlayability) then
-			v34(FetchGamePlayabilityAndProductInfo.Fetch(v35, t2.universeId))
+	local v43 = React.useCallback(function() -- line: 110
+		-- upvalues: v35 (copy), RetrievalStatus (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), t2 (copy), v33 (copy), FetchGamePlayabilityAndProductInfo (copy), v34 (copy), FFlagLuaAppTileVideoDeviceMemoryBlocking (copy), u37 (ref), u38 (ref)
+		if (v35 == RetrievalStatus.NotStarted or v35 == RetrievalStatus.Failed) and (not FFlagLuaAppUsePrevalidatedVideoGamePlayability or not t2.hasPrevalidatedVideoGamePlayability) then
+			v33(FetchGamePlayabilityAndProductInfo.Fetch(v34, t2.universeId))
 		end
 
 		if FFlagLuaAppTileVideoDeviceMemoryBlocking then
-			u38(u39())
+			u37(u38())
 		end
 	end, {
 		t2.universeId,
-		v36,
-		v34,
 		v35,
-		u39,
+		v33,
+		v34,
+		u38,
 		if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else t2.hasPrevalidatedVideoGamePlayability
 	})
-	local v45 = nil
+	local v44 = nil
 
 	if FFlagLuaAppGameTileSelectionVideoPlayback then
-		local v46 = usePreferredInput()
+		local v45 = usePreferredInput()
 
-		v45 = getPlaybackDetectionMethod(v46, t2.isHoverSupported)
+		v44 = getPlaybackDetectionMethod(v45, t2.isHoverSupported)
 	end
 
 	return React.createElement(VideoPlaybackDetector, {
 		videoKey = t2.videoKey,
 		itemIndex = t2.itemIndex,
 		itemFrameRef = t2.tileRef,
-		playbackDetectionMethod = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else v45,
+		playbackDetectionMethod = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else v44,
 		isHoverSupported = if not FFlagLuaAppGameTileSelectionVideoPlayback then t2.isHoverSupported else nil,
 		isHovered = t2.isHovered,
 		isSelected = if not FFlagLuaAppGameTileSelectionVideoPlayback then nil else t2.isSelected,
 		autoplay = if not FFlagLuaAppGameTileSelectionVideoPlayback then if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else t2.autoplay else nil,
-		videoPlaybackCoordinator = if not FFlagLuaAppHomeTouchAutoplay or not t2.videoPlaybackContext then nil else t2.videoPlaybackContext.videoPlaybackCoordinator,
+		videoPlaybackCoordinator = if not t2.videoPlaybackContext then nil else t2.videoPlaybackContext.videoPlaybackCoordinator,
 		onPlaybackChange = t2.onPlaybackChange,
 		videoAnalytics = t2.videoAnalytics,
 		videoDwellTimeInSec = t2.videoDwellTimeInSec,
 		videoVisiblePercent = t2.videoVisiblePercent,
-		isVideoEligible = if not FFlagLuaAppTileVideoDeviceMemoryBlocking then v37 else v40,
-		onVideoIneligible = v43,
-		onPlaybackCandidate = v44,
-		viewportVideoAutoplayController = if not FFlagLuaAppHomeTouchAutoplay or not t2.videoPlaybackContext then nil else t2.videoPlaybackContext.viewportVideoAutoplayController
+		isVideoEligible = if not FFlagLuaAppTileVideoDeviceMemoryBlocking then v36 else v39,
+		onVideoIneligible = v42,
+		onPlaybackCandidate = v43,
+		viewportVideoAutoplayController = if not t2.videoPlaybackContext then nil else t2.videoPlaybackContext.viewportVideoAutoplayController
 	})
 end
 

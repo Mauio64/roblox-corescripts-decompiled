@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatUseMessagesStore8", false)
+return game:DefineFastFlag("ExpChatUseMessagesStore9", false)

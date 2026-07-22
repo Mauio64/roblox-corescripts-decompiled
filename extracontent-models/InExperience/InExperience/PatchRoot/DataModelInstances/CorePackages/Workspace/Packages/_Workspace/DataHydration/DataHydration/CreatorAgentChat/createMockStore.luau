@@ -155,8 +155,8 @@ local function createMockStore(t2: {[any]: any}?) -- line: 131
 		-- upvalues: streamWords (copy), v23 (copy)
 		return function(p6) -- line: 194
 			-- upvalues: streamWords (copy), s4 (copy), v23 (copy)
-			for _, v113 in streamWords(s4) do
-				p6.emitText(v113)
+			for _, v114 in streamWords(s4) do
+				p6.emitText(v114)
 				p6.sleep(v23)
 			end
 
@@ -174,8 +174,8 @@ local function createMockStore(t2: {[any]: any}?) -- line: 131
 		if typeof(respond) == "string" then
 			return function(p7) -- line: 194
 				-- upvalues: streamWords (copy), respond (copy), v23 (copy)
-				for _, v116 in streamWords(respond) do
-					p7.emitText(v116)
+				for _, v117 in streamWords(respond) do
+					p7.emitText(v117)
 					p7.sleep(v23)
 				end
 
@@ -333,11 +333,11 @@ local function createMockStore(t2: {[any]: any}?) -- line: 131
 			end,
 			setTitle = function(p15) -- line: 295
 				-- upvalues: t3 (copy), s5 (copy), v22 (copy), n6 (ref), emitNotification (copy)
-				local v130 = t3[s5]
+				local v131 = t3[s5]
 
-				if v130 then
-					v130.title = p15
-					v130.updatedUtc = DateTime.now():ToIsoDate()
+				if v131 then
+					v131.title = p15
+					v131.updatedUtc = DateTime.now():ToIsoDate()
 				end
 
 				local t13 = {
@@ -387,8 +387,8 @@ local function createMockStore(t2: {[any]: any}?) -- line: 131
 
 				((if respond ~= nil then (if typeof(respond) ~= "string" then respond else function(p19) -- line: 194
 					-- upvalues: streamWords (copy), respond (copy), v23 (copy)
-					for _, v147 in streamWords(respond) do
-						p19.emitText(v147)
+					for _, v148 in streamWords(respond) do
+						p19.emitText(v148)
 						p19.sleep(v23)
 					end
 
@@ -657,17 +657,23 @@ local function createMockStore(t2: {[any]: any}?) -- line: 131
 			end
 
 			return {}, nil
+		end,
+		[AcpProtocol.Methods.SessionSaveAndPublish] = function(_) -- line: 475
+			return {
+				status = "success",
+				version = "1"
+			}, nil
 		end
 	}
 
-	local function dispatch(t24: {[any]: any}) -- line: 477
+	local function dispatch(t24: {[any]: any}) -- line: 480
 		-- upvalues: AcpProtocol (copy), t3 (copy), jsonError (copy), httpStatusForCode (copy), runResponder (copy), jsonOk (copy), t23 (copy)
 		if t24.method == AcpProtocol.Methods.SessionPrompt then
-			local v102 = t3[t24.params.sessionId]
+			local v103 = t3[t24.params.sessionId]
 			local t25
 
-			if v102 == nil or v102.closedUtc ~= nil then
-				v102 = nil
+			if v103 == nil or v103.closedUtc ~= nil then
+				v103 = nil
 				t25 = {
 					message = "session not found",
 					code = AcpProtocol.ErrorCodes.NotFound
@@ -680,49 +686,49 @@ local function createMockStore(t2: {[any]: any}?) -- line: 131
 				return (jsonError(t24.id, t25.code, t25.message, (httpStatusForCode(t25.code))))
 			end
 
-			v102.updatedUtc = DateTime.now():ToIsoDate()
+			v103.updatedUtc = DateTime.now():ToIsoDate()
 			runResponder(t24.id, t24.params.sessionId, t24.params.prompt or {})
 
 			return (jsonOk(t24.id, {}))
 		end
 
-		local v104 = t23[t24.method]
+		local v105 = t23[t24.method]
 
-		if v104 == nil then
+		if v105 == nil then
 			return (jsonError(t24.id, AcpProtocol.ErrorCodes.MethodNotFound, "Method not found: " .. t24.method, 404))
 		end
 
-		local ok, result, v107 = pcall(v104, t24.params or {})
+		local ok, result, v108 = pcall(v105, t24.params or {})
 
 		if not ok then
 			return (jsonError(t24.id, AcpProtocol.ErrorCodes.InternalError, tostring(result), 500))
 		end
 
-		if v107 then
-			return (jsonError(t24.id, v107.code, v107.message, (httpStatusForCode(v107.code))))
+		if v108 then
+			return (jsonError(t24.id, v108.code, v108.message, (httpStatusForCode(v108.code))))
 		end
 
 		return (jsonOk(t24.id, result))
 	end
 
 	local t26 = {
-		request = function(p32, p33) -- line: 506
+		request = function(p33, p34) -- line: 509
 			-- upvalues: HttpService (copy), dispatch (copy)
-			local data = HttpService:JSONDecode(p32.body or "{}")
+			local data = HttpService:JSONDecode(p33.body or "{}")
 
 			if typeof(data) == "table" and (typeof(data.result) == "table" and data.result.tool_name == "ask_tool") then
-				p33(true, {
+				p34(true, {
 					statusCode = 200,
 					responseBody = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{}}"
 				})
 
-				return function() -- line: 514
+				return function() -- line: 517
 				end
 			end
 
-			p33(true, (dispatch(data)))
+			p34(true, (dispatch(data)))
 
-			return function() -- line: 517
+			return function() -- line: 520
 			end
 		end
 	}

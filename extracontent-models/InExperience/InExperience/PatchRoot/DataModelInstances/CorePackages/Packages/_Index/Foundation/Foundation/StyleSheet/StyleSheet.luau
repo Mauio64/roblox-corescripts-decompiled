@@ -1,7 +1,6 @@
 local scriptParent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
-local Flags = require(Foundation.Utility.Flags)
 local React = require(FoundationParent.React)
 
 require(Foundation.Providers.Style.Tokens)
@@ -14,31 +13,20 @@ local useGeneratedRules = require(Foundation.Utility.useGeneratedRules)
 require(Foundation.Enums.Device)
 require(Foundation.Enums.Theme)
 
-local function StyleSheet(t1: {[any]: any}) -- line: 32
-	-- upvalues: React (copy), useGeneratedRules (copy), Flags (copy), getOverrideAttributes (copy), createStyleSheetRules (copy)
-	local v11, v12 = React.useState(nil)
-	local v13 = React.useRef({})
+local function StyleSheet(t1: {[any]: any}) -- line: 31
+	-- upvalues: React (copy), useGeneratedRules (copy), getOverrideAttributes (copy), createStyleSheetRules (copy)
+	local v10, v11 = React.useState(nil)
+	local v12 = React.useRef({})
 
-	React.useLayoutEffect(function() -- line: 36
-		-- upvalues: t1 (copy), v11 (copy)
+	React.useLayoutEffect(function() -- line: 35
+		-- upvalues: t1 (copy), v10 (copy)
 		if t1.setStyleSheetRef and t1.setStyleSheetRef.current then
-			t1.setStyleSheetRef.current(v11)
+			t1.setStyleSheetRef.current(v10)
 		end
-	end, { v11 })
+	end, { v10 })
 
-	local v14 = useGeneratedRules(t1.theme, t1.device)
-
-	React.useLayoutEffect(function() -- line: 46
-		-- upvalues: v11 (copy), Flags (copy), t1 (copy)
-		if v11 and not Flags.FoundationDisableStyleProviderDerives then
-			v11:SetDerives(t1.derives or {})
-		end
-	end, {
-		v11,
-		t1.derives
-	})
-
-	local v15 = React.useMemo(function() -- line: 53
+	local v13 = useGeneratedRules(t1.theme, t1.device)
+	local v14 = React.useMemo(function() -- line: 43
 		-- upvalues: getOverrideAttributes (copy), t1 (copy)
 		return getOverrideAttributes(t1.theme, t1.device, t1.tokenOverrides)
 	end, {
@@ -46,27 +34,27 @@ local function StyleSheet(t1: {[any]: any}) -- line: 32
 		t1.device,
 		t1.tokenOverrides
 	})
-	local v16 = React.useMemo(function() -- line: 57
-		-- upvalues: v11 (copy), createStyleSheetRules (copy), v14 (copy), t1 (copy), v13 (copy), v15 (copy)
-		if v11 then
-			return createStyleSheetRules(v14, t1.tags, v11, v13.current, t1.scale, v15)
+	local v15 = React.useMemo(function() -- line: 47
+		-- upvalues: v10 (copy), createStyleSheetRules (copy), v13 (copy), t1 (copy), v12 (copy), v14 (copy)
+		if v10 then
+			return createStyleSheetRules(v13, t1.tags, v10, v12.current, t1.scale, v14)
 		end
 
 		return nil
 	end, {
-		v11,
-		v14,
+		v10,
+		v13,
 		t1.tags,
 		t1.scale,
-		v15
+		v14
 	})
 
 	return React.createElement(React.Fragment, nil, {
 		FoundationStyleSheet = React.createElement("StyleSheet", {
-			ref = v12
-		}, v16),
+			ref = v11
+		}, v15),
 		FoundationStyleLink = React.createElement("StyleLink", {
-			StyleSheet = v11
+			StyleSheet = v10
 		})
 	})
 end

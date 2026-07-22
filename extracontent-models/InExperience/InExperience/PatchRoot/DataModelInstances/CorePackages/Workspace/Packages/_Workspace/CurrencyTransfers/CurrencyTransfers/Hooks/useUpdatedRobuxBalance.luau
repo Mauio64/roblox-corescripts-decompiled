@@ -12,39 +12,39 @@ local function useUpdatedRobuxBalance(p1) -- line: 19
 	local setRobuxBalanceAmount = p1.setRobuxBalanceAmount
 	local setBalanceReceivedFromApi = p1.setBalanceReceivedFromApi
 
-	React.useEffect(function() -- line: 23
-		-- upvalues: getBalanceRequest (copy), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), Promise (copy)
+	React.useEffect(function() -- line: 27
+		-- upvalues: getBalanceRequest (copy), p1 (copy), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), Promise (copy)
 		local u11 = false
 
-		getBalanceRequest():andThen(function(p2) -- line: 27
-			-- upvalues: u11 (ref), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), Promise (copy), getBalanceRequest (copy)
+		getBalanceRequest(nil, p1.getNetworkImpl()):andThen(function(p2) -- line: 31
+			-- upvalues: u11 (ref), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), Promise (copy), getBalanceRequest (copy), p1 (copy)
 			if u11 then
 				return
 			end
 
 			setRobuxBalanceAmount(p2)
 			setBalanceReceivedFromApi(true)
-			Promise.delay(0.5):andThen(function() -- line: 35
-				-- upvalues: u11 (ref), getBalanceRequest (copy), setRobuxBalanceAmount (copy)
+			Promise.delay(0.5):andThen(function() -- line: 39
+				-- upvalues: u11 (ref), getBalanceRequest (copy), p1 (copy), setRobuxBalanceAmount (copy)
 				if u11 then
 					return
 				end
 
-				return getBalanceRequest():andThen(function(p3) -- line: 40
+				return getBalanceRequest(nil, p1.getNetworkImpl()):andThen(function(p3) -- line: 44
 					-- upvalues: u11 (ref), setRobuxBalanceAmount (copy)
 					if u11 then
 						return
 					end
 
 					setRobuxBalanceAmount(p3)
-				end):catch(function() -- line: 46
+				end):catch(function() -- line: 50
 				end)
-			end):catch(function() -- line: 48
+			end):catch(function() -- line: 52
 			end)
-		end):catch(function() -- line: 50
+		end):catch(function() -- line: 54
 		end)
 
-		return function() -- line: 52
+		return function() -- line: 56
 			-- upvalues: u11 (ref)
 			u11 = true
 		end

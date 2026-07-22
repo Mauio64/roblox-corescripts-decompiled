@@ -198,35 +198,35 @@ local function parseDeviceContext(p7) -- line: 541
 
 	if attributes.maxMemory ~= nil then
 		local maxMemory = attributes.maxMemory
-		local v37
+		local v38
 
 		if maxMemory == nil then
-			v37 = nil
+			v38 = nil
 		else
 			local num = tonumber(maxMemory)
 
-			v37 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+			v38 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
 		end
 
-		if v37 ~= nil then
-			t10.memory_size = v37
+		if v38 ~= nil then
+			t10.memory_size = v38
 		end
 	end
 
 	if attributes.availRAM ~= nil then
 		local availRAM = attributes.availRAM
-		local v40
+		local v41
 
 		if availRAM == nil then
-			v40 = nil
+			v41 = nil
 		else
 			local num = tonumber(availRAM)
 
-			v40 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+			v41 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
 		end
 
-		if v40 ~= nil then
-			t10.free_memory = v40
+		if v41 ~= nil then
+			t10.free_memory = v41
 		end
 	end
 
@@ -240,35 +240,35 @@ local function parseDeviceContext(p7) -- line: 541
 
 	if attributes.cpuLogicalCount ~= nil then
 		local cpuLogicalCount = attributes.cpuLogicalCount
-		local v43
+		local v44
 
 		if cpuLogicalCount == nil then
-			v43 = nil
+			v44 = nil
 		else
 			local num = tonumber(cpuLogicalCount)
 
-			v43 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+			v44 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
 		end
 
-		if v43 ~= nil then
-			t10.processor_count = v43
+		if v44 ~= nil then
+			t10.processor_count = v44
 		end
 	end
 
 	if attributes.cpuCoreCount ~= nil then
 		local cpuCoreCount = attributes.cpuCoreCount
-		local v46
+		local v47
 
 		if cpuCoreCount == nil then
-			v46 = nil
+			v47 = nil
 		else
 			local num = tonumber(cpuCoreCount)
 
-			v46 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+			v47 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
 		end
 
-		if v46 ~= nil then
-			t10.cpu_core_count = v46
+		if v47 ~= nil then
+			t10.cpu_core_count = v47
 		end
 	end
 
@@ -278,73 +278,93 @@ local function parseDeviceContext(p7) -- line: 541
 
 	if attributes.cpuPhysCount ~= nil then
 		local cpuPhysCount = attributes.cpuPhysCount
-		local v49
+		local v50
 
 		if cpuPhysCount == nil then
-			v49 = nil
+			v50 = nil
 		else
 			local num = tonumber(cpuPhysCount)
 
-			v49 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+			v50 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
 		end
 
-		if v49 ~= nil then
-			t10.cpu_physical_count = v49
+		if v50 ~= nil then
+			t10.cpu_physical_count = v50
 		end
 	end
 
 	if attributes.cpuSpeed ~= nil then
 		local cpuSpeed = attributes.cpuSpeed
-		local v52
+		local v53
 
 		if cpuSpeed == nil then
-			v52 = nil
+			v53 = nil
 		else
 			local num = tonumber(cpuSpeed)
 
-			v52 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+			v53 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
 		end
 
-		if v52 ~= nil then
-			t10.cpu_speed = v52
+		if v53 ~= nil then
+			t10.cpu_speed = v53
 		end
 	end
 
 	return t10
 end
+local function parseCustomMetadataContexts(p8) -- line: 628
+	local t11 = {}
+	local customMetadata = p8.customMetadata
 
-function t1.parseErrorToContext(p8) -- line: 655
-	-- upvalues: parseAppContext (copy), parseDeviceContext (copy)
-	local t11 = {
-		app = parseAppContext(p8)
-	}
-	local t12 = {}
-
-	if p8.attributes.networkType ~= nil then
-		t12.network_type = p8.attributes.networkType
+	if type(customMetadata) ~= "table" then
+		return t11
 	end
 
-	t11.network = t12
-
-	local t13 = {}
-	local attributes = p8.attributes
-
-	if attributes.baseOs ~= nil then
-		t13.name = attributes.baseOs
+	for v58, v59 in customMetadata do
+		if type(v59) == "table" and next(v59) ~= nil then
+			t11[v58] = v59
+		end
 	end
-
-	if attributes.systemVersion ~= nil then
-		t13.version = attributes.systemVersion
-	end
-
-	if attributes.systemVersion ~= nil then
-		t13.version = attributes.systemVersion
-	end
-
-	t11.os = t13
-	t11.device = parseDeviceContext(p8)
 
 	return t11
+end
+
+function t1.parseErrorToContext(p9) -- line: 692
+	-- upvalues: parseAppContext (copy), parseDeviceContext (copy), parseCustomMetadataContexts (copy)
+	local t12 = {
+		app = parseAppContext(p9)
+	}
+	local t13 = {}
+
+	if p9.attributes.networkType ~= nil then
+		t13.network_type = p9.attributes.networkType
+	end
+
+	t12.network = t13
+
+	local t14 = {}
+	local attributes = p9.attributes
+
+	if attributes.baseOs ~= nil then
+		t14.name = attributes.baseOs
+	end
+
+	if attributes.systemVersion ~= nil then
+		t14.version = attributes.systemVersion
+	end
+
+	if attributes.systemVersion ~= nil then
+		t14.version = attributes.systemVersion
+	end
+
+	t12.os = t14
+	t12.device = parseDeviceContext(p9)
+
+	for v65, v66 in parseCustomMetadataContexts(p9) do
+		t12[v65] = v66
+	end
+
+	return t12
 end
 
 return t1

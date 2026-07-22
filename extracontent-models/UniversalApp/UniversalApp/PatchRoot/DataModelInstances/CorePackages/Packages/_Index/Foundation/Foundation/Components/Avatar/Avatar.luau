@@ -10,6 +10,7 @@ local StatusIndicator = require(Foundation.Components.StatusIndicator)
 require(Foundation.Components.Types)
 
 local View = require(Foundation.Components.View)
+local mapBindable = require(Foundation.Utility.mapBindable)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local ThumbnailSize = require(Foundation.Enums.ThumbnailSize)
@@ -27,35 +28,39 @@ local t1 = {
 	userPresence = UserPresence.None
 }
 
-local function Avatar(p1, p2) -- line: 47
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useAvatarVariants (copy), getAvatarSize (copy), React (copy), View (copy), withCommonProps (copy), Image (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), Flags (copy), Dash (copy), StatusIndicator (copy), Indicator (copy)
-	local v25 = withDefaults(p1, t1)
-	local v26 = useTokens()
-	local v27 = usePresentationContext()
-	local v28 = useAvatarVariants(v26, v25.size, v25.userPresence, v25.backplateStyle, v27.isIconSize)
-	local v29 = getAvatarSize(v26, v25.size, v27.isIconSize)
+local function Avatar(p1, p2) -- line: 49
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useAvatarVariants (copy), getAvatarSize (copy), React (copy), View (copy), withCommonProps (copy), Image (copy), Flags (copy), mapBindable (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), Dash (copy), StatusIndicator (copy), Indicator (copy)
+	local v26 = withDefaults(p1, t1)
+	local v27 = useTokens()
+	local v28 = usePresentationContext()
+	local v29 = useAvatarVariants(v27, v26.size, v26.userPresence, v26.backplateStyle, v28.isIconSize)
+	local v30 = getAvatarSize(v27, v26.size, v28.isIconSize)
 
-	return React.createElement(View, withCommonProps(v25, {
-		tag = v28.container.tag,
+	return React.createElement(View, withCommonProps(v26, {
+		tag = v29.container.tag,
 		ref = p2,
-		backgroundStyle = v28.container.backgroundStyle,
-		stroke = v28.container.stroke,
-		Size = UDim2.fromOffset(v29, v29)
+		backgroundStyle = v29.container.backgroundStyle,
+		stroke = v29.container.stroke,
+		Size = UDim2.fromOffset(v30, v30)
 	}), {
 		Image = React.createElement(Image, {
-			Image = getRbxThumb(ThumbnailType.AvatarHeadShot, v25.userId, ThumbnailSize.Medium),
-			tag = v28.avatar.tag,
-			backgroundStyle = v25.backgroundStyle
+			Image = if not Flags.FoundationAvatarBindableUserId then getRbxThumb(ThumbnailType.AvatarHeadShot, v26.userId, ThumbnailSize.Medium) else mapBindable(v26.userId, function(p3) -- line: 70
+				-- upvalues: getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy)
+				return getRbxThumb(ThumbnailType.AvatarHeadShot, p3, ThumbnailSize.Medium)
+			end),
+			tag = v29.avatar.tag,
+			backgroundStyle = v26.backgroundStyle,
+			testId = if not Flags.FoundationAvatarBindableUserId then nil else `{ v26.testId }--image`
 		}),
-		Indicator = if not Flags.FoundationAvatarBeta then if not v28.indicator.isVisible then nil else React.createElement(View, Dash.join(v28.indicatorBackplate, {
-			testId = `{ v25.testId }--indicator`
-		}), React.createElement(Indicator, v28.indicator)) else if not v28.statusIndicator.isVisible then nil else React.createElement(View, Dash.join(v28.statusIndicatorBackplate, {
-			testId = `{ v25.testId }--indicator-backplate`
+		Indicator = if not Flags.FoundationAvatarBeta then if not v29.indicator.isVisible then nil else React.createElement(View, Dash.join(v29.indicatorBackplate, {
+			testId = `{ v26.testId }--indicator`
+		}), React.createElement(Indicator, v29.indicator)) else if not v29.statusIndicator.isVisible then nil else React.createElement(View, Dash.join(v29.statusIndicatorBackplate, {
+			testId = `{ v26.testId }--indicator-backplate`
 		}), React.createElement(StatusIndicator, {
-			testId = `{ v25.testId }--status-indicator`,
-			variant = v28.statusIndicator.variant,
-			shape = v28.statusIndicator.shape,
-			size = v28.statusIndicator.size
+			testId = `{ v26.testId }--status-indicator`,
+			variant = v29.statusIndicator.variant,
+			shape = v29.statusIndicator.shape,
+			size = v29.statusIndicator.size
 		}))
 	})
 end

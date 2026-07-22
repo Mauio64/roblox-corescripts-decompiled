@@ -4,7 +4,7 @@ local React = require(MomentsParent.React)
 local ReactOtter = require(MomentsParent.ReactOtter)
 local Signals = require(MomentsParent.Signals)
 local GetImmersiveChromeStore = require(Moments.Stores.GetImmersiveChromeStore)
-local GetFFlagMomentsImmersiveChrome = require(Moments.Flags.GetFFlagMomentsImmersiveChrome)
+local FFlagMomentsImmersiveChrome = require(Moments.Flags.FFlagMomentsImmersiveChrome)
 local t1 = {
 	dampingRatio = 1,
 	frequency = 3,
@@ -12,19 +12,19 @@ local t1 = {
 	restingPositionLimit = 0.1
 }
 
-local function useChromeRatio() -- line: 35
-	-- upvalues: GetFFlagMomentsImmersiveChrome (copy), GetImmersiveChromeStore (copy), ReactOtter (copy), React (copy), Signals (copy), t1 (copy)
-	local v10 = GetFFlagMomentsImmersiveChrome()
+local function useChromeRatio() -- line: 32
+	-- upvalues: FFlagMomentsImmersiveChrome (copy), GetImmersiveChromeStore (copy), ReactOtter (copy), React (copy), Signals (copy), t1 (copy)
+	local v10 = FFlagMomentsImmersiveChrome
 	local v11 = GetImmersiveChromeStore(false)
 	local v12, v13 = ReactOtter.useAnimatedBinding(1)
 
-	React.useEffect(function() -- line: 41
+	React.useEffect(function() -- line: 38
 		-- upvalues: v10 (copy), Signals (copy), v11 (copy), v13 (copy), ReactOtter (copy), t1 (copy)
 		if not v10 then
 			return
 		end
 
-		return (Signals.createEffect(function(p1) -- line: 45
+		return (Signals.createEffect(function(p1) -- line: 42
 			-- upvalues: v11 (copy), v13 (copy), ReactOtter (copy), t1 (copy)
 			local v15 = v11.getChromeVisible(p1)
 

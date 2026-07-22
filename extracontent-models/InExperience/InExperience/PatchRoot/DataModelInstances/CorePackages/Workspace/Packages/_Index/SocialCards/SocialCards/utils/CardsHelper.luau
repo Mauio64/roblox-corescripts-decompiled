@@ -4,11 +4,11 @@ local createLazyComponent = require(SocialCardsParent.RoactUtils).Components.cre
 
 return {
 	CardComponent = {
-		scheduled_group_up = if not require(SocialCardsParent.SharedFlags).FFlagEnableScheduledSquads then nil else createLazyComponent(function() -- line: 12
+		scheduled_group_up = createLazyComponent(function() -- line: 9
 			-- upvalues: SocialCards (copy)
 			return require(SocialCards.Components).ScheduledSquadCard
 		end),
-		group_up = createLazyComponent(function() -- line: 16
+		group_up = createLazyComponent(function() -- line: 12
 			-- upvalues: SocialCards (copy)
 			return require(SocialCards.Components).SquadCard.SquadCard
 		end)

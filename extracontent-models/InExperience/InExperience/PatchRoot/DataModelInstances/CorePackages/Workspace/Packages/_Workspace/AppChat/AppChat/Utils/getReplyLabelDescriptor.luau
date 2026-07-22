@@ -1,4 +1,4 @@
-local function getReplyLabelDescriptor(t1: {[any]: any}) -- line: 39
+local function getReplyLabelDescriptor(t1: {[any]: any}) -- line: 35
 	local senderIsLocalUser = t1.senderIsLocalUser
 	local senderRepliedToSelf = t1.senderRepliedToSelf
 	local senderRepliedToLocalUser = t1.senderRepliedToLocalUser

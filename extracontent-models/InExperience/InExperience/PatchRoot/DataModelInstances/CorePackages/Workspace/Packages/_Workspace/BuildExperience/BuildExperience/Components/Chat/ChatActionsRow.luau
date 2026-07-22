@@ -28,7 +28,7 @@ local function ChatActionsRow(t1: {[any]: any}) -- line: 35
 		t1.isComposerEmpty
 	})
 	local v13 = SignalsReact.useSignalState(v12)
-	local v14 = t1.isAssistantResponding and (t1.canStopAssistantResponse ~= false and not (t1.canSendWhileResponding == true and not v13))
+	local v14 = t1.isAssistantResponding and (t1.canStopAssistantResponse ~= false and t1.canSendWhileResponding ~= true)
 	local v15 = not v14 and (v13 or t1.isSendDisabled == true)
 
 	return React.createElement(IconButton, {

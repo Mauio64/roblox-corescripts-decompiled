@@ -30,10 +30,12 @@ local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessio
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagChromeShortcutRemoveRespawnOnLeavePage = SharedFlags.FFlagChromeShortcutRemoveRespawnOnLeavePage
+local FFlagDebugEnablePioneerUX = SharedFlags.FFlagDebugEnablePioneerUX
 local FFlagRefactorMenuConfirmationButtons = require(RobloxGui.Modules.Settings.Flags.FFlagRefactorMenuConfirmationButtons)
 local FFlagConfirmationButtonsUseGreyButtons = require(RobloxGui.Modules.Settings.Flags.FFlagConfirmationButtonsUseGreyButtons)
 local Constants = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
-local v33 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+local LocalizationKeys = require(CorePackages.Workspace.Packages.InExperienceSideSheet).Constants.LocalizationKeys
+local v35 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 local Theme = require(RobloxGui.Modules.Settings.Theme)
 local FoundationProvider = Foundation.FoundationProvider
 local Button = Foundation.Button
@@ -43,36 +45,44 @@ local FoundationText = Foundation.Text
 local View = Foundation.View
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
 
-local function LeaveButtonsContainer(t1: {[any]: any}) -- line: 80
-	-- upvalues: React (copy), useLastInput (copy), useFocusGuiObject (copy), useLocalization (copy), Constants (copy), Input (copy), leaveGame (copy), Utility (copy), View (copy), v25 (copy), FoundationText (copy), Button (copy), InputSize (copy), FFlagConfirmationButtonsUseGreyButtons (copy), ButtonVariant (copy)
-	local v47 = React.useRef(nil)
-	local v48 = useLastInput()
-	local v49 = useFocusGuiObject()
-	local v50 = useLocalization({
-		ConfirmLeaveGame = Constants.ConfirmLeaveGameLocalizedKey,
-		LeaveGame = Constants.LeaveGameLocalizedKey,
-		DontLeaveGame = Constants.DontLeaveGameLocalizedKey
+local function LeaveButtonsContainer(t1: {[any]: any}) -- line: 84
+	-- upvalues: React (copy), useLastInput (copy), useFocusGuiObject (copy), useLocalization (copy), FFlagDebugEnablePioneerUX (copy), LocalizationKeys (copy), Constants (copy), Input (copy), leaveGame (copy), Utility (copy), View (copy), v25 (copy), FoundationText (copy), Button (copy), InputSize (copy), FFlagConfirmationButtonsUseGreyButtons (copy), ButtonVariant (copy)
+	local v49 = React.useRef(nil)
+	local v50 = useLastInput()
+	local v51 = useFocusGuiObject()
+	local v52 = useLocalization({
+		ConfirmLeaveGame = if not FFlagDebugEnablePioneerUX then Constants.ConfirmLeaveGameLocalizedKey else LocalizationKeys.LogoutConfirmation,
+		LeaveGame = if not FFlagDebugEnablePioneerUX then Constants.LeaveGameLocalizedKey else LocalizationKeys.LogoutButton,
+		DontLeaveGame = if not FFlagDebugEnablePioneerUX then Constants.DontLeaveGameLocalizedKey else LocalizationKeys.Cancel
 	})
 
-	React.useEffect(function() -- line: 92
-		-- upvalues: v48 (copy), Input (copy), v49 (copy), v47 (copy)
-		if v48 ~= Input.Touch then
-			v49(v47.current)
+	React.useEffect(function() -- line: 102
+		-- upvalues: v50 (copy), Input (copy), v51 (copy), v49 (copy)
+		if v50 ~= Input.Touch then
+			v51(v49.current)
 
 			return
 		end
 
-		v49(nil)
+		v51(nil)
 	end, {
-		v48,
-		v49
+		v50,
+		v51
 	})
 
-	local v51 = React.useCallback(function() -- line: 100
-		-- upvalues: leaveGame (copy)
+	local v53 = React.useCallback(function() -- line: 110
+		-- upvalues: FFlagDebugEnablePioneerUX (copy), leaveGame (copy)
+		if FFlagDebugEnablePioneerUX then
+			leaveGame(false, {
+				shouldNativeExit = true
+			})
+
+			return
+		end
+
 		leaveGame(true)
 	end, { leaveGame })
-	local v52 = React.useCallback(function() -- line: 104
+	local v54 = React.useCallback(function() -- line: 121
 		-- upvalues: t1 (copy), Utility (copy)
 		t1.dontLeaveFromButton(Utility:IsUsingGamepad())
 	end, {
@@ -86,7 +96,7 @@ local function LeaveButtonsContainer(t1: {[any]: any}) -- line: 80
 	}, {
 		LeaveGameText = React.createElement(FoundationText, {
 			LayoutOrder = 1,
-			Text = v50.ConfirmLeaveGame,
+			Text = v52.ConfirmLeaveGame,
 			Size = UDim2.new(1, 0, 0, not Utility:IsSmallTouchScreen() and 200 or 100),
 			tag = {
 				["text-wrap"] = true,
@@ -101,121 +111,121 @@ local function LeaveButtonsContainer(t1: {[any]: any}) -- line: 80
 		}, {
 			LeaveGameButton = React.createElement(Button, {
 				LayoutOrder = 1,
-				text = v50.LeaveGame,
+				text = v52.LeaveGame,
 				size = InputSize.Large,
 				variant = if not FFlagConfirmationButtonsUseGreyButtons then ButtonVariant.SoftEmphasis else ButtonVariant.Standard,
 				width = UDim.new(0, not v25 and 200 or 300),
-				ref = v47,
-				onActivated = v51
+				ref = v49,
+				onActivated = v53
 			}),
 			DontLeaveGameButton = React.createElement(Button, {
 				LayoutOrder = 2,
-				text = v50.DontLeaveGame,
+				text = v52.DontLeaveGame,
 				size = InputSize.Large,
 				variant = ButtonVariant.Subtle,
 				width = UDim.new(0, not v25 and 200 or 300),
-				onActivated = v52
+				onActivated = v54
 			})
 		})
 	})
 end
-local function LeaveGameContainer(t2: {[any]: any}) -- line: 148
-	-- upvalues: Localization (copy), LocalizationService (copy), React (copy), LocalizationProvider (copy), FoundationProvider (copy), Foundation (copy), ReactFocusNavigation (copy), v33 (copy), LeaveButtonsContainer (copy)
-	local v54 = Localization.new(LocalizationService.RobloxLocaleId)
+local function LeaveGameContainer(t2: {[any]: any}) -- line: 165
+	-- upvalues: Localization (copy), LocalizationService (copy), React (copy), LocalizationProvider (copy), FoundationProvider (copy), Foundation (copy), ReactFocusNavigation (copy), v35 (copy), LeaveButtonsContainer (copy)
+	local v56 = Localization.new(LocalizationService.RobloxLocaleId)
 
 	return React.createElement(LocalizationProvider, {
-		localization = v54
+		localization = v56
 	}, {
 		FoundationProvider = React.createElement(FoundationProvider, {
 			theme = Foundation.Enums.Theme.Dark
 		}, {
 			FocusNavigationProvider = React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
-				value = v33
+				value = v35
 			}, {
 				LeaveButtonsContainer = React.createElement(LeaveButtonsContainer, t2)
 			})
 		})
 	})
 end
-local function Initialize() -- line: 166
-	-- upvalues: RobloxGui (copy), EngineFeature (copy), RbxAnalyticsService (copy), Constants (copy), FFlagRefactorMenuConfirmationButtons (copy), ReactRoblox (copy), React (copy), LeaveGameContainer (copy), RobloxTranslator (copy), Create (copy), Theme (copy), v25 (copy), Utility (copy), leaveGame (copy)
-	local v55 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
+local function Initialize() -- line: 183
+	-- upvalues: RobloxGui (copy), EngineFeature (copy), RbxAnalyticsService (copy), Constants (copy), FFlagRefactorMenuConfirmationButtons (copy), ReactRoblox (copy), React (copy), LeaveGameContainer (copy), FFlagDebugEnablePioneerUX (copy), RobloxTranslator (copy), LocalizationKeys (copy), Create (copy), Theme (copy), v25 (copy), Utility (copy), leaveGame (copy)
+	local v57 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
 
-	v55.playsessionid = ""
+	v57.playsessionid = ""
 
 	if EngineFeature then
-		v55.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+		v57.playsessionid = RbxAnalyticsService:GetPlaySessionId()
 	end
 
-	function v55.DontLeaveFunc(p1) -- line: 175
-		-- upvalues: v55 (copy), RbxAnalyticsService (copy), Constants (copy)
-		if v55.HubRef then
-			v55.HubRef:PopMenu(p1, true)
+	function v57.DontLeaveFunc(p1) -- line: 192
+		-- upvalues: v57 (copy), RbxAnalyticsService (copy), Constants (copy)
+		if v57.HubRef then
+			v57.HubRef:PopMenu(p1, true)
 		end
 
 		RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsInGameMenuName, Constants.AnalyticsLeaveGameName, {
 			confirmed = Constants.AnalyticsCancelledName,
 			universeid = tostring(game.GameId),
 			source = Constants.AnalyticsLeaveGameSource,
-			playsessionid = v55.playsessionid
+			playsessionid = v57.playsessionid
 		})
 	end
-	function v55.DontLeaveFromHotkey(_, p3, p4) -- line: 192
-		-- upvalues: v55 (copy)
+	function v57.DontLeaveFromHotkey(_, p3, p4) -- line: 209
+		-- upvalues: v57 (copy)
 		if p3 == Enum.UserInputState.Begin then
-			local v64 = p4.UserInputType == Enum.UserInputType.Gamepad1 or (p4.UserInputType == Enum.UserInputType.Gamepad2 or (p4.UserInputType == Enum.UserInputType.Gamepad3 or p4.UserInputType == Enum.UserInputType.Gamepad4))
+			local v67 = p4.UserInputType == Enum.UserInputType.Gamepad1 or (p4.UserInputType == Enum.UserInputType.Gamepad2 or (p4.UserInputType == Enum.UserInputType.Gamepad3 or p4.UserInputType == Enum.UserInputType.Gamepad4))
 
-			v55.DontLeaveFunc(v64)
+			v57.DontLeaveFunc(v67)
 		end
 	end
-	function v55.DontLeaveFromButton(p5) -- line: 200
-		-- upvalues: v55 (copy)
-		v55.DontLeaveFunc(p5)
+	function v57.DontLeaveFromButton(p5) -- line: 217
+		-- upvalues: v57 (copy)
+		v57.DontLeaveFunc(p5)
 	end
 
-	v55.TabHeader = nil
-	v55.Page.Name = "LeaveGamePage"
-	v55.ShouldShowBottomBar = false
-	v55.ShouldShowHubBar = false
+	v57.TabHeader = nil
+	v57.Page.Name = "LeaveGamePage"
+	v57.ShouldShowBottomBar = false
+	v57.ShouldShowHubBar = false
 
 	if FFlagRefactorMenuConfirmationButtons then
-		function v55.RenderPage() -- line: 213
-			-- upvalues: v55 (copy), ReactRoblox (copy), React (copy), LeaveGameContainer (copy)
-			v55.PageRoot = ReactRoblox.createRoot(v55.Page)
-			v55.PageRoot:render(React.createElement(LeaveGameContainer, {
-				dontLeaveFromButton = v55.DontLeaveFromButton
+		function v57.RenderPage() -- line: 230
+			-- upvalues: v57 (copy), ReactRoblox (copy), React (copy), LeaveGameContainer (copy)
+			v57.PageRoot = ReactRoblox.createRoot(v57.Page)
+			v57.PageRoot:render(React.createElement(LeaveGameContainer, {
+				dontLeaveFromButton = v57.DontLeaveFromButton
 			}))
 		end
-		function v55.UnmountPage() -- line: 220
-			-- upvalues: v55 (copy)
-			if v55.PageRoot then
-				v55.PageRoot:unmount()
+		function v57.UnmountPage() -- line: 237
+			-- upvalues: v57 (copy)
+			if v57.PageRoot then
+				v57.PageRoot:unmount()
 			end
 		end
 
-		v55.Page.Size = UDim2.new(1, 0, 0, 0)
+		v57.Page.Size = UDim2.new(1, 0, 0, 0)
 
-		return v55
+		return v57
 	end
 
-	local v56 = RobloxTranslator:FormatByKey(Constants.ConfirmLeaveGameLocalizedKey)
-	local v57 = Create("TextLabel")({
+	local v58 = if not FFlagDebugEnablePioneerUX then RobloxTranslator:FormatByKey(Constants.ConfirmLeaveGameLocalizedKey) else RobloxTranslator:FormatByKey(LocalizationKeys.LogoutConfirmation)
+	local v59 = Create("TextLabel")({
 		Name = "LeaveGameText",
 		BackgroundTransparency = 1,
 		TextWrapped = true,
 		ZIndex = 2,
-		Text = v56,
+		Text = v58,
 		Font = Theme.font(Enum.Font.SourceSansBold, "Confirmation"),
 		FontSize = Theme.fontSize(Enum.FontSize.Size36, "Confirmation"),
 		TextColor3 = Color3.new(1, 1, 1),
 		Size = UDim2.new(1, 0, 0, 200),
-		Parent = v55.Page,
+		Parent = v57.Page,
 		Position = v25 and UDim2.new(0, 0, 0, 100) or UDim2.new(0, 0, 0, 0)
 	})
-	local v58 = Create("Frame")({
+	local v60 = Create("Frame")({
 		Name = "LeaveButtonContainer",
 		BackgroundTransparency = 1,
-		Parent = v57,
+		Parent = v59,
 		Size = UDim2.new(1, 0, 0, 400),
 		Position = UDim2.new(0, 0, 1, 0)
 	})
@@ -228,42 +238,52 @@ local function Initialize() -- line: 166
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		VerticalAlignment = Enum.VerticalAlignment.Top,
-		Parent = v58
+		Parent = v60
 	})
 
 	if Utility:IsSmallTouchScreen() then
-		v57.FontSize = Enum.FontSize.Size24
-		v57.Size = UDim2.new(1, 0, 0, 100)
+		v59.FontSize = Enum.FontSize.Size24
+		v59.Size = UDim2.new(1, 0, 0, 100)
 	elseif v25 then
-		v57.FontSize = Enum.FontSize.Size48
+		v59.FontSize = Enum.FontSize.Size48
 	end
 
-	v55.LeaveGameButton = Utility:MakeStyledButton("LeaveGame", "Leave", nil, function() -- line: 273
-		-- upvalues: leaveGame (copy)
+	local v61 = not FFlagDebugEnablePioneerUX and "Leave" or RobloxTranslator:FormatByKey(LocalizationKeys.LogoutButton)
+
+	v57.LeaveGameButton = Utility:MakeStyledButton("LeaveGame", v61, nil, function() -- line: 295
+		-- upvalues: FFlagDebugEnablePioneerUX (copy), leaveGame (copy)
+		if FFlagDebugEnablePioneerUX then
+			leaveGame(false, {
+				shouldNativeExit = true
+			})
+
+			return
+		end
+
 		leaveGame(true)
 	end)
-	v55.LeaveGameButton.NextSelectionRight = nil
-	v55.LeaveGameButton.Parent = v58
+	v57.LeaveGameButton.NextSelectionRight = nil
+	v57.LeaveGameButton.Parent = v60
 
-	local v59 = Utility:MakeStyledButton("DontLeaveGame", RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.DontLeaveButton"), nil, v55.DontLeaveFromButton)
+	local v62 = Utility:MakeStyledButton("DontLeaveGame", RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.DontLeaveButton"), nil, v57.DontLeaveFromButton)
 
-	v59.NextSelectionLeft = nil
-	v59.Parent = v58
-	v55.Page.Size = UDim2.new(1, 0, 0, v59.AbsolutePosition.Y + v59.AbsoluteSize.Y)
+	v62.NextSelectionLeft = nil
+	v62.Parent = v60
+	v57.Page.Size = UDim2.new(1, 0, 0, v62.AbsolutePosition.Y + v62.AbsoluteSize.Y)
 
-	return v55
+	return v57
 end
 
-local u45 = Initialize()
+local u47 = Initialize()
 
-u45.Displayed.Event:connect(function() -- line: 298
-	-- upvalues: FFlagRefactorMenuConfirmationButtons (copy), u45 (ref), GuiService (copy), FFlagEnableConsoleExpControls (copy), v22 (copy), FFlagChromeShortcutRemoveRespawnOnLeavePage (copy), v23 (copy), v24 (copy), ContextActionService (copy)
+u47.Displayed.Event:connect(function() -- line: 329
+	-- upvalues: FFlagRefactorMenuConfirmationButtons (copy), u47 (ref), GuiService (copy), FFlagEnableConsoleExpControls (copy), v22 (copy), FFlagChromeShortcutRemoveRespawnOnLeavePage (copy), v23 (copy), v24 (copy), ContextActionService (copy)
 	if FFlagRefactorMenuConfirmationButtons then
-		u45.RenderPage()
+		u47.RenderPage()
 	end
 
 	if not FFlagRefactorMenuConfirmationButtons then
-		GuiService.SelectedCoreObject = u45.LeaveGameButton
+		GuiService.SelectedCoreObject = u47.LeaveGameButton
 	end
 
 	if FFlagEnableConsoleExpControls then
@@ -279,16 +299,16 @@ u45.Displayed.Event:connect(function() -- line: 298
 			return
 		end
 	else
-		ContextActionService:BindCoreAction("LeaveGameCancelAction", u45.DontLeaveFromHotkey, false, Enum.KeyCode.ButtonB)
+		ContextActionService:BindCoreAction("LeaveGameCancelAction", u47.DontLeaveFromHotkey, false, Enum.KeyCode.ButtonB)
 	end
 end)
-u45.Hidden.Event:connect(function() -- line: 318
-	-- upvalues: FFlagRefactorMenuConfirmationButtons (copy), u45 (ref), ContextActionService (copy)
+u47.Hidden.Event:connect(function() -- line: 349
+	-- upvalues: FFlagRefactorMenuConfirmationButtons (copy), u47 (ref), ContextActionService (copy)
 	if FFlagRefactorMenuConfirmationButtons then
-		u45.UnmountPage()
+		u47.UnmountPage()
 	end
 
 	ContextActionService:UnbindCoreAction("LeaveGameCancelAction")
 end)
 
-return u45
+return u47

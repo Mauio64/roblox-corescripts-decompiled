@@ -11,5 +11,6 @@ return {
 		TransferDirection = TransferDirection,
 		TransferOrigination = TransferOrigination
 	},
+	GetFFlagCurrencyTransferUseRoactNetworking = require(script.Flags.GetFFlagCurrencyTransferUseRoactNetworking),
 	["jest.config"] = script["jest.config"]
 }

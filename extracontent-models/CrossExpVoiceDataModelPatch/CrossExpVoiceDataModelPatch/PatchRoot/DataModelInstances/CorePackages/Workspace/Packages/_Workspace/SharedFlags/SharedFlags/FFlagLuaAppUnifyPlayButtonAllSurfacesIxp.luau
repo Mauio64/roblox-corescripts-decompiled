@@ -1,3 +1,1 @@
-local FFlagLuaAppSupportUnifiedUIBloxPlayButton = require(script.Parent.FFlagLuaAppSupportUnifiedUIBloxPlayButton)
-
-return game:DefineFastFlag("LuaAppUnifyPlayButtonAllSurfacesIxp5", false) and FFlagLuaAppSupportUnifiedUIBloxPlayButton
+return game:DefineFastFlag("LuaAppUnifyPlayButtonAllSurfacesIxp5", false)

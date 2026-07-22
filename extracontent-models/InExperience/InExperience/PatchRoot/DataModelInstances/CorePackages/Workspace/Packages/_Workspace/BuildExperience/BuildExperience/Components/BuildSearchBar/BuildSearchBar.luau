@@ -2,26 +2,27 @@ local BuildExperience = script:FindFirstAncestor("BuildExperience")
 local BuildExperienceParent = BuildExperience.Parent
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local SearchInput = Foundation.SearchInput
 local View = Foundation.View
 local GetSearchQueryStore = require(BuildExperience.Stores.GetSearchQueryStore)
 
 require(BuildExperience.Stores.GetSearchQueryStore.createSearchQueryStore)
 
-local function BuildSearchBar(t1: {[any]: any}) -- line: 20
-	-- upvalues: GetSearchQueryStore (copy), React (copy), View (copy), SearchInput (copy)
-	local v10 = t1.store or GetSearchQueryStore()
-	local v11 = v10.useDraftQuery()
-	local v12 = React.useCallback(function(s1: string) -- line: 28
-		-- upvalues: v10 (copy)
+local function BuildSearchBar(t1: {[any]: any}) -- line: 21
+	-- upvalues: GetSearchQueryStore (copy), React (copy), View (copy), SearchInput (copy), LocalizationStrings (copy)
+	local v11 = t1.store or GetSearchQueryStore()
+	local v12 = v11.useDraftQuery()
+	local v13 = React.useCallback(function(s1: string) -- line: 29
+		-- upvalues: v11 (copy)
 		if s1 == "" then
-			v10.clear()
+			v11.clear()
 
 			return
 		end
 
-		v10.setQuery(s1)
-	end, { v10 })
+		v11.setQuery(s1)
+	end, { v11 })
 
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y",
@@ -29,10 +30,10 @@ local function BuildSearchBar(t1: {[any]: any}) -- line: 20
 		LayoutOrder = t1.LayoutOrder
 	}, {
 		Input = React.createElement(SearchInput, {
-			placeholder = "Search games",
 			testId = "build-search-bar-input",
-			text = v11,
-			onChanged = v12,
+			text = v12,
+			placeholder = LocalizationStrings.BUILD_SEARCH_PLACEHOLDER,
+			onChanged = v13,
 			width = UDim.new(1, 0)
 		})
 	})

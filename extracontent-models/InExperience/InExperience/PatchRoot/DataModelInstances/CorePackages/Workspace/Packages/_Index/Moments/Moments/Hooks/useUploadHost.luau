@@ -25,8 +25,8 @@ local t1 = {
 local v15 = isStudio()
 local MomentStatus = MomentsTypes.Enums.MomentStatus
 
-local function makeUploadedMomentItem(n1: number, p1, p2, s1: string) -- line: 56
-	-- upvalues: Players (copy), MomentStatus (copy)
+local function makeUploadedMomentItem(n1: number, p1, p2, s1: string, n2: number?) -- line: 55
+	-- upvalues: Players (copy), MomentsCreation (copy), MomentStatus (copy)
 	local str = tostring(n1)
 	local LocalPlayer = Players.LocalPlayer
 
@@ -34,7 +34,7 @@ local function makeUploadedMomentItem(n1: number, p1, p2, s1: string) -- line: 5
 		assetId = n1,
 		creatorId = LocalPlayer == nil and 0 or LocalPlayer.UserId,
 		metadata = {
-			assetTotalDuration = if p1.CaptureType ~= Enum.CaptureType.Screenshot then p1.TimeLength else 7,
+			assetTotalDuration = if p1.CaptureType ~= Enum.CaptureType.Screenshot then if n2 == nil or not (n2 > 0) then p1.TimeLength else n2 else MomentsCreation.Constants.ScreenshotMusicDuration,
 			captureType = p1.CaptureType,
 			description = s1,
 			edits = p2,
@@ -48,7 +48,7 @@ local function makeUploadedMomentItem(n1: number, p1, p2, s1: string) -- line: 5
 		status = MomentStatus.Public
 	}
 end
-local function makeUploadStore(p3, p4, p5, s2: string) -- line: 80
+local function makeUploadStore(p3, p4, p5, s2: string, n3: number?) -- line: 86
 	-- upvalues: GetFFlagMomentsRefreshFromTopAfterUpload (copy), makeUploadedMomentItem (copy)
 	if not GetFFlagMomentsRefreshFromTopAfterUpload() then
 		return p3
@@ -57,49 +57,50 @@ local function makeUploadStore(p3, p4, p5, s2: string) -- line: 80
 	return {
 		setUploading = p3.setUploading,
 		setFailed = p3.setFailed,
-		setSuccess = function(p6) -- line: 88
-			-- upvalues: p3 (copy), makeUploadedMomentItem (copy), p4 (copy), p5 (copy), s2 (copy)
+		setSuccess = function(p6) -- line: 100
+			-- upvalues: p3 (copy), makeUploadedMomentItem (copy), p4 (copy), p5 (copy), s2 (copy), n3 (copy)
 			if type(p6) ~= "number" then
 				p3.setSuccess(p6)
 
 				return
 			end
 
-			p3.setSuccess((makeUploadedMomentItem(p6, p4, p5, s2)))
+			p3.setSuccess((makeUploadedMomentItem(p6, p4, p5, s2, n3)))
 		end
 	}
 end
-local function useUploadHost(t2: {[any]: any}) -- line: 99
+local function useUploadHost(t2: {[any]: any}) -- line: 111
 	-- upvalues: useLocalization (copy), t1 (copy), React (copy), GetUploadStore (copy), GetToastStore (copy), MomentsCreation (copy), v15 (copy), publishMomentWithUpload (copy), makeUploadStore (copy)
 	local onExit = t2.onExit
 	local captureSource = t2.captureSource
-	local v33 = useLocalization(t1)
+	local v35 = useLocalization(t1)
 
-	return (React.useMemo(function() -- line: 105
-		-- upvalues: GetUploadStore (copy), GetToastStore (copy), onExit (copy), captureSource (copy), MomentsCreation (copy), v15 (copy), publishMomentWithUpload (copy), v33 (copy), makeUploadStore (copy)
-		local v35 = GetUploadStore(false)
-		local v36 = GetToastStore(false)
+	return (React.useMemo(function() -- line: 117
+		-- upvalues: GetUploadStore (copy), GetToastStore (copy), onExit (copy), captureSource (copy), MomentsCreation (copy), v15 (copy), publishMomentWithUpload (copy), v35 (copy), makeUploadStore (copy)
+		local v37 = GetUploadStore(false)
+		local v38 = GetToastStore(false)
 
 		return {
 			exitCreationFlow = onExit,
 			captureSource = captureSource,
 			isTextFiltered = MomentsCreation.isTextFiltered,
-			createMoment = not v15 and function(p7, p8, s3: string, s4: string?) -- line: 117
-				-- upvalues: publishMomentWithUpload (copy), v33 (copy), makeUploadStore (copy), v35 (copy), v36 (copy)
+			createMoment = not v15 and function(p7, p8, s3: string, s4: string?, n4: number?) -- line: 135
+				-- upvalues: publishMomentWithUpload (copy), v35 (copy), makeUploadStore (copy), v37 (copy), v38 (copy)
 				publishMomentWithUpload(p7, p8, s3, {
-					localizations = v33,
-					uploadStore = makeUploadStore(v35, p7, p8, s3),
-					toastStore = v36,
-					creationSessionId = s4
+					localizations = v35,
+					uploadStore = makeUploadStore(v37, p7, p8, s3, n4),
+					toastStore = v38,
+					creationSessionId = s4,
+					resolvedTimeLength = n4
 				})
-			end or function(_, _, s5: string, _: string?) -- line: 114
+			end or function(_, _, s5: string, _: string?, _: number?) -- line: 126
 				print(`[moments-creation] dev publish (not uploaded): "{ s5 }"`)
 			end
 		}
 	end, {
 		onExit,
 		captureSource,
-		v33
+		v35
 	}))
 end
 

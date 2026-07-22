@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFavoritePillOnItemDetails", false)
+return game:DefineFastFlag("AXFavoritePillOnItemDetails2", false)

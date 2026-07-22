@@ -10,11 +10,10 @@ local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
 local getPartialPageModalMiddleContentWidth = UIBlox.App.Dialog.Modal.getPartialPageModalMiddleContentWidth
 local LinkButton = UIBlox.App.Button.LinkButton
 local GetFFlagDisableVerifyPhoneViewOnSuccess = require(PhoneUpsell.Flags.GetFFlagDisableVerifyPhoneViewOnSuccess)
-local FFlagPhoneUpsellEnforceCodeInputLimit = require(PhoneUpsellParent.SharedFlags).FFlagPhoneUpsellEnforceCodeInputLimit
 
-local function VerifyPhoneView(t1: {[any]: any}) -- line: 44
-	-- upvalues: useStyle (copy), useLocalization (copy), React (copy), ButtonType (copy), GetFFlagDisableVerifyPhoneViewOnSuccess (copy), getPartialPageModalMiddleContentWidth (copy), PartialPageModal (copy), TextInputBoxWithBorder (copy), FFlagPhoneUpsellEnforceCodeInputLimit (copy), LinkButton (copy)
-	local v16 = useStyle()
+local function VerifyPhoneView(t1: {[any]: any}) -- line: 43
+	-- upvalues: useStyle (copy), useLocalization (copy), React (copy), ButtonType (copy), GetFFlagDisableVerifyPhoneViewOnSuccess (copy), getPartialPageModalMiddleContentWidth (copy), PartialPageModal (copy), TextInputBoxWithBorder (copy), LinkButton (copy)
+	local v15 = useStyle()
 	local t2 = {
 		titleKey = "Feature.VerificationUpsell.Heading.VerifyYourPhone",
 		verificationCodeKey = "Feature.VerificationUpsell.Heading.VerificationCode",
@@ -29,42 +28,42 @@ local function VerifyPhoneView(t1: {[any]: any}) -- line: 44
 		t2.extraButtonKey = t1.extraButtonKey
 	end
 
-	local v18 = useLocalization(t2)
-	local v19, v20 = React.useState(false)
-	local v21, v22 = React.useState(0)
+	local v17 = useLocalization(t2)
+	local v18, v19 = React.useState(false)
+	local v20, v21 = React.useState(0)
 
-	local function getButtonStackProps(s1: string, s2: string, n1: number, p1: ((...any) -> ...any), s3: string?, p2: ((...any) -> ...any)?) -- line: 64
-		-- upvalues: v20 (copy), v22 (copy), v19 (copy), v21 (copy), ButtonType (copy), GetFFlagDisableVerifyPhoneViewOnSuccess (copy), t1 (copy)
-		local function handleButtonClick() -- line: 72
-			-- upvalues: p1 (copy), v20 (copy), v22 (copy), n1 (copy)
+	local function getButtonStackProps(s1: string, s2: string, n1: number, p1: ((...any) -> ...any), s3: string?, p2: ((...any) -> ...any)?) -- line: 63
+		-- upvalues: v19 (copy), v21 (copy), v18 (copy), v20 (copy), ButtonType (copy), GetFFlagDisableVerifyPhoneViewOnSuccess (copy), t1 (copy)
+		local function handleButtonClick() -- line: 71
+			-- upvalues: p1 (copy), v19 (copy), v21 (copy), n1 (copy)
 			p1()
-			v20(true)
-			v22(n1)
+			v19(true)
+			v21(n1)
 
 			local timestamp = tick()
 
-			local function countDown() -- line: 78
-				-- upvalues: timestamp (copy), n1 (copy), v22 (copy), countDown (copy), v20 (copy)
-				local v38 = tick() - timestamp
-				local v39 = n1 - v38
+			local function countDown() -- line: 77
+				-- upvalues: timestamp (copy), n1 (copy), v21 (copy), countDown (copy), v19 (copy)
+				local v37 = tick() - timestamp
+				local v38 = n1 - v37
 
-				if v39 > 0 then
-					v22((math.round(v39)))
+				if v38 > 0 then
+					v21((math.round(v38)))
 					task.delay(1, countDown)
 
 					return
 				end
 
-				v22(0)
-				v20(false)
+				v21(0)
+				v19(false)
 			end
 
 			countDown()
 		end
-		local function getButtonText() -- line: 93
-			-- upvalues: v19 (copy), s2 (copy), v21 (copy), s1 (copy)
-			if v19 then
-				return s2 .. " (" .. v21 .. ")"
+		local function getButtonText() -- line: 92
+			-- upvalues: v18 (copy), s2 (copy), v20 (copy), s1 (copy)
+			if v18 then
+				return s2 .. " (" .. v20 .. ")"
 			end
 
 			return s1
@@ -74,8 +73,8 @@ local function VerifyPhoneView(t1: {[any]: any}) -- line: 44
 			buttonType = ButtonType.PrimarySystem,
 			props = {
 				onActivated = handleButtonClick,
-				text = if not v19 then s1 else s2 .. " (" .. v21 .. ")",
-				isDisabled = v19 or GetFFlagDisableVerifyPhoneViewOnSuccess() and t1.isDisabled
+				text = if not v18 then s1 else s2 .. " (" .. v20 .. ")",
+				isDisabled = v18 or GetFFlagDisableVerifyPhoneViewOnSuccess() and t1.isDisabled
 			}
 		}}
 
@@ -96,17 +95,17 @@ local function VerifyPhoneView(t1: {[any]: any}) -- line: 44
 			buttons = t3
 		}
 	end
-	local function getBodyText(s4: string) -- line: 132
+	local function getBodyText(s4: string) -- line: 131
 		-- upvalues: t1 (copy)
 		return s4:gsub("{phoneNumber}", "+" .. t1.prefix .. t1.phoneNumber)
 	end
 
-	local v25 = getPartialPageModalMiddleContentWidth(t1.screenSize.X)
+	local v24 = getPartialPageModalMiddleContentWidth(t1.screenSize.X)
 
 	return React.createElement(PartialPageModal, {
-		title = v18.titleKey,
+		title = v17.titleKey,
 		screenSize = t1.screenSize,
-		buttonStackProps = getButtonStackProps(v18.buttonKey, v18.buttonDisabledKey, 10, t1.onResendPhoneCode, v18.extraButtonKey, t1.onExtraButtonClick),
+		buttonStackProps = getButtonStackProps(v17.buttonKey, v17.buttonDisabledKey, 10, t1.onResendPhoneCode, v17.extraButtonKey, t1.onExtraButtonClick),
 		onCloseClicked = t1.onClose,
 		position = t1.isKeyboardShowing and UDim2.new(0.5, 0, 1, -t1.keyboardHeight) or nil,
 		anchorPoint = t1.isKeyboardShowing and Vector2.new(0.5, 1) or nil
@@ -129,33 +128,33 @@ local function VerifyPhoneView(t1: {[any]: any}) -- line: 44
 				LayoutOrder = 1,
 				BackgroundTransparency = 1,
 				TextWrapped = true,
-				Text = v18.descriptionKey:gsub("{phoneNumber}", "+" .. t1.prefix .. t1.phoneNumber),
-				TextSize = v16.Font.BaseSize,
-				TextColor3 = v16.Theme.TextDefault.Color,
-				TextTransparency = v16.Theme.TextDefault.Transparency,
-				Font = v16.Font.Body.Font,
+				Text = v17.descriptionKey:gsub("{phoneNumber}", "+" .. t1.prefix .. t1.phoneNumber),
+				TextSize = v15.Font.BaseSize,
+				TextColor3 = v15.Theme.TextDefault.Color,
+				TextTransparency = v15.Theme.TextDefault.Transparency,
+				Font = v15.Font.Body.Font,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(0, v25, 0, 0)
+				Size = UDim2.new(0, v24, 0, 0)
 			}),
 			TextBox = React.createElement(TextInputBoxWithBorder, {
 				textInputHeight = 36,
 				layoutOrder = 2,
+				maxLength = 6,
 				text = t1.code,
 				textInputType = t1.useOTPInputType and Enum.TextInputType.OneTimePassword or Enum.TextInputType.Number,
-				placeholderText = v18.placeholderKey,
+				placeholderText = v17.placeholderKey,
 				errorText = t1.errorMessage,
 				onChangeTextCallback = t1.onCodeTextChange,
 				Size = UDim2.new(1, 0, 0, 0),
-				onFocused = t1.onCodeInputFocus,
-				maxLength = if not FFlagPhoneUpsellEnforceCodeInputLimit then nil else 6
+				onFocused = t1.onCodeInputFocus
 			}),
 			ChangePhoneButton = React.createElement(LinkButton, {
 				layoutOrder = 3,
 				fontStyle = "CaptionBody",
 				minPaddingX = 0,
 				minPaddingY = 0,
-				text = v18.changePhoneNumberKey,
+				text = v17.changePhoneNumberKey,
 				onActivated = t1.returnToAddPhone
 			})
 		})

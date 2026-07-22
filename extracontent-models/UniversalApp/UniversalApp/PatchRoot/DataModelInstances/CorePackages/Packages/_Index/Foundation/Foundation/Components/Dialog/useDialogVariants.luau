@@ -8,6 +8,7 @@ local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 require(Foundation.Providers.Style.Tokens)
 
 local useTokens = require(Foundation.Providers.Style.useTokens)
+local Flags = require(Foundation.Utility.Flags)
 local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 local useDialog = require(script.Parent.useDialog)
 local t1 = {
@@ -16,8 +17,8 @@ local t1 = {
 	[DialogSize.Large] = 640
 }
 
-local function variantsFactory(p1) -- line: 43
-	-- upvalues: DialogSize (copy), t1 (copy)
+local function variantsFactory(p1) -- line: 44
+	-- upvalues: DialogSize (copy), t1 (copy), Flags (copy)
 	local t2 = {
 		backdrop = {
 			backgroundStyle = p1.Color.Common.Backdrop
@@ -70,7 +71,7 @@ local function variantsFactory(p1) -- line: 43
 				offset = p1.Size.Size_300
 			},
 			heroMedia = {
-				tag = "radius-medium",
+				tag = not Flags.FoundationMediaRoundedCornerTags and "radius-medium" or "radius-top-medium",
 				offsetX = p1.Padding.Large
 			},
 			titleText = {
@@ -98,7 +99,7 @@ local function variantsFactory(p1) -- line: 43
 				offset = p1.Size.Size_400
 			},
 			heroMedia = {
-				tag = "radius-large",
+				tag = not Flags.FoundationMediaRoundedCornerTags and "radius-large" or "radius-top-large",
 				offsetX = p1.Padding.XLarge
 			},
 			titleText = {
@@ -126,7 +127,7 @@ local function variantsFactory(p1) -- line: 43
 				offset = p1.Size.Size_400
 			},
 			heroMedia = {
-				tag = "radius-large",
+				tag = not Flags.FoundationMediaRoundedCornerTags and "radius-large" or "radius-top-large",
 				offsetX = p1.Padding.XLarge
 			},
 			titleText = {
@@ -147,13 +148,13 @@ local function variantsFactory(p1) -- line: 43
 	}
 end
 
-function useDialogVariants() -- line: 175
+function useDialogVariants() -- line: 176
 	-- upvalues: useTokens (copy), VariantsContext (copy), variantsFactory (copy), useDialog (copy), composeStyleVariant (copy)
-	local v12 = useTokens()
-	local v13 = VariantsContext.useVariants("Dialog", variantsFactory, v12)
-	local v14 = useDialog()
+	local v13 = useTokens()
+	local v14 = VariantsContext.useVariants("Dialog", variantsFactory, v13)
+	local v15 = useDialog()
 
-	return composeStyleVariant(v13.common, v13.size[v14.responsiveSize])
+	return composeStyleVariant(v14.common, v14.size[v15.responsiveSize])
 end
 
 return {

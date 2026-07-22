@@ -3,6 +3,7 @@ local BuildExperienceParent = BuildExperience.Parent
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
 local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local GetAssistantBuildStore = require(BuildExperience.Stores.GetAssistantBuildStore)
 local GetPlayButtonStore = require(BuildExperience.Stores.GetPlayButtonStore)
 local EducationalTooltip = Foundation.EducationalTooltip
@@ -13,59 +14,59 @@ local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local View = Foundation.View
 
-local function AssistantBuild(t1: {[any]: any}) -- line: 27
-	-- upvalues: GetAssistantBuildStore (copy), GetPlayButtonStore (copy), SignalsReact (copy), React (copy), IconButton (copy), IconName (copy), InputSize (copy), View (copy), EducationalTooltip (copy), PopoverAlign (copy), PopoverSide (copy)
-	local v17 = GetAssistantBuildStore()
-	local v18 = GetPlayButtonStore()
-	local v19 = SignalsReact.useSignalState(v17.getIsDisabled)
-	local v20 = SignalsReact.useSignalState(v17.getIsDisabledTooltipOpen)
-	local v21 = React.useCallback(function() -- line: 33
-		-- upvalues: v19 (copy), v17 (copy), v20 (copy), v18 (copy)
-		if v19 then
-			v17.setIsDisabledTooltipOpen(not v20)
+local function AssistantBuild(t1: {[any]: any}) -- line: 28
+	-- upvalues: GetAssistantBuildStore (copy), GetPlayButtonStore (copy), SignalsReact (copy), React (copy), IconButton (copy), IconName (copy), InputSize (copy), View (copy), EducationalTooltip (copy), PopoverAlign (copy), PopoverSide (copy), LocalizationStrings (copy)
+	local v18 = GetAssistantBuildStore()
+	local v19 = GetPlayButtonStore()
+	local v20 = SignalsReact.useSignalState(v18.getIsDisabled)
+	local v21 = SignalsReact.useSignalState(v18.getIsDisabledTooltipOpen)
+	local v22 = React.useCallback(function() -- line: 34
+		-- upvalues: v20 (copy), v18 (copy), v21 (copy), v19 (copy)
+		if v20 then
+			v18.setIsDisabledTooltipOpen(not v21)
 
 			return
 		end
 
-		v17.setIsDisabledTooltipOpen(false)
-		v18.setIsActive(true)
+		v18.setIsDisabledTooltipOpen(false)
+		v19.setIsActive(true)
 	end, {
-		v17,
-		v19,
+		v18,
 		v20,
-		v18
+		v21,
+		v19
 	})
 
-	React.useEffect(function() -- line: 42
-		-- upvalues: v19 (copy), v18 (copy), v17 (copy)
-		if v19 then
-			v18.setIsActive(false)
+	React.useEffect(function() -- line: 43
+		-- upvalues: v20 (copy), v19 (copy), v18 (copy)
+		if v20 then
+			v19.setIsActive(false)
 
 			return
 		end
 
-		v17.setIsDisabledTooltipOpen(false)
+		v18.setIsDisabledTooltipOpen(false)
 	end, {
-		v17,
-		v19,
-		v18
+		v18,
+		v20,
+		v19
 	})
 
-	local v22 = React.createElement(IconButton, {
+	local v23 = React.createElement(IconButton, {
 		isCircular = true,
 		testId = "build-header-play-button",
 		icon = IconName.Nebula,
 		variant = t1.variant,
 		size = InputSize.Medium,
-		isDisabled = v19,
-		onActivated = v21
+		isDisabled = v20,
+		onActivated = v22
 	})
-	local v23 = React.createElement(View, {
+	local v24 = React.createElement(View, {
 		tag = "auto-xy",
 		testId = "build-header-play-button-disabled",
-		onActivated = v21
+		onActivated = v22
 	}, {
-		Button = v22
+		Button = v23
 	})
 
 	return React.createElement(View, {
@@ -73,16 +74,16 @@ local function AssistantBuild(t1: {[any]: any}) -- line: 27
 		LayoutOrder = t1.layoutOrder,
 		testId = t1.testId or "assistant-build"
 	}, {
-		Tooltip = if not v19 then nil else React.createElement(EducationalTooltip, {
-			text = "Return device to portrait to chat with assistant",
-			title = "Assistant disabled",
+		Tooltip = if not v20 then nil else React.createElement(EducationalTooltip, {
 			align = PopoverAlign.Start,
-			isOpen = v20,
-			side = PopoverSide.Bottom
+			isOpen = v21,
+			side = PopoverSide.Bottom,
+			text = LocalizationStrings.CHAT_PORTRAIT_REQUIRED,
+			title = LocalizationStrings.CHAT_ASSISTANT_DISABLED
 		}, {
-			Button = v23
+			Button = v24
 		}),
-		Button = if v19 then nil else v22
+		Button = if v20 then nil else v23
 	})
 end
 

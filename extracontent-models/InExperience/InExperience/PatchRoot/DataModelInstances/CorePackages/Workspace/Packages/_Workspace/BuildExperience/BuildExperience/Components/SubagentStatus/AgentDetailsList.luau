@@ -3,6 +3,7 @@ local BuildExperienceParent = BuildExperience.Parent
 local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local TodoList = require(script.Parent.TodoList)
 local matchesSearchQuery = require(BuildExperience.utils.matchesSearchQuery)
 local Chip = Foundation.Chip
@@ -17,144 +18,144 @@ local InputSize = Foundation.Enums.InputSize
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local SubagentTaskStatus = CreatorAgentChat.SubagentTaskStatus
-local v20 = game:DefineFastInt("BuildAgentDetailsStatusMenuWidth", 172)
+local v21 = game:DefineFastInt("BuildAgentDetailsStatusMenuWidth", 172)
 local t1 = {
 	{
 		id = "All",
 		status = nil,
-		text = "All"
+		text = LocalizationStrings.SUBAGENT_STATUS_ALL
 	},
 	{
-		text = "In progress",
 		id = SubagentTaskStatus.InProgress,
-		status = SubagentTaskStatus.InProgress
+		status = SubagentTaskStatus.InProgress,
+		text = LocalizationStrings.SUBAGENT_STATUS_IN_PROGRESS
 	},
 	{
-		text = "Done",
 		id = SubagentTaskStatus.Done,
-		status = SubagentTaskStatus.Done
+		status = SubagentTaskStatus.Done,
+		text = LocalizationStrings.SUBAGENT_STATUS_DONE
 	},
 	{
-		text = "Pending",
 		id = SubagentTaskStatus.Pending,
-		status = SubagentTaskStatus.Pending
+		status = SubagentTaskStatus.Pending,
+		text = LocalizationStrings.SUBAGENT_STATUS_PENDING
 	},
 	{
-		text = "Error",
 		id = SubagentTaskStatus.Error,
-		status = SubagentTaskStatus.Error
+		status = SubagentTaskStatus.Error,
+		text = LocalizationStrings.SUBAGENT_STATUS_ERROR
 	},
 	{
-		text = "Deleted",
 		id = SubagentTaskStatus.Deleted,
-		status = SubagentTaskStatus.Deleted
+		status = SubagentTaskStatus.Deleted,
+		text = LocalizationStrings.SUBAGENT_STATUS_DELETED
 	}
 }
 
-local function getStatusFilterText(p1) -- line: 54
+local function getStatusFilterText(p1) -- line: 75
 	-- upvalues: t1 (copy)
-	for _, v29 in t1 do
-		if p1 == v29.status then
-			return v29.text
+	for _, v30 in t1 do
+		if p1 == v30.status then
+			return v30.text
 		end
 	end
 
 	return p1 or "All"
 end
-local function taskMatchesSearch(p2, s1: string) -- line: 63
+local function taskMatchesSearch(p2, s1: string) -- line: 84
 	-- upvalues: matchesSearchQuery (copy)
 	return matchesSearchQuery(p2.text, s1) or matchesSearchQuery(p2.description, s1)
 end
-local function taskMatchesStatus(p3, p4) -- line: 67
+local function taskMatchesStatus(p3, p4) -- line: 88
 	if p4 == nil then
 		return true
 	end
 
 	return p4 == p3.status
 end
-local function shouldIncludeTask(p5, t2: {[any]: any}) -- line: 74
+local function shouldIncludeTask(p5, t2: {[any]: any}) -- line: 95
 	-- upvalues: matchesSearchQuery (copy)
 	local searchQuery = t2.searchQuery
-	local v37 = matchesSearchQuery(p5.text, searchQuery) or matchesSearchQuery(p5.description, searchQuery)
+	local v38 = matchesSearchQuery(p5.text, searchQuery) or matchesSearchQuery(p5.description, searchQuery)
 
-	if v37 then
+	if v38 then
 		local status = t2.status
 
 		if status == nil then
 			return true
 		end
 
-		v37 = status == p5.status
+		v38 = status == p5.status
 	end
 
-	return v37
+	return v38
 end
-local function AgentDetailsList(t3: {[any]: any}) -- line: 78
-	-- upvalues: React (copy), useScaledValue (copy), v20 (copy), matchesSearchQuery (copy), t1 (copy), View (copy), SearchInput (copy), Menu (copy), PopoverAlign (copy), PopoverSide (copy), InputSize (copy), Chip (copy), IconName (copy), ChipVariant (copy), ChipSize (copy), TodoList (copy)
-	local v40, v41 = React.useState("")
-	local v42, v43 = React.useState(nil)
-	local v44, v45 = React.useState(false)
-	local v46 = useScaledValue(v20)
+local function AgentDetailsList(t3: {[any]: any}) -- line: 99
+	-- upvalues: React (copy), useScaledValue (copy), v21 (copy), matchesSearchQuery (copy), t1 (copy), View (copy), SearchInput (copy), LocalizationStrings (copy), Menu (copy), PopoverAlign (copy), PopoverSide (copy), InputSize (copy), Chip (copy), IconName (copy), ChipVariant (copy), ChipSize (copy), TodoList (copy)
+	local v41, v42 = React.useState("")
+	local v43, v44 = React.useState(nil)
+	local v45, v46 = React.useState(false)
+	local v47 = useScaledValue(v21)
 	local t4 = {
-		searchQuery = v40,
-		status = v42
+		searchQuery = v41,
+		status = v43
 	}
 	local t5 = {}
-	local g80 = nil
+	local g81 = nil
 	local text = nil
 
-	for v49, v50 in t3.group.tasks do
+	for v50, v51 in t3.group.tasks do
 		local searchQuery = t4.searchQuery
-		local v52 = matchesSearchQuery(v50.text, searchQuery) or matchesSearchQuery(v50.description, searchQuery)
+		local v53 = matchesSearchQuery(v51.text, searchQuery) or matchesSearchQuery(v51.description, searchQuery)
 
-		if v52 then
+		if v53 then
 			local status = t4.status
 
-			v52 = status == nil or status == v50.status
+			v53 = status == nil or status == v51.status
 		end
 
-		if v52 then
+		if v53 then
 			table.insert(t5, {
-				title = v50.text,
-				description = v50.description,
-				status = v50.status,
-				testId = `{ t3.testId or "build-agent-details-list" }-item-{ v49 }`
+				title = v51.text,
+				description = v51.description,
+				status = v51.status,
+				testId = `{ t3.testId or "build-agent-details-list" }-item-{ v50 }`
 			})
 		end
 	end
 
-	local v54 = React.useMemo(function() -- line: 101
-		-- upvalues: t1 (copy), v42 (copy)
+	local v55 = React.useMemo(function() -- line: 122
+		-- upvalues: t1 (copy), v43 (copy)
 		local t6 = {}
 
-		for _, v83 in t1 do
+		for _, v84 in t1 do
 			table.insert(t6, {
 				isDisabled = false,
-				id = v83.id,
-				text = v83.text,
-				isChecked = v42 == v83.status
+				id = v84.id,
+				text = v84.text,
+				isChecked = v43 == v84.status
 			})
 		end
 
 		return t6
-	end, { v42 })
-	local v55 = React.useCallback(function() -- line: 114
-		-- upvalues: v45 (copy)
-		v45(function(p6) -- line: 115
+	end, { v43 })
+	local v56 = React.useCallback(function() -- line: 135
+		-- upvalues: v46 (copy)
+		v46(function(p6) -- line: 136
 			return not p6
 		end)
 	end, {})
-	local v56 = React.useCallback(function() -- line: 120
-		-- upvalues: v45 (copy)
-		v45(false)
+	local v57 = React.useCallback(function() -- line: 141
+		-- upvalues: v46 (copy)
+		v46(false)
 	end, {})
-	local v57 = React.useCallback(function(p7) -- line: 124
-		-- upvalues: v43 (copy), v45 (copy)
-		v43(if p7 ~= "All" then p7 else nil)
-		v45(false)
+	local v58 = React.useCallback(function(p7) -- line: 145
+		-- upvalues: v44 (copy), v46 (copy)
+		v44(if p7 ~= "All" then p7 else nil)
+		v46(false)
 	end, {})
 	local createElement = React.createElement
-	local v59 = View
+	local v60 = View
 	local t7 = {
 		tag = "col gap-xxlarge size-full-0 auto-y padding-y-small",
 		LayoutOrder = t3.LayoutOrder,
@@ -162,7 +163,7 @@ local function AgentDetailsList(t3: {[any]: any}) -- line: 78
 	}
 	local t8 = {}
 	local createElement2 = React.createElement
-	local v63 = View
+	local v64 = View
 	local t9 = {
 		LayoutOrder = 1,
 		tag = "col gap-small size-full-0 auto-y"
@@ -170,15 +171,15 @@ local function AgentDetailsList(t3: {[any]: any}) -- line: 78
 	local t10 = {
 		Search = React.createElement(SearchInput, {
 			LayoutOrder = 1,
-			placeholder = "Search tasks",
-			text = v40,
-			onChanged = v41,
+			text = v41,
+			placeholder = LocalizationStrings.SUBAGENT_STATUS_SEARCH_TASKS,
+			onChanged = v42,
 			width = UDim.new(1, 0),
 			testId = `{ t3.testId or "build-agent-details-list" }-search-input`
 		})
 	}
 	local createElement3 = React.createElement
-	local v67 = View
+	local v68 = View
 	local t11 = {
 		LayoutOrder = 2,
 		tag = "row align-y-center gap-small size-full-0 auto-y"
@@ -187,57 +188,57 @@ local function AgentDetailsList(t3: {[any]: any}) -- line: 78
 		VersionChip = nil
 	}
 	local createElement4 = React.createElement
-	local v71 = Menu
+	local v72 = Menu
 	local t13 = {
 		LayoutOrder = 2,
 		align = PopoverAlign.Start,
-		isOpen = v44,
-		items = v54,
-		onActivated = v57,
-		onPressedOutside = v56,
+		isOpen = v45,
+		items = v55,
+		onActivated = v58,
+		onPressedOutside = v57,
 		side = PopoverSide.Bottom,
 		size = InputSize.Medium,
-		width = UDim.new(0, v46)
+		width = UDim.new(0, v47)
 	}
 	local t14 = {}
 	local createElement5 = React.createElement
-	local v75 = Chip
+	local v76 = Chip
 	local t15 = {
 		LayoutOrder = 1
 	}
 
-	for _, v78 in t1 do
-		if v42 == v78.status then
-			text = v78.text
-			g80 = true
+	for _, v79 in t1 do
+		if v43 == v79.status then
+			text = v79.text
+			g81 = true
 		end
 
-		if g80 then
+		if g81 then
 			break
 		end
 	end
 
-	if not g80 then
-		text = v42 or "All"
+	if not g81 then
+		text = v43 or "All"
 	end
 
-	g80 = false
+	g81 = false
 	t15.text = text
 	t15.trailing = IconName.ChevronLargeDown
 	t15.variant = ChipVariant.Standard
 	t15.size = ChipSize.Medium
-	t15.onActivated = v55
+	t15.onActivated = v56
 	t15.testId = `{ t3.testId or "build-agent-details-list" }-status-filter-chip`
-	t14.StatusChip = createElement5(v75, t15)
-	t12.StatusMenu = createElement4(v71, t13, t14)
-	t10.Chips = createElement3(v67, t11, t12)
-	t8.Filters = createElement2(v63, t9, t10)
+	t14.StatusChip = createElement5(v76, t15)
+	t12.StatusMenu = createElement4(v72, t13, t14)
+	t10.Chips = createElement3(v68, t11, t12)
+	t8.Filters = createElement2(v64, t9, t10)
 	t8.List = React.createElement(TodoList, {
 		layoutOrder = 2,
 		items = t5
 	})
 
-	return createElement(v59, t7, t8)
+	return createElement(v60, t7, t8)
 end
 
 return React.memo(AgentDetailsList)

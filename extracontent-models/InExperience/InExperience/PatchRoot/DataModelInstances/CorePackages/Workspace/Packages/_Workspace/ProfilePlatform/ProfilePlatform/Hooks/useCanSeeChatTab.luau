@@ -1,16 +1,9 @@
-local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local useAppPolicy = require(ProfilePlatformParent.UniversalAppPolicy).useAppPolicy
-local FFlagProfilePlatformFilterChatActionByPolicy = require(ProfilePlatform.Flags.FFlagProfilePlatformFilterChatActionByPolicy)
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
 
-return function() -- line: 9
-	-- upvalues: useAppPolicy (copy), FFlagProfilePlatformFilterChatActionByPolicy (copy)
-	return useAppPolicy(function(p1) -- line: 10
-		-- upvalues: FFlagProfilePlatformFilterChatActionByPolicy (copy)
-		if FFlagProfilePlatformFilterChatActionByPolicy then
-			return p1.getCanSeeChatTab()
-		end
-
-		return true
+return function() -- line: 6
+	-- upvalues: useAppPolicy (copy)
+	return useAppPolicy(function(p1) -- line: 7
+		return p1.getCanSeeChatTab()
 	end)
 end

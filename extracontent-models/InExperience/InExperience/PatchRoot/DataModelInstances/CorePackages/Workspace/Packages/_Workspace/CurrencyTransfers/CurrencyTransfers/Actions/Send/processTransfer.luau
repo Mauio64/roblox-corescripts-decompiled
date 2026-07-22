@@ -22,10 +22,11 @@ local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransf
 
 local function processTransfer(p1, n1: number) -- line: 24
 	-- upvalues: logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), handleTransferError (copy), PromptState (copy), processTransferRequest (copy), handleTransferSuccess (copy), FailureReason (copy), handleTransferBlock (copy), TransferRetryOrigin (copy)
+	local v18 = p1.getNetworkImpl()
 	local setPromptState = p1.setPromptState
-	local v19 = p1.getTransferRequestId(false)
+	local v20 = p1.getTransferRequestId(false)
 
-	if not v19 then
+	if not v20 then
 		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferProcessFailedCounter)
 
 		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
@@ -45,11 +46,11 @@ local function processTransfer(p1, n1: number) -- line: 24
 	end
 
 	local t1 = {
-		transferRequestId = v19,
+		transferRequestId = v20,
 		robuxAmount = n1
 	}
 
-	return processTransferRequest(t1):andThen(function(p2) -- line: 52
+	return processTransferRequest(t1, nil, v18):andThen(function(p2) -- line: 53
 		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), handleTransferSuccess (copy), handleTransferError (copy)
 		if p2 and p2.success then
 			logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferProcessSucceededCounter)
@@ -70,7 +71,7 @@ local function processTransfer(p1, n1: number) -- line: 24
 		end
 
 		handleTransferError(p1)
-	end):catch(function(p3) -- line: 73
+	end):catch(function(p3) -- line: 74
 		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), FailureReason (copy), handleTransferBlock (copy), TransferRetryOrigin (copy), handleTransferError (copy)
 		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferProcessFailedCounter)
 

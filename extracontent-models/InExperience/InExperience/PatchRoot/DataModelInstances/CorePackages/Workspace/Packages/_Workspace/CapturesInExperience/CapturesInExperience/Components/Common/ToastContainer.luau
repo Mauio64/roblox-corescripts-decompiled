@@ -1,5 +1,6 @@
 local ParentParent = script.Parent.Parent.Parent
 local ParentParentParent = ParentParent.Parent
+local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
 local Dash = require(ParentParentParent.Dash)
 local Localization = require(ParentParentParent.Localization)
@@ -48,9 +49,9 @@ local _ = {
 	videoCaptureOtherError = "videoCaptureOtherError",
 	viewAction = "viewAction"
 }
-local v29 = UserInputService:GetPlatform() == Enum.Platform.Windows or UserInputService:GetPlatform() == Enum.Platform.OSX
+local v30 = UserInputService:GetPlatform() == Enum.Platform.Windows or UserInputService:GetPlatform() == Enum.Platform.OSX
 
-local function isVideoCapture(p1) -- line: 74
+local function isVideoCapture(p1) -- line: 75
 	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy)
 	if not p1 then
 		return false
@@ -73,21 +74,21 @@ local t1 = {
 	[CapturesToastType.CaptureSavedToDevice] = {
 		toastTitleKey = "captureSavedToDevice",
 		iconImage = Images["icons/status/success"],
-		onActivated = if not v29 then nil else function(p2, _, p4) -- line: 95
+		onActivated = if not v30 then nil else function(p2, _, p4) -- line: 96
 			-- upvalues: EventNames (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy)
 			p2.fireEvent(EventNames.CapturesSavedToDeviceToastOpenButtonActivated)
 
-			local v37
+			local v38
 
 			if not p4 then
-				v37 = false
+				v38 = false
 			else
 				local captureInfo = p4.captureInfo
 
-				v37 = if captureInfo then if not FFlagEnableCapturesGalleryRetrievalCoreScript then captureInfo.type == CaptureType.Video else captureInfo.CaptureType == Enum.CaptureType.Video else false
+				v38 = if captureInfo then if not FFlagEnableCapturesGalleryRetrievalCoreScript then captureInfo.type == CaptureType.Video else captureInfo.CaptureType == Enum.CaptureType.Video else false
 			end
 
-			if v37 then
+			if v38 then
 				game:OpenVideosFolder()
 
 				return
@@ -95,28 +96,28 @@ local t1 = {
 
 			game:OpenScreenshotsFolder()
 		end,
-		toastCTAKey = if not v29 then nil else "openInFiles"
+		toastCTAKey = if not v30 then nil else "openInFiles"
 	},
 	[CapturesToastType.CaptureTaken] = {
 		toastCTAKey = "shareAction",
 		toastSubtitleKey = "shareCaptureDescription",
 		toastTitleKey = "captureSaved",
 		iconImage = Images["icons/controls/screenshot"],
-		onActivated = function(p5, p6, p7) -- line: 109
+		onActivated = function(p5, p6, p7) -- line: 110
 			-- upvalues: EventNames (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), SocialStopwatch (copy), ShareCapture (copy), ExternalShareSourceType (copy)
 			p5.fireEvent(EventNames.CapturesShareToastButtonActivated)
 
-			local v42
+			local v43
 
 			if not p7 then
-				v42 = false
+				v43 = false
 			else
 				local captureInfo = p7.captureInfo
 
-				v42 = if captureInfo then if not FFlagEnableCapturesGalleryRetrievalCoreScript then captureInfo.type == CaptureType.Video else captureInfo.CaptureType == Enum.CaptureType.Video else false
+				v43 = if captureInfo then if not FFlagEnableCapturesGalleryRetrievalCoreScript then captureInfo.type == CaptureType.Video else captureInfo.CaptureType == Enum.CaptureType.Video else false
 			end
 
-			if v42 then
+			if v43 then
 				p5.fireEvent(EventNames.CapturesVideoShareToastButtonActivated)
 			end
 
@@ -165,7 +166,7 @@ local t1 = {
 		toastCTAKey = "viewAction",
 		toastTitleKey = "captureSaved",
 		iconImage = Images["icons/controls/screenshot"],
-		onActivated = function(p8, p9) -- line: 159
+		onActivated = function(p8, p9) -- line: 160
 			-- upvalues: EventNames (copy), CarouselOpened (copy)
 			p8.fireEvent(EventNames.CapturesViewToastButtonActivated)
 			p9(CarouselOpened(1))
@@ -173,11 +174,11 @@ local t1 = {
 	}
 }
 
-return function(_: {[any]: any}) -- line: 170
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useLocalization (copy), useSelector (copy), Constants (copy), React (copy), CapturesToastType (copy), t1 (copy), ToastVanished (copy), Dash (copy), FFlagCreateMomentsToast (copy), ToastController (copy), StartMomentsCreationFlow (copy), EventNames (copy), Toast (copy)
-	local v47 = useAnalytics()
-	local v48 = useDispatch()
-	local v49 = useLocalization({
+return function(_: {[any]: any}) -- line: 171
+	-- upvalues: useAnalytics (copy), useDispatch (copy), useLocalization (copy), useSelector (copy), Constants (copy), React (copy), CapturesToastType (copy), t1 (copy), ToastVanished (copy), Dash (copy), FFlagCreateMomentsToast (copy), ToastController (copy), HttpService (copy), StartMomentsCreationFlow (copy), EventNames (copy), Toast (copy)
+	local v48 = useAnalytics()
+	local v49 = useDispatch()
+	local v50 = useLocalization({
 		captureSaved = "Feature.Captures.Toast.CaptureSaved",
 		captureSavedToDevice = "Feature.Captures.Toast.CaptureSavedToDevice",
 		capturesEnabled = "Feature.Captures.Toast.CapturesEnabled",
@@ -197,126 +198,131 @@ return function(_: {[any]: any}) -- line: 170
 		videoCaptureOtherError = "Feature.Captures.Toast.VideoCaptureOtherError",
 		viewAction = "Feature.Captures.Action.ViewCapture"
 	})
-	local v50 = useSelector(function(p10) -- line: 195
+	local v51 = useSelector(function(p10) -- line: 196
 		-- upvalues: Constants (copy)
 		return p10[Constants.RoduxKey].Toast.ToastType
 	end)
-	local v51 = useSelector(function(p11) -- line: 199
+	local v52 = useSelector(function(p11) -- line: 200
 		-- upvalues: Constants (copy)
 		return p11[Constants.RoduxKey].Toast.ToastConfig
 	end)
-	local v52 = useSelector(function(p12) -- line: 203
+	local v53 = useSelector(function(p12) -- line: 204
 		-- upvalues: Constants (copy)
 		return p12[Constants.RoduxKey].Toast.IsDismissed
 	end)
-	local v53 = React.useCallback(function(p13) -- line: 207
-		-- upvalues: v49 (copy)
+	local v54 = React.useCallback(function(p13) -- line: 208
+		-- upvalues: v50 (copy)
 		if p13 then
-			return v49[p13]
+			return v50[p13]
 		end
 
 		return nil
 	end)
-	local v54 = React.useMemo(function() -- line: 214
-		-- upvalues: v50 (copy), CapturesToastType (copy), t1 (copy), v48 (copy), ToastVanished (copy), v47 (copy), v51 (copy), Constants (copy), Dash (copy), v53 (copy)
-		if v50 == CapturesToastType.None then
+	local v55 = React.useMemo(function() -- line: 215
+		-- upvalues: v51 (copy), CapturesToastType (copy), t1 (copy), v49 (copy), ToastVanished (copy), v48 (copy), v52 (copy), Constants (copy), Dash (copy), v54 (copy)
+		if v51 == CapturesToastType.None then
 			return nil
 		end
 
-		local v59 = t1[v50]
-		local v60 = v50
-		local v61 = nil
+		local v60 = t1[v51]
+		local v61 = v51
+		local v62 = nil
 
-		if v59.onActivated then
-			function v61() -- line: 230
-				-- upvalues: v59 (copy), v47 (copy), v48 (copy), v51 (copy), v60 (copy), v50 (copy), ToastVanished (copy)
-				v59.onActivated(v47, v48, v51)
+		if v60.onActivated then
+			function v62() -- line: 231
+				-- upvalues: v60 (copy), v48 (copy), v49 (copy), v52 (copy), v61 (copy), v51 (copy), ToastVanished (copy)
+				v60.onActivated(v48, v49, v52)
 
-				if v60 == v50 then
-					v48(ToastVanished())
+				if v61 == v51 then
+					v49(ToastVanished())
 				end
 			end
 		end
 
-		local v62 = v59.duration or Constants.ToastDuration
+		local v63 = v60.duration or Constants.ToastDuration
 
-		return Dash.join(v59, {
-			buttonText = v53(v59.toastCTAKey),
-			duration = v62,
-			onActivated = v61,
-			onDismissed = function() -- line: 222
-				-- upvalues: v60 (copy), v50 (copy), v48 (copy), ToastVanished (copy)
-				if v60 == v50 then
-					v48(ToastVanished())
+		return Dash.join(v60, {
+			buttonText = v54(v60.toastCTAKey),
+			duration = v63,
+			onActivated = v62,
+			onDismissed = function() -- line: 223
+				-- upvalues: v61 (copy), v51 (copy), v49 (copy), ToastVanished (copy)
+				if v61 == v51 then
+					v49(ToastVanished())
 				end
 			end,
 			toastCTAKey = Dash.None,
-			toastSubtitle = v53(v59.toastSubtitleKey),
+			toastSubtitle = v54(v60.toastSubtitleKey),
 			toastSubtitleKey = Dash.None,
-			toastTitle = v53(v59.toastTitleKey),
+			toastTitle = v54(v60.toastTitleKey),
 			toastTitleKey = Dash.None
 		})
 	end, {
-		v50,
-		v51
+		v51,
+		v52
 	})
 
-	if not v54 then
+	if not v55 then
 		return nil
 	end
 
 	if FFlagCreateMomentsToast then
-		if v50 == CapturesToastType.CaptureTakenWithMomentsCTA then
+		if v51 == CapturesToastType.CaptureTakenWithMomentsCTA then
 			return React.createElement(ToastController, {
 				icon = "icons/brands/moments_large",
-				title = v53("momentsTitle"),
-				text = v53("discoverPostWatch"),
-				actionText = v53("createAction"),
-				onAction = function() -- line: 262
-					-- upvalues: v51 (copy), v48 (copy), StartMomentsCreationFlow (copy), v47 (copy), EventNames (copy)
-					if v51 and v51.captureInfo then
-						v48(StartMomentsCreationFlow(v51.captureInfo))
+				title = v54("momentsTitle"),
+				text = v54("discoverPostWatch"),
+				actionText = v54("createAction"),
+				onAction = function() -- line: 263
+					-- upvalues: v52 (copy), HttpService (copy), v49 (copy), StartMomentsCreationFlow (copy), v48 (copy), EventNames (copy)
+					if v52 and v52.captureInfo then
+						local guid = HttpService:GenerateGUID(false)
+
+						v49(StartMomentsCreationFlow(v52.captureInfo, guid))
+						v48.fireEvent(EventNames.XExpMomentCreationStarted, {
+							creationSessionId = guid
+						})
 					end
 
-					v47.fireEvent(EventNames.CapturesCreateMomentToastButtonActivated)
+					v48.fireEvent(EventNames.CapturesCreateMomentToastButtonActivated)
 				end,
-				onDismissed = function() -- line: 268
-					-- upvalues: v48 (copy), ToastVanished (copy)
-					v48(ToastVanished())
+				onDismissed = function() -- line: 273
+					-- upvalues: v49 (copy), ToastVanished (copy)
+					v49(ToastVanished())
 				end,
-				duration = v54.duration,
-				show = not v52
+				duration = v55.duration,
+				show = not v53
 			})
 		end
 
-		if v50 == CapturesToastType.MomentProcessing then
+		if v51 == CapturesToastType.MomentProcessing then
 			return React.createElement(ToastController, {
 				icon = "icons/brands/moments_large",
-				title = v53("momentProcessingTitle"),
-				text = v53("momentProcessingDescription"),
-				onDismissed = function() -- line: 279
-					-- upvalues: v48 (copy), ToastVanished (copy)
-					v48(ToastVanished())
+				title = v54("momentProcessingTitle"),
+				text = v54("momentProcessingDescription"),
+				onDismissed = function() -- line: 284
+					-- upvalues: v49 (copy), ToastVanished (copy)
+					v49(ToastVanished())
 				end,
-				duration = v54.duration,
-				show = not v52
+				duration = v55.duration,
+				show = not v53
 			})
 		end
 
 		return React.createElement(React.Fragment, {}, {
-			[v50] = React.createElement(Toast, {
-				duration = v54.duration,
-				show = not v52,
-				toastContent = v54
+			[v51] = React.createElement(Toast, {
+				duration = v55.duration,
+				show = not v53,
+				toastContent = v55
 			})
 		})
 	end
 
 	return React.createElement(React.Fragment, {}, {
-		[v50] = React.createElement(Toast, {
-			duration = v54.duration,
-			show = not v52,
-			toastContent = v54
+		[v51] = React.createElement(Toast, {
+			duration = v55.duration,
+			show = not v53,
+			toastContent = v55
 		})
 	})
 end

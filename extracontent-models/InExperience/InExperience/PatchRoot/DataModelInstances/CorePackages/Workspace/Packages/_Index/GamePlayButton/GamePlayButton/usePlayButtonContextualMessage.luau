@@ -1,5 +1,4 @@
 local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
-local LocalizationService = game:GetService("LocalizationService")
 local GamePlayButtonParent = GamePlayButton.Parent
 local PlayButtonStates = require(GamePlayButton.PlayButtonStates)
 
@@ -8,152 +7,90 @@ require(GamePlayButtonParent.PlayabilityRodux)
 local PlayabilityStatusEnum = require(GamePlayButtonParent.DiscoveryTypes).PlayabilityStatusEnum
 local getAppFeaturePolicies = require(GamePlayButtonParent.UniversalAppPolicy).getAppFeaturePolicies
 local LaunchErrorLocalizationKeys = require(GamePlayButtonParent.GameLaunch).LaunchErrorLocalizationKeys
-local Localization = require(GamePlayButtonParent.RobloxAppLocales).Localization
 local useSelector = require(GamePlayButtonParent.RoactUtils).Hooks.RoactRodux.useSelector
 local useGameInfosSelector = require(GamePlayButtonParent.GameInfosRodux).useGameInfosSelector
 local useGameProductInfoSelector = require(GamePlayButtonParent.GameProductInfoRodux).useGameProductInfoSelector
 local useAppPolicy = require(GamePlayButtonParent.UniversalAppPolicy).useAppPolicy
 local useLocalization = require(GamePlayButtonParent.Localization).Hooks.useLocalization
 local ExperienceDetailsNoticeType = require(GamePlayButtonParent.DiscoveryTypes).ExperienceDetailsNoticeType
-local FFlagLuaAppPlayabilityMessageUpdate = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppPlayabilityMessageUpdate
-local u16 = nil
-local s1 = ""
 
-local function translateString(p1, p2) -- line: 27
-	-- upvalues: LocalizationService (copy), u16 (ref), Localization (copy), s1 (ref)
-	local RobloxLocaleId = LocalizationService.RobloxLocaleId
-
-	if u16 == nil then
-		u16 = Localization.new(RobloxLocaleId)
-		s1 = RobloxLocaleId
-	end
-
-	if RobloxLocaleId ~= s1 then
-		u16:SetLocale(RobloxLocaleId)
-		s1 = RobloxLocaleId
-	end
-
-	return u16:Format(p1, p2)
-end
-local function v19(p3, p4, p5) -- line: 40
+local function v13(p1, p2, p3) -- line: 21
 	-- upvalues: PlayabilityStatusEnum (copy), getAppFeaturePolicies (copy), LaunchErrorLocalizationKeys (copy)
-	if p4 then
-		if p3 == nil or (p4.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p4.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired) and (p5 == nil or p5.isForSale == false) then
+	if p2 then
+		if p1 == nil or (p2.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p2.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired) and (p3 == nil or p3.isForSale == false) then
 			return "Feature.ExperienceDetails.UnplayableError.UnplayableOther"
 		end
 
-		if p4.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
-			local v26 = getAppFeaturePolicies().getPlatformDisplayName() or ""
+		if p2.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
+			local v17 = getAppFeaturePolicies().getPlatformDisplayName() or ""
 
-			if v26 ~= "" then
+			if v17 ~= "" then
 				return "Feature.ExperienceDetails.UnplayableError.DeviceRestrictedCustom", {
-					device = v26
+					device = v17
 				}
 			end
 		end
 
-		return LaunchErrorLocalizationKeys[p4.playabilityStatus]
+		return LaunchErrorLocalizationKeys[p2.playabilityStatus]
 	end
 
 	return nil
 end
 
-return function(p6, s2: string, p7) -- line: 96
-	-- upvalues: useAppPolicy (copy), useSelector (copy), useGameInfosSelector (copy), useGameProductInfoSelector (copy), FFlagLuaAppPlayabilityMessageUpdate (copy), useLocalization (copy), PlayButtonStates (copy), v19 (copy), ExperienceDetailsNoticeType (copy), LocalizationService (copy), u16 (ref), Localization (copy), s1 (ref)
-	local v36 = useAppPolicy(function(p8) -- line: 97
+return function(p4, s1: string, p5) -- line: 77
+	-- upvalues: useAppPolicy (copy), useSelector (copy), useGameInfosSelector (copy), useGameProductInfoSelector (copy), useLocalization (copy), PlayButtonStates (copy), v13 (copy), ExperienceDetailsNoticeType (copy)
+	local v27 = useAppPolicy(function(p6) -- line: 78
 		return {
-			experienceDetailsNoticeType = p8.getExperienceDetailsNoticeType()
+			experienceDetailsNoticeType = p6.getExperienceDetailsNoticeType()
 		}
 	end)
-	local v37 = useSelector(function(p9) -- line: 103
-		-- upvalues: p6 (copy)
-		return p9.PlayabilityStatus and (not not p9.PlayabilityStatus[p6] and p9.PlayabilityStatus[p6].unplayableDisplayText) or nil
+	local v28 = useSelector(function(p7) -- line: 84
+		-- upvalues: p4 (copy)
+		return p7.PlayabilityStatus and (not not p7.PlayabilityStatus[p4] and p7.PlayabilityStatus[p4].unplayableDisplayText) or nil
 	end)
-	local v38 = useSelector(function(p10) -- line: 110
-		-- upvalues: p6 (copy)
-		return p10.GameDetails[p6]
+	local v29 = useSelector(function(p8) -- line: 91
+		-- upvalues: p4 (copy)
+		return p8.GameDetails[p4]
 	end)
-	local v39 = useGameInfosSelector(p6)
-	local v40 = v38 and v38.rootPlaceId or (v39 and v39.placeId or nil)
-	local v41 = useGameProductInfoSelector(p6)
+	local v30 = useGameInfosSelector(p4)
+	local v31 = v29 and v29.rootPlaceId or (v30 and v30.placeId or nil)
+	local v32 = useGameProductInfoSelector(p4)
+	local v33 = useLocalization
+	local t1 = {
+		agreeToNotice = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
+	}
+	local v37
 
-	if FFlagLuaAppPlayabilityMessageUpdate then
-		local v42 = useLocalization
-		local t1 = {
-			agreeToNotice = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
-		}
-		local v46
+	if s1 == PlayButtonStates.UnplayableOther then
+		local v35, v36 = v13(v31, p5, v32)
 
-		if s2 == PlayButtonStates.UnplayableOther then
-			local v44, v45 = v19(v40, p7, v41)
-
-			if v44 == nil then
-				v46 = nil
-			elseif v45 then
-				v46 = table.clone(v45)
-				v46[1] = v44
-			else
-				v46 = v44
-			end
+		if v35 == nil then
+			v37 = nil
+		elseif v36 then
+			v37 = table.clone(v36)
+			v37[1] = v35
 		else
-			v46 = nil
+			v37 = v35
 		end
-
-		t1.unplayableOtherFallback = v46
-
-		local v47 = v42(t1)
-
-		if (s2 == PlayButtonStates.Playable or s2 == PlayButtonStates.PlayableWithParty or s2 == PlayButtonStates.WaitingForParty) and v36.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
-			return v47.agreeToNotice
-		end
-
-		if v37 and v37 ~= "" then
-			return v37
-		end
-
-		if s2 == PlayButtonStates.UnplayableOther then
-			return v47.unplayableOtherFallback
-		end
-
-		return nil
+	else
+		v37 = nil
 	end
 
-	local v48 = nil
-	local v49 = nil
+	t1.unplayableOtherFallback = v37
 
-	if s2 == PlayButtonStates.UnplayableOther then
-		if v37 and v37 ~= "" then
-			return v37
-		end
+	local v38 = v33(t1)
 
-		v48, v49 = v19(v40, p7, v41)
-	elseif (s2 == PlayButtonStates.Playable or s2 == PlayButtonStates.PlayableWithParty or s2 == PlayButtonStates.WaitingForParty) and v36.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
-		v48 = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
+	if (s1 == PlayButtonStates.Playable or s1 == PlayButtonStates.PlayableWithParty or s1 == PlayButtonStates.WaitingForParty) and v27.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
+		return v38.agreeToNotice
 	end
 
-	local v51
-
-	if v48 then
-		local RobloxLocaleId = LocalizationService.RobloxLocaleId
-
-		if u16 == nil then
-			u16 = Localization.new(RobloxLocaleId)
-			s1 = RobloxLocaleId
-		end
-
-		if RobloxLocaleId ~= s1 then
-			u16:SetLocale(RobloxLocaleId)
-			s1 = RobloxLocaleId
-		end
-
-		v51 = u16:Format(v48, v49)
-
-		if v51 then
-			return v51
-		end
+	if v28 and v28 ~= "" then
+		return v28
 	end
 
-	v51 = nil
+	if s1 == PlayButtonStates.UnplayableOther then
+		return v38.unplayableOtherFallback
+	end
 
-	return v51
+	return nil
 end

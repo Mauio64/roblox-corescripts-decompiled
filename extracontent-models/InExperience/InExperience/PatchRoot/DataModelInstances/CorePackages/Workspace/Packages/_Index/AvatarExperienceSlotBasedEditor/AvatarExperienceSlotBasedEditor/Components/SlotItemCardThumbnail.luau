@@ -6,15 +6,13 @@ local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
 local ItemCardThumbnail = require(Parent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local FFlagAXCustomizeMakeupSupport = AvatarExperienceFlags.FFlagAXCustomizeMakeupSupport
-local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
+local FFlagAXMigrateBuilderIcons = require(Parent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
 
-local function SlotItemCardThumbnail(t1: {[any]: any}) -- line: 40
-	-- upvalues: useTokens (copy), FFlagAXCustomizeMakeupSupport (copy), FFlagAXMigrateBuilderIcons (copy), Foundation (copy), React (copy), ItemCardThumbnail (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Icon (copy), IconSize (copy)
-	local v14 = useTokens()
-	local v15 = if not FFlagAXCustomizeMakeupSupport then nil else if not t1.icon then Foundation.Enums.IconName.PlusLarge else if not FFlagAXMigrateBuilderIcons then t1.icon else t1.icon.name
-	local v16 = if not FFlagAXCustomizeMakeupSupport or not FFlagAXMigrateBuilderIcons then nil else if not t1.icon then Foundation.Enums.IconVariant.Regular else t1.icon.variant
+local function SlotItemCardThumbnail(t1: {[any]: any}) -- line: 39
+	-- upvalues: useTokens (copy), FFlagAXMigrateBuilderIcons (copy), Foundation (copy), React (copy), ItemCardThumbnail (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Icon (copy), IconSize (copy)
+	local v12 = useTokens()
+	local v13 = if not t1.icon then Foundation.Enums.IconName.PlusLarge else if not FFlagAXMigrateBuilderIcons then t1.icon else t1.icon.name
+	local v14 = if not FFlagAXMigrateBuilderIcons then nil else if not t1.icon then Foundation.Enums.IconVariant.Regular else t1.icon.variant
 
 	if t1.url then
 		return React.createElement("Frame", {
@@ -28,11 +26,11 @@ local function SlotItemCardThumbnail(t1: {[any]: any}) -- line: 40
 			Overlay = t1.enableThumbnailOverlay and React.createElement("Frame", {
 				ZIndex = 2,
 				Size = UDim2.fromScale(1, 1),
-				BackgroundColor3 = v14.Color.Surface.Surface_200.Color3,
-				BackgroundTransparency = v14.Color.Common.Shadow.Transparency
+				BackgroundColor3 = v12.Color.Surface.Surface_200.Color3,
+				BackgroundTransparency = v12.Color.Common.Shadow.Transparency
 			}, {
 				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v14.Semantic.Radius.Medium else v14.Radius.Medium)
+					CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v12.Semantic.Radius.Medium else v12.Radius.Medium)
 				})
 			})
 		})
@@ -43,8 +41,8 @@ local function SlotItemCardThumbnail(t1: {[any]: any}) -- line: 40
 			ZIndex = 2,
 			Size = t1.iconFrameStyles and t1.iconFrameStyles.Size or UDim2.fromOffset(30, 30),
 			Position = if not FFlagAXMigrateBuilderIcons then UDim2.new(0.5, 3, 0.5, 3) else UDim2.new(0.5, 4, 0.5, 4),
-			BackgroundColor3 = v14.Color.Surface.Surface_200.Color3,
-			BackgroundTransparency = v14.Color.Surface.Surface_200.Transparency
+			BackgroundColor3 = v12.Color.Surface.Surface_200.Color3,
+			BackgroundTransparency = v12.Color.Surface.Surface_200.Transparency
 		}, {
 			UICorner = React.createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
@@ -56,13 +54,13 @@ local function SlotItemCardThumbnail(t1: {[any]: any}) -- line: 40
 				Position = UDim2.fromScale(0.5, 0.5)
 			})
 		}),
-		SlotIcon = (FFlagAXCustomizeMakeupSupport or t1.icon) and React.createElement(Icon, {
-			name = if not FFlagAXCustomizeMakeupSupport then if not FFlagAXMigrateBuilderIcons then t1.icon else t1.icon.name else v15,
-			variant = if not FFlagAXCustomizeMakeupSupport then if not FFlagAXMigrateBuilderIcons then nil else t1.icon.variant else v16,
-			size = if not FFlagAXMigrateBuilderIcons then IconSize.Large else v14.Size.Size_800,
+		SlotIcon = React.createElement(Icon, {
+			name = v13,
+			variant = v14,
+			size = if not FFlagAXMigrateBuilderIcons then IconSize.Large else v12.Size.Size_800,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			style = v14.Color.Shift.Shift_400
+			style = v12.Color.Shift.Shift_400
 		})
 	})
 end

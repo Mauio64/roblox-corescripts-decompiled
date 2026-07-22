@@ -6,6 +6,7 @@ local FFlagEnableProfileCompletion = SharedFlags.FFlagEnableProfileCompletion
 local FFlagEnableSduiV2HomepagePrompts = SharedFlags.FFlagEnableSduiV2HomepagePrompts
 local FFlagEnableHomepagePromptsForModalsAndBanners = SharedFlags.FFlagEnableHomepagePromptsForModalsAndBanners
 local FFlagPromptsHandlerEnabled = SharedFlags.FFlagPromptsHandlerEnabled
+local FFlagEdpGameLeavePromptsHandlerEnabled = SharedFlags.FFlagEdpGameLeavePromptsHandlerEnabled
 
 return {
 	["jest.config"] = script["jest.config"],
@@ -20,5 +21,6 @@ return {
 	usePromptEntries = if not FFlagEnableHomepagePromptsForModalsAndBanners then nil else SduiV2.usePromptEntries,
 	PromptsSystemBanner = if not FFlagEnableHomepagePromptsForModalsAndBanners then nil else require(script.PromptsSystemBanner),
 	reportPromptImpression = if not FFlagEnableProfileCompletion then nil else require(script.reportPromptImpression),
-	PromptsHandler = if not FFlagPromptsHandlerEnabled then nil else PromptsHandler.PromptsHandler
+	PromptsHandler = if not FFlagPromptsHandlerEnabled then nil else PromptsHandler.PromptsHandler,
+	EdpGameLeavePromptsHandler = if not FFlagEdpGameLeavePromptsHandlerEnabled then nil else require(script.SduiV2.EdpGameLeavePromptsHandler)
 }

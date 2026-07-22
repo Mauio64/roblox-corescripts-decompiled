@@ -20,18 +20,14 @@ if game:DefineFastFlag("FeedbackModuleEarlyFontInitialization", false) then
 	TextService:GetTextBoundsAsync(GetTextBoundsParams)
 end
 
-local v8 = game:DefineFastFlag("CaptureModePublishNativeExitReason", false)
 local MessageBusService = game:GetService("MessageBusService")
 local MessageId = MessageBusService:GetMessageId("CaptureMode", "sceneSelectionExitReason")
 
-local function handleNativeExit() -- line: 30
-	-- upvalues: v8 (copy), MessageBusService (copy), MessageId (copy)
-	if v8 then
-		MessageBusService:Publish(MessageId, {
-			reason = "nativeExit"
-		})
-	end
-
+local function handleNativeExit() -- line: 28
+	-- upvalues: MessageBusService (copy), MessageId (copy)
+	MessageBusService:Publish(MessageId, {
+		reason = "nativeExit"
+	})
 	game:GetService("ExperienceStateCaptureService"):ToggleCaptureMode()
 end
 

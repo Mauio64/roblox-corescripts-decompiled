@@ -62,25 +62,19 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 	local v41 = React.useContext(PopoverContext)
 	local v42 = useStyleSheet()
 	local v43 = useTokens()
-	local v44 = nil
-	local v45 = nil
-
-	if Flags.FoundationPopoverPluginDepthPool then
-		v45 = useElevation(ElevationLayer.Popover, {
-			stackAboveOwner = true
-		})
-		v44 = elevation.getRelativeIndex(v45)
-	end
-
+	local v44 = useElevation(ElevationLayer.Popover, {
+		stackAboveOwner = true
+	})
+	local v45 = elevation.getRelativeIndex(v44)
 	local v46, v47 = React.useState(nil)
 
-	React.useImperativeHandle(p2, function() -- line: 91
+	React.useImperativeHandle(p2, function() -- line: 88
 		-- upvalues: v46 (copy)
 		return v46
 	end, { v46 })
 
 	local v48 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else useOverlay()
-	local v49 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useMemo(function() -- line: 101
+	local v49 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useMemo(function() -- line: 98
 		local Frame = Instance.new("Frame")
 
 		Frame.Name = "PopoverPluginContainer"
@@ -93,9 +87,9 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 	end, {})
 
 	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		React.useEffect(function() -- line: 113
+		React.useEffect(function() -- line: 110
 			-- upvalues: v49 (copy)
-			return function() -- line: 114
+			return function() -- line: 111
 				-- upvalues: v49 (copy)
 				v49:Destroy()
 			end
@@ -170,7 +164,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 		u73 = v41.isOpen and (v71.isReady and v39.ready)
 		u74 = u73 and v48 ~= nil
 		u75 = u74 and u54 == nil
-		React.useEffect(function() -- line: 175
+		React.useEffect(function() -- line: 172
 			-- upvalues: u73 (ref), u55 (ref)
 			if not u73 then
 				u55(nil)
@@ -178,7 +172,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 		end, { u73 })
 	end
 
-	local v76 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useCallback(function(p3) -- line: 183
+	local v76 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useCallback(function(p3) -- line: 180
 		-- upvalues: u75 (ref), u55 (ref)
 		if not u75 then
 			return
@@ -190,7 +184,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 			u55(AbsoluteSize)
 		end
 	end, { u75 })
-	local v77 = React.useMemo(function() -- line: 195
+	local v77 = React.useMemo(function() -- line: 192
 		-- upvalues: getPanelPosition (copy), Flags (copy), u63 (ref), v37 (copy), PopoverSide (copy), PopoverAlign (copy), SHADOW_SIZE (copy), v72 (copy), v61 (copy)
 		return getPanelPosition(if not Flags.FoundationPopoverPluginOverlayMeasurement then v37.side or PopoverSide.Bottom else u63, v37.align or PopoverAlign.Start, nil, SHADOW_SIZE, not v72 and 0 or v61)
 	end, {
@@ -199,9 +193,9 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 		v72,
 		v61
 	})
-	local v78 = React.useCallback(function(p4, p5, p6: ((...any) -> ...any), n2: number?) -- line: 213
-		-- upvalues: Flags (copy), v40 (copy), v38 (copy)
-		local v98 = if not Flags.FoundationPopoverPluginDepthPool then nil else v40
+	local v78 = React.useCallback(function(p4, p5, p6: ((...any) -> ...any), n2: number?) -- line: 210
+		-- upvalues: v40 (copy), v38 (copy)
+		local v98 = v40
 
 		return v38.registerPopoverAsync(p4, p5, p6, n2, v98)
 	end, {
@@ -210,7 +204,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 	})
 	local v79 = React.useRef(false)
 
-	React.useEffect(function() -- line: 221
+	React.useEffect(function() -- line: 218
 		-- upvalues: v37 (copy), v79 (copy), Logger (copy)
 		if not v37.onPressedOutside and not v79.current then
 			v79.current = true
@@ -218,13 +212,13 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 		end
 	end, { v37.onPressedOutside })
 
-	local v80 = React.useCallback(function() -- line: 232
+	local v80 = React.useCallback(function() -- line: 229
 		-- upvalues: v37 (copy)
 		if v37.onPressedOutside then
 			v37.onPressedOutside()
 		end
 	end, { v37.onPressedOutside })
-	local v81 = if not Flags.FoundationPopoverPluginDepthPool then v44 else v44 == nil and 0 or v44
+	local v81 = v45 == nil and 0 or v45
 	local v82 = usePanel({
 		isOpen = if not Flags.FoundationPopoverPluginOverlayMeasurement then v41.isOpen and v71.isReady else u73,
 		onClose = v80,
@@ -232,7 +226,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 		registerPanelAsync = v78,
 		position = v77,
 		depth = v81,
-		parentPopoverId = if not Flags.FoundationPopoverPluginDepthPool then nil else v40
+		parentPopoverId = v40
 	})
 
 	if Flags.FoundationPopoverPluginOverlayMeasurement then
@@ -241,7 +235,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 	end
 
 	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		React.useLayoutEffect(function() -- line: 262
+		React.useLayoutEffect(function() -- line: 259
 			-- upvalues: u75 (ref), v46 (copy), u55 (ref)
 			if not u75 or v46 == nil then
 				return
@@ -258,7 +252,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 		})
 	end
 
-	local v83 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useMemo(function() -- line: 275
+	local v83 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useMemo(function() -- line: 272
 		-- upvalues: u54 (ref), positioning (copy), u67 (ref), u65 (ref), u66 (ref), v72 (copy), v61 (copy), SHADOW_SIZE (copy)
 		if not u54 then
 			return nil
@@ -275,7 +269,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 	})
 
 	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		React.useLayoutEffect(function() -- line: 293
+		React.useLayoutEffect(function() -- line: 290
 			-- upvalues: u54 (ref), v83 (copy), u53 (ref), u51 (ref), v82 (copy)
 			if u54 == nil or v83 == nil then
 				u53(UDim2.new())
@@ -295,7 +289,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 			v83,
 			v82
 		})
-		React.useLayoutEffect(function() -- line: 309
+		React.useLayoutEffect(function() -- line: 306
 			-- upvalues: u74 (ref), v49 (copy), v82 (copy), v83 (copy), v48 (copy)
 			if not u74 then
 				v49.Parent = nil
@@ -330,7 +324,7 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 	local v86 = not Flags.FoundationPopoverPluginOverlayMeasurement or v82 ~= nil and v83 ~= nil
 	local v87 = if not Flags.FoundationPopoverPluginOverlayMeasurement then v82 ~= nil else u74
 	local v88 = if not Flags.FoundationPopoverPluginOverlayMeasurement then if not v82 then nil else v82.container else v49
-	local v89 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useMemo(function() -- line: 347
+	local v89 = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else React.useMemo(function() -- line: 344
 		-- upvalues: v82 (copy), v86 (copy)
 		return {
 			id = if not v82 then nil else v82.popoverId,
@@ -370,11 +364,11 @@ local function PopoverContentPlugin(p1, p2) -- line: 66
 				onAbsoluteSizeChanged = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else v76,
 				backgroundStyle = v62,
 				testId = `{ v41.testId }--content`
-			}, if not Flags.FoundationPopoverPluginDepthPool then v37.children else React.createElement(PluginPopoverParentContext.Provider, {
+			}, React.createElement(PluginPopoverParentContext.Provider, {
 				value = if not Flags.FoundationPopoverPluginOverlayMeasurement then v82.popoverId else v89
 			}, {
 				Nested = React.createElement(ElevationOwnerScope, {
-					owner = v45
+					owner = v44
 				}, v37.children)
 			}))
 		})

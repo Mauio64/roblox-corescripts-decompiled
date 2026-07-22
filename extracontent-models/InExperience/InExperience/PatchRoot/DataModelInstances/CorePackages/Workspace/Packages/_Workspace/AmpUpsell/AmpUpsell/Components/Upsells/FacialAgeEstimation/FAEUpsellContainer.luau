@@ -44,7 +44,7 @@ local v43 = game:DefineFastInt("FAEWithWebViewCallbackPollDelay", 2)
 local v44 = game:DefineFastInt("FAEWithWebViewCallbackPollMaxRetries", 15)
 
 local function FAEUpsellContainer() -- line: 76
-	-- upvalues: useNavigation (copy), useDispatch (copy), useRoactService (copy), RoactNetworking (copy), useAppPolicy (copy), AppLinking (copy), GetFFlagEnableFAEQRCodeHandoff (copy), React (copy), authModalShown (copy), authFormInteraction (copy), authMsgShown (copy), GetFFlagMoveAmpUpsellOffNavigateDown (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), NavigateDown (copy), FacialAgeEstimationServiceWrapper (copy), v39 (copy), v40 (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v43 (copy), v44 (copy), v41 (copy), v42 (copy), usePollIDVStatus (copy), Players (copy), Promise (copy), UrlUtils (copy), v34 (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), logEventOnceIfEnabled (copy), IDVApiProvider (copy), v33 (copy), FAEFailedModal (copy), FAEWithQRCodeUpsell (copy), FAEDirectLinkUpsell (copy), GetFFlagShowFAELoadingModal (copy), FAELoadingModal (copy), Loading (copy), IconSize (copy)
+	-- upvalues: useNavigation (copy), useDispatch (copy), useRoactService (copy), RoactNetworking (copy), useAppPolicy (copy), AppLinking (copy), GetFFlagEnableFAEQRCodeHandoff (copy), React (copy), authModalShown (copy), authFormInteraction (copy), authMsgShown (copy), GetFFlagMoveAmpUpsellOffNavigateDown (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), NavigateDown (copy), FacialAgeEstimationServiceWrapper (copy), v39 (copy), v40 (copy), v41 (copy), v42 (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v43 (copy), v44 (copy), usePollIDVStatus (copy), Players (copy), Promise (copy), UrlUtils (copy), v34 (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), logEventOnceIfEnabled (copy), IDVApiProvider (copy), v33 (copy), FAEFailedModal (copy), FAEWithQRCodeUpsell (copy), FAEDirectLinkUpsell (copy), GetFFlagShowFAELoadingModal (copy), FAELoadingModal (copy), Loading (copy), IconSize (copy)
 	local v46 = useNavigation()
 	local v47 = useDispatch()
 	local v48 = useRoactService(RoactNetworking)
@@ -127,11 +127,18 @@ local function FAEUpsellContainer() -- line: 76
 		v47(NavigateDown(t1))
 	end, { GetFFlagMoveAmpUpsellOffNavigateDown() and v46 or v47 })
 	local v77 = React.useMemo(function() -- line: 153
-		-- upvalues: FacialAgeEstimationServiceWrapper (copy), v39 (copy), v40 (copy), v49 (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v43 (copy), v44 (copy), v41 (copy), v42 (copy)
+		-- upvalues: FacialAgeEstimationServiceWrapper (copy), v39 (copy), v40 (copy), v59 (copy), v41 (copy), v42 (copy), v49 (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v43 (copy), v44 (copy)
 		if FacialAgeEstimationServiceWrapper.isAvailable() then
 			return {
 				delay = v39,
 				retries = v40
+			}
+		end
+
+		if v59 then
+			return {
+				delay = v41,
+				retries = v42
 			}
 		end
 
@@ -146,12 +153,15 @@ local function FAEUpsellContainer() -- line: 76
 			delay = v41,
 			retries = v42
 		}
-	end, { v49 })
+	end, {
+		v49,
+		v59
+	})
 	local v78, v79 = usePollIDVStatus({
 		delay = v77.delay,
 		retries = v77.retries
 	})
-	local v80 = React.useCallback(function(p7, p8) -- line: 175
+	local v80 = React.useCallback(function(p7, p8) -- line: 179
 		-- upvalues: FacialAgeEstimationServiceWrapper (copy), authModalShown (copy), entryPointEventCtx (copy), v67 (copy), v59 (copy), Players (copy), v65 (copy), Promise (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v63 (copy), UrlUtils (copy), v34 (copy), v49 (copy), v76 (copy), skipFacialAgeEstimationWebLinkModal (copy), v54 (copy)
 		local sessionIdentifier = p7.sessionIdentifier
 		local verificationLink = p7.verificationLink
@@ -192,9 +202,9 @@ local function FAEUpsellContainer() -- line: 76
 		v67(false)
 
 		if v49 then
-			return Promise.new(function(resolve) -- line: 228
+			return Promise.new(function(resolve) -- line: 232
 				-- upvalues: sessionIdentifier (copy), v76 (copy), verificationLink (copy)
-				v76(verificationLink, function() -- line: 229
+				v76(verificationLink, function() -- line: 233
 					-- upvalues: resolve (copy), sessionIdentifier (copy)
 					resolve(sessionIdentifier)
 				end)
@@ -218,7 +228,7 @@ local function FAEUpsellContainer() -- line: 76
 		v59
 	})
 
-	React.useEffect(function() -- line: 256
+	React.useEffect(function() -- line: 260
 		-- upvalues: v70 (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), logEventOnceIfEnabled (copy), IDVApiProvider (copy), v48 (copy), v72 (copy), v80 (copy), v69 (copy), v78 (copy), v75 (copy), v33 (copy), v74 (copy), v73 (copy), v79 (copy)
 		local u95 = v70
 
@@ -226,31 +236,31 @@ local function FAEUpsellContainer() -- line: 76
 			logEventOnceIfEnabled("start_verification_init")
 			IDVApiProvider.startVerificationWithWrappedNetworking(v48, {
 				ageEstimation = true
-			}):andThen(function(p9) -- line: 261
+			}):andThen(function(p9) -- line: 265
 				-- upvalues: u95 (ref), v72 (copy), logEventOnceIfEnabled (copy)
 				u95 = `{ u95 }_{ p9.sessionIdentifier }`
 				v72(u95)
 				logEventOnceIfEnabled("start_verification_end")
 
 				return p9
-			end):andThen(function(p10) -- line: 267
+			end):andThen(function(p10) -- line: 271
 				-- upvalues: logEventOnceIfEnabled (copy), v80 (copy), u95 (ref)
 				logEventOnceIfEnabled("persona_flow_init")
 
 				return v80(p10, u95)
-			end):andThen(function(p11) -- line: 271
+			end):andThen(function(p11) -- line: 275
 				-- upvalues: logEventOnceIfEnabled (copy), v69 (copy), v78 (copy)
 				logEventOnceIfEnabled("persona_flow_end")
 				v69(true)
 				logEventOnceIfEnabled("status_polling_init")
 
 				return v78(p11)
-			end):andThen(function() -- line: 277
+			end):andThen(function() -- line: 281
 				-- upvalues: logEventOnceIfEnabled (copy), v75 (copy), u95 (ref)
 				logEventOnceIfEnabled("status_polling_end")
 
 				return v75(u95)
-			end):catch(function(p12) -- line: 281
+			end):catch(function(p12) -- line: 285
 				-- upvalues: logEventOnceIfEnabled (copy), v33 (copy), v74 (copy), u95 (ref), v73 (copy)
 				logEventOnceIfEnabled("status_polling_end")
 
@@ -263,7 +273,7 @@ local function FAEUpsellContainer() -- line: 76
 				v73(u95)
 			end)
 
-			return function() -- line: 294
+			return function() -- line: 298
 				-- upvalues: v79 (copy)
 				v79()
 			end
@@ -271,24 +281,24 @@ local function FAEUpsellContainer() -- line: 76
 
 		IDVApiProvider.startVerification({
 			ageEstimation = true
-		}):andThen(function(p13) -- line: 299
+		}):andThen(function(p13) -- line: 303
 			-- upvalues: u95 (ref), v72 (copy)
 			u95 = `{ u95 }_{ p13.sessionIdentifier }`
 			v72(u95)
 
 			return p13
-		end):andThen(function(p14) -- line: 304
+		end):andThen(function(p14) -- line: 308
 			-- upvalues: v80 (copy), u95 (ref)
 			return v80(p14, u95)
-		end):andThen(function(p15) -- line: 307
+		end):andThen(function(p15) -- line: 311
 			-- upvalues: v69 (copy), v78 (copy)
 			v69(true)
 
 			return v78(p15)
-		end):andThen(function() -- line: 311
+		end):andThen(function() -- line: 315
 			-- upvalues: v75 (copy), u95 (ref)
 			return v75(u95)
-		end):catch(function(p16) -- line: 314
+		end):catch(function(p16) -- line: 318
 			-- upvalues: v33 (copy), v74 (copy), u95 (ref), v73 (copy)
 			if v33 and (p16 and p16.resultType == Enum.FacialAgeEstimationResultType.Cancel) then
 				v74(u95)
@@ -299,7 +309,7 @@ local function FAEUpsellContainer() -- line: 76
 			v73(u95)
 		end)
 
-		return function() -- line: 326
+		return function() -- line: 330
 			-- upvalues: v79 (copy)
 			v79()
 		end

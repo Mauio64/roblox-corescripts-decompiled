@@ -14,7 +14,7 @@ return {
 			value = t1.analytics
 		}, t1.children)
 	end,
-	useAbuseReportAnalytics = function() -- line: 35
+	useAbuseReportAnalytics = function() -- line: 36
 		-- upvalues: React (copy), v4 (copy)
 		local v6 = React.useContext(v4)
 
@@ -23,5 +23,9 @@ return {
 		end
 
 		return v6
+	end,
+	useOptionalAbuseReportAnalytics = function() -- line: 52
+		-- upvalues: React (copy), v4 (copy)
+		return React.useContext(v4)
 	end
 }

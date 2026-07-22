@@ -16,11 +16,11 @@ local t1 = {
 	myMoments = "Feature.Moments.Label.FeedMyMoments"
 }
 
-local function NavigationMenu(t2: {[any]: any}) -- line: 32
-	-- upvalues: useLocalization (copy), t1 (copy), useToggleState (copy), React (copy), Menu (copy), Foundation (copy), IconButton (copy), ThreeDotsHorizontal (copy), ButtonVariant (copy), InputSize (copy)
+local function NavigationMenu(t2: {[any]: any}) -- line: 43
+	-- upvalues: useLocalization (copy), t1 (copy), useToggleState (copy), React (copy), IconButton (copy), ThreeDotsHorizontal (copy), ButtonVariant (copy), InputSize (copy), Menu (copy), Foundation (copy)
 	local v17 = useLocalization(t1)
 	local v18 = useToggleState()
-	local v19 = React.useCallback(function() -- line: 39
+	local v19 = React.useCallback(function() -- line: 50
 		-- upvalues: v18 (copy)
 		if v18.enabled then
 			v18.disable()
@@ -34,7 +34,7 @@ local function NavigationMenu(t2: {[any]: any}) -- line: 32
 		v18.enable,
 		v18.disable
 	})
-	local v20 = React.useCallback(function() -- line: 47
+	local v20 = React.useCallback(function() -- line: 58
 		-- upvalues: v18 (copy), t2 (copy)
 		v18.disable()
 		t2.onNavigateToTrending()
@@ -42,7 +42,7 @@ local function NavigationMenu(t2: {[any]: any}) -- line: 32
 		v18.disable,
 		t2.onNavigateToTrending
 	})
-	local v21 = React.useCallback(function() -- line: 52
+	local v21 = React.useCallback(function() -- line: 63
 		-- upvalues: v18 (copy), t2 (copy)
 		v18.disable()
 		t2.onNavigateToMyMoments()
@@ -50,7 +50,7 @@ local function NavigationMenu(t2: {[any]: any}) -- line: 32
 		v18.disable,
 		t2.onNavigateToMyMoments
 	})
-	local v22 = React.useMemo(function() -- line: 57
+	local v22 = React.useMemo(function() -- line: 68
 		-- upvalues: v17 (copy), v20 (copy), v21 (copy)
 		return {
 			{
@@ -69,6 +69,16 @@ local function NavigationMenu(t2: {[any]: any}) -- line: 32
 		v21,
 		v17
 	})
+	local v23 = React.createElement(IconButton, {
+		isCircular = true,
+		Selectable = true,
+		LayoutOrder = t2.layoutOrder,
+		icon = ThreeDotsHorizontal,
+		onActivated = v19,
+		variant = t2.buttonVariant or ButtonVariant.OverMedia,
+		size = InputSize.Medium,
+		testId = t2.buttonTestId or "--moments-navigation-menu-button"
+	})
 
 	return React.createElement(Menu, {
 		align = Foundation.Enums.PopoverAlign.End,
@@ -78,16 +88,7 @@ local function NavigationMenu(t2: {[any]: any}) -- line: 32
 		onPressedOutside = v18.disable,
 		side = Foundation.Enums.PopoverSide.Bottom
 	}, {
-		MoreMenuButton = React.createElement(IconButton, {
-			isCircular = true,
-			Selectable = true,
-			testId = "--moments-navigation-menu-button",
-			LayoutOrder = t2.layoutOrder,
-			icon = ThreeDotsHorizontal,
-			onActivated = v19,
-			variant = ButtonVariant.OverMedia,
-			size = InputSize.Medium
-		})
+		MoreMenuButton = v23
 	})
 end
 

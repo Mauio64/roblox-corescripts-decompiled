@@ -26,6 +26,7 @@ local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums
 local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
 local v27 = ExpChat.Stores.GetFocusNavigationStore(false)
 local shouldSuppressUnreadForTabMetadata = ExpChat.shouldSuppressUnreadForTabMetadata
+local GetFriendsChatIconUnreadStore = require(CorePackages.Workspace.Packages.FriendsChat.GetFriendsChatIconUnreadStore)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagExpChatWindowSyncUnibar = SharedFlags.FFlagExpChatWindowSyncUnibar
@@ -36,22 +37,21 @@ local InExperienceAppChatModal = require(CorePackages.Workspace.Packages.AppChat
 local ChatSelector = require(RobloxGui.Modules.ChatSelector)
 local getExperienceChatVisualConfig = require(CorePackages.Workspace.Packages.ExpChat).getExperienceChatVisualConfig
 local GetFFlagTextChatEnableUniverseChatTabs = require(CorePackages.Workspace.Packages.ExpChatShared).Flags.GetFFlagTextChatEnableUniverseChatTabs
-local v39 = game:DefineFastFlag("ExpChatSuppressWelcomeMessageUnibarUnread", false)
-local v40 = game:DefineFastFlag("ExpChatUnibarThumbstickNavigate", false)
-local v41 = game:DefineFastFlag("ExpChatUnibarAvailabilityRefactor", false)
+local v40 = game:DefineFastFlag("ExpChatSuppressWelcomeMessageUnibarUnread", false)
+local v41 = game:DefineFastFlag("ExpChatUnibarThumbstickNavigate", false)
+local v42 = game:DefineFastFlag("ExpChatUnibarAvailabilityRefactor", false)
 local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
 local InExperienceUIVRIXP = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).InExperienceUIVRIXP
 local FFlagExpChatPerfTracking = SharedFlags.FFlagExpChatPerfTracking
 local ExpChatPerfTracker = ExpChat.ExpChatPerfTracker
 local ArgoPartyExperimentation = require(CorePackages.Workspace.Packages.SocialExperiments).ArgoPartyExperimentation
 local n1 = 0
-local n2 = 0
 local Visibility = ChatSelector:GetVisibility()
 local u50 = nil
 local VisibilityStateChanged = ChatSelector.VisibilityStateChanged
 
-local function updateUnreadNotification() -- line: 67
-	-- upvalues: u50 (ref), FFlagExpChatEnableFriendsTab (copy), n1 (ref), n2 (ref), Visibility (ref)
+local function updateUnreadNotification() -- line: 70
+	-- upvalues: u50 (ref), FFlagExpChatEnableFriendsTab (copy), n1 (ref), GetFriendsChatIconUnreadStore (copy), Visibility (ref)
 	if not u50.notification then
 		return
 	end
@@ -62,20 +62,21 @@ local function updateUnreadNotification() -- line: 67
 		return
 	end
 
-	local v60 = n1 + n2
+	local v58 = GetFriendsChatIconUnreadStore(false).getUnreadCountToDisplay(false)
+	local v59 = n1 + v58
 
-	if Visibility or v60 == 0 then
+	if Visibility or v59 == 0 then
 		u50.notification:clear()
 
 		return
 	end
 
-	u50.notification:fireCount(v60)
+	u50.notification:fireCount(v59)
 end
-local function localUserCanChat() -- line: 85
+local function localUserCanChat() -- line: 89
 	-- upvalues: RunService (copy), Chat (copy), Players (copy)
 	if not RunService:IsStudio() then
-		local ok, result = pcall(function() -- line: 87
+		local ok, result = pcall(function() -- line: 91
 			-- upvalues: Chat (copy), Players (copy)
 			return Chat:CanUserChatAsync(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
 		end)
@@ -87,9 +88,9 @@ local function localUserCanChat() -- line: 85
 end
 
 if not FFlagExpChatWindowSyncUnibar then
-	VisibilityStateChanged:connect(function(p1) -- line: 98
-		-- upvalues: v41 (copy), default (copy), u50 (ref)
-		if v41 then
+	VisibilityStateChanged:connect(function(p1) -- line: 102
+		-- upvalues: v42 (copy), default (copy), u50 (ref)
+		if v42 then
 			default.setVisibleViaChatSelector(p1)
 
 			return
@@ -99,9 +100,9 @@ if not FFlagExpChatWindowSyncUnibar then
 			u50.availability:pinned()
 		end
 	end)
-	ChatSelector.ChatWindowToggled:connect(function(p2) -- line: 109
-		-- upvalues: v41 (copy), default (copy), u50 (ref)
-		if v41 then
+	ChatSelector.ChatWindowToggled:connect(function(p2) -- line: 113
+		-- upvalues: v42 (copy), default (copy), u50 (ref)
+		if v42 then
 			default.setVisibleViaChatSelector(p2)
 
 			return
@@ -114,74 +115,57 @@ if not FFlagExpChatWindowSyncUnibar then
 end
 
 if FFlagExpChatWindowSyncUnibar then
-	GameSettings:GetPropertyChangedSignal("ChatVisible"):Connect(function() -- line: 123
+	GameSettings:GetPropertyChangedSignal("ChatVisible"):Connect(function() -- line: 127
 		-- upvalues: default (copy), GameSettings (copy)
 		default.setGameSettingsChatVisible(GameSettings.ChatVisible)
 	end)
 	default.setGameSettingsChatVisible(GameSettings.ChatVisible)
 end
 
-local v54 = MappedSignal.new(VisibilityStateChanged, function() -- line: 129
+local v54 = MappedSignal.new(VisibilityStateChanged, function() -- line: 133
 	-- upvalues: Visibility (ref)
 	return Visibility
-end, function() -- line: 131
-	-- upvalues: ChatSelector (copy), v41 (copy), RunService (copy), Chat (copy), Players (copy), u50 (ref), GuiService (copy), GameSettings (copy), Visibility (ref), FFlagExpChatEnableFriendsTab (copy), n1 (ref), n2 (ref)
-	local v65 = ChatSelector.GetVisibility()
+end, function() -- line: 135
+	-- upvalues: ChatSelector (copy), v42 (copy), RunService (copy), Chat (copy), Players (copy), u50 (ref), GuiService (copy), GameSettings (copy), Visibility (ref), FFlagExpChatEnableFriendsTab (copy), n1 (ref), GetFriendsChatIconUnreadStore (copy), updateUnreadNotification (copy)
+	local v64 = ChatSelector.GetVisibility()
 
-	if not v41 and not v65 then
-		local v68
+	if not v42 and not v64 then
+		local v67
 
 		if not RunService:IsStudio() then
-			local ok, result = pcall(function() -- line: 87
+			local ok, result = pcall(function() -- line: 91
 				-- upvalues: Chat (copy), Players (copy)
 				return Chat:CanUserChatAsync(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
 			end)
 
-			v68 = ok and result
+			v67 = ok and result
 		else
-			v68 = true
+			v67 = true
 		end
 
-		if not v68 then
+		if not v67 then
 			u50.availability:unavailable()
 		end
 	end
 
 	if not GuiService.MenuIsOpen then
-		GameSettings.ChatVisible = v65
+		GameSettings.ChatVisible = v64
 	end
 
-	Visibility = v65
+	Visibility = v64
 
 	if FFlagExpChatEnableFriendsTab then
-		if v65 then
+		if v64 then
 			n1 = 0
+			GetFriendsChatIconUnreadStore(false).clearDisplayCount()
 		end
 
-		if not u50.notification then
-			return
-		end
-
-		if not FFlagExpChatEnableFriendsTab then
-			u50.notification:fireCount(n1)
-
-			return
-		end
-
-		local v69 = n1 + n2
-
-		if Visibility or v69 == 0 then
-			u50.notification:clear()
-
-			return
-		end
-
-		u50.notification:fireCount(v69)
+		updateUnreadNotification()
 
 		return
 	end
 
-	if v65 and n1 and u50.notification then
+	if v64 and n1 and u50.notification then
 		n1 = 0
 		u50.notification:clear()
 	end
@@ -191,7 +175,7 @@ u50 = Service:register({
 	id = "chat",
 	label = "CoreScripts.TopBar.Chat",
 	sideSheetPlacement = if not ArgoPartyExperimentation.getIsRenameEnabled() or not not FFlagRemoveFriendsChatUnibarEntrypoints and FFlagExpChatEnableFriendsTab then SideSheetPlacement.Unibar else SideSheetPlacement.None,
-	activated = function(_) -- line: 177
+	activated = function(_) -- line: 184
 		-- upvalues: Visibility (ref), ChatSelector (copy), FFlagExpChatPerfTracking (copy), ExpChatPerfTracker (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), InExperienceUIVRIXP (copy), ChromeIntegrationUtils (copy), InExperienceAppChatModal (copy), FFlagEnableConsoleExpControls (copy), FocusSelectExpChat (copy), u50 (ref)
 		if Visibility then
 			ChatSelector:SetVisible(false)
@@ -209,7 +193,7 @@ u50 = Service:register({
 			return
 		end
 
-		ChromeIntegrationUtils.dismissRobloxMenuAndRun(function() -- line: 187
+		ChromeIntegrationUtils.dismissRobloxMenuAndRun(function() -- line: 194
 			-- upvalues: InExperienceAppChatModal (copy), ChatSelector (copy), FFlagEnableConsoleExpControls (copy), FocusSelectExpChat (copy), u50 (ref)
 			if InExperienceAppChatModal:getVisible() then
 				InExperienceAppChatModal.default:setVisible(false)
@@ -222,31 +206,31 @@ u50 = Service:register({
 			end
 		end)
 	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 195
+	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 202
 		-- upvalues: v54 (copy)
 		return v54:get()
 	end or v54,
-	selected = if not FFlagEnableConsoleExpControls then nil else function(p4) -- line: 199
-		-- upvalues: v40 (copy), Service (copy), UserInputService (copy), GamepadUtils (copy), FocusSelectExpChat (copy), u50 (ref)
-		if v40 then
-			local u72 = nil
+	selected = if not FFlagEnableConsoleExpControls then nil else function(p4) -- line: 206
+		-- upvalues: v41 (copy), Service (copy), UserInputService (copy), GamepadUtils (copy), FocusSelectExpChat (copy), u50 (ref)
+		if v41 then
+			local u70 = nil
 			local connection = nil
 			local connection2 = nil
 
-			u72 = Service:selectedItem():connect(function(p5) -- line: 205
-				-- upvalues: p4 (copy), u72 (ref), connection (ref), connection2 (ref)
+			u70 = Service:selectedItem():connect(function(p5) -- line: 212
+				-- upvalues: p4 (copy), u70 (ref), connection (ref), connection2 (ref)
 				assert(p5 ~= p4.id, "Expected selectedId to not be self.id on selection")
-				u72:disconnect()
+				u70:disconnect()
 				connection:Disconnect()
 				connection2:Disconnect()
 			end)
-			connection = UserInputService.InputChanged:Connect(function(input) -- line: 215
+			connection = UserInputService.InputChanged:Connect(function(input) -- line: 222
 				-- upvalues: GamepadUtils (copy), FocusSelectExpChat (copy), u50 (ref)
 				if input.KeyCode == Enum.KeyCode.Thumbstick1 and GamepadUtils.mapPositionToDirection(Vector2.new(input.Position.X, input.Position.Y)) == Enum.KeyCode.Down then
 					FocusSelectExpChat(u50.id)
 				end
 			end)
-			connection2 = UserInputService.InputBegan:Connect(function(input) -- line: 224
+			connection2 = UserInputService.InputBegan:Connect(function(input) -- line: 231
 				-- upvalues: FocusSelectExpChat (copy), u50 (ref)
 				local KeyCode = input.KeyCode
 
@@ -260,7 +244,7 @@ u50 = Service:register({
 
 		local connection = nil
 
-		connection = UserInputService.InputEnded:Connect(function(input) -- line: 232
+		connection = UserInputService.InputEnded:Connect(function(input) -- line: 239
 			-- upvalues: FocusSelectExpChat (copy), u50 (ref), connection (ref), Service (copy), p4 (copy)
 			if input.KeyCode == Enum.KeyCode.DPadDown then
 				FocusSelectExpChat(u50.id)
@@ -272,17 +256,17 @@ u50 = Service:register({
 		end)
 	end,
 	components = {
-		Icon = function(_) -- line: 245
+		Icon = function(_) -- line: 252
 			-- upvalues: getExperienceChatVisualConfig (copy), CommonIcon (copy), v54 (copy)
-			local v77 = getExperienceChatVisualConfig()
+			local v75 = getExperienceChatVisualConfig()
 
-			return CommonIcon(v77.icon.off, v77.icon.on, v54)
+			return CommonIcon(v75.icon.off, v75.icon.on, v54)
 		end
 	}
 })
 
-if v41 then
-	SignalsRoblox.createDetachedEffect(function(p7) -- line: 256
+if v42 then
+	SignalsRoblox.createDetachedEffect(function(p7) -- line: 263
 		-- upvalues: default (copy), u50 (ref), FFlagExpChatWindowSyncUnibar (copy), ExpChat (copy)
 		if default.getIsChatIconVisible(p7) then
 			u50.availability:available()
@@ -291,19 +275,19 @@ if v41 then
 		end
 
 		if FFlagExpChatWindowSyncUnibar then
-			local v79 = default.getIsChatWindowVisible(p7)
+			local v77 = default.getIsChatWindowVisible(p7)
 
-			ExpChat.Events.ChatTopBarButtonActivated(v79)
+			ExpChat.Events.ChatTopBarButtonActivated(v77)
 		end
 	end)
-	ChromeUtils.setCoreGuiAvailability(u50, Enum.CoreGuiType.Chat, function(p8) -- line: 273
+	ChromeUtils.setCoreGuiAvailability(u50, Enum.CoreGuiType.Chat, function(p8) -- line: 280
 		-- upvalues: default (copy)
 		default.setCoreGuiEnabled(p8)
 	end)
 end
 
 if FFlagChatIntegrationFixShortcut and FFlagEnableConsoleExpControls then
-	SignalsRoblox.createDetachedEffect(function(p9) -- line: 279
+	SignalsRoblox.createDetachedEffect(function(p9) -- line: 286
 		-- upvalues: v27 (copy), Service (copy), Constants (copy)
 		if v27.getChatInputBarFocused(p9) then
 			Service:setShortcutBar(Constants.UNIBAR_SHORTCUTBAR_ID)
@@ -316,175 +300,87 @@ if FFlagChatIntegrationFixShortcut and FFlagEnableConsoleExpControls then
 end
 
 if FFlagExpChatEnableFriendsTab then
-	local function updateFriendsChatUnreadMessages(n3: number?) -- line: 290
-		-- upvalues: n2 (ref), u50 (ref), FFlagExpChatEnableFriendsTab (copy), n1 (ref), Visibility (ref)
-		n2 = n3 or 0
-
-		if not u50.notification then
-			return
-		end
-
-		if not FFlagExpChatEnableFriendsTab then
-			u50.notification:fireCount(n1)
-
-			return
-		end
-
-		local v83 = n1 + n2
-
-		if Visibility or v83 == 0 then
-			u50.notification:clear()
-
-			return
-		end
-
-		u50.notification:fireCount(v83)
-	end
-
-	n2 = InExperienceAppChatModal.default.unreadCount or 0
-
-	if u50.notification then
-		if not FFlagExpChatEnableFriendsTab then
-			u50.notification:fireCount(n1)
-		else
-			local v56 = n1 + n2
-
-			if Visibility or v56 == 0 then
-				u50.notification:clear()
-			else
-				u50.notification:fireCount(v56)
-			end
-		end
-	end
-
-	InExperienceAppChatModal.default.unreadCountSignal.Event:Connect(updateFriendsChatUnreadMessages)
+	SignalsRoblox.createDetachedEffect(function(p10) -- line: 298
+		-- upvalues: GetFriendsChatIconUnreadStore (copy), updateUnreadNotification (copy)
+		GetFriendsChatIconUnreadStore(p10).getUnreadCountToDisplay(p10)
+		updateUnreadNotification()
+	end)
 end
 
-local function shouldIgnoreUnreadForMessage(p10) -- line: 301
-	-- upvalues: v39 (copy), shouldSuppressUnreadForTabMetadata (copy)
-	return v39 and shouldSuppressUnreadForTabMetadata(p10 and p10.Metadata)
+local function shouldIgnoreUnreadForMessage(p11) -- line: 306
+	-- upvalues: v40 (copy), shouldSuppressUnreadForTabMetadata (copy)
+	return v40 and shouldSuppressUnreadForTabMetadata(p11 and p11.Metadata)
 end
 
-TextChatService.MessageReceived:Connect(function(p11) -- line: 306
-	-- upvalues: v39 (copy), shouldSuppressUnreadForTabMetadata (copy), Visibility (ref), n1 (ref), u50 (ref), FFlagExpChatEnableFriendsTab (copy), n2 (ref)
-	if v39 and shouldSuppressUnreadForTabMetadata(p11 and p11.Metadata) then
+TextChatService.MessageReceived:Connect(function(p12) -- line: 311
+	-- upvalues: v40 (copy), shouldSuppressUnreadForTabMetadata (copy), Visibility (ref), n1 (ref), updateUnreadNotification (copy)
+	if v40 and shouldSuppressUnreadForTabMetadata(p12 and p12.Metadata) then
 		return
 	end
 
 	if not Visibility then
 		n1 += 1
-
-		if not u50.notification then
-			return
-		end
-
-		if not FFlagExpChatEnableFriendsTab then
-			u50.notification:fireCount(n1)
-
-			return
-		end
-
-		local v86 = n1 + n2
-
-		if Visibility or v86 == 0 then
-			u50.notification:clear()
-
-			return
-		end
-
-		u50.notification:fireCount(v86)
+		updateUnreadNotification()
 	end
 end)
 
 if GetFFlagTextChatEnableUniverseChatTabs() then
-	TextChatService.UniverseChatMessageReceived:Connect(function(p12) -- line: 318
-		-- upvalues: v39 (copy), shouldSuppressUnreadForTabMetadata (copy), Visibility (ref), n1 (ref), u50 (ref), FFlagExpChatEnableFriendsTab (copy), n2 (ref)
-		if v39 and shouldSuppressUnreadForTabMetadata(p12 and p12.Metadata) then
+	TextChatService.UniverseChatMessageReceived:Connect(function(p13) -- line: 323
+		-- upvalues: v40 (copy), shouldSuppressUnreadForTabMetadata (copy), Visibility (ref), n1 (ref), updateUnreadNotification (copy)
+		if v40 and shouldSuppressUnreadForTabMetadata(p13 and p13.Metadata) then
 			return
 		end
 
 		if not Visibility then
 			n1 += 1
-
-			if not u50.notification then
-				return
-			end
-
-			if not FFlagExpChatEnableFriendsTab then
-				u50.notification:fireCount(n1)
-
-				return
-			end
-
-			local v88 = n1 + n2
-
-			if Visibility or v88 == 0 then
-				u50.notification:clear()
-
-				return
-			end
-
-			u50.notification:fireCount(v88)
+			updateUnreadNotification()
 		end
 	end)
 end
 
-local n4 = 0
+local n2 = 0
 
-ChatSelector.MessagesChanged:connect(function(n5: number) -- line: 330
-	-- upvalues: Visibility (ref), n1 (ref), n4 (ref), u50 (ref), FFlagExpChatEnableFriendsTab (copy), n2 (ref)
+ChatSelector.MessagesChanged:connect(function(n3: number) -- line: 335
+	-- upvalues: Visibility (ref), n1 (ref), n2 (ref), updateUnreadNotification (copy)
 	if not Visibility then
-		n1 += n5 - n4
-
-		if u50.notification then
-			if not FFlagExpChatEnableFriendsTab then
-				u50.notification:fireCount(n1)
-			else
-				local v90 = n1 + n2
-
-				if Visibility or v90 == 0 then
-					u50.notification:clear()
-				else
-					u50.notification:fireCount(v90)
-				end
-			end
-		end
+		n1 += n3 - n2
+		updateUnreadNotification()
 	end
 
-	n4 = n5
+	n2 = n3
 end)
 
 if not FFlagExpChatWindowSyncUnibar then
-	ChatSelector.ChatActiveChanged:connect(function(b1: boolean) -- line: 339
-		-- upvalues: v41 (copy), default (copy), RunService (copy), Chat (copy), Players (copy), u50 (ref)
-		if v41 then
+	ChatSelector.ChatActiveChanged:connect(function(b1: boolean) -- line: 344
+		-- upvalues: v42 (copy), default (copy), RunService (copy), Chat (copy), Players (copy), u50 (ref)
+		if v42 then
 			default.setChatActiveCalledByDeveloper(b1)
 
 			return
 		end
 
 		if b1 then
-			local v94
+			local v88
 
 			if not RunService:IsStudio() then
-				local ok, result = pcall(function() -- line: 87
+				local ok, result = pcall(function() -- line: 91
 					-- upvalues: Chat (copy), Players (copy)
 					return Chat:CanUserChatAsync(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
 				end)
 
-				v94 = ok and result
+				v88 = ok and result
 			else
-				v94 = true
+				v88 = true
 			end
 
-			if not v94 then
+			if not v88 then
 				u50.availability:available()
 			end
 		end
 	end)
 end
 
-local function setChatVisibilityOnLoad() -- line: 353
+local function setChatVisibilityOnLoad() -- line: 358
 	-- upvalues: GameSettings (copy), ViewportUtil (copy), Visibility (ref), ChatSelector (copy)
 	local ChatVisible = GameSettings.ChatVisible
 
@@ -496,8 +392,8 @@ local function setChatVisibilityOnLoad() -- line: 353
 	ChatSelector:SetVisible(ChatVisible)
 end
 
-coroutine.wrap(function() -- line: 363
-	-- upvalues: Players (copy), RunService (copy), Chat (copy), v41 (copy), default (copy), GameSettings (copy), ViewportUtil (copy), Visibility (ref), ChatSelector (copy), u50 (ref), ChromeUtils (copy)
+coroutine.wrap(function() -- line: 368
+	-- upvalues: Players (copy), RunService (copy), Chat (copy), v42 (copy), default (copy), GameSettings (copy), ViewportUtil (copy), Visibility (ref), ChatSelector (copy), u50 (ref), ChromeUtils (copy)
 	local LocalPlayer = Players.LocalPlayer
 
 	while not LocalPlayer do
@@ -505,23 +401,23 @@ coroutine.wrap(function() -- line: 363
 		LocalPlayer = Players.LocalPlayer
 	end
 
-	local v99
+	local v93
 
 	if not RunService:IsStudio() then
-		local ok, result = pcall(function() -- line: 87
+		local ok, result = pcall(function() -- line: 91
 			-- upvalues: Chat (copy), Players (copy)
 			return Chat:CanUserChatAsync(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
 		end)
 
-		v99 = ok and result
+		v93 = ok and result
 	else
-		v99 = true
+		v93 = true
 	end
 
-	if v41 then
-		default.setLocalUserChat(v99)
+	if v42 then
+		default.setLocalUserChat(v93)
 
-		if v99 then
+		if v93 then
 			local ChatVisible = GameSettings.ChatVisible
 
 			if ViewportUtil.isSmallTouchScreen() then
@@ -533,10 +429,10 @@ coroutine.wrap(function() -- line: 363
 
 			return
 		end
-	elseif v99 and u50.availability then
-		ChromeUtils.setCoreGuiAvailability(u50, Enum.CoreGuiType.Chat, function(p13) -- line: 378
+	elseif v93 and u50.availability then
+		ChromeUtils.setCoreGuiAvailability(u50, Enum.CoreGuiType.Chat, function(p14) -- line: 383
 			-- upvalues: u50 (ref)
-			if p13 then
+			if p14 then
 				u50.availability:pinned()
 
 				return
@@ -556,27 +452,14 @@ coroutine.wrap(function() -- line: 363
 	end
 end)()
 
-function _simulateChat() -- line: 398
-	-- upvalues: Visibility (ref), n1 (ref), u50 (ref), FFlagExpChatEnableFriendsTab (copy), n2 (ref)
+function _simulateChat() -- line: 403
+	-- upvalues: Visibility (ref), n1 (ref), updateUnreadNotification (copy)
 	while true do
 		task.wait(math.random(1, 15))
 
 		if not Visibility then
 			n1 += 1
-
-			if u50.notification then
-				if not FFlagExpChatEnableFriendsTab then
-					u50.notification:fireCount(n1)
-				else
-					local v102 = n1 + n2
-
-					if Visibility or v102 == 0 then
-						u50.notification:clear()
-					else
-						u50.notification:fireCount(v102)
-					end
-				end
-			end
+			updateUnreadNotification()
 		end
 	end
 end

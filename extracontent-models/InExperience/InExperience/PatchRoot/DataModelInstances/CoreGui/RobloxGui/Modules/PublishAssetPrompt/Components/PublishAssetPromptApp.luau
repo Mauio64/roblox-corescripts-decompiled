@@ -12,32 +12,34 @@ local PromptType = require(scriptParent.Parent.PromptType)
 local PublishAssetPromptSingleStep = require(scriptParent.PublishAssetPromptSingleStep)
 local PublishAvatarPrompt = require(scriptParent.PublishAvatarPrompt.PublishAvatarPrompt)
 local PublishAvatarAssetPrompt = require(scriptParent.PublishAvatarAssetPrompt.PublishAvatarAssetPrompt)
+local PublishMakeupLookPrompt = require(scriptParent.PublishMakeupLookPrompt.PublishMakeupLookPrompt)
 local ResultModal = require(scriptParent.ResultModal)
 local SelectionCursorProvider = require(CorePackages.Packages.UIBlox).App.SelectionImage.SelectionCursorProvider
 local ReactFocusNavigation = require(CorePackages.Packages.ReactFocusNavigation)
-local v18 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+local v19 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 local FocusNavigationUtils = require(CorePackages.Workspace.Packages.FocusNavigationUtils)
 local Provider = FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
-local v23 = Roact.PureComponent:extend("PublishAssetPromptApp")
+local GetFFlagUploadMakeupSupport = require(scriptParent.Parent.Flags.GetFFlagUploadMakeupSupport)
+local v25 = Roact.PureComponent:extend("PublishAssetPromptApp")
 
-v23.validateProps = t.strictInterface({
+v25.validateProps = t.strictInterface({
 	assetType = t.optional(t.enum(Enum.AssetType)),
 	assetInstance = t.optional(t.Instance)
 })
 
-local function isGamepadInput(p1) -- line: 47
+local function isGamepadInput(p1) -- line: 50
 	-- upvalues: getInputGroup (copy), InputType (copy)
 	return getInputGroup(p1) == InputType.InputTypeConstants.Gamepad
 end
 
-function v23.init(p2) -- line: 52
+function v25.init(p2) -- line: 55
 	p2:setState({
 		screenSize = Vector2.new(0, 0)
 	})
 
-	function p2.absoluteSizeChanged(p3) -- line: 57
+	function p2.absoluteSizeChanged(p3) -- line: 60
 		-- upvalues: p2 (copy)
 		if p2.state.screenSize ~= p3.AbsoluteSize then
 			p2:setState({
@@ -49,31 +51,35 @@ function v23.init(p2) -- line: 52
 	p2.selectedCoreGuiObject = nil
 	p2.selectedGuiObject = nil
 end
-function v23.render(p4) -- line: 69
-	-- upvalues: Roact (copy), ResultModal (copy), PromptType (copy), PublishAssetPromptSingleStep (copy), PublishAvatarPrompt (copy), PublishAvatarAssetPrompt (copy), ExternalEventConnection (copy), UserInputService (copy), getInputGroup (copy), InputType (copy), RoactGamepad (copy), SelectionCursorProvider (copy), ReactFocusNavigation (copy), v18 (copy), Provider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v29 = nil
+function v25.render(p4) -- line: 72
+	-- upvalues: Roact (copy), ResultModal (copy), PromptType (copy), PublishAssetPromptSingleStep (copy), PublishAvatarPrompt (copy), PublishAvatarAssetPrompt (copy), GetFFlagUploadMakeupSupport (copy), PublishMakeupLookPrompt (copy), ExternalEventConnection (copy), UserInputService (copy), getInputGroup (copy), InputType (copy), RoactGamepad (copy), SelectionCursorProvider (copy), ReactFocusNavigation (copy), v19 (copy), Provider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v31 = nil
 
 	if p4.props.resultModalType then
-		v29 = Roact.createElement(ResultModal, {
+		v31 = Roact.createElement(ResultModal, {
 			screenSize = p4.state.screenSize
 		})
 	elseif p4.props.assetInstance then
 		if p4.props.promptType == PromptType.PublishAssetSingleStep then
-			v29 = Roact.createElement(PublishAssetPromptSingleStep, {
+			v31 = Roact.createElement(PublishAssetPromptSingleStep, {
 				screenSize = p4.state.screenSize
 			})
 		end
 	elseif p4.props.promptType == PromptType.PublishAvatar then
-		v29 = Roact.createElement(PublishAvatarPrompt, {
+		v31 = Roact.createElement(PublishAvatarPrompt, {
 			screenSize = p4.state.screenSize
 		})
 	elseif p4.props.promptType == PromptType.PublishAvatarAsset then
-		v29 = Roact.createElement(PublishAvatarAssetPrompt, {
+		v31 = Roact.createElement(PublishAvatarAssetPrompt, {
+			screenSize = p4.state.screenSize
+		})
+	elseif GetFFlagUploadMakeupSupport() and p4.props.promptType == PromptType.PublishMakeupLook then
+		v31 = Roact.createElement(PublishMakeupLookPrompt, {
 			screenSize = p4.state.screenSize
 		})
 	end
 
-	if v29 == nil then
+	if v31 == nil then
 		return nil
 	end
 
@@ -86,7 +92,7 @@ function v23.render(p4) -- line: 69
 	}, {
 		LastInputTypeConnection = Roact.createElement(ExternalEventConnection, {
 			event = UserInputService.LastInputTypeChanged,
-			callback = function(p5) -- line: 105
+			callback = function(p5) -- line: 112
 				-- upvalues: p4 (copy), getInputGroup (copy), InputType (copy)
 				p4:setState({
 					isGamepad = getInputGroup(p5) == InputType.InputTypeConstants.Gamepad
@@ -99,7 +105,7 @@ function v23.render(p4) -- line: 69
 		}, {
 			CursorProvider = Roact.createElement(SelectionCursorProvider, {}, {
 				FocusNavigationProvider = Roact.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
-					value = v18
+					value = v19
 				}, {
 					FocusNavigationRegistryProvider = Roact.createElement(Provider, nil, {
 						FocusNavigationCoreScriptsWrapper = Roact.createElement(FocusRoot, {
@@ -107,7 +113,7 @@ function v23.render(p4) -- line: 69
 							isAutoFocusRoot = true,
 							surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.RouterView
 						}, {
-							Prompt = v29
+							Prompt = v31
 						})
 					})
 				})
@@ -116,7 +122,7 @@ function v23.render(p4) -- line: 69
 	}))
 end
 
-local function mapStateToProps(p6) -- line: 143
+local function mapStateToProps(p6) -- line: 150
 	return {
 		resultModalType = p6.promptRequest.resultModalType,
 		promptType = p6.promptRequest.promptInfo.promptType,
@@ -125,4 +131,4 @@ local function mapStateToProps(p6) -- line: 143
 	}
 end
 
-return RoactRodux.connect(mapStateToProps)(v23)
+return RoactRodux.connect(mapStateToProps)(v25)

@@ -9,8 +9,10 @@ local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local t = InGameMenuDependencies.t
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v14 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v15 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local Images = UIBlox.App.ImageSet.Images
 local ParentParent = script.Parent.Parent.Parent
@@ -36,11 +38,11 @@ local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
 local UnblockPlayer = require(RobloxGui.Modules.PlayerList.Thunks.UnblockPlayer)
 local TrustAndSafety = require(RobloxGui.Modules.TrustAndSafety)
 local onBlockButtonActivated = require(RobloxGui.Modules.Settings.onBlockButtonActivated)
-local v39 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
-local v40 = settings():GetFVariable("InGameGlobalGuiInset") + 24
-local v41 = Roact.PureComponent:extend("PlayersPage")
+local v41 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local v42 = settings():GetFVariable("InGameGlobalGuiInset") + 24
+local v43 = Roact.PureComponent:extend("PlayersPage")
 
-v41.validateProps = t.strictInterface({
+v43.validateProps = t.strictInterface({
 	isMenuOpen = t.boolean,
 	voiceEnabled = t.optional(t.boolean),
 	inspectMenuEnabled = t.boolean,
@@ -56,7 +58,7 @@ v41.validateProps = t.strictInterface({
 	isCurrentZoneActive = t.optional(t.boolean)
 })
 
-function v41.init(p1) -- line: 89
+function v43.init(p1) -- line: 96
 	-- upvalues: Players (copy), GetFFlagIGMGamepadSelectionHistory (copy), Roact (copy), FFlagLuaMenuPerfImprovements (copy)
 	p1:setState({
 		selectedPlayer = nil,
@@ -69,7 +71,7 @@ function v41.init(p1) -- line: 89
 		selectedPlayerPosition = Vector2.new(0, 0)
 	})
 
-	function p1.setSelectedPlayerRef(p2) -- line: 101
+	function p1.setSelectedPlayerRef(p2) -- line: 108
 		-- upvalues: GetFFlagIGMGamepadSelectionHistory (copy), p1 (copy), Roact (copy)
 		if GetFFlagIGMGamepadSelectionHistory() then
 			p1:setState({
@@ -84,7 +86,7 @@ function v41.init(p1) -- line: 89
 			firstPlayerRef = Roact.None
 		})
 	end
-	function p1.setFirstPlayerRef(p3) -- line: 114
+	function p1.setFirstPlayerRef(p3) -- line: 121
 		-- upvalues: p1 (copy)
 		p1:setState({
 			firstPlayerRef = p3
@@ -92,13 +94,13 @@ function v41.init(p1) -- line: 89
 	end
 
 	if FFlagLuaMenuPerfImprovements then
-		function p1.positionChanged(p4) -- line: 121
+		function p1.positionChanged(p4) -- line: 128
 			-- upvalues: p1 (copy)
 			p1:setState({
 				selectedPlayerPosition = p4.AbsolutePosition
 			})
 		end
-		function p1.toggleMoreActions(p5) -- line: 126
+		function p1.toggleMoreActions(p5) -- line: 133
 			-- upvalues: Players (copy), p1 (copy), Roact (copy)
 			local PlayerByUserId = Players:GetPlayerByUserId(p5)
 
@@ -117,13 +119,13 @@ function v41.init(p1) -- line: 89
 	end
 end
 
-local function sortPlayers(p6, p7) -- line: 141
+local function sortPlayers(p6, p7) -- line: 148
 	return p6.Name:lower() < p7.Name:lower()
 end
 
-function v41.renderListEntries(p8, p9) -- line: 145
+function v43.renderListEntries(p8, p9) -- line: 152
 	-- upvalues: Cryo (copy), sortPlayers (copy), Roact (copy), FFlagLuaMenuPerfImprovements (copy), Players (copy), PlayerLabelV2 (copy), VoiceIndicator (copy), Divider (copy)
-	local v48 = Cryo.List.sort(p9, sortPlayers)
+	local v50 = Cryo.List.sort(p9, sortPlayers)
 	local n1 = 0
 	local t1 = {
 		ListLayout = Roact.createElement("UIListLayout", {
@@ -132,15 +134,15 @@ function v41.renderListEntries(p8, p9) -- line: 145
 		})
 	}
 
-	for k, v in pairs(v48) do
-		local v53 = FFlagLuaMenuPerfImprovements and v.UserId or k
-		local v54 = FFlagLuaMenuPerfImprovements and p8.positionChanged or function(p10) -- line: 160
+	for k, v in pairs(v50) do
+		local v55 = FFlagLuaMenuPerfImprovements and v.UserId or k
+		local v56 = FFlagLuaMenuPerfImprovements and p8.positionChanged or function(p10) -- line: 167
 			-- upvalues: p8 (copy)
 			p8:setState({
 				selectedPlayerPosition = p10.AbsolutePosition
 			})
 		end
-		local v55 = FFlagLuaMenuPerfImprovements and p8.toggleMoreActions or function() -- line: 167
+		local v57 = FFlagLuaMenuPerfImprovements and p8.toggleMoreActions or function() -- line: 174
 			-- upvalues: p8 (copy), v (copy), Roact (copy)
 			if p8.state.selectedPlayer == v then
 				p8:setState({
@@ -162,30 +164,30 @@ function v41.renderListEntries(p8, p9) -- line: 145
 			setFirstPlayerRef = p8.setSelectedPlayerRef
 		end
 
-		local v57 = v == Players.LocalPlayer and "MicLight" or "SpeakerLight"
+		local v59 = v == Players.LocalPlayer and "MicLight" or "SpeakerLight"
 
-		t1["player_" .. v53] = Roact.createElement(PlayerLabelV2, {
+		t1["player_" .. v55] = Roact.createElement(PlayerLabelV2, {
 			username = v.Name,
 			displayName = v.DisplayName,
 			userId = v.UserId,
 			isOnline = true,
 			isSelected = v == p8.state.selectedPlayer,
 			LayoutOrder = n1,
-			onActivated = v55,
-			[Roact.Change.AbsolutePosition] = v == p8.state.selectedPlayer and v54 or nil,
+			onActivated = v57,
+			[Roact.Change.AbsolutePosition] = v == p8.state.selectedPlayer and v56 or nil,
 			[Roact.Ref] = setFirstPlayerRef
 		}, {
 			Icon = p8.props.voiceEnabled and (v ~= Players.LocalPlayer and Roact.createElement(VoiceIndicator, {
 				hideOnError = true,
 				userId = tostring(v.UserId),
-				iconStyle = v57,
-				onClicked = v55
+				iconStyle = v59,
+				onClicked = v57
 			}))
 		})
 		n1 += 1
 
-		if k < #v48 then
-			t1["divider_" .. v53] = Roact.createElement(Divider, {
+		if k < #v50 then
+			t1["divider_" .. v55] = Roact.createElement(Divider, {
 				LayoutOrder = n1,
 				Size = UDim2.new(1, -104, 0, 1)
 			})
@@ -195,8 +197,8 @@ function v41.renderListEntries(p8, p9) -- line: 145
 
 	return t1
 end
-function v41.getMoreActions(p11, p12) -- line: 224
-	-- upvalues: Players (copy), Images (copy), RbxAnalyticsService (copy), SendAnalytics (copy), Constants2 (copy), Roact (copy), Assets (copy), GuiService (copy), TrustAndSafety (copy), default (copy), v39 (copy), Constants (copy), BlockingUtility (copy), onBlockButtonActivated (copy)
+function v43.getMoreActions(p11, p12) -- line: 231
+	-- upvalues: Players (copy), Images (copy), RbxAnalyticsService (copy), SendAnalytics (copy), Constants2 (copy), Roact (copy), Assets (copy), GuiService (copy), TrustAndSafety (copy), default (copy), v41 (copy), Constants (copy), BlockingUtility (copy), onBlockButtonActivated (copy)
 	local t2 = {}
 
 	if p11.state.selectedPlayer ~= nil then
@@ -208,22 +210,22 @@ function v41.getMoreActions(p11, p12) -- line: 224
 			end
 
 			local addFriend = p12.addFriend
-			local v63 = Images["icons/actions/friends/friendAdd"]
+			local v65 = Images["icons/actions/friends/friendAdd"]
 
 			if Unknown == Enum.FriendStatus.Friend then
 				addFriend = p12.unfriend
-				v63 = Images["icons/actions/friends/friendRemove"]
+				v65 = Images["icons/actions/friends/friendRemove"]
 			elseif Unknown == Enum.FriendStatus.FriendRequestSent then
 				addFriend = p12.cancelFriend
-				v63 = Images["icons/actions/friends/friendRemove"]
+				v65 = Images["icons/actions/friends/friendRemove"]
 			elseif Unknown == Enum.FriendStatus.FriendRequestReceived then
 				addFriend = p12.acceptFriend
 			end
 
 			table.insert(t2, {
 				text = addFriend,
-				icon = v63,
-				onActivated = function() -- line: 249
+				icon = v65,
+				onActivated = function() -- line: 256
 					-- upvalues: p11 (copy), Unknown (ref), Players (copy), RbxAnalyticsService (copy), SendAnalytics (copy), Constants2 (copy), Roact (copy)
 					local selectedPlayer = p11.state.selectedPlayer
 
@@ -245,7 +247,7 @@ function v41.getMoreActions(p11, p12) -- line: 224
 		table.insert(t2, {
 			text = p12.viewAvatar,
 			icon = Assets.Images.ViewAvatar,
-			onActivated = function() -- line: 271
+			onActivated = function() -- line: 278
 				-- upvalues: GuiService (copy), p11 (copy), Roact (copy), SendAnalytics (copy), Constants2 (copy)
 				GuiService:InspectPlayerFromUserIdWithCtx(p11.state.selectedPlayer.UserId, "escapeMenu")
 				p11:setState({
@@ -260,7 +262,7 @@ function v41.getMoreActions(p11, p12) -- line: 224
 			table.insert(t2, {
 				text = p12.reportAbuse,
 				icon = Images["icons/actions/feedback"],
-				onActivated = function() -- line: 285
+				onActivated = function() -- line: 292
 					-- upvalues: p11 (copy), TrustAndSafety (copy), Constants2 (copy), Roact (copy)
 					local selectedPlayer = p11.state.selectedPlayer
 
@@ -272,19 +274,19 @@ function v41.getMoreActions(p11, p12) -- line: 224
 			})
 
 			if p11.props.voiceEnabled then
-				local v64 = default.participants[tostring(p11.state.selectedPlayer.UserId)]
+				local v66 = default.participants[tostring(p11.state.selectedPlayer.UserId)]
 
-				if v64 then
-					local isMutedLocally = v64.isMutedLocally
+				if v66 then
+					local isMutedLocally = v66.isMutedLocally
 
 					table.insert(t2, {
 						text = not isMutedLocally and "Mute Player" or "Unmute Player",
 						icon = default:GetIcon(not isMutedLocally and "Mute" or "Unmute", "Misc"),
-						onActivated = function() -- line: 302
-							-- upvalues: p11 (copy), v39 (copy), default (copy), Constants (copy), Roact (copy)
+						onActivated = function() -- line: 309
+							-- upvalues: p11 (copy), v41 (copy), default (copy), Constants (copy), Roact (copy)
 							local selectedPlayer = p11.state.selectedPlayer
 
-							v39:debug("Muting Player {}", selectedPlayer.UserId)
+							v41:debug("Muting Player {}", selectedPlayer.UserId)
 							default:ToggleMutePlayer(selectedPlayer.UserId, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
 							p11:setState({
 								selectedPlayer = Roact.None
@@ -295,14 +297,14 @@ function v41.getMoreActions(p11, p12) -- line: 224
 			end
 
 			local selectedPlayer = p11.state.selectedPlayer
-			local v67 = BlockingUtility:IsPlayerBlockedByUserId(selectedPlayer.UserId)
+			local v69 = BlockingUtility:IsPlayerBlockedByUserId(selectedPlayer.UserId)
 
 			table.insert(t2, {
-				text = v67 and p12.unblockPlayer or p12.blockPlayer,
+				text = v69 and p12.unblockPlayer or p12.blockPlayer,
 				icon = Images["icons/actions/block"],
-				onActivated = function() -- line: 322
-					-- upvalues: v67 (copy), p11 (copy), selectedPlayer (copy), onBlockButtonActivated (copy), Roact (copy)
-					if v67 then
+				onActivated = function() -- line: 329
+					-- upvalues: v69 (copy), p11 (copy), selectedPlayer (copy), onBlockButtonActivated (copy), Roact (copy)
+					if v69 then
 						p11.props.unblockPlayer(selectedPlayer)
 					else
 						onBlockButtonActivated(selectedPlayer, nil, p11.__componentName)
@@ -318,28 +320,28 @@ function v41.getMoreActions(p11, p12) -- line: 224
 
 	return t2
 end
-function v41.renderFocusHandler(p13, p14) -- line: 340
+function v43.renderFocusHandler(p13, p14) -- line: 347
 	-- upvalues: GetFFlagIGMGamepadSelectionHistory (copy), Constants2 (copy), Roact (copy), FocusHandler (copy), GuiService (copy)
-	local v70 = nil
+	local v72 = nil
 
 	if GetFFlagIGMGamepadSelectionHistory() then
-		v70 = p13.props.currentPage == Constants2.MainPagePageKey or not p13.props.isCurrentZoneActive
+		v72 = p13.props.currentPage == Constants2.MainPagePageKey or not p13.props.isCurrentZoneActive
 	end
 
 	return Roact.createElement(FocusHandler, {
 		isFocused = p14 and (p13.props.currentPage == "Players" and (p13.props.isMenuOpen and (not p13.props.isReportDialogOpen and (not p13.state.selectedPlayer and (p13.state.selectedPlayerRef or p13.state.firstPlayerRef) ~= nil)))),
-		shouldForgetPreviousSelection = v70,
-		didFocus = GetFFlagIGMGamepadSelectionHistory() and function(p15) -- line: 356
+		shouldForgetPreviousSelection = v72,
+		didFocus = GetFFlagIGMGamepadSelectionHistory() and function(p15) -- line: 363
 			-- upvalues: GuiService (copy), p13 (copy)
 			GuiService.SelectedCoreObject = p15 or p13.state.firstPlayerRef
-		end or function() -- line: 360
+		end or function() -- line: 367
 			-- upvalues: GuiService (copy), p13 (copy)
 			GuiService.SelectedCoreObject = p13.state.selectedPlayerRef or p13.state.firstPlayerRef
 		end
 	})
 end
-function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
-	-- upvalues: v40 (copy), Roact (copy), PlayerContextualMenu (copy), Page (copy), default (copy), Constants (copy), CursorKind (copy), withFoundationOrUIBloxStyle (copy), BarOnTopScrollingFrame (copy), PageNavigationWatcher (copy), Players (copy)
+function v43.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 374
+	-- upvalues: v42 (copy), Roact (copy), PlayerContextualMenu (copy), Page (copy), default (copy), Constants (copy), v15 (copy), withFoundationOrUIBloxStyle (copy), BarOnTopScrollingFrame (copy), PageNavigationWatcher (copy), Players (copy)
 	local n2 = 0
 	local n3 = 0
 	local t3 = {}
@@ -347,22 +349,22 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 	if p16.state.selectedPlayer ~= nil then
 		t3 = p16:getMoreActions(p17)
 
-		local v77 = #t3 * 56
+		local v79 = #t3 * 56
 		local screenSizeX = p16.props.screenSize.X
 		local screenSizeY = p16.props.screenSize.Y
 
-		n2 = if not (screenSizeY > p16.state.selectedPlayerPosition.Y + v77 + v40) then screenSizeY - v77 - v40 else p16.state.selectedPlayerPosition.Y
+		n2 = if not (screenSizeY > p16.state.selectedPlayerPosition.Y + v79 + v42) then screenSizeY - v79 - v42 else p16.state.selectedPlayerPosition.Y
 		n3 = if not (screenSizeX >= p16.state.selectedPlayerPosition.X + 400 + 20 + 352 + 24) then screenSizeX - 352 - 24 else p16.state.selectedPlayerPosition.X + 400 + 20
 	end
 
-	local v80 = p16.props.isGamepadLastInput and (not p16.props.isRespawnDialogOpen and p16.props.isCurrentZoneActive)
-	local u81 = p16.state.selectedPlayer and Roact.createElement(PlayerContextualMenu, {
+	local v82 = p16.props.isGamepadLastInput and (not p16.props.isRespawnDialogOpen and p16.props.isCurrentZoneActive)
+	local u83 = p16.state.selectedPlayer and Roact.createElement(PlayerContextualMenu, {
 		actionWidth = 352,
 		moreActions = t3,
 		xOffset = n3,
 		yOffset = n2,
-		canCaptureFocus = v80,
-		onClose = function() -- line: 411
+		canCaptureFocus = v82,
+		onClose = function() -- line: 418
 			-- upvalues: p16 (copy), Roact (copy)
 			p16:setState({
 				selectedPlayer = Roact.None
@@ -379,24 +381,24 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 			BorderSizePixel = 0,
 			Position = UDim2.new(1, 4, 0.5, 0),
 			Image = default:GetIcon(not p16.state.allMuted and "MuteAll" or "UnmuteAll", "Misc"),
-			[Roact.Event.Activated] = function() -- line: 426
+			[Roact.Event.Activated] = function() -- line: 433
 				-- upvalues: default (copy), p16 (copy), Constants (copy)
 				default:MuteAll(not p16.state.allMuted, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
 				p16:setState({
 					allMuted = not p16.state.allMuted
 				})
 			end,
-			SelectionImageObject = p18(CursorKind.RoundedRect)
+			SelectionImageObject = p18(v15.RoundedRect)
 		})
 	}, {
-		PlayerListContent = withFoundationOrUIBloxStyle(function(_) -- line: 435
+		PlayerListContent = withFoundationOrUIBloxStyle(function(_) -- line: 442
 			return {}
-		end, function(_) -- line: 437
-			-- upvalues: Roact (copy), p16 (copy), BarOnTopScrollingFrame (copy), u81 (ref)
+		end, function(_) -- line: 444
+			-- upvalues: Roact (copy), p16 (copy), BarOnTopScrollingFrame (copy), u83 (ref)
 			return Roact.createElement("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0),
-				[Roact.Change.AbsoluteSize] = function(p21) -- line: 442
+				[Roact.Change.AbsoluteSize] = function(p21) -- line: 449
 					-- upvalues: p16 (copy)
 					p16:setState({
 						pageSizeY = p21.AbsoluteSize.Y
@@ -409,19 +411,19 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 					CanvasSize = UDim2.new(1, 0, 0, #p16.state.players * 72),
 					ScrollingEnabled = p16.state.selectedPlayer == nil
 				}, p16:renderListEntries(p16.state.players)),
-				MoreActionsMenu = u81
+				MoreActionsMenu = u83
 			})
 		end),
-		FocusHandler = p16:renderFocusHandler(v80),
+		FocusHandler = p16:renderFocusHandler(v82),
 		Watcher = Roact.createElement(PageNavigationWatcher, {
 			desiredPage = "Players",
-			onNavigateTo = function() -- line: 461
+			onNavigateTo = function() -- line: 468
 				-- upvalues: p16 (copy), Players (copy)
 				p16:setState({
 					players = Players:GetPlayers()
 				})
 			end,
-			onNavigateAway = function() -- line: 466
+			onNavigateAway = function() -- line: 473
 				-- upvalues: p16 (copy), Roact (copy)
 				p16:setState({
 					selectedPlayer = Roact.None
@@ -430,14 +432,14 @@ function v41.renderWithLocalizedAndSelectionCursor(p16, p17, p18) -- line: 367
 		})
 	})
 end
-function v41.renderWithLocalized(p22, p23) -- line: 475
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p24) -- line: 476
+function v43.renderWithLocalized(p22, p23) -- line: 482
+	-- upvalues: v14 (copy)
+	return v14(function(p24) -- line: 483
 		-- upvalues: p22 (copy), p23 (copy)
 		return p22:renderWithLocalizedAndSelectionCursor(p23, p24)
 	end)
 end
-function v41.render(p25) -- line: 481
+function v43.render(p25) -- line: 488
 	-- upvalues: withLocalization (copy)
 	return withLocalization({
 		addFriend = "CoreScripts.InGameMenu.Actions.AddFriend",
@@ -448,12 +450,12 @@ function v41.render(p25) -- line: 481
 		reportAbuse = "CoreScripts.InGameMenu.Actions.ReportAbuse",
 		blockPlayer = "CoreScripts.InGameMenu.Actions.BlockPlayer",
 		unblockPlayer = "CoreScripts.InGameMenu.Actions.UnblockPlayer"
-	})(function(p26) -- line: 491
+	})(function(p26) -- line: 498
 		-- upvalues: p25 (copy)
 		return p25:renderWithLocalized(p26)
 	end)
 end
-function v41.didUpdate(p27, p28, _) -- line: 496
+function v43.didUpdate(p27, p28, _) -- line: 503
 	-- upvalues: Players (copy), Roact (copy)
 	if p27.props.isMenuOpen and not p28.isMenuOpen then
 		p27:setState({
@@ -471,7 +473,7 @@ function v41.didUpdate(p27, p28, _) -- line: 496
 	end
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p30, _) -- line: 514
+return RoactRodux.UNSTABLE_connect2(function(p30, _) -- line: 521
 	-- upvalues: Constants2 (copy)
 	return {
 		isMenuOpen = p30.isMenuOpen,
@@ -485,16 +487,16 @@ return RoactRodux.UNSTABLE_connect2(function(p30, _) -- line: 514
 		isGamepadLastInput = p30.displayOptions.inputType == Constants2.InputType.Gamepad,
 		isCurrentZoneActive = p30.currentZone == 1
 	}
-end, function(p32) -- line: 527
+end, function(p32) -- line: 534
 	-- upvalues: CloseMenu (copy), UnblockPlayer (copy)
 	return {
-		closeMenu = function() -- line: 529
+		closeMenu = function() -- line: 536
 			-- upvalues: p32 (copy), CloseMenu (copy)
 			p32(CloseMenu)
 		end,
-		unblockPlayer = function(p33) -- line: 533
+		unblockPlayer = function(p33) -- line: 540
 			-- upvalues: p32 (copy), UnblockPlayer (copy)
 			return p32(UnblockPlayer(p33))
 		end
 	}
-end)(v41)
+end)(v43)

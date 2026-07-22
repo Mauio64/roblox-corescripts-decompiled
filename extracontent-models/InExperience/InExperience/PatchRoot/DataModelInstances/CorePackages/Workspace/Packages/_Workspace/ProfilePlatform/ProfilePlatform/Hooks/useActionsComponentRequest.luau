@@ -15,34 +15,33 @@ local useCanSeeChatTab = require(ProfilePlatform.Hooks.useCanSeeChatTab)
 local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
 local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
 local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
-local FFlagProfilePlatformFilterChatActionByPolicy = require(ProfilePlatform.Flags.FFlagProfilePlatformFilterChatActionByPolicy)
 
-return function() -- line: 23
-	-- upvalues: useProfileWrapperContext (copy), getDeepValue (copy), useAreWebViewsSupported (copy), useIsProfileQrCodeEnabled (copy), useCanRenderTransferOnProfile (copy), FFlagProfilePlatformFilterChatActionByPolicy (copy), useCanSeeChatTab (copy), FFlagProfilePlatformCTAsRefactor (copy), useLocalUserId (copy), React (copy), buildUserActionsComponent (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy)
-	local v15 = useProfileWrapperContext()
-	local v16 = getDeepValue(v15, "sourceInfo.contextualInfoType")
-	local v17 = useAreWebViewsSupported()
-	local v18 = useIsProfileQrCodeEnabled()
-	local v19 = useCanRenderTransferOnProfile()
-	local v20 = if not FFlagProfilePlatformFilterChatActionByPolicy then nil else useCanSeeChatTab()
-	local v21 = if not FFlagProfilePlatformCTAsRefactor then nil else useLocalUserId()
-	local v22 = not not FFlagProfilePlatformCTAsRefactor and tostring(v15.profileId) == tostring(v21)
+return function() -- line: 21
+	-- upvalues: useProfileWrapperContext (copy), getDeepValue (copy), useAreWebViewsSupported (copy), useIsProfileQrCodeEnabled (copy), useCanRenderTransferOnProfile (copy), useCanSeeChatTab (copy), FFlagProfilePlatformCTAsRefactor (copy), useLocalUserId (copy), React (copy), buildUserActionsComponent (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy)
+	local v14 = useProfileWrapperContext()
+	local v15 = getDeepValue(v14, "sourceInfo.contextualInfoType")
+	local v16 = useAreWebViewsSupported()
+	local v17 = useIsProfileQrCodeEnabled()
+	local v18 = useCanRenderTransferOnProfile()
+	local v19 = useCanSeeChatTab()
+	local v20 = if not FFlagProfilePlatformCTAsRefactor then nil else useLocalUserId()
+	local v21 = not not FFlagProfilePlatformCTAsRefactor and tostring(v14.profileId) == tostring(v20)
 
-	return React.useMemo(function() -- line: 36
-		-- upvalues: buildUserActionsComponent (copy), v16 (copy), v17 (copy), v18 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), v19 (copy), FFlagProfilePlatformFilterChatActionByPolicy (copy), v20 (copy), FFlagProfilePlatformCTAsRefactor (copy), v22 (copy)
-		return buildUserActionsComponent(v16, {
-			areWebViewsSupported = v17,
-			isProfileQrCodeEnabled = v18,
-			canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v19,
-			canSeeChatTab = if not FFlagProfilePlatformFilterChatActionByPolicy then nil else v20,
-			isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v22
+	return React.useMemo(function() -- line: 34
+		-- upvalues: buildUserActionsComponent (copy), v15 (copy), v16 (copy), v17 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), v18 (copy), v19 (copy), FFlagProfilePlatformCTAsRefactor (copy), v21 (copy)
+		return buildUserActionsComponent(v15, {
+			areWebViewsSupported = v16,
+			isProfileQrCodeEnabled = v17,
+			canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v18,
+			canSeeChatTab = v19,
+			isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v21
 		})
 	end, {
+		v15,
 		v16,
 		v17,
-		v18,
-		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v19,
-		if not FFlagProfilePlatformFilterChatActionByPolicy then nil else v20,
-		if not FFlagProfilePlatformCTAsRefactor then nil else v22
+		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v18,
+		v19,
+		if not FFlagProfilePlatformCTAsRefactor then nil else v21
 	})
 end

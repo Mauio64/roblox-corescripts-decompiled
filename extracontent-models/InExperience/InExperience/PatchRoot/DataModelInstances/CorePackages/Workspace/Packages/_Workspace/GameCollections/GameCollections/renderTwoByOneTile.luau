@@ -9,13 +9,12 @@ local getTileBadgeByPositionConfigFromEntry = GameTile.getTileBadgeByPositionCon
 require(Parent.VideoUtils)
 
 local FFlagLuaAppSupportSponsoredExplicitFeedback = SharedFlags.FFlagLuaAppSupportSponsoredExplicitFeedback
-local FFlagLuaAppHomeTouchAutoplay = SharedFlags.FFlagLuaAppHomeTouchAutoplay
 local FFlagLuaAppFixCustomTileBugs = SharedFlags.FFlagLuaAppFixCustomTileBugs
-local v11 = React.memo(function(t1: {[any]: any}) -- line: 43
-	-- upvalues: React (copy), getTileBadgeByPositionConfigFromEntry (copy), TwoByOneGameTile (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), FFlagLuaAppHomeTouchAutoplay (copy), FFlagLuaAppFixCustomTileBugs (copy)
-	local v13 = -((t1.maxItemIndex or 0) + 1)
-	local v14 = if not t1.zIndex then v13 else t1.zIndex + v13
-	local v15 = React.useCallback(function() -- line: 48
+local v10 = React.memo(function(t1: {[any]: any}) -- line: 42
+	-- upvalues: React (copy), getTileBadgeByPositionConfigFromEntry (copy), TwoByOneGameTile (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), FFlagLuaAppFixCustomTileBugs (copy)
+	local v12 = -((t1.maxItemIndex or 0) + 1)
+	local v13 = if not t1.zIndex then v12 else t1.zIndex + v12
+	local v14 = React.useCallback(function() -- line: 47
 		-- upvalues: t1 (copy)
 		if t1.onSelectionGained then
 			t1.onSelectionGained(t1.item, t1.index, t1.item.universeId)
@@ -25,12 +24,12 @@ local v11 = React.memo(function(t1: {[any]: any}) -- line: 43
 		t1.item,
 		t1.index
 	})
-	local v16 = getTileBadgeByPositionConfigFromEntry(t1.item)
+	local v15 = getTileBadgeByPositionConfigFromEntry(t1.item)
 
 	return React.createElement(TwoByOneGameTile, {
 		size = t1.item.sizeOverride,
 		layoutOrder = t1.index,
-		zIndex = v14,
+		zIndex = v13,
 		universeId = t1.item.universeId,
 		placeId = t1.item.placeId,
 		topicId = t1.topicId,
@@ -40,7 +39,7 @@ local v11 = React.memo(function(t1: {[any]: any}) -- line: 43
 		subtitle = t1.item.subtitle,
 		ctaText = t1.item.ctaText,
 		tileVariant = t1.item.tileVariant,
-		badgeOverride = v16,
+		badgeOverride = v15,
 		payerName = t1.item.payerName,
 		adId = t1.item.adId,
 		isSponsored = t1.item.isSponsored,
@@ -58,15 +57,15 @@ local v11 = React.memo(function(t1: {[any]: any}) -- line: 43
 		enableExplicitFeedback = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else t1.enableExplicitFeedback,
 		placeIdOverride = t1.item.placeIdOverride,
 		launchDataOverride = t1.item.launchDataOverride,
-		onSelectionGained = v15,
+		onSelectionGained = v14,
 		onSelectionLost = t1.onSelectionLost,
 		primaryWideImageAssetId = t1.item.primaryWideImageAssetId,
-		videoPlaybackContext = if not FFlagLuaAppHomeTouchAutoplay then nil else t1.videoPlaybackContext,
+		videoPlaybackContext = t1.videoPlaybackContext,
 		SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t1.SelectionOrder
 	})
 end)
 
-return function(t2: {[any]: any}) -- line: 101
-	-- upvalues: React (copy), v11 (copy), GameCollectionItemTypes (copy)
-	return React.createElement(v11, t2), GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile
+return function(t2: {[any]: any}) -- line: 100
+	-- upvalues: React (copy), v10 (copy), GameCollectionItemTypes (copy)
+	return React.createElement(v10, t2), GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile
 end

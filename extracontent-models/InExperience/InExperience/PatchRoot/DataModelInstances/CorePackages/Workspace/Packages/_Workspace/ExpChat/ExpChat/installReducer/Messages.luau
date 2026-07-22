@@ -54,14 +54,13 @@ local getFFlagExpChatExcludeFOMORenders = require(ExpChat.Flags.getFFlagExpChatE
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 local FFlagExpChatDisableUniverseBubbleChat = ExpChatShared.Flags.FFlagExpChatDisableUniverseBubbleChat
 local GetFFlagExpChatSyntheticSystemMessageRichText = ExpChatShared.Flags.GetFFlagExpChatSyntheticSystemMessageRichText
-local FFlagExpChatEnablePostProcessRichSystemMessageTextFormat = require(ExpChat.Flags.FFlagExpChatEnablePostProcessRichSystemMessageTextFormat)
 local getTextAndTranslation = require(ExpChat.getTextAndTranslation)
 local ChannelTabsConfigurationEnabled = require(Actions.ChannelTabsConfigurationEnabled)
 local TextChatService = game:GetService("TextChatService")
 
-function getChatTranslationEnabled() -- line: 68
+function getChatTranslationEnabled() -- line: 66
 	-- upvalues: TextChatService (copy)
-	local ok, result = pcall(function() -- line: 69
+	local ok, result = pcall(function() -- line: 67
 		-- upvalues: TextChatService (copy)
 		return TextChatService.ChatTranslationEnabled
 	end)
@@ -84,7 +83,7 @@ local t1 = {
 	messagesBySenderId = {}
 }
 
-local function resolveChannelNameForMapOrder(t2: {[any]: any}, t3: {[any]: any}, s1: string?) -- line: 131
+local function resolveChannelNameForMapOrder(t2: {[any]: any}, t3: {[any]: any}, s1: string?) -- line: 129
 	-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), None (copy)
 	if GetFFlagTextChatEnableUniverseChatTabs() then
 		if s1 then
@@ -112,7 +111,7 @@ local function resolveChannelNameForMapOrder(t2: {[any]: any}, t3: {[any]: any},
 
 	return None
 end
-local function mapByMessageIdInOrderHelper(t4: {[any]: any}, t5: {[any]: any}, s2: string?) -- line: 157
+local function mapByMessageIdInOrderHelper(t4: {[any]: any}, t5: {[any]: any}, s2: string?) -- line: 155
 	-- upvalues: isWhiteSpaceOnly (copy), resolveChannelNameForMapOrder (copy), HttpService (copy), Dictionary (copy), FFlagEnableInExpChatRewrite (copy), FFlagExpChatDictation (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagChatLineReportingGlobalMuteEnabled (copy), FFlagExpChatPresetChatEnabled (copy), List (copy), FFlagExpChatEnableFOMOUpsell (copy), getFFlagExpChatExcludeFOMORenders (copy)
 	if isWhiteSpaceOnly(t5.text) and (t5.status ~= Enum.TextChatMessageStatus.Floodchecked and t5.status ~= Enum.TextChatMessageStatus.MessageTooLong) then
 		return t4
@@ -121,9 +120,9 @@ local function mapByMessageIdInOrderHelper(t4: {[any]: any}, t5: {[any]: any}, s
 	local partOrModel = t5.partOrModel
 	local userId = t5.userId
 	local messageId = t5.messageId
-	local v79 = resolveChannelNameForMapOrder(t4, t5, s2)
+	local v78 = resolveChannelNameForMapOrder(t4, t5, s2)
 	local windowMessagesInOrder = t4.windowMessagesInOrder
-	local v81 = t4.windowMessagesInOrderByTabId[v79] or {}
+	local v80 = t4.windowMessagesInOrderByTabId[v78] or {}
 	local byMessageId = t4.byMessageId
 	local bubbleMessagesInOrderBySenderId = t4.bubbleMessagesInOrderBySenderId
 	local mockUserIdToPartOrModel = t4.mockUserIdToPartOrModel
@@ -177,37 +176,37 @@ local function mapByMessageIdInOrderHelper(t4: {[any]: any}, t5: {[any]: any}, s
 			presetId = if not FFlagExpChatPresetChatEnabled then nil else t5.presetId,
 			presetChatVersion = if not FFlagExpChatPresetChatEnabled then nil else t5.presetChatVersion
 		}
-		local v90 = Dictionary.join(byMessageId, {
+		local v89 = Dictionary.join(byMessageId, {
 			[messageId] = t6
 		})
 
 		if userId and messagesBySenderId[userId] then
-			local v91 = List.findWhere(messagesBySenderId[userId], function(p1, _) -- line: 236
+			local v90 = List.findWhere(messagesBySenderId[userId], function(p1, _) -- line: 234
 				-- upvalues: messageId (copy)
 				return p1.messageId == messageId
 			end)
 
-			if v91 and v91 > 0 then
+			if v90 and v90 > 0 then
 				messagesBySenderId = Dictionary.join(messagesBySenderId, {
-					[userId] = List.set(messagesBySenderId[userId], v91, t6)
+					[userId] = List.set(messagesBySenderId[userId], v90, t6)
 				})
 			end
 		end
 
 		if t5.status == Enum.TextChatMessageStatus.Floodchecked or t5.status == Enum.TextChatMessageStatus.MessageTooLong then
 			windowMessagesInOrder = List.removeIndex(windowMessagesInOrder, List.count(windowMessagesInOrder))
-			v81 = List.removeIndex(v81, List.count(v81))
-			v90 = Dictionary.removeKey(v90, t5.messageId)
+			v80 = List.removeIndex(v80, List.count(v80))
+			v89 = Dictionary.removeKey(v89, t5.messageId)
 
 			if userId then
-				local v92 = List.findWhere(messagesBySenderId[userId], function(p3, _) -- line: 256
+				local v91 = List.findWhere(messagesBySenderId[userId], function(p3, _) -- line: 254
 					-- upvalues: messageId (copy)
 					return p3.messageId == messageId
 				end)
 
-				if v92 and v92 > 0 then
+				if v91 and v91 > 0 then
 					messagesBySenderId = Dictionary.join(messagesBySenderId, {
-						[userId] = List.removeIndex(messagesBySenderId[userId], v92)
+						[userId] = List.removeIndex(messagesBySenderId[userId], v91)
 					})
 				end
 			end
@@ -216,82 +215,82 @@ local function mapByMessageIdInOrderHelper(t4: {[any]: any}, t5: {[any]: any}, s
 		return Dictionary.join(t4, {
 			windowMessagesInOrder = windowMessagesInOrder,
 			windowMessagesInOrderByTabId = Dictionary.join(t4.windowMessagesInOrderByTabId, {
-				[v79] = v81
+				[v78] = v80
 			}),
-			byMessageId = v90,
+			byMessageId = v89,
 			messagesBySenderId = messagesBySenderId
 		})
 	end
 
 	if #windowMessagesInOrder == t4.messageLimit and t5.isVisibleInChatWindow then
-		local u93 = windowMessagesInOrder[1]
-		local v94 = if not byMessageId[u93] then nil else byMessageId[u93].userId
+		local u92 = windowMessagesInOrder[1]
+		local v93 = if not byMessageId[u92] then nil else byMessageId[u92].userId
 
 		windowMessagesInOrder = List.removeIndex(windowMessagesInOrder, 1)
 
-		if v94 then
-			if messagesBySenderId ~= nil and messagesBySenderId[v94] then
-				local v95 = List.findWhere(messagesBySenderId[v94], function(p5, _) -- line: 284
-					-- upvalues: u93 (ref)
-					return p5.messageId == u93
+		if v93 then
+			if messagesBySenderId ~= nil and messagesBySenderId[v93] then
+				local v94 = List.findWhere(messagesBySenderId[v93], function(p5, _) -- line: 282
+					-- upvalues: u92 (ref)
+					return p5.messageId == u92
 				end)
 
-				if v95 and v95 > 0 then
+				if v94 and v94 > 0 then
 					messagesBySenderId = Dictionary.join(messagesBySenderId, {
-						[v94] = List.removeIndex(messagesBySenderId[v94], v95)
+						[v93] = List.removeIndex(messagesBySenderId[v93], v94)
 					})
 				end
 
-				if Dictionary.count(messagesBySenderId[v94]) == 0 then
-					messagesBySenderId = Dictionary.removeKey(messagesBySenderId, v94)
+				if Dictionary.count(messagesBySenderId[v93]) == 0 then
+					messagesBySenderId = Dictionary.removeKey(messagesBySenderId, v93)
 
-					if mockUserIdToPartOrModel[v94] then
-						local v96 = mockUserIdToPartOrModel[v94]
+					if mockUserIdToPartOrModel[v93] then
+						local v95 = mockUserIdToPartOrModel[v93]
 
-						if partOrModelToMockUserId[v96] then
-							partOrModelToMockUserId = Dictionary.removeKey(partOrModelToMockUserId, v96)
+						if partOrModelToMockUserId[v95] then
+							partOrModelToMockUserId = Dictionary.removeKey(partOrModelToMockUserId, v95)
 						end
 
-						mockUserIdToPartOrModel = Dictionary.removeKey(mockUserIdToPartOrModel, v94)
+						mockUserIdToPartOrModel = Dictionary.removeKey(mockUserIdToPartOrModel, v93)
 					end
 				end
-			elseif bubbleMessagesInOrderBySenderId ~= nil and bubbleMessagesInOrderBySenderId[v94] then
-				local v97 = Dictionary.join(bubbleMessagesInOrderBySenderId, {
-					[v94] = List.removeValue(bubbleMessagesInOrderBySenderId[v94], u93)
+			elseif bubbleMessagesInOrderBySenderId ~= nil and bubbleMessagesInOrderBySenderId[v93] then
+				local v96 = Dictionary.join(bubbleMessagesInOrderBySenderId, {
+					[v93] = List.removeValue(bubbleMessagesInOrderBySenderId[v93], u92)
 				})
 
-				if Dictionary.count(v97[v94]) == 0 then
-					Dictionary.removeKey(v97, v94)
+				if Dictionary.count(v96[v93]) == 0 then
+					Dictionary.removeKey(v96, v93)
 
-					if mockUserIdToPartOrModel[v94] then
-						local v98 = mockUserIdToPartOrModel[v94]
+					if mockUserIdToPartOrModel[v93] then
+						local v97 = mockUserIdToPartOrModel[v93]
 
-						if partOrModelToMockUserId[v98] then
-							partOrModelToMockUserId = Dictionary.removeKey(partOrModelToMockUserId, v98)
+						if partOrModelToMockUserId[v97] then
+							partOrModelToMockUserId = Dictionary.removeKey(partOrModelToMockUserId, v97)
 						end
 
-						mockUserIdToPartOrModel = Dictionary.removeKey(mockUserIdToPartOrModel, v94)
+						mockUserIdToPartOrModel = Dictionary.removeKey(mockUserIdToPartOrModel, v93)
 					end
 				end
 			end
 		end
 
-		if #v81 == t4.messageLimit then
-			u93 = v81[1]
-			v81 = List.removeIndex(v81, 1)
-			byMessageId = Dictionary.removeKey(byMessageId, u93)
+		if #v80 == t4.messageLimit then
+			u92 = v80[1]
+			v80 = List.removeIndex(v80, 1)
+			byMessageId = Dictionary.removeKey(byMessageId, u92)
 		end
 	end
 
 	if t5.isVisibleInChatWindow then
 		windowMessagesInOrder = List.append(windowMessagesInOrder, messageId)
-		v81 = List.append(v81, messageId)
+		v80 = List.append(v80, messageId)
 	end
 
 	return Dictionary.join(t4, {
 		windowMessagesInOrder = windowMessagesInOrder,
 		windowMessagesInOrderByTabId = Dictionary.join(t4.windowMessagesInOrderByTabId, {
-			[v79] = v81
+			[v78] = v80
 		}),
 		byMessageId = Dictionary.join(byMessageId, {
 			[messageId] = {
@@ -351,38 +350,38 @@ local function mapByMessageIdInOrderHelper(t4: {[any]: any}, t5: {[any]: any}, s
 		})
 	})
 end
-local function globalToggleTranslations(t7: {[any]: any}, p7) -- line: 410
+local function globalToggleTranslations(t7: {[any]: any}, p7) -- line: 408
 	-- upvalues: getFFlagExpChatTelemetryEventTrigger (copy), FFlagEnableInExpChatRewrite (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatPresetChatEnabled (copy), Dictionary (copy)
 	local useTranslation = p7.useTranslation
 	local byMessageId = t7.byMessageId
 	local t8 = {}
 
 	for k, _ in pairs(byMessageId) do
-		local v106 = byMessageId[k]
+		local v105 = byMessageId[k]
 
-		if v106 ~= nil then
+		if v105 ~= nil then
 			t8[k] = {
-				prefixText = v106.prefixText,
-				text = v106.text,
-				translation = v106.translation,
+				prefixText = v105.prefixText,
+				text = v105.text,
+				translation = v105.translation,
 				useTranslation = useTranslation,
-				messageId = v106.messageId,
-				status = v106.status,
-				timestamp = v106.timestamp,
-				isVisibleInBubbleChat = v106.isVisibleInBubbleChat,
-				isVisibleInChatWindow = v106.isVisibleInChatWindow,
-				partOrModel = v106.partOrModel,
-				shouldOverrideBubbleChatSettings = v106.shouldOverrideBubbleChatSettings,
-				bubbleChatMessageProperties = v106.bubbleChatMessageProperties,
-				chatWindowMessageProperties = v106.chatWindowMessageProperties,
-				userId = v106.userId,
-				textChannel = v106.textChannel,
-				textChatMessageInstance = if not getFFlagExpChatTelemetryEventTrigger() then nil else v106.textChatMessageInstance,
-				wasRewritten = if not FFlagEnableInExpChatRewrite then nil else v106.wasRewritten,
-				originalText = if not FFlagEnableInExpChatRewrite then nil else v106.originalText,
-				chatActionType = if not FFlagEnableInExpChatSummaryOnLua then nil else v106.chatActionType,
-				presetId = if not FFlagExpChatPresetChatEnabled then nil else v106.presetId,
-				presetChatVersion = if not FFlagExpChatPresetChatEnabled then nil else v106.presetChatVersion
+				messageId = v105.messageId,
+				status = v105.status,
+				timestamp = v105.timestamp,
+				isVisibleInBubbleChat = v105.isVisibleInBubbleChat,
+				isVisibleInChatWindow = v105.isVisibleInChatWindow,
+				partOrModel = v105.partOrModel,
+				shouldOverrideBubbleChatSettings = v105.shouldOverrideBubbleChatSettings,
+				bubbleChatMessageProperties = v105.bubbleChatMessageProperties,
+				chatWindowMessageProperties = v105.chatWindowMessageProperties,
+				userId = v105.userId,
+				textChannel = v105.textChannel,
+				textChatMessageInstance = if not getFFlagExpChatTelemetryEventTrigger() then nil else v105.textChatMessageInstance,
+				wasRewritten = if not FFlagEnableInExpChatRewrite then nil else v105.wasRewritten,
+				originalText = if not FFlagEnableInExpChatRewrite then nil else v105.originalText,
+				chatActionType = if not FFlagEnableInExpChatSummaryOnLua then nil else v105.chatActionType,
+				presetId = if not FFlagExpChatPresetChatEnabled then nil else v105.presetId,
+				presetChatVersion = if not FFlagExpChatPresetChatEnabled then nil else v105.presetChatVersion
 			}
 		end
 	end
@@ -391,38 +390,38 @@ local function globalToggleTranslations(t7: {[any]: any}, p7) -- line: 410
 		byMessageId = Dictionary.join(byMessageId, t8)
 	})
 end
-local function individualToggleTranslation(t9: {[any]: any}, p8) -- line: 452
+local function individualToggleTranslation(t9: {[any]: any}, p8) -- line: 450
 	-- upvalues: Dictionary (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagEnableInExpChatRewrite (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatPresetChatEnabled (copy)
 	local useTranslation = p8.useTranslation
 	local messageId = p8.messageId
 	local byMessageId = t9.byMessageId
-	local v112 = byMessageId[messageId]
+	local v111 = byMessageId[messageId]
 
-	if v112 ~= nil then
+	if v111 ~= nil then
 		return Dictionary.join(t9, {
 			byMessageId = Dictionary.join(byMessageId, {
 				[messageId] = {
-					prefixText = v112.prefixText,
-					text = v112.text,
-					translation = v112.translation,
+					prefixText = v111.prefixText,
+					text = v111.text,
+					translation = v111.translation,
 					useTranslation = useTranslation,
-					messageId = v112.messageId,
-					status = v112.status,
-					timestamp = v112.timestamp,
-					isVisibleInBubbleChat = v112.isVisibleInBubbleChat,
-					isVisibleInChatWindow = v112.isVisibleInChatWindow,
-					partOrModel = v112.partOrModel,
-					shouldOverrideBubbleChatSettings = v112.shouldOverrideBubbleChatSettings,
-					bubbleChatMessageProperties = v112.bubbleChatMessageProperties,
-					chatWindowMessageProperties = v112.chatWindowMessageProperties,
-					userId = v112.userId,
-					textChannel = v112.textChannel,
-					textChatMessageInstance = if not getFFlagExpChatTelemetryEventTrigger() then nil else v112.textChatMessageInstance,
-					wasRewritten = if not FFlagEnableInExpChatRewrite then nil else v112.wasRewritten,
-					originalText = if not FFlagEnableInExpChatRewrite then nil else v112.originalText,
-					chatActionType = if not FFlagEnableInExpChatSummaryOnLua then nil else v112.chatActionType,
-					presetId = if not FFlagExpChatPresetChatEnabled then nil else v112.presetId,
-					presetChatVersion = if not FFlagExpChatPresetChatEnabled then nil else v112.presetChatVersion
+					messageId = v111.messageId,
+					status = v111.status,
+					timestamp = v111.timestamp,
+					isVisibleInBubbleChat = v111.isVisibleInBubbleChat,
+					isVisibleInChatWindow = v111.isVisibleInChatWindow,
+					partOrModel = v111.partOrModel,
+					shouldOverrideBubbleChatSettings = v111.shouldOverrideBubbleChatSettings,
+					bubbleChatMessageProperties = v111.bubbleChatMessageProperties,
+					chatWindowMessageProperties = v111.chatWindowMessageProperties,
+					userId = v111.userId,
+					textChannel = v111.textChannel,
+					textChatMessageInstance = if not getFFlagExpChatTelemetryEventTrigger() then nil else v111.textChatMessageInstance,
+					wasRewritten = if not FFlagEnableInExpChatRewrite then nil else v111.wasRewritten,
+					originalText = if not FFlagEnableInExpChatRewrite then nil else v111.originalText,
+					chatActionType = if not FFlagEnableInExpChatSummaryOnLua then nil else v111.chatActionType,
+					presetId = if not FFlagExpChatPresetChatEnabled then nil else v111.presetId,
+					presetChatVersion = if not FFlagExpChatPresetChatEnabled then nil else v111.presetChatVersion
 				}
 			})
 		})
@@ -430,7 +429,7 @@ local function individualToggleTranslation(t9: {[any]: any}, p8) -- line: 452
 
 	return nil
 end
-local function mapByMessageIdInOrderBubbleChat(t10: {[any]: any}, p9) -- line: 496
+local function mapByMessageIdInOrderBubbleChat(t10: {[any]: any}, p9) -- line: 494
 	-- upvalues: mapByMessageIdInOrderHelper (copy)
 	local bubbleChatMessageTable = p9.bubbleChatMessageTable
 	local t11 = {
@@ -451,50 +450,50 @@ local function mapByMessageIdInOrderBubbleChat(t10: {[any]: any}, p9) -- line: 4
 
 	return mapByMessageIdInOrderHelper(t10, t11)
 end
-local function mapByMessageIdInOrder(t12: {[any]: any}, p10) -- line: 519
+local function mapByMessageIdInOrder(t12: {[any]: any}, p10) -- line: 517
 	-- upvalues: FFlagEnableInExpChatRewrite (copy), getTextAndTranslation (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), FFlagExpChatPresetChatEnabled (copy), Set (copy), FFlagExpChatUseChatConfigStore (copy), GetChatConfigurationStore (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatDisableUniverseBubbleChat (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), computeNameColor (copy), Players (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagChatLineReportingGlobalMuteEnabled (copy), mapByMessageIdInOrderHelper (copy)
 	local textChatMessage = p10.textChatMessage
-	local v120, v121
+	local v119, v120
 
 	if FFlagEnableInExpChatRewrite then
-		v120, v121 = getTextAndTranslation(textChatMessage)
+		v119, v120 = getTextAndTranslation(textChatMessage)
 	else
-		v120 = if not getFFlagExpChatProtectedChatInternalAPIs() then textChatMessage.Text else textChatMessage.TextInternal
-		v121 = if not getFFlagExpChatProtectedChatInternalAPIs() then textChatMessage.Translation else textChatMessage.TranslationInternal
+		v119 = if not getFFlagExpChatProtectedChatInternalAPIs() then textChatMessage.Text else textChatMessage.TextInternal
+		v120 = if not getFFlagExpChatProtectedChatInternalAPIs() then textChatMessage.Translation else textChatMessage.TranslationInternal
 	end
 
-	local v122 = if not textChatMessage.TextSource then nil else tostring(textChatMessage.TextSource.UserId)
-	local v123 = v122 == nil or (t12.canLocalUserChat or not not FFlagExpChatPresetChatEnabled and (textChatMessage.PresetId or "") ~= "") and (textChatMessage.Status == Enum.TextChatMessageStatus.Success or textChatMessage.Status == Enum.TextChatMessageStatus.Sending)
-	local v124 = not not v122 and Set.has(t12._mutedUserIds, v122)
-	local v125 = v123 and not v124
-	local v126 = false
+	local v121 = if not textChatMessage.TextSource then nil else tostring(textChatMessage.TextSource.UserId)
+	local v122 = v121 == nil or (t12.canLocalUserChat or not not FFlagExpChatPresetChatEnabled and (textChatMessage.PresetId or "") ~= "") and (textChatMessage.Status == Enum.TextChatMessageStatus.Success or textChatMessage.Status == Enum.TextChatMessageStatus.Sending)
+	local v123 = not not v121 and Set.has(t12._mutedUserIds, v121)
+	local v124 = v122 and not v123
+	local v125 = false
 
-	if ((if not FFlagExpChatUseChatConfigStore then t12.isBubbleChatEnabled else GetChatConfigurationStore(false).getIsBubbleChatEnabled(false))) and v125 and (not FFlagEnableInExpChatSummaryOnLua or v122 ~= nil) and (textChatMessage.Status == Enum.TextChatMessageStatus.Success or textChatMessage.Status == Enum.TextChatMessageStatus.Sending) then
-		v126 = true
+	if ((if not FFlagExpChatUseChatConfigStore then t12.isBubbleChatEnabled else GetChatConfigurationStore(false).getIsBubbleChatEnabled(false))) and v124 and (not FFlagEnableInExpChatSummaryOnLua or v121 ~= nil) and (textChatMessage.Status == Enum.TextChatMessageStatus.Success or textChatMessage.Status == Enum.TextChatMessageStatus.Sending) then
+		v125 = true
 	end
 
 	if FFlagExpChatDisableUniverseBubbleChat and GetFFlagTextChatEnableUniverseChatTabs() and p10.isUniverseChat == true then
-		v126 = false
+		v125 = false
 	end
 
-	local v127 = if not getFFlagExpChatProtectedChatInternalAPIs() then textChatMessage.PrefixText else textChatMessage.PrefixTextInternal
+	local v126 = if not getFFlagExpChatProtectedChatInternalAPIs() then textChatMessage.PrefixText else textChatMessage.PrefixTextInternal
 
-	if GetFFlagTextChatEnableUniverseChatTabs() and p10.channelNameOverride and #v127 > 0 then
-		v127 = `<font color="#{ ((if not textChatMessage.TextSource then computeNameColor(Players.LocalPlayer.Name) else computeNameColor(textChatMessage.TextSource.Username))):ToHex() }">{ v127 }</font>`
+	if GetFFlagTextChatEnableUniverseChatTabs() and p10.channelNameOverride and #v126 > 0 then
+		v126 = `<font color="#{ ((if not textChatMessage.TextSource then computeNameColor(Players.LocalPlayer.Name) else computeNameColor(textChatMessage.TextSource.Username))):ToHex() }">{ v126 }</font>`
 	end
 
 	local t13 = {
-		userId = v122,
-		prefixText = v127,
-		text = v120,
-		translation = v121,
+		userId = v121,
+		prefixText = v126,
+		text = v119,
+		translation = v120,
 		useTranslation = getChatTranslationEnabled(),
 		textChannel = textChatMessage.TextChannel,
 		messageId = textChatMessage.MessageId,
 		status = textChatMessage.Status,
 		timestamp = textChatMessage.Timestamp,
-		isVisibleInBubbleChat = v126,
-		isVisibleInChatWindow = v125,
+		isVisibleInBubbleChat = v125,
+		isVisibleInChatWindow = v124,
 		bubbleChatMessageProperties = textChatMessage.BubbleChatMessageProperties,
 		chatWindowMessageProperties = textChatMessage.ChatWindowMessageProperties,
 		textChatMessageInstance = if not getFFlagExpChatTelemetryEventTrigger() then nil else textChatMessage,
@@ -508,10 +507,10 @@ local function mapByMessageIdInOrder(t12: {[any]: any}, p10) -- line: 519
 
 	return mapByMessageIdInOrderHelper(t12, t13, if not GetFFlagTextChatEnableUniverseChatTabs() then nil else p10.channelNameOverride)
 end
-local function mapByMessageIdInOrderLegacyBubbleChat(t14: {[any]: any}, p11) -- line: 631
+local function mapByMessageIdInOrderLegacyBubbleChat(t14: {[any]: any}, p11) -- line: 629
 	-- upvalues: mapByMessageIdInOrderHelper (copy)
 	local messageData = p11.messageData
-	local v132 = if not messageData.timestamp then DateTime.now() else DateTime.fromUnixTimestampMillis(messageData.timestamp)
+	local v131 = if not messageData.timestamp then DateTime.now() else DateTime.fromUnixTimestampMillis(messageData.timestamp)
 	local t15 = {
 		prefixText = "",
 		shouldOverrideBubbleChatSettings = true,
@@ -521,27 +520,27 @@ local function mapByMessageIdInOrderLegacyBubbleChat(t14: {[any]: any}, p11) -- 
 		text = messageData.text,
 		messageId = messageData.id,
 		status = Enum.TextChatMessageStatus.Success,
-		timestamp = v132,
+		timestamp = v131,
 		partOrModel = messageData.adornee
 	}
 
 	return mapByMessageIdInOrderHelper(t14, t15)
 end
-local function mapByMessageIdInOrderHiddenMessage(t16: {[any]: any}, p12) -- line: 655
+local function mapByMessageIdInOrderHiddenMessage(t16: {[any]: any}, p12) -- line: 653
 	-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), FIntExpChatRandomCharChangeLowerBound (copy), FIntExpChatRandomCharChangeUpperBound (copy), Config (copy), getFFlagExpChatTelemetryEventTrigger (copy), mapByMessageIdInOrderHelper (copy)
 	local userMessageIntent = p12.userMessageIntent
-	local v137 = string.len(if not getFFlagExpChatProtectedChatInternalAPIs() then userMessageIntent.Text else userMessageIntent.TextInternal)
-	local v138 = math.max(FIntExpChatRandomCharChangeLowerBound, -(v137 - 1))
-	local v139 = FIntExpChatRandomCharChangeUpperBound
-	local v140 = math.random(v138, v139)
-	local v141 = string.rep(Config.DOT_TEXT, v137 + v140)
+	local v136 = string.len(if not getFFlagExpChatProtectedChatInternalAPIs() then userMessageIntent.Text else userMessageIntent.TextInternal)
+	local v137 = math.max(FIntExpChatRandomCharChangeLowerBound, -(v136 - 1))
+	local v138 = FIntExpChatRandomCharChangeUpperBound
+	local v139 = math.random(v137, v138)
+	local v140 = string.rep(Config.DOT_TEXT, v136 + v139)
 	local t17 = {
 		userId = nil,
 		isVisibleInBubbleChat = false,
 		isVisibleInChatWindow = true,
 		isHiddenMessage = true,
 		prefixText = Config.LOCK_EMOJI .. " :",
-		text = v141,
+		text = v140,
 		textChannel = userMessageIntent.TextChannel,
 		messageId = userMessageIntent.MessageId,
 		status = userMessageIntent.Status,
@@ -551,11 +550,11 @@ local function mapByMessageIdInOrderHiddenMessage(t16: {[any]: any}, p12) -- lin
 
 	return mapByMessageIdInOrderHelper(t16, t17)
 end
-local function mapUniverseChatSystemMessage(t18: {[any]: any}, p13) -- line: 689
-	-- upvalues: HttpService (copy), sanitizeForRichText (copy), GetFFlagExpChatSyntheticSystemMessageRichText (copy), generateRichSystemMessageTextFormat (copy), FFlagExpChatDictation (copy), FFlagExpChatEnablePostProcessRichSystemMessageTextFormat (copy), mapByMessageIdInOrderHelper (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
+local function mapUniverseChatSystemMessage(t18: {[any]: any}, p13) -- line: 687
+	-- upvalues: HttpService (copy), sanitizeForRichText (copy), GetFFlagExpChatSyntheticSystemMessageRichText (copy), generateRichSystemMessageTextFormat (copy), FFlagExpChatDictation (copy), mapByMessageIdInOrderHelper (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
 	local guid = HttpService:GenerateGUID(false)
-	local v146 = sanitizeForRichText(p13.text)
-	local v147 = if not GetFFlagExpChatSyntheticSystemMessageRichText() then v146 else generateRichSystemMessageTextFormat(v146, if not FFlagExpChatDictation then nil else p13.isError, if not FFlagExpChatEnablePostProcessRichSystemMessageTextFormat then nil else p13.postProcessMessage)
+	local v145 = sanitizeForRichText(p13.text)
+	local v146 = if not GetFFlagExpChatSyntheticSystemMessageRichText() then v145 else generateRichSystemMessageTextFormat(v145, if not FFlagExpChatDictation then nil else p13.isError, p13.postProcessMessage)
 	local t19 = {
 		userId = nil,
 		prefixText = "",
@@ -568,7 +567,7 @@ local function mapUniverseChatSystemMessage(t18: {[any]: any}, p13) -- line: 689
 		chatWindowMessageProperties = nil,
 		textChatMessageInstance = nil,
 		partOrModel = nil,
-		text = v147,
+		text = v146,
 		messageId = guid,
 		timestamp = DateTime.fromUnixTimestampMillis(workspace:GetServerTimeNow() * 1000),
 		status = Enum.TextChatMessageStatus.Success,
@@ -579,7 +578,7 @@ local function mapUniverseChatSystemMessage(t18: {[any]: any}, p13) -- line: 689
 end
 
 return Rodux.createReducer(t1, {
-	[ChannelTabsConfigurationEnabled.name] = function(t20: {[any]: any}, p14) -- line: 726
+	[ChannelTabsConfigurationEnabled.name] = function(t20: {[any]: any}, p14) -- line: 724
 		-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), Dictionary (copy)
 		if not GetFFlagTextChatEnableUniverseChatTabs() then
 			return t20
@@ -592,64 +591,64 @@ return Rodux.createReducer(t1, {
 	[IncomingMessageReceived.name] = mapByMessageIdInOrder,
 	[IncomingBubbleChatMessageReceived.name] = mapByMessageIdInOrderBubbleChat,
 	[OutgoingMessageSent.name] = mapByMessageIdInOrder,
-	[UserMuted.name] = function(t21: {[any]: any}, p15) -- line: 738
+	[UserMuted.name] = function(t21: {[any]: any}, p15) -- line: 736
 		-- upvalues: Dictionary (copy), Set (copy)
 		return Dictionary.join(t21, {
 			_mutedUserIds = Set.add(t21._mutedUserIds, p15.userId)
 		})
 	end,
-	[UserUnmuted.name] = function(t22: {[any]: any}, p16) -- line: 743
+	[UserUnmuted.name] = function(t22: {[any]: any}, p16) -- line: 741
 		-- upvalues: Dictionary (copy), Set (copy)
 		return Dictionary.join(t22, {
 			_mutedUserIds = Set.subtract(t22._mutedUserIds, p16.userId)
 		})
 	end,
-	[PlayerRemoved.name] = function(t23: {[any]: any}, p17) -- line: 748
+	[PlayerRemoved.name] = function(t23: {[any]: any}, p17) -- line: 746
 		-- upvalues: Dictionary (copy), Set (copy)
-		local v157 = Dictionary.filter(t23.bubbleMessagesInOrderBySenderId, function(_, p19) -- line: 751
+		local v156 = Dictionary.filter(t23.bubbleMessagesInOrderBySenderId, function(_, p19) -- line: 749
 			-- upvalues: p17 (copy)
 			return p19 ~= p17.userId
 		end)
-		local v158 = Dictionary.filter(t23.messagesBySenderId, function(_, p21) -- line: 755
+		local v157 = Dictionary.filter(t23.messagesBySenderId, function(_, p21) -- line: 753
 			-- upvalues: p17 (copy)
 			return p21 ~= p17.userId
 		end)
-		local v159 = Set.has(t23._mutedUserIds, p17.userId)
+		local v158 = Set.has(t23._mutedUserIds, p17.userId)
 
-		if #v157 == 0 and (#v158 == 0 and not v159) then
+		if #v156 == 0 and (#v157 == 0 and not v158) then
 			return t23
 		end
 
 		return Dictionary.join(t23, {
-			messagesBySenderId = v158,
+			messagesBySenderId = v157,
 			_mutedUserIds = Set.subtract(t23._mutedUserIds, p17.userId)
 		})
 	end,
-	[ChatPrivacySettingsReceived.name] = function(t24: {[any]: any}, p22) -- line: 768
+	[ChatPrivacySettingsReceived.name] = function(t24: {[any]: any}, p22) -- line: 766
 		-- upvalues: Dictionary (copy)
 		return Dictionary.join(t24, {
 			canLocalUserChat = p22.canUserChat
 		})
 	end,
-	[ChatPrivacySettingsFetchFailed.name] = function(t25: {[any]: any}, _) -- line: 771
+	[ChatPrivacySettingsFetchFailed.name] = function(t25: {[any]: any}, _) -- line: 769
 		-- upvalues: Dictionary (copy)
 		return Dictionary.join(t25, {
 			canLocalUserChat = false
 		})
 	end,
-	[ConfigurationObjectsLoaded.name] = function(p24, p25) -- line: 774
+	[ConfigurationObjectsLoaded.name] = function(p24, p25) -- line: 772
 		-- upvalues: Dictionary (copy)
 		return Dictionary.join(p24, {
 			isBubbleChatEnabled = not not p25.bubbleChatSettings.Enabled and p25.bubbleChatSettings.Enabled
 		})
 	end,
-	[BubbleChatSettingsChanged.name] = function(p26, p27) -- line: 781
+	[BubbleChatSettingsChanged.name] = function(p26, p27) -- line: 779
 		-- upvalues: Dictionary (copy)
 		if p27.property ~= "Enabled" then
 			return p26
 		end
 
-		local v168 = Dictionary.map(p26.byMessageId, function(p28) -- line: 786
+		local v167 = Dictionary.map(p26.byMessageId, function(p28) -- line: 784
 			-- upvalues: Dictionary (copy), p27 (copy)
 			if p28.shouldOverrideBubbleChatSettings then
 				return p28
@@ -661,13 +660,13 @@ return Rodux.createReducer(t1, {
 		end)
 
 		return Dictionary.join(p26, {
-			byMessageId = v168,
+			byMessageId = v167,
 			isBubbleChatEnabled = p27.value
 		})
 	end,
-	[ChatWindowMessagesCleared.name] = function(t26: {[any]: any}, _) -- line: 801
+	[ChatWindowMessagesCleared.name] = function(t26: {[any]: any}, _) -- line: 799
 		-- upvalues: Dictionary (copy)
-		local v171 = Dictionary.map(t26.byMessageId, function(p30) -- line: 802
+		local v170 = Dictionary.map(t26.byMessageId, function(p30) -- line: 800
 			-- upvalues: Dictionary (copy)
 			return Dictionary.join(p30, {
 				isVisibleInChatWindow = false
@@ -677,13 +676,13 @@ return Rodux.createReducer(t1, {
 		return Dictionary.join(t26, {
 			windowMessagesInOrder = {},
 			windowMessagesInOrderByTabId = {},
-			byMessageId = v171
+			byMessageId = v170
 		})
 	end,
 	[ChatTranslationGlobalToggled.name] = globalToggleTranslations,
 	[ChatTranslationMessageToggled.name] = individualToggleTranslation,
 	[LegacyBubbleCreated.name] = mapByMessageIdInOrderLegacyBubbleChat,
-	[LegacyBubbleTextUpdated.name] = function(t27: {[any]: any}, p31) -- line: 816
+	[LegacyBubbleTextUpdated.name] = function(t27: {[any]: any}, p31) -- line: 814
 		-- upvalues: Dictionary (copy), List (copy)
 		local byMessageId = t27.byMessageId
 		local messagesBySenderId = t27.messagesBySenderId
@@ -691,24 +690,24 @@ return Rodux.createReducer(t1, {
 		local newText = p31.newText
 
 		if byMessageId[messageId] then
-			local v178 = byMessageId[messageId]
+			local v177 = byMessageId[messageId]
 
-			v178.text = newText
+			v177.text = newText
 			byMessageId = Dictionary.join(byMessageId, {
-				[messageId] = v178
+				[messageId] = v177
 			})
 
-			local userId = v178.userId
+			local userId = v177.userId
 
 			if userId and messagesBySenderId[userId] then
-				local v180 = List.findWhere(messagesBySenderId[userId], function(p32, _) -- line: 830
+				local v179 = List.findWhere(messagesBySenderId[userId], function(p32, _) -- line: 828
 					-- upvalues: messageId (copy)
 					return p32.messageId == messageId
 				end)
 
-				if v180 and v180 > 0 then
+				if v179 and v179 > 0 then
 					messagesBySenderId = Dictionary.join(messagesBySenderId, {
-						[userId] = List.set(messagesBySenderId[userId], v180, v178)
+						[userId] = List.set(messagesBySenderId[userId], v179, v177)
 					})
 				end
 			end
@@ -721,13 +720,13 @@ return Rodux.createReducer(t1, {
 	end,
 	[HiddenMessageReceived.name] = mapByMessageIdInOrderHiddenMessage,
 	[UniverseChatSystemMessageAdded.name] = mapUniverseChatSystemMessage,
-	[HiddenMessagesCleared.name] = function(t28: {[any]: any}, _) -- line: 848
+	[HiddenMessagesCleared.name] = function(t28: {[any]: any}, _) -- line: 846
 		-- upvalues: FFlagExpChatClearHiddenMessagesPostAgeCheck (copy), Dictionary (copy), List (copy)
 		if not FFlagExpChatClearHiddenMessagesPostAgeCheck then
 			return t28
 		end
 
-		local v183 = Dictionary.map(t28.byMessageId, function(p35) -- line: 853
+		local v182 = Dictionary.map(t28.byMessageId, function(p35) -- line: 851
 			-- upvalues: Dictionary (copy)
 			if p35.isHiddenMessage then
 				return Dictionary.join(p35, {
@@ -737,26 +736,26 @@ return Rodux.createReducer(t1, {
 
 			return p35
 		end)
-		local v184 = List.filter(t28.windowMessagesInOrder, function(p36) -- line: 863
-			-- upvalues: v183 (copy)
-			local v202 = v183[p36]
+		local v183 = List.filter(t28.windowMessagesInOrder, function(p36) -- line: 861
+			-- upvalues: v182 (copy)
+			local v201 = v182[p36]
 
-			return v202 and not v202.isHiddenMessage
+			return v201 and not v201.isHiddenMessage
 		end)
-		local v185 = Dictionary.map(t28.windowMessagesInOrderByTabId, function(p37) -- line: 870
-			-- upvalues: List (copy), v183 (copy)
-			return List.filter(p37, function(p38) -- line: 871
-				-- upvalues: v183 (copy)
-				local v205 = v183[p38]
+		local v184 = Dictionary.map(t28.windowMessagesInOrderByTabId, function(p37) -- line: 868
+			-- upvalues: List (copy), v182 (copy)
+			return List.filter(p37, function(p38) -- line: 869
+				-- upvalues: v182 (copy)
+				local v204 = v182[p38]
 
-				return v205 and not v205.isHiddenMessage
+				return v204 and not v204.isHiddenMessage
 			end)
 		end)
 
 		return Dictionary.join(t28, {
-			windowMessagesInOrder = v184,
-			windowMessagesInOrderByTabId = v185,
-			byMessageId = v183
+			windowMessagesInOrder = v183,
+			windowMessagesInOrderByTabId = v184,
+			byMessageId = v182
 		})
 	end
 })

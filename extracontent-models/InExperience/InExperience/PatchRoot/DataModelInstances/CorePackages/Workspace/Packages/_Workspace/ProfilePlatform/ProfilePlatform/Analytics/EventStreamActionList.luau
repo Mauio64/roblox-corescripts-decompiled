@@ -12,10 +12,9 @@ local FFlagProfilePlatformUseCatalogItemOpenedNewFields = require(ProfilePlatfor
 local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
 local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
 local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
-local FFlagProfilePlatformEnableEditAppearanceAnalytics = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceAnalytics)
 local FFlagSocialEnableProfileInspectAndBuyAnalytics = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuyAnalytics
 
-local function v17(p1) -- line: 29
+local function v16(p1) -- line: 27
 	return p1
 end
 
@@ -24,26 +23,26 @@ return {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.PageLoad,
 		formatRulesForAdditionalInfo = {
-			friendStatus = v17,
-			playerPresence = v17,
-			absolutePosition = v17,
-			isHomePageCarousel = v17,
-			isRecommendation = v17,
-			recommendationContextType = v17,
-			recommendationRank = v17,
-			recommendationSessionId = v17,
-			source = v17,
-			profileType = v17,
-			shareLinkId = v17,
-			primaryAction = v17
+			friendStatus = v16,
+			playerPresence = v16,
+			absolutePosition = v16,
+			isHomePageCarousel = v16,
+			isRecommendation = v16,
+			recommendationContextType = v16,
+			recommendationRank = v16,
+			recommendationSessionId = v16,
+			source = v16,
+			profileType = v16,
+			shareLinkId = v16,
+			primaryAction = v16
 		}
 	},
 	[EventNames.ProfilePresenceLoaded] = {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.PresenceLoaded,
 		formatRulesForAdditionalInfo = {
-			presenceType = v17,
-			universeId = v17
+			presenceType = v16,
+			universeId = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonChat] = {
@@ -54,7 +53,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.Chat
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonIgnoreFriendRequest] = {
@@ -65,7 +64,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.IgnoreFriendRequest
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonReport] = {
@@ -76,7 +75,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.Report
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonUnfriend] = {
@@ -87,7 +86,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.Unfriend
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonBlock] = {
@@ -98,7 +97,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.Block
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonSetAlias] = {
@@ -109,7 +108,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.SetAlias
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonCopyLink] = {
@@ -120,7 +119,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.CopyLink
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonLeaveCommunity] = {
@@ -131,8 +130,8 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.LeaveCommunity
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonUnfollow] = {
@@ -143,7 +142,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.Unfollow
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonRemoveTrustedConnection] = {
@@ -154,7 +153,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.RemoveTrustedConnection
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonAddTrustedConnection] = {
@@ -165,8 +164,8 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.AddTrustedConnection
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			modalVariantOverride = v17
+			buttonSurface = v16,
+			modalVariantOverride = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonAddIncomingTrustedConnection] = {
@@ -177,7 +176,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.AddIncomingTrustedConnection
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonMakePrimaryCommunity] = {
@@ -188,8 +187,8 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.MakePrimaryCommunity
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonRemovePrimaryCommunity] = {
@@ -200,8 +199,8 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.RemovePrimaryCommunity
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.ContextualMenuButtonCurrencyTransfer] = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else {
@@ -212,7 +211,7 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.CurrencyTransfer
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonOpenEditProfilePage] = {
@@ -222,7 +221,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.OpenEditProfilePage
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonChat] = {
@@ -232,7 +231,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.Chat
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonUnlockChat] = {
@@ -242,7 +241,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.UnlockChat
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonUnfriend] = {
@@ -252,7 +251,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.Unfriend
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonUnblock] = {
@@ -262,7 +261,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.Unblock
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonAddFriend] = {
@@ -272,16 +271,16 @@ return {
 			btn = AnalyticsConstants.CTAButtons.AddFriend
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v17,
-			isHomePageCarousel = v17,
-			isRecommendation = v17,
-			recommendationContextType = v17,
-			recommendationRank = v17,
-			recommendationSessionId = v17,
-			source = v17,
-			contextualInfoType = v17,
-			shareLinkId = v17,
-			profileType = v17
+			absolutePosition = v16,
+			isHomePageCarousel = v16,
+			isRecommendation = v16,
+			recommendationContextType = v16,
+			recommendationRank = v16,
+			recommendationSessionId = v16,
+			source = v16,
+			contextualInfoType = v16,
+			shareLinkId = v16,
+			profileType = v16
 		}
 	},
 	[EventNames.CTAButtonAddFriendFromContacts] = {
@@ -291,7 +290,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.AddFriendFromContacts
 		},
 		formatRulesForAdditionalInfo = {
-			shareLinkId = v17
+			shareLinkId = v16
 		}
 	},
 	[EventNames.CTAButtonAcceptFriendRequest] = {
@@ -301,17 +300,17 @@ return {
 			btn = AnalyticsConstants.CTAButtons.AcceptFriendRequest
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v17,
-			contextualInfoType = v17,
-			isHomePageCarousel = v17,
-			isRecommendation = v17,
-			recommendationContextType = v17,
-			recommendationRank = v17,
-			recommendationSessionId = v17,
-			source = v17,
-			buttonSurface = v17,
-			shareLinkId = v17,
-			profileType = v17
+			absolutePosition = v16,
+			contextualInfoType = v16,
+			isHomePageCarousel = v16,
+			isRecommendation = v16,
+			recommendationContextType = v16,
+			recommendationRank = v16,
+			recommendationSessionId = v16,
+			source = v16,
+			buttonSurface = v16,
+			shareLinkId = v16,
+			profileType = v16
 		}
 	},
 	[EventNames.CTAButtonEditAvatar] = {
@@ -321,7 +320,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.EditAvatar
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonEditLook] = {
@@ -331,7 +330,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.EditLook
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonShareProfile] = {
@@ -341,7 +340,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.ShareProfile
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonShareProfileQRCode] = {
@@ -351,7 +350,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.ShareProfileQRCode
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonJoinCommunity] = {
@@ -362,8 +361,8 @@ return {
 			btn = AnalyticsConstants.CTAButtons.JoinCommunity
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.CTAButtonFollow] = {
@@ -374,7 +373,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.Follow
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonViewCommunity] = {
@@ -385,8 +384,8 @@ return {
 			btn = AnalyticsConstants.CTAButtons.ViewCommunity
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.CTAButtonViewFullProfile] = {
@@ -397,8 +396,8 @@ return {
 			btn = AnalyticsConstants.CTAButtons.ViewFullProfile
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.CTAButtonCurrencyTransfer] = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else {
@@ -409,7 +408,7 @@ return {
 			btn = AnalyticsConstants.CTAButtons.CurrencyTransfer
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.CTAButtonCancelJoinCommunityRequest] = {
@@ -420,8 +419,8 @@ return {
 			btn = AnalyticsConstants.CTAButtons.CancelJoinCommunityRequest
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17,
-			btnContext = v17
+			buttonSurface = v16,
+			btnContext = v16
 		}
 	},
 	[EventNames.FriendsButton] = {
@@ -459,15 +458,15 @@ return {
 			btn = AnalyticsConstants.Btns.ViewPlayerProfile
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v17,
-			friendStatus = v17,
-			isHomePageCarousel = v17,
-			isRecommendation = v17,
-			recommendationContextType = v17,
-			recommendationRank = v17,
-			recommendationSessionId = v17,
-			source = v17,
-			buttonSurface = v17
+			absolutePosition = v16,
+			friendStatus = v16,
+			isHomePageCarousel = v16,
+			isRecommendation = v16,
+			recommendationContextType = v16,
+			recommendationRank = v16,
+			recommendationSessionId = v16,
+			source = v16,
+			buttonSurface = v16
 		}
 	},
 	[EventNames.ContextualMenuButton] = {
@@ -491,7 +490,7 @@ return {
 			btn = AnalyticsConstants.Btns.EditDisplayName
 		},
 		formatRulesForAdditionalInfo = {
-			canSetDisplayName = v17
+			canSetDisplayName = v16
 		}
 	},
 	[EventNames.SetAliasButton] = {
@@ -519,8 +518,8 @@ return {
 			btn = AnalyticsConstants.Btns.FavoriteExperience
 		},
 		formatRulesForAdditionalInfo = {
-			experienceId = v17,
-			positionInComponent = v17
+			experienceId = v16,
+			positionInComponent = v16
 		}
 	},
 	[EventNames.FavoriteExperienceSeeAll] = {
@@ -537,8 +536,8 @@ return {
 			btn = AnalyticsConstants.Btns.Experience
 		},
 		formatRulesForAdditionalInfo = {
-			experienceId = v17,
-			positionInComponent = v17
+			experienceId = v16,
+			positionInComponent = v16
 		}
 	},
 	[EventNames.EventOpened] = {
@@ -548,7 +547,7 @@ return {
 			btn = AnalyticsConstants.Btns.Event
 		},
 		formatRulesForAdditionalInfo = {
-			virtualEventId = v17
+			virtualEventId = v16
 		}
 	},
 	[EventNames.EventRSVP] = {
@@ -558,8 +557,8 @@ return {
 			btn = AnalyticsConstants.Btns.EventRSVP
 		},
 		formatRulesForAdditionalInfo = {
-			virtualEventId = v17,
-			status = v17
+			virtualEventId = v16,
+			status = v16
 		}
 	},
 	[EventNames.EventJoined] = {
@@ -569,7 +568,7 @@ return {
 			btn = AnalyticsConstants.Btns.EventJoin
 		},
 		formatRulesForAdditionalInfo = {
-			virtualEventId = v17
+			virtualEventId = v16
 		}
 	},
 	[EventNames.CatalogItemOpened] = {
@@ -579,13 +578,13 @@ return {
 			btn = AnalyticsConstants.Btns.ViewCatalogItem
 		},
 		formatRulesForAdditionalInfo = if not FFlagProfilePlatformUseCatalogItemOpenedNewFields then {
-			itemId = v17,
-			positionInComponent = v17,
-			component = v17
+			itemId = v16,
+			positionInComponent = v16,
+			component = v16
 		} else {
-			btnContext = v17,
-			btnUnitId = v17,
-			btnSortPosition = v17
+			btnContext = v16,
+			btnUnitId = v16,
+			btnSortPosition = v16
 		}
 	},
 	[EventNames.UsernameCopied] = {
@@ -603,57 +602,57 @@ return {
 			btn = AnalyticsConstants.ContextualMenuButtons.ViewPlatformProfile
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
-	[EventNames.CTAButtonEditAppearance] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.CTAButtonEditAppearance] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = AnalyticsConstants.CTAButtons.EditAppearance
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
-	[EventNames.EditAppearanceMenuEditAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.EditAppearanceMenuEditAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = AnalyticsConstants.Btns.EditAppearanceEditAvatar
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
-	[EventNames.EditAppearanceMenuEditEmote] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.EditAppearanceMenuEditEmote] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = AnalyticsConstants.Btns.EditAppearanceEditEmote
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
-	[EventNames.EditAppearanceMenuSwitchAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.EditAppearanceMenuSwitchAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = AnalyticsConstants.Btns.EditAppearanceSwitchAvatar
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
-	[EventNames.EditAppearanceMenuEditBackground] = if not FFlagProfilePlatformEnableEditAppearanceMenu or (not FFlagProfilePlatformEnableEditAppearanceAnalytics or not FFlagProfilePlatformEditBackgroundMenuItem) then nil else {
+	[EventNames.EditAppearanceMenuEditBackground] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEditBackgroundMenuItem then nil else {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = AnalyticsConstants.Btns.EditAppearanceEditBackground
 		},
 		formatRulesForAdditionalInfo = {
-			buttonSurface = v17
+			buttonSurface = v16
 		}
 	},
 	[EventNames.InspectAvatarOpened] = if not FFlagSocialEnableProfileInspectAndBuyAnalytics then nil else {
@@ -663,7 +662,7 @@ return {
 			btn = AnalyticsConstants.Btns.InspectAvatar
 		},
 		formatRulesForAdditionalInfo = {
-			profileSessionId = v17
+			profileSessionId = v16
 		}
 	},
 	[EventNames.InspectAvatarBuyClicked] = if not FFlagSocialEnableProfileInspectAndBuyAnalytics then nil else {
@@ -673,9 +672,9 @@ return {
 			btn = AnalyticsConstants.Btns.InspectAvatarBuyItems
 		},
 		formatRulesForAdditionalInfo = {
-			profileSessionId = v17,
-			itemIds = v17,
-			totalPrice = v17
+			profileSessionId = v16,
+			itemIds = v16,
+			totalPrice = v16
 		}
 	},
 	[EventNames.InspectAvatarPurchaseConfirmed] = if not FFlagSocialEnableProfileInspectAndBuyAnalytics then nil else {
@@ -685,7 +684,7 @@ return {
 			btn = AnalyticsConstants.Btns.InspectAvatarConfirmBuy
 		},
 		formatRulesForAdditionalInfo = {
-			profileSessionId = v17
+			profileSessionId = v16
 		}
 	},
 	[EventNames.MomentsSeeAll] = {

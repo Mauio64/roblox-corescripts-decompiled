@@ -3,95 +3,99 @@ local BuildExperienceParent = BuildExperience.Parent
 local Signals = require(BuildExperienceParent.Signals)
 local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
 require(BuildExperience.Chat.chatTypes)
 
-local function resolveUniverseIdFromSessionLoad(p1) -- line: 37
+local BUILD_ASSISTANT_FALLBACK_NAME = LocalizationStrings.BUILD_ASSISTANT_FALLBACK_NAME
+
+local function resolveUniverseIdFromSessionLoad(p1) -- line: 38
 	if p1 == nil then
 		return nil
 	end
 
 	local _meta = p1._meta
-	local v12 = if _meta == nil then nil else _meta._roblox
-	local v13 = if v12 == nil then nil else v12.universeId
+	local v14 = if _meta == nil then nil else _meta._roblox
+	local v15 = if v14 == nil then nil else v14.universeId
 
-	if typeof(v13) == "number" and v13 ~= 0 then
-		return v13
+	if typeof(v15) == "number" and v15 ~= 0 then
+		return v15
 	end
 
 	return nil
 end
-local function gameIconForUniverseId(n1: number) -- line: 50
+local function gameIconForUniverseId(n1: number) -- line: 51
 	return string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", n1)
 end
-local function makeTarget(n2: number?, s1: string?, p2) -- line: 54
-	local v18 = n2 or 0
+local function makeTarget(n2: number?, s1: string?, p2) -- line: 55
+	-- upvalues: BUILD_ASSISTANT_FALLBACK_NAME (copy)
+	local v20 = n2 or 0
 
 	return {
-		universeId = v18,
+		universeId = v20,
 		placeId = if p2 == nil then nil else p2.rootPlaceId,
 		sessionId = s1,
-		experienceName = (p2 == nil or p2.name == "") and "Build Assistant" or p2.name,
-		gameIcon = if v18 == 0 then nil else string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v18)
+		experienceName = if p2 == nil or p2.name == "" then BUILD_ASSISTANT_FALLBACK_NAME else p2.name,
+		gameIcon = if v20 == 0 then nil else string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v20)
 	}
 end
-local function resumeBuildChat(t1: {[any]: any}) -- line: 65
-	-- upvalues: CreatorAgentChat (copy), UniverseConfiguration (copy), Signals (copy), makeTarget (copy)
+local function resumeBuildChat(t1: {[any]: any}) -- line: 66
+	-- upvalues: CreatorAgentChat (copy), UniverseConfiguration (copy), Signals (copy), BUILD_ASSISTANT_FALLBACK_NAME (copy), makeTarget (copy)
 	local sessionId = t1.sessionId
-	local v21 = typeof(sessionId) == "string" and sessionId ~= ""
-	local v22 = t1.universeId ~= nil and t1.universeId ~= 0
+	local v23 = typeof(sessionId) == "string" and sessionId ~= ""
+	local v24 = t1.universeId ~= nil and t1.universeId ~= 0
 
-	if not v22 and not v21 then
+	if not v24 and not v23 then
 		return nil
 	end
 
-	local u23 = nil
+	local u25 = nil
 
-	if not v22 and v21 then
-		u23 = (t1.creatorAgentChatStore or CreatorAgentChat.getCreatorAgentChatStore()).sessionLoad(sessionId)
+	if not v24 and v23 then
+		u25 = (t1.creatorAgentChatStore or CreatorAgentChat.getCreatorAgentChatStore()).sessionLoad(sessionId)
 	end
 
 	local configurationStore = t1.configurationStore
 
-	local function getConfigurationStore() -- line: 81
+	local function getConfigurationStore() -- line: 82
 		-- upvalues: configurationStore (ref), UniverseConfiguration (copy)
-		local v27 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
+		local v29 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
 
-		configurationStore = v27
+		configurationStore = v29
 
-		return v27
+		return v29
 	end
 
-	local u26 = false
+	local u28 = false
 
-	return Signals.createEffect(function(p3) -- line: 89
-		-- upvalues: u26 (ref), v22 (copy), t1 (copy), u23 (ref), sessionId (copy), configurationStore (ref), UniverseConfiguration (copy), makeTarget (copy)
-		if u26 then
+	return Signals.createEffect(function(p3) -- line: 90
+		-- upvalues: u28 (ref), v24 (copy), t1 (copy), u25 (ref), sessionId (copy), BUILD_ASSISTANT_FALLBACK_NAME (copy), configurationStore (ref), UniverseConfiguration (copy), makeTarget (copy)
+		if u28 then
 			return
 		end
 
 		local universeId
 
-		if v22 then
+		if v24 then
 			universeId = t1.universeId
-		elseif u23 ~= nil then
-			local v30 = u23.state(p3)
+		elseif u25 ~= nil then
+			local v32 = u25.state(p3)
 
-			if v30.status == "pending" then
+			if v32.status == "pending" then
 				return
 			end
 
-			if v30.status == "succeeded" then
-				local result = v30.result
+			if v32.status == "succeeded" then
+				local result = v32.result
 
 				if result == nil then
 					universeId = nil
 				else
 					local _meta = result._meta
-					local v33 = if _meta == nil then nil else _meta._roblox
-					local v34 = if v33 == nil then nil else v33.universeId
+					local v35 = if _meta == nil then nil else _meta._roblox
+					local v36 = if v35 == nil then nil else v35.universeId
 
-					universeId = if typeof(v34) ~= "number" or v34 == 0 then nil else v34
+					universeId = if typeof(v36) ~= "number" or v36 == 0 then nil else v36
 				end
 			else
 				universeId = nil
@@ -101,34 +105,34 @@ local function resumeBuildChat(t1: {[any]: any}) -- line: 65
 		end
 
 		if universeId == nil then
-			u26 = true
+			u28 = true
 
 			local onOpenChat = t1.onOpenChat
-			local v36 = sessionId
+			local v38 = sessionId
 
 			onOpenChat({
 				universeId = 0,
 				placeId = nil,
-				experienceName = "Build Assistant",
 				gameIcon = nil,
-				sessionId = v36
+				sessionId = v38,
+				experienceName = BUILD_ASSISTANT_FALLBACK_NAME
 			})
 
 			return
 		end
 
-		local v37 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
+		local v39 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
 
-		configurationStore = v37
+		configurationStore = v39
 
-		local v38 = v37.getAndFetchSummary(universeId)
+		local v40 = v39.getAndFetchSummary(universeId)
 
-		if v38.status(p3) == "NotReady" then
+		if v40.status(p3) == "NotReady" then
 			return
 		end
 
-		u26 = true
-		t1.onOpenChat((makeTarget(universeId, sessionId, v38.data(p3))))
+		u28 = true
+		t1.onOpenChat((makeTarget(universeId, sessionId, v40.data(p3))))
 	end)
 end
 

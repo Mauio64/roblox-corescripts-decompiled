@@ -70,6 +70,7 @@ local function createGameMediaStore() -- line: 16
 	return {
 		getAndFetchGameMedia = v10.getAndFetchItem,
 		getGameMedia = v10.getCachedItem,
+		fetchGameMedia = v10.fetchItem,
 		clear = v10.clear,
 		dispose = v10.dispose
 	}

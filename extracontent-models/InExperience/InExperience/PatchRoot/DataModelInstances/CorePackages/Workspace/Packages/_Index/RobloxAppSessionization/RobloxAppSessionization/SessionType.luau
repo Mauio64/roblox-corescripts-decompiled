@@ -33,6 +33,7 @@ return {
 			AvatarExperienceRoot = "AvatarExperienceRoot",
 			Chat = "Chat",
 			Moments = "Moments",
+			MomentsImmersive = "Moments",
 			More = "More",
 			Landing = "Landing",
 			Startup = "Startup",
@@ -86,7 +87,8 @@ return {
 			ReportAbuse = "ReportAbuse",
 			ExperienceGuidelinesExplained = "ExperienceGuidelinesExplained",
 			PassesPage = "PassesPage",
-			MomentsFeed = "MomentsFeed"
+			MomentsFeed = "MomentsFeed",
+			MomentsImmersive = "MomentsFeed"
 		}
 	},
 	Metadata = {

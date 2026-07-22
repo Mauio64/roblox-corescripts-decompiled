@@ -17,13 +17,12 @@ local SduiParseHelpers = require(SduiCoreSystem.SduiParseHelpers)
 
 require(SduiCoreSystem.SduiComponentType)
 
-local FFlagSduiLocalizedLiterals = require(SduiCoreSystemParent.SharedFlags).FFlagSduiLocalizedLiterals
 local FFlagSduiImprovedErrorDimensions = require(SduiCoreSystemParent.SharedFlags).FFlagSduiImprovedErrorDimensions
 local FFlagSduiInlineNestedComponentSchema = require(SduiCoreSystemParent.SharedFlags).FFlagSduiInlineNestedComponentSchema
 local FFlagSduiLazyNestedComponentProp = require(SduiCoreSystemParent.SharedFlags).FFlagSduiLazyNestedComponentProp
 
-local function buildNestedComponentProp(s1: string, p1, p2, p3, p4, p5, b1: boolean?) -- line: 51
-	-- upvalues: FFlagSduiImprovedErrorDimensions (copy), FFlagSduiInlineNestedComponentSchema (copy), SduiPropUtils (copy), buildConfigForComponent (copy), Signals (copy), buildInputsForNestedComponent (copy), FFlagSduiLocalizedLiterals (copy), SduiLogger (copy), SduiErrors (copy), SduiParseHelpers (copy), FFlagSduiLazyNestedComponentProp (copy), PropResultCategory (copy), buildNestedComponentProp (copy)
+local function buildNestedComponentProp(s1: string, p1, p2, p3, p4, p5, b1: boolean?) -- line: 50
+	-- upvalues: FFlagSduiImprovedErrorDimensions (copy), FFlagSduiInlineNestedComponentSchema (copy), SduiPropUtils (copy), buildConfigForComponent (copy), Signals (copy), buildInputsForNestedComponent (copy), SduiLogger (copy), SduiErrors (copy), SduiParseHelpers (copy), FFlagSduiLazyNestedComponentProp (copy), PropResultCategory (copy), buildNestedComponentProp (copy)
 	local currentComponentType = nil
 	local currentParserName = nil
 
@@ -33,33 +32,33 @@ local function buildNestedComponentProp(s1: string, p1, p2, p3, p4, p5, b1: bool
 	end
 
 	if s1 == "literal" then
-		local v25
+		local v24
 
 		if FFlagSduiInlineNestedComponentSchema then
-			v25 = SduiPropUtils.resolveTemplateFromData(p1, p4)
+			v24 = SduiPropUtils.resolveTemplateFromData(p1, p4)
 		else
 			if p1.roblox_component == nil then
 				error("Missing templateData.roblox_component")
 			end
 
-			v25 = p4.getTemplateForRobloxComponent(p1.roblox_component)
+			v24 = p4.getTemplateForRobloxComponent(p1.roblox_component)
 
-			if v25 == nil then
+			if v24 == nil then
 				error(`Could not find template for roblox_component { p1.roblox_component }`)
 			end
 		end
 
-		local v26
+		local v25
 
 		if FFlagSduiInlineNestedComponentSchema and p1.inline_component ~= nil then
-			v26 = buildConfigForComponent(v25, p3, p4, p5, nil, p2)
+			v25 = buildConfigForComponent(v24, p3, p4, p5, nil, p2)
 		else
-			local v27 = Signals.createComputed(function(p6) -- line: 91
-				-- upvalues: buildInputsForNestedComponent (copy), p3 (copy), p1 (copy), p2 (copy), FFlagSduiLocalizedLiterals (copy), p4 (copy), SduiLogger (copy), SduiErrors (copy), SduiParseHelpers (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref), currentParserName (ref)
+			local v26 = Signals.createComputed(function(p6) -- line: 90
+				-- upvalues: buildInputsForNestedComponent (copy), p3 (copy), p1 (copy), p2 (copy), p4 (copy), SduiLogger (copy), SduiErrors (copy), SduiParseHelpers (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref), currentParserName (ref)
 				local t1 = {}
-				local ok, result = pcall(function() -- line: 93
-					-- upvalues: buildInputsForNestedComponent (copy), p3 (copy), p1 (copy), p2 (copy), p6 (copy), t1 (copy), FFlagSduiLocalizedLiterals (copy), p4 (copy)
-					buildInputsForNestedComponent(p3, p1.inputs, p2, p6, t1, if not FFlagSduiLocalizedLiterals then nil else p4)
+				local ok, result = pcall(function() -- line: 92
+					-- upvalues: buildInputsForNestedComponent (copy), p3 (copy), p1 (copy), p2 (copy), p6 (copy), t1 (copy), p4 (copy)
+					buildInputsForNestedComponent(p3, p1.inputs, p2, p6, t1, p4)
 				end)
 
 				if not ok then
@@ -74,10 +73,10 @@ local function buildNestedComponentProp(s1: string, p1, p2, p3, p4, p5, b1: bool
 				return t1
 			end)
 
-			v26 = buildConfigForComponent(v25, v27, p4, p5)
+			v25 = buildConfigForComponent(v24, v26, p4, p5)
 		end
 
-		return v26, if not FFlagSduiLazyNestedComponentProp or not b1 then PropResultCategory.NestedComponentConfig else PropResultCategory.Literal
+		return v25, if not FFlagSduiLazyNestedComponentProp or not b1 then PropResultCategory.NestedComponentConfig else PropResultCategory.Literal
 	end
 
 	if s1 == "conditional" then

@@ -42,16 +42,16 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 	local v37 = Constants.PLATFORM_SCORE_WIDTH * UIScale
 	local v38 = if not v31 then v23 else if not v30 then v31.globalEntries else v31.friendsEntries
 	local v39 = if not v31 then v21 else if not v30 then v31.getGlobalLastRefreshedAt else v31.getFriendsLastRefreshedAt
-	local v40 = if not v31 then v21 else v31.getUserScore
-	local v41 = if not v31 then v21 else v31.getUserRank
+	local v40 = if not v31 then v21 else if not v30 then v31.getUserScore else v31.getUserFriendScore
+	local v41 = if not v31 then v21 else if not v30 then v31.getUserRank else v31.getUserFriendRank
 	local v42 = if not v31 then v22 else v31.getUnit
 	local v43, v44 = React.useState("loading")
 	local v45, v46 = React.useState(0)
 	local v47 = React.useRef(false)
 	local v48 = SignalsReact.useSignalState(v38.getAllData)
-	local v49 = React.useMemo(function() -- line: 89
+	local v49 = React.useMemo(function() -- line: 93
 		-- upvalues: Signals (copy), v39 (copy)
-		return Signals.createComputed(function(p1) -- line: 90
+		return Signals.createComputed(function(p1) -- line: 94
 			-- upvalues: v39 (copy)
 			return v39(p1) ~= nil
 		end)
@@ -66,26 +66,26 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 	local v53 = SignalsReact.useSignalBinding(v39)
 	local v54, v55 = React.useBinding(os.time())
 
-	React.useEffect(function() -- line: 104
+	React.useEffect(function() -- line: 108
 		-- upvalues: v55 (copy)
 		local thread = nil
 
-		local function schedule() -- line: 106
+		local function schedule() -- line: 110
 			-- upvalues: thread (ref), v55 (copy), schedule (copy)
-			thread = task.delay(300, function() -- line: 107
+			thread = task.delay(300, function() -- line: 111
 				-- upvalues: v55 (copy), schedule (copy)
 				v55(os.time())
 				schedule()
 			end)
 		end
 
-		thread = task.delay(300, function() -- line: 107
+		thread = task.delay(300, function() -- line: 111
 			-- upvalues: v55 (copy), schedule (copy)
 			v55(os.time())
 			schedule()
 		end)
 
-		return function() -- line: 113
+		return function() -- line: 117
 			-- upvalues: thread (ref)
 			if thread then
 				task.cancel(thread)
@@ -94,12 +94,12 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 		end
 	end, {})
 
-	local v56 = React.useMemo(function() -- line: 120
+	local v56 = React.useMemo(function() -- line: 124
 		-- upvalues: React (copy), v53 (copy), v54 (copy)
 		return React.joinBindings({
 			lastRefreshedAt = v53,
 			tick = v54
-		}):map(function(p2) -- line: 124
+		}):map(function(p2) -- line: 128
 			local lastRefreshedAt = p2.lastRefreshedAt
 			local timestamp = os.time()
 
@@ -114,13 +114,13 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 		v54
 	})
 
-	React.useEffect(function() -- line: 129
+	React.useEffect(function() -- line: 133
 		-- upvalues: v31 (copy), tab (copy)
 		if v31 then
 			v31:fireTabOpened(tab)
 		end
 
-		return function() -- line: 133
+		return function() -- line: 137
 			-- upvalues: v31 (copy), tab (copy)
 			if v31 then
 				v31:fireTabClosed(tab)
@@ -130,26 +130,26 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 		v31,
 		tab
 	})
-	React.useEffect(function() -- line: 140
+	React.useEffect(function() -- line: 144
 		-- upvalues: v47 (copy), v44 (copy), v50 (copy)
 		v47.current = false
 		v44("loading")
 
 		if v50 then
-			return function() -- line: 144
+			return function() -- line: 148
 				-- upvalues: v47 (copy)
 				v47.current = true
 			end
 		end
 
-		local thread = task.delay(30, function() -- line: 148
+		local thread = task.delay(30, function() -- line: 152
 			-- upvalues: v47 (copy), v44 (copy)
 			if not v47.current then
 				v44("error")
 			end
 		end)
 
-		return function() -- line: 153
+		return function() -- line: 157
 			-- upvalues: v47 (copy), thread (copy)
 			v47.current = true
 			task.cancel(thread)
@@ -162,7 +162,7 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 	})
 
 	local LocalPlayer = Players.LocalPlayer
-	local v58 = React.useMemo(function() -- line: 160
+	local v58 = React.useMemo(function() -- line: 164
 		-- upvalues: LocalPlayer (copy), resolveDisplayName (copy)
 		if LocalPlayer then
 			return (resolveDisplayName(LocalPlayer))
@@ -176,7 +176,7 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 	if v31 == nil or not v50 then
 		if v43 == "error" then
 			return React.createElement(ServiceUnavailableState, {
-				onRetry = function() -- line: 170
+				onRetry = function() -- line: 174
 					-- upvalues: v31 (copy), tab (copy), v44 (copy), v46 (copy)
 					if v31 then
 						v31:fireTabClosed(tab)
@@ -184,7 +184,7 @@ local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 58
 					end
 
 					v44("loading")
-					v46(function(p3) -- line: 176
+					v46(function(p3) -- line: 180
 						return p3 + 1
 					end)
 				end,

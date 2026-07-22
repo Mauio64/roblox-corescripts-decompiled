@@ -10,7 +10,7 @@ local t2 = {}
 
 t2.__index = t2
 
-function t2.new(t3: {[any]: any}?) -- line: 404
+function t2.new(t3: {[any]: any}?) -- line: 406
 	-- upvalues: hydration_stream_mode (copy), t2 (copy)
 	return (setmetatable({
 		feed_page_token = if t3 ~= nil and t3.feed_page_token ~= nil then t3.feed_page_token else "",
@@ -30,7 +30,7 @@ function t2.new(t3: {[any]: any}?) -- line: 404
 		client_capabilities = if t3 ~= nil and t3.client_capabilities ~= nil then t3.client_capabilities else nil
 	}, t2))
 end
-function t2.encode(p1) -- line: 440
+function t2.encode(p1) -- line: 442
 	-- upvalues: proto (copy), hydration_stream_mode (copy)
 	local buf = buffer.create(0)
 	local n1 = 0
@@ -140,7 +140,7 @@ function t2.encode(p1) -- line: 440
 
 	return buf3
 end
-function t2.decode(p2: buffer) -- line: 550
+function t2.decode(p2: buffer) -- line: 552
 	-- upvalues: t2 (copy), proto (copy), hydration_stream_mode (copy), t1 (copy), client_capabilities (copy)
 	local v69 = t2.new()
 	local n2 = 0
@@ -255,7 +255,7 @@ function t2.decode(p2: buffer) -- line: 550
 
 	return v69
 end
-function t2.jsonEncode(p3) -- line: 676
+function t2.jsonEncode(p3) -- line: 678
 	-- upvalues: hydration_stream_mode (copy)
 	local t4 = {}
 
@@ -327,7 +327,7 @@ function t2.jsonEncode(p3) -- line: 676
 
 	return t4
 end
-function t2.jsonDecode(t6: {[any]: any}) -- line: 760
+function t2.jsonDecode(t6: {[any]: any}) -- line: 762
 	-- upvalues: t2 (copy), hydration_stream_mode (copy), t1 (copy), client_capabilities (copy)
 	local v100 = t2.new()
 
@@ -469,14 +469,14 @@ local t9 = {}
 
 t9.__index = t9
 
-function t9.new(t10: {[any]: any}?) -- line: 921
+function t9.new(t10: {[any]: any}?) -- line: 923
 	-- upvalues: t9 (copy)
 	return (setmetatable({
 		key = if t10 ~= nil and t10.key ~= nil then t10.key else "",
 		value = if t10 ~= nil and t10.value ~= nil then t10.value else ""
 	}, t9))
 end
-function t9.encode(p4) -- line: 933
+function t9.encode(p4) -- line: 935
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n3 = 0
@@ -499,7 +499,7 @@ function t9.encode(p4) -- line: 933
 
 	return buf4
 end
-function t9.decode(p5: buffer) -- line: 954
+function t9.decode(p5: buffer) -- line: 956
 	-- upvalues: t9 (copy), proto (copy)
 	local v117 = t9.new()
 	local n4 = 0
@@ -544,7 +544,7 @@ function t9.decode(p5: buffer) -- line: 954
 
 	return v117
 end
-function t9.jsonEncode(p6) -- line: 1004
+function t9.jsonEncode(p6) -- line: 1006
 	local t11 = {}
 
 	if p6.key ~= nil and p6.key ~= "" then
@@ -557,7 +557,7 @@ function t9.jsonEncode(p6) -- line: 1004
 
 	return t11
 end
-function t9.jsonDecode(t12: {[any]: any}) -- line: 1020
+function t9.jsonDecode(t12: {[any]: any}) -- line: 1022
 	-- upvalues: t9 (copy)
 	local v131 = t9.new()
 
@@ -583,14 +583,14 @@ local t13 = {}
 
 t13.__index = t13
 
-function t13.new(t14: {[any]: any}?) -- line: 1051
+function t13.new(t14: {[any]: any}?) -- line: 1053
 	-- upvalues: t13 (copy)
 	return (setmetatable({
 		items_per_row = if t14 ~= nil and t14.items_per_row ~= nil then t14.items_per_row else {},
 		rows_above_fold = if t14 ~= nil and t14.rows_above_fold ~= nil then t14.rows_above_fold else 0
 	}, t13))
 end
-function t13.encode(p7) -- line: 1058
+function t13.encode(p7) -- line: 1060
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n5 = 0
@@ -620,7 +620,7 @@ function t13.encode(p7) -- line: 1058
 
 	return buf6
 end
-function t13.decode(p8: buffer) -- line: 1085
+function t13.decode(p8: buffer) -- line: 1087
 	-- upvalues: t13 (copy), proto (copy), t1 (copy)
 	local v153 = t13.new()
 	local n6 = 0
@@ -670,7 +670,7 @@ function t13.decode(p8: buffer) -- line: 1085
 
 	return v153
 end
-function t13.jsonEncode(p9) -- line: 1140
+function t13.jsonEncode(p9) -- line: 1142
 	local t15 = {}
 
 	if p9.items_per_row ~= nil and next(p9.items_per_row) ~= nil then
@@ -689,7 +689,7 @@ function t13.jsonEncode(p9) -- line: 1140
 
 	return t15
 end
-function t13.jsonDecode(t17: {[any]: any}) -- line: 1158
+function t13.jsonDecode(t17: {[any]: any}) -- line: 1160
 	-- upvalues: t13 (copy)
 	local v171 = t13.new()
 
@@ -735,14 +735,14 @@ local t20 = {}
 
 t20.__index = t20
 
-function t20.new(t21: {[any]: any}?) -- line: 1204
+function t20.new(t21: {[any]: any}?) -- line: 1206
 	-- upvalues: t20 (copy)
 	return (setmetatable({
 		key = if t21 ~= nil and t21.key ~= nil then t21.key else "",
 		value = if t21 ~= nil and t21.value ~= nil then t21.value else 0
 	}, t20))
 end
-function t20.encode(p10) -- line: 1213
+function t20.encode(p10) -- line: 1215
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n7 = 0
@@ -765,7 +765,7 @@ function t20.encode(p10) -- line: 1213
 
 	return buf7
 end
-function t20.decode(p11: buffer) -- line: 1232
+function t20.decode(p11: buffer) -- line: 1234
 	-- upvalues: t20 (copy), proto (copy)
 	local v188 = t20.new()
 	local n8 = 0
@@ -812,7 +812,7 @@ function t20.decode(p11: buffer) -- line: 1232
 
 	return v188
 end
-function t20.jsonEncode(p12) -- line: 1280
+function t20.jsonEncode(p12) -- line: 1282
 	local t22 = {}
 
 	if p12.key ~= nil and p12.key ~= "" then
@@ -825,7 +825,7 @@ function t20.jsonEncode(p12) -- line: 1280
 
 	return t22
 end
-function t20.jsonDecode(t23: {[any]: any}) -- line: 1294
+function t20.jsonDecode(t23: {[any]: any}) -- line: 1296
 	-- upvalues: t20 (copy)
 	local v202 = t20.new()
 
@@ -851,7 +851,7 @@ local t24 = {}
 
 t24.__index = t24
 
-function t24.new(t25: {[any]: any}?) -- line: 1324
+function t24.new(t25: {[any]: any}?) -- line: 1326
 	-- upvalues: t24 (copy)
 	return (setmetatable({
 		page_entries = if t25 ~= nil and t25.page_entries ~= nil then t25.page_entries else {},
@@ -860,7 +860,7 @@ function t24.new(t25: {[any]: any}?) -- line: 1324
 		localized_literals = if t25 ~= nil and t25.localized_literals ~= nil then t25.localized_literals else {}
 	}, t24))
 end
-function t24.encode(p13) -- line: 1333
+function t24.encode(p13) -- line: 1335
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n9 = 0
@@ -914,7 +914,7 @@ function t24.encode(p13) -- line: 1333
 
 	return buf10
 end
-function t24.decode(p14: buffer) -- line: 1383
+function t24.decode(p14: buffer) -- line: 1385
 	-- upvalues: t24 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
 	local v244 = t24.new()
 	local n10 = 0
@@ -976,7 +976,7 @@ function t24.decode(p14: buffer) -- line: 1383
 
 	return v244
 end
-function t24.jsonEncode(p15) -- line: 1459
+function t24.jsonEncode(p15) -- line: 1461
 	local t26 = {}
 
 	if p15.page_entries ~= nil and #p15.page_entries > 0 then
@@ -1015,7 +1015,7 @@ function t24.jsonEncode(p15) -- line: 1459
 
 	return t26
 end
-function t24.jsonDecode(t30: {[any]: any}) -- line: 1493
+function t24.jsonDecode(t30: {[any]: any}) -- line: 1495
 	-- upvalues: t24 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
 	local v272 = t24.new()
 
@@ -1091,14 +1091,14 @@ local t36 = {}
 
 t36.__index = t36
 
-function t36.new(t37: {[any]: any}?) -- line: 1576
+function t36.new(t37: {[any]: any}?) -- line: 1578
 	-- upvalues: t36 (copy)
 	return (setmetatable({
 		key = if t37 ~= nil and t37.key ~= nil then t37.key else "",
 		value = if t37 ~= nil and t37.value ~= nil then t37.value else nil
 	}, t36))
 end
-function t36.encode(p16) -- line: 1585
+function t36.encode(p16) -- line: 1587
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n11 = 0
@@ -1122,7 +1122,7 @@ function t36.encode(p16) -- line: 1585
 
 	return buf11
 end
-function t36.decode(p17: buffer) -- line: 1605
+function t36.decode(p17: buffer) -- line: 1607
 	-- upvalues: t36 (copy), proto (copy), template_entry (copy)
 	local v299 = t36.new()
 	local n12 = 0
@@ -1167,7 +1167,7 @@ function t36.decode(p17: buffer) -- line: 1605
 
 	return v299
 end
-function t36.jsonEncode(p18) -- line: 1653
+function t36.jsonEncode(p18) -- line: 1655
 	local t38 = {}
 
 	if p18.key ~= nil and p18.key ~= "" then
@@ -1180,7 +1180,7 @@ function t36.jsonEncode(p18) -- line: 1653
 
 	return t38
 end
-function t36.jsonDecode(t39: {[any]: any}) -- line: 1667
+function t36.jsonDecode(t39: {[any]: any}) -- line: 1669
 	-- upvalues: t36 (copy), template_entry (copy)
 	local v313 = t36.new()
 
@@ -1206,14 +1206,14 @@ local t40 = {}
 
 t40.__index = t40
 
-function t40.new(t41: {[any]: any}?) -- line: 1697
+function t40.new(t41: {[any]: any}?) -- line: 1699
 	-- upvalues: t40 (copy)
 	return (setmetatable({
 		key = if t41 ~= nil and t41.key ~= nil then t41.key else "",
 		value = if t41 ~= nil and t41.value ~= nil then t41.value else ""
 	}, t40))
 end
-function t40.encode(p19) -- line: 1706
+function t40.encode(p19) -- line: 1708
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n13 = 0
@@ -1236,7 +1236,7 @@ function t40.encode(p19) -- line: 1706
 
 	return buf12
 end
-function t40.decode(p20: buffer) -- line: 1727
+function t40.decode(p20: buffer) -- line: 1729
 	-- upvalues: t40 (copy), proto (copy)
 	local v324 = t40.new()
 	local n14 = 0
@@ -1281,7 +1281,7 @@ function t40.decode(p20: buffer) -- line: 1727
 
 	return v324
 end
-function t40.jsonEncode(p21) -- line: 1777
+function t40.jsonEncode(p21) -- line: 1779
 	local t42 = {}
 
 	if p21.key ~= nil and p21.key ~= "" then
@@ -1294,7 +1294,7 @@ function t40.jsonEncode(p21) -- line: 1777
 
 	return t42
 end
-function t40.jsonDecode(t43: {[any]: any}) -- line: 1793
+function t40.jsonDecode(t43: {[any]: any}) -- line: 1795
 	-- upvalues: t40 (copy)
 	local v338 = t40.new()
 
@@ -1320,7 +1320,7 @@ local t44 = {}
 
 t44.__index = t44
 
-function t44.new(t45: {[any]: any}?) -- line: 1823
+function t44.new(t45: {[any]: any}?) -- line: 1825
 	-- upvalues: t44 (copy)
 	return (setmetatable({
 		sort_id = if t45 ~= nil and t45.sort_id ~= nil then t45.sort_id else "",
@@ -1329,10 +1329,11 @@ function t44.new(t45: {[any]: any}?) -- line: 1823
 		country = if t45 ~= nil and t45.country ~= nil then t45.country else "",
 		session_id = if t45 ~= nil and t45.session_id ~= nil then t45.session_id else "",
 		age_group = if t45 ~= nil and t45.age_group ~= nil then t45.age_group else "",
-		max_memory = if t45 ~= nil and t45.max_memory ~= nil then t45.max_memory else ""
+		max_memory = if t45 ~= nil and t45.max_memory ~= nil then t45.max_memory else "",
+		selected_genre = if t45 ~= nil and t45.selected_genre ~= nil then t45.selected_genre else ""
 	}, t44))
 end
-function t44.encode(p22) -- line: 1837
+function t44.encode(p22) -- line: 1840
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n15 = 0
@@ -1379,83 +1380,94 @@ function t44.encode(p22) -- line: 1837
 		buf, n15 = proto.writeString(v355, v356, p22.max_memory)
 	end
 
+	if p22.selected_genre ~= nil and p22.selected_genre ~= "" then
+		local v357, v358 = proto.writeTag(buf, n15, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n15 = proto.writeString(v357, v358, p22.selected_genre)
+	end
+
 	local buf13 = buffer.create(n15)
 
 	buffer.copy(buf13, 0, buf, 0, n15)
 
 	return buf13
 end
-function t44.decode(p23: buffer) -- line: 1881
+function t44.decode(p23: buffer) -- line: 1889
 	-- upvalues: t44 (copy), proto (copy)
-	local v359 = t44.new()
+	local v361 = t44.new()
 	local n16 = 0
 
 	while n16 < buffer.len(p23) do
-		local v361, v362
+		local v363, v364
 
-		v361, v362, n16 = proto.readTag(p23, n16)
+		v363, v364, n16 = proto.readTag(p23, n16)
 
-		if v362 == proto.wireTypes.varint then
-			local v363
+		if v364 == proto.wireTypes.varint then
+			local v365
 
-			v363, n16 = proto.readVarInt(p23, n16)
-		elseif v362 == proto.wireTypes.lengthDelimited then
-			if v361 == 1 then
-				local v364
-
-				v364, n16 = proto.readBuffer(p23, n16)
-				v359.sort_id = buffer.tostring(v364)
-			elseif v361 == 2 then
-				local v365
-
-				v365, n16 = proto.readBuffer(p23, n16)
-				v359.content_page_token = buffer.tostring(v365)
-			elseif v361 == 3 then
+			v365, n16 = proto.readVarInt(p23, n16)
+		elseif v364 == proto.wireTypes.lengthDelimited then
+			if v363 == 1 then
 				local v366
 
 				v366, n16 = proto.readBuffer(p23, n16)
-				v359.device = buffer.tostring(v366)
-			elseif v361 == 4 then
+				v361.sort_id = buffer.tostring(v366)
+			elseif v363 == 2 then
 				local v367
 
 				v367, n16 = proto.readBuffer(p23, n16)
-				v359.country = buffer.tostring(v367)
-			elseif v361 == 5 then
+				v361.content_page_token = buffer.tostring(v367)
+			elseif v363 == 3 then
 				local v368
 
 				v368, n16 = proto.readBuffer(p23, n16)
-				v359.session_id = buffer.tostring(v368)
-			elseif v361 == 6 then
+				v361.device = buffer.tostring(v368)
+			elseif v363 == 4 then
 				local v369
 
 				v369, n16 = proto.readBuffer(p23, n16)
-				v359.age_group = buffer.tostring(v369)
-			elseif v361 == 7 then
+				v361.country = buffer.tostring(v369)
+			elseif v363 == 5 then
 				local v370
 
 				v370, n16 = proto.readBuffer(p23, n16)
-				v359.max_memory = buffer.tostring(v370)
+				v361.session_id = buffer.tostring(v370)
+			elseif v363 == 6 then
+				local v371
+
+				v371, n16 = proto.readBuffer(p23, n16)
+				v361.age_group = buffer.tostring(v371)
+			elseif v363 == 7 then
+				local v372
+
+				v372, n16 = proto.readBuffer(p23, n16)
+				v361.max_memory = buffer.tostring(v372)
+			elseif v363 == 8 then
+				local v373
+
+				v373, n16 = proto.readBuffer(p23, n16)
+				v361.selected_genre = buffer.tostring(v373)
 			else
-				local v371, v372 = proto.readVarInt(p23, n16)
+				local v374, v375 = proto.readVarInt(p23, n16)
 
-				n16 = v372 + v371
+				n16 = v375 + v374
 			end
-		elseif v362 == proto.wireTypes.i32 then
-			local v373
+		elseif v364 == proto.wireTypes.i32 then
+			local v376
 
-			v373, n16 = proto.readFixed32(p23, n16)
-		elseif v362 == proto.wireTypes.i64 then
-			local v374
+			v376, n16 = proto.readFixed32(p23, n16)
+		elseif v364 == proto.wireTypes.i64 then
+			local v377
 
-			v374, n16 = proto.readFixed64(p23, n16)
+			v377, n16 = proto.readFixed64(p23, n16)
 		else
-			error("Unsupported wire type: " .. v362)
+			error("Unsupported wire type: " .. v364)
 		end
 	end
 
-	return v359
+	return v361
 end
-function t44.jsonEncode(p24) -- line: 1954
+function t44.jsonEncode(p24) -- line: 1967
 	local t46 = {}
 
 	if p24.sort_id ~= nil and p24.sort_id ~= "" then
@@ -1486,61 +1498,73 @@ function t44.jsonEncode(p24) -- line: 1954
 		t46.maxMemory = p24.max_memory
 	end
 
+	if p24.selected_genre ~= nil and p24.selected_genre ~= "" then
+		t46.selectedGenre = p24.selected_genre
+	end
+
 	return t46
 end
-function t44.jsonDecode(t47: {[any]: any}) -- line: 1988
+function t44.jsonDecode(t47: {[any]: any}) -- line: 2005
 	-- upvalues: t44 (copy)
-	local v378 = t44.new()
+	local v381 = t44.new()
 
 	if t47.sort_id ~= nil then
-		v378.sort_id = t47.sort_id
+		v381.sort_id = t47.sort_id
 	end
 
 	if t47.sortId ~= nil then
-		v378.sort_id = t47.sortId
+		v381.sort_id = t47.sortId
 	end
 
 	if t47.content_page_token ~= nil then
-		v378.content_page_token = t47.content_page_token
+		v381.content_page_token = t47.content_page_token
 	end
 
 	if t47.contentPageToken ~= nil then
-		v378.content_page_token = t47.contentPageToken
+		v381.content_page_token = t47.contentPageToken
 	end
 
 	if t47.device ~= nil then
-		v378.device = t47.device
+		v381.device = t47.device
 	end
 
 	if t47.country ~= nil then
-		v378.country = t47.country
+		v381.country = t47.country
 	end
 
 	if t47.session_id ~= nil then
-		v378.session_id = t47.session_id
+		v381.session_id = t47.session_id
 	end
 
 	if t47.sessionId ~= nil then
-		v378.session_id = t47.sessionId
+		v381.session_id = t47.sessionId
 	end
 
 	if t47.age_group ~= nil then
-		v378.age_group = t47.age_group
+		v381.age_group = t47.age_group
 	end
 
 	if t47.ageGroup ~= nil then
-		v378.age_group = t47.ageGroup
+		v381.age_group = t47.ageGroup
 	end
 
 	if t47.max_memory ~= nil then
-		v378.max_memory = t47.max_memory
+		v381.max_memory = t47.max_memory
 	end
 
 	if t47.maxMemory ~= nil then
-		v378.max_memory = t47.maxMemory
+		v381.max_memory = t47.maxMemory
 	end
 
-	return v378
+	if t47.selected_genre ~= nil then
+		v381.selected_genre = t47.selected_genre
+	end
+
+	if t47.selectedGenre ~= nil then
+		v381.selected_genre = t47.selectedGenre
+	end
+
+	return v381
 end
 
 t44.descriptor = {
@@ -1554,7 +1578,7 @@ local t48 = {}
 
 t48.__index = t48
 
-function t48.new(t49: {[any]: any}?) -- line: 2056
+function t48.new(t49: {[any]: any}?) -- line: 2081
 	-- upvalues: t48 (copy)
 	return (setmetatable({
 		page_entries = if t49 ~= nil and t49.page_entries ~= nil then t49.page_entries else {},
@@ -1564,57 +1588,57 @@ function t48.new(t49: {[any]: any}?) -- line: 2056
 		localized_literals = if t49 ~= nil and t49.localized_literals ~= nil then t49.localized_literals else {}
 	}, t48))
 end
-function t48.encode(p25) -- line: 2070
+function t48.encode(p25) -- line: 2095
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n17 = 0
 
 	if p25.page_entries ~= nil and #p25.page_entries > 0 then
-		for _, v384 in p25.page_entries do
-			local v385 = v384:encode()
-			local v386, v387 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
+		for _, v387 in p25.page_entries do
+			local v388 = v387:encode()
+			local v389, v390 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n17 = proto.writeBuffer(v386, v387, v385, buffer.len(v385))
+			buf, n17 = proto.writeBuffer(v389, v390, v388, buffer.len(v388))
 		end
 	end
 
 	if p25.hydration_data ~= nil then
-		local v388 = p25.hydration_data:encode()
-		local v389, v390 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
+		local v391 = p25.hydration_data:encode()
+		local v392, v393 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n17 = proto.writeBuffer(v389, v390, v388, buffer.len(v388))
+		buf, n17 = proto.writeBuffer(v392, v393, v391, buffer.len(v391))
 	end
 
 	if p25.templates ~= nil and next(p25.templates) ~= nil then
-		for v391, v392 in p25.templates do
+		for v394, v395 in p25.templates do
 			local buf14 = buffer.create(0)
-			local v394, v395 = proto.writeTag(buf14, 0, 1, proto.wireTypes.lengthDelimited)
-			local v396, v397 = proto.writeString(v394, v395, v391)
-			local v398 = v392:encode()
-			local v399, v400 = proto.writeTag(v396, v397, 2, proto.wireTypes.lengthDelimited)
-			local v401, v402 = proto.writeBuffer(v399, v400, v398, buffer.len(v398))
-			local v403, v404 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
+			local v397, v398 = proto.writeTag(buf14, 0, 1, proto.wireTypes.lengthDelimited)
+			local v399, v400 = proto.writeString(v397, v398, v394)
+			local v401 = v395:encode()
+			local v402, v403 = proto.writeTag(v399, v400, 2, proto.wireTypes.lengthDelimited)
+			local v404, v405 = proto.writeBuffer(v402, v403, v401, buffer.len(v401))
+			local v406, v407 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
 
-			buf, n17 = proto.writeBuffer(v403, v404, v401, v402)
+			buf, n17 = proto.writeBuffer(v406, v407, v404, v405)
 		end
 	end
 
 	if p25.next_content_page_token ~= nil and p25.next_content_page_token ~= "" then
-		local v405, v406 = proto.writeTag(buf, n17, 4, proto.wireTypes.lengthDelimited)
+		local v408, v409 = proto.writeTag(buf, n17, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n17 = proto.writeString(v405, v406, p25.next_content_page_token)
+		buf, n17 = proto.writeString(v408, v409, p25.next_content_page_token)
 	end
 
 	if p25.localized_literals ~= nil and next(p25.localized_literals) ~= nil then
-		for v407, v408 in p25.localized_literals do
+		for v410, v411 in p25.localized_literals do
 			local buf15 = buffer.create(0)
-			local v410, v411 = proto.writeTag(buf15, 0, 1, proto.wireTypes.lengthDelimited)
-			local v412, v413 = proto.writeString(v410, v411, v407)
-			local v414, v415 = proto.writeTag(v412, v413, 2, proto.wireTypes.lengthDelimited)
-			local v416, v417 = proto.writeString(v414, v415, v408)
-			local v418, v419 = proto.writeTag(buf, n17, 5, proto.wireTypes.lengthDelimited)
+			local v413, v414 = proto.writeTag(buf15, 0, 1, proto.wireTypes.lengthDelimited)
+			local v415, v416 = proto.writeString(v413, v414, v410)
+			local v417, v418 = proto.writeTag(v415, v416, 2, proto.wireTypes.lengthDelimited)
+			local v419, v420 = proto.writeString(v417, v418, v411)
+			local v421, v422 = proto.writeTag(buf, n17, 5, proto.wireTypes.lengthDelimited)
 
-			buf, n17 = proto.writeBuffer(v418, v419, v416, v417)
+			buf, n17 = proto.writeBuffer(v421, v422, v419, v420)
 		end
 	end
 
@@ -1624,81 +1648,81 @@ function t48.encode(p25) -- line: 2070
 
 	return buf16
 end
-function t48.decode(p26: buffer) -- line: 2125
+function t48.decode(p26: buffer) -- line: 2150
 	-- upvalues: t48 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
-	local v422 = t48.new()
+	local v425 = t48.new()
 	local n18 = 0
 
 	while n18 < buffer.len(p26) do
-		local v424, v425
+		local v427, v428
 
-		v424, v425, n18 = proto.readTag(p26, n18)
+		v427, v428, n18 = proto.readTag(p26, n18)
 
-		if v425 == proto.wireTypes.varint then
-			local v426
+		if v428 == proto.wireTypes.varint then
+			local v429
 
-			v426, n18 = proto.readVarInt(p26, n18)
-		elseif v425 == proto.wireTypes.lengthDelimited then
-			if v424 == 1 then
-				local v427
+			v429, n18 = proto.readVarInt(p26, n18)
+		elseif v428 == proto.wireTypes.lengthDelimited then
+			if v427 == 1 then
+				local v430
 
-				v427, n18 = proto.readBuffer(p26, n18)
-				table.insert(v422.page_entries, page_entry_content.UniversalPageEntry.decode(v427))
-			elseif v424 == 2 then
-				local v428
+				v430, n18 = proto.readBuffer(p26, n18)
+				table.insert(v425.page_entries, page_entry_content.UniversalPageEntry.decode(v430))
+			elseif v427 == 2 then
+				local v431
 
-				v428, n18 = proto.readBuffer(p26, n18)
-				v422.hydration_data = hydration_content.HydrationContent.decode(v428)
-			elseif v424 == 3 then
-				local v429
-
-				v429, n18 = proto.readBuffer(p26, n18)
-
-				local v430 = t1.GetChartsSortDetailResponse_TemplatesEntry.decode(v429)
-				local v431 = template_entry.TemplateEntry.new()
-
-				v422.templates[v430.key or ""] = v430.value or v431
-			elseif v424 == 4 then
+				v431, n18 = proto.readBuffer(p26, n18)
+				v425.hydration_data = hydration_content.HydrationContent.decode(v431)
+			elseif v427 == 3 then
 				local v432
 
 				v432, n18 = proto.readBuffer(p26, n18)
-				v422.next_content_page_token = buffer.tostring(v432)
-			elseif v424 == 5 then
-				local v433
 
-				v433, n18 = proto.readBuffer(p26, n18)
+				local v433 = t1.GetChartsSortDetailResponse_TemplatesEntry.decode(v432)
+				local v434 = template_entry.TemplateEntry.new()
 
-				local v434 = t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry.decode(v433)
+				v425.templates[v433.key or ""] = v433.value or v434
+			elseif v427 == 4 then
+				local v435
 
-				v422.localized_literals[v434.key or ""] = v434.value or ""
+				v435, n18 = proto.readBuffer(p26, n18)
+				v425.next_content_page_token = buffer.tostring(v435)
+			elseif v427 == 5 then
+				local v436
+
+				v436, n18 = proto.readBuffer(p26, n18)
+
+				local v437 = t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry.decode(v436)
+
+				v425.localized_literals[v437.key or ""] = v437.value or ""
 			else
-				local v435, v436 = proto.readVarInt(p26, n18)
+				local v438, v439 = proto.readVarInt(p26, n18)
 
-				n18 = v436 + v435
+				n18 = v439 + v438
 			end
-		elseif v425 == proto.wireTypes.i32 then
-			local v437
+		elseif v428 == proto.wireTypes.i32 then
+			local v440
 
-			v437, n18 = proto.readFixed32(p26, n18)
-		elseif v425 == proto.wireTypes.i64 then
-			local v438
+			v440, n18 = proto.readFixed32(p26, n18)
+		elseif v428 == proto.wireTypes.i64 then
+			local v441
 
-			v438, n18 = proto.readFixed64(p26, n18)
+			v441, n18 = proto.readFixed64(p26, n18)
 		else
-			error("Unsupported wire type: " .. v425)
+			error("Unsupported wire type: " .. v428)
 		end
 	end
 
-	return v422
+	return v425
 end
-function t48.jsonEncode(p27) -- line: 2206
+function t48.jsonEncode(p27) -- line: 2231
 	local t50 = {}
 
 	if p27.page_entries ~= nil and #p27.page_entries > 0 then
 		local t51 = {}
 
-		for _, v443 in p27.page_entries do
-			table.insert(t51, v443:jsonEncode())
+		for _, v446 in p27.page_entries do
+			table.insert(t51, v446:jsonEncode())
 		end
 
 		t50.pageEntries = t51
@@ -1711,8 +1735,8 @@ function t48.jsonEncode(p27) -- line: 2206
 	if p27.templates ~= nil and next(p27.templates) ~= nil then
 		local t52 = {}
 
-		for v445, v446 in p27.templates do
-			t52[v445] = v446:jsonEncode()
+		for v448, v449 in p27.templates do
+			t52[v448] = v449:jsonEncode()
 		end
 
 		t50.templates = t52
@@ -1725,8 +1749,8 @@ function t48.jsonEncode(p27) -- line: 2206
 	if p27.localized_literals ~= nil and next(p27.localized_literals) ~= nil then
 		local t53 = {}
 
-		for v448, v449 in p27.localized_literals do
-			t53[v448] = v449
+		for v451, v452 in p27.localized_literals do
+			t53[v451] = v452
 		end
 
 		t50.localizedLiterals = t53
@@ -1734,77 +1758,77 @@ function t48.jsonEncode(p27) -- line: 2206
 
 	return t50
 end
-function t48.jsonDecode(t54: {[any]: any}) -- line: 2244
+function t48.jsonDecode(t54: {[any]: any}) -- line: 2269
 	-- upvalues: t48 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
-	local v451 = t48.new()
+	local v454 = t48.new()
 
 	if t54.page_entries ~= nil then
 		local t55 = {}
 
-		for _, v454 in t54.page_entries do
-			table.insert(t55, page_entry_content.UniversalPageEntry.jsonDecode(v454))
+		for _, v457 in t54.page_entries do
+			table.insert(t55, page_entry_content.UniversalPageEntry.jsonDecode(v457))
 		end
 
-		v451.page_entries = t55
+		v454.page_entries = t55
 	end
 
 	if t54.pageEntries ~= nil then
 		local t56 = {}
 
-		for _, v457 in t54.pageEntries do
-			table.insert(t56, page_entry_content.UniversalPageEntry.jsonDecode(v457))
+		for _, v460 in t54.pageEntries do
+			table.insert(t56, page_entry_content.UniversalPageEntry.jsonDecode(v460))
 		end
 
-		v451.page_entries = t56
+		v454.page_entries = t56
 	end
 
 	if t54.hydration_data ~= nil then
-		v451.hydration_data = hydration_content.HydrationContent.jsonDecode(t54.hydration_data)
+		v454.hydration_data = hydration_content.HydrationContent.jsonDecode(t54.hydration_data)
 	end
 
 	if t54.hydrationData ~= nil then
-		v451.hydration_data = hydration_content.HydrationContent.jsonDecode(t54.hydrationData)
+		v454.hydration_data = hydration_content.HydrationContent.jsonDecode(t54.hydrationData)
 	end
 
 	if t54.templates ~= nil then
 		local t57 = {}
 
-		for v459, v460 in t54.templates do
-			t57[v459] = template_entry.TemplateEntry.jsonDecode(v460)
+		for v462, v463 in t54.templates do
+			t57[v462] = template_entry.TemplateEntry.jsonDecode(v463)
 		end
 
-		v451.templates = t57
+		v454.templates = t57
 	end
 
 	if t54.next_content_page_token ~= nil then
-		v451.next_content_page_token = t54.next_content_page_token
+		v454.next_content_page_token = t54.next_content_page_token
 	end
 
 	if t54.nextContentPageToken ~= nil then
-		v451.next_content_page_token = t54.nextContentPageToken
+		v454.next_content_page_token = t54.nextContentPageToken
 	end
 
 	if t54.localized_literals ~= nil then
 		local t58 = {}
 
-		for v462, v463 in t54.localized_literals do
-			t58[v462] = v463
+		for v465, v466 in t54.localized_literals do
+			t58[v465] = v466
 		end
 
-		v451.localized_literals = t58
+		v454.localized_literals = t58
 	end
 
 	if t54.localizedLiterals ~= nil then
 		local t59 = {}
 
-		for v465, v466 in t54.localizedLiterals do
-			t59[v465] = v466
+		for v468, v469 in t54.localizedLiterals do
+			t59[v468] = v469
 		end
 
-		v451.localized_literals = t59
+		v454.localized_literals = t59
 	end
 
-	return v451
+	return v454
 end
 
 t48.descriptor = {
@@ -1818,29 +1842,29 @@ local t60 = {}
 
 t60.__index = t60
 
-function t60.new(t61: {[any]: any}?) -- line: 2335
+function t60.new(t61: {[any]: any}?) -- line: 2360
 	-- upvalues: t60 (copy)
 	return (setmetatable({
 		key = if t61 ~= nil and t61.key ~= nil then t61.key else "",
 		value = if t61 ~= nil and t61.value ~= nil then t61.value else nil
 	}, t60))
 end
-function t60.encode(p28) -- line: 2344
+function t60.encode(p28) -- line: 2369
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n19 = 0
 
 	if p28.key ~= nil and p28.key ~= "" then
-		local v471, v472 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
+		local v474, v475 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v471, v472, p28.key)
+		buf, n19 = proto.writeString(v474, v475, p28.key)
 	end
 
 	if p28.value ~= nil then
-		local v473 = p28.value:encode()
-		local v474, v475 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
+		local v476 = p28.value:encode()
+		local v477, v478 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeBuffer(v474, v475, v473, buffer.len(v473))
+		buf, n19 = proto.writeBuffer(v477, v478, v476, buffer.len(v476))
 	end
 
 	local buf17 = buffer.create(n19)
@@ -1849,52 +1873,52 @@ function t60.encode(p28) -- line: 2344
 
 	return buf17
 end
-function t60.decode(p29: buffer) -- line: 2366
+function t60.decode(p29: buffer) -- line: 2391
 	-- upvalues: t60 (copy), proto (copy), template_entry (copy)
-	local v478 = t60.new()
+	local v481 = t60.new()
 	local n20 = 0
 
 	while n20 < buffer.len(p29) do
-		local v480, v481
+		local v483, v484
 
-		v480, v481, n20 = proto.readTag(p29, n20)
+		v483, v484, n20 = proto.readTag(p29, n20)
 
-		if v481 == proto.wireTypes.varint then
-			local v482
+		if v484 == proto.wireTypes.varint then
+			local v485
 
-			v482, n20 = proto.readVarInt(p29, n20)
-		elseif v481 == proto.wireTypes.lengthDelimited then
-			if v480 == 1 then
-				local v483
+			v485, n20 = proto.readVarInt(p29, n20)
+		elseif v484 == proto.wireTypes.lengthDelimited then
+			if v483 == 1 then
+				local v486
 
-				v483, n20 = proto.readBuffer(p29, n20)
-				v478.key = buffer.tostring(v483)
-			elseif v480 == 2 then
-				local v484
+				v486, n20 = proto.readBuffer(p29, n20)
+				v481.key = buffer.tostring(v486)
+			elseif v483 == 2 then
+				local v487
 
-				v484, n20 = proto.readBuffer(p29, n20)
-				v478.value = template_entry.TemplateEntry.decode(v484)
+				v487, n20 = proto.readBuffer(p29, n20)
+				v481.value = template_entry.TemplateEntry.decode(v487)
 			else
-				local v485, v486 = proto.readVarInt(p29, n20)
+				local v488, v489 = proto.readVarInt(p29, n20)
 
-				n20 = v486 + v485
+				n20 = v489 + v488
 			end
-		elseif v481 == proto.wireTypes.i32 then
-			local v487
+		elseif v484 == proto.wireTypes.i32 then
+			local v490
 
-			v487, n20 = proto.readFixed32(p29, n20)
-		elseif v481 == proto.wireTypes.i64 then
-			local v488
+			v490, n20 = proto.readFixed32(p29, n20)
+		elseif v484 == proto.wireTypes.i64 then
+			local v491
 
-			v488, n20 = proto.readFixed64(p29, n20)
+			v491, n20 = proto.readFixed64(p29, n20)
 		else
-			error("Unsupported wire type: " .. v481)
+			error("Unsupported wire type: " .. v484)
 		end
 	end
 
-	return v478
+	return v481
 end
-function t60.jsonEncode(p30) -- line: 2416
+function t60.jsonEncode(p30) -- line: 2441
 	local t62 = {}
 
 	if p30.key ~= nil and p30.key ~= "" then
@@ -1907,19 +1931,19 @@ function t60.jsonEncode(p30) -- line: 2416
 
 	return t62
 end
-function t60.jsonDecode(t63: {[any]: any}) -- line: 2432
+function t60.jsonDecode(t63: {[any]: any}) -- line: 2457
 	-- upvalues: t60 (copy), template_entry (copy)
-	local v492 = t60.new()
+	local v495 = t60.new()
 
 	if t63.key ~= nil then
-		v492.key = t63.key
+		v495.key = t63.key
 	end
 
 	if t63.value ~= nil then
-		v492.value = template_entry.TemplateEntry.jsonDecode(t63.value)
+		v495.value = template_entry.TemplateEntry.jsonDecode(t63.value)
 	end
 
-	return v492
+	return v495
 end
 
 t60.descriptor = {
@@ -1933,28 +1957,28 @@ local t64 = {}
 
 t64.__index = t64
 
-function t64.new(t65: {[any]: any}?) -- line: 2463
+function t64.new(t65: {[any]: any}?) -- line: 2488
 	-- upvalues: t64 (copy)
 	return (setmetatable({
 		key = if t65 ~= nil and t65.key ~= nil then t65.key else "",
 		value = if t65 ~= nil and t65.value ~= nil then t65.value else ""
 	}, t64))
 end
-function t64.encode(p31) -- line: 2475
+function t64.encode(p31) -- line: 2500
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n21 = 0
 
 	if p31.key ~= nil and p31.key ~= "" then
-		local v497, v498 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
+		local v500, v501 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n21 = proto.writeString(v497, v498, p31.key)
+		buf, n21 = proto.writeString(v500, v501, p31.key)
 	end
 
 	if p31.value ~= nil and p31.value ~= "" then
-		local v499, v500 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
+		local v502, v503 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n21 = proto.writeString(v499, v500, p31.value)
+		buf, n21 = proto.writeString(v502, v503, p31.value)
 	end
 
 	local buf18 = buffer.create(n21)
@@ -1963,52 +1987,52 @@ function t64.encode(p31) -- line: 2475
 
 	return buf18
 end
-function t64.decode(p32: buffer) -- line: 2496
+function t64.decode(p32: buffer) -- line: 2521
 	-- upvalues: t64 (copy), proto (copy)
-	local v503 = t64.new()
+	local v506 = t64.new()
 	local n22 = 0
 
 	while n22 < buffer.len(p32) do
-		local v505, v506
+		local v508, v509
 
-		v505, v506, n22 = proto.readTag(p32, n22)
+		v508, v509, n22 = proto.readTag(p32, n22)
 
-		if v506 == proto.wireTypes.varint then
-			local v507
+		if v509 == proto.wireTypes.varint then
+			local v510
 
-			v507, n22 = proto.readVarInt(p32, n22)
-		elseif v506 == proto.wireTypes.lengthDelimited then
-			if v505 == 1 then
-				local v508
+			v510, n22 = proto.readVarInt(p32, n22)
+		elseif v509 == proto.wireTypes.lengthDelimited then
+			if v508 == 1 then
+				local v511
 
-				v508, n22 = proto.readBuffer(p32, n22)
-				v503.key = buffer.tostring(v508)
-			elseif v505 == 2 then
-				local v509
+				v511, n22 = proto.readBuffer(p32, n22)
+				v506.key = buffer.tostring(v511)
+			elseif v508 == 2 then
+				local v512
 
-				v509, n22 = proto.readBuffer(p32, n22)
-				v503.value = buffer.tostring(v509)
+				v512, n22 = proto.readBuffer(p32, n22)
+				v506.value = buffer.tostring(v512)
 			else
-				local v510, v511 = proto.readVarInt(p32, n22)
+				local v513, v514 = proto.readVarInt(p32, n22)
 
-				n22 = v511 + v510
+				n22 = v514 + v513
 			end
-		elseif v506 == proto.wireTypes.i32 then
-			local v512
+		elseif v509 == proto.wireTypes.i32 then
+			local v515
 
-			v512, n22 = proto.readFixed32(p32, n22)
-		elseif v506 == proto.wireTypes.i64 then
-			local v513
+			v515, n22 = proto.readFixed32(p32, n22)
+		elseif v509 == proto.wireTypes.i64 then
+			local v516
 
-			v513, n22 = proto.readFixed64(p32, n22)
+			v516, n22 = proto.readFixed64(p32, n22)
 		else
-			error("Unsupported wire type: " .. v506)
+			error("Unsupported wire type: " .. v509)
 		end
 	end
 
-	return v503
+	return v506
 end
-function t64.jsonEncode(p33) -- line: 2546
+function t64.jsonEncode(p33) -- line: 2571
 	local t66 = {}
 
 	if p33.key ~= nil and p33.key ~= "" then
@@ -2021,19 +2045,19 @@ function t64.jsonEncode(p33) -- line: 2546
 
 	return t66
 end
-function t64.jsonDecode(t67: {[any]: any}) -- line: 2562
+function t64.jsonDecode(t67: {[any]: any}) -- line: 2587
 	-- upvalues: t64 (copy)
-	local v517 = t64.new()
+	local v520 = t64.new()
 
 	if t67.key ~= nil then
-		v517.key = t67.key
+		v520.key = t67.key
 	end
 
 	if t67.value ~= nil then
-		v517.value = t67.value
+		v520.value = t67.value
 	end
 
-	return v517
+	return v520
 end
 
 t64.descriptor = {

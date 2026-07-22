@@ -2,17 +2,19 @@ local Parent = script:FindFirstAncestor("Impressions").Parent
 local React = require(Parent.React)
 local ImpressionsTracker = require(script.Parent.ImpressionsTracker)
 local useViewportBounds = require(Parent.ViewportUtils).useViewportBounds
-local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = require(Parent.SharedFlags).FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
+local FFlagLuaAppRespectClipAncestorImpressions = SharedFlags.FFlagLuaAppRespectClipAncestorImpressions
 
-return function(t1: {[any]: any}) -- line: 25
-	-- upvalues: FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy), useViewportBounds (copy), React (copy), ImpressionsTracker (copy)
-	local v7 = nil
-	local v8
+return function(t1: {[any]: any}) -- line: 27
+	-- upvalues: FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy), useViewportBounds (copy), FFlagLuaAppRespectClipAncestorImpressions (copy), React (copy), ImpressionsTracker (copy)
+	local v9 = nil
+	local v10
 
 	if FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then
-		v8, v7 = useViewportBounds(t1.parentRef)
+		v10, v9 = useViewportBounds(t1.parentRef, nil, if not FFlagLuaAppRespectClipAncestorImpressions then nil else t1.respectClipAncestors)
 	else
-		v8 = useViewportBounds(t1.parentRef)
+		v10 = useViewportBounds(t1.parentRef, nil, if not FFlagLuaAppRespectClipAncestorImpressions then nil else t1.respectClipAncestors)
 	end
 
 	return React.createElement(ImpressionsTracker, {
@@ -22,7 +24,7 @@ return function(t1: {[any]: any}) -- line: 25
 		scrollViewPositionChangedSignal = t1.scrollViewPositionChangedSignal,
 		sendImpressions = t1.sendImpressions,
 		dataUpdatedTimestamp = t1.dataUpdatedTimestamp,
-		viewPortBounds = v8,
-		viewPortFillBounds = if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else v7
+		viewPortBounds = v10,
+		viewPortFillBounds = if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else v9
 	})
 end

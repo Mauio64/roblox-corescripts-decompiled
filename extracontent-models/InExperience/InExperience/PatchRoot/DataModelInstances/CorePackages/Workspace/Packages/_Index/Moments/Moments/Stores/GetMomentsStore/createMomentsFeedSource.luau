@@ -26,29 +26,30 @@ require(Moments.Stores.GetDeepLinkStore.createDeepLinkStore)
 local GetReactionsStore = require(Moments.Stores.GetReactionsStore)
 local GetShareCountsStore = require(Moments.Stores.GetShareCountsStore)
 local GetFFlagMomentsFilterUnavailableFeedItems = require(Moments.Flags.GetFFlagMomentsFilterUnavailableFeedItems)
+local GetFFlagMomentsFixUnavailableDeeplink = require(Moments.Flags.GetFFlagMomentsFixUnavailableDeeplink)
 
-local function defaultFetchDeepLinkedMoments(s1: string) -- line: 52
+local function defaultFetchDeepLinkedMoments(s1: string) -- line: 55
 	-- upvalues: Promise (copy), fetchMomentsByIds (copy)
-	return Promise.resolve():andThen(function() -- line: 53
+	return Promise.resolve():andThen(function() -- line: 56
 		-- upvalues: fetchMomentsByIds (copy), s1 (copy)
 		return fetchMomentsByIds({ s1 })
 	end)
 end
-local function loadDeepLinkedMoments(p1: ((...any) -> ...any), s2: string, n1: number) -- line: 66
+local function loadDeepLinkedMoments(p1: ((...any) -> ...any), s2: string, n1: number) -- line: 69
 	-- upvalues: Promise (copy)
-	local v20 = p1(s2):catch(function() -- line: 72
+	local v22 = p1(s2):catch(function() -- line: 75
 		return nil
 	end)
-	local v21 = Promise.delay(n1):andThen(function() -- line: 75
+	local v23 = Promise.delay(n1):andThen(function() -- line: 78
 		return nil
 	end)
-	local v22, v23 = Promise.race({
-		v20,
-		v21
+	local v24, v25 = Promise.race({
+		v22,
+		v23
 	}):await()
 
-	if v22 and type(v23) == "table" then
-		return v23
+	if v24 and type(v25) == "table" then
+		return v25
 	end
 
 	return {
@@ -57,84 +58,122 @@ local function loadDeepLinkedMoments(p1: ((...any) -> ...any), s2: string, n1: n
 		moments = {}
 	}
 end
-local function createMomentsFeedSource(p2, t1: {[any]: any}?) -- line: 86
-	-- upvalues: MomentsGetMomentsTrendingStore (copy), GetDeepLinkStore (copy), defaultFetchDeepLinkedMoments (copy), RecommendationSource (copy), GetReactionsStore (copy), GetShareCountsStore (copy), loadDeepLinkedMoments (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), shouldShowMomentInFeed (copy)
-	local v26 = t1 or {}
-	local v27 = if v26.trendingStore == nil then MomentsGetMomentsTrendingStore(false) else v26.trendingStore
-	local v28 = v26.deepLinkStore or GetDeepLinkStore()
-	local v29 = v26.fetchDeepLinkedMoments or defaultFetchDeepLinkedMoments
-	local v30 = v26.deepLinkFetchTimeoutSeconds or 20
-	local u31 = nil
+local function loadDeepLinkedMomentsForUnavailableDialog(p2: ((...any) -> ...any), s3: string, n2: number) -- line: 91
+	-- upvalues: Promise (copy)
+	local v29 = p2(s3):catch(function() -- line: 96
+		return nil
+	end)
+	local v30 = Promise.delay(n2):andThen(function() -- line: 99
+		return nil
+	end)
+	local v31, v32 = Promise.race({
+		v29,
+		v30
+	}):await()
+
+	if v31 and type(v32) == "table" then
+		return v32
+	end
+
+	return nil
+end
+local function createMomentsFeedSource(p3, t1: {[any]: any}?) -- line: 110
+	-- upvalues: MomentsGetMomentsTrendingStore (copy), GetDeepLinkStore (copy), defaultFetchDeepLinkedMoments (copy), GetFFlagMomentsFixUnavailableDeeplink (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), RecommendationSource (copy), GetReactionsStore (copy), GetShareCountsStore (copy), shouldShowMomentInFeed (copy), loadDeepLinkedMomentsForUnavailableDialog (copy), loadDeepLinkedMoments (copy)
+	local v35 = t1 or {}
+	local v36 = if v35.trendingStore == nil then MomentsGetMomentsTrendingStore(false) else v35.trendingStore
+	local v37 = v35.deepLinkStore or GetDeepLinkStore()
+	local v38 = v35.fetchDeepLinkedMoments or defaultFetchDeepLinkedMoments
+	local v39 = v35.deepLinkFetchTimeoutSeconds or 20
+	local v40 = GetFFlagMomentsFixUnavailableDeeplink() and GetFFlagMomentsFilterUnavailableFeedItems()
+	local u41 = nil
 
 	return {
 		id = "trending",
 		recommendationSource = RecommendationSource.Trending,
-		fetchAsync = function(p3) -- line: 104
-			-- upvalues: u31 (ref), v26 (copy), v27 (copy), p2 (copy), GetReactionsStore (copy), GetShareCountsStore (copy), v28 (copy), loadDeepLinkedMoments (copy), v29 (copy), v30 (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), shouldShowMomentInFeed (copy)
-			local v33 = p3 or u31
-			local signalTracker = v26.signalTracker
-			local v35 = if not signalTracker then nil else signalTracker:getSignalsPayload()
-			local v36, v37 = v27.getTrending(p2(false), v33, v35):await()
+		fetchAsync = function(p4) -- line: 130
+			-- upvalues: u41 (ref), v35 (copy), v36 (copy), p3 (copy), GetReactionsStore (copy), GetShareCountsStore (copy), v37 (copy), v40 (copy), shouldShowMomentInFeed (copy), loadDeepLinkedMomentsForUnavailableDialog (copy), v38 (copy), v39 (copy), loadDeepLinkedMoments (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy)
+			local v43 = p4 or u41
+			local signalTracker = v35.signalTracker
+			local v45 = if not signalTracker then nil else signalTracker:getSignalsPayload()
+			local v46, v47 = v36.getTrending(p3(false), v43, v45):await()
 
-			if not v36 then
-				error(v37)
+			if not v46 then
+				error(v47)
 			end
 
-			u31 = v37.nextCursor or u31
+			u41 = v47.nextCursor or u41
 
-			if p3 == nil then
+			if p4 == nil then
 				GetReactionsStore(false).clear()
 				GetShareCountsStore(false).clear()
 			end
 
-			GetReactionsStore(false).setBatchReactionCounts(v37.reactionsByMomentId or {})
-			GetShareCountsStore(false).setBatchShareCounts(v37.shareInfoByMomentId or {})
+			GetReactionsStore(false).setBatchReactionCounts(v47.reactionsByMomentId or {})
+			GetShareCountsStore(false).setBatchShareCounts(v47.shareInfoByMomentId or {})
 
 			local t2 = {}
 
-			if p3 == nil then
-				local v39 = v28.consumeDeepLinkedMomentId()
+			if p4 == nil then
+				local v49 = v37.consumeDeepLinkedMomentId()
 
-				if v39 ~= nil then
+				if v49 ~= nil then
 					local t3 = {}
+					local v51 = false
 
-					for _, v42 in v37.moments do
-						t3[v42.momentId] = true
+					for _, v53 in v47.moments do
+						t3[v53.momentId] = true
+
+						if v40 and v49 == v53.momentId and shouldShowMomentInFeed(v53) then
+							v51 = true
+						end
 					end
 
-					local v43 = loadDeepLinkedMoments(v29, v39, v30)
+					local v54 = if not v40 then loadDeepLinkedMoments(v38, v49, v39) else loadDeepLinkedMomentsForUnavailableDialog(v38, v49, v39)
 
-					if v43.reactionsByMomentId then
-						GetReactionsStore(false).setBatchReactionCounts(v43.reactionsByMomentId)
-					end
+					if v54 ~= nil then
+						if v54.reactionsByMomentId then
+							GetReactionsStore(false).setBatchReactionCounts(v54.reactionsByMomentId)
+						end
 
-					if v43.shareInfoByMomentId then
-						GetShareCountsStore(false).setBatchShareCounts(v43.shareInfoByMomentId)
-					end
+						if v54.shareInfoByMomentId then
+							GetShareCountsStore(false).setBatchShareCounts(v54.shareInfoByMomentId)
+						end
 
-					for _, v45 in v43.moments do
-						if (not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v45)) and not t3[v45.momentId] then
-							table.insert(t2, {
-								kind = "moment",
-								moment = v45
-							})
+						for _, v56 in v54.moments do
+							local v57 = not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v56)
+							local v58 = not v40 or v49 == v56.momentId
+
+							if v40 and v58 and v57 then
+								v51 = true
+							end
+
+							if v57 and v58 and not t3[v56.momentId] then
+								table.insert(t2, {
+									kind = "moment",
+									moment = v56
+								})
+							end
+						end
+
+						if v40 and not v51 and v35.onDeepLinkedMomentUnavailable ~= nil then
+							v35.onDeepLinkedMomentUnavailable()
 						end
 					end
 				end
 			end
 
-			for _, v47 in v37.moments do
-				if if not GetFFlagMomentsFilterUnavailableFeedItems() then not v47.isModerated else shouldShowMomentInFeed(v47) then
+			for _, v60 in v47.moments do
+				if if not GetFFlagMomentsFilterUnavailableFeedItems() then not v60.isModerated else shouldShowMomentInFeed(v60) then
 					table.insert(t2, {
 						kind = "moment",
-						moment = v47
+						moment = v60
 					})
 				end
 			end
 
 			return {
 				items = t2,
-				nextCursor = v37.nextCursor
+				nextCursor = v47.nextCursor
 			}
 		end
 	}

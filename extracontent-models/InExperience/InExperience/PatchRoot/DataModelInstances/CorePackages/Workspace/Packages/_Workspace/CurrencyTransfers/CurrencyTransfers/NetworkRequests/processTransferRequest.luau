@@ -21,24 +21,24 @@ local v11 = t.strictInterface({
 	robuxAmount = t.number
 })
 
-local function processTransferRequest(p1, p2) -- line: 33
+local function processTransferRequest(p1, p2, p3) -- line: 33
 	-- upvalues: v11 (copy), HttpRequest (copy), UrlBuilder2 (copy), UrlBase (copy), ProcessTransferModel (copy), Promise (copy)
 	assert(v11(p1))
 
-	local v16 = HttpRequest.new(p2)
+	local v17 = if p3 == nil then HttpRequest.new(p2) else HttpRequest.fromNetworkImpl(p3)
 	local transferRequestId = p1.transferRequestId
 
-	return v16:post(UrlBuilder2.new({
+	return v17:post(UrlBuilder2.new({
 		base = UrlBase.APIS,
 		path = `transfer/v1/robux-transfer/process-transfer/{ transferRequestId }`
 	})(), {
 		robuxAmount = p1.robuxAmount
-	}):andThen(function(p3) -- line: 41
+	}):andThen(function(p4) -- line: 43
 		-- upvalues: ProcessTransferModel (copy)
-		return ProcessTransferModel.format(p3)
-	end):catch(function(p4) -- line: 44
+		return ProcessTransferModel.format(p4)
+	end):catch(function(p5) -- line: 46
 		-- upvalues: Promise (copy)
-		return Promise.reject(p4)
+		return Promise.reject(p5)
 	end)
 end
 

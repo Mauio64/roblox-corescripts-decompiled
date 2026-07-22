@@ -46,7 +46,7 @@ local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppC
 local getFFlagAppChatRequestedRoute = require(AppChat.Flags.getFFlagAppChatRequestedRoute)
 
 return function(t1: {[any]: any}) -- line: 63
-	-- upvalues: useDispatch (copy), useContext (copy), ParentContainerContext (copy), useState (copy), useExternalNavigationByScreen (copy), useMemo (copy), Signal (copy), RobloxEventReceiver (copy), NotificationService (copy), React (copy), Responsive (copy), FIntAppChatWideBreakpointMinWidth (copy), FIntAppChatWideBreakpointMinHeight (copy), FFlagAppChatInExpSelectChatMembersMobileHeight (copy), useAppChatIsWideMode (copy), getFFlagAppChatRequestedRoute (copy), getFFlagAppChatEnableRootedNavigation (copy), useEffect (copy), PartyPageCarouselExperimentation (copy), SetFormFactor (copy), FormFactor (copy), useParentContainerExtents (copy), useRef (copy), useCallback (copy), v36 (copy), Loading (copy), IconSize (copy), AppChatEntryPoint (copy), LocalPlayer (copy), ChatPlacementContext (copy), ChatEventReceiver (copy), ChatExternalEventReceiver (copy), Container (copy), FFlagSquadAppChatRTNFix (copy), SquadAppChatEventReceiver (copy)
+	-- upvalues: useDispatch (copy), useContext (copy), ParentContainerContext (copy), useState (copy), useExternalNavigationByScreen (copy), useMemo (copy), Signal (copy), RobloxEventReceiver (copy), NotificationService (copy), React (copy), Responsive (copy), FIntAppChatWideBreakpointMinWidth (copy), FIntAppChatWideBreakpointMinHeight (copy), FFlagAppChatInExpSelectChatMembersMobileHeight (copy), useAppChatIsWideMode (copy), getFFlagAppChatRequestedRoute (copy), getFFlagAppChatEnableRootedNavigation (copy), useRef (copy), useEffect (copy), PartyPageCarouselExperimentation (copy), SetFormFactor (copy), FormFactor (copy), useParentContainerExtents (copy), useCallback (copy), v36 (copy), Loading (copy), IconSize (copy), AppChatEntryPoint (copy), LocalPlayer (copy), ChatPlacementContext (copy), ChatEventReceiver (copy), ChatExternalEventReceiver (copy), Container (copy), FFlagSquadAppChatRTNFix (copy), SquadAppChatEventReceiver (copy)
 	local v45 = useDispatch()
 	local hideParentContainer = useContext(ParentContainerContext).hideParentContainer
 	local v47, v48 = useState(0)
@@ -73,12 +73,19 @@ return function(t1: {[any]: any}) -- line: 63
 	end
 
 	local v57 = getFFlagAppChatRequestedRoute()
-	local v58 = not (getFFlagAppChatEnableRootedNavigation() and (t1.requestedRoute ~= nil and (t1.requestedRoute.params ~= nil and t1.requestedRoute.params.rooted == true))) and v56
+	local v58 = getFFlagAppChatEnableRootedNavigation() and (t1.requestedRoute ~= nil and (t1.requestedRoute.params ~= nil and t1.requestedRoute.params.rooted == true))
+	local v59 = useRef(false)
 
-	useEffect(function() -- line: 101
-		-- upvalues: PartyPageCarouselExperimentation (copy), v58 (copy), v45 (copy), SetFormFactor (copy), FormFactor (copy)
+	if v58 then
+		v59.current = true
+	end
+
+	local v60 = not v59.current and v56
+
+	useEffect(function() -- line: 106
+		-- upvalues: PartyPageCarouselExperimentation (copy), v60 (copy), v45 (copy), SetFormFactor (copy), FormFactor (copy)
 		if PartyPageCarouselExperimentation.getAppChatFormFactorEnabled() then
-			if v58 then
+			if v60 then
 				v45(SetFormFactor(FormFactor.Enums.FormFactor.WIDE))
 
 				return
@@ -87,15 +94,15 @@ return function(t1: {[any]: any}) -- line: 63
 			v45(SetFormFactor(FormFactor.Enums.FormFactor.COMPACT))
 		end
 	end, {
-		v58,
+		v60,
 		v45
 	})
 
-	local v59, v60 = useParentContainerExtents()
-	local v61 = v54 == Responsive.DefaultKey
-	local v62, v63 = useState(v61)
-	local v64 = useRef(os.clock())
-	local v65 = useCallback(function() -- line: 117
+	local v61, v62 = useParentContainerExtents()
+	local v63 = v54 == Responsive.DefaultKey
+	local v64, v65 = useState(v63)
+	local v66 = useRef(os.clock())
+	local v67 = useCallback(function() -- line: 122
 		-- upvalues: t1 (copy), hideParentContainer (copy)
 		t1.hideAppChat()
 		hideParentContainer()
@@ -104,36 +111,36 @@ return function(t1: {[any]: any}) -- line: 63
 		t1.hideAppChat
 	})
 
-	useEffect(function() -- line: 122
-		-- upvalues: v61 (copy), v64 (copy), v36 (copy), v63 (copy)
-		if not v61 then
-			local v66 = os.clock() - v64.current
-			local v67 = v36 / 1000
+	useEffect(function() -- line: 127
+		-- upvalues: v63 (copy), v66 (copy), v36 (copy), v65 (copy)
+		if not v63 then
+			local v68 = os.clock() - v66.current
+			local v69 = v36 / 1000
 
-			if v66 < v67 then
-				delay(v67 - v66, function() -- line: 128
-					-- upvalues: v63 (copy)
-					v63(false)
+			if v68 < v69 then
+				delay(v69 - v68, function() -- line: 133
+					-- upvalues: v65 (copy)
+					v65(false)
 				end)
 
 				return
 			end
 
-			v63(false)
+			v65(false)
 		end
 	end, {
-		v61,
-		v63
+		v63,
+		v65
 	})
 
 	return React.createElement(React.Fragment, {}, {
 		AppChatWindow = React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.new(0, 0, 0),
-			Size = v59:map(function(vector2: Vector2) -- line: 141
+			Size = v61:map(function(vector2: Vector2) -- line: 146
 				return UDim2.fromOffset(vector2.X, vector2.Y)
 			end),
-			Position = v60:map(function(vector2: Vector2) -- line: 144
+			Position = v62:map(function(vector2: Vector2) -- line: 149
 				return UDim2.fromOffset(vector2.X, vector2.Y)
 			end),
 			ref = v53
@@ -144,7 +151,7 @@ return function(t1: {[any]: any}) -- line: 63
 			containerRef = React.createElement(Responsive.ContainerRef.Provider, {
 				value = v53
 			}, {
-				AppChatEntryPoint = if not v62 then React.createElement(AppChatEntryPoint, {
+				AppChatEntryPoint = if not v64 then React.createElement(AppChatEntryPoint, {
 					isVisible = true,
 					setActiveConversationId = v48,
 					localUserId = if not LocalPlayer then nil else LocalPlayer.UserId,
@@ -153,8 +160,8 @@ return function(t1: {[any]: any}) -- line: 63
 					setInitialConversationId = t1.setInitialConversationId,
 					requestedRoute = if not v57 then nil else t1.requestedRoute,
 					clearRequestedRoute = if not v57 then nil else t1.clearRequestedRoute,
-					wideMode = v58,
-					navigateToRootStack = v65,
+					wideMode = v60,
+					navigateToRootStack = v67,
 					updateExternalNavigationForScreen = v50
 				}) else React.createElement(Loading, {
 					size = IconSize.Large,

@@ -11,9 +11,10 @@ local sendCounter = require(PurchasePrompt.Thunks.sendCounter)
 local handleNativePurchaseFailureOrCancel = require(PurchasePrompt.Thunks.handleNativePurchaseFailureOrCancel)
 local ExternalEventConnection = require(script.Parent.ExternalEventConnection)
 local FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal
+local FFlagLuaAppEnableNativePurchaseFinishedV2Signals = require(PurchasePrompt.Parent.SharedFlags).FFlagLuaAppEnableNativePurchaseFinishedV2Signals
 
-local function NativePurchaseFinishedConnector(p1) -- line: 28
-	-- upvalues: Roact (copy), ExternalEventConnection (copy), MarketplaceService (copy)
+local function NativePurchaseFinishedConnector(p1) -- line: 30
+	-- upvalues: Roact (copy), ExternalEventConnection (copy), MarketplaceService (copy), FFlagLuaAppEnableNativePurchaseFinishedV2Signals (copy)
 	local nativePurchaseFinished = p1.nativePurchaseFinished
 	local nativePurchaseFinishedWithLocalPlayer = p1.nativePurchaseFinishedWithLocalPlayer
 
@@ -26,6 +27,27 @@ local function NativePurchaseFinishedConnector(p1) -- line: 28
 			NativePurchaseWithLocalPlayer = Roact.createElement(ExternalEventConnection, {
 				event = MarketplaceService.NativePurchaseFinishedWithLocalPlayer,
 				callback = nativePurchaseFinishedWithLocalPlayer
+			}),
+			NativePurchaseV2 = if not FFlagLuaAppEnableNativePurchaseFinishedV2Signals then nil else Roact.createElement(ExternalEventConnection, {
+				event = MarketplaceService.NativePurchaseFinishedV2,
+				callback = nativePurchaseFinished
+			}),
+			NativePurchaseWithLocalPlayerV2 = if not FFlagLuaAppEnableNativePurchaseFinishedV2Signals then nil else Roact.createElement(ExternalEventConnection, {
+				event = MarketplaceService.NativePurchaseFinishedWithLocalPlayerV2,
+				callback = nativePurchaseFinishedWithLocalPlayer
+			})
+		})
+	end
+
+	if FFlagLuaAppEnableNativePurchaseFinishedV2Signals then
+		return Roact.createFragment({
+			NativePurchase = Roact.createElement(ExternalEventConnection, {
+				event = MarketplaceService.NativePurchaseFinished,
+				callback = nativePurchaseFinished
+			}),
+			NativePurchaseV2 = Roact.createElement(ExternalEventConnection, {
+				event = MarketplaceService.NativePurchaseFinishedV2,
+				callback = nativePurchaseFinished
 			})
 		})
 	end
@@ -35,10 +57,10 @@ local function NativePurchaseFinishedConnector(p1) -- line: 28
 		callback = nativePurchaseFinished
 	})
 end
-local function mapDispatchToProps(p2) -- line: 51
+local function mapDispatchToProps(p2) -- line: 78
 	-- upvalues: retryAfterUpsell (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), handleNativePurchaseFailureOrCancel (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy)
 	return {
-		nativePurchaseFinished = function(_, _, p5) -- line: 53
+		nativePurchaseFinished = function(_, _, p5, _) -- line: 80
 			-- upvalues: p2 (copy), retryAfterUpsell (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), handleNativePurchaseFailureOrCancel (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy)
 			if p5 then
 				p2(retryAfterUpsell())
@@ -55,9 +77,9 @@ local function mapDispatchToProps(p2) -- line: 51
 			p2(ErrorOccurred(PurchaseError.InvalidFundsUnknown))
 			p2(sendCounter(Counter.UpsellFailedNativePurchase))
 		end,
-		nativePurchaseFinishedWithLocalPlayer = function(_, p7) -- line: 65
+		nativePurchaseFinishedWithLocalPlayer = function(_, p8, _) -- line: 92
 			-- upvalues: p2 (copy), retryAfterUpsell (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), handleNativePurchaseFailureOrCancel (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy)
-			if p7 then
+			if p8 then
 				p2(retryAfterUpsell())
 
 				return

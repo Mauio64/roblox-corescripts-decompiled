@@ -4,9 +4,11 @@ local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local Otter = InGameMenuDependencies.Otter
 local t = InGameMenuDependencies.t
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v11 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent
 local divideTransparency = require(ParentParent.Utility.divideTransparency)
 local AssetImage = require(script.Parent.AssetImage)
@@ -15,9 +17,9 @@ local uDim2_2 = UDim2.new(1, -39, 0.5, 0)
 local t1 = {
 	frequency = 4
 }
-local v16 = Roact.PureComponent:extend("ToggleSwitch")
+local v18 = Roact.PureComponent:extend("ToggleSwitch")
 
-v16.validateProps = t.strictInterface({
+v18.validateProps = t.strictInterface({
 	checked = t.boolean,
 	onToggled = t.callback,
 	disabled = t.optional(t.boolean),
@@ -30,27 +32,27 @@ v16.validateProps = t.strictInterface({
 	onSelectionGained = t.optional(t.callback)
 })
 
-function v16.init(p1) -- line: 42
+function v18.init(p1) -- line: 49
 	-- upvalues: Roact (copy), divideTransparency (copy), uDim2 (copy), uDim2_2 (copy), Otter (copy)
-	local v18 = not p1.props.checked and 0 or 1
-	local v19, v20 = Roact.createBinding(v18)
+	local v20 = not p1.props.checked and 0 or 1
+	local v21, v22 = Roact.createBinding(v20)
 
-	p1.progress = v19
-	p1.setProgress = v20
-	p1.fillTransparency = p1.progress:map(function(p2) -- line: 46
+	p1.progress = v21
+	p1.setProgress = v22
+	p1.fillTransparency = p1.progress:map(function(p2) -- line: 53
 		-- upvalues: divideTransparency (copy), p1 (copy)
 		return divideTransparency(1 - p2, not p1.props.disabled and 1 or 4)
 	end)
-	p1.knobPosition = p1.progress:map(function(p3) -- line: 50
+	p1.knobPosition = p1.progress:map(function(p3) -- line: 57
 		-- upvalues: uDim2 (copy), uDim2_2 (copy)
 		return uDim2:lerp(uDim2_2, p3)
 	end)
-	p1.motor = Otter.createSingleMotor(v18)
+	p1.motor = Otter.createSingleMotor(v20)
 	p1.motor:onStep(p1.setProgress)
 end
-function v16.renderWithSelectionCursor(p4, p5) -- line: 58
-	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), AssetImage (copy), divideTransparency (copy), CursorKind (copy)
-	return withFoundationOrUIBloxStyle(function(p6) -- line: 59
+function v18.renderWithSelectionCursor(p4, p5) -- line: 65
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), AssetImage (copy), divideTransparency (copy), v11 (copy)
+	return withFoundationOrUIBloxStyle(function(p6) -- line: 66
 		return {
 			Theme = {
 				SecondaryDefault = {
@@ -63,8 +65,8 @@ function v16.renderWithSelectionCursor(p4, p5) -- line: 58
 				}
 			}
 		}
-	end, function(p7) -- line: 66
-		-- upvalues: Roact (copy), AssetImage (copy), p4 (copy), divideTransparency (copy), p5 (copy), CursorKind (copy)
+	end, function(p7) -- line: 73
+		-- upvalues: Roact (copy), AssetImage (copy), p4 (copy), divideTransparency (copy), p5 (copy), v11 (copy)
 		return Roact.createElement(AssetImage.Button, {
 			Size = UDim2.new(0, 60, 0, 36),
 			BackgroundTransparency = 1,
@@ -79,7 +81,7 @@ function v16.renderWithSelectionCursor(p4, p5) -- line: 58
 			[Roact.Ref] = p4.props.buttonRef,
 			[Roact.Event.SelectionLost] = p4.props.onSelectionLost,
 			[Roact.Event.SelectionGained] = p4.props.onSelectionGained,
-			SelectionImageObject = p5(CursorKind.Toggle)
+			SelectionImageObject = p5(v11.Toggle)
 		}, {
 			Fill = Roact.createElement(AssetImage.Label, {
 				BackgroundTransparency = 1,
@@ -100,21 +102,21 @@ function v16.renderWithSelectionCursor(p4, p5) -- line: 58
 		})
 	end)
 end
-function v16.render(p8) -- line: 106
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p9) -- line: 107
+function v18.render(p8) -- line: 113
+	-- upvalues: v10 (copy)
+	return v10(function(p9) -- line: 114
 		-- upvalues: p8 (copy)
 		return p8:renderWithSelectionCursor(p9)
 	end)
 end
-function v16.didUpdate(p10) -- line: 112
+function v18.didUpdate(p10) -- line: 119
 	-- upvalues: Otter (copy), t1 (copy)
-	local v25 = not p10.props.checked and 0 or 1
+	local v27 = not p10.props.checked and 0 or 1
 
-	p10.motor:setGoal(Otter.spring(v25, t1))
+	p10.motor:setGoal(Otter.spring(v27, t1))
 end
-function v16.willUnmount(p11) -- line: 117
+function v18.willUnmount(p11) -- line: 124
 	p11.motor:destroy()
 end
 
-return v16
+return v18

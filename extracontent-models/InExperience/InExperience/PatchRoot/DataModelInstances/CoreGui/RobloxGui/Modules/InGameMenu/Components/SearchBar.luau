@@ -8,11 +8,15 @@ local Cryo = InGameMenuDependencies.Cryo
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
+local Foundation = require(CorePackages.Packages.Foundation)
+local Icon = Foundation.Icon
+local IconSize = Foundation.Enums.IconSize
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 local ParentParent = script.Parent.Parent
 local withLocalization = require(ParentParent.Localization.withLocalization)
-local v13 = Roact.PureComponent:extend("SearchBar")
+local v17 = Roact.PureComponent:extend("SearchBar")
 
-v13.validateProps = t.interface({
+v17.validateProps = t.interface({
 	size = t.UDim2,
 	text = t.optional(t.string),
 	onTextChanged = t.optional(t.callback),
@@ -23,86 +27,86 @@ v13.validateProps = t.interface({
 	zIndex = t.optional(t.number),
 	visible = t.optional(t.boolean)
 })
-v13.defaultProps = {
+v17.defaultProps = {
 	autoCaptureFocus = false,
 	visible = true,
 	size = UDim2.fromScale(1, 1)
 }
 
-function v13.init(p1) -- line: 46
+function v17.init(p1) -- line: 52
 	-- upvalues: Roact (copy)
 	p1.textboxRef = Roact.createRef()
 
-	function p1.onAbsoluteSizeChanged(p2) -- line: 49
+	function p1.onAbsoluteSizeChanged(p2) -- line: 55
 		-- upvalues: p1 (copy)
-		local v23 = false
+		local v27 = false
 
 		if p1.width ~= p2.AbsoluteSize.X then
 			p1.width = p2.AbsoluteSize.X
-			v23 = true
+			v27 = true
 		end
 
 		if p1.height ~= p2.AbsoluteSize.Y then
 			p1.height = p2.AbsoluteSize.Y
-			v23 = true
+			v27 = true
 		end
 
-		if v23 then
+		if v27 then
 			p1:setState({
 				width = p1.width - 2,
 				height = p1.height - 2
 			})
 		end
 	end
-	function p1.searchTextChanged(p3) -- line: 70
+	function p1.searchTextChanged(p3) -- line: 76
 		-- upvalues: p1 (copy)
 		if p1.props.onTextChanged then
 			p1.props.onTextChanged(p3.Text)
 		end
 	end
-	function p1.searchBoxFocused(_) -- line: 76
+	function p1.searchBoxFocused(_) -- line: 82
 		-- upvalues: p1 (copy)
 		if p1.props.onFocused then
 			p1.props.onFocused()
 		end
 	end
-	function p1.searchCancel() -- line: 82
+	function p1.searchCancel() -- line: 88
 		-- upvalues: p1 (copy)
 		if p1.props.onCancelled then
 			p1.props.onCancelled()
 		end
 	end
-	function p1.onFocusLost() -- line: 88
+	function p1.onFocusLost() -- line: 94
 		-- upvalues: p1 (copy)
 		if p1.props.onFocusLost then
 			p1.props.onFocusLost()
 		end
 	end
-	function p1.onTextboxTouchTap() -- line: 94
+	function p1.onTextboxTouchTap() -- line: 100
 		-- upvalues: p1 (copy)
 		if p1.props.onTextboxTouchTap then
 			p1.props.onTextboxTouchTap()
 		end
 	end
 end
-function v13.willUpdate(p5, p6) -- line: 101
+function v17.willUpdate(p5, p6) -- line: 107
 	if p5.props.autoCaptureFocus and (p5.props.visible == false and p6.visible) then
 		p5:focus()
 	end
 end
-function v13.didMount(p7) -- line: 107
+function v17.didMount(p7) -- line: 113
 	if p7.props.autoCaptureFocus and p7.props.visible then
 		p7:focus()
 	end
 end
-function v13.focus(p8) -- line: 113
+function v17.focus(p8) -- line: 119
 	if p8.textboxRef then
 		p8.textboxRef.current:CaptureFocus()
 	end
 end
-function v13.render(p9) -- line: 119
-	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
-	return withFoundationOrUIBloxStyle(function(p10) -- line: 120
+function v17.render(p9) -- line: 125
+	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), Roact (copy), UserInputService (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
+	return withFoundationOrUIBloxStyle(function(p10) -- line: 126
 		return {
 			Theme = {
 				TextEmphasis = {
@@ -122,17 +126,17 @@ function v13.render(p9) -- line: 119
 				}
 			}
 		}
-	end, function(p11) -- line: 131
-		-- upvalues: withLocalization (copy), p9 (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
+	end, function(p11) -- line: 137
+		-- upvalues: withLocalization (copy), p9 (copy), Roact (copy), UserInputService (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
 		return withLocalization({
 			search = "CoreScripts.InGameMenu.InviteFriends.Search",
 			cancel = "CoreScripts.InGameMenu.Cancel"
-		})(function(p12) -- line: 135
-			-- upvalues: p11 (copy), p9 (copy), Roact (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy)
+		})(function(p12) -- line: 141
+			-- upvalues: p11 (copy), p9 (copy), Roact (copy), UserInputService (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
 			local Body = p11.Font.Body
-			local v30 = p11.Font.BaseSize * Body.RelativeSize
+			local v34 = p11.Font.BaseSize * Body.RelativeSize
 			local Body2 = p11.Font.Body
-			local v32 = p11.Font.BaseSize * Body2.RelativeSize
+			local v36 = p11.Font.BaseSize * Body2.RelativeSize
 			local t1 = {
 				BackgroundTransparency = 1,
 				GroupTransparency = 0.5,
@@ -141,7 +145,7 @@ function v13.render(p9) -- line: 119
 				Visible = p9.props.visible,
 				[Roact.Ref] = p9.props.forwardRef or Roact.createRef()
 			}
-			local v34 = if UserInputService:GetPlatform() ~= Enum.Platform.Android then Enum.TextInputType.NoSuggestions else Enum.TextInputType.PasswordShown
+			local v38 = if UserInputService:GetPlatform() ~= Enum.Platform.Android then Enum.TextInputType.NoSuggestions else Enum.TextInputType.PasswordShown
 
 			return Roact.createElement("CanvasGroup", t1, {
 				SearchPanelLayout = Roact.createElement("UIListLayout", {
@@ -180,11 +184,15 @@ function v13.render(p9) -- line: 119
 						BorderRadius = Roact.createElement("UICorner", {
 							CornerRadius = UDim.new(0, 4)
 						}),
-						SearchImage = Roact.createElement(ImageSetLabel, {
+						SearchImage = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
 							LayoutOrder = 1,
 							BackgroundTransparency = 1,
 							Image = Images["icons/common/search_small"],
 							Size = UDim2.fromOffset(18, 18)
+						}) else Roact.createElement(Icon, {
+							name = "icons/common/search_small",
+							LayoutOrder = 1,
+							size = IconSize.Medium
 						}),
 						SearchInput = Roact.createElement("TextBox", {
 							LayoutOrder = 2,
@@ -192,8 +200,8 @@ function v13.render(p9) -- line: 119
 							Size = UDim2.new(1, -28, 0, 20),
 							Font = Body2.Font,
 							Text = p9.props.text or "",
-							TextInputType = v34,
-							TextSize = v32,
+							TextInputType = v38,
+							TextSize = v36,
 							TextColor3 = p11.Theme.TextEmphasis.Color,
 							TextXAlignment = Enum.TextXAlignment.Left,
 							PlaceholderText = p12.search,
@@ -213,7 +221,7 @@ function v13.render(p9) -- line: 119
 					BackgroundTransparency = 1,
 					Size = UDim2.fromOffset(57, 20),
 					Font = Body.Font,
-					TextSize = v30,
+					TextSize = v34,
 					Text = p12.cancel,
 					TextColor3 = p11.Theme.TextEmphasis.Color,
 					[Roact.Event.Activated] = p9.searchCancel
@@ -223,9 +231,9 @@ function v13.render(p9) -- line: 119
 	end)
 end
 
-return Roact.forwardRef(function(p13, p14) -- line: 247
-	-- upvalues: Roact (copy), v13 (copy), Cryo (copy)
-	return Roact.createElement(v13, Cryo.Dictionary.join(p13, {
+return Roact.forwardRef(function(p13, p14) -- line: 259
+	-- upvalues: Roact (copy), v17 (copy), Cryo (copy)
+	return Roact.createElement(v17, Cryo.Dictionary.join(p13, {
 		forwardRef = p14
 	}))
 end)

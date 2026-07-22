@@ -104,36 +104,36 @@ local function useChatScroll() -- line: 29
 		v13,
 		v14
 	})
-	local v20 = React.useCallback(function() -- line: 127
+	local v20 = React.useCallback(function() -- line: 132
 		-- upvalues: v13 (copy)
 		v13()
 	end, { v13 })
-	local v21 = React.useCallback(function() -- line: 131
+	local v21 = React.useCallback(function() -- line: 136
 		-- upvalues: v7 (copy), v9 (copy), v16 (copy)
 		if v7.current then
 			v9.current = 0
 			v16()
 		end
 	end, { v16 })
-	local v22 = React.useCallback(function() -- line: 138
+	local v22 = React.useCallback(function() -- line: 143
 		-- upvalues: v9 (copy), v7 (copy), v16 (copy)
 		v9.current = 0
 		v7.current = true
 		v16()
 		task.defer(v16)
 	end, { v16 })
-	local v23 = React.useCallback(function(p2: ((...any) -> ...any)?) -- line: 145
+	local v23 = React.useCallback(function(p2: ((...any) -> ...any)?) -- line: 150
 		-- upvalues: v10 (copy), v11 (copy)
 		v10.current = p2
 		task.defer(v11)
 	end, { v11 })
 
-	React.useEffect(function() -- line: 150
+	React.useEffect(function() -- line: 155
 		-- upvalues: v12 (copy)
 		return v12
 	end, { v12 })
 
-	return React.useMemo(function() -- line: 155
+	return React.useMemo(function() -- line: 160
 		-- upvalues: v19 (copy), v17 (copy), v18 (copy), v20 (copy), v21 (copy), v22 (copy), v15 (copy), v7 (copy), v8 (copy), v23 (copy)
 		return {
 			setScrollingFrame = v19,

@@ -3,8 +3,12 @@ local Constants = require(script.Parent.Constants)
 local calculateIntersectionRatio = require(script.Parent.calculateIntersectionRatio)
 local sponsoredAdViewabilityRegistry = require(script.Parent.sponsoredAdViewabilityRegistry)
 local sponsoredAdViewabilityState = require(script.Parent.sponsoredAdViewabilityState)
+local t1 = {
+	SurfaceTeardown = "SurfaceTeardown",
+	FeedRefresh = "FeedRefresh"
+}
 
-local function measureTile(p1, p2, p3) -- line: 32
+local function measureTile(p1, p2, p3) -- line: 54
 	-- upvalues: Constants (copy), sponsoredAdViewabilityRegistry (copy), calculateIntersectionRatio (copy)
 	if not p1:IsA("GuiObject") then
 		return nil
@@ -20,16 +24,16 @@ local function measureTile(p1, p2, p3) -- line: 32
 		return nil
 	end
 
-	local v12 = sponsoredAdViewabilityRegistry.get(ConstantsViewabilityTargetIdAttribute)
+	local v13 = sponsoredAdViewabilityRegistry.get(ConstantsViewabilityTargetIdAttribute)
 
-	if v12 == nil then
+	if v13 == nil then
 		return nil
 	end
 
 	local AbsoluteSize = p1.AbsoluteSize
 
 	return {
-		metadata = v12,
+		metadata = v13,
 		geometry = {
 			adSize = AbsoluteSize,
 			viewportBounds = p3
@@ -38,28 +42,28 @@ local function measureTile(p1, p2, p3) -- line: 32
 	}
 end
 
-local t1 = {}
+local t2 = {}
 
-t1.__index = t1
+t2.__index = t2
 
-function t1.new(t2: {[any]: any}) -- line: 79
-	-- upvalues: t1 (copy)
+function t2.new(t3: {[any]: any}) -- line: 101
+	-- upvalues: t2 (copy)
 	return (setmetatable({
 		_surfaceScope = nil,
 		_viewportBounds = nil,
 		_running = false,
 		_scanThread = nil,
-		_callbacks = t2,
+		_callbacks = t3,
 		_sessions = {}
-	}, t1))
+	}, t2))
 end
-function t1.setSurfaceScope(p4, p5) -- line: 90
+function t2.setSurfaceScope(p4, p5) -- line: 112
 	p4._surfaceScope = p5
 end
-function t1.setViewportBounds(p6, p7) -- line: 94
+function t2.setViewportBounds(p6, p7) -- line: 116
 	p6._viewportBounds = p7
 end
-function t1.start(p8) -- line: 101
+function t2.start(p8) -- line: 123
 	if p8._running then
 		return
 	end
@@ -67,8 +71,8 @@ function t1.start(p8) -- line: 101
 	p8._running = true
 	p8:_scheduleNextScan()
 end
-function t1._scheduleNextScan(p9) -- line: 109
-	p9._scanThread = task.delay(0.2, function() -- line: 110
+function t2._scheduleNextScan(p9) -- line: 131
+	p9._scanThread = task.delay(0.2, function() -- line: 132
 		-- upvalues: p9 (copy)
 		if not p9._running then
 			return
@@ -81,7 +85,7 @@ function t1._scheduleNextScan(p9) -- line: 109
 		end
 	end)
 end
-function t1._scanTick(p10, n1: number) -- line: 123
+function t2._scanTick(p10, n1: number) -- line: 145
 	-- upvalues: CollectionService (copy), Constants (copy), measureTile (copy), sponsoredAdViewabilityState (copy)
 	local _surfaceScope = p10._surfaceScope
 	local _viewportBounds = p10._viewportBounds
@@ -94,48 +98,69 @@ function t1._scanTick(p10, n1: number) -- line: 123
 		return
 	end
 
-	local t3 = {}
+	local t4 = {}
 
-	for _, v27 in CollectionService:GetTagged(Constants.CandidateTag) do
-		local v28 = measureTile(v27, _surfaceScope, _viewportBounds)
+	for _, v28 in CollectionService:GetTagged(Constants.CandidateTag) do
+		local v29 = measureTile(v28, _surfaceScope, _viewportBounds)
 
-		if v28 then
-			local metadata = v28.metadata
+		if v29 then
+			local metadata = v29.metadata
 			local encryptedAdTrackingData = metadata.encryptedAdTrackingData
 
-			t3[encryptedAdTrackingData] = true
+			t4[encryptedAdTrackingData] = true
 
-			local v31 = p10._sessions[encryptedAdTrackingData]
+			local v32 = p10._sessions[encryptedAdTrackingData]
 
-			if not v31 then
-				v31 = sponsoredAdViewabilityState.new(n1)
-				p10._sessions[encryptedAdTrackingData] = v31
-				p10._callbacks.onSessionStart(metadata, v28.geometry, n1)
+			if not v32 then
+				v32 = {
+					state = sponsoredAdViewabilityState.new(n1),
+					metadata = metadata
+				}
+				p10._sessions[encryptedAdTrackingData] = v32
+				p10._callbacks.onSessionStart(metadata, v29.geometry, n1)
 			end
 
-			for _, v33 in v31:advance(n1, v28.ratio, v28.geometry) do
-				p10._callbacks.onMilestone(metadata, v33)
+			for _, v34 in v32.state:advance(n1, v29.ratio, v29.geometry) do
+				p10._callbacks.onMilestone(metadata, v34)
 			end
 		end
 	end
 
-	for v34, v35 in p10._sessions do
-		if not t3[v34] then
-			v35:advance(n1, 0, nil)
+	for v35, v36 in p10._sessions do
+		if not t4[v35] then
+			v36.state:advance(n1, 0, nil)
 		end
 	end
 end
-function t1.reset(p11) -- line: 164
-	p11._running = false
+function t2._terminateAllSessions(p11, n2: number, s1: string) -- line: 187
+	local _sessions = p11._sessions
 
-	local _scanThread = p11._scanThread
+	p11._sessions = {}
+
+	for _, v42 in _sessions do
+		local v43 = v42.state:finalize(n2)
+
+		p11._callbacks.onUnload(v42.metadata, v43, s1)
+	end
+end
+function t2.onFeedRefresh(p12, n3: number?) -- line: 203
+	-- upvalues: t1 (copy)
+	p12:_terminateAllSessions(n3 or DateTime.now().UnixTimestampMillis, t1.FeedRefresh)
+end
+function t2.reset(p13, n4: number?) -- line: 208
+	-- upvalues: t1 (copy)
+	p13._running = false
+
+	local _scanThread = p13._scanThread
 
 	if _scanThread ~= nil and coroutine.status(_scanThread) == "suspended" then
 		task.cancel(_scanThread)
 	end
 
-	p11._scanThread = nil
-	p11._sessions = {}
+	p13._scanThread = nil
+	p13:_terminateAllSessions(n4 or DateTime.now().UnixTimestampMillis, t1.SurfaceTeardown)
 end
 
-return t1
+t2.TerminalReason = t1
+
+return t2

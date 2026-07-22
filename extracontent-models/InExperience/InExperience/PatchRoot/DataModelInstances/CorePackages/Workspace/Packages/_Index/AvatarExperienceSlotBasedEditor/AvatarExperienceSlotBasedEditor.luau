@@ -30,7 +30,9 @@ return {
 		SlotItemCardThumbnail = require(script.Components.SlotItemCardThumbnail),
 		ClearAllButton = require(script.Components.ClearAllButton),
 		CloseableHeader = require(script.Components.CloseableHeader),
-		AXPartialPageModal = require(script.Components.AXPartialPageModal)
+		AXPartialPageModal = require(script.Components.AXPartialPageModal),
+		OutfitDetailsActionBar = require(script.Components.OutfitDetails.ActionBar.OutfitDetailsActionBarContainer),
+		OutfitDetailsTopBar = require(script.Components.OutfitDetails.TopBar.OutfitDetailsTopBarContainer)
 	},
 	Hooks = {
 		useSlotItemCardBreakpoints = require(script.Hooks.useSlotItemCardBreakpoints),

@@ -17,28 +17,28 @@ local v12 = t.strictInterface({
 	transferOrigination = t.optional(t.string)
 })
 
-local function initiateTransferRequest(p1, p2) -- line: 32
+local function initiateTransferRequest(p1, p2, p3) -- line: 32
 	-- upvalues: v12 (copy), HttpRequest (copy), TransferOrigination (copy), v11 (copy), InitiateTransferModel (copy), Promise (copy)
 	assert(v12(p1))
 
-	local v16 = HttpRequest.new(p2)
-	local v17 = p1.transferOrigination or TransferOrigination.Unknown
-	local v18 = TransferOrigination.toEnumInteger[v17] or TransferOrigination.toEnumInteger[TransferOrigination.Unknown]
+	local v17 = if p3 == nil then HttpRequest.new(p2) else HttpRequest.fromNetworkImpl(p3)
+	local v18 = p1.transferOrigination or TransferOrigination.Unknown
+	local v19 = TransferOrigination.toEnumInteger[v18] or TransferOrigination.toEnumInteger[TransferOrigination.Unknown]
 	local t1 = {
 		recipientId = p1.recipientId,
-		transferOrigin = v18
+		transferOrigin = v19
 	}
 
-	return v16:post(v11, t1):andThen(function(p3) -- line: 47
+	return v17:post(v11, t1):andThen(function(p4) -- line: 49
 		-- upvalues: InitiateTransferModel (copy)
-		print("[initiateTransferRequest] Backend response (success):", p3)
+		print("[initiateTransferRequest] Backend response (success):", p4)
 
-		return (InitiateTransferModel.format(p3))
-	end):catch(function(p4) -- line: 52
+		return (InitiateTransferModel.format(p4))
+	end):catch(function(p5) -- line: 54
 		-- upvalues: Promise (copy)
-		print("[initiateTransferRequest] Backend response (error):", p4)
+		print("[initiateTransferRequest] Backend response (error):", p5)
 
-		return Promise.reject(p4)
+		return Promise.reject(p5)
 	end)
 end
 

@@ -5,13 +5,12 @@ require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
 
 local AbuseVector = require(GenericAbuseReporting.Enums.AbuseVector)
 local v4 = game:DefineFastFlag("UpdateAbuseReportRevampItemAbuseVector", false)
-local FFlagFixNotificationReportsMobile = require(GenericAbuseReportingParent.SharedFlags).FFlagFixNotificationReportsMobile
 local FFlagLuaAppEnableReportBadge = require(GenericAbuseReportingParent.SharedFlags).FFlagLuaAppEnableReportBadge
 local FFlagEnableReportingFlowForDevSubs = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForDevSubs
 local FFlagEnableReportingFlowForExperienceShop = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForExperienceShop
 
-return function(t1: {[any]: any}) -- line: 30
-	-- upvalues: AbuseVector (copy), FFlagEnableReportingFlowForDevSubs (copy), FFlagEnableReportingFlowForExperienceShop (copy), FFlagFixNotificationReportsMobile (copy), FFlagLuaAppEnableReportBadge (copy), v4 (copy)
+return function(t1: {[any]: any}) -- line: 29
+	-- upvalues: AbuseVector (copy), FFlagEnableReportingFlowForDevSubs (copy), FFlagEnableReportingFlowForExperienceShop (copy), FFlagLuaAppEnableReportBadge (copy), v4 (copy)
 	local t2 = {}
 
 	if t1.abuseVector == AbuseVector.Looks then
@@ -42,7 +41,7 @@ return function(t1: {[any]: any}) -- line: 30
 		t2.PLACE_ID = t1.targetId
 	elseif t1.abuseVector == AbuseVector.Group then
 		t2.REPORT_TARGET_GROUP_ID = t1.targetId
-	elseif FFlagFixNotificationReportsMobile and t1.abuseVector == AbuseVector.Notifications then
+	elseif t1.abuseVector == AbuseVector.Notifications then
 		t2.NOTIFICATION_ID = t1.targetId
 	elseif FFlagLuaAppEnableReportBadge and t1.abuseVector == AbuseVector.Badge then
 		t2.REPORT_TARGET_BADGE_ID = t1.targetId

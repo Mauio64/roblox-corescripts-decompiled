@@ -7,14 +7,14 @@ local Tokens = require(script.Providers.Style.Tokens)
 
 require(script.Components.Types)
 
-local Flags = require(script.Utility.Flags)
-local v5 = if not Flags.FoundationUseStyleSheetRegistry then nil else require(script.StyleSheet.StyleSheetRegistry)
+local StyleSheetRegistry = require(script.StyleSheet.StyleSheetRegistry)
 local scriptParent = script.Parent
 local BuilderIcons = require(scriptParent.BuilderIcons)
 local AccessoryType = require(script.Enums.AccessoryType)
 local AlertSeverity = require(script.Enums.AlertSeverity)
 local AlertVariant = require(script.Enums.AlertVariant)
 local AvatarGroupType = require(script.Enums.AvatarGroupType)
+local AvatarIconSize = require(script.Enums.AvatarIconSize)
 local AvatarSize = require(script.Enums.AvatarSize)
 local BadgeShape = require(script.Enums.BadgeShape)
 local BadgeSize = require(script.Enums.BadgeSize)
@@ -67,6 +67,7 @@ local Visibility = require(script.Enums.Visibility)
 local Accordion = require(script.Components.Accordion)
 local Avatar = require(script.Components.Avatar)
 local AvatarGroup = require(script.Components.AvatarGroup)
+local AvatarIcon = require(script.Components.AvatarIcon)
 local Badge = require(script.Components.Badge)
 local BaseMenu = require(script.Components.BaseMenu)
 local Button = require(script.Components.Button)
@@ -120,10 +121,11 @@ local Toggle = require(script.Components.Toggle)
 local Tooltip = require(script.Components.Tooltip)
 local Toast = require(script.Components.Toast)
 local View = require(script.Components.View)
-local v114 = strict({
+local v115 = strict({
 	Accordion = Accordion,
 	Avatar = Avatar,
 	AvatarGroup = AvatarGroup,
+	AvatarIcon = AvatarIcon,
 	Badge = Badge,
 	Button = Button,
 	ButtonGroup = ButtonGroup,
@@ -206,6 +208,7 @@ local v114 = strict({
 		AlertSeverity = AlertSeverity,
 		AlertVariant = AlertVariant,
 		AvatarGroupType = AvatarGroupType,
+		AvatarIconSize = AvatarIconSize,
 		AvatarSize = AvatarSize,
 		BadgeShape = BadgeShape,
 		BadgeSize = BadgeSize,
@@ -262,8 +265,8 @@ local v114 = strict({
 		Visibility = Visibility
 	},
 	Utility = {
-		getStyleSheet = if not Flags.FoundationUseStyleSheetRegistry then nil else v5.getStyleSheet,
-		addStyleTags = if not Flags.FoundationUseStyleSheetRegistry then nil else v5.addStyleTags,
+		getStyleSheet = StyleSheetRegistry.getStyleSheet,
+		addStyleTags = StyleSheetRegistry.addStyleTags,
 		getTokens = Tokens.getTokens,
 		blendColors = require(script.Utility.blendColors),
 		composeStyleVariant = require(script.Utility.composeStyleVariant),
@@ -292,11 +295,11 @@ local v114 = strict({
 if _G.__FOUNDATION_TRACK_USAGE__ then
 	local UsageTracker = require(script.Parent.UsageTracker)
 
-	v114 = UsageTracker.trackMemberAccess("Foundation", v114, UsageTracker.isReactComponent)
+	v115 = UsageTracker.trackMemberAccess("Foundation", v115, UsageTracker.isReactComponent)
 end
 
 if _G.__FOUNDATION_TRACE_LOG__ then
 	require(script.Utility.Logger):enableTraceLog()
 end
 
-return v114
+return v115

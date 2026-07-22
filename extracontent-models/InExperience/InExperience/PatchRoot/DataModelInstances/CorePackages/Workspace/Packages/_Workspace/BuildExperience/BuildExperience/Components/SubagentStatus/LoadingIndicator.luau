@@ -4,23 +4,30 @@ local Foundation = require(Parent.Foundation)
 local React = require(Parent.React)
 local Icon = Foundation.Icon
 local Progress = Foundation.Progress
+local View = Foundation.View
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local ProgressShape = Foundation.Enums.ProgressShape
 local ProgressSize = Foundation.Enums.ProgressSize
 local SubagentTaskStatus = CreatorAgentChat.SubagentTaskStatus
 
-local function LoadingIndicator(t1: {[any]: any}) -- line: 28
-	-- upvalues: SubagentTaskStatus (copy), React (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), Icon (copy), IconName (copy), IconSize (copy)
-	local v14 = t1.testId or "subagent-status-loading-indicator"
+local function LoadingIndicator(t1: {[any]: any}) -- line: 29
+	-- upvalues: React (copy), SubagentTaskStatus (copy), View (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), Icon (copy), IconName (copy), IconSize (copy)
+	local v15 = React.useBinding(0)
+	local v16 = t1.testId or "subagent-status-loading-indicator"
 	local layoutOrder = t1.layoutOrder
 
 	if t1.status == SubagentTaskStatus.InProgress then
-		return React.createElement(Progress, {
+		return React.createElement(View, {
+			tag = "auto-xy clip",
 			LayoutOrder = layoutOrder,
-			shape = ProgressShape.Circle,
-			size = ProgressSize.Small,
-			testId = `{ v14 }-loading`
+			GroupTransparency = v15
+		}, {
+			Progress = React.createElement(Progress, {
+				shape = ProgressShape.Circle,
+				size = ProgressSize.Small,
+				testId = `{ v16 }-loading`
+			})
 		})
 	end
 
@@ -30,7 +37,7 @@ local function LoadingIndicator(t1: {[any]: any}) -- line: 28
 			LayoutOrder = layoutOrder,
 			name = IconName.CircleCheck,
 			size = IconSize.Small,
-			testId = `{ v14 }-check-icon`
+			testId = `{ v16 }-check-icon`
 		})
 	end
 
@@ -40,7 +47,7 @@ local function LoadingIndicator(t1: {[any]: any}) -- line: 28
 			LayoutOrder = layoutOrder,
 			name = IconName.CircleSlash,
 			size = IconSize.Small,
-			testId = `{ v14 }-deleted-icon`
+			testId = `{ v16 }-deleted-icon`
 		})
 	end
 
@@ -50,7 +57,7 @@ local function LoadingIndicator(t1: {[any]: any}) -- line: 28
 			LayoutOrder = layoutOrder,
 			name = IconName.TriangleExclamation,
 			size = IconSize.Small,
-			testId = `{ v14 }-error-icon`
+			testId = `{ v16 }-error-icon`
 		})
 	end
 

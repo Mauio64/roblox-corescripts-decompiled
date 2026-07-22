@@ -11,11 +11,13 @@ local Controls = require(ParentParent.Resources.Controls)
 local React = require(CorePackages.Packages.React)
 local withLocalization = require(ParentParent.Localization.withLocalization)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v14 = #Controls.gamepadLabels.right * 43 + 62
+local Image = require(CorePackages.Packages.Foundation).Image
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v16 = #Controls.gamepadLabels.right * 43 + 62
 
-local function verticalControlsList(p1) -- line: 42
+local function verticalControlsList(p1) -- line: 47
 	-- upvalues: withLocalization (copy), Roact (copy), ThemedTextLabel (copy)
-	return withLocalization(p1.controls)(function(p2) -- line: 43
+	return withLocalization(p1.controls)(function(p2) -- line: 48
 		-- upvalues: Roact (copy), ThemedTextLabel (copy), p1 (copy)
 		local t1 = {
 			ListLayout = Roact.createElement("UIListLayout", {
@@ -42,22 +44,23 @@ local function verticalControlsList(p1) -- line: 42
 		}, t1)
 	end)
 end
-local function GamepadControls(p3) -- line: 71
-	-- upvalues: UserInputService (copy), Roact (copy), ControlLayoutContainer (copy), ImageSetLabel (copy), Assets (copy), React (copy), verticalControlsList (copy), Controls (copy), v14 (copy)
+local function GamepadControls(p3) -- line: 76
+	-- upvalues: UserInputService (copy), Roact (copy), ControlLayoutContainer (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), ImageSetLabel (copy), Assets (copy), React (copy), verticalControlsList (copy), Controls (copy), v16 (copy)
 	local Platform = UserInputService:GetPlatform()
-	local v20 = Platform == Enum.Platform.XBox360 or Platform == Enum.Platform.XBoxOne
+	local v22 = Platform == Enum.Platform.XBox360 or Platform == Enum.Platform.XBoxOne
 
 	return Roact.createElement(ControlLayoutContainer, {
 		titleText = "CoreScripts.InGameMenu.Controls.GamepadTitle",
 		closeButtonRef = p3.closeButtonRef
 	}, {
-		GamepadImage = Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			Image = v20 and Assets.Images.GamepadXbox or Assets.Images.Gamepad,
+		GamepadImage = Roact.createElement(if not FFlagCoreUiMigrateUIBloxToFoundation then ImageSetLabel else Image, {
+			BackgroundTransparency = not FFlagCoreUiMigrateUIBloxToFoundation and 1 or nil,
+			Image = v22 and Assets.Images.GamepadXbox or Assets.Images.Gamepad,
 			Size = UDim2.new(0, 473, 0, 465),
 			Position = UDim2.new(0.5, 16.5, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			[React.Tag] = "data-testid=GamepadInstructions"
+			testId = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else "GamepadInstructions",
+			[React.Tag] = not FFlagCoreUiMigrateUIBloxToFoundation and "data-testid=GamepadInstructions" or nil
 		}, {
 			LeftControlsList = Roact.createElement(verticalControlsList, {
 				TextXAlignment = Enum.TextXAlignment.Right,
@@ -71,7 +74,7 @@ local function GamepadControls(p3) -- line: 71
 			}),
 			RightIconsControlslIst = Roact.createElement(verticalControlsList, {
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Position = UDim2.new(1, 26, 0, v14),
+				Position = UDim2.new(1, 26, 0, v16),
 				controls = Controls.gamepadLabels.camera
 			})
 		})

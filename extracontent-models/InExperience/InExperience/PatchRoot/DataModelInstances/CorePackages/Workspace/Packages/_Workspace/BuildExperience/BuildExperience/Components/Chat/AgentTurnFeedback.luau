@@ -3,6 +3,7 @@ local BuildExperienceParent = BuildExperience.Parent
 local React = require(BuildExperienceParent.React)
 local Signals = require(BuildExperienceParent.Signals)
 local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
 require(BuildExperience.Chat.chatTypes)
 
@@ -10,105 +11,105 @@ local UserFeedback = require(BuildExperience.Components.MessageUtilities.UserFee
 local feedbackIcons = require(BuildExperience.Components.MessageUtilities.feedbackIcons)
 local GetPlaytestLoadingStore = require(BuildExperience.Stores.GetPlaytestLoadingStore)
 local Snackbar = require(BuildExperienceParent.Foundation).Snackbar
-local v10, v11 = Signals.createSignal(false)
+local v11, v12 = Signals.createSignal(false)
 local t1 = {
-	get = v10,
-	set = v11
+	get = v11,
+	set = v12
 }
 local t2 = {}
 
-local function getRollbackInProgressSignal(n1: number?) -- line: 38
+local function getRollbackInProgressSignal(n1: number?) -- line: 36
 	-- upvalues: t1 (copy), t2 (copy), Signals (copy)
 	if n1 == nil then
 		return t1
 	end
 
-	local v17 = t2[n1]
+	local v18 = t2[n1]
 
-	if v17 == nil then
-		local v18, v19 = Signals.createSignal(false)
+	if v18 == nil then
+		local v19, v20 = Signals.createSignal(false)
 
-		v17 = {
-			get = v18,
-			set = v19
+		v18 = {
+			get = v19,
+			set = v20
 		}
-		t2[n1] = v17
+		t2[n1] = v18
 	end
 
-	return v17
+	return v18
 end
-local function AgentTurnFeedback(t3: {[any]: any}) -- line: 55
-	-- upvalues: React (copy), t1 (copy), t2 (copy), Signals (copy), GetPlaytestLoadingStore (copy), SignalsReact (copy), feedbackIcons (copy), UserFeedback (copy), Snackbar (copy)
+local function AgentTurnFeedback(t3: {[any]: any}) -- line: 53
+	-- upvalues: React (copy), t1 (copy), t2 (copy), Signals (copy), GetPlaytestLoadingStore (copy), SignalsReact (copy), LocalizationStrings (copy), feedbackIcons (copy), UserFeedback (copy), Snackbar (copy)
 	local turnFeedbackIds = t3.turnFeedbackIds
-	local v22, v23 = React.useState("")
-	local v24 = if turnFeedbackIds == nil then nil else turnFeedbackIds.placeId
-	local v25 = React.useMemo(function() -- line: 59
-		-- upvalues: v24 (copy), t1 (copy), t2 (copy), Signals (copy)
-		local v34 = v24
+	local v23, v24 = React.useState("")
+	local v25 = if turnFeedbackIds == nil then nil else turnFeedbackIds.placeId
+	local v26 = React.useMemo(function() -- line: 57
+		-- upvalues: v25 (copy), t1 (copy), t2 (copy), Signals (copy)
+		local v35 = v25
 
-		if v34 == nil then
+		if v35 == nil then
 			return t1
 		end
 
-		local v35 = t2[v34]
+		local v36 = t2[v35]
 
-		if v35 == nil then
-			local v36, v37 = Signals.createSignal(false)
+		if v36 == nil then
+			local v37, v38 = Signals.createSignal(false)
 
-			v35 = {
-				get = v36,
-				set = v37
+			v36 = {
+				get = v37,
+				set = v38
 			}
-			t2[v34] = v35
+			t2[v35] = v36
 		end
 
-		return v35
-	end, { v24 })
-	local v26 = React.useCallback(function(p1) -- line: 62
-		-- upvalues: GetPlaytestLoadingStore (copy), v24 (copy)
-		local v39 = GetPlaytestLoadingStore(p1)
+		return v36
+	end, { v25 })
+	local v27 = React.useCallback(function(p1) -- line: 60
+		-- upvalues: GetPlaytestLoadingStore (copy), v25 (copy)
+		local v40 = GetPlaytestLoadingStore(p1)
 
-		if v24 == nil then
+		if v25 == nil then
 			return false
 		end
 
-		return v39.getAgentStatusForPlaceId(v24)(p1) == "Loading"
-	end, { v24 })
-	local v27 = SignalsReact.useSignalState(v26)
-	local v28 = SignalsReact.useSignalState(v25.get)
-	local v29 = React.useCallback(function() -- line: 71
-		-- upvalues: v23 (copy)
-		v23("")
+		return v40.getAgentStatusForPlaceId(v25)(p1) == "Loading"
+	end, { v25 })
+	local v28 = SignalsReact.useSignalState(v27)
+	local v29 = SignalsReact.useSignalState(v26.get)
+	local v30 = React.useCallback(function() -- line: 69
+		-- upvalues: v24 (copy)
+		v24("")
 	end, {})
-	local v30 = React.useCallback(function() -- line: 75
-		-- upvalues: v25 (copy)
-		v25.set(true)
-	end, { v25 })
-	local v31 = React.useCallback(function() -- line: 78
-		-- upvalues: v25 (copy), v23 (copy)
-		v25.set(false)
-		v23("Reverted agent publish.")
-	end, { v25 })
-	local v32 = React.useCallback(function() -- line: 82
-		-- upvalues: v25 (copy), v23 (copy)
-		v25.set(false)
-		v23("Couldn't revert agent publish. Try again.")
-	end, { v25 })
-	local v33 = React.useCallback(function(p2) -- line: 86
-		-- upvalues: turnFeedbackIds (copy), feedbackIcons (copy), v30 (copy), v31 (copy), v32 (copy)
+	local v31 = React.useCallback(function() -- line: 73
+		-- upvalues: v26 (copy)
+		v26.set(true)
+	end, { v26 })
+	local v32 = React.useCallback(function() -- line: 76
+		-- upvalues: v26 (copy), v24 (copy), LocalizationStrings (copy)
+		v26.set(false)
+		v24(LocalizationStrings.CHAT_REVERT_SUCCESS)
+	end, { v26 })
+	local v33 = React.useCallback(function() -- line: 80
+		-- upvalues: v26 (copy), v24 (copy), LocalizationStrings (copy)
+		v26.set(false)
+		v24(LocalizationStrings.CHAT_REVERT_FAILURE)
+	end, { v26 })
+	local v34 = React.useCallback(function(p2) -- line: 84
+		-- upvalues: turnFeedbackIds (copy), feedbackIcons (copy), v31 (copy), v32 (copy), v33 (copy)
 		if turnFeedbackIds == nil then
 			return
 		end
 
 		feedbackIcons.createOnActivated(turnFeedbackIds, {
-			onRevertStart = v30,
-			onRevertSuccess = v31,
-			onRevertFailure = v32
+			onRevertStart = v31,
+			onRevertSuccess = v32,
+			onRevertFailure = v33
 		})(p2)
 	end, {
-		v32,
-		v30,
+		v33,
 		v31,
+		v32,
 		turnFeedbackIds
 	})
 
@@ -121,15 +122,15 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 55
 			layoutOrder = t3.LayoutOrder,
 			icons = feedbackIcons.getFeedbackIcons({
 				includeRevert = feedbackIcons.canRevert(turnFeedbackIds),
-				isRevertDisabled = v27 or v28
+				isRevertDisabled = v28 or v29
 			}),
-			onActivated = v33,
+			onActivated = v34,
 			testId = t3.testId
 		}),
-		RevertSnackbar = if v22 == "" then nil else React.createElement(Snackbar, {
+		RevertSnackbar = if v23 == "" then nil else React.createElement(Snackbar, {
 			LayoutOrder = (t3.LayoutOrder or 0) + 1,
-			title = v22,
-			onClose = v29,
+			title = v23,
+			onClose = v30,
 			testId = `{ t3.testId }.revert-snackbar`
 		})
 	})

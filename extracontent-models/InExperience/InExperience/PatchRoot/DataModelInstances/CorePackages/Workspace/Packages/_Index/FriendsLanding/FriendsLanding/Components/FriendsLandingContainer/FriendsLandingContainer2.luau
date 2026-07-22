@@ -20,10 +20,9 @@ local useDecoratedTrustedConnections = FriendsCommon.Hooks.useDecoratedTrustedCo
 local useLocalUserId = require(FriendsLandingParent.RobloxAppHooks).useLocalUserId
 local filterStates = require(FriendsLanding.Friends.filterStates)
 local AppUserLayers = require(FriendsLandingParent.ExperimentLayers).AppUserLayers
-local FFlagConnectionsHubLayerExposure = require(FriendsLandingParent.SharedFlags).FFlagConnectionsHubLayerExposure
 local FFlagFixCohubExposureLayer = require(FriendsLandingParent.SharedFlags).FFlagFixCohubExposureLayer
 local FFlagConnectionManagementChips = require(FriendsLandingParent.SharedFlags).FFlagConnectionManagementChips
-local v26 = game:DefineFastInt("FriendsLandingPageSize", 50)
+local v25 = game:DefineFastInt("FriendsLandingPageSize", 50)
 local t1 = {
 	[PresenceType2.Offline] = PresenceType.Offline,
 	[PresenceType2.Online] = PresenceType.Online,
@@ -31,64 +30,62 @@ local t1 = {
 	[PresenceType2.InStudio] = PresenceType.InStudio
 }
 
-function FriendsLandingContainer(_) -- line: 48
-	-- upvalues: FFlagConnectionsHubLayerExposure (copy), React (copy), FFlagFixCohubExposureLayer (copy), IXPServiceWrapper (copy), AppUserLayers (copy), IXPService (copy), useLocalUserId (copy), useSelector (copy), getDeepValue (copy), useAppPolicy (copy), FriendsLandingContext (copy), useFriendsListOrderedByPresence (copy), v26 (copy), FFlagConnectionManagementChips (copy), useDecoratedTrustedConnections (copy), filterStates (copy), Cryo (copy), PresenceType2 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy), FriendsLandingPage (copy)
-	if FFlagConnectionsHubLayerExposure then
-		React.useEffect(function() -- line: 50
-			-- upvalues: FFlagFixCohubExposureLayer (copy), IXPServiceWrapper (copy), AppUserLayers (copy), IXPService (copy)
-			if FFlagFixCohubExposureLayer then
-				IXPServiceWrapper:LogFlagLinkedUserLayerExposure(AppUserLayers.ConnectionsHubExposureLayer)
+function FriendsLandingContainer(_) -- line: 46
+	-- upvalues: React (copy), FFlagFixCohubExposureLayer (copy), IXPServiceWrapper (copy), AppUserLayers (copy), IXPService (copy), useLocalUserId (copy), useSelector (copy), getDeepValue (copy), useAppPolicy (copy), FriendsLandingContext (copy), useFriendsListOrderedByPresence (copy), v25 (copy), FFlagConnectionManagementChips (copy), useDecoratedTrustedConnections (copy), filterStates (copy), Cryo (copy), PresenceType2 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy), FriendsLandingPage (copy)
+	React.useEffect(function() -- line: 47
+		-- upvalues: FFlagFixCohubExposureLayer (copy), IXPServiceWrapper (copy), AppUserLayers (copy), IXPService (copy)
+		if FFlagFixCohubExposureLayer then
+			IXPServiceWrapper:LogFlagLinkedUserLayerExposure(AppUserLayers.ConnectionsHubExposureLayer)
 
-				return
-			end
+			return
+		end
 
-			IXPService:LogFlagLinkedUserLayerExposure(AppUserLayers.ConnectionsHubExposureLayer)
-		end, {})
-	end
+		IXPService:LogFlagLinkedUserLayerExposure(AppUserLayers.ConnectionsHubExposureLayer)
+	end, {})
 
-	local v29 = useLocalUserId()
-	local v30 = useSelector(function(p2) -- line: 60
-		-- upvalues: getDeepValue (copy), v29 (copy)
-		return getDeepValue(p2, `FriendsLanding.Friends.countsByUserId.{ v29 }`)
+	local v28 = useLocalUserId()
+	local v29 = useSelector(function(p2) -- line: 56
+		-- upvalues: getDeepValue (copy), v28 (copy)
+		return getDeepValue(p2, `FriendsLanding.Friends.countsByUserId.{ v28 }`)
 	end)
-	local v31 = useAppPolicy(function(p3) -- line: 64
+	local v30 = useAppPolicy(function(p3) -- line: 60
 		return p3.getShowDisplayName()
 	end)
-	local v32 = React.useContext(FriendsLandingContext.Context)
-	local v33 = useFriendsListOrderedByPresence({
-		userId = v29,
-		pageSize = v26
+	local v31 = React.useContext(FriendsLandingContext.Context)
+	local v32 = useFriendsListOrderedByPresence({
+		userId = v28,
+		pageSize = v25
 	})
-	local u34 = nil
+	local u33 = nil
 
 	if FFlagConnectionManagementChips then
-		u34 = useDecoratedTrustedConnections(v33.onlineFriends)
+		u33 = useDecoratedTrustedConnections(v32.onlineFriends)
 	end
 
-	local v35 = React.useMemo(function() -- line: 82
-		-- upvalues: v33 (copy), v32 (copy), filterStates (copy), Cryo (copy), FFlagConnectionManagementChips (copy), u34 (ref), PresenceType2 (copy)
+	local v34 = React.useMemo(function() -- line: 78
+		-- upvalues: v32 (copy), v31 (copy), filterStates (copy), Cryo (copy), FFlagConnectionManagementChips (copy), u33 (ref), PresenceType2 (copy)
 		local t2 = {}
 
-		if v33.onlineFriends and v33.offlineFriends then
-			if v32.filter == filterStates.All then
-				return (Cryo.List.join(v33.onlineFriends, v33.offlineFriends))
+		if v32.onlineFriends and v32.offlineFriends then
+			if v31.filter == filterStates.All then
+				return (Cryo.List.join(v32.onlineFriends, v32.offlineFriends))
 			end
 
-			if v32.filter == filterStates.Offline then
-				return v33.offlineFriends
+			if v31.filter == filterStates.Offline then
+				return v32.offlineFriends
 			end
 
-			if v32.filter == filterStates.Online then
-				return v33.onlineFriends
+			if v31.filter == filterStates.Online then
+				return v32.onlineFriends
 			end
 
-			if FFlagConnectionManagementChips and v32.filter == filterStates.Trusted then
-				return u34 or {}
+			if FFlagConnectionManagementChips and v31.filter == filterStates.Trusted then
+				return u33 or {}
 			end
 
-			local onlineFriends = v33.onlineFriends
+			local onlineFriends = v32.onlineFriends
 
-			t2 = Cryo.List.filter(onlineFriends, function(p4) -- line: 95
+			t2 = Cryo.List.filter(onlineFriends, function(p4) -- line: 91
 				-- upvalues: PresenceType2 (copy)
 				return p4.presence and p4.presence.userPresenceType == PresenceType2.InGame
 			end)
@@ -96,40 +93,40 @@ function FriendsLandingContainer(_) -- line: 48
 
 		return t2
 	end, if not FFlagConnectionManagementChips then {
-		v32.filter,
-		v33.onlineFriends,
-		v33.offlineFriends
+		v31.filter,
+		v32.onlineFriends,
+		v32.offlineFriends
 	} else {
-		v32.filter,
-		v33.onlineFriends,
-		v33.offlineFriends,
-		u34
+		v31.filter,
+		v32.onlineFriends,
+		v32.offlineFriends,
+		u33
 	})
-	local v36 = React.useMemo(function() -- line: 108
-		-- upvalues: Cryo (copy), v35 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy)
-		return Cryo.List.map(v35, function(p5, _) -- line: 109
+	local v35 = React.useMemo(function() -- line: 104
+		-- upvalues: Cryo (copy), v34 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy)
+		return Cryo.List.map(v34, function(p5, _) -- line: 105
 			-- upvalues: getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy)
-			local v44 = getRbxthumbWithTypeSizeAndOptions(p5.id, UserLibConstants.RbxthumbTypes.Avatar, 352)
-			local v45 = if not p5.presence then PresenceType.Offline else t1[p5.presence.userPresenceType]
+			local v43 = getRbxthumbWithTypeSizeAndOptions(p5.id, UserLibConstants.RbxthumbTypes.Avatar, 352)
+			local v44 = if not p5.presence then PresenceType.Offline else t1[p5.presence.userPresenceType]
 
 			return {
 				username = "",
 				id = p5.id,
-				thumbnail = v44,
-				userPresenceType = v45,
+				thumbnail = v43,
+				userPresenceType = v44,
 				universeId = p5.presence and p5.presence.universeId or nil,
 				lastLocation = if not p5.presence then nil else p5.presence.lastLocation
 			}
 		end)
-	end, { v35 })
+	end, { v34 })
 
 	return React.createElement(FriendsLandingPage, {
-		totalFriendCount = v30,
-		friends = if not FFlagConnectionManagementChips then v36 else v36 or {},
-		fetchMoreFriends = if not v33 or v33.isEndOfList then nil else v33.fetchMoreFriends,
-		refreshFriends = v33.refreshFriendsData,
-		enableDisplayNamePolicy = v31,
-		localUserId = v29
+		totalFriendCount = v29,
+		friends = if not FFlagConnectionManagementChips then v35 else v35 or {},
+		fetchMoreFriends = if not v32 or v32.isEndOfList then nil else v32.fetchMoreFriends,
+		refreshFriends = v32.refreshFriendsData,
+		enableDisplayNamePolicy = v30,
+		localUserId = v28
 	})
 end
 

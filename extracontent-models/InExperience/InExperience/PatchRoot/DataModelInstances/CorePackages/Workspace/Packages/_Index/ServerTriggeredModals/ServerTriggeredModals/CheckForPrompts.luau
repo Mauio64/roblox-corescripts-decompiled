@@ -39,13 +39,14 @@ local function CheckForPrompts(t2: {[any]: any}) -- line: 46
 			surfaceKey = "HomepagePrompts",
 			configKey = "HomepagePrompts",
 			clearOnEmptyResponse = true,
+			clientAttributes = nil,
 			entryPoint = PromptsEntryPoint.HomepageLaunch,
 			allowNoConfigsBuilt = not not FFlagSduiAllowNoConfigsBuilt or nil,
 			loadTimer = SduiLoadTimer.createLoadTimer("HomepagePrompts")
 		}
 	end, {})
 
-	React.useEffect(function() -- line: 64
+	React.useEffect(function() -- line: 65
 		-- upvalues: fetchPrompts (copy), v35 (copy)
 		fetchPrompts(v35)
 	end, { v35 })
@@ -55,7 +56,7 @@ local function CheckForPrompts(t2: {[any]: any}) -- line: 46
 	if FFlagEnableHomepagePromptsForModalsAndBanners then
 		u36 = usePromptEntries("HomepagePrompts", PromptStyle.Modal)[1]
 	else
-		local v37 = React.useCallback(function(p1) -- line: 74
+		local v37 = React.useCallback(function(p1) -- line: 75
 			-- upvalues: getSduiApiStore (copy)
 			local v39 = getSduiApiStore().getData("HomepagePrompts").data(p1)
 
@@ -65,7 +66,7 @@ local function CheckForPrompts(t2: {[any]: any}) -- line: 46
 		u36 = useSignalState(v37)
 	end
 
-	React.useEffect(function() -- line: 82
+	React.useEffect(function() -- line: 83
 		-- upvalues: v33 (copy), v32 (copy), isFocused (copy), u36 (ref), v31 (copy), EntryPoint (copy), v30 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), AppPage (copy), FFlagPromptsImpressionUsesTitle (copy)
 		if v33 then
 			return

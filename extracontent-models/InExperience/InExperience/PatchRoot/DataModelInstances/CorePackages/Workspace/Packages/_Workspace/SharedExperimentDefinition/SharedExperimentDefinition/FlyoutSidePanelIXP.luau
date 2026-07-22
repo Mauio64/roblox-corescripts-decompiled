@@ -14,10 +14,12 @@ local v13 = game:DefineFastFlag("EnableFlyoutExposure", false)
 local v14 = game:DefineFastFlag("FlyoutHamburgerEnableProfileEntry", false)
 local v15 = game:DefineFastFlag("FlyoutFacepileEnableProfileEntry", false)
 local v16 = game:DefineFastFlag("FlyoutDisallowAlternativeEntryOnProfileEntryEnabled", false)
-local u17 = nil
+local FFlagSubTabRemoveFlyoutDependency = require(ParentParent.SharedFlags).FFlagSubTabRemoveFlyoutDependency
+local FFlagHiddenFriendsSortHeaderRemoveFlyoutDependency = require(ParentParent.SharedFlags).FFlagHiddenFriendsSortHeaderRemoveFlyoutDependency
+local u19 = nil
 
-local function getIXPVariant() -- line: 26
-	-- upvalues: v3 (copy), v4 (copy), v7 (copy), u17 (ref), ExperimentCacheManager (copy), v5 (copy), v13 (copy), v6 (copy)
+local function getIXPVariant() -- line: 29
+	-- upvalues: v3 (copy), v4 (copy), v7 (copy), u19 (ref), ExperimentCacheManager (copy), v5 (copy), v13 (copy), v6 (copy)
 	if v3 ~= -1 then
 		return v3
 	end
@@ -26,76 +28,84 @@ local function getIXPVariant() -- line: 26
 		return v7
 	end
 
-	if u17 == nil then
-		local v19 = ExperimentCacheManager.default:getLayerVariables(v5)
+	if u19 == nil then
+		local v21 = ExperimentCacheManager.default:getLayerVariables(v5)
 
-		if v13 and v19 ~= nil then
+		if v13 and v21 ~= nil then
 			ExperimentCacheManager.default:logLayerExposure(v5)
 		end
 
-		u17 = v19 or {}
+		u19 = v21 or {}
 	end
 
-	local v20 = u17[v6]
+	local v22 = u19[v6]
 
-	if v20 == nil then
+	if v22 == nil then
 		return v7
 	end
 
-	return (tonumber(v20))
+	return (tonumber(v22))
 end
 
 return {
-	isFlyoutSidePanelEnabled = function() -- line: 47
+	isFlyoutSidePanelEnabled = function() -- line: 50
 		-- upvalues: getIXPVariant (copy), v7 (copy)
 		return getIXPVariant() ~= v7
 	end,
-	isRobloxLogoEnabled = function() -- line: 53
+	isRobloxLogoEnabled = function() -- line: 56
 		-- upvalues: getIXPVariant (copy), v7 (copy)
 		return getIXPVariant() ~= v7
 	end,
-	isProfileEntryRemoved = function() -- line: 59
+	isProfileEntryRemoved = function() -- line: 62
 		-- upvalues: getIXPVariant (copy), v14 (copy), v9 (copy), v15 (copy), v8 (copy), v10 (copy), v7 (copy)
-		local v21 = getIXPVariant()
+		local v23 = getIXPVariant()
 
-		if v14 and v21 == v9 then
+		if v14 and v23 == v9 then
 			return false
 		end
 
-		if v15 and (v21 == v8 or v21 == v10) then
+		if v15 and (v23 == v8 or v23 == v10) then
 			return false
 		end
 
-		return v21 ~= v7
+		return v23 ~= v7
 	end,
-	isFriendsSortHeaderHiddenInFlyoutIxp = function() -- line: 73
-		-- upvalues: getIXPVariant (copy), v7 (copy), v12 (copy)
+	isFriendsSortHeaderHiddenInFlyoutIxp = function() -- line: 76
+		-- upvalues: FFlagHiddenFriendsSortHeaderRemoveFlyoutDependency (copy), v12 (copy), getIXPVariant (copy), v7 (copy)
+		if FFlagHiddenFriendsSortHeaderRemoveFlyoutDependency then
+			return not v12
+		end
+
 		return getIXPVariant() ~= v7 and not v12
 	end,
-	isAlternateEntryPointEnabled = function() -- line: 78
+	isAlternateEntryPointEnabled = function() -- line: 84
 		-- upvalues: getIXPVariant (copy), v16 (copy), v14 (copy), v9 (copy), v15 (copy), v8 (copy), v10 (copy), v7 (copy)
-		local v22 = getIXPVariant()
+		local v24 = getIXPVariant()
 
 		if v16 then
-			local v23 = getIXPVariant()
+			local v25 = getIXPVariant()
 
-			return (not v14 or v23 ~= v9) and ((not v15 or v23 ~= v8 and v23 ~= v10) and v23 ~= v7) and (v22 == v8 or v22 == v10)
+			return (not v14 or v25 ~= v9) and ((not v15 or v25 ~= v8 and v25 ~= v10) and v25 ~= v7) and (v24 == v8 or v24 == v10)
 		end
 
-		return v22 == v8 or v22 == v10
+		return v24 == v8 or v24 == v10
 	end,
-	isRobuxIconRemoved = function() -- line: 89
+	isRobuxIconRemoved = function() -- line: 95
 		-- upvalues: getIXPVariant (copy), v11 (copy)
 		return getIXPVariant() == v11
 	end,
-	isScrollAwayEnabled = function() -- line: 95
+	isScrollAwayEnabled = function() -- line: 101
 		-- upvalues: getIXPVariant (copy), v7 (copy)
 		return getIXPVariant() ~= v7
 	end,
-	isHomeSubTabEnabled = function() -- line: 100
-		-- upvalues: getIXPVariant (copy), v8 (copy), v9 (copy)
-		local v24 = getIXPVariant()
+	isHomeSubTabEnabled = function() -- line: 106
+		-- upvalues: FFlagSubTabRemoveFlyoutDependency (copy), getIXPVariant (copy), v8 (copy), v9 (copy)
+		if FFlagSubTabRemoveFlyoutDependency then
+			return true
+		end
 
-		return v24 == v8 or v24 == v9
+		local v26 = getIXPVariant()
+
+		return v26 == v8 or v26 == v9
 	end
 }

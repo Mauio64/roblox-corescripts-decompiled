@@ -1,3 +1,3 @@
-local _Index = script.Parent.Parent.Parent.Parent._Index
+local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
 
-return (require(_Index.FriendsChat.FriendsChat.Stores.GetFriendsChatRealtimeStore))
+return (require(_Workspace.FriendsChat.FriendsChat.Stores.GetFriendsChatRealtimeStore))

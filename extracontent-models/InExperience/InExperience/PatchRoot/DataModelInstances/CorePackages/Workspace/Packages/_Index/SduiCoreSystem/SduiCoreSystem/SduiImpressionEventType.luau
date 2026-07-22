@@ -5,5 +5,6 @@ return {
 	virtualEventImpressions = "virtualEventImpressions",
 	experienceStoreImpressions = "experienceStoreImpressions",
 	marketplaceItemImpressions = "marketplaceItemImpressions",
-	devStoreSeeAllImpressions = "devStoreSeeAllImpressions"
+	devStoreSeeAllImpressions = "devStoreSeeAllImpressions",
+	queryImpressions = "queryImpressions"
 }

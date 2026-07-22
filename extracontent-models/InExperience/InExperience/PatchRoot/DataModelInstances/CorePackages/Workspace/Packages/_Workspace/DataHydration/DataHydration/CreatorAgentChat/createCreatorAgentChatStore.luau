@@ -280,12 +280,12 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			u57 = nil
 
-			local v150 = p12.sessions or {}
+			local v151 = p12.sessions or {}
 			local nextPageToken = p12.nextPageToken
-			local v152 = if typeof(nextPageToken) ~= "string" or nextPageToken == "" then nil else nextPageToken
+			local v153 = if typeof(nextPageToken) ~= "string" or nextPageToken == "" then nil else nextPageToken
 
-			v50(v150)
-			v52(v152)
+			v50(v151)
+			v52(v153)
 			v54("succeeded")
 		end, function(_) -- line: 249
 			-- upvalues: v89 (copy), n2 (ref), u57 (ref), v54 (copy)
@@ -349,13 +349,13 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			u58 = nil
 
-			local v155 = p14.sessions or {}
+			local v156 = p14.sessions or {}
 			local nextPageToken = p14.nextPageToken
-			local v157 = if typeof(nextPageToken) ~= "string" or nextPageToken == "" then nil else nextPageToken
-			local v158 = appendSessionListEntries(v49(false), v155)
+			local v158 = if typeof(nextPageToken) ~= "string" or nextPageToken == "" then nil else nextPageToken
+			local v159 = appendSessionListEntries(v49(false), v156)
 
-			v50(v158)
-			v52(v157)
+			v50(v159)
+			v52(v158)
 			v56("succeeded")
 		end, function(_) -- line: 292
 			-- upvalues: v95 (copy), n2 (ref), u58 (ref), v56 (copy)
@@ -396,136 +396,136 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			sessionId = s4
 		})
 	end
-	local function registerTurnHandle(s5: string, p16, p17, t13: {[any]: any}?) -- line: 372
+	local function registerTurnHandle(s5: string, p16, p17, t13: {[any]: any}?) -- line: 382
 		-- upvalues: createTurnHandle (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
-		local v125, v126 = createTurnHandle(s5, p16, function() -- line: 378
+		local v126, v127 = createTurnHandle(s5, p16, function() -- line: 388
 			-- upvalues: s5 (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
-			local v170 = s5
+			local v171 = s5
 
-			assert(typeof(v170) == "string" and v170 ~= "", "sessionId is required")
+			assert(typeof(v171) == "string" and v171 ~= "", "sessionId is required")
 
 			local SessionCancel = AcpProtocol.Methods.SessionCancel
 			local t14 = {
-				sessionId = v170
+				sessionId = v171
 			}
-			local v173 = rpcCall
-			local v174
+			local v174 = rpcCall
+			local v175
 
 			if v32.generateRequestId then
-				v174 = v32.generateRequestId()
+				v175 = v32.generateRequestId()
 			else
 				n1 += 1
-				v174 = n1
+				v175 = n1
 			end
 
-			local v175 = v173(v174, SessionCancel, t14)
+			local v176 = v174(v175, SessionCancel, t14)
 
-			onTerminal(v175.state, function() -- line: 344
-				-- upvalues: t6 (copy), v170 (copy), t8 (copy), t7 (copy)
-				local v193 = t6[v170]
+			onTerminal(v176.state, function() -- line: 344
+				-- upvalues: t6 (copy), v171 (copy), t8 (copy), t7 (copy)
+				local v194 = t6[v171]
 
-				if v193 then
-					v193.markCancelled()
+				if v194 then
+					v194.markCancelled()
 
-					for v194, v195 in t6 do
-						if v195 == v193 then
-							t6[v194] = nil
-							t8[v194] = nil
+					for v195, v196 in t6 do
+						if v196 == v194 then
+							t6[v195] = nil
+							t8[v195] = nil
 
 							break
 						end
 					end
 
-					local requestId = v193.requestId
-					local v197 = if requestId ~= nil then tostring(requestId) else nil
+					local requestId = v194.requestId
+					local v198 = if requestId ~= nil then tostring(requestId) else nil
 
-					if v197 and v193 == t7[v197] then
-						t7[v197] = nil
+					if v198 and v194 == t7[v198] then
+						t7[v198] = nil
 					end
 				end
 			end)
 		end, p17, t13)
 
-		t6[s5] = v126
-		t8[s5] = v125
+		t6[s5] = v127
+		t8[s5] = v126
 
 		if p16 ~= nil then
-			t7[tostring(p16)] = v126
+			t7[tostring(p16)] = v127
 		end
 
-		return v125
+		return v126
 	end
-	local function sessionPrompt(p18) -- line: 389
+	local function sessionPrompt(p18) -- line: 399
 		-- upvalues: v32 (copy), n1 (ref), createTurnHandle (copy), AcpProtocol (copy), rpcCall (copy), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 		assert(p18 and (typeof(p18.sessionId) == "string" and p18.sessionId ~= ""), "sessionId is required")
 		assert(p18.prompt, "prompt is required")
 
 		local sessionId = p18.sessionId
-		local v129
+		local v130
 
 		if v32.generateRequestId then
-			v129 = v32.generateRequestId()
+			v130 = v32.generateRequestId()
 		else
 			n1 += 1
-			v129 = n1
+			v130 = n1
 		end
 
-		local v130, v131 = createTurnHandle(sessionId, v129, function() -- line: 378
+		local v131, v132 = createTurnHandle(sessionId, v130, function() -- line: 388
 			-- upvalues: sessionId (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
-			local v176 = sessionId
+			local v177 = sessionId
 
-			assert(typeof(v176) == "string" and v176 ~= "", "sessionId is required")
+			assert(typeof(v177) == "string" and v177 ~= "", "sessionId is required")
 
 			local SessionCancel = AcpProtocol.Methods.SessionCancel
 			local t15 = {
-				sessionId = v176
+				sessionId = v177
 			}
-			local v179 = rpcCall
-			local v180
+			local v180 = rpcCall
+			local v181
 
 			if v32.generateRequestId then
-				v180 = v32.generateRequestId()
+				v181 = v32.generateRequestId()
 			else
 				n1 += 1
-				v180 = n1
+				v181 = n1
 			end
 
-			local v181 = v179(v180, SessionCancel, t15)
+			local v182 = v180(v181, SessionCancel, t15)
 
-			onTerminal(v181.state, function() -- line: 344
-				-- upvalues: t6 (copy), v176 (copy), t8 (copy), t7 (copy)
-				local v198 = t6[v176]
+			onTerminal(v182.state, function() -- line: 344
+				-- upvalues: t6 (copy), v177 (copy), t8 (copy), t7 (copy)
+				local v199 = t6[v177]
 
-				if v198 then
-					v198.markCancelled()
+				if v199 then
+					v199.markCancelled()
 
-					for v199, v200 in t6 do
-						if v200 == v198 then
-							t6[v199] = nil
-							t8[v199] = nil
+					for v200, v201 in t6 do
+						if v201 == v199 then
+							t6[v200] = nil
+							t8[v200] = nil
 
 							break
 						end
 					end
 
-					local requestId = v198.requestId
-					local v202 = if requestId ~= nil then tostring(requestId) else nil
+					local requestId = v199.requestId
+					local v203 = if requestId ~= nil then tostring(requestId) else nil
 
-					if v202 and v198 == t7[v202] then
-						t7[v202] = nil
+					if v203 and v199 == t7[v203] then
+						t7[v203] = nil
 					end
 				end
 			end)
 		end, nil, nil)
 
-		t6[sessionId] = v131
-		t8[sessionId] = v130
+		t6[sessionId] = v132
+		t8[sessionId] = v131
 
-		if v129 ~= nil then
-			t7[tostring(v129)] = v131
+		if v130 ~= nil then
+			t7[tostring(v130)] = v132
 		end
 
-		local v132 = t6[sessionId]
+		local v133 = t6[sessionId]
 		local t16 = {
 			sessionId = sessionId
 		}
@@ -540,48 +540,48 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			t16._meta = p18._meta
 		end
 
-		local v135 = rpcCall(v129, AcpProtocol.Methods.SessionPrompt, t16)
+		local v136 = rpcCall(v130, AcpProtocol.Methods.SessionPrompt, t16)
 
-		onTerminal(v135.state, nil, function(p19, p20) -- line: 408
-			-- upvalues: v132 (copy), t6 (copy), t8 (copy), t7 (copy)
-			task.defer(function() -- line: 409
-				-- upvalues: v132 (copy), p19 (copy), p20 (copy), t6 (copy), t8 (copy), t7 (copy)
-				if v132.isDone() then
+		onTerminal(v136.state, nil, function(p19, p20) -- line: 418
+			-- upvalues: v133 (copy), t6 (copy), t8 (copy), t7 (copy)
+			task.defer(function() -- line: 419
+				-- upvalues: v133 (copy), p19 (copy), p20 (copy), t6 (copy), t8 (copy), t7 (copy)
+				if v133.isDone() then
 					return
 				end
 
-				v132.fail(("CAS session/prompt failed: %s"):format(p19), p20)
+				v133.fail(("CAS session/prompt failed: %s"):format(p19), p20)
 
-				local v203 = v132
+				local v204 = v133
 
-				for v204, v205 in t6 do
-					if v205 == v203 then
-						t6[v204] = nil
-						t8[v204] = nil
+				for v205, v206 in t6 do
+					if v206 == v204 then
+						t6[v205] = nil
+						t8[v205] = nil
 
 						break
 					end
 				end
 
-				local requestId = v203.requestId
-				local v207 = if requestId ~= nil then tostring(requestId) else nil
+				local requestId = v204.requestId
+				local v208 = if requestId ~= nil then tostring(requestId) else nil
 
-				if v207 and v203 == t7[v207] then
-					t7[v207] = nil
+				if v208 and v204 == t7[v208] then
+					t7[v208] = nil
 				end
 			end)
 		end)
 
-		return v130
+		return v131
 	end
-	local function getActiveTurnHandle(s6: string) -- line: 437
+	local function getActiveTurnHandle(s6: string) -- line: 447
 		-- upvalues: t8 (copy)
 		return t8[s6]
 	end
-	local function ingestSessionHistory(s7: string, t17: {[any]: any}, n3: number?) -- line: 441
+	local function ingestSessionHistory(s7: string, t17: {[any]: any}, n3: number?) -- line: 451
 		-- upvalues: historyIngest (copy), t6 (copy), unregisterHandle (copy)
 		return historyIngest.ingestSessionHistory({
-			getActiveTurnInternals = function(s8: string) -- line: 447
+			getActiveTurnInternals = function(s8: string) -- line: 457
 				-- upvalues: t6 (copy)
 				return t6[s8]
 			end,
@@ -597,7 +597,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 		ingestSessionHistory = ingestSessionHistory,
 		submitToolResult = submitToolResult,
 		getActiveTurnHandle = getActiveTurnHandle,
-		onCasSessionIdChanged = function(_: string?) -- line: 462
+		onCasSessionIdChanged = function(_: string?) -- line: 472
 		end,
 		rpcTimeoutSeconds = constants.getRpcTimeoutSeconds()
 	})
@@ -609,7 +609,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 			return rpcCallSync(AcpProtocol.Methods.SessionList, p21 or {})
 		end,
-		getSessionListStore = function() -- line: 485
+		getSessionListStore = function() -- line: 495
 			-- upvalues: t11 (copy)
 			return t11
 		end,
@@ -653,25 +653,25 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			onTerminal(v112.state, function() -- line: 344
 				-- upvalues: t6 (copy), s11 (copy), t8 (copy), t7 (copy)
-				local v160 = t6[s11]
+				local v161 = t6[s11]
 
-				if v160 then
-					v160.markCancelled()
+				if v161 then
+					v161.markCancelled()
 
-					for v161, v162 in t6 do
-						if v162 == v160 then
-							t6[v161] = nil
-							t8[v161] = nil
+					for v162, v163 in t6 do
+						if v163 == v161 then
+							t6[v162] = nil
+							t8[v162] = nil
 
 							break
 						end
 					end
 
-					local requestId = v160.requestId
-					local v164 = if requestId ~= nil then tostring(requestId) else nil
+					local requestId = v161.requestId
+					local v165 = if requestId ~= nil then tostring(requestId) else nil
 
-					if v164 and v160 == t7[v164] then
-						t7[v164] = nil
+					if v165 and v161 == t7[v165] then
+						t7[v165] = nil
 					end
 				end
 			end)
@@ -700,25 +700,25 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			onTerminal(v118.state, function() -- line: 357
 				-- upvalues: t6 (copy), s12 (copy), AcpProtocol (copy), t8 (copy), t7 (copy)
-				local v165 = t6[s12]
+				local v166 = t6[s12]
 
-				if v165 then
-					v165.fail("Session deleted before prompt response", AcpProtocol.ErrorCodes.Gone)
+				if v166 then
+					v166.fail("Session deleted before prompt response", AcpProtocol.ErrorCodes.Gone)
 
-					for v166, v167 in t6 do
-						if v167 == v165 then
-							t6[v166] = nil
-							t8[v166] = nil
+					for v167, v168 in t6 do
+						if v168 == v166 then
+							t6[v167] = nil
+							t8[v167] = nil
 
 							break
 						end
 					end
 
-					local requestId = v165.requestId
-					local v169 = if requestId ~= nil then tostring(requestId) else nil
+					local requestId = v166.requestId
+					local v170 = if requestId ~= nil then tostring(requestId) else nil
 
-					if v169 and v165 == t7[v169] then
-						t7[v169] = nil
+					if v170 and v166 == t7[v170] then
+						t7[v170] = nil
 					end
 				end
 			end)
@@ -734,90 +734,99 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 				title = s14
 			})
 		end,
+		sessionSaveAndPublish = function(p23) -- line: 372
+			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
+			assert(typeof(p23) == "table", "sessionSaveAndPublish requires params")
+			assert(typeof(p23.placeId) == "number" and p23.placeId > 0, "placeId must be a positive number")
+			assert(p23.title == nil or typeof(p23.title) == "string", "title must be a string")
+			assert(p23.description == nil or typeof(p23.description) == "string", "description must be a string")
+
+			return rpcCallSync(AcpProtocol.Methods.SessionSaveAndPublish, p23)
+		end,
 		ingestSessionHistory = ingestSessionHistory,
-		ingestFrame = function(p23, p24) -- line: 466
+		ingestFrame = function(p24, p25) -- line: 476
 			-- upvalues: ingestFrameHandler (copy), v35 (copy), v69 (copy), t6 (copy), t7 (copy), unregisterHandle (copy)
 			ingestFrameHandler.ingestFrame({
 				logger = v35,
 				getSessionByCasSessionId = v69.getSessionByCasSessionId,
 				getSessionForProject = v69.getSessionForProject,
-				getActiveTurnBySession = function(s15: string) -- line: 471
+				getActiveTurnBySession = function(s15: string) -- line: 481
 					-- upvalues: t6 (copy)
 					return t6[s15]
 				end,
-				getActiveTurnByRequestId = function(s16: string) -- line: 474
+				getActiveTurnByRequestId = function(s16: string) -- line: 484
 					-- upvalues: t7 (copy)
 					return t7[s16]
 				end,
 				onTurnDone = unregisterHandle
-			}, p23, p24)
+			}, p24, p25)
 		end,
-		resumeTurnFromHistory = function(s17: string, p25, t20: {[any]: any}?) -- line: 421
+		resumeTurnFromHistory = function(s17: string, p26, t20: {[any]: any}?) -- line: 431
 			-- upvalues: t8 (copy), createTurnHandle (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t7 (copy)
 			assert(typeof(s17) == "string" and s17 ~= "", "sessionId is required")
 
-			if p25.isDone then
+			if p26.isDone then
 				return nil
 			end
 
-			local v139 = t8[s17]
+			local v140 = t8[s17]
 
-			if v139 ~= nil then
-				return v139
+			if v140 ~= nil then
+				return v140
 			end
 
-			local v140, v141 = createTurnHandle(s17, nil, function() -- line: 378
+			local v141, v142 = createTurnHandle(s17, nil, function() -- line: 388
 				-- upvalues: s17 (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
-				local v184 = s17
+				local v185 = s17
 
-				assert(typeof(v184) == "string" and v184 ~= "", "sessionId is required")
+				assert(typeof(v185) == "string" and v185 ~= "", "sessionId is required")
 
 				local SessionCancel = AcpProtocol.Methods.SessionCancel
 				local t21 = {
-					sessionId = v184
+					sessionId = v185
 				}
-				local v187 = rpcCall
-				local v188
+				local v188 = rpcCall
+				local v189
 
 				if v32.generateRequestId then
-					v188 = v32.generateRequestId()
+					v189 = v32.generateRequestId()
 				else
 					n1 += 1
-					v188 = n1
+					v189 = n1
 				end
 
-				local v189 = v187(v188, SessionCancel, t21)
+				local v190 = v188(v189, SessionCancel, t21)
 
-				onTerminal(v189.state, function() -- line: 344
-					-- upvalues: t6 (copy), v184 (copy), t8 (copy), t7 (copy)
-					local v208 = t6[v184]
+				onTerminal(v190.state, function() -- line: 344
+					-- upvalues: t6 (copy), v185 (copy), t8 (copy), t7 (copy)
+					local v209 = t6[v185]
 
-					if v208 then
-						v208.markCancelled()
+					if v209 then
+						v209.markCancelled()
 
-						for v209, v210 in t6 do
-							if v210 == v208 then
-								t6[v209] = nil
-								t8[v209] = nil
+						for v210, v211 in t6 do
+							if v211 == v209 then
+								t6[v210] = nil
+								t8[v210] = nil
 
 								break
 							end
 						end
 
-						local requestId = v208.requestId
-						local v212 = if requestId ~= nil then tostring(requestId) else nil
+						local requestId = v209.requestId
+						local v213 = if requestId ~= nil then tostring(requestId) else nil
 
-						if v212 and v208 == t7[v212] then
-							t7[v212] = nil
+						if v213 and v209 == t7[v213] then
+							t7[v213] = nil
 						end
 					end
 				end)
-			end, p25, t20)
+			end, p26, t20)
 
-			t6[s17] = v141
-			t8[s17] = v140
+			t6[s17] = v142
+			t8[s17] = v141
 
-			return v140
+			return v141
 		end,
 		getActiveTurnHandle = getActiveTurnHandle,
 		getSessionForProject = v69.getSessionForProject

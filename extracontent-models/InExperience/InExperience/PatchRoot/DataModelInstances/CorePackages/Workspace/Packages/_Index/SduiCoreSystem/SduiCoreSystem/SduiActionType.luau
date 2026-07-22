@@ -59,5 +59,6 @@ return {
 	OpenSduiOverlay = "OpenSduiOverlay",
 	EnableEventNotifications = "EnableEventNotifications",
 	DismissEventNotificationsModal = "DismissEventNotificationsModal",
-	OpenFaeTrialUpsell = "OpenFaeTrialUpsell"
+	OpenFaeTrialUpsell = "OpenFaeTrialUpsell",
+	PinExperienceShortcut = "PinExperienceShortcut"
 }

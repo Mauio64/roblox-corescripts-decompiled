@@ -4,7 +4,10 @@ local JestConfigs = require(ParentParent.Dev.JestConfigs)
 return {
 	displayName = "PurchasePrompt",
 	testMatch = { "**/*.test" },
-	testPathIgnorePatterns = { "launchRobuxPackagePurchase" },
+	testPathIgnorePatterns = {
+		"launchRobuxPackagePurchase",
+		"NativePurchaseFinishedConnector"
+	},
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.UIBloxInitializer,
 		JestConfigs.setupFiles.createPromiseRejectionHandler()

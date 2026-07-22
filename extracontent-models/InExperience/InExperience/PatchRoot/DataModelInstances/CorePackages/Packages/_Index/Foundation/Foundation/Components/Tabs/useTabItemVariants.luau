@@ -67,7 +67,7 @@ local function variantsFactory(_) -- line: 35
 	local t3 = {
 		[InputSize.XSmall] = {
 			content = {
-				tag = "padding-x-small"
+				tag = not Flags.FoundationFixTabsFitBorderWidth and "padding-x-small" or "padding-x-xsmall"
 			}
 		},
 		[InputSize.Small] = {
@@ -116,9 +116,9 @@ local function variantsFactory(_) -- line: 35
 	}
 end
 
-return function(p2, p3, b1: boolean) -- line: 84
-	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
+return function(p2, p3, b1: boolean) -- line: 86
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy), Flags (copy)
 	local v16 = VariantsContext.useVariants("Tab", variantsFactory, p2)
 
-	return composeStyleVariant(v16.common, v16.sizes[p3], v16.isFill[b1], if not b1 then {} else v16.paddings[p3])
+	return composeStyleVariant(v16.common, v16.sizes[p3], v16.isFill[b1], if not Flags.FoundationFixTabsFitBorderWidth then if not b1 then {} else v16.paddings[p3] else v16.paddings[p3])
 end

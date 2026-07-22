@@ -17,5 +17,6 @@ return {
 	Hooks = require(script.Hooks),
 	EventReceivers = require(script.EventReceivers),
 	Experiments = require(script.Experiments),
-	Stores = require(script.Stores)
+	Stores = require(script.Stores),
+	DesignTokenMappers = require(script.DesignTokenMappers)
 }

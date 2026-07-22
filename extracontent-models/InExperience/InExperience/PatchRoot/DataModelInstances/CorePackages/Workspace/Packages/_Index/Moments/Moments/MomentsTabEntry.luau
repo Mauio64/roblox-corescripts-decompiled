@@ -376,18 +376,18 @@ local function MomentsTabEntry(t2: {[any]: any}) -- line: 193
 		v83
 	})
 
-	local v85 = React.useMemo(function() -- line: 386
+	local v85 = React.useMemo(function() -- line: 385
 		-- upvalues: t2 (copy), GetImmersiveChromeStore (copy)
 		local openProfile = t2.openProfile
 		local openOwnMoments = t2.openOwnMoments
 
 		return {
-			openProfile = if not openProfile then nil else function(n2: number) -- line: 391
+			openProfile = if not openProfile then nil else function(n2: number) -- line: 390
 				-- upvalues: GetImmersiveChromeStore (copy), openProfile (copy)
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
 				openProfile(n2)
 			end,
-			openOwnMoments = if not openOwnMoments then nil else function() -- line: 397
+			openOwnMoments = if not openOwnMoments then nil else function() -- line: 396
 				-- upvalues: GetImmersiveChromeStore (copy), openOwnMoments (copy)
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
 				openOwnMoments()
@@ -413,7 +413,7 @@ local function MomentsTabEntry(t2: {[any]: any}) -- line: 193
 		openOwnMoments = v85.openOwnMoments
 	}, v87)
 end
-local function MomentsTabEntrySessionized(t3: {[any]: any}) -- line: 433
+local function MomentsTabEntrySessionized(t3: {[any]: any}) -- line: 432
 	-- upvalues: React (copy), MomentsTabEntry (copy)
 	return React.createElement(MomentsTabEntry, {
 		useRootOwnedNavigation = true,
@@ -426,7 +426,7 @@ end
 
 local v43 = React.Component:extend("MomentsTabEntryScreen")
 
-function v43.render(p8) -- line: 448
+function v43.render(p8) -- line: 447
 	-- upvalues: React (copy), MomentsTabEntrySessionized (copy)
 	return React.createElement(MomentsTabEntrySessionized, p8.props)
 end

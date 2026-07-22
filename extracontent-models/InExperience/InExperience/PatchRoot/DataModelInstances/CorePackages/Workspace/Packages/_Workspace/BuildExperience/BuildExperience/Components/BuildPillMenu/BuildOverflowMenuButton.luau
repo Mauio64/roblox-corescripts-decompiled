@@ -3,6 +3,8 @@ local BuildExperienceParent = BuildExperience.Parent
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
 local ArchiveGameDialog = require(script.Parent.ArchiveGameDialog)
+local FriendsOnlyShareDialog = require(BuildExperience.Components.ShareAudience.FriendsOnlyShareDialog)
+local PrivateShareTooltip = require(BuildExperience.Components.ShareAudience.PrivateShareTooltip)
 local VersionHistoryContainer = require(BuildExperience.Components.VersionHistory.VersionHistoryContainer)
 local leaveExperience = require(BuildExperience.utils.leaveExperience)
 local IconButton = Foundation.IconButton
@@ -18,18 +20,21 @@ require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenu
 local releaseAnyFocus = require(BuildExperience.utils.releaseAnyFocus)
 local sharePublishedExperience = require(BuildExperience.utils.sharePublishedExperience).sharePublishedExperience
 local useArchiveGameFlow = require(BuildExperience.utils.useArchiveGameFlow)
-local v18 = game:DefineFastInt("BuildOverflowMenuWidth", 172)
+local v20 = game:DefineFastInt("BuildOverflowMenuWidth", 172)
 
-local function BuildOverflowMenuButton(t1: {[any]: any}) -- line: 56
-	-- upvalues: useScaledValue (copy), v18 (copy), React (copy), useArchiveGameFlow (copy), releaseAnyFocus (copy), sharePublishedExperience (copy), leaveExperience (copy), ArchiveGameDialog (copy), VersionHistoryContainer (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy)
-	local v21 = useScaledValue(v18)
-	local v22, v23 = React.useState(false)
+local function BuildOverflowMenuButton(t1: {[any]: any}) -- line: 59
+	-- upvalues: useScaledValue (copy), v20 (copy), React (copy), useArchiveGameFlow (copy), releaseAnyFocus (copy), sharePublishedExperience (copy), leaveExperience (copy), ArchiveGameDialog (copy), VersionHistoryContainer (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy), PrivateShareTooltip (copy), FriendsOnlyShareDialog (copy)
+	local v23 = useScaledValue(v20)
 	local v24, v25 = React.useState(false)
-	local v26 = useArchiveGameFlow()
-	local v27 = t1.isDisabled == true or t1.target.universeId == nil
-	local v28 = t1.hasPublishedTurn == true
-	local v29 = React.useMemo(function() -- line: 64
-		-- upvalues: t1 (copy), v28 (copy)
+	local v26, v27 = React.useState(false)
+	local v28, v29 = React.useState(false)
+	local v30, v31 = React.useState(nil)
+	local v32 = React.useRef(nil)
+	local v33 = useArchiveGameFlow()
+	local v34 = t1.isDisabled == true or t1.target.universeId == nil
+	local v35 = t1.hasPublishedTurn == true
+	local v36 = React.useMemo(function() -- line: 70
+		-- upvalues: t1 (copy), v35 (copy)
 		if t1.target.universeId == nil then
 			return nil
 		end
@@ -37,36 +42,41 @@ local function BuildOverflowMenuButton(t1: {[any]: any}) -- line: 56
 		return {
 			universeId = t1.target.universeId,
 			placeId = t1.target.placeId,
+			sessionId = t1.target.sessionId,
 			isNewGameTarget = t1.target.isNewGameTarget,
-			hasPublishedTurn = v28
+			hasPublishedTurn = v35,
+			hasPublishedVersion = t1.hasPublishedVersion == true
 		}
 	end, {
 		t1.target.universeId,
 		t1.target.placeId,
+		t1.target.sessionId,
 		t1.target.isNewGameTarget,
-		v28
+		v35,
+		t1.hasPublishedVersion
 	})
-	local v30 = t1.store.useItems(v29)
-	local v31 = React.useMemo(function() -- line: 84
-		-- upvalues: v27 (copy), v29 (copy), v30 (copy)
-		if v27 or v29 == nil then
+	local v37 = t1.store.useItems(v36)
+	local v38 = React.useMemo(function() -- line: 94
+		-- upvalues: v34 (copy), v36 (copy), v37 (copy), v32 (copy)
+		if v34 or v36 == nil then
 			return {}
 		end
 
 		local t2 = {}
 
-		for _, v41 in v30 do
+		for _, v50 in v37 do
 			local t3 = {
 				items = {}
 			}
 
-			for _, v44 in v41.items do
-				local v45 = if v44.isDisabled == nil then nil else v44.isDisabled(v29)
+			for _, v53 in v50.items do
+				local v54 = if v53.isDisabled == nil then nil else v53.isDisabled(v36)
 				local t4 = {
-					id = v44.id,
-					text = v44.text,
-					icon = v44.icon,
-					isDisabled = v45
+					id = v53.id,
+					text = if v53.getText == nil then v53.text else v53.getText(v36),
+					icon = v53.icon,
+					isDisabled = v54,
+					ref = if v53.id ~= "share" then nil else v32
 				}
 
 				table.insert(t3.items, t4)
@@ -77,17 +87,18 @@ local function BuildOverflowMenuButton(t1: {[any]: any}) -- line: 56
 
 		return t2
 	end, {
-		v27,
-		v30,
-		v29
+		v34,
+		v37,
+		v36
 	})
-	local v32 = React.useCallback(function() -- line: 108
-		-- upvalues: v27 (copy), v23 (copy), t1 (copy)
-		if v27 then
+	local v39 = React.useCallback(function() -- line: 119
+		-- upvalues: v34 (copy), v29 (copy), v25 (copy), t1 (copy)
+		if v34 then
 			return
 		end
 
-		v23(function(p1) -- line: 112
+		v29(false)
+		v25(function(p1) -- line: 124
 			return not p1
 		end)
 
@@ -95,105 +106,140 @@ local function BuildOverflowMenuButton(t1: {[any]: any}) -- line: 56
 			t1.onActivated()
 		end
 	end, {
-		v27,
+		v34,
 		t1.onActivated
 	})
-	local v33 = React.useCallback(function() -- line: 120
-		-- upvalues: v23 (copy)
-		v23(false)
+	local v40 = React.useCallback(function() -- line: 132
+		-- upvalues: v25 (copy), v29 (copy)
+		v25(false)
+		v29(false)
 	end, {})
-	local v34 = React.useCallback(function(p2) -- line: 124
-		-- upvalues: v29 (copy), v30 (copy), v26 (copy), t1 (copy), releaseAnyFocus (copy), v25 (copy), sharePublishedExperience (copy), v23 (copy), leaveExperience (copy)
-		if v29 == nil then
+	local v41 = React.useCallback(function(p2) -- line: 138
+		-- upvalues: v36 (copy), v37 (copy), v33 (copy), t1 (copy), releaseAnyFocus (copy), v27 (copy), v31 (copy), sharePublishedExperience (copy), v29 (copy), v25 (copy), leaveExperience (copy)
+		if v36 == nil then
 			return
 		end
 
-		for _, v49 in v30 do
-			for _, v51 in v49.items do
-				if p2 == v51.id then
-					local v52 = if not v51.onActivated then nil else v51.onActivated(v29)
+		for _, v58 in v37 do
+			for _, v60 in v58.items do
+				if p2 == v60.id then
+					local v61 = if not v60.onActivated then nil else v60.onActivated(v36)
 
-					if v52 ~= nil then
-						if v52.type == "archive" then
-							v26.requestArchive(v29.universeId)
-						elseif v52.type == "openPage" then
+					if v61 ~= nil then
+						if v61.type == "archive" then
+							v33.requestArchive(v36.universeId)
+						elseif v61.type == "openPage" then
 							if t1.onAction then
-								t1.onAction(v52)
+								t1.onAction(v61)
 							end
-						elseif v52.type == "openVersionHistory" then
+						elseif v61.type == "openVersionHistory" then
 							releaseAnyFocus()
-							v25(true)
-						elseif v52.type == "share" then
-							sharePublishedExperience(v52.placeId)
-						elseif v52.type == "leaveExperience" then
-							v23(false)
-							leaveExperience()
+							v27(true)
+						elseif v61.type == "confirmFriendsShare" then
+							v31(v61.placeId)
+						elseif v61.type == "share" then
+							sharePublishedExperience(v61.placeId)
+						else
+							if v61.type == "showPrivateShareTooltip" then
+								v29(function(p3) -- line: 161
+									return not p3
+								end)
 
-							return
+								return
+							end
+
+							if v61.type == "leaveExperience" then
+								v25(false)
+								leaveExperience()
+
+								return
+							end
 						end
 					end
 
-					v23(false)
+					v29(false)
+					v25(false)
 
 					return
 				end
 			end
 		end
 	end, {
-		v30,
-		v29,
+		v37,
+		v36,
 		t1.onAction,
-		v26.requestArchive,
-		t1.target.universeId
+		v33.requestArchive
 	})
-	local v35 = React.useCallback(function() -- line: 157
-		-- upvalues: v25 (copy)
-		v25(false)
+	local v42 = React.useCallback(function() -- line: 186
+		-- upvalues: v27 (copy)
+		v27(false)
 	end, {})
-	local v36 = React.useCallback(function() -- line: 161
-		-- upvalues: v26 (copy), t1 (copy)
-		v26.confirm()
+	local v43 = React.useCallback(function() -- line: 190
+		-- upvalues: v30 (copy), v31 (copy), sharePublishedExperience (copy)
+		local v62 = v30
+
+		v31(nil)
+
+		if v62 ~= nil then
+			sharePublishedExperience(v62)
+		end
+	end, { v30 })
+	local v44 = React.useCallback(function() -- line: 198
+		-- upvalues: v31 (copy)
+		v31(nil)
+	end, {})
+	local v45 = React.useCallback(function() -- line: 202
+		-- upvalues: v33 (copy), t1 (copy)
+		v33.confirm()
 
 		if t1.onClose then
 			t1.onClose()
 		end
 	end, {
-		v26.confirm,
+		v33.confirm,
 		t1.onClose
 	})
-	local v37 = if not v26.isOpen then nil else React.createElement(ArchiveGameDialog, {
+	local v46 = if not v33.isOpen then nil else React.createElement(ArchiveGameDialog, {
 		isOpen = true,
-		onArchive = v36,
-		onCancel = v26.cancel
+		onArchive = v45,
+		onCancel = v33.cancel
 	})
-	local v38 = if not v24 or t1.target.placeId == nil then nil else React.createElement(VersionHistoryContainer, {
+	local v47 = if not v26 or t1.target.placeId == nil then nil else React.createElement(VersionHistoryContainer, {
 		isOpen = true,
 		testId = "build-version-history",
 		placeId = t1.target.placeId,
-		onClose = v35
+		onClose = v42
 	})
 
 	return React.createElement(React.Fragment, nil, {
 		Menu = React.createElement(Menu, {
-			isOpen = v22 and not v27,
-			items = v31,
+			isOpen = v24 and not v34,
+			items = v38,
 			side = PopoverSide.Bottom,
 			align = PopoverAlign.End,
-			onPressedOutside = v33,
-			onActivated = v34,
+			onPressedOutside = v40,
+			onActivated = v41,
 			LayoutOrder = t1.layoutOrder,
-			width = UDim.new(0, v21)
+			width = UDim.new(0, v23)
 		}, React.createElement(IconButton, {
 			isCircular = true,
 			testId = "build-header-overflow-button",
 			icon = t1.icon,
 			variant = ButtonVariant.Utility,
 			size = InputSize.Medium,
-			isDisabled = v27,
-			onActivated = v32
+			isDisabled = v34,
+			onActivated = v39
 		})),
-		ArchiveDialog = v37,
-		VersionHistory = v38
+		ArchiveDialog = v46,
+		PrivateShareTooltip = React.createElement(PrivateShareTooltip, {
+			anchorRef = v32,
+			isOpen = v24 and v28
+		}),
+		FriendsOnlyShareDialog = if v30 == nil then nil else React.createElement(FriendsOnlyShareDialog, {
+			onCancel = v44,
+			onShare = v43
+		}),
+		VersionHistory = v47
 	})
 end
 

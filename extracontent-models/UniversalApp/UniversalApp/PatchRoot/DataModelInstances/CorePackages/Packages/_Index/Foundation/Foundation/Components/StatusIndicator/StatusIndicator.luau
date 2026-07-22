@@ -26,13 +26,13 @@ local t1 = {
 	size = if not Flags.FoundationAvatarBeta then nil else StatusIndicatorSize.Small
 }
 
-local function StatusIndicator(p1, p2) -- line: 60
+local function StatusIndicator(p1, p2) -- line: 65
 	-- upvalues: withDefaults (copy), t1 (copy), StatusIndicatorShape (copy), v13 (copy), ValidNumericVariants (copy), Dash (copy), useTokens (copy), useStatusIndicatorVariants (copy), Flags (copy), React (copy), View (copy), withCommonProps (copy), Text (copy), ReactIs (copy)
 	local v22 = withDefaults(p1, t1)
 	local v23 = if not v22.value then v22.shape else StatusIndicatorShape.Circle
 
 	if v13 and v22.value ~= nil then
-		assert(ValidNumericVariants[v22.variant], `{ v22.variant } is not a supported numeric variant. The following are valid numeric variants: { table.concat(Dash.filter(Dash.keys(ValidNumericVariants), function(p3, _) -- line: 68
+		assert(ValidNumericVariants[v22.variant], `{ v22.variant } is not a supported numeric variant. The following are valid numeric variants: { table.concat(Dash.filter(Dash.keys(ValidNumericVariants), function(p3, _) -- line: 73
 			-- upvalues: ValidNumericVariants (copy)
 			return ValidNumericVariants[p3] == true
 		end), ",") }`)
@@ -41,7 +41,7 @@ local function StatusIndicator(p1, p2) -- line: 60
 	local v24 = useTokens()
 	local v25 = v22.value ~= nil
 	local v26 = useStatusIndicatorVariants(v24, v22.variant, v25, v23, if not Flags.FoundationAvatarBeta then nil else v22.size)
-	local v27 = React.useCallback(function(n1: number) -- line: 86
+	local v27 = React.useCallback(function(n1: number) -- line: 91
 		-- upvalues: v22 (copy)
 		if v22.max and n1 > v22.max then
 			return `{ v22.max }+`

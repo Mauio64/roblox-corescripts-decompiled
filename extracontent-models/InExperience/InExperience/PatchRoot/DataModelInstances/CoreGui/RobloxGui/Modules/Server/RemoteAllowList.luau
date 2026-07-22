@@ -1,9 +1,11 @@
 local CorePackages = game:GetService("CorePackages")
-local FFlagEnableModerateChatRemoteEvent = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableModerateChatRemoteEvent
-local v3 = game:DefineFastFlag("RemoteAllowListAddExpChatFeatureValueChanged", false)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableModerateChatRemoteEvent = SharedFlags.FFlagEnableModerateChatRemoteEvent
+local FFlagPlatformLeaderboardRccEnabled = SharedFlags.FFlagPlatformLeaderboardRccEnabled
+local v5 = game:DefineFastFlag("RemoteAllowListAddExpChatFeatureValueChanged", false)
 
-return function() -- line: 6
-	-- upvalues: FFlagEnableModerateChatRemoteEvent (copy), v3 (copy)
+return function() -- line: 8
+	-- upvalues: FFlagEnableModerateChatRemoteEvent (copy), v5 (copy), FFlagPlatformLeaderboardRccEnabled (copy)
 	assert(game:FindService("NetworkServer") ~= nil)
 
 	local NetworkServer = game:GetService("NetworkServer")
@@ -32,7 +34,7 @@ return function() -- line: 6
 		table.insert(t1, "ModerateChatSettingUpdated")
 	end
 
-	if v3 then
+	if v5 then
 		table.insert(t1, "ExpChatFeatureValueChanged")
 	end
 
@@ -47,5 +49,12 @@ return function() -- line: 6
 	table.insert(t1, "BuildExperiencePlaytestTeleport")
 	table.insert(t1, "SetUserActive")
 	table.insert(t1, "AvatarGesturesVRPlayer")
+
+	if FFlagPlatformLeaderboardRccEnabled then
+		table.insert(t1, "PlatformLeaderboardPush")
+		table.insert(t1, "PlatformLeaderboardTabOpened")
+		table.insert(t1, "PlatformLeaderboardTabClosed")
+	end
+
 	NetworkServer:InitializeRemoteAllowList(t1)
 end

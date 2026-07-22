@@ -5,49 +5,58 @@ local turnState = require(script.Parent.turnState)
 
 require(script.Parent.types)
 
-local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1: {[any]: any}?) -- line: 33
+local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1: {[any]: any}?) -- line: 34
 	-- upvalues: createSignal (copy), turnState (copy), AcpProtocol (copy)
 	local v11, v12 = createSignal(p3 or turnState.createEmptyTurnState(s1, p1))
 	local t2 = {}
 	local n1 = 1
-	local u15 = nil
-
-	local function noteProcessedSequenceNumber(n2: number) -- line: 46
-		-- upvalues: u15 (ref)
-		if u15 == nil or n2 > u15 then
-			u15 = n2
-		end
-	end
+	local t3 = {}
+	local u16 = nil
+	local u17 = nil
+	local n2 = 0
 
 	if t1 ~= nil then
-		for _, v18 in t1 do
-			if typeof(v18) == "number" and (u15 == nil or v18 > u15) then
-				u15 = v18
+		for _, v20 in t1 do
+			if typeof(v20) == "number" and t3[v20] ~= true then
+				t3[v20] = true
+
+				if u16 == nil then
+					u16 = v20
+					u17 = v20
+				elseif v20 > u16 then
+					n2 += v20 - u16 - 1
+					u16 = v20
+				elseif v20 < u17 then
+					n2 += u17 - v20 - 1
+					u17 = v20
+				else
+					n2 -= 1
+				end
 			end
 		end
 	end
 
-	local function mutate(p4: ((...any) -> ...any)) -- line: 71
+	local function mutate(p4: ((...any) -> ...any)) -- line: 94
 		-- upvalues: v12 (copy)
-		v12(function(p5) -- line: 72
+		v12(function(p5) -- line: 95
 			-- upvalues: p4 (copy)
 			if p5.isDone then
 				return p5
 			end
 
-			local v60 = table.clone(p5)
+			local v63 = table.clone(p5)
 
-			p4(v60)
+			p4(v63)
 
-			return v60
+			return v63
 		end)
 	end
-	local function fireHandlers(p6) -- line: 82
+	local function fireHandlers(p6) -- line: 105
 		-- upvalues: t2 (copy)
-		for _, v30 in t2 do
-			local ok, result = pcall(function() -- line: 85
-				-- upvalues: v30 (copy), p6 (copy)
-				v30(p6)
+		for _, v32 in t2 do
+			local ok, result = pcall(function() -- line: 108
+				-- upvalues: v32 (copy), p6 (copy)
+				v32(p6)
 			end)
 
 			if not ok then
@@ -55,12 +64,12 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 			end
 		end
 	end
-	local function completeFromResponse(p7) -- line: 94
+	local function completeFromResponse(p7) -- line: 117
 		-- upvalues: v12 (copy)
 		if p7.error then
 			local error = p7.error
 
-			local function v35(p8) -- line: 97
+			local function v37(p8) -- line: 120
 				-- upvalues: error (copy)
 				p8.error = tostring(error.message or "JSON-RPC error")
 				p8.errorCode = tonumber(error.code)
@@ -68,149 +77,203 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				p8.isDone = true
 			end
 
-			v12(function(p9) -- line: 72
-				-- upvalues: v35 (copy)
+			v12(function(p9) -- line: 95
+				-- upvalues: v37 (copy)
 				if p9.isDone then
 					return p9
 				end
 
-				local v63 = table.clone(p9)
+				local v66 = table.clone(p9)
 
-				v35(v63)
+				v37(v66)
 
-				return v63
+				return v66
 			end)
 		end
 	end
-	local function getEventSequenceId(p10, p11) -- line: 106
+	local function getEventSequenceId(p10, p11) -- line: 129
 		local sequenceId = p10.sequenceId
 
 		if typeof(sequenceId) == "number" then
 			return sequenceId
 		end
 
-		local v39 = if p11 == nil then nil else p11.sequenceNumber
+		local v41 = if p11 == nil then nil else p11.sequenceNumber
 
-		if typeof(v39) == "number" then
-			return v39
+		if typeof(v41) == "number" then
+			return v41
 		end
 
 		return nil
 	end
-	local function applyTerminalUpdate(p12) -- line: 120
+	local function applyTerminalUpdate(p12) -- line: 143
 		-- upvalues: v11 (copy), v12 (copy)
-		local v41 = p12.sessionUpdate == "state_change" and p12.state == "idle"
+		local v43 = p12.sessionUpdate == "state_change" and p12.state == "idle"
 
-		if not v41 and v11(false).status ~= "queued" then
+		if not v43 and v11(false).status ~= "queued" then
 			return
 		end
 
-		local function v42(p13) -- line: 125
-			-- upvalues: v41 (copy), p12 (copy)
+		local function v44(p13) -- line: 148
+			-- upvalues: v43 (copy), p12 (copy)
 			if p13.status == "queued" then
 				p13.status = "streaming"
 			end
 
-			if v41 then
-				local v65 = typeof(p12.stop_reason) ~= "string" and "end_turn" or p12.stop_reason
+			if v43 then
+				local v68 = typeof(p12.stop_reason) ~= "string" and "end_turn" or p12.stop_reason
 
-				p13.stopReason = v65
-				p13.status = v65 ~= "cancelled" and "succeeded" or "cancelled"
+				p13.stopReason = v68
+				p13.status = v68 ~= "cancelled" and "succeeded" or "cancelled"
 				p13.isDone = true
 			end
 		end
 
-		v12(function(p14) -- line: 72
-			-- upvalues: v42 (copy)
+		v12(function(p14) -- line: 95
+			-- upvalues: v44 (copy)
 			if p14.isDone then
 				return p14
 			end
 
-			local v67 = table.clone(p14)
+			local v70 = table.clone(p14)
 
-			v42(v67)
+			v44(v70)
 
-			return v67
+			return v70
 		end)
 	end
 
 	return {
 		state = v11,
-		onNotification = function(p15) -- line: 61
+		onNotification = function(p15) -- line: 84
 			-- upvalues: n1 (ref), t2 (copy)
-			local v26 = n1
+			local v28 = n1
 
 			n1 += 1
-			t2[v26] = p15
+			t2[v28] = p15
 
-			return function() -- line: 65
-				-- upvalues: t2 (copy), v26 (copy)
-				t2[v26] = nil
+			return function() -- line: 88
+				-- upvalues: t2 (copy), v28 (copy)
+				t2[v28] = nil
 			end
 		end,
-		getLatestProcessedSequenceNumber = function() -- line: 193
-			-- upvalues: u15 (ref)
-			return u15
+		getLatestProcessedSequenceNumber = function() -- line: 214
+			-- upvalues: u16 (ref)
+			return u16
+		end,
+		hasSequenceGap = function() -- line: 71
+			-- upvalues: n2 (ref)
+			return n2 > 0
+		end,
+		noteProcessedSequenceNumber = function(n3: number) -- line: 218
+			-- upvalues: t3 (copy), u16 (ref), u17 (ref), n2 (ref)
+			if t3[n3] == true then
+				return
+			end
+
+			t3[n3] = true
+
+			if u16 == nil then
+				u16 = n3
+				u17 = n3
+
+				return
+			end
+
+			if n3 > u16 then
+				n2 += n3 - u16 - 1
+				u16 = n3
+
+				return
+			end
+
+			if n3 < u17 then
+				n2 += u17 - n3 - 1
+				u17 = n3
+
+				return
+			end
+
+			n2 -= 1
 		end,
 		cancel = p2
 	}, {
-		dispatchFrame = function(p16, p17, b1: boolean?) -- line: 138
-			-- upvalues: v11 (copy), AcpProtocol (copy), u15 (ref), v12 (copy), fireHandlers (copy)
+		dispatchFrame = function(p16, p17, b1: boolean?) -- line: 161
+			-- upvalues: v11 (copy), AcpProtocol (copy), t3 (copy), u16 (ref), u17 (ref), n2 (ref), v12 (copy), fireHandlers (copy)
 			if v11(false).isDone then
 				return false
 			end
 
-			local v46 = false
+			local v48 = false
 
 			if p16.kind == "notification" then
 				if p16.notification.method == AcpProtocol.Notifications.SessionUpdate then
-					local v47 = p16.notification.params and p16.notification.params.update
+					local v49 = p16.notification.params and p16.notification.params.update
 
-					if v47 ~= nil then
-						local sequenceId = v47.sequenceId
+					if v49 ~= nil then
+						local sequenceId = v49.sequenceId
 
 						if typeof(sequenceId) == "number" then
 						else
-							local v49 = if p17 == nil then nil else p17.sequenceNumber
+							local v51 = if p17 == nil then nil else p17.sequenceNumber
 
-							sequenceId = if typeof(v49) ~= "number" then nil else v49
+							sequenceId = if typeof(v51) ~= "number" then nil else v51
 						end
 
-						v46 = sequenceId == nil or (u15 == nil or sequenceId > u15)
+						v48 = true
 
-						if sequenceId ~= nil and (u15 == nil or sequenceId > u15) then
-							u15 = sequenceId
+						if sequenceId ~= nil then
+							if t3[sequenceId] == true then
+								v48 = false
+							else
+								t3[sequenceId] = true
+
+								if u16 == nil then
+									u16 = sequenceId
+									u17 = sequenceId
+								elseif sequenceId > u16 then
+									n2 += sequenceId - u16 - 1
+									u16 = sequenceId
+								elseif sequenceId < u17 then
+									n2 += u17 - sequenceId - 1
+									u17 = sequenceId
+								else
+									n2 -= 1
+								end
+
+								v48 = true
+							end
 						end
 
-						local v50 = v47.sessionUpdate == "state_change" and v47.state == "idle"
+						local v52 = v49.sessionUpdate == "state_change" and v49.state == "idle"
 
-						if v50 or v11(false).status == "queued" then
-							local function v51(p18) -- line: 125
-								-- upvalues: v50 (copy), v47 (copy)
+						if v52 or v11(false).status == "queued" then
+							local function v53(p18) -- line: 148
+								-- upvalues: v52 (copy), v49 (copy)
 								if p18.status == "queued" then
 									p18.status = "streaming"
 								end
 
-								if v50 then
-									local v69 = typeof(v47.stop_reason) ~= "string" and "end_turn" or v47.stop_reason
+								if v52 then
+									local v72 = typeof(v49.stop_reason) ~= "string" and "end_turn" or v49.stop_reason
 
-									p18.stopReason = v69
-									p18.status = v69 ~= "cancelled" and "succeeded" or "cancelled"
+									p18.stopReason = v72
+									p18.status = v72 ~= "cancelled" and "succeeded" or "cancelled"
 									p18.isDone = true
 								end
 							end
 
-							v12(function(p19) -- line: 72
-								-- upvalues: v51 (copy)
+							v12(function(p19) -- line: 95
+								-- upvalues: v53 (copy)
 								if p19.isDone then
 									return p19
 								end
 
-								local v71 = table.clone(p19)
+								local v74 = table.clone(p19)
 
-								v51(v71)
+								v53(v74)
 
-								return v71
+								return v74
 							end)
 						end
 					end
@@ -219,7 +282,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				if b1 ~= false then
 					fireHandlers(p16.notification)
 
-					return v46
+					return v48
 				end
 			elseif p16.kind == "response" then
 				local response = p16.response
@@ -227,7 +290,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				if response.error then
 					local error = response.error
 
-					local function v54(p20) -- line: 97
+					local function v56(p20) -- line: 120
 						-- upvalues: error (copy)
 						p20.error = tostring(error.message or "JSON-RPC error")
 						p20.errorCode = tonumber(error.code)
@@ -235,70 +298,93 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 						p20.isDone = true
 					end
 
-					v12(function(p21) -- line: 72
-						-- upvalues: v54 (copy)
+					v12(function(p21) -- line: 95
+						-- upvalues: v56 (copy)
 						if p21.isDone then
 							return p21
 						end
 
-						local v74 = table.clone(p21)
+						local v77 = table.clone(p21)
 
-						v54(v74)
+						v56(v77)
 
-						return v74
+						return v77
 					end)
 				end
 
-				v46 = p16.response.error ~= nil
+				v48 = p16.response.error ~= nil
 			end
 
-			return v46
+			return v48
 		end,
-		fail = function(s2: string, n3: number?) -- line: 173
+		noteProcessedSequenceNumber = function(n4: number) -- line: 50
+			-- upvalues: t3 (copy), u16 (ref), u17 (ref), n2 (ref)
+			if t3[n4] == true then
+				return false
+			end
+
+			t3[n4] = true
+
+			if u16 == nil then
+				u16 = n4
+				u17 = n4
+			elseif n4 > u16 then
+				n2 += n4 - u16 - 1
+				u16 = n4
+			elseif n4 < u17 then
+				n2 += u17 - n4 - 1
+				u17 = n4
+			else
+				n2 -= 1
+			end
+
+			return true
+		end,
+		fail = function(s2: string, n5: number?) -- line: 194
 			-- upvalues: v12 (copy)
-			local function v57(p22) -- line: 174
-				-- upvalues: s2 (copy), n3 (copy)
+			local function v59(p22) -- line: 195
+				-- upvalues: s2 (copy), n5 (copy)
 				p22.error = s2
-				p22.errorCode = n3
+				p22.errorCode = n5
 				p22.status = "failed"
 				p22.isDone = true
 			end
 
-			v12(function(p23) -- line: 72
-				-- upvalues: v57 (copy)
+			v12(function(p23) -- line: 95
+				-- upvalues: v59 (copy)
 				if p23.isDone then
 					return p23
 				end
 
-				local v77 = table.clone(p23)
+				local v80 = table.clone(p23)
 
-				v57(v77)
+				v59(v80)
 
-				return v77
+				return v80
 			end)
 		end,
-		markCancelled = function() -- line: 182
+		markCancelled = function() -- line: 203
 			-- upvalues: v12 (copy)
-			local function v58(p24) -- line: 183
+			local function v60(p24) -- line: 204
 				p24.status = "cancelled"
 				p24.stopReason = "cancelled"
 				p24.isDone = true
 			end
 
-			v12(function(p25) -- line: 72
-				-- upvalues: v58 (copy)
+			v12(function(p25) -- line: 95
+				-- upvalues: v60 (copy)
 				if p25.isDone then
 					return p25
 				end
 
-				local v80 = table.clone(p25)
+				local v83 = table.clone(p25)
 
-				v58(v80)
+				v60(v83)
 
-				return v80
+				return v83
 			end)
 		end,
-		isDone = function() -- line: 203
+		isDone = function() -- line: 229
 			-- upvalues: v11 (copy)
 			return v11(false).isDone
 		end,

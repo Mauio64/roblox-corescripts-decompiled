@@ -8,7 +8,6 @@ local FFlagProfilePlatformUseCatalogItemOpenedNewFields = require(ProfilePlatfor
 local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
 local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
 local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
-local FFlagProfilePlatformEnableEditAppearanceAnalytics = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceAnalytics)
 
 return {
 	defaults = {
@@ -26,22 +25,22 @@ return {
 			{
 				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 				dynamicCustomFields = {
-					status = function(p1) -- line: 35
+					status = function(p1) -- line: 33
 						return p1
 					end
 				}
 			},
 			{
 				type = SupportedTelemetryBackends.RobloxTelemetryStat,
-				overrideName = function(p2) -- line: 42
+				overrideName = function(p2) -- line: 40
 					-- upvalues: EventNames (copy)
 					return EventNames.ProfileLoadingStage .. "Time" .. p2.status
 				end,
 				dynamicCustomFields = {
-					status = function(p3) -- line: 46
+					status = function(p3) -- line: 44
 						return p3
 					end,
-					isProfilePlatform = function(p4) -- line: 49
+					isProfilePlatform = function(p4) -- line: 47
 						return p4 or false
 					end
 				}
@@ -58,7 +57,7 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 			dynamicCustomFields = {
-				reloadCount = function(p5) -- line: 63
+				reloadCount = function(p5) -- line: 61
 					if p5 <= 10 then
 						return `ReloadCount${ p5 }`
 					end
@@ -78,10 +77,10 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryStat,
 			dynamicCustomFields = {
-				status = function(p6) -- line: 83
+				status = function(p6) -- line: 81
 					return p6
 				end,
-				isInExperience = function(p7) -- line: 86
+				isInExperience = function(p7) -- line: 84
 					return p7
 				end
 			}
@@ -97,7 +96,7 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 			dynamicCustomFields = {
-				friendStatus = function(p8) -- line: 100
+				friendStatus = function(p8) -- line: 98
 					return p8
 				end
 			}
@@ -113,7 +112,7 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 			dynamicCustomFields = {
-				presenceType = function(p9) -- line: 114
+				presenceType = function(p9) -- line: 112
 					return p9
 				end
 			}
@@ -250,7 +249,7 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 			dynamicCustomFields = {
-				modalVariantOverride = function(p10) -- line: 227
+				modalVariantOverride = function(p10) -- line: 225
 					return p10
 				end
 			}
@@ -552,11 +551,11 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryStat,
 			dynamicCustomFields = if not FFlagProfilePlatformEnableStore then nil else if not FFlagProfilePlatformUseCatalogItemOpenedNewFields then {
-				source = function(p11) -- line: 482
+				source = function(p11) -- line: 480
 					return p11
 				end
 			} else {
-				btnContext = function(p12) -- line: 477
+				btnContext = function(p12) -- line: 475
 					return p12
 				end
 			}
@@ -572,7 +571,7 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 			dynamicCustomFields = {
-				component = function(p13) -- line: 497
+				component = function(p13) -- line: 495
 					return p13
 				end
 			}
@@ -622,7 +621,7 @@ return {
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter
 		}}
 	},
-	[EventNames.CTAButtonEditAppearance] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.CTAButtonEditAppearance] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		description = "Edit appearance menu opened",
 		lastUpdated = {
 			26,
@@ -633,7 +632,7 @@ return {
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter
 		}}
 	},
-	[EventNames.EditAppearanceMenuEditAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.EditAppearanceMenuEditAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		description = "Edit avatar clicked from edit appearance menu",
 		lastUpdated = {
 			26,
@@ -644,7 +643,7 @@ return {
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter
 		}}
 	},
-	[EventNames.EditAppearanceMenuEditEmote] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.EditAppearanceMenuEditEmote] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		description = "Edit emote clicked from edit appearance menu",
 		lastUpdated = {
 			26,
@@ -655,7 +654,7 @@ return {
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter
 		}}
 	},
-	[EventNames.EditAppearanceMenuSwitchAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+	[EventNames.EditAppearanceMenuSwitchAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else {
 		description = "Switch avatar clicked from edit appearance menu",
 		lastUpdated = {
 			26,
@@ -666,7 +665,7 @@ return {
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter
 		}}
 	},
-	[EventNames.EditAppearanceMenuEditBackground] = if not FFlagProfilePlatformEnableEditAppearanceMenu or (not FFlagProfilePlatformEnableEditAppearanceAnalytics or not FFlagProfilePlatformEditBackgroundMenuItem) then nil else {
+	[EventNames.EditAppearanceMenuEditBackground] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEditBackgroundMenuItem then nil else {
 		description = "Edit background clicked from edit appearance menu",
 		lastUpdated = {
 			26,

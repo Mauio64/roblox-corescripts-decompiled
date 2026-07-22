@@ -2,6 +2,7 @@ local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local React = require(CorePackages.Packages.React)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local Sounds = require(CorePackages.Workspace.Packages.SoundManager).Sounds
 local SoundGroups = require(CorePackages.Workspace.Packages.SoundManager).SoundGroups
 local SoundManager = require(CorePackages.Workspace.Packages.SoundManager).SoundManager
@@ -14,6 +15,14 @@ local getStandardSizeAvatarHeadShotRbxthumb = dependencies.getStandardSizeAvatar
 local GetPresencesFromUserIds = dependencies.NetworkingPresence.GetPresencesFromUserIds
 local useLocalization = dependencies.Hooks.useLocalization
 local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
+local v18 = game:DefineFastFlag("ContactListPresenceStoreMigration", false) and SharedFlags.FFlagFriendSortedByPresenceSignalsImplementation
+local v19 = if not v18 then nil else require(CorePackages.Workspace.Packages.FriendsCommon).Hooks.useGetPresenceByUserId
+local t1 = {
+	Online = PresenceType.Online,
+	InGame = PresenceType.InGame,
+	InStudio = PresenceType.InStudio,
+	Offline = PresenceType.Offline
+}
 local UIBlox = dependencies.UIBlox
 local ControlState = UIBlox.Core.Control.Enum.ControlState
 local PlayerContext = UIBlox.App.Indicator.PlayerContext
@@ -29,58 +38,68 @@ local Pages = require(ContactList.Enums.Pages)
 local random = Random.new()
 local vector2 = Vector2.new(24, 12)
 
-local function FriendListItem(t1: {[any]: any}) -- line: 61
-	-- upvalues: useAnalytics (copy), useStyle (copy), useDispatch (copy), useLocalization (copy), React (copy), GetPresencesFromUserIds (copy), useSelector (copy), ControlState (copy), SoundManager (copy), Sounds (copy), random (copy), SoundGroups (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), useStartCallCallback (copy), Images (copy), PresenceType (copy), PlayerContext (copy), EventNamesEnum (copy), Pages (copy), OpenOrUpdateCFM (copy), Interactable (copy), vector2 (copy), UserProfiles (copy), ImageSetLabel (copy)
-	local v33 = useAnalytics()
-	local v34 = useStyle()
-	local Theme = v34.Theme
-	local Font = v34.Font
-	local v37 = useDispatch()
-	local t2 = {
-		userId = t1.userId,
-		userName = t1.userName,
-		combinedName = t1.combinedName
+local function FriendListItem(t2: {[any]: any}) -- line: 75
+	-- upvalues: useAnalytics (copy), useStyle (copy), useDispatch (copy), useLocalization (copy), React (copy), v18 (copy), GetPresencesFromUserIds (copy), v19 (copy), useSelector (copy), ControlState (copy), SoundManager (copy), Sounds (copy), random (copy), SoundGroups (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), useStartCallCallback (copy), Images (copy), t1 (copy), PresenceType (copy), PlayerContext (copy), EventNamesEnum (copy), Pages (copy), OpenOrUpdateCFM (copy), Interactable (copy), vector2 (copy), UserProfiles (copy), ImageSetLabel (copy)
+	local v37 = useAnalytics()
+	local v38 = useStyle()
+	local Theme = v38.Theme
+	local Font = v38.Font
+	local v41 = useDispatch()
+	local t3 = {
+		userId = t2.userId,
+		userName = t2.userName,
+		combinedName = t2.combinedName
 	}
-	local v39 = useLocalization({
+	local v43 = useLocalization({
 		offlineStatusLabel = "InGame.Presence.Label.Offline",
 		onlineStatusLabel = "InGame.Presence.Label.Online",
 		studioStatusLabel = "InGame.Presence.Label.RobloxStudio"
 	})
 
-	React.useEffect(function() -- line: 81
-		-- upvalues: t1 (copy), v37 (copy), GetPresencesFromUserIds (copy)
-		if t1.userPresenceType == nil then
-			v37(GetPresencesFromUserIds.API({ t1.userId }))
+	React.useEffect(function() -- line: 95
+		-- upvalues: v18 (copy), t2 (copy), v41 (copy), GetPresencesFromUserIds (copy)
+		if not v18 and t2.userPresenceType == nil then
+			v41(GetPresencesFromUserIds.API({ t2.userId }))
 		end
 	end, {
-		t1.userId,
-		t1.userPresenceType
+		t2.userId,
+		t2.userPresenceType
 	})
 
-	local v40 = React.useCallback(function(p1) -- line: 87
-		-- upvalues: t1 (copy)
-		return p1.Presence.byUserId[tostring(t1.userId)]
-	end, { t1.userId })
-	local v41 = useSelector(v40)
-	local v42 = React.useCallback(function(p2) -- line: 92
+	local u44
+
+	if v18 then
+		u44 = v19(t2.userId, {
+			skipFetch = not not t2.userPresenceType or nil
+		})
+	else
+		local v45 = React.useCallback(function(p1) -- line: 108
+			-- upvalues: t2 (copy)
+			return p1.Presence.byUserId[tostring(t2.userId)]
+		end, { t2.userId })
+
+		u44 = useSelector(v45)
+	end
+
+	local v46 = React.useCallback(function(p2) -- line: 114
 		return p2.Navigation.currentTag
 	end, {})
-	local v43 = useSelector(v42)
-	local v44 = React.useCallback(function(p3) -- line: 97
+	local v47 = useSelector(v46)
+	local v48 = React.useCallback(function(p3) -- line: 119
 		return p3.Navigation.currentPage
 	end, {})
-	local v45 = useSelector(v44)
-	local v46, v47 = React.useState("BackgroundDefault")
-	local v48 = React.useCallback(function(_, p5) -- line: 103
-		-- upvalues: ControlState (copy), v47 (copy), SoundManager (copy), Sounds (copy), random (copy), SoundGroups (copy)
+	local v49 = useSelector(v48)
+	local v50, v51 = React.useState("BackgroundDefault")
+	local v52 = React.useCallback(function(_, p5) -- line: 125
+		-- upvalues: ControlState (copy), v51 (copy), SoundManager (copy), Sounds (copy), random (copy), SoundGroups (copy)
 		if p5 == ControlState.Pressed then
-			v47("BackgroundOnPress")
+			v51("BackgroundOnPress")
 
 			return
 		end
 
 		if p5 == ControlState.Hover then
-			v47("BackgroundOnHover")
+			v51("BackgroundOnHover")
 			SoundManager:PlaySound(Sounds.Hover.Name, {
 				Volume = 0.5 + random:NextNumber(-0.25, 0.25),
 				PlaybackSpeed = 1 + random:NextNumber(-0.5, 0.5)
@@ -89,104 +108,104 @@ local function FriendListItem(t1: {[any]: any}) -- line: 61
 			return
 		end
 
-		v47("BackgroundDefault")
+		v51("BackgroundDefault")
 	end, {})
-	local v49 = getStandardSizeAvatarHeadShotRbxthumb((tostring(t1.userId)))
-	local t3 = {
-		searchQueryString = t1.searchQueryString,
-		itemListIndex = t1.itemListIndex,
-		isSuggestedUser = t1.isSuggestedUser,
-		page = v45
+	local v53 = getStandardSizeAvatarHeadShotRbxthumb((tostring(t2.userId)))
+	local t4 = {
+		searchQueryString = t2.searchQueryString,
+		itemListIndex = t2.itemListIndex,
+		isSuggestedUser = t2.isSuggestedUser,
+		page = v49
 	}
-	local v51 = useStartCallCallback(v43, t1.userId, t1.combinedName, t1.dismissCallback, t3)
-	local v52 = React.useMemo(function() -- line: 127
-		-- upvalues: Images (copy), v34 (copy), v39 (copy), v41 (copy), t1 (copy), PresenceType (copy), Theme (copy), React (copy), PlayerContext (copy), v51 (copy)
-		local v59 = Images["component_assets/circle_26_stroke_3"]
-		local OfflineStatusColor = v34.Theme.OfflineStatus.Color
-		local OfflineStatusTransparency = v34.Theme.OfflineStatus.Transparency
+	local v55 = useStartCallCallback(v47, t2.userId, t2.combinedName, t2.dismissCallback, t4)
+	local v56 = React.useMemo(function() -- line: 149
+		-- upvalues: Images (copy), v38 (copy), v43 (copy), u44 (ref), v18 (copy), t1 (copy), PresenceType (copy), t2 (copy), Theme (copy), React (copy), PlayerContext (copy), v55 (copy)
+		local v63 = Images["component_assets/circle_26_stroke_3"]
+		local OfflineStatusColor = v38.Theme.OfflineStatus.Color
+		local OfflineStatusTransparency = v38.Theme.OfflineStatus.Transparency
 		local n1 = 12
-		local offlineStatusLabel = v39.offlineStatusLabel
-		local TextMuted = v34.Theme.TextMuted
-		local userPresenceType, lastLocation
+		local offlineStatusLabel = v43.offlineStatusLabel
+		local TextMuted = v38.Theme.TextMuted
+		local v69, lastLocation
 
-		if v41 then
-			userPresenceType = v41.userPresenceType
-			lastLocation = v41.lastLocation
+		if u44 then
+			v69 = if not v18 then u44.userPresenceType else t1[u44.userPresenceType] or PresenceType.Offline
+			lastLocation = u44.lastLocation
 		else
-			userPresenceType = if not t1.userPresenceType then PresenceType.Offline else PresenceType[t1.userPresenceType]
-			lastLocation = t1.lastLocation or ""
+			v69 = if not t2.userPresenceType then PresenceType.Offline else PresenceType[t2.userPresenceType]
+			lastLocation = t2.lastLocation or ""
 		end
 
-		if userPresenceType == PresenceType.Online then
-			v59 = Images["component_assets/circle_16"]
-			OfflineStatusColor = v34.Theme.OnlineStatus.Color
-			OfflineStatusTransparency = v34.Theme.OnlineStatus.Transparency
-			offlineStatusLabel = v39.onlineStatusLabel
-			TextMuted = v34.Theme.TextMuted
+		if v69 == PresenceType.Online then
+			v63 = Images["component_assets/circle_16"]
+			OfflineStatusColor = v38.Theme.OnlineStatus.Color
+			OfflineStatusTransparency = v38.Theme.OnlineStatus.Transparency
+			offlineStatusLabel = v43.onlineStatusLabel
+			TextMuted = v38.Theme.TextMuted
 			n1 = 12
-		elseif userPresenceType == PresenceType.InGame then
-			v59 = Images["icons/menu/games_small"]
-			OfflineStatusColor = v34.Theme.IconEmphasis.Color
-			OfflineStatusTransparency = v34.Theme.IconEmphasis.Transparency
+		elseif v69 == PresenceType.InGame then
+			v63 = Images["icons/menu/games_small"]
+			OfflineStatusColor = v38.Theme.IconEmphasis.Color
+			OfflineStatusTransparency = v38.Theme.IconEmphasis.Transparency
 			offlineStatusLabel = lastLocation
 			TextMuted = Theme.TextEmphasis
 			n1 = 16
-		elseif userPresenceType == PresenceType.InStudio then
-			v59 = Images["icons/logo/studiologo_small"]
-			OfflineStatusColor = v34.Theme.TextDefault.Color
-			OfflineStatusTransparency = v34.Theme.TextDefault.Transparency
-			offlineStatusLabel = v39.studioStatusLabel
-			TextMuted = v34.Theme.TextMuted
+		elseif v69 == PresenceType.InStudio then
+			v63 = Images["icons/logo/studiologo_small"]
+			OfflineStatusColor = v38.Theme.TextDefault.Color
+			OfflineStatusTransparency = v38.Theme.TextDefault.Transparency
+			offlineStatusLabel = v43.studioStatusLabel
+			TextMuted = v38.Theme.TextMuted
 			n1 = 16
 		end
 
 		return React.createElement(PlayerContext, {
 			layoutOrder = 2,
 			textHeight = 24,
-			fontStyle = v34.Font.CaptionBody,
-			icon = v59,
+			fontStyle = v38.Font.CaptionBody,
+			icon = v63,
 			iconColor = OfflineStatusColor,
 			iconSize = UDim2.fromOffset(n1, n1),
 			iconTransparency = OfflineStatusTransparency,
-			onActivated = v51,
+			onActivated = v55,
 			text = offlineStatusLabel,
 			textColorStyle = TextMuted
 		})
 	end, {
-		v41,
-		v34,
-		v39.offlineStatusLabel,
-		v39.onlineStatusLabel,
-		v39.studioStatusLabel
+		u44,
+		v38,
+		v43.offlineStatusLabel,
+		v43.onlineStatusLabel,
+		v43.studioStatusLabel
 	})
-	local v53 = React.useCallback(function() -- line: 184
-		-- upvalues: v33 (copy), EventNamesEnum (copy), t2 (copy), t1 (copy), Pages (copy), v37 (copy), OpenOrUpdateCFM (copy)
-		v33.fireEvent(EventNamesEnum.PhoneBookPlayerMenuOpened, {
+	local v57 = React.useCallback(function() -- line: 210
+		-- upvalues: v37 (copy), EventNamesEnum (copy), t3 (copy), t2 (copy), Pages (copy), v41 (copy), OpenOrUpdateCFM (copy)
+		v37.fireEvent(EventNamesEnum.PhoneBookPlayerMenuOpened, {
 			eventTimestampMs = os.time() * 1000,
-			friendUserId = t2.userId,
-			searchQueryString = t1.searchQueryString,
-			itemListIndex = t1.itemListIndex,
-			isSuggestedUser = t1.isSuggestedUser,
+			friendUserId = t3.userId,
+			searchQueryString = t2.searchQueryString,
+			itemListIndex = t2.itemListIndex,
+			isSuggestedUser = t2.isSuggestedUser,
 			page = Pages.FriendList
 		})
-		v37(OpenOrUpdateCFM(t2))
+		v41(OpenOrUpdateCFM(t3))
 	end, {
-		t2.userId,
-		t1.searchQueryString,
-		t1.itemListIndex,
-		t1.isSuggestedUser
+		t3.userId,
+		t2.searchQueryString,
+		t2.itemListIndex,
+		t2.isSuggestedUser
 	})
 
 	return React.createElement(Interactable, {
 		Position = UDim2.fromOffset(0, 0),
 		Size = UDim2.new(1, 0, 0, 68 + vector2.Y * 2),
-		BackgroundColor3 = Theme[v46].Color,
-		BackgroundTransparency = Theme[v46].Transparency,
+		BackgroundColor3 = Theme[v50].Color,
+		BackgroundTransparency = Theme[v50].Transparency,
 		BorderSizePixel = 0,
-		LayoutOrder = t1.layoutOrder,
-		onStateChanged = v48,
+		LayoutOrder = t2.layoutOrder,
+		onStateChanged = v52,
 		AutoButtonColor = false,
-		[React.Event.Activated] = v51
+		[React.Event.Activated] = v55
 	}, {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, vector2.X),
@@ -194,9 +213,9 @@ local function FriendListItem(t1: {[any]: any}) -- line: 61
 		}),
 		ProfileImage = React.createElement("ImageButton", {
 			Size = UDim2.fromOffset(68, 68),
-			Image = v49,
-			[React.Event.MouseButton2Up] = v53,
-			[React.Event.TouchTap] = v53,
+			Image = v53,
+			[React.Event.MouseButton2Up] = v57,
+			[React.Event.TouchTap] = v57,
 			AutoButtonColor = false
 		}, {
 			UICorner = React.createElement("UICorner", {
@@ -234,7 +253,7 @@ local function FriendListItem(t1: {[any]: any}) -- line: 61
 					LayoutOrder = 1,
 					Size = UDim2.new(1, 0, 0, 20),
 					Font = Font.Header2.Font,
-					Text = t1.combinedName,
+					Text = t2.combinedName,
 					TextColor3 = Theme.TextEmphasis.Color,
 					TextSize = Font.BaseSize * Font.Header2.RelativeSize,
 					TextTransparency = Theme.TextEmphasis.Transparency,
@@ -247,7 +266,7 @@ local function FriendListItem(t1: {[any]: any}) -- line: 61
 					LayoutOrder = 2,
 					Size = UDim2.new(1, 0, 0, 14),
 					Font = Font.CaptionBody.Font,
-					Text = UserProfiles.Formatters.formatUsername(t1.userName),
+					Text = UserProfiles.Formatters.formatUsername(t2.userName),
 					TextColor3 = Theme.TextDefault.Color,
 					TextSize = Font.BaseSize * Font.CaptionBody.RelativeSize,
 					TextTransparency = Theme.TextDefault.Transparency,
@@ -255,7 +274,7 @@ local function FriendListItem(t1: {[any]: any}) -- line: 61
 					TextXAlignment = Enum.TextXAlignment.Left
 				})
 			}),
-			PlayerContext = v52
+			PlayerContext = v56
 		}),
 		CallIcon = React.createElement(ImageSetLabel, {
 			BackgroundTransparency = 1,
@@ -266,7 +285,7 @@ local function FriendListItem(t1: {[any]: any}) -- line: 61
 			ImageColor3 = Theme.ContextualPrimaryDefault.Color,
 			ImageTransparency = Theme.ContextualPrimaryDefault.Transparency
 		}),
-		Divider = t1.showDivider and React.createElement("Frame", {
+		Divider = t2.showDivider and React.createElement("Frame", {
 			BorderSizePixel = 0,
 			Position = UDim2.new(0, 0, 1, -1),
 			Size = UDim2.new(1, 0, 0, 1),

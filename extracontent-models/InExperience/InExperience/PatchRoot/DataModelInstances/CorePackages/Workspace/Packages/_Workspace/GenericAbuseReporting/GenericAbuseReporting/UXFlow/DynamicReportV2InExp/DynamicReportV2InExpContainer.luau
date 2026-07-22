@@ -29,19 +29,21 @@ local useIsVoiceChatReportable = require(script.Parent.useIsVoiceChatReportable)
 require(GenericAbuseReporting.BeduiV2.Utils.appendReportAnythingTags)
 
 local FFlagAbuseReportInlineAlertStateOutsideReducer = require(GenericAbuseReporting.Flags.FFlagAbuseReportInlineAlertStateOutsideReducer)
+local FFlagAbuseReportVoiceSpeakingIcon = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportVoiceSpeakingIcon
+local FFlagAbuseReportVoiceMute = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportVoiceMute
 
-local function DynamicReportV2InExpContainer(t1: {[any]: any}) -- line: 59
-	-- upvalues: React (copy), useIsVoiceChatReportable (copy), getIsInExpSceneSelectionAvailable (copy), useDynamicInExpConfig (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), useDeviceOrientation (copy), GuiService (copy), getUsers (copy), useInExpCustomSubmit (copy), sendBoundaryErrorTelemetry (copy), DynamicReportV2InExpError (copy), AbuseReportErrorBoundary (copy), AbuseReportContentInExp (copy)
+local function DynamicReportV2InExpContainer(t1: {[any]: any}) -- line: 61
+	-- upvalues: React (copy), useIsVoiceChatReportable (copy), getIsInExpSceneSelectionAvailable (copy), useDynamicInExpConfig (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), useDeviceOrientation (copy), GuiService (copy), getUsers (copy), useInExpCustomSubmit (copy), sendBoundaryErrorTelemetry (copy), DynamicReportV2InExpError (copy), AbuseReportErrorBoundary (copy), AbuseReportContentInExp (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), FFlagAbuseReportVoiceMute (copy)
 	local preselectedPlayer = t1.preselectedPlayer
-	local v19 = React.useMemo(function() -- line: 62
+	local v21 = React.useMemo(function() -- line: 64
 		return (tostring(game.GameId))
 	end, {})
-	local v20 = useIsVoiceChatReportable(t1.voiceChatServiceManager)
-	local v21 = React.useMemo(function() -- line: 68
-		-- upvalues: v19 (copy), v20 (copy), getIsInExpSceneSelectionAvailable (copy), preselectedPlayer (copy)
+	local v22 = useIsVoiceChatReportable(t1.voiceChatServiceManager)
+	local v23 = React.useMemo(function() -- line: 70
+		-- upvalues: v21 (copy), v22 (copy), getIsInExpSceneSelectionAvailable (copy), preselectedPlayer (copy)
 		local t2 = {
-			experienceTargetId = v19,
-			isVoiceChatReportable = v20,
+			experienceTargetId = v21,
+			isVoiceChatReportable = v22,
 			isSceneSelectionAvailable = getIsInExpSceneSelectionAvailable()
 		}
 
@@ -53,29 +55,29 @@ local function DynamicReportV2InExpContainer(t1: {[any]: any}) -- line: 59
 
 		return t2
 	end, {
-		v19,
+		v21,
 		preselectedPlayer,
-		v20
+		v22
 	})
-	local v22 = useDynamicInExpConfig(t1.isReportTabVisible, v21)
-	local config = v22.config
-	local hasError = v22.hasError
-	local setHasError = v22.setHasError
-	local abuseVector = v22.abuseVector
-	local u27 = nil
-	local u28 = nil
+	local v24 = useDynamicInExpConfig(t1.isReportTabVisible, v23)
+	local config = v24.config
+	local hasError = v24.hasError
+	local setHasError = v24.setHasError
+	local abuseVector = v24.abuseVector
+	local u29 = nil
+	local u30 = nil
 
 	if FFlagAbuseReportInlineAlertStateOutsideReducer then
-		local v29, v30 = React.useState(nil)
+		local v31, v32 = React.useState(nil)
 
-		u27 = v29
-		u28 = v30
+		u29 = v31
+		u30 = v32
 	end
 
-	local v31 = useDeviceOrientation()
-	local v32 = GuiService.ViewportDisplaySize == Enum.DisplaySize.Small
-	local v33 = v31 == "Landscape" or not v32
-	local v34 = React.useMemo(function() -- line: 97
+	local v33 = useDeviceOrientation()
+	local v34 = GuiService.ViewportDisplaySize == Enum.DisplaySize.Small
+	local v35 = v33 == "Landscape" or not v34
+	local v36 = React.useMemo(function() -- line: 99
 		-- upvalues: getUsers (copy), t1 (copy)
 		local t3 = {
 			users = {
@@ -97,66 +99,66 @@ local function DynamicReportV2InExpContainer(t1: {[any]: any}) -- line: 59
 		t1.inExpChatMessagesLoader,
 		t1.inExpVoiceUsersLoader
 	})
-	local v35 = React.useRef(DateTime.now().UnixTimestampMillis)
+	local v37 = React.useRef(DateTime.now().UnixTimestampMillis)
 
-	React.useEffect(function() -- line: 118
-		-- upvalues: t1 (copy), v35 (copy)
+	React.useEffect(function() -- line: 120
+		-- upvalues: t1 (copy), v37 (copy)
 		if t1.isReportTabVisible then
-			v35.current = DateTime.now().UnixTimestampMillis
+			v37.current = DateTime.now().UnixTimestampMillis
 		end
 	end, { t1.isReportTabVisible })
 
 	if FFlagAbuseReportInlineAlertStateOutsideReducer then
-		React.useEffect(function() -- line: 125
-			-- upvalues: t1 (copy), u28 (ref)
-			if not t1.isReportTabVisible and u28 then
-				u28(nil)
+		React.useEffect(function() -- line: 127
+			-- upvalues: t1 (copy), u30 (ref)
+			if not t1.isReportTabVisible and u30 then
+				u30(nil)
 			end
 		end, {
 			t1.isReportTabVisible,
-			u28
+			u30
 		})
 	end
 
-	local v36 = useInExpCustomSubmit({
+	local v38 = useInExpCustomSubmit({
 		voiceChatServiceManager = t1.voiceChatServiceManager,
 		inExpChatMessagesLoader = t1.inExpChatMessagesLoader,
-		menuOpenTimeRef = v35,
+		menuOpenTimeRef = v37,
 		reportAnythingSnapshotRef = t1.reportAnythingSnapshotRef
 	})
-	local v37 = React.useCallback(function() -- line: 141
+	local v39 = React.useCallback(function() -- line: 143
 		-- upvalues: setHasError (copy)
 		setHasError(true)
 	end, { setHasError })
-	local v38 = React.useCallback(function(p1) -- line: 145
-		-- upvalues: sendBoundaryErrorTelemetry (copy), abuseVector (copy), v19 (copy), setHasError (copy)
+	local v40 = React.useCallback(function(p1) -- line: 147
+		-- upvalues: sendBoundaryErrorTelemetry (copy), abuseVector (copy), v21 (copy), setHasError (copy)
 		warn("AbuseReportErrorBoundary (in-exp) caught:", p1)
 		sendBoundaryErrorTelemetry(p1, {
 			abuse_vector = abuseVector,
-			target_id = v19
+			target_id = v21
 		})
 		setHasError(true)
 	end, {
 		abuseVector,
-		v19,
+		v21,
 		setHasError
 	})
-	local v39 = nil
+	local v41 = nil
 
 	if FFlagAbuseReportInlineAlertStateOutsideReducer then
-		v39 = React.useMemo(function() -- line: 156
-			-- upvalues: u28 (ref), u27 (ref)
-			if u28 then
+		v41 = React.useMemo(function() -- line: 158
+			-- upvalues: u30 (ref), u29 (ref)
+			if u30 then
 				return {
-					pendingInlineAlert = u27,
-					setInlineAlert = u28
+					pendingInlineAlert = u29,
+					setInlineAlert = u30
 				}
 			end
 
 			return nil
 		end, {
-			u27,
-			u28
+			u29,
+			u30
 		})
 	end
 
@@ -165,21 +167,22 @@ local function DynamicReportV2InExpContainer(t1: {[any]: any}) -- line: 59
 	end
 
 	return if not t1.isReportTabVisible or (not config or hasError) then nil else React.createElement(AbuseReportErrorBoundary, {
-		onError = v38
+		onError = v40
 	}, {
 		AbuseReportContentInExp = React.createElement(AbuseReportContentInExp, {
 			rawConfig = config,
 			abuseVector = abuseVector,
-			targetId = v19,
+			targetId = v21,
 			onClose = t1.onClose,
 			open = t1.isReportTabVisible,
-			onCustomSubmit = v36,
+			onCustomSubmit = v38,
 			onFinish = t1.onReportFinish,
-			onResolveError = v37,
-			shouldUseOverlaidControls = v33,
-			loaders = v34,
+			onResolveError = v39,
+			shouldUseOverlaidControls = v35,
+			loaders = v36,
 			attemptTrigger = not preselectedPlayer and "onFirstAction" or "onOpen",
-			inlineAlertController = v39
+			inlineAlertController = v41,
+			voiceChatServiceManager = if not FFlagAbuseReportVoiceSpeakingIcon and not FFlagAbuseReportVoiceMute then nil else t1.voiceChatServiceManager
 		})
 	})
 end

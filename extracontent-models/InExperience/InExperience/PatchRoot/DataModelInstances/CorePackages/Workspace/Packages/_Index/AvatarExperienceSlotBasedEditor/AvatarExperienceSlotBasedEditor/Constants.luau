@@ -8,7 +8,6 @@ local Categories = require(script.Parent.Enums.Categories)
 local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
 local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
 local FFlagRemoveClassicHeadsAndFaces = AvatarExperienceFlags.FFlagRemoveClassicHeadsAndFaces
-local FFlagAXCustomizeMakeupSupport = AvatarExperienceFlags.FFlagAXCustomizeMakeupSupport
 local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
 local FFlagAXSlotsDesktopRedesign = AvatarExperienceFlags.FFlagAXSlotsDesktopRedesign
 local FFlagAXInventoryDurablesExpiredFilter = AvatarExperienceFlags.FFlagAXInventoryDurablesExpiredFilter
@@ -205,7 +204,7 @@ local t4 = {
 	Categories.Body
 }
 
-if FFlagAXCustomizeMakeupSupport and not FFlagAXDownrankMakeupCustomize then
+if not FFlagAXDownrankMakeupCustomize then
 	table.insert(t4, Categories.Makeup)
 end
 
@@ -225,8 +224,8 @@ end
 
 local t5 = {}
 
-for v21, v22 in t4 do
-	t5[v22] = v21 - 1
+for v20, v21 in t4 do
+	t5[v21] = v20 - 1
 end
 
 local t6 = {
@@ -323,7 +322,7 @@ local t6 = {
 			}
 		}
 	},
-	[Categories.Makeup] = if FFlagAXCustomizeMakeupSupport then {
+	[Categories.Makeup] = {
 		name = "Makeup",
 		nameTranslationKey = "Feature.Avatar.Label.Makeup",
 		resetSlotOnClearAll = true,
@@ -375,7 +374,7 @@ local t6 = {
 				assetTypes = { Enum.AvatarAssetType.EyebrowAccessory }
 			}
 		}
-	} else nil,
+	},
 	[Categories.Clothing] = {
 		name = "Clothing",
 		nameTranslationKey = "Feature.Catalog.Label.Clothing",
@@ -557,7 +556,7 @@ local t6 = {
 		slots = {}
 	}
 }
-local v24 = if not FFlagAXInventoryDurablesExpiredFilter then nil else {
+local v23 = if not FFlagAXInventoryDurablesExpiredFilter then nil else {
 	[InventoryFilters.Expired] = 2
 }
 
@@ -565,6 +564,7 @@ t1.Categories = Categories
 t1.SlotEditorCategories = t6
 t1.Icons = t2
 t1.BodyAssetTypes = t3
-t1.InventoryFilterToAvailabilityStatus = v24
+t1.InventoryFilterToAvailabilityStatus = v23
+t1.ActionBarHeight = 64
 
 return t1

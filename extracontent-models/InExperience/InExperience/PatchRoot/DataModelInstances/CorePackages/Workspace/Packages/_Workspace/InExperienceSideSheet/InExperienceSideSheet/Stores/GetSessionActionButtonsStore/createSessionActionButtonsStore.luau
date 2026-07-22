@@ -7,6 +7,8 @@ local GetInputModeStore = Responsive.GetInputModeStore
 local Input = Responsive.Input
 local IconName = require(InExperienceSideSheetParent.Foundation).Enums.IconName
 local Enums = require(InExperienceSideSheet.Common.Enums)
+local Constants = require(InExperienceSideSheet.Common.Constants)
+local FFlagDebugEnablePioneerUX = require(InExperienceSideSheetParent.SharedFlags).FFlagDebugEnablePioneerUX
 local GetActionBindingsStore = require(InExperienceSideSheet.Stores.GetActionBindingsStore)
 local t1 = {
 	["rbxasset://textures/ui/Controls/DefaultController/ButtonX@2x.png"] = IconName.XboxX,
@@ -17,20 +19,20 @@ local t1 = {
 	["rbxasset://textures/ui/Controls/PlayStationController/ButtonTriangle@2x.png"] = IconName.PsTriagle
 }
 
-local function createSessionActionButtonsStore() -- line: 45
-	-- upvalues: GetActionBindingsStore (copy), Signals (copy), Enums (copy), GetInputModeStore (copy), Input (copy), UserInputService (copy), t1 (copy)
+local function createSessionActionButtonsStore() -- line: 49
+	-- upvalues: GetActionBindingsStore (copy), Signals (copy), FFlagDebugEnablePioneerUX (copy), Constants (copy), Enums (copy), GetInputModeStore (copy), Input (copy), UserInputService (copy), t1 (copy)
 	local sessionActionBindings = GetActionBindingsStore().sessionActionBindings
-	local v14, v15 = Signals.createSignal(nil)
 	local v16, v17 = Signals.createSignal(nil)
+	local v18, v19 = Signals.createSignal(nil)
 	local t2 = {
 		{
 			name = "LeaveButton",
-			label = "CoreScripts.InGameMenu.LeaveGame",
 			keyboardIcon = "icons/controls/keys/key_l",
 			isEmphasis = true,
+			label = not FFlagDebugEnablePioneerUX and "CoreScripts.InGameMenu.LeaveGame" or Constants.LocalizationKeys.LogoutButton,
 			gamepadKeyCode = Enum.KeyCode.ButtonX,
-			getShortcutIcon = v14,
-			setShortcutIcon = v15,
+			getShortcutIcon = v16,
+			setShortcutIcon = v17,
 			getOnActivated = sessionActionBindings[Enums.ActionBinding.Leave].getOnActivated,
 			getIsEnabled = sessionActionBindings[Enums.ActionBinding.Leave].getIsEnabled
 		},
@@ -40,32 +42,32 @@ local function createSessionActionButtonsStore() -- line: 45
 			keyboardIcon = "icons/controls/keys/key_r",
 			isEmphasis = false,
 			gamepadKeyCode = Enum.KeyCode.ButtonY,
-			getShortcutIcon = v16,
-			setShortcutIcon = v17,
+			getShortcutIcon = v18,
+			setShortcutIcon = v19,
 			getOnActivated = sessionActionBindings[Enums.ActionBinding.Respawn].getOnActivated,
 			getIsEnabled = sessionActionBindings[Enums.ActionBinding.Respawn].getIsEnabled
 		}
 	}
 	local connection = nil
-	local v20 = Signals.createEffect(function(p1) -- line: 78
+	local v22 = Signals.createEffect(function(p1) -- line: 84
 		-- upvalues: GetInputModeStore (copy), connection (ref), Input (copy), t2 (copy), UserInputService (copy), t1 (copy)
-		local v22 = GetInputModeStore(p1).getLastInputType(p1)
+		local v24 = GetInputModeStore(p1).getLastInputType(p1)
 
 		if connection then
 			connection:Disconnect()
 		end
 
-		if v22 == Input.Directional then
-			local function setGamepadIcons() -- line: 86
+		if v24 == Input.Directional then
+			local function setGamepadIcons() -- line: 92
 				-- upvalues: t2 (copy), UserInputService (copy), t1 (copy)
-				for _, v29 in t2 do
-					local ImageForKeyCode = UserInputService:GetImageForKeyCode(v29.gamepadKeyCode)
+				for _, v31 in t2 do
+					local ImageForKeyCode = UserInputService:GetImageForKeyCode(v31.gamepadKeyCode)
 
-					v29.setShortcutIcon(t1[ImageForKeyCode])
+					v31.setShortcutIcon(t1[ImageForKeyCode])
 				end
 			end
 
-			connection = UserInputService.GamepadConnected:Connect(function(_) -- line: 95
+			connection = UserInputService.GamepadConnected:Connect(function(_) -- line: 101
 				-- upvalues: setGamepadIcons (copy)
 				setGamepadIcons()
 			end)
@@ -74,29 +76,29 @@ local function createSessionActionButtonsStore() -- line: 45
 			return
 		end
 
-		if v22 == Input.Pointer then
-			for _, v25 in t2 do
-				v25.setShortcutIcon(v25.keyboardIcon)
+		if v24 == Input.Pointer then
+			for _, v27 in t2 do
+				v27.setShortcutIcon(v27.keyboardIcon)
 			end
 
 			return
 		end
 
-		for _, v27 in t2 do
-			v27.setShortcutIcon(nil)
+		for _, v29 in t2 do
+			v29.setShortcutIcon(nil)
 		end
 	end)
 
 	return {
 		sessionActionButtonConfigs = t2,
-		cleanUp = function() -- line: 111
-			-- upvalues: connection (ref), v20 (copy)
+		cleanUp = function() -- line: 117
+			-- upvalues: connection (ref), v22 (copy)
 			if connection then
 				connection:Disconnect()
 			end
 
-			if v20 then
-				v20()
+			if v22 then
+				v22()
 			end
 		end
 	}

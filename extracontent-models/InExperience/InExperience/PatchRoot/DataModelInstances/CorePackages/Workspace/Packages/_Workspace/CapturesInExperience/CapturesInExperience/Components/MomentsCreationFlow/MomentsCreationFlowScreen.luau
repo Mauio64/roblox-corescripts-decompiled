@@ -1,5 +1,6 @@
 local ParentParent = script.Parent.Parent.Parent
 local ParentParentParent = ParentParent.Parent
+local Cryo = require(ParentParentParent.Cryo)
 local Dash = require(ParentParentParent.Dash)
 local Localization = require(ParentParentParent.Localization)
 local MomentsCreationFlow = require(ParentParentParent.MomentsCreationFlow)
@@ -47,58 +48,64 @@ local t1 = {
 	[CreationFlowLocalization.StayFriendlyModeration] = "Feature.Moments.Description.StayFriendly"
 }
 
-local function MomentsCreationFlowScreen() -- line: 60
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useLocalization (copy), t1 (copy), useSelector (copy), Constants (copy), React (copy), MomentsCreationFlowClosed (copy), CreateMoment (copy), Dash (copy), CreationFlowContextProvider (copy), CreationFlowScreen (copy)
-	local v20 = useAnalytics()
-	local v21 = useDispatch()
-	local v22 = useLocalization(t1)
-	local v23 = useSelector(function(p1) -- line: 66
+local function MomentsCreationFlowScreen() -- line: 61
+	-- upvalues: useAnalytics (copy), useDispatch (copy), useLocalization (copy), t1 (copy), useSelector (copy), Constants (copy), React (copy), MomentsCreationFlowClosed (copy), CreateMoment (copy), Dash (copy), Cryo (copy), CreationFlowContextProvider (copy), CreationFlowScreen (copy)
+	local v21 = useAnalytics()
+	local v22 = useDispatch()
+	local v23 = useLocalization(t1)
+	local v24 = useSelector(function(p1) -- line: 67
 		-- upvalues: Constants (copy)
 		return p1[Constants.RoduxKey].MomentsCreationFlow.IsOpen
 	end)
-	local v24 = useSelector(function(p2) -- line: 70
+	local v25 = useSelector(function(p2) -- line: 71
 		-- upvalues: Constants (copy)
 		return p2[Constants.RoduxKey].MomentsCreationFlow.Capture
 	end)
-	local v25 = React.useCallback(function() -- line: 74
-		-- upvalues: v21 (copy), MomentsCreationFlowClosed (copy)
-		v21(MomentsCreationFlowClosed())
-	end, { v21 })
-	local v26 = React.useCallback(function(p3) -- line: 78
-		-- upvalues: v22 (copy)
-		return v22[p3] or nil
+	local v26 = useSelector(function(p3) -- line: 75
+		-- upvalues: Constants (copy)
+		return p3[Constants.RoduxKey].MomentsCreationFlow.SessionId
+	end)
+	local v27 = React.useCallback(function() -- line: 79
+		-- upvalues: v22 (copy), MomentsCreationFlowClosed (copy)
+		v22(MomentsCreationFlowClosed())
 	end, { v22 })
-	local v27 = React.useCallback(function(p4, p5, p6) -- line: 83
-		-- upvalues: v21 (copy), CreateMoment (copy)
-		v21(CreateMoment(p4, p5, p6))
-	end, { v21 })
+	local v28 = React.useCallback(function(p4) -- line: 83
+		-- upvalues: v23 (copy)
+		return v23[p4] or nil
+	end, { v23 })
+	local v29 = React.useCallback(function(p5, p6, p7) -- line: 88
+		-- upvalues: v22 (copy), CreateMoment (copy)
+		v22(CreateMoment(p5, p6, p7))
+	end, { v22 })
 
-	if not v23 or not v24 then
+	if not v24 or not v25 then
 		return nil
 	end
 
 	local t2 = {
-		capturesPagesIsFinished = function() -- line: 98
+		capturesPagesIsFinished = function() -- line: 103
 			return true
 		end,
-		createMoment = v27,
+		createMoment = v29,
 		fetchAdditionalCaptures = Dash.noop,
 		fetchInitialCaptures = Dash.noop,
-		fireEvent = function(s1: string, p7) -- line: 104
-			-- upvalues: v20 (copy)
-			v20.fireEvent("XExp" .. s1, p7)
+		fireEvent = function(s1: string, p8) -- line: 109
+			-- upvalues: v21 (copy), Cryo (copy), v26 (copy)
+			v21.fireEvent("XExp" .. s1, Cryo.Dictionary.join(p8 or {}, {
+				creationSessionId = v26
+			}))
 		end,
-		getLocalization = v26,
+		getLocalization = v28,
 		getUserConfiguration = Dash.noop,
-		isTextFiltered = function() -- line: 109
+		isTextFiltered = function() -- line: 119
 			return false
 		end,
 		setScreenOrientation = Dash.noop
 	}
 
 	return React.createElement(CreationFlowContextProvider, {
-		captures = { v24 },
-		exitCreationFlow = v25,
+		captures = { v25 },
+		exitCreationFlow = v27,
 		value = t2
 	}, {
 		Screen = React.createElement(CreationFlowScreen, {

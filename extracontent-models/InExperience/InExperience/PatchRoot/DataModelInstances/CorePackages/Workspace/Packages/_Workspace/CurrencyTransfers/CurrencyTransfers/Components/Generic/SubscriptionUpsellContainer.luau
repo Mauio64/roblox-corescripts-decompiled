@@ -50,7 +50,7 @@ local function SubscriptionUpsellContainer(t1: {[any]: any}) -- line: 56
 		analyticsContext = v37
 	}
 
-	React.useEffect(function() -- line: 93
+	React.useEffect(function() -- line: 99
 		-- upvalues: t1 (copy), triggerOnClose (copy), logCurrencyTransferCounter (copy), v29 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), PromptState (copy), getCounterUserId (copy), direction (copy), InExpAmpWizardController (copy), AccessResponseEnum (copy), v34 (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), v33 (copy), TransferDirection (copy), t2 (copy), AmpWizardTransferConstants (copy)
 		if not t1.ampFeatureCheck then
 			triggerOnClose()
@@ -82,7 +82,7 @@ local function SubscriptionUpsellContainer(t1: {[any]: any}) -- line: 56
 			}}
 		end
 
-		InExpAmpWizardController.OpenAmpWizardContainerInExp(t1.ampFeatureCheck, function(p1, _) -- line: 122
+		InExpAmpWizardController.OpenAmpWizardContainerInExp(t1.ampFeatureCheck, function(p1, _) -- line: 128
 			-- upvalues: AccessResponseEnum (copy), logCurrencyTransferCounter (copy), v29 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), v34 (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), v33 (copy), direction (copy), TransferDirection (copy), triggerOnClose (copy)
 			if p1 == AccessResponseEnum.Granted then
 				logCurrencyTransferCounter(v29, CurrencyTransferTelemetry.CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter, {

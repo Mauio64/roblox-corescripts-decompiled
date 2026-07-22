@@ -22,12 +22,13 @@ local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransf
 
 local function acceptTransfer(p1) -- line: 25
 	-- upvalues: logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), handleReceiveError (copy), PromptState (copy), acceptTransferRequest (copy), handleReceiveSuccess (copy), FailureReason (copy), handleReceiveBlock (copy), TransferRetryOrigin (copy)
+	local v17 = p1.getNetworkImpl()
 	local setPromptState = p1.setPromptState
 	local setRobuxTransfer = p1.setRobuxTransfer
 	local setIsAlreadyAccepted = p1.setIsAlreadyAccepted
-	local v20 = p1.getTransferRequestId(false)
+	local v21 = p1.getTransferRequestId(false)
 
-	if not v20 then
+	if not v21 then
 		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
 
 		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
@@ -42,7 +43,7 @@ local function acceptTransfer(p1) -- line: 25
 	setPromptState(PromptState.ReceiveRequested)
 
 	local t1 = {
-		transferRequestId = v20
+		transferRequestId = v21
 	}
 
 	logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptAttemptedCounter)
@@ -51,7 +52,7 @@ local function acceptTransfer(p1) -- line: 25
 		logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.accept_attempted)
 	end
 
-	return acceptTransferRequest(t1):andThen(function(p2) -- line: 53
+	return acceptTransferRequest(t1, nil, v17):andThen(function(p2) -- line: 54
 		-- upvalues: setPromptState (copy), PromptState (copy), setRobuxTransfer (copy), setIsAlreadyAccepted (copy), logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), handleReceiveSuccess (copy), handleReceiveError (copy)
 		setPromptState(PromptState.ReceiveStarted)
 
@@ -76,7 +77,7 @@ local function acceptTransfer(p1) -- line: 25
 		end
 
 		handleReceiveError(p1, nil)
-	end):catch(function(p3) -- line: 75
+	end):catch(function(p3) -- line: 76
 		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), FailureReason (copy), handleReceiveBlock (copy), TransferRetryOrigin (copy), handleReceiveError (copy)
 		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
 

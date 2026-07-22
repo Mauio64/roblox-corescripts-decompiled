@@ -16,6 +16,7 @@ local useLocalization = require(GameTileParent.Localization).Hooks.useLocalizati
 local OmniRecommendationsContentType = require(GameTileParent.DiscoveryTypes).OmniRecommendationsContentType
 local useNavigation = require(GameTileParent.Navigation).useNavigation
 local AppPage = require(GameTileParent.RobloxAppEnums).AppPage
+local FFlagLuaAppDemoModePlayButton = require(GameTileParent.SharedFlags).FFlagLuaAppDemoModePlayButton
 
 require(GameTileParent.VideoUtils)
 
@@ -25,36 +26,35 @@ local GameTileThumbnailBadges = require(GameTile.Overlays.GameTileThumbnailBadge
 
 require(GameTile.GameTileTypes)
 
-local FFlagLuaAppHomeTouchAutoplay = require(GameTileParent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
 local v23 = game:DefineFastInt("LuaAppOneByTwoTileLogoWidthPercentLandscape", 40)
 local v24 = game:DefineFastInt("LuaAppOneByTwoTileLogoWidthPercentSquare", 25)
 local v25 = v23 / 100
 local v26 = v24 / 100
 
-local function noop() -- line: 60
+local function noop() -- line: 59
 end
-local function OneByTwoTile(t1: {[any]: any}) -- line: 62
-	-- upvalues: useTokens (copy), Responsive (copy), React (copy), useIsHoveredTile (copy), useNavigation (copy), AppPage (copy), FFlagLuaAppHomeTouchAutoplay (copy), useValidTileBadges (copy), useLocalization (copy), OmniRecommendationsContentType (copy), v25 (copy), v26 (copy), ButtonSize (copy), FoundationImage (copy), GameTileThumbnailBadges (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), noop (copy), PlayButton (copy)
+local function OneByTwoTile(t1: {[any]: any}) -- line: 61
+	-- upvalues: useTokens (copy), Responsive (copy), React (copy), useIsHoveredTile (copy), useNavigation (copy), AppPage (copy), useValidTileBadges (copy), useLocalization (copy), OmniRecommendationsContentType (copy), v25 (copy), v26 (copy), ButtonSize (copy), FoundationImage (copy), GameTileThumbnailBadges (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), noop (copy), PlayButton (copy), FFlagLuaAppDemoModePlayButton (copy)
 	local v30 = useTokens()
 	local v31 = Responsive.useResponsive({ Responsive.BreakpointConfig.sizes.Small }) == Responsive.Keys.Small
 	local v32 = React.useRef(nil)
 	local v33 = `OneByTwoTile_{ t1.layoutOrder or 0 }`
 	local v34 = useIsHoveredTile(v32, v33, true)
 	local v35 = useNavigation()
-	local v36 = React.useCallback(function() -- line: 75
-		-- upvalues: v35 (copy), AppPage (copy), t1 (copy), FFlagLuaAppHomeTouchAutoplay (copy)
+	local v36 = React.useCallback(function() -- line: 74
+		-- upvalues: v35 (copy), AppPage (copy), t1 (copy)
 		v35.navigate(AppPage.FeatureTileAdPlayer, {
 			extraProps = {
 				videoAssetId = t1.primaryVideoAssetId,
 				imageAssetId = t1.primaryImageAssetId,
-				videoPlaybackContext = if not FFlagLuaAppHomeTouchAutoplay then nil else t1.videoPlaybackContext
+				videoPlaybackContext = t1.videoPlaybackContext
 			}
 		})
 	end, {
 		v35,
 		t1.primaryVideoAssetId,
 		t1.primaryImageAssetId,
-		if not FFlagLuaAppHomeTouchAutoplay then nil else t1.videoPlaybackContext
+		t1.videoPlaybackContext
 	})
 	local v37 = useValidTileBadges(t1.universeId or "", t1.topicId, t1.badgeOverride)
 	local v38 = useLocalization({
@@ -208,6 +208,7 @@ local function OneByTwoTile(t1: {[any]: any}) -- line: 62
 					referralSource = t1.referralSource,
 					playableText = v40,
 					buttonSize = Small,
+					preferSecondaryPlayButton = not not FFlagLuaAppDemoModePlayButton or nil,
 					reportExperienceLaunched = t1.reportExperienceLaunched,
 					experienceJoinData = if not t1.launchDataOverride then nil else {
 						launchData = t1.launchDataOverride

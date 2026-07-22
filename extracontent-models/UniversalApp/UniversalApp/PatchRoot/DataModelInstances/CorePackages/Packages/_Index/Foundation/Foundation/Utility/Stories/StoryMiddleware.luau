@@ -3,7 +3,6 @@ local FoundationParent = Foundation.Parent
 local React = require(FoundationParent.React)
 local ReactRoblox = require(FoundationParent.ReactRoblox)
 local Device = require(Foundation.Enums.Device)
-local Flags = require(Foundation.Utility.Flags)
 local Foundation2 = require(Foundation.Providers.Foundation)
 local Theme = require(Foundation.Enums.Theme)
 local Types = require(Foundation.Utility.Stories.Types)
@@ -11,89 +10,83 @@ local TokenOverridesStore = require(script.Parent.TokenOverridesStore)
 local isPluginSecurity = require(Foundation.Utility.isPluginSecurity)
 local useStyleSheet = require(Foundation.Providers.Style.StyleSheetContext).useStyleSheet
 
-local function useTokenOverrides() -- line: 21
+local function useTokenOverrides() -- line: 20
 	-- upvalues: TokenOverridesStore (copy), React (copy)
-	local v17 = TokenOverridesStore()
-	local v18, v19 = React.useState(function() -- line: 23
-		-- upvalues: v17 (copy)
-		return v17.getTokenOverrides()
+	local v16 = TokenOverridesStore()
+	local v17, v18 = React.useState(function() -- line: 22
+		-- upvalues: v16 (copy)
+		return v16.getTokenOverrides()
 	end)
 
-	React.useEffect(function() -- line: 27
-		-- upvalues: v17 (copy), v19 (copy)
-		local v28 = v17.subscribe(function(p1) -- line: 28
-			-- upvalues: v19 (copy)
-			v19(p1)
+	React.useEffect(function() -- line: 26
+		-- upvalues: v16 (copy), v18 (copy)
+		local v27 = v16.subscribe(function(p1) -- line: 27
+			-- upvalues: v18 (copy)
+			v18(p1)
 		end)
 
-		return function() -- line: 31
-			-- upvalues: v28 (copy)
-			v28()
+		return function() -- line: 30
+			-- upvalues: v27 (copy)
+			v27()
 		end
-	end, { v17 })
+	end, { v16 })
 
-	return v18
+	return v17
 end
-local function StyleLinkPortal(t1: {[any]: any}) -- line: 51
+local function StyleLinkPortal(t1: {[any]: any}) -- line: 50
 	-- upvalues: useStyleSheet (copy), ReactRoblox (copy), React (copy)
-	local v21 = useStyleSheet()
+	local v20 = useStyleSheet()
 
-	if not v21 or not t1.overlay then
+	if not v20 or not t1.overlay then
 		return nil
 	end
 
 	return ReactRoblox.createPortal(React.createElement("StyleLink", {
-		StyleSheet = v21
+		StyleSheet = v20
 	}), t1.overlay)
 end
-local function useCreateOverlay(p2) -- line: 66
+local function useCreateOverlay(p2) -- line: 65
 	-- upvalues: Types (copy), React (copy)
-	local v23 = Types.toFlipbookStoryProps(p2)
-	local v24 = if not v23 then p2.focus else v23.widget
-	local v25 = v24.Name == "StorybookEmbed"
-	local v26 = React.useRef(Instance.new("Frame"))
+	local v22 = Types.toFlipbookStoryProps(p2)
+	local v23 = if not v22 then p2.focus else v22.widget
+	local v24 = v23.Name == "StorybookEmbed"
+	local v25 = React.useRef(Instance.new("Frame"))
 
-	if v24 ~= v26.current.Parent then
-		v26.current.Parent = v24
+	if v23 ~= v25.current.Parent then
+		v25.current.Parent = v23
 	end
 
-	React.useEffect(function() -- line: 80
-		-- upvalues: v26 (copy)
-		v26.current.Size = UDim2.fromScale(1, 1)
-		v26.current.BackgroundTransparency = 1
+	React.useEffect(function() -- line: 79
+		-- upvalues: v25 (copy)
+		v25.current.Size = UDim2.fromScale(1, 1)
+		v25.current.BackgroundTransparency = 1
 
-		return function() -- line: 84
-			-- upvalues: v26 (copy)
-			v26.current:Destroy()
+		return function() -- line: 83
+			-- upvalues: v25 (copy)
+			v25.current:Destroy()
 		end
 	end, {})
 
-	if v25 then
+	if v24 then
 		return nil
 	end
 
-	return v26.current
+	return v25.current
 end
-local function StoryMiddleware(p3) -- line: 92
-	-- upvalues: useCreateOverlay (copy), Theme (copy), useTokenOverrides (copy), Types (copy), Device (copy), Flags (copy), isPluginSecurity (copy), React (copy), Foundation2 (copy), StyleLinkPortal (copy)
-	return function(p4) -- line: 94
-		-- upvalues: useCreateOverlay (copy), Theme (copy), useTokenOverrides (copy), Types (copy), Device (copy), Flags (copy), isPluginSecurity (copy), React (copy), Foundation2 (copy), p3 (copy), StyleLinkPortal (copy)
-		local v30 = useCreateOverlay(p4)
-		local v31 = Theme[p4.theme]
-		local v32 = useTokenOverrides()
-		local v33 = Types.toDeveloperStorybookStoryProps(p4)
-		local v34 = nil
+local function StoryMiddleware(p3) -- line: 91
+	-- upvalues: useCreateOverlay (copy), Theme (copy), useTokenOverrides (copy), Types (copy), Device (copy), React (copy), Foundation2 (copy), isPluginSecurity (copy), StyleLinkPortal (copy)
+	return function(p4) -- line: 93
+		-- upvalues: useCreateOverlay (copy), Theme (copy), useTokenOverrides (copy), Types (copy), Device (copy), React (copy), Foundation2 (copy), isPluginSecurity (copy), p3 (copy), StyleLinkPortal (copy)
+		local v29 = useCreateOverlay(p4)
+		local v30 = Theme[p4.theme]
+		local v31 = useTokenOverrides()
+		local v32 = Types.toDeveloperStorybookStoryProps(p4)
+		local v33 = nil
 		local settings = nil
 
-		if v33 then
-			v34 = Device[v33.platform]
-			settings = v33.settings
-		end
-
-		local FoundationPopoverPluginSupport = Flags.FoundationPopoverPluginSupport
-
-		if Flags.FoundationPopoverPluginSecurityGate then
-			FoundationPopoverPluginSupport = FoundationPopoverPluginSupport and isPluginSecurity()
+		if v32 then
+			v33 = Device[v32.platform]
+			settings = v32.settings
 		end
 
 		return React.createElement("Frame", {
@@ -108,17 +101,17 @@ local function StoryMiddleware(p3) -- line: 92
 				PaddingRight = UDim.new(0, 10)
 			}),
 			FoundationContext = React.createElement(Foundation2, {
-				theme = v31,
-				device = v34,
+				theme = v30,
+				device = v33,
 				preferences = settings,
 				scale = settings and settings.scale,
-				overlayGui = v30,
-				plugin = if not FoundationPopoverPluginSupport then nil else p4.plugin,
-				tokenOverrides = v32
+				overlayGui = v29,
+				plugin = if not isPluginSecurity() then nil else p4.plugin,
+				tokenOverrides = v31
 			}, {
 				Child = React.createElement(p3, p4),
-				StyleLink = React.createElement(StyleLinkPortal, if not v30 then nil else {
-					overlay = v30
+				StyleLink = React.createElement(StyleLinkPortal, if not v29 then nil else {
+					overlay = v29
 				})
 			})
 		})

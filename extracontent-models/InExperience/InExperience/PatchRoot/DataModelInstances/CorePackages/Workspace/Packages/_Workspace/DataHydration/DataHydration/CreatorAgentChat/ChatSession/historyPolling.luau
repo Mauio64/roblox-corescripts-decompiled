@@ -8,125 +8,461 @@ require(script.Parent.sessionDeps)
 return {
 	createHistoryPolling = function(t1: {[any]: any}) -- line: 23
 		-- upvalues: historyPageUtils (copy), constants (copy)
-		local function pollSessionHistory(s1: string, n1: number?, p1: ((...any) -> ...any)) -- line: 24
+		local function pollSessionHistory(s1: string, n1: number?, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)) -- line: 24
 			-- upvalues: t1 (copy), historyPageUtils (copy)
-			if p1() then
+			if p2() then
 				return false
 			end
 
-			local v9 = t1.deps.sessionLoad(s1, nil)
-			local v10 = historyPageUtils.awaitRequestState(v9.state, os.clock() + t1.rpcTimeoutSeconds)
+			local v10 = t1.deps.sessionLoad(s1, nil)
+			local v11 = historyPageUtils.awaitRequestState(v10.state, os.clock() + t1.rpcTimeoutSeconds)
 
-			if v10.status == "pending" then
-				v9.dispose()
+			if v11.status == "pending" then
+				v10.dispose()
 
 				return false
 			end
 
-			if p1() or v10.status ~= "succeeded" then
+			if p2() or v11.status ~= "succeeded" then
 				return false
 			end
 
-			local v11 = historyPageUtils.getSessionLoadHistory(v10.result)
+			local v12 = historyPageUtils.getSessionLoadHistory(v11.result)
 
-			if #v11 == 0 or p1() then
+			if #v12 == 0 or p2() then
 				return false
 			end
 
-			if p1() then
+			if p2() then
 				return false
 			end
 
-			t1.mergeHistoryPage(v11, t1.getNextHistoryPageToken())
+			t1.mergeHistoryPage(v12, t1.getNextHistoryPageToken())
 
-			local v12 = t1.deps.ingestSessionHistory(s1, v11, n1)
+			local v13 = t1.deps.ingestSessionHistory(s1, v12, n1)
 
-			if p1() then
+			if p1 ~= nil then
+				for _, v15 in v13 do
+					p1(v15)
+				end
+			end
+
+			if p2() then
 				return false
 			end
 
-			return v12
+			return #v13 > 0
 		end
-		local function startPollingTurnFromHistory(s2: string, p2, p3) -- line: 60
+		local function startPollingTurnFromHistory(s2: string, p3, p4) -- line: 66
 			-- upvalues: historyPageUtils (copy), constants (copy), pollSessionHistory (copy)
-			local v16 = p3 or {}
-			local v17 = historyPageUtils.resolveNonNegativeNumber(v16.rtnIdleFallbackSeconds, constants.getRtnIdleFallbackSeconds())
-			local v18 = historyPageUtils.resolvePositiveNumber(v16.pollMinIntervalSeconds, constants.getPollMinIntervalSeconds())
-			local u19 = historyPageUtils.resolvePositiveNumber(v16.pollMaxIntervalSeconds, constants.getPollMaxIntervalSeconds())
+			local v19 = p4 or {}
+			local v20 = historyPageUtils.resolveNonNegativeNumber(v19.rtnIdleFallbackSeconds, constants.getRtnIdleFallbackSeconds())
+			local v21 = historyPageUtils.resolveNonNegativeNumber(v19.rtnSequenceGapFallbackSeconds, constants.getRtnSequenceGapFallbackSeconds())
+			local v22 = historyPageUtils.resolvePositiveNumber(v19.pollMinIntervalSeconds, constants.getPollMinIntervalSeconds())
+			local u23 = historyPageUtils.resolvePositiveNumber(v19.pollMaxIntervalSeconds, constants.getPollMaxIntervalSeconds())
 
-			if v18 > u19 then
-				u19 = v18
+			if v22 > u23 then
+				u23 = v22
 			end
 
-			local u20 = false
-			local u21 = false
-			local n2 = 0
-			local u23 = v18
+			local afterSequenceId = v19.afterSequenceId
+			local noteProcessedSequenceNumber = p3.noteProcessedSequenceNumber
+
+			if afterSequenceId ~= nil and noteProcessedSequenceNumber ~= nil then
+				noteProcessedSequenceNumber(afterSequenceId)
+			end
+
+			local u26 = false
+			local u27 = false
+			local u28 = false
+			local u29 = false
+			local u30 = false
+			local u31 = v22
 			local elapsed = os.clock()
-			local v25 = p2.onNotification(function() -- line: 88
-				-- upvalues: elapsed (ref), u21 (ref), u23 (ref), v18 (copy)
-				elapsed = os.clock()
-				u21 = false
-				u23 = v18
-			end)
+			local u33 = false
+			local n2 = 0
+			local n3 = 0
+			local n4 = 0
 
-			task.spawn(function() -- line: 94
-				-- upvalues: u20 (ref), p2 (copy), u21 (ref), elapsed (ref), v17 (copy), n2 (ref), u23 (ref), v18 (copy), pollSessionHistory (copy), s2 (copy), v16 (copy), u19 (ref), constants (copy), v25 (copy)
-				while not u20 and not p2.state(false).isDone do
-					local elapsed2 = os.clock()
+			local function shouldStopPolling() -- line: 110
+				-- upvalues: u26 (ref), p3 (copy)
+				return u26 or p3.state(false).isDone
+			end
 
-					if not u21 and elapsed2 - elapsed >= v17 then
-						u21 = true
-						n2 = elapsed2
-						u23 = v18
-					end
+			local u38 = nil
 
-					if u21 and elapsed2 >= n2 then
-						local v30 = pollSessionHistory(s2, v16.afterSequenceId, function() -- line: 104
-							-- upvalues: u20 (ref), p2 (copy)
-							return u20 or p2.state(false).isDone
-						end)
-
-						if u20 or p2.state(false).isDone then
-							break
-						end
-
-						if u21 then
-							if v30 then
-								u23 = v18
-							else
-								u23 = math.min(u19, u23 * constants.getPollBackoffMultiplier())
-							end
-
-							n2 = os.clock() + u23
-						end
-					end
-
-					task.wait()
+			local function stopPolling() -- line: 116
+				-- upvalues: u27 (ref), u31 (ref), v22 (copy), n4 (ref)
+				if not u27 then
+					return
 				end
 
-				v25()
+				u27 = false
+				u31 = v22
+				n4 += 1
+			end
+			local function startPolling() -- line: 125
+				-- upvalues: u27 (ref), u26 (ref), p3 (copy), u31 (ref), v22 (copy), u38 (ref)
+				if u27 or (u26 or p3.state(false).isDone) then
+					return
+				end
+
+				u27 = true
+				u31 = v22
+				u38(0)
+			end
+			local function updatePollingState() -- line: 134
+				-- upvalues: u26 (ref), p3 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u30 (ref), u38 (ref)
+				if u26 or p3.state(false).isDone then
+					if not u27 then
+						return
+					end
+
+					u27 = false
+					u31 = v22
+					n4 += 1
+
+					return
+				end
+
+				if u28 or u30 then
+					if not u27 then
+						if u26 or p3.state(false).isDone then
+							return
+						end
+
+						u27 = true
+						u31 = v22
+						u38(0)
+
+						return
+					end
+				else
+					if not u27 then
+						return
+					end
+
+					u27 = false
+					u31 = v22
+					n4 += 1
+				end
+			end
+			local function refreshSequenceGapState() -- line: 144
+				-- upvalues: p3 (copy), u29 (ref), u30 (ref), n3 (ref), v21 (copy), u26 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u38 (ref)
+				local hasSequenceGap = p3.hasSequenceGap
+				local v50 = hasSequenceGap ~= nil and hasSequenceGap()
+
+				if v50 == u29 then
+					return
+				end
+
+				u29 = v50
+				u30 = false
+				n3 += 1
+
+				local v51 = n3
+
+				if v50 then
+					task.delay(v21, function() -- line: 156
+						-- upvalues: v51 (copy), n3 (ref), u26 (ref), p3 (copy), u29 (ref), u30 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u38 (ref)
+						if v51 ~= n3 or (u26 or p3.state(false).isDone or not u29) then
+							return
+						end
+
+						u30 = true
+
+						if u26 or p3.state(false).isDone then
+							if not u27 then
+								return
+							end
+
+							u27 = false
+							u31 = v22
+							n4 += 1
+
+							return
+						end
+
+						if u28 or u30 then
+							if not u27 then
+								if u26 or p3.state(false).isDone then
+									return
+								end
+
+								u27 = true
+								u31 = v22
+								u38(0)
+
+								return
+							end
+						else
+							if not u27 then
+								return
+							end
+
+							u27 = false
+							u31 = v22
+							n4 += 1
+						end
+					end)
+				end
+
+				if u26 or p3.state(false).isDone then
+					if not u27 then
+						return
+					end
+
+					u27 = false
+					u31 = v22
+					n4 += 1
+
+					return
+				end
+
+				if u28 or u30 then
+					if not u27 then
+						if u26 or p3.state(false).isDone then
+							return
+						end
+
+						u27 = true
+						u31 = v22
+						u38(0)
+
+						return
+					end
+				else
+					if not u27 then
+						return
+					end
+
+					u27 = false
+					u31 = v22
+					n4 += 1
+				end
+			end
+			local function u43(n5: number) -- line: 168
+				-- upvalues: u33 (ref), n2 (ref), u26 (ref), p3 (copy), v20 (copy), elapsed (ref), u43 (ref), u28 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref)
+				if u33 then
+					return
+				end
+
+				u33 = true
+
+				local v53 = n2
+
+				task.delay(n5, function() -- line: 174
+					-- upvalues: u33 (ref), v53 (copy), n2 (ref), u26 (ref), p3 (copy), v20 (copy), elapsed (ref), u43 (ref), u28 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref)
+					u33 = false
+
+					if v53 ~= n2 or (u26 or p3.state(false).isDone) then
+						return
+					end
+
+					local v56 = v20 - (os.clock() - elapsed)
+
+					if v56 > 0 then
+						u43(v56)
+
+						return
+					end
+
+					u28 = true
+
+					if u26 or p3.state(false).isDone then
+						if not u27 then
+							return
+						end
+
+						u27 = false
+						u31 = v22
+						n4 += 1
+
+						return
+					end
+
+					if u28 or u30 then
+						if not u27 then
+							if u26 or p3.state(false).isDone then
+								return
+							end
+
+							u27 = true
+							u31 = v22
+							u38(0)
+
+							return
+						end
+					else
+						if not u27 then
+							return
+						end
+
+						u27 = false
+						u31 = v22
+						n4 += 1
+					end
+				end)
+			end
+			local function noteRtnActivity() -- line: 190
+				-- upvalues: elapsed (ref), u28 (ref), u26 (ref), p3 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref), u43 (ref), v20 (copy)
+				elapsed = os.clock()
+				u28 = false
+
+				if u26 or p3.state(false).isDone then
+					if u27 then
+						u27 = false
+						u31 = v22
+						n4 += 1
+					end
+				elseif u28 or u30 then
+					if not u27 and (not u26 and not p3.state(false).isDone) then
+						u27 = true
+						u31 = v22
+						u38(0)
+					end
+				elseif u27 then
+					u27 = false
+					u31 = v22
+					n4 += 1
+				end
+
+				u43(v20)
+			end
+
+			function u38(n6: number) -- line: 197
+				-- upvalues: n4 (ref), u27 (ref), u26 (ref), p3 (copy), pollSessionHistory (copy), s2 (copy), afterSequenceId (copy), v19 (copy), shouldStopPolling (copy), u31 (ref), v22 (copy), refreshSequenceGapState (copy), u28 (ref), u30 (ref), u38 (ref), u23 (ref), constants (copy)
+				n4 += 1
+
+				local v55 = n4
+
+				task.delay(n6, function() -- line: 200
+					-- upvalues: v55 (copy), n4 (ref), u27 (ref), u26 (ref), p3 (copy), pollSessionHistory (copy), s2 (copy), afterSequenceId (copy), v19 (copy), shouldStopPolling (copy), u31 (ref), v22 (copy), refreshSequenceGapState (copy), u28 (ref), u30 (ref), u38 (ref), u23 (ref), constants (copy)
+					if v55 ~= n4 or (not u27 or (u26 or p3.state(false).isDone)) then
+						return
+					end
+
+					local v57 = pollSessionHistory(s2, afterSequenceId, v19.onDroppedChatMessage, shouldStopPolling)
+
+					if u26 or p3.state(false).isDone then
+						if not u27 then
+							return
+						end
+
+						u27 = false
+						u31 = v22
+						n4 += 1
+
+						return
+					end
+
+					refreshSequenceGapState()
+
+					if u26 or p3.state(false).isDone then
+						if u27 then
+							u27 = false
+							u31 = v22
+							n4 += 1
+						end
+					elseif u28 or u30 then
+						if not u27 and (not u26 and not p3.state(false).isDone) then
+							u27 = true
+							u31 = v22
+							u38(0)
+						end
+					elseif u27 then
+						u27 = false
+						u31 = v22
+						n4 += 1
+					end
+
+					if not u27 then
+						return
+					end
+
+					if v57 then
+						u31 = v22
+					else
+						u31 = math.min(u23, u31 * constants.getPollBackoffMultiplier())
+					end
+
+					u38(u31)
+				end)
+			end
+
+			local v45 = p3.onNotification(function() -- line: 232
+				-- upvalues: elapsed (ref), u28 (ref), u26 (ref), p3 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref), u43 (ref), v20 (copy), refreshSequenceGapState (copy)
+				elapsed = os.clock()
+				u28 = false
+
+				if u26 or p3.state(false).isDone then
+					if u27 then
+						u27 = false
+						u31 = v22
+						n4 += 1
+					end
+				elseif u28 or u30 then
+					if not u27 and (not u26 and not p3.state(false).isDone) then
+						u27 = true
+						u31 = v22
+						u38(0)
+					end
+				elseif u27 then
+					u27 = false
+					u31 = v22
+					n4 += 1
+				end
+
+				u43(v20)
+				refreshSequenceGapState()
 			end)
 
-			return function() -- line: 128
-				-- upvalues: u20 (ref), v25 (copy)
-				u20 = true
-				v25()
+			refreshSequenceGapState()
+			elapsed = os.clock()
+			u28 = false
+
+			if u26 or p3.state(false).isDone then
+				if u27 then
+					u27 = false
+					u31 = v22
+					n4 += 1
+				end
+			elseif u28 or u30 then
+				if not u27 and (not u26 and not p3.state(false).isDone) then
+					u27 = true
+					u31 = v22
+					u38(0)
+				end
+			elseif u27 then
+				u27 = false
+				u31 = v22
+				n4 += 1
+			end
+
+			u43(v20)
+
+			return function() -- line: 240
+				-- upvalues: u26 (ref), n2 (ref), n3 (ref), n4 (ref), v45 (copy)
+				u26 = true
+				n2 += 1
+				n3 += 1
+				n4 += 1
+				v45()
 			end
 		end
 
 		return {
 			startPollingTurnFromHistory = startPollingTurnFromHistory,
-			startPollingActiveTurn = function(s3: string, p4) -- line: 134
+			startPollingActiveTurn = function(s3: string, p5) -- line: 249
 				-- upvalues: t1 (copy), startPollingTurnFromHistory (copy)
-				local v28 = t1.deps.getActiveTurnHandle(s3)
+				local v48 = t1.deps.getActiveTurnHandle(s3)
 
-				if v28 == nil then
-					return function() -- line: 137
+				if v48 == nil then
+					return function() -- line: 252
 					end
 				end
 
-				return (startPollingTurnFromHistory(s3, v28, p4))
+				return (startPollingTurnFromHistory(s3, v48, p5))
 			end
 		}
 	end

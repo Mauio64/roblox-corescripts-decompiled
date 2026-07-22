@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local BuildExperienceParent = BuildExperience.Parent
+local React = require(BuildExperienceParent.React)
+local Foundation = require(BuildExperienceParent.Foundation)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local IconButton = Foundation.IconButton
 local FoundationText = Foundation.Text
 local View = Foundation.View
@@ -11,8 +13,20 @@ local MediaSelector = require(script.Parent.MediaSelector)
 
 require(script.Parent.types)
 
-local function IconThumbnailsSheet(t1: {[any]: any}) -- line: 26
-	-- upvalues: React (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), FoundationText (copy), MediaSelector (copy)
+local function IconThumbnailsSheet(t1: {[any]: any}) -- line: 27
+	-- upvalues: React (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), FoundationText (copy), LocalizationStrings (copy), MediaSelector (copy)
+	local v15 = React.useRef(nil)
+	local v16 = React.useCallback(function() -- line: 30
+		-- upvalues: v15 (copy), t1 (copy)
+		if v15.current then
+			v15.current()
+
+			return
+		end
+
+		t1.onClose()
+	end, { t1.onClose })
+
 	return React.createElement(View, {
 		tag = "col size-full bg-surface-0"
 	}, {
@@ -24,14 +38,14 @@ local function IconThumbnailsSheet(t1: {[any]: any}) -- line: 26
 				LayoutOrder = 1,
 				isCircular = true,
 				icon = IconName.ArrowLargeLeft,
-				onActivated = t1.onClose,
+				onActivated = v16,
 				size = InputSize.Medium,
 				variant = ButtonVariant.Utility
 			}),
 			Title = React.createElement(FoundationText, {
 				LayoutOrder = 2,
-				Text = "Icon & Thumbnails",
-				tag = "fill auto-y text-heading-medium text-align-x-left text-truncate-end content-emphasis"
+				tag = "fill auto-y text-heading-medium text-align-x-left text-truncate-end content-emphasis",
+				Text = LocalizationStrings.MEDIA_SELECTION_TITLE
 			})
 		}),
 		Content = React.createElement(View, {
@@ -40,7 +54,8 @@ local function IconThumbnailsSheet(t1: {[any]: any}) -- line: 26
 		}, {
 			MediaSelector = React.createElement(MediaSelector, {
 				universeId = t1.universeId,
-				onBack = t1.onClose
+				onBack = t1.onClose,
+				backHandlerRef = v15
 			})
 		})
 	})

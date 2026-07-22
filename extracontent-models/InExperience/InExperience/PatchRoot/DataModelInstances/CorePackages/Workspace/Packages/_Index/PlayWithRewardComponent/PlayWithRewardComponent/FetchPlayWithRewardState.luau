@@ -9,7 +9,7 @@ local mutedError = require(PlayWithRewardComponentParent.Loggers).mutedError
 local t = require(PlayWithRewardComponentParent.t)
 local IXPServiceWrapper = require(PlayWithRewardComponentParent.IXPServiceWrapper).IXPServiceWrapper
 local AppUserLayers = require(PlayWithRewardComponentParent.ExperimentLayers).AppUserLayers
-local v12 = game:DefineFastFlag("LuaAppRemovePlayWithRewardBetaAllowlist", false)
+local FFlagLuaAppRemovePlayWithRewardBetaAllowlist = require(PlayWithRewardComponentParent.SharedFlags).FFlagLuaAppRemovePlayWithRewardBetaAllowlist
 local PlayWithRewardState = require(PlayWithRewardComponentParent.PlayWithRewardState)
 local PlayWithRewardAdData = PlayWithRewardState.PlayWithRewardAdData
 local SetPlayWithRewardState = PlayWithRewardState.SetPlayWithRewardState
@@ -126,10 +126,10 @@ local function shouldShowShimmer(p5, s5: string) -- line: 134
 	return false
 end
 local function FetchPlayWithRewardState(p6, s6: string, n3: number) -- line: 167
-	-- upvalues: v12 (copy), isUniverseIdInPlayWithRewardBetaAllowList (copy), v16 (copy), Promise (copy), HttpService (copy), shouldShowShimmer (copy), PlayWithRewardTelemetry (copy), SetPlayWithRewardState (copy), fetchPlayWithRewardStateAsync (copy), Logger (copy)
+	-- upvalues: FFlagLuaAppRemovePlayWithRewardBetaAllowlist (copy), isUniverseIdInPlayWithRewardBetaAllowList (copy), v16 (copy), Promise (copy), HttpService (copy), shouldShowShimmer (copy), PlayWithRewardTelemetry (copy), SetPlayWithRewardState (copy), fetchPlayWithRewardStateAsync (copy), Logger (copy)
 	return function(p7) -- line: 168
-		-- upvalues: v12 (copy), isUniverseIdInPlayWithRewardBetaAllowList (copy), v16 (copy), s6 (copy), Promise (copy), HttpService (copy), shouldShowShimmer (copy), p6 (copy), PlayWithRewardTelemetry (copy), SetPlayWithRewardState (copy), fetchPlayWithRewardStateAsync (copy), n3 (copy), Logger (copy)
-		if not v12 and not isUniverseIdInPlayWithRewardBetaAllowList(v16, s6) then
+		-- upvalues: FFlagLuaAppRemovePlayWithRewardBetaAllowlist (copy), isUniverseIdInPlayWithRewardBetaAllowList (copy), v16 (copy), s6 (copy), Promise (copy), HttpService (copy), shouldShowShimmer (copy), p6 (copy), PlayWithRewardTelemetry (copy), SetPlayWithRewardState (copy), fetchPlayWithRewardStateAsync (copy), n3 (copy), Logger (copy)
+		if not FFlagLuaAppRemovePlayWithRewardBetaAllowlist and not isUniverseIdInPlayWithRewardBetaAllowList(v16, s6) then
 			return Promise.resolve()
 		end
 

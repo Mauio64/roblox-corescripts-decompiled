@@ -1,6 +1,5 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
 local BuildExperienceParent = BuildExperience.Parent
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
 local View = Foundation.View
@@ -11,23 +10,13 @@ local GetBuildOverflowMenuStore = require(BuildExperience.Stores.GetBuildOverflo
 
 require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenuStore)
 
-local useSessionSummary = require(BuildExperience.Chat.useSessionSummary)
+local PublishStatus = require(BuildExperience.Chat.PublishStatus)
 
-local function BuildPillMenu(t1: {[any]: any}) -- line: 43
-	-- upvalues: GetBuildOverflowMenuStore (copy), React (copy), CreatorAgentChat (copy), useSessionSummary (copy), View (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), IconName (copy)
-	local v14 = t1.store or GetBuildOverflowMenuStore()
-	local v15 = React.useMemo(function() -- line: 45
-		-- upvalues: CreatorAgentChat (copy), t1 (copy)
-		return CreatorAgentChat.getCreatorAgentChatStore().getSessionForProject(t1.target.universeId, t1.target.placeId, t1.target.sessionId)
-	end, {
-		t1.target.universeId,
-		t1.target.placeId,
-		t1.target.sessionId
-	})
-	local v16 = useSessionSummary(v15)
-	local subagentTaskState = v16.subagentTaskState
-	local v18 = subagentTaskState ~= nil and #subagentTaskState.groups > 0
-	local v19 = React.useCallback(function(p1) -- line: 53
+local function BuildPillMenu(t1: {[any]: any}) -- line: 41
+	-- upvalues: GetBuildOverflowMenuStore (copy), PublishStatus (copy), React (copy), View (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), IconName (copy)
+	local v13 = t1.store or GetBuildOverflowMenuStore()
+	local v14 = PublishStatus.usePublishStatus(t1.target)
+	local v15 = React.useCallback(function(p1) -- line: 45
 		-- upvalues: t1 (copy)
 		if p1.type == "openPage" then
 			if t1.onOpenPage then
@@ -42,19 +31,12 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 43
 		t1.onAction,
 		t1.onOpenPage
 	})
-	local v20 = React.useCallback(function() -- line: 63
-		-- upvalues: v18 (copy), t1 (copy)
-		if not v18 then
-			return
-		end
-
+	local v16 = React.useCallback(function() -- line: 55
+		-- upvalues: t1 (copy)
 		if t1.onOpenAgentsPage then
 			t1.onOpenAgentsPage()
 		end
-	end, {
-		v18,
-		t1.onOpenAgentsPage
-	})
+	end, { t1.onOpenAgentsPage })
 
 	return React.createElement(React.Fragment, nil, {
 		Pill = React.createElement(View, {
@@ -66,16 +48,16 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 43
 		}, {
 			AgentDetail = React.createElement(AgentDetailMenu, {
 				layoutOrder = 1,
-				isDisabled = not v18,
-				onActivated = v20
+				onActivated = v16
 			}),
 			Overflow = React.createElement(BuildOverflowMenuButton, {
 				layoutOrder = 2,
 				icon = IconName.ThreeDotsHorizontal,
-				store = v14,
+				store = v13,
 				target = t1.target,
-				hasPublishedTurn = v16.hasPublishedTurn,
-				onAction = v19
+				hasPublishedTurn = v14.hasPublishedTurn,
+				hasPublishedVersion = v14.hasPublishedVersion,
+				onAction = v15
 			})
 		})
 	})

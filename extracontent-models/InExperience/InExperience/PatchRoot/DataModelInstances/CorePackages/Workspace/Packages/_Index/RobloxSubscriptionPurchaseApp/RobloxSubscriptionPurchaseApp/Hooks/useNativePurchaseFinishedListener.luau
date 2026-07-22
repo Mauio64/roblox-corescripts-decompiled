@@ -5,40 +5,41 @@ local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.Robl
 local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
 local completeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.completeRobloxSubscriptionUpsellFlow)
 local FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback)
+local FFlagLuaAppEnableNativePurchaseFinishedV2Signals = require(RobloxSubscriptionPurchaseAppParent.SharedFlags).FFlagLuaAppEnableNativePurchaseFinishedV2Signals
 
-local function useNativePurchaseFinishedListenerLegacy(p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 14
-	-- upvalues: RobloxSubscriptionStore (copy), React (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
-	local v13 = RobloxSubscriptionStore.get()
-	local v14 = React.useRef(v13)
-	local v15 = React.useMemo(function() -- line: 21
+local function useNativePurchaseFinishedListenerLegacy(p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any)?, p4: ((...any) -> ...any)?) -- line: 16
+	-- upvalues: RobloxSubscriptionStore (copy), React (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), FFlagLuaAppEnableNativePurchaseFinishedV2Signals (copy)
+	local v16 = RobloxSubscriptionStore.get()
+	local v17 = React.useRef(v16)
+	local v18 = React.useMemo(function() -- line: 25
 		-- upvalues: p1 (copy)
 		if p1 then
 			return p1
 		end
 
-		return function() -- line: 25
+		return function() -- line: 29
 			return game:GetService("MarketplaceService").NativePurchaseFinishedWithLocalPlayer
 		end
 	end, { p1 })
-	local v16 = React.useMemo(function() -- line: 31
+	local v19 = React.useMemo(function() -- line: 35
 		-- upvalues: p2 (copy)
 		if p2 then
 			return p2
 		end
 
-		return function() -- line: 35
+		return function() -- line: 39
 			return game:GetService("MarketplaceService").NativePurchaseFinished
 		end
 	end, { p2 })
 
-	React.useEffect(function() -- line: 41
-		-- upvalues: v15 (copy), v14 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), v16 (copy)
-		local connection = v15():Connect(function(_, p4) -- line: 43
-			-- upvalues: v14 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
-			local current = v14.current
+	React.useEffect(function() -- line: 46
+		-- upvalues: v18 (copy), v17 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), v19 (copy), FFlagLuaAppEnableNativePurchaseFinishedV2Signals (copy), p3 (copy), p4 (copy)
+		local connection = v18():Connect(function(_, p6) -- line: 48
+			-- upvalues: v17 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+			local current = v17.current
 
 			if current.getPromptState() == PromptState.SubscriptionPurchaseInProgress then
-				if p4 then
+				if p6 then
 					current.setDidTryPurchasing(true)
 					completeRobloxSubscriptionUpsellFlow()
 
@@ -48,12 +49,12 @@ local function useNativePurchaseFinishedListenerLegacy(p1: ((...any) -> ...any)?
 				current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
 			end
 		end)
-		local connection2 = v16():Connect(function(_, _, p7) -- line: 58
-			-- upvalues: v14 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
-			local current = v14.current
+		local connection2 = v19():Connect(function(_, _, p9) -- line: 63
+			-- upvalues: v17 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+			local current = v17.current
 
 			if current.getPromptState() == PromptState.SubscriptionPurchaseInProgress then
-				if p7 then
+				if p9 then
 					current.setDidTryPurchasing(true)
 					completeRobloxSubscriptionUpsellFlow()
 
@@ -63,9 +64,44 @@ local function useNativePurchaseFinishedListenerLegacy(p1: ((...any) -> ...any)?
 				current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
 			end
 		end)
+		local connection3 = nil
+		local connection4 = nil
 
-		return function() -- line: 72
-			-- upvalues: connection (copy), connection2 (copy)
+		if FFlagLuaAppEnableNativePurchaseFinishedV2Signals then
+			connection3 = ((if not p3 then game:GetService("MarketplaceService").NativePurchaseFinishedWithLocalPlayerV2 else p3())):Connect(function(_, p11, _) -- line: 85
+				-- upvalues: v17 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+				local current = v17.current
+
+				if current.getPromptState() == PromptState.SubscriptionPurchaseInProgress then
+					if p11 then
+						current.setDidTryPurchasing(true)
+						completeRobloxSubscriptionUpsellFlow()
+
+						return
+					end
+
+					current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
+				end
+			end)
+			connection4 = ((if not p4 then game:GetService("MarketplaceService").NativePurchaseFinishedV2 else p4())):Connect(function(_, _, p15, _) -- line: 102
+				-- upvalues: v17 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+				local current = v17.current
+
+				if current.getPromptState() == PromptState.SubscriptionPurchaseInProgress then
+					if p15 then
+						current.setDidTryPurchasing(true)
+						completeRobloxSubscriptionUpsellFlow()
+
+						return
+					end
+
+					current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
+				end
+			end)
+		end
+
+		return function() -- line: 116
+			-- upvalues: connection (copy), connection2 (copy), connection3 (ref), connection4 (ref)
 			if connection then
 				connection:Disconnect()
 			end
@@ -73,44 +109,54 @@ local function useNativePurchaseFinishedListenerLegacy(p1: ((...any) -> ...any)?
 			if connection2 then
 				connection2:Disconnect()
 			end
+
+			if connection3 then
+				connection3:Disconnect()
+			end
+
+			if connection4 then
+				connection4:Disconnect()
+			end
 		end
 	end, {
-		v15,
-		v16
+		v18,
+		v19,
+		p3,
+		p4
 	})
 end
-local function useNativePurchaseFinishedListenerWithCancelCallback(p8: ((...any) -> ...any)?, p9: ((...any) -> ...any)?, p10: ((...any) -> ...any)?) -- line: 84
-	-- upvalues: RobloxSubscriptionStore (copy), React (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
-	local v20 = RobloxSubscriptionStore.get()
-	local v21 = React.useRef(v20)
-	local v22 = React.useRef(p10)
+local function useNativePurchaseFinishedListenerWithCancelCallback(p17: ((...any) -> ...any)?, p18: ((...any) -> ...any)?, p19: ((...any) -> ...any)?, p20: ((...any) -> ...any)?, p21: ((...any) -> ...any)?) -- line: 141
+	-- upvalues: RobloxSubscriptionStore (copy), React (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), FFlagLuaAppEnableNativePurchaseFinishedV2Signals (copy)
+	local v25 = RobloxSubscriptionStore.get()
+	local v26 = React.useRef(v25)
+	local v27 = React.useRef(p19)
 
-	v22.current = p10
+	v27.current = p19
 
-	local v23 = React.useMemo(function() -- line: 94
-		-- upvalues: p8 (copy)
-		if p8 then
-			return p8
+	local v28 = React.useMemo(function() -- line: 153
+		-- upvalues: p17 (copy)
+		if p17 then
+			return p17
 		end
 
-		return function() -- line: 98
+		return function() -- line: 157
 			return game:GetService("MarketplaceService").NativePurchaseFinishedWithLocalPlayer
 		end
-	end, { p8 })
-	local v24 = React.useMemo(function() -- line: 104
-		-- upvalues: p9 (copy)
-		if p9 then
-			return p9
+	end, { p17 })
+	local v29 = React.useMemo(function() -- line: 163
+		-- upvalues: p18 (copy)
+		if p18 then
+			return p18
 		end
 
-		return function() -- line: 108
+		return function() -- line: 167
 			return game:GetService("MarketplaceService").NativePurchaseFinished
 		end
-	end, { p9 })
+	end, { p18 })
 
-	local function onNativePurchaseFinished(_: string, b1: boolean) -- line: 114
-		-- upvalues: v21 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), v22 (copy)
-		local current = v21.current
+	local function onNativePurchaseFinished(_: string, b1: boolean) -- line: 173
+		-- upvalues: v26 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), v27 (copy)
+		local current = v26.current
 
 		if current.getPromptState() ~= PromptState.SubscriptionPurchaseInProgress then
 			return
@@ -123,8 +169,8 @@ local function useNativePurchaseFinishedListenerWithCancelCallback(p8: ((...any)
 			return
 		end
 
-		if v22.current then
-			v22.current()
+		if v27.current then
+			v27.current()
 
 			return
 		end
@@ -132,41 +178,64 @@ local function useNativePurchaseFinishedListenerWithCancelCallback(p8: ((...any)
 		current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
 	end
 
-	React.useEffect(function() -- line: 131
-		-- upvalues: v23 (copy), onNativePurchaseFinished (copy), v24 (copy)
-		local connection = v23():Connect(function(p11, p12) -- line: 133
+	React.useEffect(function() -- line: 191
+		-- upvalues: v28 (copy), onNativePurchaseFinished (copy), v29 (copy), FFlagLuaAppEnableNativePurchaseFinishedV2Signals (copy), p20 (copy), p21 (copy)
+		local connection = v28():Connect(function(p22, p23) -- line: 193
 			-- upvalues: onNativePurchaseFinished (copy)
-			onNativePurchaseFinished(p11, p12)
+			onNativePurchaseFinished(p22, p23)
 		end)
-		local connection3 = v24():Connect(function(_, p14, p15) -- line: 139
+		local connection5 = v29():Connect(function(_, p25, p26) -- line: 199
 			-- upvalues: onNativePurchaseFinished (copy)
-			onNativePurchaseFinished(p14, p15)
+			onNativePurchaseFinished(p25, p26)
 		end)
+		local connection6 = nil
+		local connection7 = nil
 
-		return function() -- line: 144
-			-- upvalues: connection (copy), connection3 (copy)
+		if FFlagLuaAppEnableNativePurchaseFinishedV2Signals then
+			connection6 = ((if not p20 then game:GetService("MarketplaceService").NativePurchaseFinishedWithLocalPlayerV2 else p20())):Connect(function(p27, p28, _) -- line: 212
+				-- upvalues: onNativePurchaseFinished (copy)
+				onNativePurchaseFinished(p27, p28)
+			end)
+			connection7 = ((if not p21 then game:GetService("MarketplaceService").NativePurchaseFinishedV2 else p21())):Connect(function(_, p31, p32, _) -- line: 221
+				-- upvalues: onNativePurchaseFinished (copy)
+				onNativePurchaseFinished(p31, p32)
+			end)
+		end
+
+		return function() -- line: 227
+			-- upvalues: connection (copy), connection5 (copy), connection6 (ref), connection7 (ref)
 			if connection then
 				connection:Disconnect()
 			end
 
-			if connection3 then
-				connection3:Disconnect()
+			if connection5 then
+				connection5:Disconnect()
+			end
+
+			if connection6 then
+				connection6:Disconnect()
+			end
+
+			if connection7 then
+				connection7:Disconnect()
 			end
 		end
 	end, {
-		v23,
-		v24
+		v28,
+		v29,
+		p20,
+		p21
 	})
 end
-local function useNativePurchaseFinishedListener(p16: ((...any) -> ...any)?, p17: ((...any) -> ...any)?, p18: ((...any) -> ...any)?) -- line: 159
+local function useNativePurchaseFinishedListener(p34: ((...any) -> ...any)?, p35: ((...any) -> ...any)?, p36: ((...any) -> ...any)?, p37: ((...any) -> ...any)?, p38: ((...any) -> ...any)?) -- line: 255
 	-- upvalues: FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback (copy), useNativePurchaseFinishedListenerWithCancelCallback (copy), useNativePurchaseFinishedListenerLegacy (copy)
 	if FFlagEnableHeadlessSubscriptionNativePurchaseCancelCallback then
-		useNativePurchaseFinishedListenerWithCancelCallback(p16, p17, p18)
+		useNativePurchaseFinishedListenerWithCancelCallback(p34, p35, p36, p37, p38)
 
 		return
 	end
 
-	useNativePurchaseFinishedListenerLegacy(p16, p17)
+	useNativePurchaseFinishedListenerLegacy(p34, p35, p37, p38)
 end
 
 return useNativePurchaseFinishedListener

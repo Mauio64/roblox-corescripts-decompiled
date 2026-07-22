@@ -7,12 +7,14 @@ local ParentParent = script.Parent.Parent
 local Assets = require(ParentParent.Resources.Assets)
 local divideTransparency = require(ParentParent.Utility.divideTransparency)
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local v13 = Roact.PureComponent:extend("ThemedButton")
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v13 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v14 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
+local v15 = Roact.PureComponent:extend("ThemedButton")
 
-v13.validateProps = t.strictInterface({
+v15.validateProps = t.strictInterface({
 	normalThemeKey = t.string,
 	hoverThemeKey = t.string,
 	imageProps = t.strictInterface({
@@ -30,19 +32,19 @@ v13.validateProps = t.strictInterface({
 	Visible = t.optional(t.boolean),
 	ButtonRef = t.optional(t.union(t.callback, t.table))
 })
-v13.defaultProps = {
+v15.defaultProps = {
 	enabled = true,
 	imageProps = Assets.Images.RoundedRect
 }
 
-function v13.init(p1) -- line: 67
+function v15.init(p1) -- line: 74
 	p1:setState({
 		hover = false,
 		press = false
 	})
 end
-function v13.renderWithSelectionCursor(p2, p3) -- line: 74
-	-- upvalues: withFoundationOrUIBloxStyle (copy), divideTransparency (copy), Roact (copy), ImageSetButton (copy), CursorKind (copy)
+function v15.renderWithSelectionCursor(p2, p3) -- line: 81
+	-- upvalues: withFoundationOrUIBloxStyle (copy), divideTransparency (copy), Roact (copy), ImageSetButton (copy), v14 (copy)
 	local props = p2.props
 	local normalThemeKey = props.normalThemeKey
 
@@ -50,7 +52,7 @@ function v13.renderWithSelectionCursor(p2, p3) -- line: 74
 		normalThemeKey = props.hoverThemeKey
 	end
 
-	return withFoundationOrUIBloxStyle(function(p4) -- line: 82
+	return withFoundationOrUIBloxStyle(function(p4) -- line: 89
 		return {
 			Theme = {
 				BackgroundDefault = {
@@ -191,51 +193,51 @@ function v13.renderWithSelectionCursor(p2, p3) -- line: 74
 				}
 			}
 		}
-	end, function(p5) -- line: 223
-		-- upvalues: normalThemeKey (ref), divideTransparency (copy), p2 (copy), props (copy), Roact (copy), ImageSetButton (copy), p3 (copy), CursorKind (copy)
-		local v22 = p5.Theme[normalThemeKey]
+	end, function(p5) -- line: 230
+		-- upvalues: normalThemeKey (ref), divideTransparency (copy), p2 (copy), props (copy), Roact (copy), ImageSetButton (copy), p3 (copy), v14 (copy)
+		local v24 = p5.Theme[normalThemeKey]
 
-		assert(v22 ~= nil, "theme key " .. normalThemeKey .. " is nil")
+		assert(v24 ~= nil, "theme key " .. normalThemeKey .. " is nil")
 
-		local v23 = divideTransparency(v22.Transparency, not p2.state.press and 1 or 2)
+		local v25 = divideTransparency(v24.Transparency, not p2.state.press and 1 or 2)
 
 		if not props.enabled then
-			v23 = 0.5
+			v25 = 0.5
 		end
 
 		return Roact.createElement(ImageSetButton, {
 			Visible = props.Visible,
 			BackgroundTransparency = 1,
-			ImageColor3 = v22.Color,
+			ImageColor3 = v24.Color,
 			Position = props.Position,
 			Size = props.Size,
 			AnchorPoint = props.AnchorPoint,
-			ImageTransparency = v23,
+			ImageTransparency = v25,
 			LayoutOrder = props.LayoutOrder,
 			ScaleType = props.imageProps.ScaleType,
 			SliceCenter = props.imageProps.SliceCenter,
 			Image = props.imageProps.Image,
-			SelectionImageObject = p3(CursorKind.RoundedRectNoInset),
-			[Roact.Event.Activated] = function() -- line: 243
+			SelectionImageObject = p3(v14.RoundedRectNoInset),
+			[Roact.Event.Activated] = function() -- line: 250
 				-- upvalues: props (copy)
 				if props.enabled then
 					props.onActivated()
 				end
 			end,
-			[Roact.Event.MouseEnter] = function() -- line: 248
+			[Roact.Event.MouseEnter] = function() -- line: 255
 				-- upvalues: p2 (copy)
 				p2:setState({
 					hover = true
 				})
 			end,
-			[Roact.Event.MouseLeave] = function() -- line: 253
+			[Roact.Event.MouseLeave] = function() -- line: 260
 				-- upvalues: p2 (copy)
 				p2:setState({
 					hover = false,
 					press = false
 				})
 			end,
-			[Roact.Event.InputBegan] = function(_, p7) -- line: 259
+			[Roact.Event.InputBegan] = function(_, p7) -- line: 266
 				-- upvalues: p2 (copy)
 				if p7.UserInputType == Enum.UserInputType.MouseButton1 or p7.UserInputType == Enum.UserInputType.Touch then
 					p2:setState({
@@ -243,7 +245,7 @@ function v13.renderWithSelectionCursor(p2, p3) -- line: 74
 					})
 				end
 			end,
-			[Roact.Event.InputEnded] = function(_, p9) -- line: 269
+			[Roact.Event.InputEnded] = function(_, p9) -- line: 276
 				-- upvalues: p2 (copy)
 				if p9.UserInputType == Enum.UserInputType.MouseButton1 or p9.UserInputType == Enum.UserInputType.Touch then
 					p2:setState({
@@ -252,15 +254,15 @@ function v13.renderWithSelectionCursor(p2, p3) -- line: 74
 				end
 			end,
 			[Roact.Ref] = p2.props.ButtonRef
-		}, props.renderChildren(v23, props.enabled and p2.state.hover, props.enabled and p2.state.press))
+		}, props.renderChildren(v25, props.enabled and p2.state.hover, props.enabled and p2.state.press))
 	end)
 end
-function v13.render(p10) -- line: 284
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p11) -- line: 285
+function v15.render(p10) -- line: 291
+	-- upvalues: v13 (copy)
+	return v13(function(p11) -- line: 292
 		-- upvalues: p10 (copy)
 		return p10:renderWithSelectionCursor(p11)
 	end)
 end
 
-return v13
+return v15

@@ -11,6 +11,7 @@ return {
 	InputValidity = InputValidity,
 	IssueCondition = require(script.IssueCondition),
 	PasswordIssue = require(script.PasswordIssue),
+	PasskeyRegistrationSource = require(script.PasskeyRegistrationSource),
 	SignupActionRequired = require(script.SignupActionRequired),
 	ScrollingPickerDirection = require(script.ScrollingPickerDirection),
 	UsernameIssue = require(script.UsernameIssue),

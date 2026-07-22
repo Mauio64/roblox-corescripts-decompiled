@@ -10,23 +10,21 @@ local useTokens = Foundation.Hooks.useTokens
 local SignalsReact = require(Parent.SignalsReact)
 local TextSize = require(Parent.TextSize)
 local Cryo = require(Parent.Cryo)
-local SharedFlags = require(Parent.SharedFlags)
-local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
-local v15 = game:DefineFastFlag("LuaAppExpandableTextNewLineStrip", true)
-local v16 = game:DefineFastFlag("LuaAppExpandableTextAdjustClipToContent", false)
-local FFlagLuaAppExpandableTextTappableText = SharedFlags.FFlagLuaAppExpandableTextTappableText
+local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+local v14 = game:DefineFastFlag("LuaAppExpandableTextNewLineStrip", true)
+local v15 = game:DefineFastFlag("LuaAppExpandableTextAdjustClipToContent", false)
 local t1 = {
 	Selectable = true
 }
 
-local function v19() -- line: 25
+local function v17() -- line: 24
 end
 
 local t2 = {
 	affordance = Foundation.Enums.StateLayerAffordance.None
 }
 
-local function getCompactLineMeasureText(n1: number) -- line: 53
+local function getCompactLineMeasureText(n1: number) -- line: 52
 	if n1 <= 0 then
 		return ""
 	end
@@ -39,146 +37,138 @@ local function getCompactLineMeasureText(n1: number) -- line: 53
 
 	return (table.concat(t3, "\n"))
 end
-local function calculateBlankLineAdjustedHeight(n2: number, n3: number, n4: number, n5: number) -- line: 68
-	local v31 = (not (n3 > 0) or not (n2 > 0)) and 0 or n2 / n3
+local function calculateBlankLineAdjustedHeight(n2: number, n3: number, n4: number, n5: number) -- line: 67
+	local v29 = (not (n3 > 0) or not (n2 > 0)) and 0 or n2 / n3
 
-	if v31 > 0 and (n4 > 0 and n3 == math.floor(n4 / v31 + 0.5) + 1) then
-		local v32 = n2 + v31
+	if v29 > 0 and (n4 > 0 and n3 == math.floor(n4 / v29 + 0.5) + 1) then
+		local v30 = n2 + v29
 
-		if v32 < n5 then
-			return (math.ceil(v32))
+		if v30 < n5 then
+			return (math.ceil(v30))
 		end
 	end
 
 	return n2
 end
-local function ExpandableText(t4: {[any]: any}) -- line: 88
-	-- upvalues: v15 (copy), SignalsReact (copy), TextSize (copy), useTokens (copy), Cryo (copy), FFlagLuaAppExpandableTextTappableText (copy), React (copy), ControlState (copy), useLocalization (copy), useProperty (copy), v16 (copy), View (copy), FFlagSduiExperienceDetailsSupport (copy), t1 (copy), v19 (copy), t2 (copy), FoundationText (copy), getCompactLineMeasureText (copy)
-	local v34 = if not v15 then t4.text else (t4.text or ""):gsub("[\r\n]+$", "")
-	local v35 = SignalsReact.useSignalState(function(p1) -- line: 92
+local function ExpandableText(t4: {[any]: any}) -- line: 87
+	-- upvalues: v14 (copy), SignalsReact (copy), TextSize (copy), useTokens (copy), Cryo (copy), React (copy), ControlState (copy), useLocalization (copy), useProperty (copy), v15 (copy), View (copy), FFlagSduiExperienceDetailsSupport (copy), t1 (copy), v17 (copy), t2 (copy), FoundationText (copy), getCompactLineMeasureText (copy)
+	local v32 = if not v14 then t4.text else (t4.text or ""):gsub("[\r\n]+$", "")
+	local v33 = SignalsReact.useSignalState(function(p1) -- line: 91
 		-- upvalues: TextSize (copy)
 		return TextSize.getTextSizeStore(p1).getTextSizeOffset(p1)
 	end)
-	local v36 = useTokens()
-	local v37 = t4.fontStyle or v36.Typography.CaptionLarge
-	local v38 = Cryo.Dictionary.join(v37, {
-		FontSize = v37.FontSize + v35
+	local v34 = useTokens()
+	local v35 = t4.fontStyle or v34.Typography.CaptionLarge
+	local v36 = Cryo.Dictionary.join(v35, {
+		FontSize = v35.FontSize + v33
 	})
-	local v39 = if FFlagLuaAppExpandableTextTappableText then nil else t4.textColor or v36.Color.Content.Default.Color3
-	local v40 = t4.textStyle or v36.Color.Content.Default
-	local v41 = t4.compactNumberOfLines or 3
-	local v42 = nil
-	local v43 = nil
-	local g62 = nil
+	local v37 = t4.textStyle or v34.Color.Content.Default
+	local v38 = t4.compactNumberOfLines or 3
+	local v39 = t4.pressedTextStyle or v34.Color.Content.Muted
+	local v40, v41 = React.useBinding(ControlState.Default)
+	local v42 = v40:map(function(s1: string) -- line: 108
+		-- upvalues: ControlState (copy), v39 (copy), v37 (copy)
+		if s1 == ControlState.Pressed or s1 == ControlState.SelectedPressed then
+			return v39
+		end
 
-	if FFlagLuaAppExpandableTextTappableText then
-		local v44 = t4.pressedTextStyle or v36.Color.Content.Muted
-		local v45
-
-		v45, v42 = React.useBinding(ControlState.Default)
-		v43 = v45:map(function(s1: string) -- line: 112
-			-- upvalues: ControlState (copy), v44 (copy), v40 (copy)
-			if s1 == ControlState.Pressed or s1 == ControlState.SelectedPressed then
-				return v44
-			end
-
-			return v40
-		end)
-	end
-
-	local v46, v47 = React.useState(t4.expandedInitially or false)
-	local v48 = React.useCallback(function() -- line: 122
-		-- upvalues: v47 (copy), t4 (copy)
-		v47(function(p2) -- line: 123
+		return v37
+	end)
+	local v43, v44 = React.useState(t4.expandedInitially or false)
+	local v45 = React.useCallback(function() -- line: 117
+		-- upvalues: v44 (copy), t4 (copy)
+		v44(function(p2) -- line: 118
 			-- upvalues: t4 (copy)
-			local v74 = not p2
+			local v71 = not p2
 
 			if t4.onExpandChanged then
-				t4.onExpandChanged(v74)
+				t4.onExpandChanged(v71)
 			end
 
-			return v74
+			return v71
 		end)
 	end, { t4.onExpandChanged })
-	local v49 = useLocalization({
+	local v46 = useLocalization({
 		moreText = "CommonUI.Features.Action.MoreLowercase",
 		lessText = "CommonUI.Features.Action.LessLowercase"
 	})
-	local v50 = React.useRef(nil)
-	local v51 = useProperty(v50, "AbsoluteSize")
-	local v52 = React.useRef(nil)
-	local v53 = useProperty(v52, "AbsoluteSize")
-	local v54 = React.useRef(nil)
-	local v55 = useProperty(v54, "AbsoluteSize")
-	local v56 = v51 and v51.X > 0
-	local v57 = v55 and v55.Y or 0
-	local v58 = v53 and v53.Y or 0
-	local v59 = nil
-	local v60 = nil
+	local v47 = React.useRef(nil)
+	local v48 = useProperty(v47, "AbsoluteSize")
+	local v49 = React.useRef(nil)
+	local v50 = useProperty(v49, "AbsoluteSize")
+	local v51 = React.useRef(nil)
+	local v52 = useProperty(v51, "AbsoluteSize")
+	local v53 = v48 and v48.X > 0
+	local v54 = v52 and v52.Y or 0
+	local v55 = v50 and v50.Y or 0
+	local v56 = nil
+	local v57 = nil
+	local g59
 
-	if v16 then
-		v59 = React.useRef(nil)
+	if v15 then
+		v56 = React.useRef(nil)
 
-		local v61 = useProperty(v59, "AbsoluteSize")
+		local v58 = useProperty(v56, "AbsoluteSize")
 
-		v60 = React.useMemo(function() -- line: 160
-			-- upvalues: t4 (copy), v34 (copy)
+		v57 = React.useMemo(function() -- line: 155
+			-- upvalues: t4 (copy), v32 (copy)
 			if not t4.avoidBlankLineClip then
 				return nil
 			end
 
-			local v72 = v34:find("\n\n")
+			local v69 = v32:find("\n\n")
 
-			if not v72 then
+			if not v69 then
 				return nil
 			end
 
-			return v34:sub(1, v72 - 1)
+			return v32:sub(1, v69 - 1)
 		end, {
-			v34,
+			v32,
 			t4.avoidBlankLineClip
 		})
+		g59 = nil
 
-		if not v60 then
-			g62 = true
+		if not v57 then
+			g59 = true
 		end
 
-		if not g62 then
-			local v63 = v61 and v61.Y or 0
-			local v64 = (not (v41 > 0) or not (v58 > 0)) and 0 or v58 / v41
+		if not g59 then
+			local v60 = v58 and v58.Y or 0
+			local v61 = (not (v38 > 0) or not (v55 > 0)) and 0 or v55 / v38
 
-			if v64 > 0 and v63 > 0 and v41 == math.floor(v63 / v64 + 0.5) + 1 then
-				local v65 = v58 + v64
+			if v61 > 0 and v60 > 0 and v38 == math.floor(v60 / v61 + 0.5) + 1 then
+				local v62 = v55 + v61
 
-				if v65 < v57 then
-					v58 = math.ceil(v65)
-					g62 = true
+				if v62 < v54 then
+					v55 = math.ceil(v62)
+					g59 = true
 				end
 			end
 
-			if not g62 then
-				g62 = true
+			if not g59 then
+				g59 = true
 			end
 		end
 	end
 
-	g62 = false
+	g59 = false
 
-	local v66 = not t4.expandedInitially and v57 > v58 + 1
-	local v67 = v46 or not v66
-	local lessText = v49.lessText
+	local v63 = not t4.expandedInitially and v54 > v55 + 1
+	local v64 = v43 or not v63
+	local lessText = v46.lessText
 
-	if v66 and not v46 then
-		v57 = v58
-		lessText = v49.moreText
+	if v63 and not v43 then
+		v54 = v55
+		lessText = v46.moreText
 	end
 
-	if v34 == "" then
+	if v32 == "" then
 		return nil
 	end
 
-	local v69 = if not v67 then {
-		Size = UDim2.new(1, 0, 0, (math.ceil(v57)))
+	local v66 = if not v64 then {
+		Size = UDim2.new(1, 0, 0, (math.ceil(v54)))
 	} else {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y
@@ -188,49 +178,46 @@ local function ExpandableText(t4: {[any]: any}) -- line: 88
 		tag = "col size-full-0 auto-y",
 		LayoutOrder = t4.LayoutOrder,
 		selection = if not FFlagSduiExperienceDetailsSupport or t4.selectable == false then nil else t1,
-		onActivated = if not FFlagSduiExperienceDetailsSupport or t4.selectable == false then nil else v19,
+		onActivated = if not FFlagSduiExperienceDetailsSupport or t4.selectable == false then nil else v17,
 		stateLayer = if not FFlagSduiExperienceDetailsSupport or t4.selectable == false then nil else t2,
-		ref = v50
+		ref = v47
 	}, {
-		TextContent = if not v56 or not v67 and not (v57 > 0) then nil else React.createElement(FoundationText, Cryo.Dictionary.join({
+		TextContent = if not v53 or not v64 and not (v54 > 0) then nil else React.createElement(FoundationText, Cryo.Dictionary.join({
 			LayoutOrder = 1,
 			TextWrapped = true,
-			Text = v34,
-			fontStyle = v38,
-			textStyle = if not FFlagLuaAppExpandableTextTappableText then nil else if not v66 then v40 else v43,
-			textColor = if FFlagLuaAppExpandableTextTappableText then nil else v39,
+			Text = v32,
+			fontStyle = v36,
+			textStyle = if not v63 then v37 else v42,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
-			ClipsDescendants = if not FFlagLuaAppExpandableTextTappableText or not v66 then nil else not v46,
-			onActivated = if not FFlagLuaAppExpandableTextTappableText or not v66 then nil else v48,
-			onStateChanged = if not FFlagLuaAppExpandableTextTappableText or not v66 then nil else v42,
-			selection = if not FFlagLuaAppExpandableTextTappableText or not v66 then nil else {
+			ClipsDescendants = if not v63 then nil else not v43,
+			onActivated = if not v63 then nil else v45,
+			onStateChanged = if not v63 then nil else v41,
+			selection = if not v63 then nil else {
 				Selectable = false
 			},
-			stateLayer = if not FFlagLuaAppExpandableTextTappableText or not v66 then nil else t2
-		}, v69)),
-		ToggleExpandButton = if not v66 then nil else React.createElement(FoundationText, {
+			stateLayer = if not v63 then nil else t2
+		}, v66)),
+		ToggleExpandButton = if not v63 then nil else React.createElement(FoundationText, {
 			LayoutOrder = 2,
 			tag = "auto-xy radius-small",
 			RichText = true,
 			Text = `<u><b>{ lessText }</b></u>`,
-			fontStyle = v38,
-			textStyle = if not FFlagLuaAppExpandableTextTappableText then nil else v36.Color.Content.Emphasis,
-			textColor = if FFlagLuaAppExpandableTextTappableText then nil else v36.Color.Content.Emphasis.Color3,
-			onActivated = v48
+			fontStyle = v36,
+			textStyle = v34.Color.Content.Emphasis,
+			onActivated = v45
 		}),
 		CompactTextMeasure = React.createElement(FoundationText, {
 			Visible = false,
 			IgnoreLayout = true,
 			LayoutOrder = 3,
 			TextWrapped = true,
-			ref = v52,
+			ref = v49,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Text = getCompactLineMeasureText(v41),
-			fontStyle = v38,
-			textStyle = if not FFlagLuaAppExpandableTextTappableText then nil else v40,
-			textColor = if FFlagLuaAppExpandableTextTappableText then nil else v39,
+			Text = getCompactLineMeasureText(v38),
+			fontStyle = v36,
+			textStyle = v37,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top
 		}),
@@ -239,27 +226,26 @@ local function ExpandableText(t4: {[any]: any}) -- line: 88
 			IgnoreLayout = true,
 			LayoutOrder = 4,
 			TextWrapped = true,
-			ref = v54,
+			ref = v51,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Text = v34,
-			fontStyle = v38,
-			textStyle = if not FFlagLuaAppExpandableTextTappableText then nil else v40,
-			textColor = if FFlagLuaAppExpandableTextTappableText then nil else v39,
+			Text = v32,
+			fontStyle = v36,
+			textStyle = v37,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top
 		}),
-		PrefixMeasure = if not v16 or not v60 then nil else React.createElement(FoundationText, {
+		PrefixMeasure = if not v15 or not v57 then nil else React.createElement(FoundationText, {
 			Visible = false,
 			IgnoreLayout = true,
 			LayoutOrder = 5,
+			textColor = nil,
 			TextWrapped = true,
-			ref = v59,
+			ref = v56,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Text = v60,
-			fontStyle = v38,
-			textColor = v39,
+			Text = v57,
+			fontStyle = v36,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top
 		})

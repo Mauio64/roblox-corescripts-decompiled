@@ -20,7 +20,8 @@ local function fetchExperienceDetailsPage(s1: string, p1, b1: boolean?) -- line:
 	if FFlagSduiEdpClientTemplateCache then
 		local v20 = SduiCapabilities.getEnabledCapabilityNumbers({
 			"CAPABILITY_SUPPORTS_EDP_PERSISTENT_ACTION_BAR_PLAY_BUTTON",
-			"CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION"
+			"CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION",
+			"CAPABILITY_SUPPORTS_PIN_SHORTCUT_ACTION"
 		})
 		local v21 = ServiceContractsProto.apppageplatform.shared.client_capabilities.ClientCapabilities.new({
 			enabled_capabilities = v20

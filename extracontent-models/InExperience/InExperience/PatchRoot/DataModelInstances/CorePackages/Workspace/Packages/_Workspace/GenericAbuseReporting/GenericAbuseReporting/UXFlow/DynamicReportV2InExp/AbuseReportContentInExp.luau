@@ -1,6 +1,7 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
 local GenericAbuseReportingParent = GenericAbuseReporting.Parent
 local React = require(GenericAbuseReportingParent.React)
+local SharedFlags = require(GenericAbuseReportingParent.SharedFlags)
 local AbuseReportAnalyticsProvider = require(GenericAbuseReporting.BeduiV2.Analytics.AbuseReportAnalyticsContext).AbuseReportAnalyticsProvider
 local AbuseReportInline = require(GenericAbuseReporting.BeduiV2.Components.AbuseReportInline)
 
@@ -11,14 +12,17 @@ local ArTranslationProvider = require(GenericAbuseReporting.BeduiV2.Utils.Transl
 local LayoutSlots = require(GenericAbuseReporting.BeduiV2.Components.LayoutSlots)
 local LoaderContext = require(GenericAbuseReporting.BeduiV2.Loaders.LoaderContext)
 local useAbuseSheetFlow = require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.useAbuseSheetFlow)
+local voiceSpeakingSignals = require(GenericAbuseReporting.BeduiV2.Utils.Signals.voiceSpeakingSignals)
 local inlineSlots = LayoutSlots.inlineSlots
 local LayoutSlotsProvider = LayoutSlots.LayoutSlotsProvider
 local OverlaidControlsProvider = LayoutSlots.OverlaidControlsProvider
 local LoaderProvider = LoaderContext.LoaderProvider
+local FFlagAbuseReportVoiceSpeakingIcon = SharedFlags.FFlagAbuseReportVoiceSpeakingIcon
+local FFlagAbuseReportVoiceMute = SharedFlags.FFlagAbuseReportVoiceMute
 
-local function AbuseReportContentInExp(t1: {[any]: any}) -- line: 52
-	-- upvalues: useAbuseSheetFlow (copy), React (copy), ArTranslationProvider (copy), AbuseReportAnalyticsProvider (copy), LayoutSlotsProvider (copy), inlineSlots (copy), OverlaidControlsProvider (copy), LoaderProvider (copy), AbuseReportInline (copy)
-	local v16 = useAbuseSheetFlow(t1.rawConfig, {
+local function AbuseReportContentInExp(t1: {[any]: any}) -- line: 58
+	-- upvalues: useAbuseSheetFlow (copy), React (copy), ArTranslationProvider (copy), AbuseReportAnalyticsProvider (copy), LayoutSlotsProvider (copy), inlineSlots (copy), OverlaidControlsProvider (copy), LoaderProvider (copy), AbuseReportInline (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), FFlagAbuseReportVoiceMute (copy), voiceSpeakingSignals (copy)
+	local v20 = useAbuseSheetFlow(t1.rawConfig, {
 		abuseVector = t1.abuseVector,
 		targetId = t1.targetId,
 		onClose = t1.onClose,
@@ -29,24 +33,24 @@ local function AbuseReportContentInExp(t1: {[any]: any}) -- line: 52
 		inlineAlertController = t1.inlineAlertController
 	})
 
-	React.useEffect(function() -- line: 64
-		-- upvalues: v16 (copy), t1 (copy)
-		if not v16 then
+	React.useEffect(function() -- line: 70
+		-- upvalues: v20 (copy), t1 (copy)
+		if not v20 then
 			t1.onResolveError()
 		end
 	end, {
-		v16,
+		v20,
 		t1.onResolveError
 	})
 
-	if not v16 then
+	if not v20 then
 		return nil
 	end
 
-	return React.createElement(ArTranslationProvider, {
-		translations = v16.config.translations
+	local v21 = React.createElement(ArTranslationProvider, {
+		translations = v20.config.translations
 	}, React.createElement(AbuseReportAnalyticsProvider, {
-		analytics = v16.analytics
+		analytics = v20.analytics
 	}, React.createElement(LayoutSlotsProvider, {
 		slots = inlineSlots
 	}, React.createElement(OverlaidControlsProvider, {
@@ -55,9 +59,17 @@ local function AbuseReportContentInExp(t1: {[any]: any}) -- line: 52
 		loaders = t1.loaders,
 		open = t1.open
 	}, React.createElement(AbuseReportInline, {
-		abuseReportFlow = v16,
+		abuseReportFlow = v20,
 		shouldUseOverlaidControls = t1.shouldUseOverlaidControls
 	}))))))
+
+	if FFlagAbuseReportVoiceSpeakingIcon or FFlagAbuseReportVoiceMute then
+		return React.createElement(voiceSpeakingSignals.VoiceChatServiceManagerContext.Provider, {
+			value = t1.voiceChatServiceManager
+		}, v21)
+	end
+
+	return v21
 end
 
 return AbuseReportContentInExp

@@ -7,6 +7,5 @@ return {
 	FStringEditProfileToAvatarLayerName = require(script.FStringEditProfileToAvatarLayerName),
 	SocialNetworksInEditProfileIXP = require(script.SocialNetworksInEditProfileIXP),
 	FFlagEditProfileMigration = require(script.FFlagEditProfileMigration),
-	FFlagEditProfileNavigateToProfilePictureEditor = require(script.FFlagEditProfileNavigateToProfilePictureEditor),
 	FFlagEditProfilePPEStartOnEmotesPage = require(script.FFlagEditProfilePPEStartOnEmotesPage)
 }

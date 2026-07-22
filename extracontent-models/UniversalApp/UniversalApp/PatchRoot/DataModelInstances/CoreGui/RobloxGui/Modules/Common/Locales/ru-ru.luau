@@ -518,8 +518,6 @@ return {
 	["CommonUI.Features.Label.CreationCenter"] = "Центр создания",
 	["CommonUI.Features.Label.DevSubs"] = "Подписки",
 	["CommonUI.Features.Label.Discover"] = "Плейсы",
-	["CommonUI.Features.Label.EngagementScreen.Continue"] = "Продолжить",
-	["CommonUI.Features.Label.EngagementScreen.SwitchAccounts"] = "Переключиться между аккаунтами {platform}",
 	["CommonUI.Features.Label.Friends"] = "Друзья",
 	["CommonUI.Features.Label.Game"] = "Плейсы",
 	["CommonUI.Features.Label.GiftCards"] = "Гифткарты",

@@ -20,7 +20,6 @@ local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableS
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local v19 = game:DefineFastFlag("EnableSquadPromptAnalytics", false)
-local FFlagEnableScheduledSquads = require(SquadsCoreParent.SharedFlags).FFlagEnableScheduledSquads
 local useScreenSize = RobloxAppHooks.useScreenSize
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
@@ -29,66 +28,66 @@ local t1 = {
 	bodyTextLocalizationProps = nil
 }
 
-local function getFFlagRenameFriendsToConnectionsPartyLobby() -- line: 40
+local function getFFlagRenameFriendsToConnectionsPartyLobby() -- line: 39
 	-- upvalues: UniversalAppPolicy (copy)
 	return UniversalAppPolicy.getAppFeaturePolicies().getRenameFriendsToConnections()
 end
 
-return function(p1) -- line: 44
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), SquadExternalContractContext (copy), useDispatch (copy), useCurrentSquadId (copy), useScreenSize (copy), EventNames (copy), v19 (copy), SquadPromptType (copy), UniversalAppPolicy (copy), FFlagEnableScheduledSquads (copy), useLocalization (copy), ButtonType (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), InteractiveAlert (copy)
-	local v27 = Cryo.Dictionary.join(t1, p1)
-	local v28 = React.useContext(SquadExternalContractContext)
-	local v29 = useDispatch()
-	local v30 = useCurrentSquadId() or ""
-	local v31 = if not v27.screenSize then useScreenSize() else v27.screenSize
-	local v32 = React.useCallback(function(s1: string) -- line: 52
-		-- upvalues: v28 (copy), EventNames (copy), v27 (copy), v30 (copy)
-		v28.fireSquadAnalytics(EventNames.SquadPromptResponded, {
-			promptType = v27.promptType,
-			squadId = v30 or "",
+return function(p1) -- line: 43
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), SquadExternalContractContext (copy), useDispatch (copy), useCurrentSquadId (copy), useScreenSize (copy), EventNames (copy), v19 (copy), SquadPromptType (copy), UniversalAppPolicy (copy), useLocalization (copy), ButtonType (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), InteractiveAlert (copy)
+	local v26 = Cryo.Dictionary.join(t1, p1)
+	local v27 = React.useContext(SquadExternalContractContext)
+	local v28 = useDispatch()
+	local v29 = useCurrentSquadId() or ""
+	local v30 = if not v26.screenSize then useScreenSize() else v26.screenSize
+	local v31 = React.useCallback(function(s1: string) -- line: 51
+		-- upvalues: v27 (copy), EventNames (copy), v26 (copy), v29 (copy)
+		v27.fireSquadAnalytics(EventNames.SquadPromptResponded, {
+			promptType = v26.promptType,
+			squadId = v29 or "",
 			responseType = s1
 		})
 	end, {
-		v27.promptType,
-		v30,
-		v28.fireSquadAnalytics
+		v26.promptType,
+		v29,
+		v27.fireSquadAnalytics
 	})
-	local v33 = React.useCallback(function() -- line: 60
-		-- upvalues: v19 (copy), v32 (copy), v29 (copy), v28 (copy), v27 (copy)
+	local v32 = React.useCallback(function() -- line: 59
+		-- upvalues: v19 (copy), v31 (copy), v28 (copy), v27 (copy), v26 (copy)
 		if v19 then
-			v32("cancel")
+			v31("cancel")
 		end
 
-		v29(v28.closeSquadPrompt())
+		v28(v27.closeSquadPrompt())
 
-		if v27.onCancel then
-			v27.onCancel()
+		if v26.onCancel then
+			v26.onCancel()
 		end
 	end, {
-		v29,
-		v27.onCancel,
-		v28.closeSquadPrompt,
-		v32
+		v28,
+		v26.onCancel,
+		v27.closeSquadPrompt,
+		v31
 	})
-	local v34 = React.useCallback(function() -- line: 72
-		-- upvalues: v19 (copy), v32 (copy), v29 (copy), v28 (copy), v27 (copy)
+	local v33 = React.useCallback(function() -- line: 71
+		-- upvalues: v19 (copy), v31 (copy), v28 (copy), v27 (copy), v26 (copy)
 		if v19 then
-			v32("confirm")
+			v31("confirm")
 		end
 
-		v29(v28.closeSquadPrompt())
+		v28(v27.closeSquadPrompt())
 
-		if v27.onConfirm then
-			v27.onConfirm()
+		if v26.onConfirm then
+			v26.onConfirm()
 		end
 	end, {
-		v29,
-		v27.onConfirm,
-		v28.closeSquadPrompt,
-		v32
+		v28,
+		v26.onConfirm,
+		v27.closeSquadPrompt,
+		v31
 	})
-	local v35 = React.useCallback(function(p2) -- line: 84
-		-- upvalues: SquadPromptType (copy), UniversalAppPolicy (copy), FFlagEnableScheduledSquads (copy), v27 (copy)
+	local v34 = React.useCallback(function(p2) -- line: 83
+		-- upvalues: SquadPromptType (copy), UniversalAppPolicy (copy), v26 (copy)
 		local s2 = "CommonUI.Controls.Action.Cancel"
 		local s3, s4, s5
 
@@ -156,11 +155,11 @@ return function(p1) -- line: 44
 			s4 = "Feature.Squads.Description.VoiceRecordedDisclosure"
 			s5 = "Feature.Chat.Action.Continue"
 			s2 = "Feature.Squads.Action.JoinWithoutVoice"
-		elseif FFlagEnableScheduledSquads and p2 == SquadPromptType.ConfirmDeleteScheduledSquad then
+		elseif p2 == SquadPromptType.ConfirmDeleteScheduledSquad then
 			s3 = "Feature.Squads.Label.DeleteScheduledParty"
 			s4 = "Feature.Squads.Description.DeleteScheduledSquad"
 			s5 = "CommonUI.Controls.Action.Yes"
-		elseif FFlagEnableScheduledSquads and p2 == SquadPromptType.ScheduledSquadConflict then
+		elseif p2 == SquadPromptType.ScheduledSquadConflict then
 			s3 = "Feature.Squads.Label.PartyOperationFailed"
 			s4 = "Feature.Squads.Description.ScheduledPartyAlreadyExists"
 			s5 = "Feature.Squads.Action.Ok"
@@ -174,10 +173,10 @@ return function(p1) -- line: 44
 			s5 = "Feature.Squads.Action.Ok"
 		end
 
-		if v27.bodyTextLocalizationProps then
+		if v26.bodyTextLocalizationProps then
 			s4 = { s4 }
 
-			for k, v in pairs(v27.bodyTextLocalizationProps) do
+			for k, v in pairs(v26.bodyTextLocalizationProps) do
 				s4[k] = v
 			end
 		end
@@ -189,25 +188,25 @@ return function(p1) -- line: 44
 			cancelButtonText = s2
 		}
 	end, {})
-	local v36 = React.useMemo(function() -- line: 185
-		-- upvalues: v35 (copy), v27 (copy)
-		return v35(v27.promptType)
-	end, { v27.promptType })
-	local v37 = useLocalization({
-		title = v36.title,
-		bodyText = v36.bodyText,
-		confirmText = v36.confirmText,
-		cancelButtonText = v36.cancelButtonText
+	local v35 = React.useMemo(function() -- line: 184
+		-- upvalues: v34 (copy), v26 (copy)
+		return v34(v26.promptType)
+	end, { v26.promptType })
+	local v36 = useLocalization({
+		title = v35.title,
+		bodyText = v35.bodyText,
+		confirmText = v35.confirmText,
+		cancelButtonText = v35.cancelButtonText
 	})
-	local v38 = React.useCallback(function() -- line: 196
-		-- upvalues: v27 (copy), v33 (copy), v37 (copy), ButtonType (copy), v34 (copy)
+	local v37 = React.useCallback(function() -- line: 195
+		-- upvalues: v26 (copy), v32 (copy), v36 (copy), ButtonType (copy), v33 (copy)
 		local t2 = {}
 
-		if not v27.hideCancelButton then
+		if not v26.hideCancelButton then
 			table.insert(t2, {
 				props = {
-					onActivated = v33,
-					text = v37.cancelButtonText
+					onActivated = v32,
+					text = v36.cancelButtonText
 				}
 			})
 		end
@@ -215,43 +214,43 @@ return function(p1) -- line: 44
 		table.insert(t2, {
 			buttonType = ButtonType.PrimarySystem,
 			props = {
-				onActivated = v34,
-				text = v37.confirmText
+				onActivated = v33,
+				text = v36.confirmText
 			}
 		})
 
 		return t2
 	end, {
-		v37.cancelButtonText,
-		v37.confirmText,
-		v27.hideCancelButton,
-		v34,
-		v33
+		v36.cancelButtonText,
+		v36.confirmText,
+		v26.hideCancelButton,
+		v33,
+		v32
 	})
-	local v39 = React.useMemo(function() -- line: 224
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v33 (copy)
+	local v38 = React.useMemo(function() -- line: 223
+		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v32 (copy)
 		return {
 			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p3) -- line: 227
-					-- upvalues: v33 (copy)
-					v33()
+				handler = InputHandlers.onRelease(function(p3) -- line: 226
+					-- upvalues: v32 (copy)
+					v32()
 					p3:cancel()
 				end)
 			}
 		}
-	end, { v33 })
+	end, { v32 })
 
 	return (React.createElement(FocusRoot, {
 		isAutoFocusRoot = true,
 		isIsolated = true,
-		eventHandlers = v39,
+		eventHandlers = v38,
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
 	}, { React.createElement(InteractiveAlert, {
-		screenSize = v31,
-		title = v37.title,
-		bodyText = v37.bodyText,
+		screenSize = v30,
+		title = v36.title,
+		bodyText = v36.bodyText,
 		buttonStackInfo = {
-			buttons = v38()
+			buttons = v37()
 		}
 	}) }))
 end

@@ -123,7 +123,7 @@ local function rollbackPlaceWithRetry(n5: number, n6: number, t4: {[any]: any}?)
 	local v33 = t4 or {}
 	local v34 = if v33.retries == nil then v6 else v33.retries
 	local v35 = if v33.retryDelayMs == nil then v7 else v33.retryDelayMs
-	local v36 = v33.published == nil or v33.published
+	local v36 = v33.published ~= nil and v33.published
 	local v37 = PlaceVersionHistory.getPlaceVersionHistoryStore()
 
 	local function rollbackWithRetry(n7: number, p7) -- line: 128

@@ -8,7 +8,7 @@ local IconButton = Foundation.IconButton
 local function PanelHeader(t1: {[any]: any}) -- line: 10
 	-- upvalues: React (copy), View (copy), FoundationText (copy), IconButton (copy), Foundation (copy)
 	return React.createElement(View, {
-		tag = "row flex-x-between align-y-center padding-x-large",
+		tag = "row flex-x-between align-y-center auto-y padding-x-large",
 		Size = UDim2.new(1, 0, 0, t1.height),
 		LayoutOrder = t1.layoutOrder
 	}, {

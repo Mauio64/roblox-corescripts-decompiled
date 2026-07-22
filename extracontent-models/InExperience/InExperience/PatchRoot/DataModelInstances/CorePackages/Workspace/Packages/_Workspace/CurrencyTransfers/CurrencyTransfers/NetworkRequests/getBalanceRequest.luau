@@ -10,10 +10,10 @@ local function getEconomyUserCurrencyUrl() -- line: 10
 
 	return string.gsub(v8, "https://www.", "https://economy.") .. "v1/user/currency"
 end
-local function getBalanceRequest(p1) -- line: 18
+local function getBalanceRequest(p1, p2) -- line: 18
 	-- upvalues: HttpRequest (copy), getEconomyUserCurrencyUrl (copy)
-	return HttpRequest.new(p1):get((getEconomyUserCurrencyUrl())):andThen(function(p2) -- line: 21
-		return ((if p2.robux == nil then p2.Robux else p2.robux)) or 0
+	return ((if p2 == nil then HttpRequest.new(p1) else HttpRequest.fromNetworkImpl(p2))):get((getEconomyUserCurrencyUrl())):andThen(function(p3) -- line: 23
+		return ((if p3.robux == nil then p3.Robux else p3.robux)) or 0
 	end)
 end
 

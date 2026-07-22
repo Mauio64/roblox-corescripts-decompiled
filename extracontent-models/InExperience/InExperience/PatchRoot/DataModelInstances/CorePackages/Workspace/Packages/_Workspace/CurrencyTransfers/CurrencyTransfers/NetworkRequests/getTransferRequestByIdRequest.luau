@@ -20,16 +20,16 @@ local v11 = t.strictInterface({
 	transferRequestId = t.string
 })
 
-local function getTransferRequestByIdRequest(p1, p2) -- line: 31
+local function getTransferRequestByIdRequest(p1, p2, p3) -- line: 31
 	-- upvalues: v11 (copy), HttpRequest (copy), getTransferByIdUrl (copy), GetTransferByIdModel (copy), Promise (copy)
 	assert(v11(p1))
 
-	return HttpRequest.new(p2):get(getTransferByIdUrl(p1.transferRequestId)):andThen(function(p3) -- line: 37
+	return ((if p3 == nil then HttpRequest.new(p2) else HttpRequest.fromNetworkImpl(p3))):get(getTransferByIdUrl(p1.transferRequestId)):andThen(function(p4) -- line: 39
 		-- upvalues: GetTransferByIdModel (copy)
-		return GetTransferByIdModel.format(p3)
-	end):catch(function(p4) -- line: 40
+		return GetTransferByIdModel.format(p4)
+	end):catch(function(p5) -- line: 42
 		-- upvalues: Promise (copy)
-		return Promise.reject(p4)
+		return Promise.reject(p5)
 	end)
 end
 

@@ -38,6 +38,8 @@ return {
 	["Amp.Upsell.Message.EmailSentPluralParent"] = "Мы отправили эл. письмо твоим родителям на связанный аккаунт",
 	["Amp.Upsell.Title.AskYourParent"] = "Спроси родителей",
 	["Amp.Upsell.Title.RequestSent"] = "Запрос отправлен",
+	["Application.Logout.Action.Logout"] = "Выход",
+	["Application.Logout.Message.Confirmation"] = "Точно хочешь выйти?",
 	["Authentication.AccountSwitch.Action.SwitchAccount"] = "Переключить аккаунт",
 	["Authentication.CrossDevice.Heading.QuickLogin"] = "Быстрый вход",
 	["Authentication.Login.Button.CloseAndSwitchPlatformAccount"] = "Выполни выход из Roblox для смены аккаунта для {platformAccountName}",

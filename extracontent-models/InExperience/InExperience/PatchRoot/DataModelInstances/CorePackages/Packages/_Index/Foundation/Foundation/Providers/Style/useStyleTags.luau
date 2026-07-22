@@ -4,32 +4,25 @@ local FoundationParent = Foundation.Parent
 local React = require(FoundationParent.React)
 local TagsContext = require(scriptParent.TagsContext)
 local getFormattedTags = require(Foundation.Utility.getFormattedTags)
-local Flags = require(Foundation.Utility.Flags)
 
 require(Foundation.Components.Types)
 
-local function useStyleTags(p1) -- line: 14
-	-- upvalues: getFormattedTags (copy), React (copy), TagsContext (copy), Flags (copy)
-	local v10 = getFormattedTags(p1)
-	local v11 = React.useContext(TagsContext)
+local function useStyleTags(p1) -- line: 12
+	-- upvalues: getFormattedTags (copy), React (copy), TagsContext (copy)
+	local v9 = getFormattedTags(p1)
+	local v10 = React.useContext(TagsContext)
 
-	React.useLayoutEffect(function() -- line: 18
-		-- upvalues: v10 (copy), Flags (copy), v11 (copy)
-		if v10 ~= nil then
-			if Flags.FoundationUseStyleSheetRegistry then
-				v11(string.split(v10, " "))
-
-				return
-			end
-
-			v11(v10)
+	React.useLayoutEffect(function() -- line: 16
+		-- upvalues: v9 (copy), v10 (copy)
+		if v9 ~= nil then
+			v10(string.split(v9, " "))
 		end
 	end, {
-		v10,
-		if not Flags.FoundationUseStyleSheetRegistry then nil else v11
+		v9,
+		v10
 	})
 
-	return v10
+	return v9
 end
 
 return useStyleTags

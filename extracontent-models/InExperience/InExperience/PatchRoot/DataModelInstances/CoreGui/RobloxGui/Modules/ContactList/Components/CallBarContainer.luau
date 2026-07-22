@@ -1,6 +1,22 @@
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
-local CurrentCamera = game:GetService("Workspace").CurrentCamera
+local Workspace = game:GetService("Workspace")
+local v4 = game:DefineFastFlag("FixContactListNilCamera", false)
+local v5 = if not v4 then Workspace.CurrentCamera else Workspace.CurrentCamera
+
+local function getViewportSize() -- line: 9
+	-- upvalues: v4 (copy), v5 (copy)
+	if v4 then
+		if v5 then
+			return v5.ViewportSize
+		end
+
+		return Vector2.new(0, 0)
+	end
+
+	return v5.ViewportSize
+end
+
 local React = require(CorePackages.Packages.React)
 local Cryo = require(CorePackages.Packages.Cryo)
 local CallProtocol = require(CorePackages.Workspace.Packages.CallProtocol)
@@ -11,7 +27,7 @@ local ReactOtter = require(CorePackages.Packages.ReactOtter)
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Chrome = RobloxGui.Modules.Chrome
 local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
-local v14 = if not Enabled() then nil else require(Chrome.Service)
+local v17 = if not Enabled() then nil else require(Chrome.Service)
 local Constants = require(Chrome.ChromeShared.Unibar.Constants)
 local TopBar = RobloxGui.Modules.TopBar
 local Constants2 = require(TopBar.Constants)
@@ -32,56 +48,56 @@ local _ = {
 	Off = "Off"
 }
 
-local function CallBarContainer(t2: {[any]: any}) -- line: 56
-	-- upvalues: Cryo (copy), t1 (copy), useDispatch (copy), Constants2 (copy), React (copy), ReactOtter (copy), CurrentCamera (copy), vector2 (copy), Enabled (copy), v14 (copy), Constants (copy), useSelector (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), RoduxCall (copy), CallAction (copy), CallBar (copy)
-	local v31 = Cryo.Dictionary.join(t1, t2)
-	local v32 = useDispatch()
-	local v33 = Constants2.useDisplayScaleState(Constants2.TopBarButtonPadding)
-	local v34 = Constants2.useDisplayScaleState(Constants2.TopBarTopMargin)
-	local v35, v36 = React.useState(false)
-	local v37, v38 = ReactOtter.useAnimatedBinding({
-		X = CurrentCamera.ViewportSize.X / 2 - vector2.X / 2,
+local function CallBarContainer(t2: {[any]: any}) -- line: 67
+	-- upvalues: Cryo (copy), t1 (copy), useDispatch (copy), Constants2 (copy), React (copy), ReactOtter (copy), v4 (copy), v5 (copy), vector2 (copy), Enabled (copy), v17 (copy), Constants (copy), useSelector (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), RoduxCall (copy), CallAction (copy), CallBar (copy)
+	local v34 = Cryo.Dictionary.join(t1, t2)
+	local v35 = useDispatch()
+	local v36 = Constants2.useDisplayScaleState(Constants2.TopBarButtonPadding)
+	local v37 = Constants2.useDisplayScaleState(Constants2.TopBarTopMargin)
+	local v38, v39 = React.useState(false)
+	local v40, v41 = ReactOtter.useAnimatedBinding({
+		X = ((if not v4 then v5.ViewportSize else (if not v5 then Vector2.new(0, 0) else v5.ViewportSize))).X / 2 - vector2.X / 2,
 		Y = -vector2.Y
-	}, function(p1) -- line: 69
-		-- upvalues: vector2 (copy), v35 (copy), v36 (copy)
-		if p1.Y == -vector2.Y and v35 then
-			v36(false)
+	}, function(p1) -- line: 80
+		-- upvalues: vector2 (copy), v38 (copy), v39 (copy)
+		if p1.Y == -vector2.Y and v38 then
+			v39(false)
 		end
 	end)
-	local u39 = v38
-	local v40 = React.useCallback(function(s1: string) -- line: 84
-		-- upvalues: CurrentCamera (copy), vector2 (copy), Enabled (copy), v34 (copy), v33 (copy), v14 (copy), Constants2 (copy), u39 (ref), ReactOtter (copy), Constants (copy)
-		local v51 = CurrentCamera.ViewportSize.X / 2 - vector2.X / 2
-		local v52 = if s1 ~= "On" then -vector2.Y else not Enabled() and 4 or v34 + v33
+	local u42 = v41
+	local v43 = React.useCallback(function(s1: string) -- line: 95
+		-- upvalues: v4 (copy), v5 (copy), vector2 (copy), Enabled (copy), v37 (copy), v36 (copy), v17 (copy), Constants2 (copy), u42 (ref), ReactOtter (copy), Constants (copy)
+		local v54 = ((if not v4 then v5.ViewportSize else (if not v5 then Vector2.new(0, 0) else v5.ViewportSize))).X / 2 - vector2.X / 2
+		local v55 = if s1 ~= "On" then -vector2.Y else not Enabled() and 4 or v37 + v36
 
-		if Enabled() and v14 then
-			local Max = v14:layout():get().Max
+		if Enabled() and v17 then
+			local Max = v17:layout():get().Max
 
-			if Max.X + 12 > CurrentCamera.ViewportSize.X / 2 - vector2.X / 2 then
-				if Max.X + 24 + vector2.X > CurrentCamera.ViewportSize.X then
+			if Max.X + 12 > ((if not v4 then v5.ViewportSize else (if not v5 then Vector2.new(0, 0) else v5.ViewportSize))).X / 2 - vector2.X / 2 then
+				if Max.X + 24 + vector2.X > ((if not v4 then v5.ViewportSize else (if not v5 then Vector2.new(0, 0) else v5.ViewportSize))).X then
 					if s1 == "On" then
-						v52 = Constants2.ApplyDisplayScale(Constants2.TopBarHeight) + 10
+						v55 = Constants2.ApplyDisplayScale(Constants2.TopBarHeight) + 10
 					end
 				else
-					v51 = Max.X + 12
+					v54 = Max.X + 12
 				end
 			end
 		end
 
-		u39({
-			X = ReactOtter.spring(v51, Constants.MENU_ANIMATION_SPRING),
-			Y = ReactOtter.spring(v52, Constants.MENU_ANIMATION_SPRING)
+		u42({
+			X = ReactOtter.spring(v54, Constants.MENU_ANIMATION_SPRING),
+			Y = ReactOtter.spring(v55, Constants.MENU_ANIMATION_SPRING)
 		})
 	end, {})
-	local v41 = React.useCallback(function(p2) -- line: 124
+	local v44 = React.useCallback(function(p2) -- line: 135
 		if p2.Call.currentCall ~= nil then
 			return p2.Call.currentCall.status
 		end
 
 		return nil
 	end, {})
-	local v42 = useSelector(v41)
-	local v43 = React.useCallback(function(p3) -- line: 129
+	local v45 = useSelector(v44)
+	local v46 = React.useCallback(function(p3) -- line: 140
 		local n1 = 0
 
 		if p3.Call.currentCall and p3.Call.currentCall.activeUtc then
@@ -90,105 +106,110 @@ local function CallBarContainer(t2: {[any]: any}) -- line: 56
 
 		return n1
 	end)
-	local v44 = useSelector(v43)
-	local v45 = React.useCallback(function(p4) -- line: 138
+	local v47 = useSelector(v46)
+	local v48 = React.useCallback(function(p4) -- line: 149
 		if p4.Call.currentCall ~= nil then
 			return p4.Call.currentCall.instanceId
 		end
 
 		return nil
 	end)
-	local v46 = useSelector(v45)
+	local v49 = useSelector(v48)
 
-	React.useEffect(function() -- line: 143
-		-- upvalues: v31 (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), v32 (copy), RoduxCall (copy)
-		local v58 = v31.callProtocol:listenToHandleConnectingCall(function(p5) -- line: 146
-			-- upvalues: SoundManager (copy), Sounds (copy), SoundGroups (copy), v32 (copy), RoduxCall (copy)
+	React.useEffect(function() -- line: 154
+		-- upvalues: v34 (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), v35 (copy), RoduxCall (copy)
+		local v61 = v34.callProtocol:listenToHandleConnectingCall(function(p5) -- line: 157
+			-- upvalues: SoundManager (copy), Sounds (copy), SoundGroups (copy), v35 (copy), RoduxCall (copy)
 			SoundManager:PlaySound(Sounds.Ringtone.Name, {
 				Volume = 0.5,
 				Looped = true
 			}, SoundGroups.Iris)
-			v32(RoduxCall.Actions.UpdateCall(p5))
+			v35(RoduxCall.Actions.UpdateCall(p5))
 		end)
-		local v59 = v31.callProtocol:listenToHandleTeleportingCall(function(p6) -- line: 152
-			-- upvalues: SoundManager (copy), Sounds (copy), SoundGroups (copy), v32 (copy), RoduxCall (copy)
+		local v62 = v34.callProtocol:listenToHandleTeleportingCall(function(p6) -- line: 163
+			-- upvalues: SoundManager (copy), Sounds (copy), SoundGroups (copy), v35 (copy), RoduxCall (copy)
 			SoundManager:StopSound(Sounds.Ringtone.Name)
 			SoundManager:PlaySound(Sounds.CallAccept.Name, {
 				Volume = 0.5
 			}, SoundGroups.Iris)
-			v32(RoduxCall.Actions.UpdateCall(p6))
+			v35(RoduxCall.Actions.UpdateCall(p6))
 		end)
-		local v60 = v31.callProtocol:listenToHandleActiveCall(function(p7) -- line: 158
-			-- upvalues: v32 (copy), RoduxCall (copy)
-			v32(RoduxCall.Actions.UpdateCall(p7))
+		local v63 = v34.callProtocol:listenToHandleActiveCall(function(p7) -- line: 169
+			-- upvalues: v35 (copy), RoduxCall (copy)
+			v35(RoduxCall.Actions.UpdateCall(p7))
 		end)
-		local v61 = v31.callProtocol:listenToHandleTransferCallTeleportJoin(function() -- line: 162
-			-- upvalues: v31 (copy), v32 (copy), RoduxCall (copy)
-			v31.callProtocol:getCallState():andThen(function(p8) -- line: 165
-				-- upvalues: v32 (copy), RoduxCall (copy)
-				v32(RoduxCall.Actions.UpdateCall(p8))
+		local v64 = v34.callProtocol:listenToHandleTransferCallTeleportJoin(function() -- line: 173
+			-- upvalues: v34 (copy), v35 (copy), RoduxCall (copy)
+			v34.callProtocol:getCallState():andThen(function(p8) -- line: 176
+				-- upvalues: v35 (copy), RoduxCall (copy)
+				v35(RoduxCall.Actions.UpdateCall(p8))
 			end)
 		end)
 
-		v31.callProtocol:getCallState():andThen(function(p9) -- line: 170
-			-- upvalues: v32 (copy), RoduxCall (copy)
-			v32(RoduxCall.Actions.UpdateCall(p9))
+		v34.callProtocol:getCallState():andThen(function(p9) -- line: 181
+			-- upvalues: v35 (copy), RoduxCall (copy)
+			v35(RoduxCall.Actions.UpdateCall(p9))
 		end)
 
-		return function() -- line: 174
-			-- upvalues: v58 (copy), v59 (copy), v60 (copy), v61 (copy)
-			v58:Disconnect()
-			v59:Disconnect()
-			v60:Disconnect()
+		return function() -- line: 185
+			-- upvalues: v61 (copy), v62 (copy), v63 (copy), v64 (copy)
 			v61:Disconnect()
+			v62:Disconnect()
+			v63:Disconnect()
+			v64:Disconnect()
 		end
-	end, { v31.callProtocol })
+	end, { v34.callProtocol })
 
-	local v47, v48 = React.useState(nil)
+	local v50, v51 = React.useState(nil)
 
-	if Enabled() and v14 then
-		React.useEffect(function() -- line: 184
-			-- upvalues: v14 (copy), v48 (copy)
-			local v62 = v14:layout():connect(function(p10) -- line: 186
-				-- upvalues: v48 (copy)
-				v48(p10)
+	if Enabled() and v17 then
+		React.useEffect(function() -- line: 195
+			-- upvalues: v17 (copy), v51 (copy)
+			local v65 = v17:layout():connect(function(p10) -- line: 197
+				-- upvalues: v51 (copy)
+				v51(p10)
 			end)
 
-			return function() -- line: 190
-				-- upvalues: v62 (copy)
-				v62.disconnect()
+			return function() -- line: 201
+				-- upvalues: v65 (copy)
+				v65.disconnect()
 			end
 		end, {})
 	end
 
-	React.useEffect(function() -- line: 196
-		-- upvalues: v42 (copy), RoduxCall (copy), v46 (copy), v36 (copy), v40 (copy), CurrentCamera (copy)
-		local v63 = v42 == RoduxCall.Enums.Status.Connecting or (v42 == RoduxCall.Enums.Status.Teleporting or (v42 == RoduxCall.Enums.Status.Active or v42 == RoduxCall.Enums.Status.Idle and game.JobId == v46))
+	React.useEffect(function() -- line: 207
+		-- upvalues: v45 (copy), RoduxCall (copy), v49 (copy), v39 (copy), v43 (copy), v4 (copy), v5 (copy)
+		local v66 = v45 == RoduxCall.Enums.Status.Connecting or (v45 == RoduxCall.Enums.Status.Teleporting or (v45 == RoduxCall.Enums.Status.Active or v45 == RoduxCall.Enums.Status.Idle and game.JobId == v49))
 
-		if v63 then
-			v36(true)
+		if v66 then
+			v39(true)
 		end
 
-		v40(not v63 and "Off" or "On")
+		v43(not v66 and "Off" or "On")
 
-		local connection = CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 209
-			-- upvalues: v40 (copy), v63 (copy)
-			v40(not v63 and "Off" or "On")
+		local u67 = if not v4 then v5:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 228
+			-- upvalues: v43 (copy), v66 (copy)
+			v43(not v66 and "Off" or "On")
+		end) else if not v5 then nil else v5:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 223
+			-- upvalues: v43 (copy), v66 (copy)
+			v43(not v66 and "Off" or "On")
 		end)
 
-		return function() -- line: 213
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function() -- line: 233
+			-- upvalues: u67 (ref)
+			if u67 then
+				u67:Disconnect()
+			end
 		end
 	end, {
-		v42,
-		v46,
-		v47
+		v45,
+		v49,
+		v50
 	})
-	React.useEffect(function() -- line: 222
-		-- upvalues: v31 (copy), CallAction (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), v32 (copy), RoduxCall (copy)
-		local v65 = v31.callProtocol:listenToHandleEndCall(function(p11) -- line: 223
-			-- upvalues: CallAction (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), v32 (copy), RoduxCall (copy)
+	React.useEffect(function() -- line: 244
+		-- upvalues: v34 (copy), CallAction (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), v35 (copy), RoduxCall (copy)
+		local v68 = v34.callProtocol:listenToHandleEndCall(function(p11) -- line: 245
+			-- upvalues: CallAction (copy), SoundManager (copy), Sounds (copy), SoundGroups (copy), v35 (copy), RoduxCall (copy)
 			if p11.callAction == CallAction.Cancel then
 				SoundManager:StopSound(Sounds.Ringtone.Name)
 				SoundManager:PlaySound(Sounds.HangUp.Name, {
@@ -205,24 +226,24 @@ local function CallBarContainer(t2: {[any]: any}) -- line: 56
 				}, SoundGroups.Iris)
 			end
 
-			v32(RoduxCall.Actions.UpdateCall(p11))
+			v35(RoduxCall.Actions.UpdateCall(p11))
 		end)
 
-		return function() -- line: 237
-			-- upvalues: v65 (copy)
-			v65:Disconnect()
+		return function() -- line: 259
+			-- upvalues: v68 (copy)
+			v68:Disconnect()
 		end
-	end, { v31.callProtocol })
+	end, { v34.callProtocol })
 
-	return if not v35 then nil else React.createElement("Frame", {
+	return if not v38 then nil else React.createElement("Frame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.fromScale(1, 1)
 	}, {
 		CallBar = React.createElement(CallBar, {
 			size = vector2,
-			activeUtc = v44,
-			position = v37:map(function(p12) -- line: 251
+			activeUtc = v47,
+			position = v40:map(function(p12) -- line: 273
 				return UDim2.fromOffset(math.round(p12.X), (math.round(p12.Y)))
 			end)
 		})

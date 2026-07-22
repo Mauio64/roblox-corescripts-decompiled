@@ -17,8 +17,9 @@ local VoiceChatData = require(Components.VoiceChat.VoiceChatData)
 local DataContext = require(Components.DataContext)
 local v18 = Roact.Component:extend("DataProvider")
 local EngineFeature = game:GetEngineFeature("VoiceChatDevConsoleTabEnabled")
+local v20 = game:DefineFastFlag("DevConsoleStartDataOnMount", false)
 
-function v18.init(p1) -- line: 25
+function v18.init(p1) -- line: 26
 	-- upvalues: LogData (copy), ClientMemoryData (copy), ServerMemoryData (copy), NetworkData (copy), ServerScriptsData (copy), DataStoresData (copy), ServerStatsData (copy), ActionBindingsData (copy), ServerJobsData (copy), DebugVisualizationsData (copy), LuauHeapData (copy), EngineFeature (copy), VoiceChatData (copy)
 	p1:setState({
 		DevConsoleData = {
@@ -39,16 +40,24 @@ function v18.init(p1) -- line: 25
 		}
 	})
 end
-function v18.didMount(p2) -- line: 46
-	-- upvalues: EngineFeature (copy)
+function v18.didMount(p2) -- line: 47
+	-- upvalues: EngineFeature (copy), v20 (copy)
 	p2.state.DevConsoleData.ClientLogData:start()
 	p2.state.DevConsoleData.ClientMemoryData:start()
 
 	if EngineFeature then
 		p2.state.DevConsoleData.VoiceChatData:start()
 	end
+
+	if v20 and p2.props.isDeveloperView then
+		for _, v in pairs(p2.state.DevConsoleData) do
+			if not v:isRunning() then
+				v:start()
+			end
+		end
+	end
 end
-function v18.willUpdate(p3, p4, _) -- line: 55
+function v18.willUpdate(p3, p4, _) -- line: 64
 	if p4.isDeveloperView and not p3.props.isDeveloperView then
 		for _, v in pairs(p3.state.DevConsoleData) do
 			if not v:isRunning() then
@@ -57,14 +66,14 @@ function v18.willUpdate(p3, p4, _) -- line: 55
 		end
 	end
 end
-function v18.render(p6) -- line: 65
+function v18.render(p6) -- line: 74
 	-- upvalues: Roact (copy), DataContext (copy)
 	return Roact.createElement(DataContext.Provider, {
 		value = p6.state.DevConsoleData
 	}, Roact.oneChild(p6.props[Roact.Children]))
 end
 
-local function mapStateToProps(p7, _) -- line: 71
+local function mapStateToProps(p7, _) -- line: 80
 	return {
 		isDeveloperView = p7.MainView.isDeveloperView
 	}

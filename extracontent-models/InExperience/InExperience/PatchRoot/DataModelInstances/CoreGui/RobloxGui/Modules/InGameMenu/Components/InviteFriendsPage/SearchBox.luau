@@ -4,16 +4,19 @@ local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local v9 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent.Parent
 local Assets = require(ParentParent.Resources.Assets)
 local withLocalization = require(ParentParent.Localization.withLocalization)
 local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v14 = Roact.PureComponent:extend("SearchBox")
+local FoundationImage = Foundation.Image
+local v17 = Roact.PureComponent:extend("SearchBox")
 
-v14.validateProps = t.strictInterface({
+v17.validateProps = t.strictInterface({
 	Size = t.UDim2,
 	Position = t.UDim2,
 	AnchorPoint = t.Vector2,
@@ -22,18 +25,18 @@ v14.validateProps = t.strictInterface({
 	itemRef = t.optional(t.table)
 })
 
-function v14.init(p1) -- line: 41
+function v17.init(p1) -- line: 50
 	p1.state = {
 		searchText = ""
 	}
 end
-function v14.renderWithSelectionCursor(p2, p3) -- line: 47
-	-- upvalues: withLocalization (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), CursorKind (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy)
+function v17.renderWithSelectionCursor(p2, p3) -- line: 56
+	-- upvalues: withLocalization (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), v10 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
 	return withLocalization({
 		searchPlaceholder = "CoreScripts.InGameMenu.InviteFriends.Search"
-	})(function(p4) -- line: 50
-		-- upvalues: withFoundationOrUIBloxStyle (copy), p2 (copy), Roact (copy), p3 (copy), CursorKind (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy)
-		return withFoundationOrUIBloxStyle(function(p5) -- line: 51
+	})(function(p4) -- line: 59
+		-- upvalues: withFoundationOrUIBloxStyle (copy), p2 (copy), Roact (copy), p3 (copy), v10 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
+		return withFoundationOrUIBloxStyle(function(p5) -- line: 60
 			return {
 				Theme = {
 					TextEmphasis = {
@@ -61,26 +64,26 @@ function v14.renderWithSelectionCursor(p2, p3) -- line: 47
 					}
 				}
 			}
-		end, function(p6) -- line: 64
-			-- upvalues: p2 (copy), Roact (copy), p3 (copy), CursorKind (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), p4 (copy)
+		end, function(p6) -- line: 73
+			-- upvalues: p2 (copy), Roact (copy), p3 (copy), v10 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), ImageSetLabel (copy), ThemedTextLabel (copy), p4 (copy)
 			local TextEmphasis = p6.Theme.TextEmphasis
 			local Body = p6.Font.Body
-			local v25 = p2.state.searchText ~= ""
+			local v28 = p2.state.searchText ~= ""
 			local n1 = 49
 
-			if v25 then
+			if v28 then
 				n1 += 46
 			end
 
-			local v27 = Roact.createElement("TextButton", {
+			local v30 = Roact.createElement("TextButton", {
 				Size = UDim2.fromOffset(32, 32),
 				Position = UDim2.new(1, -7, 0.5, 0),
 				AnchorPoint = Vector2.new(1, 0.5),
 				BackgroundTransparency = 1,
-				Visible = v25,
-				SelectionImageObject = p3(CursorKind.SmallPill),
+				Visible = v28,
+				SelectionImageObject = p3(v10.SmallPill),
 				Selectable = true,
-				[Roact.Event.Activated] = function() -- line: 85
+				[Roact.Event.Activated] = function() -- line: 94
 					-- upvalues: p2 (copy)
 					p2:setState({
 						searchText = ""
@@ -94,12 +97,23 @@ function v14.renderWithSelectionCursor(p2, p3) -- line: 47
 					PaddingTop = UDim.new(0, 7),
 					PaddingBottom = UDim.new(0, 7)
 				}),
-				ClearImage = Roact.createElement(ImageSetLabel, {
+				ClearImage = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
 					BackgroundTransparency = 1,
 					Selectable = false,
 					Size = UDim2.fromScale(1, 1),
 					Image = Assets.Images.ClearIcon,
 					ImageColor3 = p6.Theme.IconEmphasis.Color
+				}) else Roact.createElement(FoundationImage, {
+					Size = UDim2.fromScale(1, 1),
+					Image = Assets.Images.ClearIcon.Image,
+					imageRect = {
+						offset = Assets.Images.ClearIcon.ImageRectOffset,
+						size = Assets.Images.ClearIcon.ImageRectSize
+					},
+					imageStyle = {
+						Transparency = 0,
+						Color3 = p6.Theme.IconEmphasis.Color
+					}
 				})
 			})
 
@@ -123,13 +137,26 @@ function v14.renderWithSelectionCursor(p2, p3) -- line: 47
 					ImageColor3 = p6.Theme.Divider.Color,
 					ImageTransparency = p6.Theme.Divider.Transparency
 				}),
-				SearchIcon = Roact.createElement(ImageSetLabel, {
+				SearchIcon = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(0, 16, 0, 16),
 					Position = UDim2.new(0, 22, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Image = Assets.Images.SearchIcon,
 					ImageColor3 = p6.Theme.IconEmphasis.Color
+				}) else Roact.createElement(FoundationImage, {
+					Size = UDim2.new(0, 16, 0, 16),
+					Position = UDim2.new(0, 22, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Image = Assets.Images.SearchIcon.Image,
+					imageRect = {
+						offset = Assets.Images.SearchIcon.ImageRectOffset,
+						size = Assets.Images.SearchIcon.ImageRectSize
+					},
+					imageStyle = {
+						Transparency = 0,
+						Color3 = p6.Theme.IconEmphasis.Color
+					}
 				}),
 				TextBox = Roact.createElement("TextBox", {
 					Size = UDim2.new(1, -n1, 1, 0),
@@ -145,8 +172,8 @@ function v14.renderWithSelectionCursor(p2, p3) -- line: 47
 					Font = Body.Font,
 					TextSize = Body.RelativeSize * p6.Font.BaseSize,
 					TextWrapped = false,
-					SelectionImageObject = p3(CursorKind.InputFields),
-					[Roact.Change.Text] = function(p7) -- line: 156
+					SelectionImageObject = p3(v10.InputFields),
+					[Roact.Change.Text] = function(p7) -- line: 181
 						-- upvalues: p2 (copy)
 						if p2.state.searchText ~= p7.Text then
 							p2:setState({
@@ -168,17 +195,17 @@ function v14.renderWithSelectionCursor(p2, p3) -- line: 47
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Visible = p2.state.searchText == ""
 				}),
-				ClearButton = v27
+				ClearButton = v30
 			})
 		end)
 	end)
 end
-function v14.render(p8) -- line: 186
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p9) -- line: 187
+function v17.render(p8) -- line: 211
+	-- upvalues: v9 (copy)
+	return v9(function(p9) -- line: 212
 		-- upvalues: p8 (copy)
 		return p8:renderWithSelectionCursor(p9)
 	end)
 end
 
-return v14
+return v17

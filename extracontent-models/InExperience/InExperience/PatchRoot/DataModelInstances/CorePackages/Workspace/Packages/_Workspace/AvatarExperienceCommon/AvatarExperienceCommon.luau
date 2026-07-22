@@ -13,6 +13,7 @@ local CatalogItemCardStatusIconTypeEnum = require(script.Components.CatalogItemC
 local ColorGradientCircle = require(script.Components.ColorGradientCircle.ColorGradientCircle)
 local normalize = require(script.Utils.normalize)
 local AXPartialPageModal = require(script.Components.AXPartialPageModal.AXPartialPageModal)
+local BackgroundHighlightContainer = require(script.Components.BackgroundHighlight.BackgroundHighlightContainer)
 local ContextualActionButton = require(script.Components.ContextualActionButton.ContextualActionButton)
 local selectColorAdjustmentButtonColor = require(script.State.Selectors.selectColorAdjustmentButtonColor)
 local selectAdjustableLastTryOnItem = require(script.State.Selectors.selectAdjustableLastTryOnItem)
@@ -102,6 +103,7 @@ return {
 			AnimatedScrollingFrame = require(script.Components.AnimatedScrollingFrame.AnimatedScrollingFrame)
 		},
 		AXPartialPageModal = AXPartialPageModal,
+		BackgroundHighlight = BackgroundHighlightContainer,
 		wrapForReactPortal = require(script.Components.Wrappers.wrapForReactPortal),
 		AXTooltip = require(script.Components.AXTooltip.AXTooltipContainer),
 		TimeoutBanner = require(script.Components.TimeoutBanner.TimeoutBannerContainer),
@@ -228,6 +230,7 @@ return {
 		loadBackgroundAsset = require(script.Backgrounds.loadBackgroundAsset),
 		selectActiveBackground = require(script.Backgrounds.selectActiveBackground),
 		buildOutfitProfileConfiguration = require(script.Backgrounds.buildOutfitProfileConfiguration),
+		normalizeBackgroundId = require(script.Backgrounds.normalizeBackgroundId),
 		NO_BACKGROUND_ASSET_ID = require(script.Backgrounds.constants).NO_BACKGROUND_ASSET_ID
 	},
 	Constants = require(script.Constants),

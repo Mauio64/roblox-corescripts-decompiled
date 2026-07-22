@@ -36,70 +36,75 @@ local function normalizeWaveform(t1: {[any]: any}) -- line: 32
 	return t3
 end
 local function useAudioWaveform(n3: number, n4: number) -- line: 55
-	-- upvalues: React (copy), SegmentSelectorWidth (copy), WaveformWidth (copy), WaveformPadding (copy), useEffect (copy), LocalPlayer (copy), normalizeWaveform (copy)
+	-- upvalues: React (copy), useEffect (copy), SegmentSelectorWidth (copy), WaveformWidth (copy), WaveformPadding (copy), LocalPlayer (copy), normalizeWaveform (copy)
 	local v26, v27 = React.useState({})
-	local v28 = React.useRef(nil)
-	local v29 = React.useMemo(function() -- line: 59
-		-- upvalues: SegmentSelectorWidth (copy), WaveformWidth (copy), WaveformPadding (copy), n4 (copy)
-		return SegmentSelectorWidth / (WaveformWidth + WaveformPadding) / n4
-	end, { n4 })
-	local v30 = React.useMemo(function() -- line: 63
-		-- upvalues: n3 (copy)
-		return `rbxassetid://{ n3 }`
-	end, { n3 })
 
-	useEffect(function() -- line: 69
-		-- upvalues: v30 (copy), v28 (copy), LocalPlayer (copy)
+	useEffect(function() -- line: 63
+		-- upvalues: v27 (copy), n4 (copy), SegmentSelectorWidth (copy), WaveformWidth (copy), WaveformPadding (copy), n3 (copy), LocalPlayer (copy), normalizeWaveform (copy)
+		v27({})
+
+		if n4 <= 0 then
+			return nil
+		end
+
+		local v28 = SegmentSelectorWidth / (WaveformWidth + WaveformPadding) / n4
 		local Folder = Instance.new("Folder")
 
 		Folder.Name = "AudioWaveform"
 
 		local AudioPlayer = Instance.new("AudioPlayer")
 
-		AudioPlayer.Asset = v30
+		AudioPlayer.Asset = `rbxassetid://{ n3 }`
 		AudioPlayer.Parent = Folder
-		v28.current = AudioPlayer
 		Folder.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-		return function() -- line: 80
-			-- upvalues: Folder (copy)
+		local u31 = false
+
+		local function generate() -- line: 83
+			-- upvalues: u31 (ref), AudioPlayer (copy), v28 (copy), v27 (copy), normalizeWaveform (copy)
+			if u31 or not AudioPlayer.IsReady then
+				return
+			end
+
+			task.spawn(function() -- line: 87
+				-- upvalues: AudioPlayer (copy), v28 (copy), u31 (ref), v27 (copy), normalizeWaveform (copy)
+				local ok, result = pcall(function() -- line: 88
+					-- upvalues: AudioPlayer (copy), v28 (copy)
+					return AudioPlayer:GetWaveformAsync(NumberRange.new(0, AudioPlayer.TimeLength), v28 * AudioPlayer.TimeLength)
+				end)
+
+				if not u31 and ok then
+					v27((normalizeWaveform(result)))
+				end
+			end)
+		end
+
+		local connection = AudioPlayer:GetPropertyChangedSignal("IsReady"):Connect(generate)
+
+		if AudioPlayer.IsReady and not u31 and AudioPlayer.IsReady then
+			task.spawn(function() -- line: 87
+				-- upvalues: AudioPlayer (copy), v28 (copy), u31 (ref), v27 (copy), normalizeWaveform (copy)
+				local ok, result = pcall(function() -- line: 88
+					-- upvalues: AudioPlayer (copy), v28 (copy)
+					return AudioPlayer:GetWaveformAsync(NumberRange.new(0, AudioPlayer.TimeLength), v28 * AudioPlayer.TimeLength)
+				end)
+
+				if not u31 and ok then
+					v27((normalizeWaveform(result)))
+				end
+			end)
+		end
+
+		return function() -- line: 106
+			-- upvalues: u31 (ref), connection (copy), Folder (copy)
+			u31 = true
+			connection:Disconnect()
 			Folder:Destroy()
 		end
 	end, {
 		n3,
 		n4
 	})
-
-	local v31 = React.useCallback(function() -- line: 87
-		-- upvalues: v28 (copy), v29 (copy), v27 (copy), normalizeWaveform (copy)
-		local current = v28.current
-
-		if current and current.IsReady then
-			task.spawn(function() -- line: 90
-				-- upvalues: current (copy), v29 (copy), v27 (copy), normalizeWaveform (copy)
-				local WaveformAsync = current:GetWaveformAsync(NumberRange.new(0, current.TimeLength), v29 * current.TimeLength)
-
-				v27((normalizeWaveform(WaveformAsync)))
-			end)
-		end
-	end, {})
-
-	useEffect(function() -- line: 102
-		-- upvalues: v28 (copy), v31 (copy)
-		local current = v28.current
-		local t4 = {}
-
-		if current then
-			table.insert(t4, current:GetPropertyChangedSignal("IsReady"):Connect(v31))
-		end
-
-		return function() -- line: 109
-			-- upvalues: t4 (copy)
-			for _, v39 in t4 do
-				v39:Disconnect()
-			end
-		end
-	end, {})
 
 	return v26
 end

@@ -42,18 +42,23 @@ local function AppChatNotificationEventReceiver(t1: {[any]: any}) -- line: 24
 
 	local v25 = if not FFlagExpChatEnableFriendsTab or not t1.isInExperience then v22 else v23
 
-	React.useEffect(function() -- line: 53
-		-- upvalues: v15 (copy), v20 (copy), AppChatNetworking (copy), v18 (copy), EventNames (copy)
+	React.useEffect(function() -- line: 56
+		-- upvalues: v15 (copy), v20 (copy), AppChatNetworking (copy), FFlagExpChatEnableFriendsTab (copy), t1 (copy), InExperienceAppChatModal (copy), v18 (copy), EventNames (copy)
 		v15:debug("Fetching conversation metadata to get unread count")
-		v20(AppChatNetworking.rodux.GetConversationMetadata.API()):andThen(function(p2) -- line: 57
-			-- upvalues: v15 (copy), v18 (copy), EventNames (copy)
+		v20(AppChatNetworking.rodux.GetConversationMetadata.API()):andThen(function(p2) -- line: 60
+			-- upvalues: v15 (copy), FFlagExpChatEnableFriendsTab (copy), t1 (copy), InExperienceAppChatModal (copy), v18 (copy), EventNames (copy)
 			local global_unread_message_count = p2.responseBody.global_unread_message_count
 
 			v15:info("Initial unread message count: {}", global_unread_message_count)
+
+			if FFlagExpChatEnableFriendsTab and t1.isInExperience then
+				InExperienceAppChatModal:markInitialUnreadCountReceived(global_unread_message_count or 0)
+			end
+
 			v18.fireAnalyticsEvent(EventNames.preloadSocialTabDataEvent, {
 				unreadConversationCount = global_unread_message_count
 			})
-		end):catch(function(p3) -- line: 65
+		end):catch(function(p3) -- line: 74
 			-- upvalues: v15 (copy), v18 (copy), EventNames (copy)
 			v15:error("Failure in GetConversationMetadata. Error: {}", (tostring(p3)))
 			v18.fireAnalyticsEvent(EventNames.preloadSocialTabDataFailedEvent, {})
@@ -62,7 +67,7 @@ local function AppChatNotificationEventReceiver(t1: {[any]: any}) -- line: 24
 		v20,
 		v18
 	})
-	React.useEffect(function() -- line: 71
+	React.useEffect(function() -- line: 80
 		-- upvalues: v15 (copy), v21 (copy), v19 (copy)
 		v15:info("Dispatching unread messsage count as {}", v21)
 		v19(v21)
@@ -70,14 +75,14 @@ local function AppChatNotificationEventReceiver(t1: {[any]: any}) -- line: 24
 		v19,
 		v21
 	})
-	useRealtimePlatformChat(function(p4) -- line: 76
+	useRealtimePlatformChat(function(p4) -- line: 85
 		-- upvalues: v15 (copy), v25 (copy), v20 (copy), AppChatNetworking (copy)
 		if p4.Type == "ChannelMetadataUpdated" or p4.Type == "ChannelMarkedRead" then
 			v15:info("Received event {}, fetching conversation metadata to get unread count", p4.Type)
 
 			if v25 then
 				v15:info("Chat tab is visible during realtime event, calling clear endpoint")
-				v20(AppChatNetworking.rodux.ClearGlobalUnreadCount.API()):catch(function(p5) -- line: 84
+				v20(AppChatNetworking.rodux.ClearGlobalUnreadCount.API()):catch(function(p5) -- line: 93
 					-- upvalues: v15 (copy)
 					v15:error("Failure in ClearGlobalUnreadCount. Error: {}", (tostring(p5)))
 				end)
@@ -85,7 +90,7 @@ local function AppChatNotificationEventReceiver(t1: {[any]: any}) -- line: 24
 				return
 			end
 
-			v20(AppChatNetworking.rodux.GetConversationMetadata.API()):catch(function(p6) -- line: 88
+			v20(AppChatNetworking.rodux.GetConversationMetadata.API()):catch(function(p6) -- line: 97
 				-- upvalues: v15 (copy)
 				v15:error("Failure in GetConversationMetadata. Error: {}", (tostring(p6)))
 			end)
@@ -94,14 +99,14 @@ local function AppChatNotificationEventReceiver(t1: {[any]: any}) -- line: 24
 		v20,
 		v25
 	})
-	RealtimeDelivery.useRealtimeConnectionStateChanged("CommunicationChannels", function(p7, p8) -- line: 98
+	RealtimeDelivery.useRealtimeConnectionStateChanged("CommunicationChannels", function(p7, p8) -- line: 107
 		-- upvalues: v15 (copy), v25 (copy), v20 (copy), AppChatNetworking (copy)
 		if p7 == Enum.ConnectionState.Connected and p8 then
 			v15:info("Connection re-established, fetching conversation metadata to get unread count")
 
 			if v25 then
 				v15:info("Chat tab is visible during connection recovery, calling clear endpoint")
-				v20(AppChatNetworking.rodux.ClearGlobalUnreadCount.API()):catch(function(p9) -- line: 104
+				v20(AppChatNetworking.rodux.ClearGlobalUnreadCount.API()):catch(function(p9) -- line: 113
 					-- upvalues: v15 (copy)
 					v15:error("Failure in ClearGlobalUnreadCount. Error: {}", (tostring(p9)))
 				end)
@@ -109,7 +114,7 @@ local function AppChatNotificationEventReceiver(t1: {[any]: any}) -- line: 24
 				return
 			end
 
-			v20(AppChatNetworking.rodux.GetConversationMetadata.API()):catch(function(p10) -- line: 108
+			v20(AppChatNetworking.rodux.GetConversationMetadata.API()):catch(function(p10) -- line: 117
 				-- upvalues: v15 (copy)
 				v15:error("Failure in GetConversationMetadata. Error: {}", (tostring(p10)))
 			end)

@@ -11,51 +11,50 @@ local Promise = require(DataHydrationParent.Promise)
 local SharedFlags = require(DataHydrationParent.SharedFlags)
 local FFlagLuaAppDataHydrationDataResolverOnClear = SharedFlags.FFlagLuaAppDataHydrationDataResolverOnClear
 local FFlagSduiChartsSupport = SharedFlags.FFlagSduiChartsSupport
-local FFlagSduiDataCacheResetItem = SharedFlags.FFlagSduiDataCacheResetItem
 local FFlagLuaAppDataHydrationOptimisticMutationLayer = SharedFlags.FFlagLuaAppDataHydrationOptimisticMutationLayer
-local v13 = game:DefineFastInt("LuaAppDataHydrationDefaultBatchSize", 50)
-local v14 = game:DefineFastInt("LuaAppDataHydrationQueueProcessDelaySec", 1)
-local v15 = game:DefineFastInt("LuaAppDataHydrationDefaultRequestTimeoutSec", 30)
+local v12 = game:DefineFastInt("LuaAppDataHydrationDefaultBatchSize", 50)
+local v13 = game:DefineFastInt("LuaAppDataHydrationQueueProcessDelaySec", 1)
+local v14 = game:DefineFastInt("LuaAppDataHydrationDefaultRequestTimeoutSec", 30)
 
-local function createDataResolver(t1: {[any]: any}) -- line: 28
-	-- upvalues: v13 (copy), v14 (copy), v15 (copy), createRequestQueue (copy), getLocalPlayerUserId (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), createMutationLayer (copy), Promise (copy), FFlagSduiDataCacheResetItem (copy), FFlagSduiChartsSupport (copy), FFlagLuaAppDataHydrationDataResolverOnClear (copy), Players (copy)
-	local v18 = t1.supportsMultiGet == nil or t1.supportsMultiGet
-	local u19 = t1.requestBatchSize or v13
+local function createDataResolver(t1: {[any]: any}) -- line: 27
+	-- upvalues: v12 (copy), v13 (copy), v14 (copy), createRequestQueue (copy), getLocalPlayerUserId (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), createMutationLayer (copy), Promise (copy), FFlagSduiChartsSupport (copy), FFlagLuaAppDataHydrationDataResolverOnClear (copy), Players (copy)
+	local v17 = t1.supportsMultiGet == nil or t1.supportsMultiGet
+	local u18 = t1.requestBatchSize or v12
 
-	if not v18 and not t1.requestBatchSize then
-		u19 = 1
+	if not v17 and not t1.requestBatchSize then
+		u18 = 1
 	end
 
-	local u20 = t1.queueProcessDelaySec or v14
+	local u19 = t1.queueProcessDelaySec or v13
 
-	if not v18 and not t1.queueProcessDelaySec then
-		u20 = 0
+	if not v17 and not t1.queueProcessDelaySec then
+		u19 = 0
 	end
 
-	local v21 = t1.requestTimeoutSec or v15
+	local v20 = t1.requestTimeoutSec or v14
 	local cache = t1.cache
-	local v23 = createRequestQueue()
+	local v22 = createRequestQueue()
 	local t2 = {}
-	local u25 = nil
-	local u26 = getLocalPlayerUserId()
-	local u27 = nil
+	local u24 = nil
+	local u25 = getLocalPlayerUserId()
+	local u26 = nil
 
 	if FFlagLuaAppDataHydrationOptimisticMutationLayer and t1.supportsMutations then
-		u27 = createMutationLayer()
+		u26 = createMutationLayer()
 	end
 
-	local function FORCE_FETCH() -- line: 66
+	local function FORCE_FETCH() -- line: 65
 		return true
 	end
-	local function logError(p1) -- line: 70
+	local function logError(p1) -- line: 69
 		-- upvalues: t1 (copy)
 		if t1.logError then
 			t1.logError(p1)
 		end
 	end
-	local function handleFailure(s1: string, t3: {[any]: any}, n1: number?) -- line: 77
-		-- upvalues: u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-		if n1 ~= u26 then
+	local function handleFailure(s1: string, t3: {[any]: any}, n1: number?) -- line: 76
+		-- upvalues: u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+		if n1 ~= u25 then
 			return
 		end
 
@@ -63,24 +62,24 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 			t1.logError(s1)
 		end
 
-		for _, v43 in t3 do
-			t2[v43] = nil
+		for _, v42 in t3 do
+			t2[v42] = nil
 		end
 
 		cache.markItemsAsFailed(t3)
 
-		if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-			u27.drainCommitted(t3, cache.updateItem)
+		if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+			u26.drainCommitted(t3, cache.updateItem)
 		end
 	end
-	local function handleSuccess(t4: {[any]: any}, t5: {[any]: any}, n2: number?) -- line: 94
-		-- upvalues: u26 (ref), t2 (ref), t1 (copy), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-		if n2 ~= u26 then
+	local function handleSuccess(t4: {[any]: any}, t5: {[any]: any}, n2: number?) -- line: 93
+		-- upvalues: u25 (ref), t2 (ref), t1 (copy), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+		if n2 ~= u25 then
 			return
 		end
 
-		for v47, _ in t4 do
-			t2[v47] = nil
+		for v46, _ in t4 do
+			t2[v46] = nil
 		end
 
 		if t1.replaceItems then
@@ -92,29 +91,29 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 		local t6 = {}
 
 		if FFlagLuaAppDataHydrationOptimisticMutationLayer then
-			for _, v51 in t5 do
-				if t4[v51] == nil then
-					if u27 and u27.isCommitted(v51) then
-						t2[v51] = nil
+			for _, v50 in t5 do
+				if t4[v50] == nil then
+					if u26 and u26.isCommitted(v50) then
+						t2[v50] = nil
 					else
-						table.insert(t6, v51)
+						table.insert(t6, v50)
 					end
 				end
 			end
 
-			if u27 then
-				u27.drainCommitted(t5, cache.updateItem)
+			if u26 then
+				u26.drainCommitted(t5, cache.updateItem)
 			end
 		else
-			for _, v53 in t5 do
-				if t4[v53] == nil then
-					table.insert(t6, v53)
+			for _, v52 in t5 do
+				if t4[v52] == nil then
+					table.insert(t6, v52)
 				end
 			end
 		end
 
 		if #t6 > 0 then
-			if n2 ~= u26 then
+			if n2 ~= u25 then
 				return
 			end
 
@@ -122,101 +121,101 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 				t1.logError("Items missing in response")
 			end
 
-			for _, v55 in t6 do
-				t2[v55] = nil
+			for _, v54 in t6 do
+				t2[v54] = nil
 			end
 
 			cache.markItemsAsFailed(t6)
 
-			if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-				u27.drainCommitted(t6, cache.updateItem)
+			if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+				u26.drainCommitted(t6, cache.updateItem)
 			end
 		end
 	end
-	local function scheduleFetch() -- line: 139
-		-- upvalues: u25 (ref), v23 (copy), u20 (ref), u26 (ref), u19 (ref), t2 (ref), cache (copy), v21 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), v18 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-		if u25 ~= nil or v23.isEmpty() then
+	local function scheduleFetch() -- line: 138
+		-- upvalues: u24 (ref), v22 (copy), u19 (ref), u25 (ref), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
+		if u24 ~= nil or v22.isEmpty() then
 			return
 		end
 
-		u25 = task.delay(u20, function() -- line: 145
-			-- upvalues: u26 (ref), u25 (ref), v23 (copy), u19 (ref), t2 (ref), cache (copy), v21 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), v18 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-			local v99 = u26
+		u24 = task.delay(u19, function() -- line: 144
+			-- upvalues: u25 (ref), u24 (ref), v22 (copy), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
+			local v98 = u25
 
-			u25 = nil
+			u24 = nil
 
-			if v23.isEmpty() then
+			if v22.isEmpty() then
 				return
 			end
 
-			local v100 = v23.pop(u19)
+			local v99 = v22.pop(u18)
 
-			for _, v102 in v100 do
-				t2[v102] = true
+			for _, v101 in v99 do
+				t2[v101] = true
 			end
 
-			local v103 = cache.getItems(v100)
-			local thread = task.delay(v21, function() -- line: 160
-				-- upvalues: v21 (copy), v100 (copy), v99 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-				local v129 = `No fetch response after { v21 } sec`
-				local v130 = v100
+			local v102 = cache.getItems(v99)
+			local thread = task.delay(v20, function() -- line: 159
+				-- upvalues: v20 (copy), v99 (copy), v98 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+				local v128 = `No fetch response after { v20 } sec`
+				local v129 = v99
 
-				if v99 ~= u26 then
+				if v98 ~= u25 then
 					return
 				end
 
 				if t1.logError then
-					t1.logError(v129)
+					t1.logError(v128)
 				end
 
-				for _, v132 in v130 do
-					t2[v132] = nil
+				for _, v131 in v129 do
+					t2[v131] = nil
 				end
 
-				cache.markItemsAsFailed(v130)
+				cache.markItemsAsFailed(v129)
 
-				if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-					u27.drainCommitted(v130, cache.updateItem)
+				if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+					u26.drainCommitted(v129, cache.updateItem)
 				end
 			end)
-			local ok, result = pcall(function() -- line: 164
-				-- upvalues: v18 (copy), v100 (copy), v103 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v99 (copy), thread (copy), u26 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-				if not v18 then
+			local ok, result = pcall(function() -- line: 163
+				-- upvalues: v17 (copy), v99 (copy), v102 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v98 (copy), thread (copy), u25 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+				if not v17 then
 					local t7 = {}
 
-					for _, v135 in v100 do
-						local v136 = v103[v135]
+					for _, v134 in v99 do
+						local v135 = v102[v134]
 
-						table.insert(t7, t1.fetchFn(v135, v136))
+						table.insert(t7, t1.fetchFn(v134, v135))
 					end
 
-					Promise.all(t7):andThen(function(p2) -- line: 173
-						-- upvalues: v100 (copy), handleSuccess (copy), v99 (copy), thread (copy)
+					Promise.all(t7):andThen(function(p2) -- line: 172
+						-- upvalues: v99 (copy), handleSuccess (copy), v98 (copy), thread (copy)
 						local t8 = {}
 
-						for v155, v156 in v100 do
-							t8[v156] = p2[v155]
+						for v154, v155 in v99 do
+							t8[v155] = p2[v154]
 						end
 
-						handleSuccess(t8, v100, v99)
+						handleSuccess(t8, v99, v98)
 						task.cancel(thread)
-					end):catch(function(p3) -- line: 181
-						-- upvalues: v100 (copy), v99 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), thread (copy)
-						local v158 = v100
+					end):catch(function(p3) -- line: 180
+						-- upvalues: v99 (copy), v98 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
+						local v157 = v99
 
-						if v99 == u26 then
+						if v98 == u25 then
 							if t1.logError then
 								t1.logError(p3)
 							end
 
-							for _, v160 in v158 do
-								t2[v160] = nil
+							for _, v159 in v157 do
+								t2[v159] = nil
 							end
 
-							cache.markItemsAsFailed(v158)
+							cache.markItemsAsFailed(v157)
 
-							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-								u27.drainCommitted(v158, cache.updateItem)
+							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+								u26.drainCommitted(v157, cache.updateItem)
 							end
 						end
 
@@ -226,27 +225,27 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 					return
 				end
 
-				t1.fetchFn(v103):andThen(function(t9: {[any]: any}) -- line: 187
-					-- upvalues: handleSuccess (copy), v100 (copy), v99 (copy), thread (copy)
-					handleSuccess(t9, v100, v99)
+				t1.fetchFn(v102):andThen(function(t9: {[any]: any}) -- line: 186
+					-- upvalues: handleSuccess (copy), v99 (copy), v98 (copy), thread (copy)
+					handleSuccess(t9, v99, v98)
 					task.cancel(thread)
-				end):catch(function(p4) -- line: 191
-					-- upvalues: v100 (copy), v99 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), thread (copy)
-					local v163 = v100
+				end):catch(function(p4) -- line: 190
+					-- upvalues: v99 (copy), v98 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
+					local v162 = v99
 
-					if v99 == u26 then
+					if v98 == u25 then
 						if t1.logError then
 							t1.logError(p4)
 						end
 
-						for _, v165 in v163 do
-							t2[v165] = nil
+						for _, v164 in v162 do
+							t2[v164] = nil
 						end
 
-						cache.markItemsAsFailed(v163)
+						cache.markItemsAsFailed(v162)
 
-						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-							u27.drainCommitted(v163, cache.updateItem)
+						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+							u26.drainCommitted(v162, cache.updateItem)
 						end
 					end
 
@@ -255,19 +254,19 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 			end)
 
 			if not ok then
-				if v99 == u26 then
+				if v98 == u25 then
 					if t1.logError then
 						t1.logError(result)
 					end
 
-					for _, v108 in v100 do
-						t2[v108] = nil
+					for _, v107 in v99 do
+						t2[v107] = nil
 					end
 
-					cache.markItemsAsFailed(v100)
+					cache.markItemsAsFailed(v99)
 
-					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-						u27.drainCommitted(v100, cache.updateItem)
+					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+						u26.drainCommitted(v99, cache.updateItem)
 					end
 				end
 
@@ -277,111 +276,108 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 			scheduleFetch()
 		end)
 	end
-	local function getAndFetchItems(t10: {[any]: any}, p5: ((...any) -> ...any)?) -- line: 217
-		-- upvalues: cache (copy), FFlagSduiDataCacheResetItem (copy), v23 (copy), t2 (ref), u25 (ref), u20 (ref), u26 (ref), u19 (ref), v21 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), v18 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-		local v59, v60 = cache.getItems(t10, p5)
+	local function getAndFetchItems(t10: {[any]: any}, p5: ((...any) -> ...any)?) -- line: 216
+		-- upvalues: cache (copy), v22 (copy), t2 (ref), u24 (ref), u19 (ref), u25 (ref), u18 (ref), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
+		local v58, v59 = cache.getItems(t10, p5)
 		local t11 = {}
-		local v62 = if not FFlagSduiDataCacheResetItem then nil else {}
+		local t12 = {}
 
-		for v63, v64 in v59 do
-			t11[v63] = v64
+		for v62, v63 in v58 do
+			t11[v62] = v63
 
-			if v60[v63] and (not v23.hasItem(v63) and t2[v63] == nil) then
-				v23.push(v63)
-
-				if FFlagSduiDataCacheResetItem then
-					table.insert(v62, v63)
-				end
+			if v59[v62] and (not v22.hasItem(v62) and t2[v62] == nil) then
+				v22.push(v62)
+				table.insert(t12, v62)
 			end
 		end
 
-		if FFlagSduiDataCacheResetItem and #v62 > 0 then
-			cache.resetFailedItems(v62)
+		if #t12 > 0 then
+			cache.resetFailedItems(t12)
 		end
 
-		if not v23.isEmpty() and u25 == nil then
-			if v23.isEmpty() then
+		if not v22.isEmpty() and u24 == nil then
+			if v22.isEmpty() then
 				return t11
 			end
 
-			u25 = task.delay(u20, function() -- line: 145
-				-- upvalues: u26 (ref), u25 (ref), v23 (copy), u19 (ref), t2 (ref), cache (copy), v21 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), v18 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-				local v109 = u26
+			u24 = task.delay(u19, function() -- line: 144
+				-- upvalues: u25 (ref), u24 (ref), v22 (copy), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
+				local v108 = u25
 
-				u25 = nil
+				u24 = nil
 
-				if v23.isEmpty() then
+				if v22.isEmpty() then
 					return
 				end
 
-				local v110 = v23.pop(u19)
+				local v109 = v22.pop(u18)
 
-				for _, v112 in v110 do
-					t2[v112] = true
+				for _, v111 in v109 do
+					t2[v111] = true
 				end
 
-				local v113 = cache.getItems(v110)
-				local thread = task.delay(v21, function() -- line: 160
-					-- upvalues: v21 (copy), v110 (copy), v109 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-					local v137 = `No fetch response after { v21 } sec`
-					local v138 = v110
+				local v112 = cache.getItems(v109)
+				local thread = task.delay(v20, function() -- line: 159
+					-- upvalues: v20 (copy), v109 (copy), v108 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+					local v136 = `No fetch response after { v20 } sec`
+					local v137 = v109
 
-					if v109 ~= u26 then
+					if v108 ~= u25 then
 						return
 					end
 
 					if t1.logError then
-						t1.logError(v137)
+						t1.logError(v136)
 					end
 
-					for _, v140 in v138 do
-						t2[v140] = nil
+					for _, v139 in v137 do
+						t2[v139] = nil
 					end
 
-					cache.markItemsAsFailed(v138)
+					cache.markItemsAsFailed(v137)
 
-					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-						u27.drainCommitted(v138, cache.updateItem)
+					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+						u26.drainCommitted(v137, cache.updateItem)
 					end
 				end)
-				local ok, result = pcall(function() -- line: 164
-					-- upvalues: v18 (copy), v110 (copy), v113 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v109 (copy), thread (copy), u26 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-					if not v18 then
-						local t12 = {}
+				local ok, result = pcall(function() -- line: 163
+					-- upvalues: v17 (copy), v109 (copy), v112 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v108 (copy), thread (copy), u25 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+					if not v17 then
+						local t13 = {}
 
-						for _, v143 in v110 do
-							local v144 = v113[v143]
+						for _, v142 in v109 do
+							local v143 = v112[v142]
 
-							table.insert(t12, t1.fetchFn(v143, v144))
+							table.insert(t13, t1.fetchFn(v142, v143))
 						end
 
-						Promise.all(t12):andThen(function(p6) -- line: 173
-							-- upvalues: v110 (copy), handleSuccess (copy), v109 (copy), thread (copy)
-							local t13 = {}
+						Promise.all(t13):andThen(function(p6) -- line: 172
+							-- upvalues: v109 (copy), handleSuccess (copy), v108 (copy), thread (copy)
+							local t14 = {}
 
-							for v168, v169 in v110 do
-								t13[v169] = p6[v168]
+							for v167, v168 in v109 do
+								t14[v168] = p6[v167]
 							end
 
-							handleSuccess(t13, v110, v109)
+							handleSuccess(t14, v109, v108)
 							task.cancel(thread)
-						end):catch(function(p7) -- line: 181
-							-- upvalues: v110 (copy), v109 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), thread (copy)
-							local v171 = v110
+						end):catch(function(p7) -- line: 180
+							-- upvalues: v109 (copy), v108 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
+							local v170 = v109
 
-							if v109 == u26 then
+							if v108 == u25 then
 								if t1.logError then
 									t1.logError(p7)
 								end
 
-								for _, v173 in v171 do
-									t2[v173] = nil
+								for _, v172 in v170 do
+									t2[v172] = nil
 								end
 
-								cache.markItemsAsFailed(v171)
+								cache.markItemsAsFailed(v170)
 
-								if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-									u27.drainCommitted(v171, cache.updateItem)
+								if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+									u26.drainCommitted(v170, cache.updateItem)
 								end
 							end
 
@@ -391,27 +387,27 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 						return
 					end
 
-					t1.fetchFn(v113):andThen(function(t14: {[any]: any}) -- line: 187
-						-- upvalues: handleSuccess (copy), v110 (copy), v109 (copy), thread (copy)
-						handleSuccess(t14, v110, v109)
+					t1.fetchFn(v112):andThen(function(t15: {[any]: any}) -- line: 186
+						-- upvalues: handleSuccess (copy), v109 (copy), v108 (copy), thread (copy)
+						handleSuccess(t15, v109, v108)
 						task.cancel(thread)
-					end):catch(function(p8) -- line: 191
-						-- upvalues: v110 (copy), v109 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), thread (copy)
-						local v176 = v110
+					end):catch(function(p8) -- line: 190
+						-- upvalues: v109 (copy), v108 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
+						local v175 = v109
 
-						if v109 == u26 then
+						if v108 == u25 then
 							if t1.logError then
 								t1.logError(p8)
 							end
 
-							for _, v178 in v176 do
-								t2[v178] = nil
+							for _, v177 in v175 do
+								t2[v177] = nil
 							end
 
-							cache.markItemsAsFailed(v176)
+							cache.markItemsAsFailed(v175)
 
-							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-								u27.drainCommitted(v176, cache.updateItem)
+							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+								u26.drainCommitted(v175, cache.updateItem)
 							end
 						end
 
@@ -420,19 +416,19 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 				end)
 
 				if not ok then
-					if v109 == u26 then
+					if v108 == u25 then
 						if t1.logError then
 							t1.logError(result)
 						end
 
-						for _, v118 in v110 do
-							t2[v118] = nil
+						for _, v117 in v109 do
+							t2[v117] = nil
 						end
 
-						cache.markItemsAsFailed(v110)
+						cache.markItemsAsFailed(v109)
 
-						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-							u27.drainCommitted(v110, cache.updateItem)
+						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+							u26.drainCommitted(v109, cache.updateItem)
 						end
 					end
 
@@ -445,97 +441,94 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 
 		return t11
 	end
-	local function getAndFetchItem(s2: string, p9: ((...any) -> ...any)?) -- line: 241
-		-- upvalues: cache (copy), v23 (copy), t2 (ref), FFlagSduiDataCacheResetItem (copy), u25 (ref), u20 (ref), u26 (ref), u19 (ref), v21 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), v18 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy), FFlagSduiChartsSupport (copy)
-		local v67, v68 = cache.getItem(s2, p9)
+	local function getAndFetchItem(s2: string, p9: ((...any) -> ...any)?) -- line: 238
+		-- upvalues: cache (copy), v22 (copy), t2 (ref), u24 (ref), u19 (ref), u25 (ref), u18 (ref), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy), FFlagSduiChartsSupport (copy)
+		local v66, v67 = cache.getItem(s2, p9)
 
-		if v68 and (not v23.hasItem(s2) and t2[s2] == nil) then
-			if FFlagSduiDataCacheResetItem then
-				cache.resetFailedItem(s2)
-			end
-
-			v23.push(s2)
+		if v67 and (not v22.hasItem(s2) and t2[s2] == nil) then
+			cache.resetFailedItem(s2)
+			v22.push(s2)
 		end
 
-		if not v23.isEmpty() and u25 == nil and not v23.isEmpty() then
-			u25 = task.delay(u20, function() -- line: 145
-				-- upvalues: u26 (ref), u25 (ref), v23 (copy), u19 (ref), t2 (ref), cache (copy), v21 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), v18 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-				local v119 = u26
+		if not v22.isEmpty() and u24 == nil and not v22.isEmpty() then
+			u24 = task.delay(u19, function() -- line: 144
+				-- upvalues: u25 (ref), u24 (ref), v22 (copy), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
+				local v118 = u25
 
-				u25 = nil
+				u24 = nil
 
-				if v23.isEmpty() then
+				if v22.isEmpty() then
 					return
 				end
 
-				local v120 = v23.pop(u19)
+				local v119 = v22.pop(u18)
 
-				for _, v122 in v120 do
-					t2[v122] = true
+				for _, v121 in v119 do
+					t2[v121] = true
 				end
 
-				local v123 = cache.getItems(v120)
-				local thread = task.delay(v21, function() -- line: 160
-					-- upvalues: v21 (copy), v120 (copy), v119 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-					local v145 = `No fetch response after { v21 } sec`
-					local v146 = v120
+				local v122 = cache.getItems(v119)
+				local thread = task.delay(v20, function() -- line: 159
+					-- upvalues: v20 (copy), v119 (copy), v118 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+					local v144 = `No fetch response after { v20 } sec`
+					local v145 = v119
 
-					if v119 ~= u26 then
+					if v118 ~= u25 then
 						return
 					end
 
 					if t1.logError then
-						t1.logError(v145)
+						t1.logError(v144)
 					end
 
-					for _, v148 in v146 do
-						t2[v148] = nil
+					for _, v147 in v145 do
+						t2[v147] = nil
 					end
 
-					cache.markItemsAsFailed(v146)
+					cache.markItemsAsFailed(v145)
 
-					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-						u27.drainCommitted(v146, cache.updateItem)
+					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+						u26.drainCommitted(v145, cache.updateItem)
 					end
 				end)
-				local ok, result = pcall(function() -- line: 164
-					-- upvalues: v18 (copy), v120 (copy), v123 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v119 (copy), thread (copy), u26 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref)
-					if not v18 then
-						local t15 = {}
+				local ok, result = pcall(function() -- line: 163
+					-- upvalues: v17 (copy), v119 (copy), v122 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v118 (copy), thread (copy), u25 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
+					if not v17 then
+						local t16 = {}
 
-						for _, v151 in v120 do
-							local v152 = v123[v151]
+						for _, v150 in v119 do
+							local v151 = v122[v150]
 
-							table.insert(t15, t1.fetchFn(v151, v152))
+							table.insert(t16, t1.fetchFn(v150, v151))
 						end
 
-						Promise.all(t15):andThen(function(p10) -- line: 173
-							-- upvalues: v120 (copy), handleSuccess (copy), v119 (copy), thread (copy)
-							local t16 = {}
+						Promise.all(t16):andThen(function(p10) -- line: 172
+							-- upvalues: v119 (copy), handleSuccess (copy), v118 (copy), thread (copy)
+							local t17 = {}
 
-							for v181, v182 in v120 do
-								t16[v182] = p10[v181]
+							for v180, v181 in v119 do
+								t17[v181] = p10[v180]
 							end
 
-							handleSuccess(t16, v120, v119)
+							handleSuccess(t17, v119, v118)
 							task.cancel(thread)
-						end):catch(function(p11) -- line: 181
-							-- upvalues: v120 (copy), v119 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), thread (copy)
-							local v184 = v120
+						end):catch(function(p11) -- line: 180
+							-- upvalues: v119 (copy), v118 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
+							local v183 = v119
 
-							if v119 == u26 then
+							if v118 == u25 then
 								if t1.logError then
 									t1.logError(p11)
 								end
 
-								for _, v186 in v184 do
-									t2[v186] = nil
+								for _, v185 in v183 do
+									t2[v185] = nil
 								end
 
-								cache.markItemsAsFailed(v184)
+								cache.markItemsAsFailed(v183)
 
-								if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-									u27.drainCommitted(v184, cache.updateItem)
+								if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+									u26.drainCommitted(v183, cache.updateItem)
 								end
 							end
 
@@ -545,27 +538,27 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 						return
 					end
 
-					t1.fetchFn(v123):andThen(function(t17: {[any]: any}) -- line: 187
-						-- upvalues: handleSuccess (copy), v120 (copy), v119 (copy), thread (copy)
-						handleSuccess(t17, v120, v119)
+					t1.fetchFn(v122):andThen(function(t18: {[any]: any}) -- line: 186
+						-- upvalues: handleSuccess (copy), v119 (copy), v118 (copy), thread (copy)
+						handleSuccess(t18, v119, v118)
 						task.cancel(thread)
-					end):catch(function(p12) -- line: 191
-						-- upvalues: v120 (copy), v119 (copy), u26 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), thread (copy)
-						local v189 = v120
+					end):catch(function(p12) -- line: 190
+						-- upvalues: v119 (copy), v118 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
+						local v188 = v119
 
-						if v119 == u26 then
+						if v118 == u25 then
 							if t1.logError then
 								t1.logError(p12)
 							end
 
-							for _, v191 in v189 do
-								t2[v191] = nil
+							for _, v190 in v188 do
+								t2[v190] = nil
 							end
 
-							cache.markItemsAsFailed(v189)
+							cache.markItemsAsFailed(v188)
 
-							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-								u27.drainCommitted(v189, cache.updateItem)
+							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+								u26.drainCommitted(v188, cache.updateItem)
 							end
 						end
 
@@ -574,19 +567,19 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 				end)
 
 				if not ok then
-					if v119 == u26 then
+					if v118 == u25 then
 						if t1.logError then
 							t1.logError(result)
 						end
 
-						for _, v128 in v120 do
-							t2[v128] = nil
+						for _, v127 in v119 do
+							t2[v127] = nil
 						end
 
-						cache.markItemsAsFailed(v120)
+						cache.markItemsAsFailed(v119)
 
-						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-							u27.drainCommitted(v120, cache.updateItem)
+						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+							u26.drainCommitted(v119, cache.updateItem)
 						end
 					end
 
@@ -598,24 +591,24 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 		end
 
 		if FFlagSduiChartsSupport then
-			return v67, v68
+			return v66, v67
 		end
 
-		return v67, nil
+		return v66, nil
 	end
-	local function clear() -- line: 276
-		-- upvalues: u25 (ref), t2 (ref), cache (copy), v23 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u27 (ref), FFlagLuaAppDataHydrationDataResolverOnClear (copy), t1 (copy)
-		if u25 then
-			task.cancel(u25)
-			u25 = nil
+	local function clear() -- line: 271
+		-- upvalues: u24 (ref), t2 (ref), cache (copy), v22 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), FFlagLuaAppDataHydrationDataResolverOnClear (copy), t1 (copy)
+		if u24 then
+			task.cancel(u24)
+			u24 = nil
 		end
 
 		t2 = {}
 		cache.clear()
-		v23.clear()
+		v22.clear()
 
-		if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-			u27.clearAll()
+		if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+			u26.clearAll()
 		end
 
 		if FFlagLuaAppDataHydrationDataResolverOnClear and t1.onClear then
@@ -623,37 +616,37 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 		end
 	end
 
-	local connection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 293
-		-- upvalues: getLocalPlayerUserId (copy), u26 (ref), clear (copy)
-		local v75 = getLocalPlayerUserId()
+	local connection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 288
+		-- upvalues: getLocalPlayerUserId (copy), u25 (ref), clear (copy)
+		local v74 = getLocalPlayerUserId()
 
-		if v75 ~= u26 then
-			u26 = v75
+		if v74 ~= u25 then
+			u25 = v74
 			clear()
 		end
 	end)
-	local t20 = {
+	local t21 = {
 		getAndFetchItems = getAndFetchItems,
 		getAndFetchItem = getAndFetchItem,
-		getCachedItem = function(s3: string) -- line: 260
+		getCachedItem = function(s3: string) -- line: 255
 			-- upvalues: cache (copy)
 			return cache.getItem(s3)
 		end,
-		getCachedItems = function(t18: {[any]: any}) -- line: 264
+		getCachedItems = function(t19: {[any]: any}) -- line: 259
 			-- upvalues: cache (copy)
-			return cache.getItems(t18)
+			return cache.getItems(t19)
 		end,
-		fetchItem = function(s4: string, p13: ((...any) -> ...any)?) -- line: 268
+		fetchItem = function(s4: string, p13: ((...any) -> ...any)?) -- line: 263
 			-- upvalues: getAndFetchItem (copy), FORCE_FETCH (copy)
 			return getAndFetchItem(s4, p13 or FORCE_FETCH)
 		end,
-		fetchItems = function(t19: {[any]: any}, p14: ((...any) -> ...any)?) -- line: 272
+		fetchItems = function(t20: {[any]: any}, p14: ((...any) -> ...any)?) -- line: 267
 			-- upvalues: getAndFetchItems (copy), FORCE_FETCH (copy)
-			return (getAndFetchItems(t19, p14 or FORCE_FETCH))
+			return (getAndFetchItems(t20, p14 or FORCE_FETCH))
 		end,
-		isRequestInQueueOrInFlight = function(s5: string) -- line: 207
-			-- upvalues: v23 (copy), t2 (ref)
-			if v23.hasItem(s5) then
+		isRequestInQueueOrInFlight = function(s5: string) -- line: 206
+			-- upvalues: v22 (copy), t2 (ref)
+			if v22.hasItem(s5) then
 				return true
 			end
 
@@ -663,7 +656,7 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 
 			return false
 		end,
-		dispose = function() -- line: 301
+		dispose = function() -- line: 296
 			-- upvalues: connection (ref), cache (copy)
 			if connection then
 				connection:Disconnect()
@@ -675,71 +668,71 @@ local function createDataResolver(t1: {[any]: any}) -- line: 28
 		clear = clear
 	}
 
-	if FFlagLuaAppDataHydrationOptimisticMutationLayer and u27 then
-		function t20.getOptimisticCachedItem(s6: string) -- line: 327
-			-- upvalues: cache (copy), u27 (ref)
-			local v77, v78 = cache.getItem(s6)
+	if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
+		function t21.getOptimisticCachedItem(s6: string) -- line: 322
+			-- upvalues: cache (copy), u26 (ref)
+			local v76, v77 = cache.getItem(s6)
 
-			return u27.getMergedResult(s6, v77), v78
+			return u26.getMergedResult(s6, v76), v77
 		end
-		function t20.getOptimisticCachedItems(t21: {[any]: any}) -- line: 332
-			-- upvalues: cache (copy), u27 (ref)
-			local v80, v81 = cache.getItems(t21)
-			local t22 = {}
+		function t21.getOptimisticCachedItems(t22: {[any]: any}) -- line: 327
+			-- upvalues: cache (copy), u26 (ref)
+			local v79, v80 = cache.getItems(t22)
+			local t23 = {}
 
-			for v83, v84 in v80 do
-				t22[v83] = u27.getMergedResult(v83, v84)
+			for v82, v83 in v79 do
+				t23[v82] = u26.getMergedResult(v82, v83)
 			end
 
-			return t22, v81
+			return t23, v80
 		end
-		function t20.getOptimisticAndFetchItem(s7: string, p15: ((...any) -> ...any)?) -- line: 342
-			-- upvalues: getAndFetchItem (copy), FFlagSduiChartsSupport (copy), u27 (ref)
-			local v87, v88 = getAndFetchItem(s7, p15)
+		function t21.getOptimisticAndFetchItem(s7: string, p15: ((...any) -> ...any)?) -- line: 337
+			-- upvalues: getAndFetchItem (copy), FFlagSduiChartsSupport (copy), u26 (ref)
+			local v86, v87 = getAndFetchItem(s7, p15)
 
 			if FFlagSduiChartsSupport then
-				return u27.getMergedResult(s7, v87), v88
+				return u26.getMergedResult(s7, v86), v87
 			end
 
-			return u27.getMergedResult(s7, v87), nil
+			return u26.getMergedResult(s7, v86), nil
 		end
-		function t20.getOptimisticAndFetchItems(t23: {[any]: any}, p16: ((...any) -> ...any)?) -- line: 350
-			-- upvalues: getAndFetchItems (copy), u27 (ref)
-			local t24 = {}
+		function t21.getOptimisticAndFetchItems(t24: {[any]: any}, p16: ((...any) -> ...any)?) -- line: 345
+			-- upvalues: getAndFetchItems (copy), u26 (ref)
+			local t25 = {}
 
-			for v92, v93 in (getAndFetchItems(t23, p16)) do
-				t24[v92] = u27.getMergedResult(v92, v93)
+			for v91, v92 in (getAndFetchItems(t24, p16)) do
+				t25[v91] = u26.getMergedResult(v91, v92)
 			end
 
-			return t24
+			return t25
 		end
-		function t20.setMutation(s8: string, p17) -- line: 360
-			-- upvalues: u27 (ref)
-			u27.set(s8, p17)
+		function t21.setMutation(s8: string, p17) -- line: 355
+			-- upvalues: u26 (ref)
+			u26.set(s8, p17)
 		end
-		function t20.clearMutation(s9: string) -- line: 365
-			-- upvalues: u27 (ref)
-			u27.clear(s9)
+		function t21.clearMutation(s9: string) -- line: 360
+			-- upvalues: u26 (ref)
+			u26.clear(s9)
 		end
-		function t20.commitMutation(s10: string) -- line: 370
-			-- upvalues: v23 (copy), t2 (ref), u27 (ref), cache (copy)
-			if not not v23.hasItem(s10) or t2[s10] ~= nil then
-				u27.markCommitted(s10)
+		function t21.commitMutation(s10: string) -- line: 365
+			-- upvalues: v22 (copy), t2 (ref), u26 (ref), cache (copy)
+			if not not v22.hasItem(s10) or t2[s10] ~= nil then
+				u26.markCommitted(s10)
 
 				return
 			end
 
-			local v98 = u27.get(s10)
+			local v97 = u26.get(s10)
 
-			if v98 ~= nil then
-				cache.updateItem(s10, v98)
+			if v97 ~= nil then
+				cache.updateItem(s10, v97)
 			end
 
-			u27.clear(s10)
+			u26.clear(s10)
 		end
 	end
 
-	return t20
+	return t21
 end
 
 return createDataResolver

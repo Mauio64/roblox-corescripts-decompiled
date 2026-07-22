@@ -37,6 +37,7 @@ local t1 = {
 	FailedToLogVirtualEventImpressions = "FailedToLogVirtualEventImpressions",
 	FailedToLogExperienceStoreImpressions = "FailedToLogExperienceStoreImpressions",
 	FailedToLogMarketplaceItemImpressions = "FailedToLogMarketplaceItemImpressions",
+	FailedToLogQueryImpressions = "FailedToLogQueryImpressions",
 	FailedToMapRobloxComponentToTemplate = "FailedToMapRobloxComponentToTemplate",
 	FailedToOpenLink = "FailedToOpenLink",
 	FailedToPaginateRequest = "FailedToPaginateRequest",

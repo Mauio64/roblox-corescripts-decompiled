@@ -6,33 +6,34 @@ local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNa
 local ButtonHoldStateEnum = FocusNavigationUtils.ButtonHoldStateEnum
 local AppShortcutBarContext = require(HoldToPlayParent.AppShortcutBar).AppShortcutBarContext
 local HoldToPlayLoader = require(HoldToPlay.HoldToPlayLoader)
+local FFlagLuaAppDemoModePlayButtonTelemetry = require(HoldToPlayParent.SharedFlags).FFlagLuaAppDemoModePlayButtonTelemetry
 
-local function HoldToPlayLauncher(t1: {[any]: any}) -- line: 36
-	-- upvalues: AppShortcutBarContext (copy), React (copy), ButtonHoldStateEnum (copy), FocusNavigationEventNameEnum (copy), HoldToPlayLoader (copy)
-	local v11 = AppShortcutBarContext.useDispatchButtonHoldStarted()
-	local v12 = AppShortcutBarContext.useDispatchButtonHoldEnded()
+local function HoldToPlayLauncher(t1: {[any]: any}) -- line: 38
+	-- upvalues: AppShortcutBarContext (copy), React (copy), ButtonHoldStateEnum (copy), FocusNavigationEventNameEnum (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), HoldToPlayLoader (copy)
+	local v12 = AppShortcutBarContext.useDispatchButtonHoldStarted()
+	local v13 = AppShortcutBarContext.useDispatchButtonHoldEnded()
 
-	React.useEffect(function() -- line: 40
-		-- upvalues: t1 (copy), ButtonHoldStateEnum (copy), v11 (copy), FocusNavigationEventNameEnum (copy), v12 (copy)
+	React.useEffect(function() -- line: 42
+		-- upvalues: t1 (copy), ButtonHoldStateEnum (copy), v12 (copy), FocusNavigationEventNameEnum (copy), v13 (copy)
 		if t1.holdState == ButtonHoldStateEnum.JUST_PRESSED then
-			v11(FocusNavigationEventNameEnum.HoldToPlay, t1.holdProgress)
+			v12(FocusNavigationEventNameEnum.HoldToPlay, t1.holdProgress)
 
 			return
 		end
 
 		if t1.holdState == ButtonHoldStateEnum.NOT_HELD then
-			v12(FocusNavigationEventNameEnum.HoldToPlay)
+			v13(FocusNavigationEventNameEnum.HoldToPlay)
 		end
 	end, {
 		t1.holdState,
 		t1.holdProgress,
-		v11,
-		v12
+		v12,
+		v13
 	})
 
-	local v13 = React.useCallback(function() -- line: 49
-		-- upvalues: t1 (copy)
-		t1.reportExperienceLaunched(t1.selectedEntry, t1.referralSource, nil, t1.launchContext, t1.selectedIndex)
+	local v14 = React.useCallback(function(s1: string?) -- line: 51
+		-- upvalues: t1 (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy)
+		t1.reportExperienceLaunched(t1.selectedEntry, t1.referralSource, nil, t1.launchContext, t1.selectedIndex, if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else s1)
 	end, {
 		t1.reportExperienceLaunched,
 		t1.selectedEntry,
@@ -40,13 +41,13 @@ local function HoldToPlayLauncher(t1: {[any]: any}) -- line: 36
 		t1.selectedIndex,
 		t1.launchContext
 	})
-	local v14 = t1.selectedNavigationUniverseId or (t1.selectedEntry and t1.selectedEntry.universeId or nil)
+	local v15 = t1.selectedNavigationUniverseId or (t1.selectedEntry and t1.selectedEntry.universeId or nil)
 
-	if v14 and (t1.holdState == ButtonHoldStateEnum.HOLDING or t1.holdState == ButtonHoldStateEnum.COMPLETED) then
+	if v15 and (t1.holdState == ButtonHoldStateEnum.HOLDING or t1.holdState == ButtonHoldStateEnum.COMPLETED) then
 		return React.createElement(HoldToPlayLoader, {
-			universeId = v14,
+			universeId = v15,
 			shouldAttemptLaunch = t1.holdState == ButtonHoldStateEnum.COMPLETED,
-			reportExperienceLaunched = v13,
+			reportExperienceLaunched = v14,
 			onLaunched = t1.cancelHold
 		})
 	end

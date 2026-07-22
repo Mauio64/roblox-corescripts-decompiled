@@ -6,21 +6,28 @@ local PeopleService = require(PeopleReactViewParent.PeopleService)
 local View = Foundation.View
 local CoreButton = require(PeopleReactView.Components.Buttons.CoreButton)
 local CoreButtonConfigs = require(PeopleReactView.Configs.CoreButtonConfigs)
-local GetFFlagAddPeoplePageCardLayout = PeopleService.getService("Flags").GetFFlagAddPeoplePageCardLayout
+local v9 = PeopleService.getService("Flags")
+local GetFFlagAddPeoplePageCardLayout = v9.GetFFlagAddPeoplePageCardLayout
+local FFlagEnablePeoplePageButtonOnMount = v9.FFlagEnablePeoplePageButtonOnMount
 
-local function MemoizedButton(t1: {[any]: any}) -- line: 19
-	-- upvalues: React (copy), CoreButton (copy)
+local function MemoizedButton(t1: {[any]: any}) -- line: 21
+	-- upvalues: React (copy), FFlagEnablePeoplePageButtonOnMount (copy), CoreButton (copy)
 	local config = t1.config
-	local v13 = React.useCallback(function(p1) -- line: 25
-		-- upvalues: t1 (copy), config (copy)
+	local v15 = React.useCallback(function(p1) -- line: 27
+		-- upvalues: t1 (copy), config (copy), FFlagEnablePeoplePageButtonOnMount (copy)
 		t1.onButtonMount(p1, config.id)
+
+		if FFlagEnablePeoplePageButtonOnMount and (p1 and config.onMount) then
+			config.onMount()
+		end
 	end, {
+		config.onMount,
 		t1.onButtonMount,
 		config.id
 	})
 
-	return React.useMemo(function() -- line: 29
-		-- upvalues: React (copy), CoreButton (copy), config (copy), v13 (copy)
+	return React.useMemo(function() -- line: 34
+		-- upvalues: React (copy), CoreButton (copy), config (copy), v15 (copy)
 		return React.createElement(CoreButton, {
 			text = config.text,
 			icon = {
@@ -32,7 +39,7 @@ local function MemoizedButton(t1: {[any]: any}) -- line: 19
 			isNewIcon = config.isNewIcon,
 			LayoutOrder = config.layoutOrder,
 			onActivated = config.onActivated,
-			onMount = v13
+			onMount = v15
 		})
 	end, {
 		config.text,
@@ -43,49 +50,49 @@ local function MemoizedButton(t1: {[any]: any}) -- line: 19
 		config.isNewIcon,
 		config.layoutOrder,
 		config.onActivated,
-		v13
+		v15
 	})
 end
 
-return function(t2: {[any]: any}) -- line: 57
+return function(t2: {[any]: any}) -- line: 62
 	-- upvalues: CoreButtonConfigs (copy), React (copy), PeopleService (copy), MemoizedButton (copy), View (copy), GetFFlagAddPeoplePageCardLayout (copy)
-	local v15 = CoreButtonConfigs(t2.chromeEnabled, t2.buttonActivatedTable)
-	local v16 = React.useMemo(function() -- line: 62
+	local v17 = CoreButtonConfigs(t2.chromeEnabled, t2.buttonActivatedTable)
+	local v18 = React.useMemo(function() -- line: 67
 		-- upvalues: PeopleService (copy)
 		return PeopleService.getService("FocusNavigationService")
 	end, {})
-	local v17 = React.useRef(nil)
-	local v18 = React.useRef({})
-	local v19 = React.useCallback(function(p2, s1: string) -- line: 72
-		-- upvalues: v18 (copy)
+	local v19 = React.useRef(nil)
+	local v20 = React.useRef({})
+	local v21 = React.useCallback(function(p2, s1: string) -- line: 77
+		-- upvalues: v20 (copy)
 		if p2 then
-			v18.current[s1] = p2
+			v20.current[s1] = p2
 
 			return
 		end
 
-		v18.current[s1] = nil
+		v20.current[s1] = nil
 	end, {})
-	local v20 = React.useCallback(function(p3) -- line: 80
-		-- upvalues: v17 (copy), PeopleService (copy), v16 (copy)
-		v17.current = p3
+	local v22 = React.useCallback(function(p3) -- line: 85
+		-- upvalues: v19 (copy), PeopleService (copy), v18 (copy)
+		v19.current = p3
 
 		if p3 then
-			v16.registerScrollCallback(-1, function() -- line: 84
-				-- upvalues: PeopleService (copy), v17 (copy)
-				local v48 = PeopleService.getService("SettingsHubService").hubRef()
+			v18.registerScrollCallback(-1, function() -- line: 89
+				-- upvalues: PeopleService (copy), v19 (copy)
+				local v50 = PeopleService.getService("SettingsHubService").hubRef()
 
-				if v48 and (v48.ScrollToFrame and v17.current) then
-					v48:ScrollToFrame(v17.current, true)
+				if v50 and (v50.ScrollToFrame and v19.current) then
+					v50:ScrollToFrame(v19.current, true)
 				end
 			end)
 		end
-	end, { v16 })
-	local v21 = React.useMemo(function() -- line: 96
-		-- upvalues: v15 (copy)
+	end, { v18 })
+	local v23 = React.useMemo(function() -- line: 101
+		-- upvalues: v17 (copy)
 		local t3 = {}
 
-		for _, v in ipairs(v15) do
+		for _, v in ipairs(v17) do
 			if v.shouldShow() then
 				table.insert(t3, v.id)
 			end
@@ -94,70 +101,70 @@ return function(t2: {[any]: any}) -- line: 57
 		table.sort(t3)
 
 		return table.concat(t3, ",")
-	end, { v15 })
+	end, { v17 })
 
-	React.useEffect(function() -- line: 107
-		-- upvalues: v15 (copy), v18 (copy), v16 (copy)
+	React.useEffect(function() -- line: 112
+		-- upvalues: v17 (copy), v20 (copy), v18 (copy)
 		local t4 = {}
 
-		for _, v in ipairs(v15) do
+		for _, v in ipairs(v17) do
 			if v.shouldShow() then
-				local v41 = v18.current[v.id]
+				local v43 = v20.current[v.id]
 
-				if v41 then
-					table.insert(t4, v41)
+				if v43 then
+					table.insert(t4, v43)
 				end
 			end
 		end
 
 		if #t4 > 0 then
-			table.sort(t4, function(p4, p5) -- line: 121
+			table.sort(t4, function(p4, p5) -- line: 126
 				return p4.LayoutOrder < p5.LayoutOrder
 			end)
-			v16.registerButtonRow(-1, t4, 0)
+			v18.registerButtonRow(-1, t4, 0)
 		end
 	end, {
-		v16,
-		v21
+		v18,
+		v23
 	})
-	React.useEffect(function() -- line: 130
-		-- upvalues: v16 (copy)
-		return function() -- line: 131
-			-- upvalues: v16 (copy)
-			v16.unregisterScrollCallback(-1)
-			v16.unregisterButtonRow(-1)
+	React.useEffect(function() -- line: 135
+		-- upvalues: v18 (copy)
+		return function() -- line: 136
+			-- upvalues: v18 (copy)
+			v18.unregisterScrollCallback(-1)
+			v18.unregisterButtonRow(-1)
 		end
-	end, { v16 })
+	end, { v18 })
 
-	local v22 = React.useMemo(function() -- line: 138
-		-- upvalues: v15 (copy), React (copy), MemoizedButton (copy), v19 (copy)
+	local v24 = React.useMemo(function() -- line: 143
+		-- upvalues: v17 (copy), React (copy), MemoizedButton (copy), v21 (copy)
 		local t5 = {}
 
-		for _, v in ipairs(v15) do
+		for _, v in ipairs(v17) do
 			if v.shouldShow() then
 				table.insert(t5, React.createElement(MemoizedButton, {
 					key = v.id,
 					config = v,
-					onButtonMount = v19
+					onButtonMount = v21
 				}))
 			end
 		end
 
 		return t5
 	end, {
-		v15,
-		v19
+		v17,
+		v21
 	})
 
-	if #v22 == 0 then
+	if #v24 == 0 then
 		return nil
 	end
 
-	local function getButtonElements() -- line: 164
-		-- upvalues: v22 (copy)
+	local function getButtonElements() -- line: 169
+		-- upvalues: v24 (copy)
 		local t6 = {}
 
-		for i, v in ipairs(v22) do
+		for i, v in ipairs(v24) do
 			t6["Button" .. i] = v
 		end
 
@@ -165,20 +172,20 @@ return function(t2: {[any]: any}) -- line: 57
 	end
 
 	local createElement = React.createElement
-	local v25 = View
+	local v27 = View
 	local t7 = {
 		tag = "size-full-0 auto-y row gap-large",
 		LayoutOrder = not GetFFlagAddPeoplePageCardLayout() and 1 or t2.LayoutOrder,
-		ref = v20
+		ref = v22
 	}
 	local t8 = {}
 	local t9 = {}
 
-	for i, v in ipairs(v22) do
+	for i, v in ipairs(v24) do
 		t9["Button" .. i] = v
 	end
 
 	t8[1] = t9
 
-	return createElement(v25, t7, t8)
+	return createElement(v27, t7, t8)
 end

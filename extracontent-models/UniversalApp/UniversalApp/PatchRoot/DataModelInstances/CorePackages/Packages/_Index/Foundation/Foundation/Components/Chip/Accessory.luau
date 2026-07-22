@@ -22,7 +22,7 @@ local useAccessoryVariants = require(script.Parent.useAccessoryVariants)
 
 require(Foundation.Enums.ChipSize)
 
-local function AvatarGroupWrapper(t1: {[any]: any}) -- line: 64
+local function AvatarGroupWrapper(t1: {[any]: any}) -- line: 66
 	-- upvalues: useBackgroundStyle (copy), useCumulativeBackground (copy), React (copy), AvatarGroup (copy)
 	local v19 = useBackgroundStyle()
 	local v20 = table.clone(t1.config.props)
@@ -32,10 +32,10 @@ local function AvatarGroupWrapper(t1: {[any]: any}) -- line: 64
 
 	return React.createElement(AvatarGroup, v20)
 end
-local function Accessory(t2: {[any]: any}) -- line: 72
+local function Accessory(t2: {[any]: any}) -- line: 74
 	-- upvalues: useTokens (copy), React (copy), useAccessoryVariants (copy), AvatarGroupWrapper (copy), isBuilderOrMigratedIcon (copy), Icon (copy), isMigrated (copy), uiblox (copy), Image (copy), View (copy)
 	local v22 = useTokens()
-	local v23 = React.useMemo(function() -- line: 74
+	local v23 = React.useMemo(function() -- line: 76
 		-- upvalues: t2 (copy)
 		if type(t2.config) == "string" then
 			return {

@@ -32,6 +32,8 @@ local useInExpFocusNavigationRefs = require(GenericAbuseReporting.BeduiV2.Hooks.
 local useInExpOpenLink = require(GenericAbuseReporting.BeduiV2.Hooks.useInExpOpenLink)
 local userBlock = require(GenericAbuseReporting.BeduiV2.Api.userBlock)
 local userMute = require(GenericAbuseReporting.BeduiV2.Api.userMute)
+local voiceSpeakingSignals = require(GenericAbuseReporting.BeduiV2.Utils.Signals.voiceSpeakingSignals)
+local SharedFlags = require(GenericAbuseReportingParent.SharedFlags)
 local blockUser = userBlock.blockUser
 local isBlockedUser = userBlock.isBlockedUser
 local isUserMuted = userMute.isUserMuted
@@ -40,56 +42,58 @@ local TelemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useArTranslation = arTranslation.useArTranslation
 local useLayoutSlots = LayoutSlots.useLayoutSlots
+local FFlagAbuseReportLinkOpenedAnalytics = SharedFlags.FFlagAbuseReportLinkOpenedAnalytics
 
-local function computeInitialMuteState(p1) -- line: 81
+local function computeInitialMuteState(p1) -- line: 86
 	-- upvalues: isUserMuted (copy)
 	if not p1 or not p1.userId then
 		return "Hidden"
 	end
 
-	local v42 = tonumber(p1.userId) or 0
+	local v45 = tonumber(p1.userId) or 0
 
-	if v42 == 0 or isUserMuted(v42) then
+	if v45 == 0 or isUserMuted(v45) then
 		return "Hidden"
 	end
 
 	return "Visible"
 end
-local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
-	-- upvalues: useArTranslation (copy), React (copy), isUserMuted (copy), useAbuseReportAnalytics (copy), useRoactService (copy), RoactNetworking (copy), isBlockedUser (copy), TelemetryEventType (copy), Dash (copy), LocalPlayer (copy), muteUser (copy), Players (copy), BlockingUtility (copy), blockUser (copy), ButtonVariant (copy)
+local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 97
+	-- upvalues: useArTranslation (copy), React (copy), voiceSpeakingSignals (copy), isUserMuted (copy), useAbuseReportAnalytics (copy), useRoactService (copy), RoactNetworking (copy), isBlockedUser (copy), TelemetryEventType (copy), Dash (copy), LocalPlayer (copy), muteUser (copy), Players (copy), BlockingUtility (copy), blockUser (copy), ButtonVariant (copy)
 	local translateIntoString = useArTranslation().translateIntoString
-	local v47, v48 = React.useState("Hidden")
-	local v49, v50 = React.useState(function() -- line: 102
+	local v50 = React.useContext(voiceSpeakingSignals.VoiceChatServiceManagerContext)
+	local v51, v52 = React.useState("Hidden")
+	local v53, v54 = React.useState(function() -- line: 108
 		-- upvalues: p3 (copy), isUserMuted (copy)
-		local v78 = p3
+		local v83 = p3
 
-		if not v78 or not v78.userId then
+		if not v83 or not v83.userId then
 			return "Hidden"
 		end
 
-		local v79 = tonumber(v78.userId) or 0
+		local v84 = tonumber(v83.userId) or 0
 
-		if v79 == 0 or isUserMuted(v79) then
+		if v84 == 0 or isUserMuted(v84) then
 			return "Hidden"
 		end
 
 		return "Visible"
 	end)
-	local v51, v52 = React.useState(false)
+	local v55, v56 = React.useState(false)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
-	local v54 = useRoactService(RoactNetworking)
+	local v58 = useRoactService(RoactNetworking)
 
-	React.useEffect(function() -- line: 110
-		-- upvalues: p2 (copy), isBlockedUser (copy), v54 (copy), v48 (copy), v52 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
+	React.useEffect(function() -- line: 116
+		-- upvalues: p2 (copy), isBlockedUser (copy), v58 (copy), v52 (copy), v56 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
 		if p2 and p2.userId then
-			isBlockedUser(v54, p2.userId):andThen(function(p5) -- line: 113
-				-- upvalues: v48 (copy), v52 (copy)
+			isBlockedUser(v58, p2.userId):andThen(function(p5) -- line: 119
+				-- upvalues: v52 (copy), v56 (copy)
 				local responseBody = p5.responseBody
 
-				v48(not responseBody and "Visible" or "Hidden")
-				v52(true)
-			end):catch(function(p6) -- line: 118
-				-- upvalues: sendEvent (copy), TelemetryEventType (copy), Dash (copy), v52 (copy)
+				v52(not responseBody and "Visible" or "Hidden")
+				v56(true)
+			end):catch(function(p6) -- line: 124
+				-- upvalues: sendEvent (copy), TelemetryEventType (copy), Dash (copy), v56 (copy)
 				sendEvent({
 					sub_event_type = TelemetryEventType.Error,
 					error_detail = {
@@ -98,7 +102,7 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 						})
 					}
 				})
-				v52(true)
+				v56(true)
 			end)
 			sendEvent({
 				sub_event_type = TelemetryEventType.IsUserBlockAvailable
@@ -106,27 +110,27 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 		end
 	end, {
 		if not p2 then nil else p2.userId,
-		v54,
+		v58,
 		sendEvent
 	})
 
-	local v55 = React.useRef(false)
+	local v59 = React.useRef(false)
 
-	React.useEffect(function() -- line: 139
-		-- upvalues: v49 (copy), v55 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if v49 == "Visible" and not v55.current then
-			v55.current = true
+	React.useEffect(function() -- line: 145
+		-- upvalues: v53 (copy), v59 (copy), sendEvent (copy), TelemetryEventType (copy)
+		if v53 == "Visible" and not v59.current then
+			v59.current = true
 			sendEvent({
 				sub_event_type = TelemetryEventType.IsUserMuteAvailable
 			})
 		end
 	end, {
-		v49,
+		v53,
 		sendEvent
 	})
 
-	local v56 = React.useCallback(function() -- line: 146
-		-- upvalues: p3 (copy), LocalPlayer (copy), v50 (copy), muteUser (copy), sendEvent (copy), TelemetryEventType (copy), p4 (copy)
+	local v60 = React.useCallback(function() -- line: 152
+		-- upvalues: p3 (copy), LocalPlayer (copy), v54 (copy), muteUser (copy), v50 (copy), sendEvent (copy), TelemetryEventType (copy), p4 (copy)
 		if not p3 or not p3.userId then
 			return
 		end
@@ -134,9 +138,9 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 		local num = tonumber(p3.userId)
 
 		if num and LocalPlayer then
-			v50("Loading")
+			v54("Loading")
 
-			if muteUser(num, LocalPlayer) then
+			if muteUser(num, LocalPlayer, v50) then
 				sendEvent({
 					sub_event_type = TelemetryEventType.DidMuteUser
 				})
@@ -162,9 +166,10 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 	end, {
 		p3,
 		sendEvent,
-		p4
+		p4,
+		v50
 	})
-	local v57 = React.useCallback(function(n1: number) -- line: 172
+	local v61 = React.useCallback(function(n1: number) -- line: 178
 		-- upvalues: sendEvent (copy), TelemetryEventType (copy), Players (copy), BlockingUtility (copy)
 		if not n1 or n1 == 0 then
 			sendEvent({
@@ -188,15 +193,15 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 			})
 		end
 	end, { sendEvent })
-	local v58 = React.useCallback(function() -- line: 192
-		-- upvalues: p2 (copy), v48 (copy), blockUser (copy), v54 (copy), sendEvent (copy), TelemetryEventType (copy), v57 (copy), p4 (copy)
+	local v62 = React.useCallback(function() -- line: 198
+		-- upvalues: p2 (copy), v52 (copy), blockUser (copy), v58 (copy), sendEvent (copy), TelemetryEventType (copy), v61 (copy), p4 (copy)
 		if not p2 or not p2.userId then
 			return
 		end
 
-		v48("Loading")
-		blockUser(v54, p2.userId):andThen(function() -- line: 198
-			-- upvalues: sendEvent (copy), TelemetryEventType (copy), p2 (copy), v57 (copy), p4 (copy)
+		v52("Loading")
+		blockUser(v58, p2.userId):andThen(function() -- line: 204
+			-- upvalues: sendEvent (copy), TelemetryEventType (copy), p2 (copy), v61 (copy), p4 (copy)
 			sendEvent({
 				sub_event_type = TelemetryEventType.DidBlockUser
 			})
@@ -204,16 +209,16 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 			local num = tonumber(p2.userId)
 
 			if num then
-				v57(num)
+				v61(num)
 			end
 
 			p4({
 				didBlockUser = true,
 				didMuteUser = false
 			})
-		end):catch(function() -- line: 206
-			-- upvalues: v48 (copy), sendEvent (copy), TelemetryEventType (copy), p2 (copy)
-			v48("Error")
+		end):catch(function() -- line: 212
+			-- upvalues: v52 (copy), sendEvent (copy), TelemetryEventType (copy), p2 (copy)
+			v52("Error")
 			sendEvent({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
@@ -224,36 +229,36 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 	end, {
 		p2,
 		p4,
-		v57,
-		v54,
+		v61,
+		v58,
 		sendEvent
 	})
-	local v59 = p2 == nil or v51
+	local v63 = p2 == nil or v55
 
 	return {
-		actions = React.useMemo(function() -- line: 220
-			-- upvalues: v59 (copy), p2 (copy), v47 (copy), translateIntoString (copy), ButtonVariant (copy), v58 (copy), p3 (copy), v49 (copy), v56 (copy)
+		actions = React.useMemo(function() -- line: 226
+			-- upvalues: v63 (copy), p2 (copy), v51 (copy), translateIntoString (copy), ButtonVariant (copy), v62 (copy), p3 (copy), v53 (copy), v60 (copy)
 			local t1 = {}
 
-			if not v59 then
+			if not v63 then
 				return t1
 			end
 
-			if p2 and v47 ~= "Hidden" then
+			if p2 and v51 ~= "Hidden" then
 				table.insert(t1, {
 					text = translateIntoString(p2.label),
 					variant = ButtonVariant.Alert,
-					onActivated = v58,
-					isLoading = v47 == "Loading"
+					onActivated = v62,
+					isLoading = v51 == "Loading"
 				})
 			end
 
-			if p3 and v49 ~= "Hidden" then
+			if p3 and v53 ~= "Hidden" then
 				table.insert(t1, {
 					text = translateIntoString(p3.label),
 					variant = ButtonVariant.Alert,
-					onActivated = v56,
-					isLoading = v49 == "Loading"
+					onActivated = v60,
+					isLoading = v53 == "Loading"
 				})
 			end
 
@@ -261,80 +266,107 @@ local function useBlockMuteActions(p2, p3, p4: ((...any) -> ...any)) -- line: 92
 		end, {
 			p2,
 			p3,
-			v58,
-			v56,
+			v62,
+			v60,
 			translateIntoString,
-			v47,
-			v49,
-			v59
+			v51,
+			v53,
+			v63
 		}),
-		blockState = v47,
-		muteState = v49,
+		blockState = v51,
+		muteState = v53,
 		hasActions = p2 ~= nil or p3 ~= nil,
-		hasLoadedActions = v59
+		hasLoadedActions = v63
 	}
 end
-local function useDelayedTrue(n2: number) -- line: 265
+local function useDelayedTrue(n2: number) -- line: 271
 	-- upvalues: React (copy)
-	local v61, v62 = React.useState(false)
+	local v65, v66 = React.useState(false)
 
-	React.useEffect(function() -- line: 267
-		-- upvalues: n2 (copy), v62 (copy)
-		local thread = task.delay(n2, function() -- line: 268
-			-- upvalues: v62 (copy)
-			v62(true)
+	React.useEffect(function() -- line: 273
+		-- upvalues: n2 (copy), v66 (copy)
+		local thread = task.delay(n2, function() -- line: 274
+			-- upvalues: v66 (copy)
+			v66(true)
 		end)
 
-		return function() -- line: 271
+		return function() -- line: 277
 			-- upvalues: thread (copy)
 			task.cancel(thread)
 		end
 	end, { n2 })
 
-	return v61
+	return v65
 end
-local function InExpConfirmationNode(t2: {[any]: any}) -- line: 283
-	-- upvalues: useArTranslation (copy), useInExpOpenLink (copy), useBlockMuteActions (copy), useDelayedTrue (copy), useLayoutSlots (copy), React (copy), useInExpFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), Dialog (copy), DialogSize (copy), View (copy), TextWithTranslation (copy), TextLink (copy), Footer (copy), EnumsOrientation (copy)
+local function InExpConfirmationNode(t2: {[any]: any}) -- line: 289
+	-- upvalues: useArTranslation (copy), useInExpOpenLink (copy), FFlagAbuseReportLinkOpenedAnalytics (copy), useAbuseReportAnalytics (copy), useBlockMuteActions (copy), useDelayedTrue (copy), useLayoutSlots (copy), React (copy), TelemetryEventType (copy), useInExpFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), Dialog (copy), DialogSize (copy), View (copy), TextWithTranslation (copy), TextLink (copy), Footer (copy), EnumsOrientation (copy)
 	local translateIntoString = useArTranslation().translateIntoString
-	local v65 = useInExpOpenLink()
-	local v66 = useBlockMuteActions(t2.blockToggle, t2.muteToggle, t2.onNext)
-	local actions = v66.actions
-	local blockState = v66.blockState
-	local muteState = v66.muteState
-	local hasActions = v66.hasActions
-	local hasLoadedActions = v66.hasLoadedActions
-	local v72 = useDelayedTrue(0.6)
-	local v73 = t2.isStoryMode or (v72 or (not hasActions or hasLoadedActions))
+	local v69 = useInExpOpenLink()
+	local sendEvent = nil
+
+	if FFlagAbuseReportLinkOpenedAnalytics then
+		sendEvent = useAbuseReportAnalytics().sendEvent
+	end
+
+	local v71 = useBlockMuteActions(t2.blockToggle, t2.muteToggle, t2.onNext)
+	local actions = v71.actions
+	local blockState = v71.blockState
+	local muteState = v71.muteState
+	local hasActions = v71.hasActions
+	local hasLoadedActions = v71.hasLoadedActions
+	local v77 = useDelayedTrue(0.6)
+	local v78 = t2.isStoryMode or (v77 or (not hasActions or hasLoadedActions))
 	local Layout = useLayoutSlots().Layout
-	local v75 = React.useCallback(function() -- line: 302
-		-- upvalues: t2 (copy), v65 (copy)
+
+	if FFlagAbuseReportLinkOpenedAnalytics then
+		React.useEffect(function() -- line: 317
+			-- upvalues: sendEvent (ref), v78 (copy), t2 (copy), TelemetryEventType (copy)
+			if sendEvent and (v78 and t2.helpline and t2.helpline.href) then
+				sendEvent({
+					sub_event_type = TelemetryEventType.HelplineShown
+				})
+			end
+		end, {
+			t2.helpline and t2.helpline.href,
+			v78
+		})
+	end
+
+	local v80 = React.useCallback(function() -- line: 326
+		-- upvalues: t2 (copy), v69 (copy), FFlagAbuseReportLinkOpenedAnalytics (copy), sendEvent (ref), TelemetryEventType (copy)
 		if t2.helpline and t2.helpline.href then
-			v65(t2.helpline.href)
+			v69(t2.helpline.href)
+
+			if FFlagAbuseReportLinkOpenedAnalytics and sendEvent then
+				sendEvent({
+					sub_event_type = TelemetryEventType.HelplineOpened
+				})
+			end
 		end
 	end, {
 		t2.helpline,
-		v65
+		v69
 	})
-	local v76 = React.useCallback(function() -- line: 308
+	local v81 = React.useCallback(function() -- line: 335
 		-- upvalues: t2 (copy)
 		t2.onNext({
 			didBlockUser = false,
 			didMuteUser = false
 		})
 	end, { t2.onNext })
-	local v77 = useInExpFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v76)
+	local v82 = useInExpFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v81)
 
 	return React.createElement(React.Fragment, nil, {
 		Content = React.createElement(Layout, {
 			body = nil,
 			actions = nil
 		}),
-		ConfirmationDialog = if not v73 then nil else React.createElement(Dialog.Root, {
-			ref = v77,
+		ConfirmationDialog = if not v78 then nil else React.createElement(Dialog.Root, {
+			ref = v82,
 			size = DialogSize.Small,
 			hasBackdrop = not t2.isStoryMode,
 			disablePortal = not not t2.isStoryMode,
-			onClose = v76
+			onClose = v81
 		}, {
 			DialogTitle = React.createElement(Dialog.Title, {
 				text = translateIntoString(t2.title)
@@ -363,7 +395,7 @@ local function InExpConfirmationNode(t2: {[any]: any}) -- line: 283
 							tag = "auto-xy text-body-medium text-wrap text-align-x-left radius-small content-emphasis",
 							layoutOrder = 2,
 							text = translateIntoString(t2.helpline.buttonText),
-							onActivated = v75
+							onActivated = v80
 						})
 					}),
 					ErrorMessage = if blockState ~= "Error" and muteState ~= "Error" then nil else React.createElement(TextWithTranslation, {

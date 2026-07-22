@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local BuildExperienceParent = BuildExperience.Parent
+local Foundation = require(BuildExperienceParent.Foundation)
+local React = require(BuildExperienceParent.React)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local OptionSelector = require(script.Parent.OptionSelector)
 local Button = Foundation.Button
 local View = Foundation.View
@@ -16,8 +18,8 @@ local function isOptionSelected(p1, s1: string) -- line: 37
 		return false
 	end
 
-	for _, v15 in p1 do
-		if v15 == s1 then
+	for _, v17 in p1 do
+		if v17 == s1 then
 			return true
 		end
 	end
@@ -36,62 +38,62 @@ local function getFirstSelectedOptionId(p2) -- line: 52
 	return nil
 end
 local function AnswerStack(t1: {[any]: any}) -- line: 62
-	-- upvalues: React (copy), OptionSelector (copy), View (copy), Button (copy), InputSize (copy), ButtonVariant (copy)
+	-- upvalues: React (copy), OptionSelector (copy), View (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy)
 	local onOptionSelected = t1.onOptionSelected
 	local options = t1.options
-	local v20 = (t1.selectionMode or "single") == "multi"
+	local v22 = (t1.selectionMode or "single") == "multi"
 	local selectedOptionId = t1.selectedOptionId
 	local onConfirm = t1.onConfirm
-	local v23 = v20 and onConfirm ~= nil
-	local v24 = if v23 or selectedOptionId == nil then nil else if typeof(selectedOptionId) ~= "string" then if typeof(selectedOptionId) ~= "table" then nil else selectedOptionId[1] else selectedOptionId
+	local v25 = v22 and onConfirm ~= nil
+	local v26 = if v25 or selectedOptionId == nil then nil else if typeof(selectedOptionId) ~= "string" then if typeof(selectedOptionId) ~= "table" then nil else selectedOptionId[1] else selectedOptionId
 	local t2 = {}
-	local g36 = nil
-	local v33 = nil
+	local g38 = nil
+	local v35 = nil
 
-	for v26, v27 in options do
-		if v24 == nil or v24 == v27.id then
-			local id = v27.id
+	for v28, v29 in options do
+		if v26 == nil or v26 == v29.id then
+			local id = v29.id
 			local createElement = React.createElement
-			local v30 = OptionSelector
+			local v32 = OptionSelector
 			local t3 = {
-				LayoutOrder = v26,
-				title = v27.title,
-				description = v27.description
+				LayoutOrder = v28,
+				title = v29.title,
+				description = v29.description
 			}
-			local id2 = v27.id
+			local id2 = v29.id
 
 			if typeof(selectedOptionId) == "string" then
-				v33 = selectedOptionId == id2
+				v35 = selectedOptionId == id2
 			elseif typeof(selectedOptionId) ~= "table" then
-				v33 = false
+				v35 = false
 			else
-				for _, v35 in selectedOptionId do
-					if v35 == id2 then
-						v33 = true
-						g36 = true
+				for _, v37 in selectedOptionId do
+					if v37 == id2 then
+						v35 = true
+						g38 = true
 					end
 
-					if g36 then
+					if g38 then
 						break
 					end
 				end
 
-				if not g36 then
-					v33 = false
+				if not g38 then
+					v35 = false
 				end
 			end
 
-			g36 = false
-			t3.isSelected = v33
-			t3.selectionStyle = v23 and "intermediate" or "committed"
-			t3.testId = `AnswerStack.Option.{ v27.id }`
+			g38 = false
+			t3.isSelected = v35
+			t3.selectionStyle = v25 and "intermediate" or "committed"
+			t3.testId = `AnswerStack.Option.{ v29.id }`
 
 			function t3.onActivated() -- line: 88
-				-- upvalues: onOptionSelected (copy), v27 (copy)
-				onOptionSelected(v27)
+				-- upvalues: onOptionSelected (copy), v29 (copy)
+				onOptionSelected(v29)
 			end
 
-			t2[id] = createElement(v30, t3)
+			t2[id] = createElement(v32, t3)
 		end
 	end
 
@@ -102,18 +104,18 @@ local function AnswerStack(t1: {[any]: any}) -- line: 62
 		}, t2)
 	}
 
-	if v23 and onConfirm ~= nil then
-		local v38 = t1.isConfirmDisabled == true
+	if v25 and onConfirm ~= nil then
+		local v40 = t1.isConfirmDisabled == true
 
 		t4.Confirm = React.createElement(View, {
 			LayoutOrder = 2,
 			tag = "row align-x-right size-full-0 auto-y"
 		}, {
 			Button = React.createElement(Button, {
-				text = if not v38 then t1.confirmLabel or "Submit" else "Select an option",
+				text = if not v40 then t1.confirmLabel or LocalizationStrings.ANSWER_STACK_SUBMIT else LocalizationStrings.ANSWER_STACK_SELECT_AN_OPTION,
 				size = InputSize.Medium,
 				variant = ButtonVariant.Standard,
-				isDisabled = v38,
+				isDisabled = v40,
 				onActivated = onConfirm,
 				testId = `{ t1.testId or "AnswerStack" }.Confirm`
 			})

@@ -76,9 +76,7 @@ function v22.render(p7) -- line: 87
 				value = p7.props.gameTranslator
 			}, {
 				eventReceiver = if not v16 then nil else Roact.createElement(v17),
-				friendsChatEventReceiver = if not FFlagExpChatEnableFriendsTab then nil else Roact.createElement(v19, {
-					isChatWindowVisible = p7.props.isChatWindowVisible
-				}),
+				friendsChatEventReceiver = if not FFlagExpChatEnableFriendsTab then nil else Roact.createElement(v19),
 				container = Roact.createElement(AppContainer, {
 					isChatInputBarVisible = p7.props.isChatInputBarVisible,
 					isChatWindowVisible = p7.props.isChatWindowVisible,
@@ -100,7 +98,7 @@ function v22.render(p7) -- line: 87
 end
 
 if getFFlagExpChatTelemetryEventTrigger() then
-	function v22.didMount(p8) -- line: 127
+	function v22.didMount(p8) -- line: 125
 		-- upvalues: FFlagExpChatPresetChatEnabled (copy), GetPresetChatStore (copy), v15 (copy), TextChatService (copy), computePresetBitmap (copy)
 		local expChatLoadStartTime = p8.props.expChatLoadStartTime
 
@@ -109,7 +107,7 @@ if getFFlagExpChatTelemetryEventTrigger() then
 				local v36 = os.clock() - expChatLoadStartTime
 				local v37 = GetPresetChatStore(false)
 
-				task.spawn(function() -- line: 136
+				task.spawn(function() -- line: 134
 					-- upvalues: v37 (copy), v15 (copy), p8 (copy), TextChatService (copy), v36 (copy), computePresetBitmap (copy)
 					local elapsed = os.clock()
 

@@ -3,7 +3,9 @@ local BuildExperienceParent = BuildExperience.Parent
 local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
-local HeaderBar = require(BuildExperienceParent.UIBlox).App.Bar.HeaderBar
+local UIBlox = require(BuildExperienceParent.UIBlox)
+local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local HeaderBar = UIBlox.App.Bar.HeaderBar
 local IconButton = Foundation.IconButton
 local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
@@ -14,29 +16,29 @@ local FlyoutSidePanelIXP = require(BuildExperienceParent.SharedExperimentDefinit
 local FlyoutLeftHeader = require(BuildExperienceParent.FlyoutSidePanel).Components.FlyoutLeftHeader
 local FFlagEnableHomeRobloxLogo = require(BuildExperienceParent.SharedFlags).FFlagEnableHomeRobloxLogo
 
-local function renderFlyoutLeftHeader() -- line: 29
-	-- upvalues: React (copy), FlyoutLeftHeader (copy), FFlagEnableHomeRobloxLogo (copy), FlyoutSidePanelIXP (copy)
+local function renderFlyoutLeftHeader() -- line: 28
+	-- upvalues: React (copy), FlyoutLeftHeader (copy), LocalizationStrings (copy), FFlagEnableHomeRobloxLogo (copy), FlyoutSidePanelIXP (copy)
 	return React.createElement(FlyoutLeftHeader, {
-		titleText = "Build",
 		isRobloxLogoEnabled = false,
+		titleText = LocalizationStrings.BUILD_HEADER_TITLE,
 		isFlyoutEntrypointEnabled = if not FFlagEnableHomeRobloxLogo then nil else FlyoutSidePanelIXP.isFlyoutSidePanelEnabled(),
 		isAlternateEntryPointEnabled = FlyoutSidePanelIXP.isAlternateEntryPointEnabled()
 	})
 end
-local function BuildPageHeader(t1: {[any]: any}) -- line: 40
-	-- upvalues: FlyoutSidePanelIXP (copy), React (copy), CreatorAgentChat (copy), IconButton (copy), IconName (copy), ButtonVariant (copy), InputSize (copy), View (copy), HeaderBar (copy), renderFlyoutLeftHeader (copy), AgentSpecDebugSheet (copy)
-	local v19 = FlyoutSidePanelIXP.isFlyoutSidePanelEnabled()
-	local v20, v21 = React.useState(false)
-	local v22 = if not CreatorAgentChat.experimentOverride.isEnabled() then nil else function() -- line: 45
-		-- upvalues: React (copy), IconButton (copy), IconName (copy), ButtonVariant (copy), InputSize (copy), v21 (copy)
+local function BuildPageHeader(t1: {[any]: any}) -- line: 39
+	-- upvalues: FlyoutSidePanelIXP (copy), React (copy), CreatorAgentChat (copy), IconButton (copy), IconName (copy), ButtonVariant (copy), InputSize (copy), View (copy), HeaderBar (copy), renderFlyoutLeftHeader (copy), LocalizationStrings (copy), AgentSpecDebugSheet (copy)
+	local v21 = FlyoutSidePanelIXP.isFlyoutSidePanelEnabled()
+	local v22, v23 = React.useState(false)
+	local v24 = if not CreatorAgentChat.experimentOverride.isEnabled() then nil else function() -- line: 44
+		-- upvalues: React (copy), IconButton (copy), IconName (copy), ButtonVariant (copy), InputSize (copy), v23 (copy)
 		return React.createElement(IconButton, {
 			isCircular = true,
 			icon = IconName.LabBeaker,
 			variant = ButtonVariant.Utility,
 			size = InputSize.Medium,
-			onActivated = function() -- line: 51
-				-- upvalues: v21 (copy)
-				v21(true)
+			onActivated = function() -- line: 50
+				-- upvalues: v23 (copy)
+				v23(true)
 			end
 		})
 	end
@@ -53,14 +55,14 @@ local function BuildPageHeader(t1: {[any]: any}) -- line: 40
 			barHeight = t1.height,
 			paddingLeft = UDim.new(0, 0),
 			paddingRight = UDim.new(0, 0),
-			renderLeft = if not v19 then nil else renderFlyoutLeftHeader,
-			title = not v19 and "Build" or nil,
-			renderRight = v22
+			renderLeft = if not v21 then nil else renderFlyoutLeftHeader,
+			title = if not v21 then LocalizationStrings.BUILD_HEADER_TITLE else nil,
+			renderRight = v24
 		}),
-		AgentSpecSheet = if not v20 then nil else React.createElement(AgentSpecDebugSheet, {
-			onClose = function() -- line: 76
-				-- upvalues: v21 (copy)
-				v21(false)
+		AgentSpecSheet = if not v22 then nil else React.createElement(AgentSpecDebugSheet, {
+			onClose = function() -- line: 75
+				-- upvalues: v23 (copy)
+				v23(false)
 			end
 		})
 	})

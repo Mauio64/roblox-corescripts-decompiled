@@ -1,3 +1,5 @@
+require(script.Components.AppNavItem)
+
 return {
 	Placement = require(script.Enum.Placement),
 	AppNavBar = require(script.Components.AppNavBar),

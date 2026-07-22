@@ -23,20 +23,21 @@ local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local withStyle = UIBlox.Core.Style.withStyle
 local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
 local GetFFlagEnableFeedbackReportDialogAdjustments = require(RobloxGui.Modules.Flags.GetFFlagEnableFeedbackReportDialogAdjustments)
-local v26 = game:DefineFastFlag("EnableFeedbackSelectionUpdate", false)
+local GetFFlagEnableSendImageFeedbackToBackend = require(RobloxGui.Modules.Flags.GetFFlagEnableSendImageFeedbackToBackend)
+local v27 = game:DefineFastFlag("EnableFeedbackSelectionUpdate", false)
 local FFlagTopBarSignalizeScreenSize = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize
-local v28 = Roact.PureComponent:extend("FeedbackReportDialog")
+local v29 = Roact.PureComponent:extend("FeedbackReportDialog")
 
-v28.validateProps = t.strictInterface({
+v29.validateProps = t.strictInterface({
 	isReportDialogOpen = t.boolean,
 	screenSize = if not FFlagTopBarSignalizeScreenSize then t.Vector2 else nil,
 	closeDialog = t.optional(t.callback),
 	reportCategory = t.optional(t.string)
 })
 
-function v28.init(p1) -- line: 66
-	-- upvalues: v26 (copy), ExperienceStateCaptureService (copy), Constants (copy), FFlagTopBarSignalizeScreenSize (copy), Display (copy), Signals (copy)
-	if v26 then
+function v29.init(p1) -- line: 68
+	-- upvalues: v27 (copy), ExperienceStateCaptureService (copy), Constants (copy), GetFFlagEnableSendImageFeedbackToBackend (copy), FFlagTopBarSignalizeScreenSize (copy), Display (copy), Signals (copy)
+	if v27 then
 		p1.state = {
 			feedbackText = "",
 			feedbackOriginalText = "",
@@ -61,16 +62,16 @@ function v28.init(p1) -- line: 66
 		}
 	end
 
-	function p1.calculateFieldHeight(n1: number, n2: number, n3: number) -- line: 93
+	function p1.calculateFieldHeight(n1: number, n2: number, n3: number) -- line: 95
 		if n1 < 180 and n3 then
 			return n2 * 5
 		end
 
 		return n2 * (n1 / 45 + 2)
 	end
-	function p1.resetLocalState() -- line: 102
-		-- upvalues: v26 (copy), p1 (copy), ExperienceStateCaptureService (copy)
-		if v26 then
+	function p1.resetLocalState() -- line: 104
+		-- upvalues: v27 (copy), p1 (copy), ExperienceStateCaptureService (copy)
+		if v27 then
 			p1:setState({
 				isGenericSelection = false
 			})
@@ -88,8 +89,8 @@ function v28.init(p1) -- line: 66
 		p1.props.setFeedbackReason(0)
 		ExperienceStateCaptureService:ResetHighlight()
 	end
-	function p1.setInstanceRelatedReportDialogState(p2) -- line: 123
-		-- upvalues: p1 (copy), v26 (copy)
+	function p1.setInstanceRelatedReportDialogState(p2) -- line: 125
+		-- upvalues: p1 (copy), v27 (copy)
 		if p2:IsA("TextBox") then
 			p1:setState({
 				feedbackText = if p2.PlaceholderText ~= "" then p2.PlaceholderText else p2.Text,
@@ -97,7 +98,7 @@ function v28.init(p1) -- line: 66
 				feedbackIdentifier = p2.LocalizationMatchIdentifier
 			})
 
-			if v26 then
+			if v27 then
 				p1:setState({
 					isGenericSelection = false
 				})
@@ -111,7 +112,7 @@ function v28.init(p1) -- line: 66
 				feedbackIdentifier = p2.LocalizationMatchIdentifier
 			})
 
-			if v26 then
+			if v27 then
 				p1:setState({
 					isGenericSelection = false
 				})
@@ -166,7 +167,7 @@ function v28.init(p1) -- line: 66
 
 					return
 				end
-			elseif v26 then
+			elseif v27 then
 				p1:setState({
 					feedbackIdentifier = "",
 					isGenericSelection = true,
@@ -177,35 +178,54 @@ function v28.init(p1) -- line: 66
 		end
 	end
 
-	ExperienceStateCaptureService.ItemSelectedInCaptureMode:Connect(function(p3) -- line: 191
+	ExperienceStateCaptureService.ItemSelectedInCaptureMode:Connect(function(p3) -- line: 193
 		-- upvalues: p1 (copy), Constants (copy)
 		p1.resetLocalState()
 		p1.setInstanceRelatedReportDialogState(p3)
 		p1.props.setFeedbackFlowState(Constants.State.CurrentlyLeavingFeedback)
 	end)
 
-	function p1.onCorrectTranslationTextChanged(p4) -- line: 198
+	function p1.onCorrectTranslationTextChanged(p4) -- line: 200
 		-- upvalues: p1 (copy)
 		p1:setState({
 			correctTranslationText = p4
 		})
 	end
-	function p1.onAdditionalCommentsTextChanged(p5) -- line: 204
+	function p1.onAdditionalCommentsTextChanged(p5) -- line: 206
 		-- upvalues: p1 (copy)
 		p1:setState({
 			additionalCommentsText = p5
 		})
 	end
-	function p1.onSubmitFeedback() -- line: 210
-		-- upvalues: p1 (copy), Constants (copy)
+	function p1.onSubmitFeedback() -- line: 212
+		-- upvalues: p1 (copy), Constants (copy), GetFFlagEnableSendImageFeedbackToBackend (copy)
 		p1:setState({
 			numFeedbackSubmissionAttempts = p1.state.numFeedbackSubmissionAttempts + 1
 		})
-		p1.props.sendFeedback(p1.state.feedbackOriginalText, p1.state.feedbackText, p1.state.feedbackIdentifier, p1.state.correctTranslationText, p1.state.additionalCommentsText, p1.props.feedbackReason, p1.state.numFeedbackSubmissionAttempts)
+
+		local ContentTypeText = Constants.ContentType.Text
+		local feedbackOriginalText = p1.state.feedbackOriginalText
+		local feedbackIdentifier = p1.state.feedbackIdentifier
+
+		if GetFFlagEnableSendImageFeedbackToBackend() and p1.state.shouldDisplayFeedbackImage then
+			feedbackOriginalText = string.match(p1.state.feedbackImageUri, "rbxassetid://(%d+)")
+
+			if not feedbackOriginalText then
+				p1.props.setFeedbackFlowState(Constants.State.Default)
+				p1.resetLocalState()
+
+				return
+			end
+
+			feedbackIdentifier = game.GameId .. ":" .. feedbackOriginalText
+			ContentTypeText = Constants.ContentType.Image
+		end
+
+		p1.props.sendFeedback(ContentTypeText, feedbackOriginalText, p1.state.feedbackText, feedbackIdentifier, p1.state.correctTranslationText, p1.state.additionalCommentsText, p1.props.feedbackReason, p1.state.numFeedbackSubmissionAttempts)
 		p1.props.setFeedbackFlowState(Constants.State.Default)
 		p1.resetLocalState()
 	end
-	function p1.onCancel() -- line: 230
+	function p1.onCancel() -- line: 251
 		-- upvalues: p1 (copy), Constants (copy)
 		p1.props.setFeedbackFlowState(Constants.State.Default)
 		p1.resetLocalState()
@@ -214,7 +234,7 @@ function v28.init(p1) -- line: 66
 	if FFlagTopBarSignalizeScreenSize then
 		local getViewportSize = Display.GetDisplayStore(false).getViewportSize
 
-		p1.disposeScreenSize = Signals.createEffect(function(p6) -- line: 238
+		p1.disposeScreenSize = Signals.createEffect(function(p6) -- line: 259
 			-- upvalues: p1 (copy), getViewportSize (copy)
 			p1:setState({
 				screenSize = getViewportSize(p6)
@@ -222,10 +242,10 @@ function v28.init(p1) -- line: 66
 		end)
 	end
 end
-function v28.renderContents(p7, p8) -- line: 246
-	-- upvalues: withStyle (copy), GetFFlagEnableFeedbackReportDialogAdjustments (copy), Roact (copy), StyledTextLabel (copy), ThemedTextLabel (copy), v26 (copy), RadioButtonList (copy), TextEntryField (copy)
-	return withStyle(function(p9) -- line: 247
-		-- upvalues: p8 (copy), GetFFlagEnableFeedbackReportDialogAdjustments (copy), Roact (copy), StyledTextLabel (copy), p7 (copy), ThemedTextLabel (copy), v26 (copy), RadioButtonList (copy), TextEntryField (copy)
+function v29.renderContents(p7, p8) -- line: 267
+	-- upvalues: withStyle (copy), GetFFlagEnableFeedbackReportDialogAdjustments (copy), Roact (copy), StyledTextLabel (copy), ThemedTextLabel (copy), v27 (copy), RadioButtonList (copy), TextEntryField (copy)
+	return withStyle(function(p9) -- line: 268
+		-- upvalues: p8 (copy), GetFFlagEnableFeedbackReportDialogAdjustments (copy), Roact (copy), StyledTextLabel (copy), p7 (copy), ThemedTextLabel (copy), v27 (copy), RadioButtonList (copy), TextEntryField (copy)
 		local Theme = p9.Theme
 		local p9Font = p9.Font
 		local t1 = {
@@ -261,7 +281,7 @@ function v28.renderContents(p7, p8) -- line: 246
 					themeKey = "TextDefault",
 					TextWrapped = true,
 					Size = UDim2.new(1, 0, 0, p7.calculateFieldHeight(string.len(p7.state.feedbackText), 14, false)),
-					Text = if not v26 then p7.state.feedbackText or "" else ((if not p7.state.isGenericSelection then p7.state.feedbackText else p8.genericSelectionWrapper)) or "",
+					Text = if not v27 then p7.state.feedbackText or "" else ((if not p7.state.isGenericSelection then p7.state.feedbackText else p8.genericSelectionWrapper)) or "",
 					TextXAlignment = Enum.TextXAlignment.Left
 				}) else Roact.createElement("ImageLabel", {
 					LayoutOrder = 2,
@@ -291,7 +311,7 @@ function v28.renderContents(p7, p8) -- line: 246
 				}, {
 					RadioButtonList = Roact.createElement(RadioButtonList, {
 						radioButtons = t1,
-						onActivated = function(p10) -- line: 327
+						onActivated = function(p10) -- line: 348
 							-- upvalues: p7 (copy)
 							p7.props.setFeedbackReason(p10)
 						end,
@@ -375,7 +395,7 @@ function v28.renderContents(p7, p8) -- line: 246
 				AnchorPoint = Vector2.new(0, 0.5),
 				Position = UDim2.new(0, 76, 0.5, 0),
 				Size = UDim2.new(1, 0, 0, p7.calculateFieldHeight(string.len(p7.state.feedbackText), 18, false)),
-				Text = if not v26 then p7.state.feedbackText or "" else ((if not p7.state.isGenericSelection then p7.state.feedbackText else p8.genericSelectionWrapper)) or "",
+				Text = if not v27 then p7.state.feedbackText or "" else ((if not p7.state.isGenericSelection then p7.state.feedbackText else p8.genericSelectionWrapper)) or "",
 				TextXAlignment = Enum.TextXAlignment.Left
 			}) else Roact.createElement("ImageLabel", {
 				LayoutOrder = 2,
@@ -447,7 +467,7 @@ function v28.renderContents(p7, p8) -- line: 246
 			RadioButtonList = Roact.createElement(RadioButtonList, {
 				layoutOrder = 8,
 				radioButtons = t1,
-				onActivated = function(p11) -- line: 507
+				onActivated = function(p11) -- line: 528
 					-- upvalues: p7 (copy)
 					p7.props.setFeedbackReason(p11)
 				end,
@@ -457,7 +477,7 @@ function v28.renderContents(p7, p8) -- line: 246
 		})
 	end)
 end
-function v28.render(p12) -- line: 519
+function v29.render(p12) -- line: 540
 	-- upvalues: withLocalization (copy), Roact (copy), ModalDialog (copy), Constants (copy), FFlagTopBarSignalizeScreenSize (copy), GetFFlagEnableFeedbackReportDialogAdjustments (copy), VerticalScrollView (copy), ButtonStack (copy), ButtonType (copy)
 	return withLocalization({
 		mainHeader = "CoreScripts.Feedback.FeedbackReportDialog.MainHeader",
@@ -478,7 +498,7 @@ function v28.render(p12) -- line: 519
 			"CoreScripts.Feedback.FeedbackReportDialog.CorrectTranslationObjectPlaceholder",
 			ObjectType = p12.state.feedbackText
 		}
-	})(function(p13) -- line: 539
+	})(function(p13) -- line: 560
 		-- upvalues: Roact (copy), ModalDialog (copy), p12 (copy), Constants (copy), FFlagTopBarSignalizeScreenSize (copy), GetFFlagEnableFeedbackReportDialogAdjustments (copy), VerticalScrollView (copy), ButtonStack (copy), ButtonType (copy)
 		return Roact.createElement(ModalDialog, {
 			visible = p12.props.feedbackFlowState == Constants.State.CurrentlyLeavingFeedback,
@@ -523,40 +543,40 @@ function v28.render(p12) -- line: 519
 		})
 	end)
 end
-function v28.willUnmount(p14) -- line: 596
+function v29.willUnmount(p14) -- line: 617
 	-- upvalues: FFlagTopBarSignalizeScreenSize (copy)
 	if FFlagTopBarSignalizeScreenSize then
 		p14.disposeScreenSize()
 	end
 end
 
-return RoactRodux.connect(function(p15) -- line: 603
+return RoactRodux.connect(function(p15) -- line: 624
 	-- upvalues: FFlagTopBarSignalizeScreenSize (copy)
 	return {
 		screenSize = if not FFlagTopBarSignalizeScreenSize then p15.displayOptions.screenSize else nil,
 		feedbackFlowState = p15.feedbackFlowState.feedbackFlowState,
 		feedbackReason = p15.feedbackFlowState.feedbackReason
 	}
-end, function(p16) -- line: 609
+end, function(p16) -- line: 630
 	-- upvalues: SendFeedbackThunk (copy), SetFeedbackFlowState (copy), SetFeedbackReason (copy)
 	return {
-		sendFeedback = function(p17, p18, p19, p20, p21, p22, p23) -- line: 611
+		sendFeedback = function(p17, p18, p19, p20, p21, p22, p23, p24) -- line: 632
 			-- upvalues: p16 (copy), SendFeedbackThunk (copy)
-			p16(SendFeedbackThunk(p17, p18, p19, p20, p21, p22, p23))
+			p16(SendFeedbackThunk(p17, p18, p19, p20, p21, p22, p23, p24))
 		end,
-		setFeedbackFlowState = function(p24) -- line: 632
+		setFeedbackFlowState = function(p25) -- line: 655
 			-- upvalues: p16 (copy), SetFeedbackFlowState (copy)
-			p16(function(p25) -- line: 633
-				-- upvalues: SetFeedbackFlowState (copy), p24 (copy)
-				p25:dispatch(SetFeedbackFlowState(p24))
+			p16(function(p26) -- line: 656
+				-- upvalues: SetFeedbackFlowState (copy), p25 (copy)
+				p26:dispatch(SetFeedbackFlowState(p25))
 			end)
 		end,
-		setFeedbackReason = function(p26) -- line: 637
+		setFeedbackReason = function(p27) -- line: 660
 			-- upvalues: p16 (copy), SetFeedbackReason (copy)
-			p16(function(p27) -- line: 638
-				-- upvalues: SetFeedbackReason (copy), p26 (copy)
-				p27:dispatch(SetFeedbackReason(p26))
+			p16(function(p28) -- line: 661
+				-- upvalues: SetFeedbackReason (copy), p27 (copy)
+				p28:dispatch(SetFeedbackReason(p27))
 			end)
 		end
 	}
-end)(v28)
+end)(v29)

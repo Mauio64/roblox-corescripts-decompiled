@@ -11,7 +11,6 @@ return {
 	SquadRegroupExperimentation = require(script.SquadRegroupExperimentation),
 	AppChatPerfExperimentation = require(script.AppChatPerfExperimentation),
 	PartyPageCarouselExperimentation = require(script.PartyPageCarouselExperimentation),
-	ScheduledPartiesExperimentation = require(script.ScheduledPartiesExperimentation),
 	deviceMeetsRequirementsForFAE = require(script.DeviceMeetsRequirementsForFAE),
 	FFlagTestDeviceForFAEUpsell = require(script.FFlagTestDeviceForFAEUpsell),
 	GetIsDeviceGated = require(script.GetIsDeviceGated),

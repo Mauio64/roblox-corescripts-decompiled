@@ -23,6 +23,7 @@ local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransf
 
 local function initiateTransfer(p1) -- line: 26
 	-- upvalues: PromptState (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), initiateTransferRequest (copy), setTransferPromptState (copy), GetFFlagCurrencyTransferUseBackendTransferLimits (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), FailureReason (copy), handleTransferBlock (copy), TransferRetryOrigin (copy), handleTransferError (copy)
+	local v18 = p1.getNetworkImpl()
 	local setPromptState = p1.setPromptState
 	local setTransferRequestId = p1.setTransferRequestId
 	local setRobuxBalanceAmount = p1.setRobuxBalanceAmount
@@ -32,7 +33,7 @@ local function initiateTransfer(p1) -- line: 26
 	local setSender = p1.setSender
 	local setMinimumTransferAmount = p1.setMinimumTransferAmount
 	local setMaximumTransferAmount = p1.setMaximumTransferAmount
-	local v27 = p1.getRecipientUserId(false)
+	local v28 = p1.getRecipientUserId(false)
 
 	setPromptState(PromptState.TransferRequested)
 
@@ -41,15 +42,15 @@ local function initiateTransfer(p1) -- line: 26
 	end
 
 	local t1 = {
-		recipientId = v27
+		recipientId = v28
 	}
-	local v29 = p1.getTransferOrigination()
+	local v30 = p1.getTransferOrigination()
 
-	if v29 then
-		t1.transferOrigination = v29
+	if v30 then
+		t1.transferOrigination = v30
 	end
 
-	initiateTransferRequest(t1):andThen(function(p2) -- line: 50
+	initiateTransferRequest(t1, nil, v18):andThen(function(p2) -- line: 51
 		-- upvalues: setTransferPromptState (copy), p1 (copy), PromptState (copy), setTransferRequestId (copy), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), setUserRelationshipDetail (copy), setRecipient (copy), setSender (copy), GetFFlagCurrencyTransferUseBackendTransferLimits (copy), setMinimumTransferAmount (copy), setMaximumTransferAmount (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy)
 		setTransferPromptState(p1, PromptState.TransferStarted)
 
@@ -78,7 +79,7 @@ local function initiateTransfer(p1) -- line: 26
 				logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.initiate_succeeded)
 			end
 		end
-	end):catch(function(p3) -- line: 78
+	end):catch(function(p3) -- line: 79
 		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), FailureReason (copy), handleTransferBlock (copy), TransferRetryOrigin (copy), handleTransferError (copy)
 		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferInitiateFailedCounter)
 

@@ -71,8 +71,8 @@ local function SystemBanner(p1, p2) -- line: 57
 	return React.createElement(View, withCommonProps(v30, {
 		tag = {
 			[v32.container.tag] = true,
-			["align-y-center"] = if not Flags.FoundationSystemBannerOptionalTitle then v30.description == nil else v30.title == "" or v30.description == nil,
-			["align-y-top"] = if not Flags.FoundationSystemBannerOptionalTitle then v30.description ~= nil else v30.title ~= "" and v30.description ~= nil
+			["align-y-center"] = v30.title == "" or v30.description == nil,
+			["align-y-top"] = v30.title ~= "" and v30.description ~= nil
 		},
 		ref = v35
 	}), React.createElement(PresentationContext.Provider, {
@@ -101,13 +101,7 @@ local function SystemBanner(p1, p2) -- line: 57
 				LayoutOrder = 2,
 				tag = "col auto-xy"
 			}, {
-				Title = if not Flags.FoundationSystemBannerOptionalTitle then React.createElement(Text, {
-					LayoutOrder = 1,
-					Text = v30.title,
-					textStyle = v32.title.style,
-					tag = v32.title.tag,
-					testId = `{ v30.testId }--title`
-				}) else if v30.title == "" then nil else React.createElement(Text, {
+				Title = if v30.title == "" then nil else React.createElement(Text, {
 					LayoutOrder = 1,
 					Text = v30.title,
 					textStyle = v32.title.style,

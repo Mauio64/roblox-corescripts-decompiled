@@ -5,17 +5,15 @@ require(script.Parent.Types.CategoryTypes.CategoryTypes)
 
 local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
 local FFlagAXCatalogBodySuits = AvatarExperienceFlags.FFlagAXCatalogBodySuits
-local FFlagAXCustomizeMakeupSupport = AvatarExperienceFlags.FFlagAXCustomizeMakeupSupport
-local FFlagAXMakeupEquipping = AvatarExperienceFlags.FFlagAXMakeupEquipping
 local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
 local FFlagAXInventoryDurablesSupport = AvatarExperienceFlags.FFlagAXInventoryDurablesSupport
 local t1 = {}
 local t2 = {}
 local EnumItems = Enum.BundleType:GetEnumItems()
 
-for _, v13 in EnumItems do
-	t1[v13.Name] = tostring(v13.Value)
-	t2[tostring(v13.Value)] = v13.Name
+for _, v11 in EnumItems do
+	t1[v11.Name] = tostring(v11.Value)
+	t2[tostring(v11.Value)] = v11.Name
 end
 
 if FFlagAXInventoryDurablesSupport then
@@ -34,9 +32,9 @@ local t3 = {
 local t4 = {}
 local t5 = {}
 
-for _, v19 in (Enum.AvatarAssetType:GetEnumItems()) do
-	t4[v19.Name] = tostring(v19.Value)
-	t5[tostring(v19.Value)] = v19.Name
+for _, v17 in (Enum.AvatarAssetType:GetEnumItems()) do
+	t4[v17.Name] = tostring(v17.Value)
+	t5[tostring(v17.Value)] = v17.Name
 end
 
 local t6 = {
@@ -62,8 +60,8 @@ local t6 = {
 }
 local t7 = {}
 
-for v22, v23 in t6 do
-	t7[v23] = v22
+for v20, v21 in t6 do
+	t7[v21] = v20
 end
 
 local t8 = {
@@ -115,13 +113,13 @@ local t11 = {
 	IS_LEFT = "IS_LEFT",
 	IS_RIGHT = "IS_RIGHT"
 }
-local v28 = game:DefineFastInt("AXMakeupZoomRadius", 7)
-local v29 = game:DefineFastInt("AXMakeupLooksZoomRadius", 7)
-local v30 = game:DefineFastInt("AXEyelashesZoomRadius", 7)
-local v31 = game:DefineFastInt("AXEyebrowsZoomRadius", 7)
-local v32 = game:DefineFastInt("AXFaceMakeupZoomRadius", 7)
-local v33 = game:DefineFastInt("AXLipMakeupZoomRadius", 7)
-local v34 = game:DefineFastInt("AXEyeMakeupZoomRadius", 7)
+local v26 = game:DefineFastInt("AXMakeupZoomRadius", 7)
+local v27 = game:DefineFastInt("AXMakeupLooksZoomRadius", 7)
+local v28 = game:DefineFastInt("AXEyelashesZoomRadius", 7)
+local v29 = game:DefineFastInt("AXEyebrowsZoomRadius", 7)
+local v30 = game:DefineFastInt("AXFaceMakeupZoomRadius", 7)
+local v31 = game:DefineFastInt("AXLipMakeupZoomRadius", 7)
+local v32 = game:DefineFastInt("AXEyeMakeupZoomRadius", 7)
 local t12 = {
 	BodyCategories = {
 		Heads = 8.5,
@@ -181,14 +179,14 @@ local t12 = {
 		Bottoms = 12,
 		Bodysuits = if not FFlagAXCatalogBodySuits then nil else 12
 	},
-	Makeup = if not FFlagAXCustomizeMakeupSupport and not FFlagAXCatalogMakeupSupport then nil else {
-		Makeup = v28,
-		MakeupLooks = v29,
-		Eyelashes = v30,
-		Eyebrows = v31,
-		FaceMakeup = v32,
-		LipMakeup = v33,
-		EyeMakeup = v34
+	Makeup = {
+		Makeup = v26,
+		MakeupLooks = v27,
+		Eyelashes = v28,
+		Eyebrows = v29,
+		FaceMakeup = v30,
+		LipMakeup = v31,
+		EyeMakeup = v32
 	},
 	Special = {
 		HeadRefinement = 7
@@ -247,22 +245,22 @@ local t18 = {
 	Makeup = "Makeup",
 	Outfit = "Outfit"
 }
-local v42 = if not FFlagAXMakeupEquipping and not FFlagAXCustomizeMakeupSupport then nil else {
+local t19 = {
 	[t4.EyeMakeup] = Enum.MakeupType.Eye,
 	[t4.FaceMakeup] = Enum.MakeupType.Face,
 	[t4.LipMakeup] = Enum.MakeupType.Lip
 }
-local v43 = if not FFlagAXCustomizeMakeupSupport then nil else {
+local t20 = {
 	[Enum.MakeupType.Eye] = t4.EyeMakeup,
 	[Enum.MakeupType.Face] = t4.FaceMakeup,
 	[Enum.MakeupType.Lip] = t4.LipMakeup
 }
-local v44 = if not FFlagAXCustomizeMakeupSupport then nil else {
+local t21 = {
 	[t4.FaceMakeup] = 0,
 	[t4.LipMakeup] = 1,
 	[t4.EyeMakeup] = 2
 }
-local t19 = {
+local t22 = {
 	AttributeKey = "IXP_LAYER",
 	TagName = "WIDGET"
 }
@@ -292,13 +290,13 @@ return {
 	AVATAR_EDITOR_CONSTANTS = t14,
 	LAYERED_CLOTHING_ORDER = t15,
 	LAYERED_ASSET_TYPES = t16,
-	ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE = v42,
-	MAKEUP_TYPE_TO_ASSET_TYPE_ID = v43,
-	LAYERED_MAKEUP_ORDER = v44,
+	ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE = t19,
+	MAKEUP_TYPE_TO_ASSET_TYPE_ID = t20,
+	LAYERED_MAKEUP_ORDER = t21,
 	MAKEUP_LOOK_ASSET_TYPES = t17,
 	MAX_MAKEUP_LAYERS = 6,
 	LOOK_TYPE = t18,
 	MIN_MAKEUP_ITEMS_FOR_LAYERING_BUTTON = 2,
 	LabelAbuseTypeMapping = LabelAbuseTypeMapping,
-	IXP_WIDGET_LAYER_EXPOSURE = t19
+	IXP_WIDGET_LAYER_EXPOSURE = t22
 }

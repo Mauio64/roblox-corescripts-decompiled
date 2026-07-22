@@ -13,6 +13,7 @@ local defaultCreationTools = require(MomentsCreation.Tools.defaultCreationTools)
 local createCapturePreviewController = require(MomentsCreation.Preview.createCapturePreviewController)
 local createEditSession = require(MomentsCreation.Stores.createEditSession)
 local fireAnalyticsEvent = require(MomentsCreation.Analytics.fireAnalyticsEvent)
+local GetFFlagMomentsCreationPersistEditSession = require(MomentsCreation.Flags.GetFFlagMomentsCreationPersistEditSession)
 local makeCreationEventFields = require(MomentsCreation.Analytics.makeCreationEventFields)
 local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
 local EventNames = MomentsCommon.Analytics.EventNames
@@ -22,87 +23,98 @@ local GetFFlagMomentsAnalyticsProducerPrereqs = MomentsCommon.Flags.GetFFlagMome
 local createComputed = Signals.createComputed
 local createSignal = Signals.createSignal
 
-local function createCreationController(t1: {[any]: any}) -- line: 59
-	-- upvalues: creationToolRegistry (copy), defaultCreationTools (copy), createSignal (copy), createComputed (copy), createCapturePreviewController (copy), SessionManager (copy), FunnelEventNames (copy), Cryo (copy), makeCreationEventFields (copy), CreationFlowState (copy), fireAnalyticsEvent (copy), EventNames (copy), createEditSession (copy), DialogType (copy), GetFFlagMomentsAnalyticsProducerPrereqs (copy)
+local function createCreationController(t1: {[any]: any}) -- line: 61
+	-- upvalues: creationToolRegistry (copy), defaultCreationTools (copy), GetFFlagMomentsCreationPersistEditSession (copy), createSignal (copy), createComputed (copy), createCapturePreviewController (copy), SessionManager (copy), FunnelEventNames (copy), Cryo (copy), makeCreationEventFields (copy), CreationFlowState (copy), fireAnalyticsEvent (copy), EventNames (copy), createEditSession (copy), DialogType (copy), GetFFlagMomentsAnalyticsProducerPrereqs (copy)
 	local store = t1.store
-	local v23 = t1.host or {}
-	local v24 = t1.registry or creationToolRegistry(defaultCreationTools)
+	local v24 = t1.host or {}
+	local v25 = t1.registry or creationToolRegistry(defaultCreationTools)
 	local t6 = nil
-	local v26, v27 = createSignal(nil)
+	local getActiveSession, setActiveSession
 
-	local function setActiveSession(p1) -- line: 68
-		-- upvalues: v27 (copy)
-		v27(p1)
+	if GetFFlagMomentsCreationPersistEditSession() then
+		getActiveSession = store.getActiveSession
+		setActiveSession = store.setActiveSession
+	else
+		local v29, v30 = createSignal(nil)
+
+		getActiveSession = v29
+
+		local u31 = v30
+
+		function setActiveSession(p1) -- line: 81
+			-- upvalues: u31 (ref)
+			u31(p1)
+		end
 	end
 
-	local v29, v30 = createSignal(nil)
-	local v31 = createComputed(function(p2) -- line: 76
-		-- upvalues: store (copy), v24 (copy)
+	local v32, v33 = createSignal(nil)
+	local v34 = createComputed(function(p2) -- line: 90
+		-- upvalues: store (copy), v25 (copy)
 		local t2 = {}
 
-		for v43, v44 in (store.getEditsMap(p2)) do
-			if v44 ~= nil then
-				local v45 = v24.get(v43)
+		for v46, v47 in (store.getEditsMap(p2)) do
+			if v47 ~= nil then
+				local v48 = v25.get(v46)
 
-				if v45 ~= nil and v45.toEdits ~= nil then
-					for v46, v47 in v45.toEdits(v44) do
-						t2[v46] = v47
+				if v48 ~= nil and v48.toEdits ~= nil then
+					for v49, v50 in v48.toEdits(v47) do
+						t2[v49] = v50
 					end
 				else
-					t2[v43] = v44
+					t2[v46] = v47
 				end
 			end
 		end
 
 		return t2
 	end)
-	local v32 = createComputed(function(p3) -- line: 95
-		-- upvalues: store (copy), v31 (copy), v24 (copy)
-		local v49 = store.getSelectedCapture(p3)
-		local v50 = if v49 == nil then nil else v49.CaptureType
+	local v35 = createComputed(function(p3) -- line: 109
+		-- upvalues: store (copy), v34 (copy), v25 (copy)
+		local v52 = store.getSelectedCapture(p3)
+		local v53 = if v52 == nil then nil else v52.CaptureType
 		local t3 = {
-			captureType = v50,
-			getComposedEdits = v31
+			captureType = v53,
+			getComposedEdits = v34
 		}
 		local t4 = {}
 
-		for _, v54 in v24.getAll() do
-			if (v54.supportedCaptureTypes == nil or v50 ~= nil and table.find(v54.supportedCaptureTypes, v50) ~= nil) and (v54.isAvailable == nil or v54.isAvailable(t3)) then
-				table.insert(t4, v54)
+		for _, v57 in v25.getAll() do
+			if (v57.supportedCaptureTypes == nil or v53 ~= nil and table.find(v57.supportedCaptureTypes, v53) ~= nil) and (v57.isAvailable == nil or v57.isAvailable(t3)) then
+				table.insert(t4, v57)
 			end
 		end
 
 		return t4
 	end)
-	local v33 = createComputed(function(p4) -- line: 116
-		-- upvalues: store (copy), v24 (copy)
-		local v56 = store.getStep(p4)
+	local v36 = createComputed(function(p4) -- line: 130
+		-- upvalues: store (copy), v25 (copy)
+		local v59 = store.getStep(p4)
 
-		for _, v58 in v24.getAll() do
-			if v56 == v58.step then
-				return v58
+		for _, v61 in v25.getAll() do
+			if v59 == v61.step then
+				return v61
 			end
 		end
 
 		return nil
 	end)
-	local v34 = createComputed(function(p5) -- line: 130
-		-- upvalues: v33 (copy), v26 (copy), v31 (copy)
-		local v60 = v33(p5)
+	local v37 = createComputed(function(p5) -- line: 144
+		-- upvalues: v36 (copy), getActiveSession (ref), v34 (copy)
+		local v63 = v36(p5)
 
-		if v60 ~= nil and v60.kind == "trim" then
-			local v61 = v26(p5)
-			local v62 = if v61 == nil then nil else v61.getDraft(p5)
+		if v63 ~= nil and v63.kind == "trim" then
+			local v64 = getActiveSession(p5)
+			local v65 = if v64 == nil then nil else v64.getDraft(p5)
 
-			if v62 ~= nil and v62.startTime ~= nil and v62.endTime ~= nil then
+			if v65 ~= nil and v65.startTime ~= nil and v65.endTime ~= nil then
 				return {
-					startTime = v62.startTime,
-					endTime = v62.endTime
+					startTime = v65.startTime,
+					endTime = v65.endTime
 				}
 			end
 		end
 
-		local trim = v31(p5).trim
+		local trim = v34(p5).trim
 
 		if trim ~= nil and trim.startTime ~= nil and trim.endTime ~= nil then
 			return {
@@ -113,56 +125,56 @@ local function createCreationController(t1: {[any]: any}) -- line: 59
 
 		return nil
 	end)
-	local v35 = createComputed(function(p6) -- line: 149
-		-- upvalues: v33 (copy), v26 (copy), v31 (copy)
-		local v65 = v33(p6)
+	local v38 = createComputed(function(p6) -- line: 163
+		-- upvalues: v36 (copy), getActiveSession (ref), v34 (copy)
+		local v68 = v36(p6)
 
-		if v65 ~= nil and v65.kind == "music" then
-			local v66 = v26(p6)
-			local v67 = if v66 == nil then nil else v66.getDraft(p6)
+		if v68 ~= nil and v68.kind == "music" then
+			local v69 = getActiveSession(p6)
+			local v70 = if v69 == nil then nil else v69.getDraft(p6)
 
-			if v67 ~= nil and v67.assetId ~= nil then
-				return v67
+			if v70 ~= nil and v70.assetId ~= nil then
+				return v70
 			end
 		end
 
-		return v31(p6).music
+		return v34(p6).music
 	end)
-	local v36 = t1.preview or createCapturePreviewController(store, v34, v35)
+	local v39 = t1.preview or createCapturePreviewController(store, v37, v38)
 
-	local function dismissModal() -- line: 167
-		-- upvalues: v30 (copy)
-		v30(nil)
+	local function dismissModal() -- line: 181
+		-- upvalues: v33 (copy)
+		v33(nil)
 	end
-	local function withCreationSession(t5: {[any]: any}) -- line: 175
+	local function withCreationSession(t5: {[any]: any}) -- line: 189
 		-- upvalues: SessionManager (copy), FunnelEventNames (copy), Cryo (copy), makeCreationEventFields (copy)
-		local v70 = SessionManager.getSessionId(FunnelEventNames.FunnelTypes.CreationFlow)
+		local v73 = SessionManager.getSessionId(FunnelEventNames.FunnelTypes.CreationFlow)
 
-		return Cryo.Dictionary.join(t5, makeCreationEventFields.makeCreationBaseFields(v70))
+		return Cryo.Dictionary.join(t5, makeCreationEventFields.makeCreationBaseFields(v73))
 	end
-	local function dismiss() -- line: 294
-		-- upvalues: v30 (copy), store (copy), t1 (copy), CreationFlowState (copy), v23 (copy)
-		v30(nil)
+	local function dismiss() -- line: 308
+		-- upvalues: v33 (copy), store (copy), t1 (copy), CreationFlowState (copy), v24 (copy)
+		v33(nil)
 		store.clearEdits(if not t1.excludeGallery then CreationFlowState.Gallery else CreationFlowState.Preview)
 
-		if v23.exitCreationFlow ~= nil then
-			v23.exitCreationFlow()
+		if v24.exitCreationFlow ~= nil then
+			v24.exitCreationFlow()
 		end
 	end
 
 	t6 = {
 		getStep = store.getStep,
-		navigate = function(p7) -- line: 180
+		navigate = function(p7) -- line: 194
 			-- upvalues: store (copy)
 			store.navigate(p7)
 		end,
-		returnToGallery = function() -- line: 185
-			-- upvalues: store (copy), CreationFlowState (copy), v27 (copy)
+		returnToGallery = function() -- line: 199
+			-- upvalues: store (copy), CreationFlowState (copy), setActiveSession (ref)
 			store.clearEdits(CreationFlowState.Gallery)
-			v27(nil)
+			setActiveSession(nil)
 		end,
 		getSelectedCapture = store.getSelectedCapture,
-		selectCapture = function(p8) -- line: 190
+		selectCapture = function(p8) -- line: 204
 			-- upvalues: store (copy), fireAnalyticsEvent (copy), EventNames (copy), withCreationSession (copy), makeCreationEventFields (copy)
 			store.onSelectedCaptureUpdated(p8)
 
@@ -171,102 +183,102 @@ local function createCreationController(t1: {[any]: any}) -- line: 59
 			end
 		end,
 		getDescription = store.getDescription,
-		setDescription = function(s1: string) -- line: 203
+		setDescription = function(s1: string) -- line: 217
 			-- upvalues: store (copy)
 			store.updateDescription(s1)
 		end,
-		getAvailableTools = v32,
-		getActiveTool = v33,
-		getActiveSession = v26,
-		getComposedEdits = v31,
-		beginTool = function(s2: string) -- line: 207
-			-- upvalues: v24 (copy), fireAnalyticsEvent (copy), withCreationSession (copy), makeCreationEventFields (copy), t6 (ref), createEditSession (copy), store (copy), v27 (copy)
-			local v75 = v24.get(s2)
+		getAvailableTools = v35,
+		getActiveTool = v36,
+		getActiveSession = getActiveSession,
+		getComposedEdits = v34,
+		beginTool = function(s2: string) -- line: 221
+			-- upvalues: v25 (copy), fireAnalyticsEvent (copy), withCreationSession (copy), makeCreationEventFields (copy), t6 (ref), createEditSession (copy), store (copy), setActiveSession (ref)
+			local v78 = v25.get(s2)
 
-			if v75 == nil then
+			if v78 == nil then
 				return
 			end
 
-			if v75.cta.analyticsEvent ~= nil then
-				fireAnalyticsEvent(v75.cta.analyticsEvent, withCreationSession(makeCreationEventFields.makeToolField(v75)))
+			if v78.cta.analyticsEvent ~= nil then
+				fireAnalyticsEvent(v78.cta.analyticsEvent, withCreationSession(makeCreationEventFields.makeToolField(v78)))
 			end
 
-			if v75.presentation == "InstantAction" then
-				if v75.apply ~= nil then
-					v75.apply(t6)
+			if v78.presentation == "InstantAction" then
+				if v78.apply ~= nil then
+					v78.apply(t6)
 				end
 
 				return
 			end
 
-			local createSession = v75.createSession
-			local v77 = if createSession == nil then createEditSession() else createSession()
+			local createSession = v78.createSession
+			local v80 = if createSession == nil then createEditSession() else createSession()
 
-			if v75.step ~= nil and not store.navigate(v75.step) then
+			if v78.step ~= nil and not store.navigate(v78.step) then
 				return
 			end
 
-			v77.begin(store.getEditsMap(false)[s2])
-			v27(v77)
+			v80.begin(store.getEditsMap(false)[s2])
+			setActiveSession(v80)
 		end,
-		commitActiveTool = function() -- line: 245
-			-- upvalues: v26 (copy), v33 (copy), store (copy), CreationFlowState (copy), t6 (ref), fireAnalyticsEvent (copy), withCreationSession (copy), makeCreationEventFields (copy), v27 (copy)
-			local v78 = v26(false)
-			local v79 = v33(false)
+		commitActiveTool = function() -- line: 259
+			-- upvalues: getActiveSession (ref), v36 (copy), store (copy), CreationFlowState (copy), t6 (ref), fireAnalyticsEvent (copy), withCreationSession (copy), makeCreationEventFields (copy), setActiveSession (ref)
+			local v81 = getActiveSession(false)
+			local v82 = v36(false)
 
-			if v78 == nil or v79 == nil then
+			if v81 == nil or v82 == nil then
 				store.navigate(CreationFlowState.Preview)
 
 				return
 			end
 
-			local v80 = v78.commit()
+			local v83 = v81.commit()
 
-			if v79.onCommit ~= nil and v79.onCommit(v80, t6) == false then
+			if v82.onCommit ~= nil and v82.onCommit(v83, t6) == false then
 				return
 			end
 
-			store.setCommittedEdit(v79.kind, v80)
+			store.setCommittedEdit(v82.kind, v83)
 
-			if v79.cta.commitAnalyticsEvent ~= nil then
-				fireAnalyticsEvent(v79.cta.commitAnalyticsEvent, withCreationSession(makeCreationEventFields.makeToolField(v79)))
+			if v82.cta.commitAnalyticsEvent ~= nil then
+				fireAnalyticsEvent(v82.cta.commitAnalyticsEvent, withCreationSession(makeCreationEventFields.makeToolField(v82)))
 			end
 
-			v27(nil)
+			setActiveSession(nil)
 			store.navigate(CreationFlowState.Preview)
 		end,
-		discardActiveTool = function() -- line: 270
-			-- upvalues: v26 (copy), v33 (copy), fireAnalyticsEvent (copy), withCreationSession (copy), makeCreationEventFields (copy), v27 (copy), store (copy), CreationFlowState (copy)
-			local v81 = v26(false)
-			local v82 = v33(false)
+		discardActiveTool = function() -- line: 284
+			-- upvalues: getActiveSession (ref), v36 (copy), fireAnalyticsEvent (copy), withCreationSession (copy), makeCreationEventFields (copy), setActiveSession (ref), store (copy), CreationFlowState (copy)
+			local v84 = getActiveSession(false)
+			local v85 = v36(false)
 
-			if v81 ~= nil then
-				v81.discard()
+			if v84 ~= nil then
+				v84.discard()
 			end
 
-			if v82 ~= nil and v82.cta.cancelAnalyticsEvent ~= nil then
-				fireAnalyticsEvent(v82.cta.cancelAnalyticsEvent, withCreationSession(makeCreationEventFields.makeToolField(v82)))
+			if v85 ~= nil and v85.cta.cancelAnalyticsEvent ~= nil then
+				fireAnalyticsEvent(v85.cta.cancelAnalyticsEvent, withCreationSession(makeCreationEventFields.makeToolField(v85)))
 			end
 
-			v27(nil)
+			setActiveSession(nil)
 			store.navigate(CreationFlowState.Preview)
 		end,
-		updateCommittedEdit = function(s3: string, p9) -- line: 290
+		updateCommittedEdit = function(s3: string, p9) -- line: 304
 			-- upvalues: store (copy)
 			store.setCommittedEdit(s3, p9)
 		end,
-		getActiveModal = v29,
-		showModal = function(p10) -- line: 163
-			-- upvalues: v30 (copy)
-			v30(p10)
+		getActiveModal = v32,
+		showModal = function(p10) -- line: 177
+			-- upvalues: v33 (copy)
+			v33(p10)
 		end,
 		dismissModal = dismissModal,
-		publish = function() -- line: 302
-			-- upvalues: store (copy), v23 (copy), v30 (copy), DialogType (copy), dismissModal (copy), GetFFlagMomentsAnalyticsProducerPrereqs (copy), SessionManager (copy), FunnelEventNames (copy), v31 (copy), fireAnalyticsEvent (copy), EventNames (copy), Cryo (copy), makeCreationEventFields (copy), t1 (copy), CreationFlowState (copy)
-			local v85 = store.getDescription(false)
+		publish = function() -- line: 316
+			-- upvalues: store (copy), v24 (copy), v33 (copy), DialogType (copy), dismissModal (copy), GetFFlagMomentsAnalyticsProducerPrereqs (copy), SessionManager (copy), FunnelEventNames (copy), v39 (copy), v34 (copy), fireAnalyticsEvent (copy), EventNames (copy), Cryo (copy), makeCreationEventFields (copy), t1 (copy), CreationFlowState (copy)
+			local v88 = store.getDescription(false)
 
-			if v23.isTextFiltered ~= nil and v23.isTextFiltered(v85) then
-				v30({
+			if v24.isTextFiltered ~= nil and v24.isTextFiltered(v88) then
+				v33({
 					modalType = DialogType.TextFiltered,
 					modalProps = {
 						onConfirm = dismissModal
@@ -276,31 +288,33 @@ local function createCreationController(t1: {[any]: any}) -- line: 59
 				return
 			end
 
-			local v86 = if not GetFFlagMomentsAnalyticsProducerPrereqs() then nil else SessionManager.getSessionId(FunnelEventNames.FunnelTypes.CreationFlow)
+			local v89 = if not GetFFlagMomentsAnalyticsProducerPrereqs() then nil else SessionManager.getSessionId(FunnelEventNames.FunnelTypes.CreationFlow)
 
-			if v23.createMoment ~= nil then
-				v23.createMoment(store.getSelectedCapture(false), v31(false), v85, v86)
+			if v24.createMoment ~= nil then
+				local v90 = v39.playback.getTimeLength(false)
+
+				v24.createMoment(store.getSelectedCapture(false), v34(false), v88, v89, v90)
 			end
 
-			fireAnalyticsEvent(EventNames.MomentsEditingFlowPublished, Cryo.Dictionary.join(makeCreationEventFields.makeStepField(EventNames.MomentsEditingFlowPublished), makeCreationEventFields.makeCreationBaseFields(v86)))
-			v30(nil)
+			fireAnalyticsEvent(EventNames.MomentsEditingFlowPublished, Cryo.Dictionary.join(makeCreationEventFields.makeStepField(EventNames.MomentsEditingFlowPublished), makeCreationEventFields.makeCreationBaseFields(v89)))
+			v33(nil)
 			store.clearEdits(if not t1.excludeGallery then CreationFlowState.Gallery else CreationFlowState.Preview)
 
-			if v23.exitCreationFlow ~= nil then
-				v23.exitCreationFlow()
+			if v24.exitCreationFlow ~= nil then
+				v24.exitCreationFlow()
 			end
 		end,
-		exit = function() -- line: 334
-			-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), withCreationSession (copy), makeCreationEventFields (copy), v30 (copy), store (copy), t1 (copy), CreationFlowState (copy), v23 (copy)
+		exit = function() -- line: 357
+			-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), withCreationSession (copy), makeCreationEventFields (copy), v33 (copy), store (copy), t1 (copy), CreationFlowState (copy), v24 (copy)
 			fireAnalyticsEvent(EventNames.MomentsEditingFlowExited, withCreationSession(makeCreationEventFields.makeStepField(EventNames.MomentsEditingFlowExited)))
-			v30(nil)
+			v33(nil)
 			store.clearEdits(if not t1.excludeGallery then CreationFlowState.Gallery else CreationFlowState.Preview)
 
-			if v23.exitCreationFlow ~= nil then
-				v23.exitCreationFlow()
+			if v24.exitCreationFlow ~= nil then
+				v24.exitCreationFlow()
 			end
 		end,
-		preview = v36
+		preview = v39
 	}
 
 	return t6

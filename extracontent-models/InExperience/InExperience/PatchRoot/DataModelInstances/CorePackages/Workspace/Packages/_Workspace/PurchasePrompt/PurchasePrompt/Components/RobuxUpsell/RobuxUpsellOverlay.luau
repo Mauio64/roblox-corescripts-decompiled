@@ -37,41 +37,51 @@ local FFlagUnifiedPurchaseFlowMarketplaceUIImprovements = require(PurchasePrompt
 local FFlagAddPerformanceMetricsToUnifiedPurchaseModal = require(PurchasePromptParent.SharedFlags).FFlagAddPerformanceMetricsToUnifiedPurchaseModal
 local FFlagEnableDiscountInfoInUnifiedPurchaseModal = require(PurchasePromptParent.SharedFlags).FFlagEnableDiscountInfoInUnifiedPurchaseModal
 local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
+local FFlagSkipBuyDelayForExperienceShop = require(PurchasePrompt.Flags.FFlagSkipBuyDelayForExperienceShop)
 
 require(PurchasePromptParent.IAPExperience)
 
-function v16.init(p1) -- line: 121
-	-- upvalues: FFlagEnableUnifiedProductPurchaseFlow (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), UnifiedPurchaseEventNameEnum (copy), Players (copy), PromptState (copy), PurchaseError (copy), FFlagFixCountersForUpsellModalShown (copy), FFlagAddPerformanceMetricsToUnifiedPurchaseModal (copy), emitPerformanceMetrics (copy), Constants (copy)
+function v16.init(p1) -- line: 124
+	-- upvalues: FFlagSkipBuyDelayForExperienceShop (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), UnifiedPurchaseEventNameEnum (copy), Players (copy), PromptState (copy), PurchaseError (copy), FFlagFixCountersForUpsellModalShown (copy), FFlagAddPerformanceMetricsToUnifiedPurchaseModal (copy), emitPerformanceMetrics (copy), Constants (copy)
+	function p1.shouldUseDelayedInput() -- line: 127
+		-- upvalues: FFlagSkipBuyDelayForExperienceShop (copy), p1 (copy)
+		if FFlagSkipBuyDelayForExperienceShop and p1.props.isFromInExperienceShop then
+			return false
+		end
+
+		return true
+	end
+
 	p1.state = {
-		canAcceptInput = false
+		canAcceptInput = not p1.shouldUseDelayedInput()
 	}
 
-	function p1.dispatchFetchPurchaseWarning() -- line: 126
+	function p1.dispatchFetchPurchaseWarning() -- line: 138
 		-- upvalues: p1 (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), UnifiedPurchaseEventNameEnum (copy)
 		local props = p1.props
 
 		if FFlagEnableUnifiedProductPurchaseFlow and p1.props.useUnifiedProductPurchaseModal then
-			local v59 = p1.props.purchaseAnalyticsMetadata or {}
+			local v60 = p1.props.purchaseAnalyticsMetadata or {}
 
-			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellModalBuyButtonClickedCounter, v59.surface, v59.productType)
+			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellModalBuyButtonClickedCounter, v60.surface, v60.productType)
 			p1:emitUnifiedPurchaseTelemetry(UnifiedPurchaseEventNameEnum.RobuxUpsellModalBuyClicked)
 		end
 
 		return p1.props.dispatchFetchPurchaseWarning(props.robuxProviderId)
 	end
-	function p1.promptRobuxPurchase() -- line: 141
+	function p1.promptRobuxPurchase() -- line: 153
 		-- upvalues: p1 (copy)
 		local props = p1.props
 
 		p1.props.promptRobuxPurchase(p1.props.networking, props.robuxProviderId, props.robuxProductId)
 	end
-	function p1.onDelayedInputComplete() -- line: 146
+	function p1.onDelayedInputComplete() -- line: 158
 		-- upvalues: p1 (copy)
 		p1:setState({
 			canAcceptInput = true
 		})
 	end
-	function p1.canAcceptInput() -- line: 152
+	function p1.canAcceptInput() -- line: 164
 		-- upvalues: p1 (copy), Players (copy)
 		local state = p1.state
 
@@ -81,7 +91,7 @@ function v16.init(p1) -- line: 121
 
 		return state.canAcceptInput
 	end
-	function p1.confirmButtonPressed() -- line: 162
+	function p1.confirmButtonPressed() -- line: 174
 		-- upvalues: p1 (copy), PromptState (copy), PurchaseError (copy)
 		local props = p1.props
 		local promptState = props.promptState
@@ -127,48 +137,48 @@ function v16.init(p1) -- line: 121
 			return
 		end
 	end
-	function p1.cancelButtonPressed() -- line: 202
+	function p1.cancelButtonPressed() -- line: 214
 		-- upvalues: p1 (copy)
 		p1.props.endPurchase()
 	end
-	function p1.onBuyItemButtonMounted(_) -- line: 208
+	function p1.onBuyItemButtonMounted(_) -- line: 220
 		-- upvalues: p1 (copy), FFlagFixCountersForUpsellModalShown (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), UnifiedPurchaseEventNameEnum (copy), FFlagAddPerformanceMetricsToUnifiedPurchaseModal (copy), emitPerformanceMetrics (copy), Constants (copy)
-		local v66 = p1.props.purchaseAnalyticsMetadata or {}
+		local v67 = p1.props.purchaseAnalyticsMetadata or {}
 
 		if FFlagFixCountersForUpsellModalShown then
-			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellModalShownCounter, v66.surface, v66.productType)
+			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellModalShownCounter, v67.surface, v67.productType)
 		else
-			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellModalBuyButtonClickedCounter, v66.surface, v66.productType)
+			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellModalBuyButtonClickedCounter, v67.surface, v67.productType)
 		end
 
 		p1:emitUnifiedPurchaseTelemetry(UnifiedPurchaseEventNameEnum.RobuxUpsellModalShown)
 
-		if FFlagAddPerformanceMetricsToUnifiedPurchaseModal and v66 and v66.surface then
-			emitPerformanceMetrics(Constants.PerformanceMetrics.IntervalName.RobuxUpsellModalShown, v66.surface)
+		if FFlagAddPerformanceMetricsToUnifiedPurchaseModal and v67 and v67.surface then
+			emitPerformanceMetrics(Constants.PerformanceMetrics.IntervalName.RobuxUpsellModalShown, v67.surface)
 		end
 	end
 end
-function v16.didMount(p3) -- line: 237
+function v16.didMount(p3) -- line: 249
 	-- upvalues: ContextActionService (copy)
-	ContextActionService:BindCoreAction("ProductPurchaseConfirmButtonBind", function(_, p5, _) -- line: 238
+	ContextActionService:BindCoreAction("ProductPurchaseConfirmButtonBind", function(_, p5, _) -- line: 250
 		-- upvalues: p3 (copy)
 		if p5 == Enum.UserInputState.Begin then
 			p3.confirmButtonPressed()
 		end
 	end, false, Enum.KeyCode.ButtonA)
-	ContextActionService:BindCoreAction("ProductPurchaseCancelButtonBind", function(_, p8, _) -- line: 243
+	ContextActionService:BindCoreAction("ProductPurchaseCancelButtonBind", function(_, p8, _) -- line: 255
 		-- upvalues: p3 (copy)
 		if p8 == Enum.UserInputState.Begin then
 			p3.cancelButtonPressed()
 		end
 	end, false, Enum.KeyCode.ButtonB)
 end
-function v16.willUnmount(_) -- line: 250
+function v16.willUnmount(_) -- line: 262
 	-- upvalues: ContextActionService (copy)
 	ContextActionService:UnbindCoreAction("ProductPurchaseConfirmButtonBind")
 	ContextActionService:UnbindCoreAction("ProductPurchaseCancelButtonBind")
 end
-function v16.getFlowState(p11) -- line: 255
+function v16.getFlowState(p11) -- line: 267
 	-- upvalues: PromptState (copy), RobuxUpsellFlowState (copy), PurchaseError (copy)
 	local props = p11.props
 	local promptState = props.promptState
@@ -228,7 +238,7 @@ function v16.getFlowState(p11) -- line: 255
 
 	return RobuxUpsellFlowState.None
 end
-function v16.getU13ConfirmType(p12) -- line: 293
+function v16.getU13ConfirmType(p12) -- line: 305
 	-- upvalues: PromptState (copy), U13ConfirmType (copy)
 	local promptState = p12.props.promptState
 
@@ -250,7 +260,7 @@ function v16.getU13ConfirmType(p12) -- line: 293
 
 	return U13ConfirmType.None
 end
-function v16.getErrorType(p13) -- line: 311
+function v16.getErrorType(p13) -- line: 323
 	-- upvalues: PurchaseError (copy), PurchaseErrorType (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), AppContext (copy)
 	local props = p13.props
 
@@ -304,7 +314,7 @@ function v16.getErrorType(p13) -- line: 311
 
 	return PurchaseErrorType.Unknown
 end
-function v16.getVPCModalType(p14) -- line: 351
+function v16.getVPCModalType(p14) -- line: 363
 	-- upvalues: PromptState (copy), VPCModalType (copy)
 	if p14.props.promptState == PromptState.EnablePurchaseVPCModal then
 		return VPCModalType.toRawValue(VPCModalType.EnablePurchase)
@@ -312,22 +322,22 @@ function v16.getVPCModalType(p14) -- line: 351
 
 	return VPCModalType.toRawValue(VPCModalType.None)
 end
-function v16.emitUnifiedPurchaseTelemetry(p15, p16) -- line: 363
+function v16.emitUnifiedPurchaseTelemetry(p15, p16) -- line: 375
 	-- upvalues: FFlagPurchasePromptCartPricingEnabled (copy), deriveUnifiedPurchaseEventRobuxPrice (copy), FFlagUnifiedPurchaseGamepassAddProductUniverseId (copy), HttpService (copy), sendUnifiedPurchaseEventLog (copy)
 	local props = p15.props
-	local v52 = props.purchaseAnalyticsMetadata or {}
-	local v53 = if not FFlagPurchasePromptCartPricingEnabled then v52.price else deriveUnifiedPurchaseEventRobuxPrice(props.cartPricingResponse, v52.price)
+	local v53 = props.purchaseAnalyticsMetadata or {}
+	local v54 = if not FFlagPurchasePromptCartPricingEnabled then v53.price else deriveUnifiedPurchaseEventRobuxPrice(props.cartPricingResponse, v53.price)
 	local t1 = {
 		event_name = p16,
-		purchase_flow_uuid = v52.purchaseFlowUUID,
-		product_id = v52.productId,
-		product_type = v52.productType,
-		product_target_id = v52.productTargetId,
-		robux_price = v53,
-		surface = v52.surface,
-		user_roblox_balance = v52.userRobuxBalance,
-		salelocation_universeid = v52.saleLocationUniverseId,
-		product_universeid = if not FFlagUnifiedPurchaseGamepassAddProductUniverseId then nil else v52.productUniverseId,
+		purchase_flow_uuid = v53.purchaseFlowUUID,
+		product_id = v53.productId,
+		product_type = v53.productType,
+		product_target_id = v53.productTargetId,
+		robux_price = v54,
+		surface = v53.surface,
+		user_roblox_balance = v53.userRobuxBalance,
+		salelocation_universeid = v53.saleLocationUniverseId,
+		product_universeid = if not FFlagUnifiedPurchaseGamepassAddProductUniverseId then nil else v53.productUniverseId,
 		event_metadata = HttpService:JSONEncode({
 			upsell_robux_package_id = props.robuxProductId,
 			upsell_robux_package_amount = props.iapRobuxAmount
@@ -336,15 +346,15 @@ function v16.emitUnifiedPurchaseTelemetry(p15, p16) -- line: 363
 
 	sendUnifiedPurchaseEventLog(t1)
 end
-function v16.render(p17) -- line: 393
+function v16.render(p17) -- line: 405
 	-- upvalues: ExternalSettings (copy), Roact (copy), RobuxUpsellFlow (copy), FFlagEnableDiscountInfoInUnifiedPurchaseModal (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), getUnifiedPurchaseModalType (copy), FFlagUnifiedPurchaseFlowMarketplaceUIImprovements (copy), FFlagPurchasePromptCartPricingEnabled (copy), GetFFlagDisablePurchasePromptFunctionForMaquettes (copy), getPaymentPlatform (copy), PaymentPlatform (copy)
 	local props = p17.props
-	local v57 = ExternalSettings.new()
+	local v58 = ExternalSettings.new()
 
 	return Roact.createElement(RobuxUpsellFlow, {
 		screenSize = props.screenSize,
 		shouldAnimate = true,
-		isDelayedInput = true,
+		isDelayedInput = p17.shouldUseDelayedInput(),
 		onDelayedInputComplete = p17.onDelayedInputComplete,
 		model = props.humanoidModel,
 		itemIcon = props.itemIcon,
@@ -386,7 +396,7 @@ function v16.render(p17) -- line: 393
 		flowComplete = props.endPurchase,
 		onAnalyticEvent = props.onAnalyticEvent,
 		eventPrefix = "InGame",
-		isQuest = GetFFlagDisablePurchasePromptFunctionForMaquettes() and getPaymentPlatform(v57.getPlatform()) == PaymentPlatform.Maquettes
+		isQuest = GetFFlagDisablePurchasePromptFunctionForMaquettes() and getPaymentPlatform(v58.getPlatform()) == PaymentPlatform.Maquettes
 	})
 end
 

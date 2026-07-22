@@ -9,18 +9,20 @@ local MomentsCreationFlowClosed = require(ParentParent.Actions.MomentsCreationFl
 local MomentsCreationFlowOpened = require(ParentParent.Actions.MomentsCreationFlowOpened)
 local t1 = {
 	IsOpen = false,
-	Capture = nil
+	Capture = nil,
+	SessionId = nil
 }
 
 return Rodux.createReducer(t1, {
-	[MomentsCreationFlowOpened.name] = function(t2: {[any]: any}, p1) -- line: 23
+	[MomentsCreationFlowOpened.name] = function(t2: {[any]: any}, p1) -- line: 25
 		-- upvalues: Cryo (copy)
 		return Cryo.Dictionary.join(t2, {
 			IsOpen = true,
-			Capture = p1.capture
+			Capture = p1.capture,
+			SessionId = p1.sessionId
 		})
 	end,
-	[MomentsCreationFlowClosed.name] = function(_: {[any]: any}, _: {[any]: any}) -- line: 30
+	[MomentsCreationFlowClosed.name] = function(_: {[any]: any}, _: {[any]: any}) -- line: 33
 		-- upvalues: t1 (copy)
 		return t1
 	end

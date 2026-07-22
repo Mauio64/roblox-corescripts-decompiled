@@ -87,6 +87,7 @@ return {
 	AvatarMarketplaceItemDetailsPage = "AvatarMarketplace.ItemDetailsPage",
 	AvatarMarketplaceShoppingCart = "AvatarMarketplace.ShoppingCart",
 	AvatarMarketplaceWidgetPlatformSorts = "AvatarMarketplace.WidgetPlatformSorts",
+	PostPurchaseLayer = "Payments.PostPurchase.Mobile",
 	ParentalSpendControlsLayer = "Fraud.PurchaseValidation",
 	AvatarAutocompleteLayer = "PlayerApp.TopNavSearchBox",
 	GameLaunchLayer = "Website.GameLaunch",

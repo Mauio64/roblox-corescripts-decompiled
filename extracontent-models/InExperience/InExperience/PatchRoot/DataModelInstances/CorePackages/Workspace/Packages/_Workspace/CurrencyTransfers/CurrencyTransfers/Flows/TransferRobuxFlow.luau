@@ -13,85 +13,89 @@ local CurrencyTransferTelemetry = require(CurrencyTransfers.Events.CurrencyTrans
 local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransferFlowEventName)
 local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
 local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
+local GetFFlagCurrencyTransferUseRoactNetworking = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferUseRoactNetworking)
 
-local function normalizeTransferOrigination(s1: string) -- line: 32
+local function normalizeTransferOrigination(s1: string) -- line: 40
 	-- upvalues: TransferOrigination (copy)
-	local v19 = string.lower(s1)
+	local v20 = string.lower(s1)
 
-	if v19 == "unknown" then
+	if v20 == "unknown" then
 		return TransferOrigination.Unknown
 	end
 
-	if v19 == "profile" then
+	if v20 == "profile" then
 		return TransferOrigination.Profile
 	end
 
-	if v19 == "chat" then
+	if v20 == "chat" then
 		return TransferOrigination.Chat
 	end
 
-	if v19 == "buyrobux" then
+	if v20 == "buyrobux" then
 		return TransferOrigination.BuyRobux
 	end
 
-	if v19 == "inexperience" then
+	if v20 == "inexperience" then
 		return TransferOrigination.InExperience
 	end
 
 	return TransferOrigination.Unknown
 end
-local function validateParams(t1: {[any]: any}) -- line: 52
+local function validateParams(t1: {[any]: any}) -- line: 60
 	-- upvalues: TransferDirection (copy)
 	if t1.direction ~= TransferDirection.Send and t1.direction ~= TransferDirection.Receive then
 		error(string.format("[TransferRobuxFlow] Invalid direction: '%s'. Must be either TransferDirection.Send or TransferDirection.Receive.", (tostring(t1.direction))))
 	end
 end
 
-function TransferRobuxFlow(t2: {[any]: any}) -- line: 64
-	-- upvalues: TransferDirection (copy), createTransferStore (copy), SharedFlags (copy), HttpService (copy), TransferOrigination (copy), initiateTransfer (copy), acceptTransfer (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), React (copy), TransferRobuxApp (copy)
+function TransferRobuxFlow(t2: {[any]: any}) -- line: 72
+	-- upvalues: TransferDirection (copy), createTransferStore (copy), GetFFlagCurrencyTransferUseRoactNetworking (copy), SharedFlags (copy), HttpService (copy), TransferOrigination (copy), initiateTransfer (copy), acceptTransfer (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), React (copy), TransferRobuxApp (copy)
 	if t2.direction ~= TransferDirection.Send and t2.direction ~= TransferDirection.Receive then
 		error(string.format("[TransferRobuxFlow] Invalid direction: '%s'. Must be either TransferDirection.Send or TransferDirection.Receive.", (tostring(t2.direction))))
 	end
 
-	local v22 = createTransferStore()
+	local v23 = createTransferStore()
+	local v24 = if not GetFFlagCurrencyTransferUseRoactNetworking() then nil else t2.networkImpl
+
+	v23.setNetworkImpl(v24)
 
 	if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-		v22.setTransferClientSessionId(HttpService:GenerateGUID(false))
+		v23.setTransferClientSessionId(HttpService:GenerateGUID(false))
 	end
 
-	v22.setOnClose(t2.onClose)
-	v22.setDirection(t2.direction)
+	v23.setOnClose(t2.onClose)
+	v23.setDirection(t2.direction)
 
 	if t2.transferOrigination then
-		local setTransferOrigination = v22.setTransferOrigination
+		local setTransferOrigination = v23.setTransferOrigination
 		local transferOrigination = t2.transferOrigination
-		local v25 = string.lower(transferOrigination)
+		local v27 = string.lower(transferOrigination)
 
-		setTransferOrigination(if v25 ~= "unknown" then if v25 ~= "profile" then if v25 ~= "chat" then if v25 ~= "buyrobux" then if v25 ~= "inexperience" then TransferOrigination.Unknown else TransferOrigination.InExperience else TransferOrigination.BuyRobux else TransferOrigination.Chat else TransferOrigination.Profile else TransferOrigination.Unknown)
+		setTransferOrigination(if v27 ~= "unknown" then if v27 ~= "profile" then if v27 ~= "chat" then if v27 ~= "buyrobux" then if v27 ~= "inexperience" then TransferOrigination.Unknown else TransferOrigination.InExperience else TransferOrigination.BuyRobux else TransferOrigination.Chat else TransferOrigination.Profile else TransferOrigination.Unknown)
 	end
 
 	if t2.direction == TransferDirection.Send then
 		if t2.recipientUserId then
-			v22.setRecipientUserId(t2.recipientUserId)
+			v23.setRecipientUserId(t2.recipientUserId)
 		end
 
-		initiateTransfer(v22)
+		initiateTransfer(v23)
 	elseif t2.direction == TransferDirection.Receive then
 		if t2.transferId then
-			v22.setTransferRequestId(t2.transferId)
+			v23.setTransferRequestId(t2.transferId)
 		end
 
-		acceptTransfer(v22)
+		acceptTransfer(v23)
 	end
 
-	logCurrencyTransferCounter(v22, CurrencyTransferTelemetry.CurrencyTransferFlowOpenedCounter)
+	logCurrencyTransferCounter(v23, CurrencyTransferTelemetry.CurrencyTransferFlowOpenedCounter)
 
 	if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-		logRobuxTransferFlowEvent(v22, RobuxTransferFlowEventName.in_app_flow_open)
+		logRobuxTransferFlowEvent(v23, RobuxTransferFlowEventName.in_app_flow_open)
 	end
 
 	return (React.createElement(TransferRobuxApp, {
-		transferStore = v22
+		transferStore = v23
 	}))
 end
 

@@ -21,7 +21,9 @@ return {
 		FFlagPlayerListDropDownShowPlatformName = require(script.Flags.FFlagPlayerListDropDownShowPlatformName),
 		FFlagPlayerListFoundationSubscriptionIcon = require(script.Flags.FFlagPlayerListFoundationSubscriptionIcon),
 		FFlagPlayerListReskin = require(script.Flags.FFlagPlayerListReskin),
+		FFlagPlayerListReskinMobileLayoutFix = require(script.Flags.FFlagPlayerListReskinMobileLayoutFix),
 		FFlagPlayerListTwoTabs = require(script.Flags.FFlagPlayerListTwoTabs),
+		FFlagPlayerListReskinPreferredTransparency = require(script.Flags.FFlagPlayerListReskinPreferredTransparency),
 		FFlagPlayerListLocalizeGameText = require(script.Flags.FFlagPlayerListLocalizeGameText),
 		FFlagEnablePlayerListExposureEvents = require(script.Flags.FFlagEnablePlayerListExposureEvents),
 		FStringPlayerListIXPLayer = require(script.Flags.FStringPlayerListIXPLayer)

@@ -6,42 +6,51 @@ local v5 = game:DefineFastString("ArgoPartyVariant", "enableArgoPartyChanges")
 local v6 = game:DefineFastFlag("ForceEnableArgoPartyChanges7", false)
 local v7 = game:DefineFastFlag("EnableArgoPartyExperimentation7", false)
 local FFlagAppChatRenameGuacPolicyEnabled = SharedFlags.FFlagAppChatRenameGuacPolicyEnabled
+local v9 = game:DefineFastFlag("EnableArgoPartyChanges", false)
 
-local function getIsUserInTreatment(s1: string) -- line: 14
+local function getIsUserInTreatment(s1: string) -- line: 15
 	-- upvalues: ExperimentCacheManager (copy), v4 (copy)
-	local v11 = ExperimentCacheManager.default:getLayerVariables(v4)
+	local v12 = ExperimentCacheManager.default:getLayerVariables(v4)
 
-	if v11 and v11[s1] ~= nil then
-		return v11[s1]
+	if v12 and v12[s1] ~= nil then
+		return v12[s1]
 	end
 
 	return false
 end
 
 return {
-	getIsRenameEnabled = function() -- line: 24
-		-- upvalues: v6 (copy), v7 (copy), FFlagAppChatRenameGuacPolicyEnabled (copy), v5 (copy), ExperimentCacheManager (copy), v4 (copy)
-		local v12 = v6
+	getIsRenameEnabled = function() -- line: 25
+		-- upvalues: v6 (copy), v9 (copy), FFlagAppChatRenameGuacPolicyEnabled (copy), v7 (copy), v5 (copy), ExperimentCacheManager (copy), v4 (copy)
+		local v13 = v6
 
-		if not v12 then
-			v12 = v7
+		if not v13 then
+			if v9 then
+				v13 = FFlagAppChatRenameGuacPolicyEnabled
 
-			if v12 then
-				v12 = FFlagAppChatRenameGuacPolicyEnabled
+				if v13 then
+					return v13
+				end
+			end
 
-				if v12 then
-					local v13 = v5
-					local v14 = ExperimentCacheManager.default:getLayerVariables(v4)
+			v13 = v7
 
-					if v14 and v14[v13] ~= nil then
-						return v14[v13]
+			if v13 then
+				v13 = FFlagAppChatRenameGuacPolicyEnabled
+
+				if v13 then
+					local v14 = v5
+					local v15 = ExperimentCacheManager.default:getLayerVariables(v4)
+
+					if v15 and v15[v14] ~= nil then
+						return v15[v14]
 					end
 
-					v12 = false
+					v13 = false
 				end
 			end
 		end
 
-		return v12
+		return v13
 	end
 }
