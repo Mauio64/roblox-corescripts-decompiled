@@ -16,11 +16,11 @@ local Constants = require(Foundation.Constants)
 local font = Font.new(Constants.BUILDER_SANS_FONT_ASSET, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
 
 function variantsFactory(p1) -- line: 35
-	-- upvalues: Flags (copy), font (copy), StatusIndicatorVariant (copy), StatusIndicatorShape (copy), StatusIndicatorSize (copy)
+	-- upvalues: font (copy), StatusIndicatorVariant (copy), Flags (copy), StatusIndicatorShape (copy), StatusIndicatorSize (copy)
 	local t1 = {
 		content = {
-			tag = not Flags.FoundationStatusIndicatorBeta and "auto-xy text-caption-small text-align-x-left" or "auto-xy text-align-x-left",
-			font = if not Flags.FoundationStatusIndicatorBeta then nil else font
+			tag = "auto-xy text-align-x-left",
+			font = font
 		}
 	}
 	local t2 = {
@@ -175,7 +175,7 @@ function variantsFactory(p1) -- line: 35
 	}
 end
 
-return function(p2, p3, b1: boolean, p4, p5) -- line: 180
+return function(p2, p3, b1: boolean, p4, p5) -- line: 178
 	-- upvalues: Flags (copy), v8 (copy), StatusIndicatorVariant (copy), VariantsContext (copy), composeStyleVariant (copy)
 	if not Flags.FoundationStatusIndicatorVariantExperiment and v8 then
 		if p3 == StatusIndicatorVariant.Contrast_Experiment then

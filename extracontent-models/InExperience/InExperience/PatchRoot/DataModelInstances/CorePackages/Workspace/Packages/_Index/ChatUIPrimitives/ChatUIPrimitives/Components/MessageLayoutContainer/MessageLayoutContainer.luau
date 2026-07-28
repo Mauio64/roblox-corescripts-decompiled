@@ -30,12 +30,12 @@ local t1 = {
 	right = UDim.new(0, 8)
 }
 
-local function MessageLayoutContainer(t2: {[any]: any}) -- line: 56
+local function MessageLayoutContainer(t2: {[any]: any}) -- line: 57
 	-- upvalues: v13 (copy), React (copy), Signals (copy), useMessagesMap (copy), BubbleEntry (copy), TextLineEntry (copy), useMessagePool (copy), SignalsReact (copy), Foundation (copy), BottomLockedScrollView (copy), t1 (copy)
 	local v19 = t2.messagesSignal or v13
-	local v20 = React.useMemo(function() -- line: 60
+	local v20 = React.useMemo(function() -- line: 61
 		-- upvalues: Signals (copy), v19 (copy)
-		return Signals.createComputed(function(p4) -- line: 61
+		return Signals.createComputed(function(p4) -- line: 62
 			-- upvalues: v19 (copy)
 			local t3 = {}
 
@@ -48,7 +48,7 @@ local function MessageLayoutContainer(t2: {[any]: any}) -- line: 56
 	end, { v19 })
 	local v21 = useMessagesMap(v19)
 	local v22 = if t2.layoutStyle ~= "bubble" then TextLineEntry else BubbleEntry
-	local v23 = React.useMemo(function() -- line: 79
+	local v23 = React.useMemo(function() -- line: 80
 		-- upvalues: v22 (copy), v21 (copy), React (copy)
 		local v28 = v22
 		local v29 = v21
@@ -70,7 +70,7 @@ local function MessageLayoutContainer(t2: {[any]: any}) -- line: 56
 		createSlotElement = v23
 	})
 	local v25 = SignalsReact.useSignalState(v24)
-	local v26 = React.useMemo(function() -- line: 94
+	local v26 = React.useMemo(function() -- line: 95
 		-- upvalues: v25 (copy), React (copy)
 		local v30 = table.clone(v25)
 
@@ -89,7 +89,8 @@ local function MessageLayoutContainer(t2: {[any]: any}) -- line: 56
 		scrollView = React.createElement(BottomLockedScrollView, {
 			Size = UDim2.fromScale(1, 1),
 			contentPadding = t2.contentPadding or t1,
-			children = v26
+			children = v26,
+			onScroll = t2.onScroll
 		})
 	})
 end

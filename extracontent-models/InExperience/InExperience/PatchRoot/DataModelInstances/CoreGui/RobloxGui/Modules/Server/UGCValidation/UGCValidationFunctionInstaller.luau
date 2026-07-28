@@ -59,30 +59,26 @@ local function UGCValidationFunction(p1) -- line: 10
 		v22, v23 = UGCValidation.validate(instances, assetType, isServer, allowUnreviewedAssets, restrictedUserIds, token, universeId, true, t1, true, true, requireAllFolders)
 	end
 
-	if UGCValidation.isFolderStructureEnabled and UGCValidation.isFolderStructureEnabled() then
-		local t4 = {
-			source = not isServer and "InExpClient" or "InExpServer",
-			enforceR15FolderStructure = requireAllFolders or false,
-			iecConfigs = if not v5 then nil else {
-				token = token,
-				universeId = universeId,
-				restrictedUserIds = if not v6 then nil else restrictedUserIds
-			}
+	local t4 = {
+		source = not isServer and "InExpClient" or "InExpServer",
+		enforceR15FolderStructure = requireAllFolders or false,
+		skipAssetQualityChecks = UGCValidation.shouldSkipAssetQualityChecks and UGCValidation.shouldSkipAssetQualityChecks() or nil,
+		iecConfigs = if not v5 then nil else {
+			token = token,
+			universeId = universeId,
+			restrictedUserIds = if not v6 then nil else restrictedUserIds
 		}
-		local v25 = if not fullBodyData then UGCValidation.ValidateAsset(instances, assetType, t4) else UGCValidation.ValidateFinalizedBundle(fullBodyData, Enum.BundleType.BodyParts, t4)
+	}
+	local v25 = if not fullBodyData then UGCValidation.ValidateAsset(instances, assetType, t4) else UGCValidation.ValidateFinalizedBundle(fullBodyData, Enum.BundleType.BodyParts, t4)
+	local v26, v27 = UGCValidation.combineResultsIntoLegacy(v22, v23, v25)
 
-		if UGCValidation.isEntrypointMergingEnabled and UGCValidation.isEntrypointMergingEnabled() then
-			v22, v23 = UGCValidation.combineResultsIntoLegacy(v22, v23, v25)
-		end
-	end
-
-	if not v22 then
-		return false, v23
+	if not v26 then
+		return false, v27
 	end
 
 	return true, { "Success" }
 end
-local function Install() -- line: 126
+local function Install() -- line: 119
 	-- upvalues: UGCValidationService (copy), UGCValidationFunction (copy)
 	UGCValidationService:RegisterUGCValidationFunction(UGCValidationFunction)
 end

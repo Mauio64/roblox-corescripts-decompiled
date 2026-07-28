@@ -14,11 +14,11 @@ local t1 = {
 	}
 }
 
-local function defaultEmit(p1, n1: number, t2: {[any]: any}) -- line: 67
+local function defaultEmit(p1, n1: number, t2: {[any]: any}) -- line: 66
 	-- upvalues: LoggingProtocol (copy)
 	LoggingProtocol.default:logRobloxTelemetryCounter(p1, n1, t2)
 end
-local function reportMomentSkip(s1: string, s2: string, t3: {[any]: any}?, p2: ((...any) -> ...any)?) -- line: 81
+local function reportMomentSkip(s1: string, s2: string, t3: {[any]: any}?, p2: ((...any) -> ...any)?) -- line: 80
 	-- upvalues: GetFFlagMomentsAnalyticsSchemaIdentity (copy), defaultEmit (copy), t1 (copy)
 	if not GetFFlagMomentsAnalyticsSchemaIdentity() then
 		return

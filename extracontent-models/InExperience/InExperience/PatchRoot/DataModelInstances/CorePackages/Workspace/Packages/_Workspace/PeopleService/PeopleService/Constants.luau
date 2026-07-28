@@ -7,6 +7,11 @@ local t1 = {
 		MUTED_SPEAKER = "rbxasset://textures/ui/VoiceChat/SpeakerLight/Muted.png",
 		SPEAKER_OFF = "rbxasset://textures/ui/VoiceChat/SpeakerLight/Muted.png",
 		ANIMATED_SPEAKER_FORMAT = "icons/controls/voice/speaker_%d_dark"
+	},
+	VOICE_VOLUME = {
+		MIN = 0,
+		MAX = 2,
+		DEFAULT = 1
 	}
 }
 local t2 = {

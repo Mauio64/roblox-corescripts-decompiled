@@ -12,40 +12,41 @@ require(Moments.Stores.GetReactionsStore.createReactionsStore)
 require(Moments.Stores.GetShareCountsStore.createShareCountsStore)
 
 local ReactionAction = require(Moments.Enums.ReactionAction)
+local FFlagMomentsReactToFeedItemV2 = require(Moments.Flags.FFlagMomentsReactToFeedItemV2)
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
 
-local function createMomentStore(p1, t1: {[any]: any}?) -- line: 157
-	-- upvalues: createSignal (copy), GetReactionsStore (copy), GetShareCountsStore (copy), createComputed (copy), ReactionAction (copy)
-	local v12 = createSignal(p1)
+local function createMomentStore(p1, t1: {[any]: any}?) -- line: 155
+	-- upvalues: createSignal (copy), GetReactionsStore (copy), GetShareCountsStore (copy), createComputed (copy), FFlagMomentsReactToFeedItemV2 (copy), ReactionAction (copy)
+	local v13 = createSignal(p1)
 	local momentId = p1.momentId
-	local v14 = t1 or {}
-	local v15 = if v14.reactionsStore == nil then GetReactionsStore(false) else v14.reactionsStore
-	local v16 = if v14.shareCountsStore == nil then GetShareCountsStore(false) else v14.shareCountsStore
-	local v17 = if p1.kind ~= "experience" then nil else p1.commentCount
-	local v18, v19 = createSignal(v17)
-	local v20, v21 = createSignal(p1.isModerated == true)
-	local v22 = v15.getUserReactionForMoment(momentId)
-	local v23 = createComputed(function(p2) -- line: 182
-		-- upvalues: v22 (copy)
-		return v22(p2) ~= nil
+	local v15 = t1 or {}
+	local v16 = if v15.reactionsStore == nil then GetReactionsStore(false) else v15.reactionsStore
+	local v17 = if v15.shareCountsStore == nil then GetShareCountsStore(false) else v15.shareCountsStore
+	local v18 = if p1.kind ~= "experience" then nil else p1.commentCount
+	local v19, v20 = createSignal(v18)
+	local v21, v22 = createSignal(p1.isModerated == true)
+	local v23 = v16.getUserReactionForMoment(momentId)
+	local v24 = createComputed(function(p2) -- line: 180
+		-- upvalues: v23 (copy)
+		return v23(p2) ~= nil
 	end)
-	local v24 = v15.getTotalReactionCountForMoment(momentId)
-	local v25 = createComputed(function(p3) -- line: 186
-		-- upvalues: v24 (copy)
-		local v36 = v24(p3)
+	local v25 = v16.getTotalReactionCountForMoment(momentId)
+	local v26 = createComputed(function(p3) -- line: 184
+		-- upvalues: v25 (copy)
+		local v37 = v25(p3)
 
-		if v36 > 0 then
-			return v36
+		if v37 > 0 then
+			return v37
 		end
 
 		return nil
 	end)
-	local v26 = v15.getIndividualReactionCountsForMoment(momentId)
-	local v27 = v16.getShareInfo(momentId)
-	local v28 = createComputed(function(p4) -- line: 196
-		-- upvalues: v27 (copy)
-		local shareCount = v27(p4).shareCount
+	local v27 = v16.getIndividualReactionCountsForMoment(momentId)
+	local v28 = v17.getShareInfo(momentId)
+	local v29 = createComputed(function(p4) -- line: 194
+		-- upvalues: v28 (copy)
+		local shareCount = v28(p4).shareCount
 
 		if shareCount > 0 then
 			return shareCount
@@ -53,31 +54,31 @@ local function createMomentStore(p1, t1: {[any]: any}?) -- line: 157
 
 		return nil
 	end)
-	local v29, v30 = createSignal(nil)
-	local v31 = createComputed(function(p5) -- line: 232
-		-- upvalues: v29 (copy)
-		return v29(p5) ~= nil
+	local v30, v31 = createSignal(nil)
+	local v32 = createComputed(function(p5) -- line: 247
+		-- upvalues: v30 (copy)
+		return v30(p5) ~= nil
 	end)
-	local v32, v33 = createSignal(false)
+	local v33, v34 = createSignal(false)
 
 	return {
-		getData = v12,
-		getReactionCount = v25,
-		getIndividualReactionCounts = v26,
-		getCommentCount = v18,
-		setCommentCount = v19,
-		getShareCount = v28,
-		setShareCount = function(n1: number?) -- line: 200
-			-- upvalues: v27 (copy), v16 (copy), momentId (copy)
-			local v40 = v27(false)
+		getData = v13,
+		getReactionCount = v26,
+		getIndividualReactionCounts = v27,
+		getCommentCount = v19,
+		setCommentCount = v20,
+		getShareCount = v29,
+		setShareCount = function(n1: number?) -- line: 198
+			-- upvalues: v28 (copy), v17 (copy), momentId (copy)
+			local v41 = v28(false)
 
-			v16.setShareCount(momentId, n1 or 0, v40.hasShared)
+			v17.setShareCount(momentId, n1 or 0, v41.hasShared)
 		end,
-		getSelectedReaction = v22,
-		getIsReacted = v23,
-		commitReaction = function(p6) -- line: 207
-			-- upvalues: v15 (copy), p1 (copy), momentId (copy)
-			local v42 = v15.reactToFeedItem({
+		getSelectedReaction = v23,
+		getIsReacted = v24,
+		commitReaction = function(p6) -- line: 205
+			-- upvalues: v16 (copy), p1 (copy), momentId (copy)
+			local v43 = v16.reactToFeedItem({
 				entityType = "userCreatedMoment",
 				feedItemId = p1.feedItemId or momentId,
 				entityId = momentId,
@@ -85,25 +86,46 @@ local function createMomentStore(p1, t1: {[any]: any}?) -- line: 157
 				feedSessionId = p1.feedSessionId
 			})
 
-			if type(v42) == "table" and v42.catch ~= nil then
-				v42:catch(function() -- line: 221
+			if type(v43) == "table" and v43.catch ~= nil then
+				v43:catch(function() -- line: 220
 				end)
 			end
 		end,
-		clearReaction = function() -- line: 224
-			-- upvalues: v15 (copy), ReactionAction (copy), momentId (copy)
-			v15.updateReaction({
+		clearReaction = function() -- line: 223
+			-- upvalues: FFlagMomentsReactToFeedItemV2 (copy), v23 (copy), v16 (copy), p1 (copy), momentId (copy), ReactionAction (copy)
+			if FFlagMomentsReactToFeedItemV2 then
+				local v44 = v23(false)
+
+				if v44 ~= nil then
+					local v45 = v16.removeFeedItemReaction({
+						entityType = "userCreatedMoment",
+						feedItemId = p1.feedItemId or momentId,
+						entityId = momentId,
+						reactionType = v44,
+						feedSessionId = p1.feedSessionId
+					})
+
+					if type(v45) == "table" and v45.catch ~= nil then
+						v45:catch(function() -- line: 235
+						end)
+					end
+
+					return
+				end
+			end
+
+			v16.updateReaction({
 				action = ReactionAction.Unreact,
 				momentId = momentId
 			})
 		end,
-		getIsModerated = v20,
-		setIsModerated = v21,
-		getIsScrubbing = v31,
-		getScrubPosition = v29,
-		setScrubPosition = v30,
-		getIsReactionPickerOpen = v32,
-		setReactionPickerOpen = v33
+		getIsModerated = v21,
+		setIsModerated = v22,
+		getIsScrubbing = v32,
+		getScrubPosition = v30,
+		setScrubPosition = v31,
+		getIsReactionPickerOpen = v33,
+		setReactionPickerOpen = v34
 	}
 end
 

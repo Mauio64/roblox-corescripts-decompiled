@@ -15,7 +15,7 @@ local themeFromBackgroundColor = require(script.Parent.themeFromBackgroundColor)
 local v9 = game:DefineFastFlag("ExpChatTextChannelWindowThemeByBackground", false)
 local createNextOrder = ReactUtils.createNextOrder
 
-local function ChatAppInner(t1: {[any]: any}) -- line: 32
+local function ChatAppInner(t1: {[any]: any}) -- line: 33
 	-- upvalues: Foundation (copy), createNextOrder (copy), React (copy), v9 (copy), MessageListArea (copy), TextChatWindowInputBarHost (copy), ChatWindowTopBanner (copy)
 	local v14 = Foundation.Hooks.useTokens()
 	local v15 = createNextOrder()
@@ -39,7 +39,8 @@ local function ChatAppInner(t1: {[any]: any}) -- line: 32
 			}, {
 				content = React.createElement(MessageListArea, {
 					channelState = t1.channelState,
-					messagesSignal = t1.messagesSignal
+					messagesSignal = t1.messagesSignal,
+					windowName = t1.windowName
 				})
 			}),
 			inputBar = React.createElement(Foundation.View, {
@@ -61,7 +62,7 @@ local function ChatAppInner(t1: {[any]: any}) -- line: 32
 		})
 	})
 end
-local function ChatApp(t2: {[any]: any}) -- line: 87
+local function ChatApp(t2: {[any]: any}) -- line: 89
 	-- upvalues: v9 (copy), themeFromBackgroundColor (copy), Foundation (copy), React (copy), ChatAppInner (copy)
 	local v17 = if not v9 or not t2.backgroundColor then Foundation.Enums.Theme.Dark else themeFromBackgroundColor(t2.backgroundColor)
 

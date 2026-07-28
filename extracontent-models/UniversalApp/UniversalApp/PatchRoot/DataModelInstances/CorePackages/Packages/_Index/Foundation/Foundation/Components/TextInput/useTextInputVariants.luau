@@ -105,11 +105,11 @@ local function variantsFactory(p1) -- line: 92
 	}
 end
 
-return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?, b3: boolean?) -- line: 159
-	-- upvalues: VariantsContext (copy), variantsFactory (copy), getInputVariantsFactory (copy), InputVariant (copy), composeStyleVariant (copy), Flags (copy)
-	local v24 = VariantsContext.useVariants("TextInput", variantsFactory, p2)
-	local v25 = VariantsContext.useVariants("InputField", getInputVariantsFactory, p2)
-	local v26 = v25.variants[p4 or InputVariant.Standard]
+return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?) -- line: 159
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), getInputVariantsFactory (copy), InputVariant (copy), composeStyleVariant (copy)
+	local v23 = VariantsContext.useVariants("TextInput", variantsFactory, p2)
+	local v24 = VariantsContext.useVariants("InputField", getInputVariantsFactory, p2)
+	local v25 = v24.variants[p4 or InputVariant.Standard]
 
-	return composeStyleVariant(v24.common, v25.sizes[p3], v24.sizes[p3], if p4 == InputVariant.Utility then {} else v26, if not p5 then v25.defaultRadius[p3] else v25.radius[p5], if not Flags.FoundationTextInputsBetaUpdate then if b2 == nil then {} else v25.hoverState[b2] else {}, if b1 == nil then {} else v25.focusedState[b1], if b3 == nil then {} else v25.errorState[b3], if p4 ~= InputVariant.Utility then {} else v26)
+	return composeStyleVariant(v23.common, v24.sizes[p3], v23.sizes[p3], if p4 == InputVariant.Utility then {} else v25, if not p5 then v24.defaultRadius[p3] else v24.radius[p5], if b1 == nil then {} else v24.focusedState[b1], if b2 == nil then {} else v24.errorState[b2], if p4 ~= InputVariant.Utility then {} else v25)
 end

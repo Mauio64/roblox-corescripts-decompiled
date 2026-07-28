@@ -33,27 +33,26 @@ local unblockUser = userBlock.unblockUser
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useLayoutSlots = LayoutSlots.useLayoutSlots
 local FFlagSupportSubmissionOnAllReportNodes = SharedFlags.FFlagSupportSubmissionOnAllReportNodes
-local FFlagRemoveHardcodedStringsInReportNodes = SharedFlags.FFlagRemoveHardcodedStringsInReportNodes
 local FFlagAbuseReportMenuV2 = SharedFlags.FFlagAbuseReportMenuV2
 
-local function useBlockToggle(p1) -- line: 72
+local function useBlockToggle(p1) -- line: 71
 	-- upvalues: React (copy), useAbuseReportAnalytics (copy), useRoactService (copy), RoactNetworking (copy), isBlockedUser (copy), TelemetryEventType (copy), Dash (copy), unblockUser (copy), blockUser (copy)
-	local v35, v36 = React.useState(not p1 and "Hidden" or "Loading")
-	local v37, v38 = React.useState(false)
+	local v34, v35 = React.useState(not p1 and "Hidden" or "Loading")
+	local v36, v37 = React.useState(false)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
-	local v40 = useRoactService(RoactNetworking)
+	local v39 = useRoactService(RoactNetworking)
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: p1 (copy), isBlockedUser (copy), v40 (copy), v36 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
+	React.useEffect(function() -- line: 78
+		-- upvalues: p1 (copy), isBlockedUser (copy), v39 (copy), v35 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
 		if p1 and p1.userId then
-			isBlockedUser(v40, p1.userId):andThen(function(p2) -- line: 82
-				-- upvalues: v36 (copy)
+			isBlockedUser(v39, p1.userId):andThen(function(p2) -- line: 81
+				-- upvalues: v35 (copy)
 				local responseBody = p2.responseBody
 
-				v36(not responseBody and "Visible" or "Hidden")
-			end):catch(function(p3) -- line: 86
-				-- upvalues: v36 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
-				v36("Hidden")
+				v35(not responseBody and "Visible" or "Hidden")
+			end):catch(function(p3) -- line: 85
+				-- upvalues: v35 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
+				v35("Hidden")
 				sendEvent({
 					sub_event_type = TelemetryEventType.Error,
 					error_detail = {
@@ -70,26 +69,26 @@ local function useBlockToggle(p1) -- line: 72
 			return
 		end
 
-		v36("Hidden")
+		v35("Hidden")
 	end, {
 		p1 and p1.userId,
 		sendEvent,
-		v40
+		v39
 	})
 
-	local v41 = React.useCallback(function() -- line: 101
-		-- upvalues: p1 (copy), v37 (copy), unblockUser (copy), v40 (copy), v38 (copy), v36 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy), blockUser (copy)
+	local v40 = React.useCallback(function() -- line: 100
+		-- upvalues: p1 (copy), v36 (copy), unblockUser (copy), v39 (copy), v37 (copy), v35 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy), blockUser (copy)
 		if p1 == nil or p1.userId == nil then
 			return
 		end
 
-		if v37 then
-			unblockUser(v40, p1.userId):andThen(function() -- line: 108
-				-- upvalues: v38 (copy)
-				v38(false)
-			end):catch(function(p4) -- line: 111
-				-- upvalues: v36 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
-				v36("Error")
+		if v36 then
+			unblockUser(v39, p1.userId):andThen(function() -- line: 107
+				-- upvalues: v37 (copy)
+				v37(false)
+			end):catch(function(p4) -- line: 110
+				-- upvalues: v35 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
+				v35("Error")
 				sendEvent({
 					sub_event_type = TelemetryEventType.Error,
 					error_detail = {
@@ -106,15 +105,15 @@ local function useBlockToggle(p1) -- line: 72
 			return
 		end
 
-		blockUser(v40, p1.userId):andThen(function() -- line: 123
-			-- upvalues: sendEvent (copy), TelemetryEventType (copy), v38 (copy)
+		blockUser(v39, p1.userId):andThen(function() -- line: 122
+			-- upvalues: sendEvent (copy), TelemetryEventType (copy), v37 (copy)
 			sendEvent({
 				sub_event_type = TelemetryEventType.DidBlockUser
 			})
-			v38(true)
-		end):catch(function(p5) -- line: 127
-			-- upvalues: v36 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
-			v36("Error")
+			v37(true)
+		end):catch(function(p5) -- line: 126
+			-- upvalues: v35 (copy), sendEvent (copy), TelemetryEventType (copy), Dash (copy)
+			v35("Error")
 			sendEvent({
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
@@ -126,38 +125,38 @@ local function useBlockToggle(p1) -- line: 72
 		end)
 	end, {
 		sendEvent,
-		v40,
+		v39,
 		p1 and p1.userId,
-		v37
+		v36
 	})
 
 	return {
-		blockToggleState = v35,
-		handleBlockToggleChange = v41,
-		isBlocked = v37
+		blockToggleState = v34,
+		handleBlockToggleChange = v40,
+		isBlocked = v36
 	}
 end
-local function ConfirmationNode(t1: {[any]: any}) -- line: 150
-	-- upvalues: useArTranslation (copy), useOpenLink (copy), useAbuseReportAnalytics (copy), useBlockToggle (copy), useLayoutSlots (copy), FFlagAbuseReportMenuV2 (copy), React (copy), TelemetryEventType (copy), Eyebrow (copy), TextWithTranslation (copy), View (copy), Toggle (copy), Button (copy), ButtonVariant (copy), Footer (copy), FFlagRemoveHardcodedStringsInReportNodes (copy), FillBehavior (copy), FFlagSupportSubmissionOnAllReportNodes (copy)
+local function ConfirmationNode(t1: {[any]: any}) -- line: 149
+	-- upvalues: useArTranslation (copy), useOpenLink (copy), useAbuseReportAnalytics (copy), useBlockToggle (copy), useLayoutSlots (copy), FFlagAbuseReportMenuV2 (copy), React (copy), TelemetryEventType (copy), Eyebrow (copy), TextWithTranslation (copy), View (copy), Toggle (copy), Button (copy), ButtonVariant (copy), Footer (copy), FillBehavior (copy), FFlagSupportSubmissionOnAllReportNodes (copy)
 	local translateIntoString = useArTranslation().translateIntoString
-	local v44 = useOpenLink()
+	local v43 = useOpenLink()
 	local sendEvent = useAbuseReportAnalytics().sendEvent
 	local blockToggle = t1.blockToggle
-	local v47 = useBlockToggle(blockToggle)
-	local blockToggleState = v47.blockToggleState
-	local handleBlockToggleChange = v47.handleBlockToggleChange
-	local isBlocked = v47.isBlocked
-	local v51 = useLayoutSlots()
-	local Body = v51.Body
-	local Actions = v51.Actions
-	local Title = v51.Title
+	local v46 = useBlockToggle(blockToggle)
+	local blockToggleState = v46.blockToggleState
+	local handleBlockToggleChange = v46.handleBlockToggleChange
+	local isBlocked = v46.isBlocked
+	local v50 = useLayoutSlots()
+	local Body = v50.Body
+	local Actions = v50.Actions
+	local Title = v50.Title
 	local Layout = nil
 
 	if FFlagAbuseReportMenuV2 then
-		Layout = v51.Layout
+		Layout = v50.Layout
 	end
 
-	React.useEffect(function() -- line: 171
+	React.useEffect(function() -- line: 170
 		-- upvalues: t1 (copy), sendEvent (copy), TelemetryEventType (copy)
 		if t1.helpline and t1.helpline.href then
 			sendEvent({
@@ -169,23 +168,23 @@ local function ConfirmationNode(t1: {[any]: any}) -- line: 150
 		sendEvent
 	})
 
-	local v56 = React.useCallback(function() -- line: 177
+	local v55 = React.useCallback(function() -- line: 176
 		-- upvalues: t1 (copy)
 		if t1.onNext then
 			t1.onNext()
 		end
 	end, { t1.onNext })
-	local v57 = React.useCallback(function() -- line: 184
-		-- upvalues: t1 (copy), v44 (copy), translateIntoString (copy), sendEvent (copy), TelemetryEventType (copy)
+	local v56 = React.useCallback(function() -- line: 183
+		-- upvalues: t1 (copy), v43 (copy), translateIntoString (copy), sendEvent (copy), TelemetryEventType (copy)
 		if t1.helpline and t1.helpline.href then
-			v44(translateIntoString(t1.helpline.heading or ""), t1.helpline.href)
+			v43(translateIntoString(t1.helpline.heading or ""), t1.helpline.href)
 			sendEvent({
 				sub_event_type = TelemetryEventType.HelplineOpened
 			})
 		end
 	end, {
 		t1.helpline and t1.helpline.href,
-		v44,
+		v43,
 		translateIntoString,
 		t1.helpline and t1.helpline.heading,
 		sendEvent
@@ -253,7 +252,7 @@ local function ConfirmationNode(t1: {[any]: any}) -- line: 150
 				text = translateIntoString(t1.helpline.buttonText),
 				variant = ButtonVariant.Standard,
 				width = UDim.new(1, 0),
-				onActivated = v57
+				onActivated = v56
 			})
 		}),
 		Footer = if not FFlagAbuseReportMenuV2 or not t1.footerItems then nil else React.createElement(Footer, {
@@ -262,26 +261,26 @@ local function ConfirmationNode(t1: {[any]: any}) -- line: 150
 			footerItems = t1.footerItems
 		})
 	}
-	local v59 = if not t1.onNext then nil else React.createElement(Button, {
-		text = not FFlagRemoveHardcodedStringsInReportNodes and "Close" or translateIntoString(t1.nextButtonText),
+	local v58 = if not t1.onNext then nil else React.createElement(Button, {
+		text = translateIntoString(t1.nextButtonText),
 		variant = ButtonVariant.Emphasis,
 		fillBehavior = FillBehavior.Fill,
 		isLoading = not not FFlagSupportSubmissionOnAllReportNodes and t1.isSubmitting,
 		isDisabled = not not FFlagSupportSubmissionOnAllReportNodes and t1.isSubmitting,
-		onActivated = v56
+		onActivated = v55
 	})
 
 	if FFlagAbuseReportMenuV2 then
 		return React.createElement(Layout, {
 			body = React.createElement(React.Fragment, nil, t2),
-			actions = v59
+			actions = v58
 		})
 	end
 
 	return React.createElement(React.Fragment, nil, {
 		Content = React.createElement(Body, nil, t2),
-		Actions = if not v59 then nil else React.createElement(Actions, nil, {
-			Button = v59
+		Actions = if not v58 then nil else React.createElement(Actions, nil, {
+			Button = v58
 		})
 	})
 end

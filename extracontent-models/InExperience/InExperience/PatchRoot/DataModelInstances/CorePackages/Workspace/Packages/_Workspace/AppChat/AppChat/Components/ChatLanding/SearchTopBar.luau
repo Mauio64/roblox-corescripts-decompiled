@@ -229,7 +229,7 @@ function FocusableSearchTopBar(p11) -- line: 260
 	local cancelCallback = p11.cancelCallback
 	local v37 = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, function(p12) -- line: 268
 		-- upvalues: v35 (copy), v33 (copy), cancelCallback (copy)
-		if p12.eventData and (v35.focusedGuiObject:getValue() == v33.current and p12.eventData.KeyCode ~= Enum.KeyCode.Unknown) then
+		if p12.eventData and (v35.focusedGuiObject:getValue() == v33.current and p12.eventData.KeyCode ~= Enum.KeyCode.None) then
 			p12:cancel()
 
 			if cancelCallback then

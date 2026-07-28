@@ -25,30 +25,33 @@ local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExtern
 local useCurrentSquadParentChannelId = require(SquadsParent.SquadsCore.Hooks).useCurrentSquadParentChannelId
 local FFlagSquadVoiceMenuFoundationRefactor = require(Flags.FFlagSquadVoiceMenuFoundationRefactor)
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
-local v28 = Images["component_assets/circle_24_stroke_1"]
-local v29 = Images["component_assets/circle_16"]
+local FFlagSquadsPresenceStoreMigration = require(SquadsParent.SquadsCore.Flags).FFlagSquadsPresenceStoreMigration
+local v29 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.FriendsCommon).Hooks.useGetPresenceByUserId
+local v30 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.DataHydration).Presence.PresenceEnums.PresenceType
+local v31 = Images["component_assets/circle_24_stroke_1"]
+local v32 = Images["component_assets/circle_16"]
 local t1 = {
 	forceEnableAudioFocusToggle = false,
 	forceShowVoiceChangerSection = false,
-	openSquadVoiceChangers = function() -- line: 56
+	openSquadVoiceChangers = function() -- line: 64
 	end
 }
 
-local function v31(t2: {[any]: any}) -- line: 66
+local function v34(t2: {[any]: any}) -- line: 74
 	-- upvalues: useTokens (copy), React (copy), Foundation (copy), FFlagSquadVoiceMenuFoundationRefactor (copy), ContextualSlider (copy)
-	local v34 = useTokens()
+	local v37 = useTokens()
 
 	return React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		padding = {
-			top = UDim.new(0, v34.Padding.Small),
-			bottom = UDim.new(0, v34.Padding.Small)
+			top = UDim.new(0, v37.Padding.Small),
+			bottom = UDim.new(0, v37.Padding.Small)
 		},
 		layout = {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v34.Gap.Small)
+			Padding = UDim.new(0, v37.Gap.Small)
 		},
 		LayoutOrder = t2.LayoutOrder
 	} else {
@@ -59,8 +62,8 @@ local function v31(t2: {[any]: any}) -- line: 66
 			TextWrapped = false,
 			LayoutOrder = 1,
 			AutomaticSize = Enum.AutomaticSize.XY,
-			fontStyle = v34.Typography.LabelMedium,
-			textStyle = v34.Color.Content.Emphasis,
+			fontStyle = v37.Typography.LabelMedium,
+			textStyle = v37.Color.Content.Emphasis,
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			Text = t2.labelText
@@ -88,22 +91,22 @@ local function v31(t2: {[any]: any}) -- line: 66
 		})
 	})
 end
-local function v32(t3: {[any]: any}) -- line: 145
-	-- upvalues: useTokens (copy), React (copy), Foundation (copy), FFlagSquadVoiceMenuFoundationRefactor (copy), ImageSetLabel (copy), v28 (copy), v29 (copy)
-	local v36 = useTokens()
-	local EmphasisColor3 = v36.Color.Content.Emphasis.Color3
-	local EmphasisTransparency = v36.Color.Content.Emphasis.Transparency
+local function v35(t3: {[any]: any}) -- line: 153
+	-- upvalues: useTokens (copy), React (copy), Foundation (copy), FFlagSquadVoiceMenuFoundationRefactor (copy), ImageSetLabel (copy), v31 (copy), v32 (copy)
+	local v39 = useTokens()
+	local EmphasisColor3 = v39.Color.Content.Emphasis.Color3
+	local EmphasisTransparency = v39.Color.Content.Emphasis.Transparency
 
 	return React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		padding = Vector2.new(v36.Padding.Large, v36.Padding.XSmall),
+		padding = Vector2.new(v39.Padding.Large, v39.Padding.XSmall),
 		layout = {
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v36.Gap.Large)
+			Padding = UDim.new(0, v39.Gap.Large)
 		},
 		LayoutOrder = t3.LayoutOrder,
 		onActivated = t3.onActivated
@@ -127,8 +130,8 @@ local function v32(t3: {[any]: any}) -- line: 145
 			flexItem = {
 				FlexMode = Enum.UIFlexMode.Fill
 			},
-			fontStyle = v36.Typography.LabelMedium,
-			textStyle = v36.Color.Content.Emphasis,
+			fontStyle = v39.Typography.LabelMedium,
+			textStyle = v39.Color.Content.Emphasis,
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			Text = t3.labelText
@@ -153,7 +156,7 @@ local function v32(t3: {[any]: any}) -- line: 145
 		}, {
 			DefaultIcon = React.createElement(ImageSetLabel, {
 				BackgroundTransparency = 1,
-				Image = v28,
+				Image = v31,
 				Size = UDim2.new(0, 24, 0, 24),
 				ImageColor3 = EmphasisColor3,
 				ImageTransparency = EmphasisTransparency,
@@ -162,7 +165,7 @@ local function v32(t3: {[any]: any}) -- line: 145
 			}, {
 				SelectedIcon = t3.isSelected and React.createElement(ImageSetLabel, {
 					BackgroundTransparency = 1,
-					Image = v29,
+					Image = v32,
 					Size = UDim2.new(0, 16, 0, 16),
 					ImageColor3 = EmphasisColor3,
 					ImageTransparency = EmphasisTransparency,
@@ -174,86 +177,86 @@ local function v32(t3: {[any]: any}) -- line: 145
 	})
 end
 
-return function(t4: {[any]: any}) -- line: 248
-	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), useLocalUserId (copy), useIsVoiceFocused (copy), useEnableAudioFocusToggle (copy), React (copy), SquadExternalContractContext (copy), useSelector (copy), PresenceType (copy), useCurrentSquadParentChannelId (copy), CrossExperienceVoiceManager (copy), EngineFeature (copy), GameSettings (copy), useLocalization (copy), Foundation (copy), FFlagSquadVoiceMenuFoundationRefactor (copy), v31 (copy), v32 (copy), Images (copy), FFlagEnablePartyVoiceChangersInLua (copy)
-	local v40 = Cryo.Dictionary.join(t1, t4)
-	local v41 = useTokens()
-	local v42 = useLocalUserId()
-	local v43 = useIsVoiceFocused()
-	local v44 = useEnableAudioFocusToggle()
-	local v45 = React.useContext(SquadExternalContractContext)
-	local v46 = React.useCallback(function(p1) -- line: 256
-		-- upvalues: v42 (copy)
-		return p1.Squad.Presence.byUserId[tostring(v42)]
-	end, { v42 })
-	local v47 = useSelector(v46)
-	local v48 = React.useMemo(function() -- line: 261
-		-- upvalues: v47 (copy), PresenceType (copy)
-		return v47 and v47.userPresenceType == PresenceType.InGame
-	end, { v47 })
-	local v49 = React.useMemo(function() -- line: 265
-		-- upvalues: v47 (copy), v48 (copy)
-		if v47 and v48 then
-			return v47.lastLocation
+return function(t4: {[any]: any}) -- line: 256
+	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), useLocalUserId (copy), useIsVoiceFocused (copy), useEnableAudioFocusToggle (copy), React (copy), SquadExternalContractContext (copy), FFlagSquadsPresenceStoreMigration (copy), v29 (copy), useSelector (copy), v30 (copy), PresenceType (copy), useCurrentSquadParentChannelId (copy), CrossExperienceVoiceManager (copy), EngineFeature (copy), GameSettings (copy), useLocalization (copy), Foundation (copy), FFlagSquadVoiceMenuFoundationRefactor (copy), v34 (copy), v35 (copy), Images (copy), FFlagEnablePartyVoiceChangersInLua (copy)
+	local v43 = Cryo.Dictionary.join(t1, t4)
+	local v44 = useTokens()
+	local v45 = useLocalUserId()
+	local v46 = useIsVoiceFocused()
+	local v47 = useEnableAudioFocusToggle()
+	local v48 = React.useContext(SquadExternalContractContext)
+	local v49 = React.useCallback(function(p1) -- line: 264
+		-- upvalues: v45 (copy)
+		return p1.Squad.Presence.byUserId[tostring(v45)]
+	end, { v45 })
+	local v50 = if not FFlagSquadsPresenceStoreMigration then useSelector(v49) else v29((tostring(v45)))
+	local v51 = React.useMemo(function() -- line: 272
+		-- upvalues: v50 (copy), FFlagSquadsPresenceStoreMigration (copy), v30 (copy), PresenceType (copy)
+		return v50 and v50.userPresenceType == if not FFlagSquadsPresenceStoreMigration then PresenceType.InGame else v30.InGame
+	end, { v50 })
+	local v52 = React.useMemo(function() -- line: 278
+		-- upvalues: v50 (copy), v51 (copy)
+		if v50 and v51 then
+			return v50.lastLocation
 		end
 
 		return nil
 	end, {
-		v47,
-		v48
+		v50,
+		v51
 	})
-	local v50 = useCurrentSquadParentChannelId()
-	local v51 = v45.useParentChannelTitleSelector(v50 or "")
-	local v52 = React.useCallback(function() -- line: 273
+	local v53 = useCurrentSquadParentChannelId()
+	local v54 = v48.useParentChannelTitleSelector(v53 or "")
+	local v55 = React.useCallback(function() -- line: 286
 		-- upvalues: CrossExperienceVoiceManager (copy)
 		CrossExperienceVoiceManager.default:toggleAudioFocus()
 	end, {})
-	local v53 = EngineFeature
-	local v54 = v48 or not v53
-	local v55 = v53 and v54
-	local v56 = v48 and (v44 or v40.forceEnableAudioFocusToggle)
-	local v57, v58 = React.useState(not EngineFeature and 0 or GameSettings.PartyVoiceVolume)
-	local v59, v60 = React.useState(GameSettings.MasterVolume)
-	local v61 = useLocalization({
+	local v56 = EngineFeature
+	local v57 = v51 or not v56
+	local v58 = v56 and v57
+	local v59 = v51 and (v47 or v43.forceEnableAudioFocusToggle)
+	local v60, v61 = React.useState(not EngineFeature and 0 or GameSettings.PartyVoiceVolume)
+	local v62, v63 = React.useState(GameSettings.MasterVolume)
+	local v64 = useLocalization({
 		volumeLabelText = "Feature.Squads.Label.Volume",
 		partyVolumeLabelText = "Feature.Squads.Label.PartyVolume",
 		experienceLabelText = "Feature.Squads.Label.Experience",
 		voiceChatsLabelText = "Feature.Squads.Label.VoiceChats",
 		partyLabelText = "Feature.Squads.Label.Party"
 	})
-	local v62 = if not v55 then v61.partyVolumeLabelText else v61.partyLabelText
-	local v63 = if not v53 then v61.volumeLabelText else v61.experienceLabelText
-	local v64 = React.useCallback(function() -- line: 301
-		-- upvalues: v43 (copy), v52 (copy)
-		if not v43 then
-			v52()
+	local v65 = if not v58 then v64.partyVolumeLabelText else v64.partyLabelText
+	local v66 = if not v56 then v64.volumeLabelText else v64.experienceLabelText
+	local v67 = React.useCallback(function() -- line: 314
+		-- upvalues: v46 (copy), v55 (copy)
+		if not v46 then
+			v55()
 		end
 	end, {
-		v43,
-		v52
+		v46,
+		v55
 	})
-	local v65 = React.useCallback(function() -- line: 307
-		-- upvalues: v43 (copy), v52 (copy)
-		if v43 then
-			v52()
+	local v68 = React.useCallback(function() -- line: 320
+		-- upvalues: v46 (copy), v55 (copy)
+		if v46 then
+			v55()
 		end
 	end, {
-		v43,
-		v52
+		v46,
+		v55
 	})
-	local v66 = React.useCallback(function() -- line: 314
-		-- upvalues: v40 (copy)
-		if v40.openSquadVoiceChangers then
-			v40.openSquadVoiceChangers()
+	local v69 = React.useCallback(function() -- line: 327
+		-- upvalues: v43 (copy)
+		if v43.openSquadVoiceChangers then
+			v43.openSquadVoiceChangers()
 		end
-	end, { v40.openSquadVoiceChangers })
+	end, { v43.openSquadVoiceChangers })
 
 	return React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		padding = Vector2.new(0, v41.Padding.Small),
-		cornerRadius = UDim.new(0, v41.Radius.Medium),
-		backgroundStyle = v41.Color.Surface.Surface_300,
+		padding = Vector2.new(0, v44.Padding.Small),
+		cornerRadius = UDim.new(0, v44.Radius.Medium),
+		backgroundStyle = v44.Color.Surface.Surface_300,
 		layout = {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder
@@ -265,7 +268,7 @@ return function(t4: {[any]: any}) -- line: 248
 			LayoutOrder = 1,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			padding = Vector2.new(v41.Padding.Large, 0),
+			padding = Vector2.new(v44.Padding.Large, 0),
 			layout = {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
@@ -274,57 +277,57 @@ return function(t4: {[any]: any}) -- line: 248
 			tag = "size-full-0 auto-y padding-x-large col",
 			LayoutOrder = 1
 		}, {
-			VolumeLabel = v55 and React.createElement(Foundation.Text, if not FFlagSquadVoiceMenuFoundationRefactor then {
+			VolumeLabel = v58 and React.createElement(Foundation.Text, if not FFlagSquadVoiceMenuFoundationRefactor then {
 				TextWrapped = false,
 				LayoutOrder = 1,
 				AutomaticSize = Enum.AutomaticSize.XY,
-				fontStyle = v41.Typography.TitleSmall,
-				textStyle = v41.Color.Content.Muted,
+				fontStyle = v44.Typography.TitleSmall,
+				textStyle = v44.Color.Content.Muted,
 				TextTruncate = Enum.TextTruncate.AtEnd,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				padding = Vector2.new(0, v41.Padding.XSmall),
-				Text = v61.volumeLabelText
+				padding = Vector2.new(0, v44.Padding.XSmall),
+				Text = v64.volumeLabelText
 			} else {
 				tag = "auto-xy text-truncate-end text-no-wrap text-align-x-left padding-y-xsmall text-title-small content-muted",
 				LayoutOrder = 1,
-				Text = v61.volumeLabelText
+				Text = v64.volumeLabelText
 			}),
-			PartySliderGroup = v53 and React.createElement(v31, {
+			PartySliderGroup = v56 and React.createElement(v34, {
 				LayoutOrder = 2,
-				labelText = v62,
-				sliderValue = v57,
-				onValueChanged = function(n1: number) -- line: 381
-					-- upvalues: GameSettings (copy), v58 (copy)
+				labelText = v65,
+				sliderValue = v60,
+				onValueChanged = function(n1: number) -- line: 394
+					-- upvalues: GameSettings (copy), v61 (copy)
 					GameSettings.PartyVoiceVolume = n1
-					v58(n1)
+					v61(n1)
 				end
 			}),
-			ExperienceSliderGroup = v54 and React.createElement(v31, {
+			ExperienceSliderGroup = v57 and React.createElement(v34, {
 				LayoutOrder = 3,
-				labelText = v63,
-				sliderValue = v59,
-				onValueChanged = function(n2: number) -- line: 390
-					-- upvalues: GameSettings (copy), v60 (copy)
+				labelText = v66,
+				sliderValue = v62,
+				onValueChanged = function(n2: number) -- line: 403
+					-- upvalues: GameSettings (copy), v63 (copy)
 					GameSettings.MasterVolume = n2
-					v60(n2)
+					v63(n2)
 				end
 			})
 		}),
-		Divider = v56 and React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
+		Divider = v59 and React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
 			LayoutOrder = 2,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			padding = Vector2.new(0, v41.Padding.Small)
+			padding = Vector2.new(0, v44.Padding.Small)
 		} else {
 			tag = "size-full-0 auto-y padding-y-small",
 			LayoutOrder = 2
 		}, {
 			Divider = React.createElement(Foundation.View, {
 				Size = UDim2.new(1, 0, 0, 1),
-				backgroundStyle = v41.Color.Stroke.Default
+				backgroundStyle = v44.Color.Stroke.Default
 			})
 		}),
-		VoiceChatSection = v56 and React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
+		VoiceChatSection = v59 and React.createElement(Foundation.View, if not FFlagSquadVoiceMenuFoundationRefactor then {
 			LayoutOrder = 3,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
@@ -340,33 +343,33 @@ return function(t4: {[any]: any}) -- line: 248
 				TextWrapped = false,
 				LayoutOrder = 1,
 				AutomaticSize = Enum.AutomaticSize.XY,
-				fontStyle = v41.Typography.TitleSmall,
-				textStyle = v41.Color.Content.Muted,
+				fontStyle = v44.Typography.TitleSmall,
+				textStyle = v44.Color.Content.Muted,
 				TextTruncate = Enum.TextTruncate.AtEnd,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				padding = Vector2.new(v41.Padding.Large, v41.Padding.XSmall),
-				Text = v61.voiceChatsLabelText
+				padding = Vector2.new(v44.Padding.Large, v44.Padding.XSmall),
+				Text = v64.voiceChatsLabelText
 			} else {
 				tag = "auto-xy text-truncate-end text-no-wrap text-align-x-left padding-x-large padding-y-xsmall text-title-small content-muted",
 				LayoutOrder = 1,
-				Text = v61.voiceChatsLabelText
+				Text = v64.voiceChatsLabelText
 			}),
-			PartySelector = React.createElement(v32, {
+			PartySelector = React.createElement(v35, {
 				LayoutOrder = 2,
 				icon = Images["icons/menu/platformChatOff"],
-				labelText = v51 or "",
-				isSelected = v43,
-				onActivated = v64
+				labelText = v54 or "",
+				isSelected = v46,
+				onActivated = v67
 			}),
-			ExperienceSelector = React.createElement(v32, {
+			ExperienceSelector = React.createElement(v35, {
 				LayoutOrder = 3,
 				icon = Images["icons/menu/publicChatOff"],
-				labelText = v49 or "",
-				isSelected = not v43,
-				onActivated = v65
+				labelText = v52 or "",
+				isSelected = not v46,
+				onActivated = v68
 			})
 		}),
-		VoiceChangerSection = if not FFlagEnablePartyVoiceChangersInLua and not v40.forceShowVoiceChangerSection then nil else React.createElement(Foundation.View, {
+		VoiceChangerSection = if not FFlagEnablePartyVoiceChangersInLua and not v43.forceShowVoiceChangerSection then nil else React.createElement(Foundation.View, {
 			tag = "size-full-0 auto-y col",
 			LayoutOrder = 4
 		}, {
@@ -378,7 +381,7 @@ return function(t4: {[any]: any}) -- line: 248
 			OpenVoiceChangerModal = React.createElement(Foundation.View, {
 				tag = "size-full-0 auto-y row align-x-left align-y-center gap-large padding-x-large padding-y-xsmall",
 				LayoutOrder = 2,
-				onActivated = v66
+				onActivated = v69
 			}, {
 				ChooseVoicePackLabel = React.createElement(Foundation.Text, {
 					tag = "auto-xy text-truncate-end text-no-wrap text-align-x-left fill text-label-medium content-emphasis",

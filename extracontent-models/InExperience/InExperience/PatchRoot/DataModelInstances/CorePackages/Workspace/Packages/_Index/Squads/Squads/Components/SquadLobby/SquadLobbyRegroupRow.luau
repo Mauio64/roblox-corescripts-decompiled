@@ -22,37 +22,39 @@ local SquadExperienceInviteSource = Enums.SquadExperienceInviteSource
 local SquadRegroupEntryPoint = Enums.SquadRegroupEntryPoint
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local v24 = game:DefineFastFlag("RegroupTextTruncationFix", false)
+local FFlagSquadsPresenceStoreMigration = require(SquadsParent.SquadsCore.Flags).FFlagSquadsPresenceStoreMigration
+local v26 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.FriendsCommon).Hooks.useGetPresenceByUserId
 
-local function SquadLobbyRegroupRow(t1: {[any]: any}) -- line: 35
-	-- upvalues: useDispatch (copy), React (copy), SquadExternalContractContext (copy), useLocalization (copy), useSelector (copy), useCurrentSquadId (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), Foundation (copy), FoundationImage (copy), v24 (copy), ButtonSize (copy), ButtonVariant (copy), Logger (copy), CreateExperienceInvite (copy), SquadExperienceInviteSource (copy), EventNames (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
-	local v27 = useDispatch()
-	local v28 = React.useContext(SquadExternalContractContext)
-	local v29 = useLocalization({
+local function SquadLobbyRegroupRow(t1: {[any]: any}) -- line: 39
+	-- upvalues: useDispatch (copy), React (copy), SquadExternalContractContext (copy), useLocalization (copy), useSelector (copy), useCurrentSquadId (copy), FFlagSquadsPresenceStoreMigration (copy), v26 (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), Foundation (copy), FoundationImage (copy), v24 (copy), ButtonSize (copy), ButtonVariant (copy), Logger (copy), CreateExperienceInvite (copy), SquadExperienceInviteSource (copy), EventNames (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
+	local v29 = useDispatch()
+	local v30 = React.useContext(SquadExternalContractContext)
+	local v31 = useLocalization({
 		Title = "Notifications.SquadRegroupPrompt.ToastLabel.ContinuePlayingTogether",
 		Body = "Notifications.SquadRegroupPrompt.ToastLabel.JoinANewServer",
 		Join = "Notifications.SquadRegroupPrompt.ToastAction.Join"
 	})
-	local v30 = React.useCallback(function(p1) -- line: 44
+	local v32 = React.useCallback(function(p1) -- line: 48
 		return p1.Squad and (p1.Squad.Squad and p1.Squad.Squad.currentExperienceInvite)
 	end, {})
-	local v31 = useSelector(v30)
-	local v32 = useCurrentSquadId()
-	local v33 = React.useCallback(function(p2) -- line: 50
+	local v33 = useSelector(v32)
+	local v34 = useCurrentSquadId()
+	local v35 = React.useCallback(function(p2) -- line: 54
 		-- upvalues: t1 (copy)
 		return p2 and (p2.Squad and (p2.Squad.Presence and (p2.Squad.Presence.byUserId and p2.Squad.Presence.byUserId[tostring(t1.localUserId)])))
 	end, { t1.localUserId })
-	local v34 = useSelector(v33)
-	local v35 = v34 and v34.rootPlaceId or nil
-	local v36 = v34 and (v34.universeId or v34.gameId) or nil
-	local v37 = if v36 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v36), Constants.RbxthumbTypes.GameIcon, 150, false)
+	local v36 = if not FFlagSquadsPresenceStoreMigration then useSelector(v35) else v26((tostring(t1.localUserId)))
+	local v37 = if not FFlagSquadsPresenceStoreMigration then v36 and v36.rootPlaceId or nil else if not v36 or v36.rootPlaceId == "" then nil else v36.rootPlaceId
+	local v38 = if not FFlagSquadsPresenceStoreMigration then v36 and (v36.universeId or v36.gameId) or nil else if not v36 or v36.universeId == "" then if not v36 or v36.gameId == "" then nil else v36.gameId else v36.universeId
+	local v39 = if v38 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v38), Constants.RbxthumbTypes.GameIcon, 150, false)
 
 	return React.createElement(Foundation.View, {
 		tag = "align-y-center row auto-none size-full radius-medium gap-medium gui-object-defaults padding-x-xlarge padding-y-medium"
 	}, {
-		Thumbnail = if not v37 then nil else React.createElement(FoundationImage, {
+		Thumbnail = if not v39 then nil else React.createElement(FoundationImage, {
 			tag = "radius-small bg-surface-100 size-1000",
 			LayoutOrder = 1,
-			Image = v37
+			Image = v39
 		}),
 		TextContainer = React.createElement(Foundation.View, {
 			tag = "auto-y fill col gap-xsmall align-x-left gui-object-defaults",
@@ -64,7 +66,7 @@ local function SquadLobbyRegroupRow(t1: {[any]: any}) -- line: 35
 					["auto-y text-align-x-left text-no-wrap text-title-medium content-emphasis"] = true,
 					["size-full-0 text-truncate-end"] = v24
 				},
-				Text = v29.Title
+				Text = v31.Title
 			}),
 			Body = React.createElement(Foundation.Text, {
 				LayoutOrder = 2,
@@ -72,33 +74,33 @@ local function SquadLobbyRegroupRow(t1: {[any]: any}) -- line: 35
 					["auto-y content-default text-body-medium text-align-x-left text-no-wrap gui-object-defaults"] = true,
 					["size-full-0 text-truncate-end"] = v24
 				},
-				Text = v29.Body
+				Text = v31.Body
 			})
 		}),
 		JoinButton = React.createElement(Foundation.Button, {
 			LayoutOrder = 3,
-			text = v29.Join,
+			text = v31.Join,
 			size = ButtonSize.Medium,
 			variant = ButtonVariant.Standard,
-			isDisabled = v31 ~= nil,
-			onActivated = React.useCallback(function() -- line: 111
-				-- upvalues: v35 (copy), Logger (copy), v27 (copy), CreateExperienceInvite (copy), v28 (copy), SquadExperienceInviteSource (copy), EventNames (copy), v32 (copy), t1 (copy), v34 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
-				if v35 == nil then
+			isDisabled = v33 ~= nil,
+			onActivated = React.useCallback(function() -- line: 124
+				-- upvalues: v37 (copy), Logger (copy), v29 (copy), CreateExperienceInvite (copy), v30 (copy), SquadExperienceInviteSource (copy), EventNames (copy), v34 (copy), t1 (copy), FFlagSquadsPresenceStoreMigration (copy), v36 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
+				if v37 == nil then
 					Logger:warning("SquadRegroupEventReceiver: Join clicked but rootPlaceId is missing from local presence")
 
 					return
 				end
 
-				v27(CreateExperienceInvite(tostring(v35), v28, SquadExperienceInviteSource.Regroup)):andThen(function(p3) -- line: 123
-					-- upvalues: v28 (copy), EventNames (copy), v32 (copy), t1 (copy), v34 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
-					v28.fireSquadAnalytics(EventNames.SquadRegroupButtonClicked, {
+				v29(CreateExperienceInvite(tostring(v37), v30, SquadExperienceInviteSource.Regroup)):andThen(function(p3) -- line: 136
+					-- upvalues: v30 (copy), EventNames (copy), v34 (copy), t1 (copy), FFlagSquadsPresenceStoreMigration (copy), v36 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
+					v30.fireSquadAnalytics(EventNames.SquadRegroupButtonClicked, {
 						clientTimestamp = os.time(),
-						squadId = v32,
+						squadId = v34,
 						initiatorId = t1.localUserId,
-						gameInstanceId = v34.gameId,
-						rootPlaceId = v34.rootPlaceId,
-						placeId = v34.placeId,
-						universeId = v34.universeId,
+						gameInstanceId = if not FFlagSquadsPresenceStoreMigration then v36.gameId else v36 and v36.gameId,
+						rootPlaceId = if not FFlagSquadsPresenceStoreMigration then v36.rootPlaceId else v36 and v36.rootPlaceId,
+						placeId = if not FFlagSquadsPresenceStoreMigration then v36.placeId else v36 and v36.placeId,
+						universeId = if not FFlagSquadsPresenceStoreMigration then v36.universeId else v36 and v36.universeId,
 						playSessionId = RbxAnalyticsService:GetPlaySessionId(),
 						experienceInviteId = p3,
 						button = SquadToastActionsAndStates.RegroupJoin,
@@ -106,13 +108,13 @@ local function SquadLobbyRegroupRow(t1: {[any]: any}) -- line: 35
 					})
 				end)
 			end, {
-				v27,
+				v29,
 				CreateExperienceInvite,
-				v35,
-				v28,
-				v32,
+				v37,
+				v30,
+				v34,
 				t1.localUserId,
-				v34
+				v36
 			})
 		})
 	})

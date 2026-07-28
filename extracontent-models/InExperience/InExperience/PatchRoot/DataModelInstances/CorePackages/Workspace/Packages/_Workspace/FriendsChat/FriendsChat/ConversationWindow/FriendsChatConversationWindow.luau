@@ -8,6 +8,7 @@ local ExpChatShared = require(FriendsChatParent.ExpChatShared)
 local Localization = require(FriendsChatParent.Localization)
 local LocalizationRoactContext = Localization.LocalizationRoactContext
 local localizeStrings = Localization.localizeStrings
+local ConversationChannels = require(FriendsChatParent.AppChat.ConversationChannels)
 local GetConversationMessageListStore = require(FriendsChatParent.AppChat.GetConversationMessageListStore)
 local fetchMessagePage = require(FriendsChatParent.AppChat.fetchMessagePage)
 local useChatWindow = require(script.Parent.Parent.Bridge.useChatWindow)
@@ -22,12 +23,20 @@ local getFriendsChatHeaderProps = require(script.Parent.Parent.HeaderBar.getFrie
 local FriendsChatInputBarHost = require(script.Parent.FriendsChatInputBarHost)
 local LayoutConstants = require(FriendsChat.LayoutConstants)
 local useFriendsChatConversationTelemetry = require(script.Parent.Parent.Telemetry.ChatConversation.useFriendsChatConversationTelemetry)
-local v25 = ExpChatShared.Logger:new(script.Name)
-local v26 = React.createElement("UIListLayout", {
+local v26 = ExpChatShared.Logger:new(script.Name)
+local v27 = React.createElement("UIListLayout", {
 	SortOrder = Enum.SortOrder.LayoutOrder
 })
 
-local function areArraysEqual(t1: {[any]: any}?, t2: {[any]: any}?) -- line: 94
+local function toConversationModerationType(s1: string?) -- line: 96
+	-- upvalues: ConversationChannels (copy)
+	if s1 == ConversationChannels.ModerationType.TrustedComms or (s1 == ConversationChannels.ModerationType.Moderated or s1 == ConversationChannels.ModerationType.Invalid or s1 == ConversationChannels.ModerationType.UnknownType) then
+		return s1
+	end
+
+	return nil
+end
+local function areArraysEqual(t1: {[any]: any}?, t2: {[any]: any}?) -- line: 108
 	if t1 == t2 then
 		return true
 	end
@@ -36,15 +45,15 @@ local function areArraysEqual(t1: {[any]: any}?, t2: {[any]: any}?) -- line: 94
 		return false
 	end
 
-	for v32, v33 in t1 do
-		if v33 ~= t2[v32] then
+	for v35, v36 in t1 do
+		if v36 ~= t2[v35] then
 			return false
 		end
 	end
 
 	return true
 end
-local function areSelectedConversationHeaderFieldsEqual(t3: {[any]: any}?, t4: {[any]: any}?) -- line: 109
+local function areSelectedConversationHeaderFieldsEqual(t3: {[any]: any}?, t4: {[any]: any}?) -- line: 123
 	if t3 == t4 then
 		return true
 	end
@@ -53,131 +62,149 @@ local function areSelectedConversationHeaderFieldsEqual(t3: {[any]: any}?, t4: {
 		return false
 	end
 
-	local v36 = false
+	local v39 = false
 
 	if t3.source == t4.source then
-		v36 = false
+		v39 = false
 
 		if t3.title == t4.title then
-			v36 = false
+			v39 = false
 
 			if t3.titleForViewer == t4.titleForViewer then
 				local participants = t3.participants
 				local participants2 = t4.participants
+				local g44
 
 				if participants == participants2 then
-					return true
-				end
+					v39 = true
+				elseif participants == nil or participants2 == nil or #participants ~= #participants2 then
+					v39 = false
+				else
+					g44 = nil
 
-				if participants == nil or participants2 == nil or #participants ~= #participants2 then
-					return false
-				end
+					for v42, v43 in participants do
+						if v43 ~= participants2[v42] then
+							v39 = false
+							g44 = true
+						end
 
-				for v39, v40 in participants do
-					if v40 ~= participants2[v39] then
-						return false
+						if g44 then
+							break
+						end
+					end
+
+					if not g44 then
+						v39 = true
 					end
 				end
 
-				v36 = true
+				g44 = false
+
+				if v39 then
+					v39 = t3.moderationType == t4.moderationType
+				end
 			end
 		end
 	end
 
-	return v36
+	return v39
 end
-local function FriendsChatConversationWindow(t5: {[any]: any}) -- line: 125
-	-- upvalues: useChatWindow (copy), FFlagDebugFriendsChat (copy), FStringDebugFriendsChatConversationId (copy), Players (copy), ExpChatConversationListAdapter (copy), React (copy), Signals (copy), areSelectedConversationHeaderFieldsEqual (copy), SignalsReact (copy), getFriendsChatHeaderProps (copy), GetConversationMessageListStore (copy), LocalizationRoactContext (copy), localizeStrings (copy), useMessageDisplayStore (copy), FriendsChatTextMessage (copy), useMessagePool (copy), v26 (copy), fetchMessagePage (copy), v25 (copy), useFriendsChatConversationTelemetry (copy), LayoutConstants (copy), FriendsChatConversationHeaderBar (copy), FriendsChatInputBarHost (copy)
-	local v42 = useChatWindow()
-	local u43 = t5.conversationId or ""
+local function FriendsChatConversationWindow(t5: {[any]: any}) -- line: 140
+	-- upvalues: useChatWindow (copy), FFlagDebugFriendsChat (copy), FStringDebugFriendsChatConversationId (copy), Players (copy), ExpChatConversationListAdapter (copy), React (copy), Signals (copy), ConversationChannels (copy), areSelectedConversationHeaderFieldsEqual (copy), SignalsReact (copy), getFriendsChatHeaderProps (copy), GetConversationMessageListStore (copy), LocalizationRoactContext (copy), localizeStrings (copy), useMessageDisplayStore (copy), FriendsChatTextMessage (copy), useMessagePool (copy), v27 (copy), fetchMessagePage (copy), v26 (copy), useFriendsChatConversationTelemetry (copy), LayoutConstants (copy), FriendsChatConversationHeaderBar (copy), FriendsChatInputBarHost (copy)
+	local v46 = useChatWindow()
+	local u47 = t5.conversationId or ""
 
-	if u43 == "" and FFlagDebugFriendsChat then
-		u43 = FStringDebugFriendsChatConversationId
+	if u47 == "" and FFlagDebugFriendsChat then
+		u47 = FStringDebugFriendsChatConversationId
 	end
 
-	local v44 = u43 ~= ""
+	local v48 = u47 ~= ""
 	local LocalPlayer = Players.LocalPlayer
-	local v46 = not LocalPlayer and 0 or LocalPlayer.UserId
-	local v47 = ExpChatConversationListAdapter.getConversationStore()
-	local v48 = React.useMemo(function() -- line: 140
-		-- upvalues: Signals (copy), v44 (copy), v47 (copy), u43 (ref), areSelectedConversationHeaderFieldsEqual (copy)
-		return Signals.createComputed(function(p1) -- line: 141
-			-- upvalues: v44 (copy), v47 (copy), u43 (ref)
-			if not v44 then
+	local v50 = not LocalPlayer and 0 or LocalPlayer.UserId
+	local v51 = ExpChatConversationListAdapter.getConversationStore()
+	local v52 = React.useMemo(function() -- line: 155
+		-- upvalues: Signals (copy), v48 (copy), v51 (copy), u47 (ref), ConversationChannels (copy), areSelectedConversationHeaderFieldsEqual (copy)
+		return Signals.createComputed(function(p1) -- line: 156
+			-- upvalues: v48 (copy), v51 (copy), u47 (ref), ConversationChannels (copy)
+			if not v48 then
 				return nil
 			end
 
-			local v76 = v47.getConversation(u43, p1)
+			local v79 = v51.getConversation(u47, p1)
 
-			if v76 == nil then
+			if v79 == nil then
 				return nil
 			end
 
-			return {
-				source = v76.source,
-				title = v76.title,
-				titleForViewer = v76.titleForViewer,
-				participants = v76.participants
+			local t6 = {
+				source = v79.source,
+				title = v79.title,
+				titleForViewer = v79.titleForViewer,
+				participants = v79.participants
 			}
+			local moderationType = v79.moderationType
+
+			t6.moderationType = if moderationType ~= ConversationChannels.ModerationType.TrustedComms and (moderationType ~= ConversationChannels.ModerationType.Moderated and (moderationType ~= ConversationChannels.ModerationType.Invalid and moderationType ~= ConversationChannels.ModerationType.UnknownType)) then nil else moderationType
+
+			return t6
 		end, areSelectedConversationHeaderFieldsEqual)
 	end, {
-		v47,
-		u43,
-		v44
+		v51,
+		u47,
+		v48
 	})
-	local v49 = SignalsReact.useSignalState(v48)
-	local v50 = React.useMemo(function() -- line: 158
-		-- upvalues: v49 (copy), getFriendsChatHeaderProps (copy), v46 (copy)
-		if v49 == nil then
+	local v53 = SignalsReact.useSignalState(v52)
+	local v54 = React.useMemo(function() -- line: 174
+		-- upvalues: v53 (copy), getFriendsChatHeaderProps (copy), v50 (copy)
+		if v53 == nil then
 			return nil
 		end
 
-		return getFriendsChatHeaderProps(v49, v46)
+		return getFriendsChatHeaderProps(v53, v50)
 	end, {
-		v49,
-		v46
+		v53,
+		v50
 	})
-	local v51 = v49 ~= nil and v49.source == ExpChatConversationListAdapter.ConversationSource.Friends
-	local v52 = v49 == nil and string.sub(u43, 1, 8) == "friends:"
-	local v53 = v44 and (not v51 and not v52)
-	local v54 = v44 and not v51
+	local v55 = ExpChatConversationListAdapter.isFriendPlaceholder(u47)
+	local v56 = v48 and not v55
+	local v57 = v48 and not v55
 
-	React.useEffect(function() -- line: 171
-		-- upvalues: v44 (copy), ExpChatConversationListAdapter (copy), u43 (ref)
-		if v44 then
-			ExpChatConversationListAdapter.markConversationRead(u43)
+	React.useEffect(function() -- line: 184
+		-- upvalues: v48 (copy), ExpChatConversationListAdapter (copy), u47 (ref)
+		if v48 then
+			ExpChatConversationListAdapter.markConversationRead(u47)
 		end
 	end, {
-		u43,
-		v44
+		u47,
+		v48
 	})
 
-	local v55 = React.useMemo(function() -- line: 182
-		-- upvalues: v54 (copy), GetConversationMessageListStore (copy), u43 (ref)
-		if not v54 then
-			return function() -- line: 184
+	local v58 = React.useMemo(function() -- line: 195
+		-- upvalues: v57 (copy), GetConversationMessageListStore (copy), u47 (ref)
+		if not v57 then
+			return function() -- line: 197
 				return {}
 			end
 		end
 
-		return function(p2) -- line: 188
-			-- upvalues: GetConversationMessageListStore (copy), u43 (ref)
-			return GetConversationMessageListStore(p2).getOrderedIds(u43, p2)
+		return function(p2) -- line: 201
+			-- upvalues: GetConversationMessageListStore (copy), u47 (ref)
+			return GetConversationMessageListStore(p2).getOrderedIds(u47, p2)
 		end
 	end, {
-		u43,
-		v54
+		u47,
+		v57
 	})
-	local v56 = React.useContext(LocalizationRoactContext)
-	local v57 = React.useCallback(function(p3) -- line: 195
-		-- upvalues: v56 (copy), localizeStrings (copy)
-		if v56 == nil then
+	local v59 = React.useContext(LocalizationRoactContext)
+	local v60 = React.useCallback(function(p3) -- line: 208
+		-- upvalues: v59 (copy), localizeStrings (copy)
+		if v59 == nil then
 			return ""
 		end
 
-		local ok, result = pcall(function() -- line: 199
-			-- upvalues: localizeStrings (copy), v56 (copy), p3 (copy)
-			return localizeStrings(v56, {
+		local ok, result = pcall(function() -- line: 212
+			-- upvalues: localizeStrings (copy), v59 (copy), p3 (copy)
+			return localizeStrings(v59, {
 				value = p3
 			}).value
 		end)
@@ -187,108 +214,108 @@ local function FriendsChatConversationWindow(t5: {[any]: any}) -- line: 125
 		end
 
 		return ""
-	end, { v56 })
-	local v58 = useMessageDisplayStore(v55, u43, v57)
-	local v59 = React.useCallback(function(p4) -- line: 213
-		-- upvalues: React (copy), FriendsChatTextMessage (copy), v58 (copy), t5 (copy)
+	end, { v59 })
+	local v61 = useMessageDisplayStore(v58, u47, v60)
+	local v62 = React.useCallback(function(p4) -- line: 226
+		-- upvalues: React (copy), FriendsChatTextMessage (copy), v61 (copy), t5 (copy)
 		return React.createElement(FriendsChatTextMessage, {
 			getDisplayId = p4.getMessageId,
-			getDisplayFromId = v58.getDisplayFromId,
+			getDisplayFromId = v61.getDisplayFromId,
 			getLayoutOrder = p4.getLayoutOrder,
 			chatWindowSettings = t5.chatWindowSettings,
 			textTransparency = t5.textTransparency,
 			isSpatialUIEnabled = t5.isSpatialUIEnabled
 		})
 	end, {
-		v58,
+		v61,
 		t5.chatWindowSettings,
 		t5.textTransparency,
 		t5.isSpatialUIEnabled
 	})
-	local v60 = useMessagePool({
+	local v63 = useMessagePool({
 		maxSlots = 50,
-		messageIdsSignal = v58.getDisplayIds,
-		createSlotElement = v59
+		messageIdsSignal = v61.getDisplayIds,
+		createSlotElement = v62
 	})
-	local v61 = React.useMemo(function() -- line: 233
-		-- upvalues: Signals (copy), v60 (copy), v26 (copy)
-		return Signals.createComputed(function(p5) -- line: 234
-			-- upvalues: v60 (copy), v26 (copy)
-			local v79 = table.clone(v60(p5))
+	local v64 = React.useMemo(function() -- line: 246
+		-- upvalues: Signals (copy), v63 (copy), v27 (copy)
+		return Signals.createComputed(function(p5) -- line: 247
+			-- upvalues: v63 (copy), v27 (copy)
+			local v84 = table.clone(v63(p5))
 
-			v79["$layout"] = v26
+			v84["$layout"] = v27
 
-			return v79
+			return v84
 		end)
-	end, { v60 })
+	end, { v63 })
 
-	React.useEffect(function() -- line: 242
-		-- upvalues: v54 (copy), fetchMessagePage (copy), u43 (ref), v25 (copy)
-		if not v54 then
+	React.useEffect(function() -- line: 255
+		-- upvalues: v57 (copy), fetchMessagePage (copy), u47 (ref), v26 (copy)
+		if not v57 then
 			return
 		end
 
-		local u74 = false
+		local u77 = false
 
-		fetchMessagePage(u43, nil):catch(function(p6) -- line: 257
-			-- upvalues: u74 (ref), v25 (copy), u43 (ref)
-			if u74 then
+		fetchMessagePage(u47, nil):catch(function(p6) -- line: 270
+			-- upvalues: u77 (ref), v26 (copy), u47 (ref)
+			if u77 then
 				return
 			end
 
-			v25:warning(`Failed to fetch conversation messages for { u43 }: { tostring(p6) }`)
+			v26:warning(`Failed to fetch conversation messages for { u47 }: { tostring(p6) }`)
 		end)
 
-		return function() -- line: 264
-			-- upvalues: u74 (ref)
-			u74 = true
+		return function() -- line: 277
+			-- upvalues: u77 (ref)
+			u77 = true
 		end
 	end, {
-		u43,
-		v54
+		u47,
+		v57
 	})
 
-	local v62 = React.useCallback(function() -- line: 273
-		-- upvalues: v44 (copy), GetConversationMessageListStore (copy), u43 (ref)
-		if not v44 then
+	local v65 = React.useCallback(function() -- line: 286
+		-- upvalues: v48 (copy), GetConversationMessageListStore (copy), u47 (ref)
+		if not v48 then
 			return 0
 		end
 
-		return #GetConversationMessageListStore(false).getOrderedIds(u43, false)
+		return #GetConversationMessageListStore(false).getOrderedIds(u47, false)
 	end, {
-		u43,
-		v44
+		u47,
+		v48
 	})
-	local v63 = useFriendsChatConversationTelemetry({
-		conversationId = u43,
-		getLoadedMessageCount = v62
+	local v66 = useFriendsChatConversationTelemetry({
+		conversationId = u47,
+		getLoadedMessageCount = v65
 	})
-	local v64 = t5.parentLayoutOrder or 1
-	local v65 = React.useCallback(function() -- line: 293
-		-- upvalues: v25 (copy)
-		v25:warning("resetTargetChannel called on FriendsChatConversationWindow; not supported")
+	local v67 = t5.parentLayoutOrder or 1
+	local v68 = React.useCallback(function() -- line: 306
+		-- upvalues: v26 (copy)
+		v26:warning("resetTargetChannel called on FriendsChatConversationWindow; not supported")
 	end, {})
-	local v66 = React.useCallback(function() -- line: 296
-		-- upvalues: v25 (copy)
-		v25:warning("activateWhisperMode called on FriendsChatConversationWindow; not supported")
+	local v69 = React.useCallback(function() -- line: 309
+		-- upvalues: v26 (copy)
+		v26:warning("activateWhisperMode called on FriendsChatConversationWindow; not supported")
 	end, {})
 	local onOpenDetails = t5.onOpenDetails
-	local fireInfoButtonClicked = v63.fireInfoButtonClicked
-	local v69 = React.useCallback(function() -- line: 301
-		-- upvalues: fireInfoButtonClicked (copy), onOpenDetails (copy), u43 (ref)
+	local fireInfoButtonClicked = v66.fireInfoButtonClicked
+	local v72 = React.useCallback(function() -- line: 314
+		-- upvalues: fireInfoButtonClicked (copy), onOpenDetails (copy), u47 (ref)
 		fireInfoButtonClicked()
-		onOpenDetails(u43)
+		onOpenDetails(u47)
 	end, {
 		fireInfoButtonClicked,
 		onOpenDetails,
-		u43
+		u47
 	})
 
 	return React.createElement(React.Fragment, nil, {
 		friendsChatHeaderWindow = React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			LayoutOrder = v64,
+			LayoutOrder = v67,
 			Size = UDim2.new(1, 0, 1, LayoutConstants.PanelTopSpacerHeight)
 		}, {
 			layout = React.createElement("UIListLayout", {
@@ -297,15 +324,15 @@ local function FriendsChatConversationWindow(t5: {[any]: any}) -- line: 125
 			}),
 			header = React.createElement(FriendsChatConversationHeaderBar, {
 				layoutOrder = 1,
-				localUserId = v46,
-				participantUserIds = if not v50 then nil else v50.participantUserIds,
-				titleText = if not v50 then nil else v50.titleText,
+				localUserId = v50,
+				participantUserIds = if not v54 then nil else v54.participantUserIds,
+				titleText = if not v54 then nil else v54.titleText,
 				chatWindowSettings = t5.chatWindowSettings,
 				transparencyValue = t5.transparencyValue,
 				onHovered = t5.onHovered,
 				onUnhovered = t5.onUnhovered,
 				onBack = t5.onBack,
-				onActivated = if not t5.onOpenDetails or not v53 then nil else v69
+				onActivated = if not t5.onOpenDetails or not v56 then nil else v72
 			}),
 			windowSlot = React.createElement("Frame", {
 				LayoutOrder = 2,
@@ -316,12 +343,12 @@ local function FriendsChatConversationWindow(t5: {[any]: any}) -- line: 125
 				flex = React.createElement("UIFlexItem", {
 					FlexMode = Enum.UIFlexMode.Fill
 				}),
-				window = React.createElement(v42, {
+				window = React.createElement(v46, {
 					disableLineReporting = true,
 					size = UDim2.fromScale(1, 1),
 					isChannelBarVisible = t5.isChannelBarVisible,
-					scrollResetKey = "FriendsChat:" .. u43,
-					messageComponentsSignal = v61,
+					scrollResetKey = "FriendsChat:" .. u47,
+					messageComponentsSignal = v64,
 					chatWindowSettings = t5.chatWindowSettings,
 					transparencyValue = t5.transparencyValue,
 					textTransparency = t5.textTransparency,
@@ -330,14 +357,15 @@ local function FriendsChatConversationWindow(t5: {[any]: any}) -- line: 125
 					onUnhovered = t5.onUnhovered,
 					onAbsoluteSizeChanged = t5.onAbsoluteSizeChanged,
 					onAbsolutePositionChanged = t5.onAbsolutePositionChanged,
-					resetTargetChannel = v65,
-					activateWhisperMode = v66
+					resetTargetChannel = v68,
+					activateWhisperMode = v69
 				})
 			})
 		}),
 		friendsChatInput = React.createElement(FriendsChatInputBarHost, {
-			LayoutOrder = v64 + 1,
-			conversationId = u43,
+			LayoutOrder = v67 + 1,
+			conversationId = u47,
+			conversationModerationType = if not v53 then nil else v53.moderationType,
 			onFriendPlaceholderConversationCreated = t5.onFriendPlaceholderConversationCreated,
 			chatWindowSettings = t5.chatWindowSettings,
 			transparencyValue = t5.transparencyValue,

@@ -22,7 +22,7 @@ local function isManageTasksToolTitle(s2: string?) -- line: 28
 end
 local function formatStepCount(n1: number) -- line: 33
 	-- upvalues: LocalizationStrings (copy)
-	return LocalizationStrings.formatChatActionCount(n1)
+	return LocalizationStrings.formatChatTaskCount(n1)
 end
 local function formatWorkedDuration(n2: number) -- line: 39
 	-- upvalues: LocalizationStrings (copy)
@@ -55,16 +55,22 @@ local function getToolActivityLabel(p2) -- line: 78
 	end
 
 	local v39 = if typeof(p2.title) ~= "string" or p2.title == "" then LocalizationStrings.CHAT_TOOL else p2.title
-	local v40 = false
+	local v40 = LocalizationStrings.getChatToolActivityLabel(v39, p2.status)
 
-	if typeof(v39) == "string" then
-		local v41 = string.lower((string.gsub(v39, "[_%-%s]", "")))
-		local TOOL_NAME = SubagentTasks.TOOL_NAME
-
-		v40 = v41 == string.lower((string.gsub(TOOL_NAME, "[_%-%s]", "")))
+	if v40 ~= nil then
+		return v40
 	end
 
-	if v40 then
+	local v41 = false
+
+	if typeof(v39) == "string" then
+		local v42 = string.lower((string.gsub(v39, "[_%-%s]", "")))
+		local TOOL_NAME = SubagentTasks.TOOL_NAME
+
+		v41 = v42 == string.lower((string.gsub(TOOL_NAME, "[_%-%s]", "")))
+	end
+
+	if v41 then
 		return LocalizationStrings.CHAT_ASSIGNING_TASKS
 	end
 
@@ -78,13 +84,13 @@ local function getToolActivityLabel(p2) -- line: 78
 
 	return LocalizationStrings.formatChatRunningTool(v39)
 end
-local function getActiveActivityLabel(t1: {[any]: any}, _: boolean) -- line: 108
+local function getActiveActivityLabel(t1: {[any]: any}, _: boolean) -- line: 112
 	-- upvalues: getToolActivityLabel (copy), LocalizationStrings (copy)
 	for i = #t1, 1, -1 do
-		local v50 = t1[i]
+		local v51 = t1[i]
 
-		if v50.kind == "tool_call" and (v50.kind == "tool_call" and (v50.status == "pending" or (v50.status == "in_progress" or v50.status == nil))) then
-			return getToolActivityLabel(v50)
+		if v51.kind == "tool_call" and (v51.kind == "tool_call" and (v51.status == "pending" or (v51.status == "in_progress" or v51.status == nil))) then
+			return getToolActivityLabel(v51)
 		end
 	end
 
@@ -93,11 +99,11 @@ end
 
 return {
 	ASSISTANT_STOPPED_TEXT = LocalizationStrings.CHAT_ASSISTANT_STOPPED,
-	countToolCalls = function(t2: {[any]: any}) -- line: 98
+	countToolCalls = function(t2: {[any]: any}) -- line: 102
 		local n3 = 0
 
-		for _, v46 in t2 do
-			if v46.kind == "tool_call" then
+		for _, v47 in t2 do
+			if v47.kind == "tool_call" then
 				n3 += 1
 			end
 		end
@@ -113,7 +119,7 @@ return {
 	formatStepCount = formatStepCount,
 	formatWorkedDuration = formatWorkedDuration,
 	getActiveActivityLabel = getActiveActivityLabel,
-	getAskUserActivityLabel = function(n4: number, n5: number?) -- line: 126
+	getAskUserActivityLabel = function(n4: number, n5: number?) -- line: 137
 		-- upvalues: LocalizationStrings (copy)
 		if n5 == 0 then
 			return LocalizationStrings.CHAT_QUESTION_COMPOSER_ANSWER
@@ -125,13 +131,21 @@ return {
 
 		return LocalizationStrings.CHAT_QUESTION_MULTIPLE
 	end,
-	getCompletedActivityLabel = function(t3: {[any]: any}) -- line: 118
-		-- upvalues: formatStepCount (copy), getActiveActivityLabel (copy)
+	getCompletedActivityLabel = function(t3: {[any]: any}) -- line: 122
+		-- upvalues: getToolActivityLabel (copy), formatStepCount (copy), getActiveActivityLabel (copy)
 		local n6 = 0
 
-		for _, v54 in t3 do
-			if v54.kind == "tool_call" then
+		for _, v55 in t3 do
+			if v55.kind == "tool_call" then
 				n6 += 1
+			end
+		end
+
+		if n6 == 1 then
+			for _, v57 in t3 do
+				if v57.kind == "tool_call" then
+					return getToolActivityLabel(v57)
+				end
 			end
 		end
 
@@ -185,7 +199,7 @@ return {
 		end
 
 		if n9 > 0 then
-			return (LocalizationStrings.formatChatActionCount(n9))
+			return (LocalizationStrings.formatChatTaskCount(n9))
 		end
 
 		return LocalizationStrings.CHAT_TURN_ACTIVITY

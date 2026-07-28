@@ -16,47 +16,50 @@ local useFetchPresences = require(SocialTabsPage.Hooks.useFetchPresences)
 local useSortedEntitiesByPresence = require(SocialTabsPage.Hooks.useSortedEntitiesByPresence)
 local useUserListCTAs = require(SocialTabsPage.Hooks.useUserListCTAs)
 local useCTAActionHandlers = require(SocialTabsPage.Hooks.useCTAActionHandlers)
+local FFlagSocialTabsPagePresenceSignalsMigration = require(SocialTabsPage.Flags.FFlagSocialTabsPagePresenceSignalsMigration)
 
-local function MutualsTabContent() -- line: 23
-	-- upvalues: useSocialTabsContext (copy), useMutualsList (copy), React (copy), Dash (copy), EntityType (copy), useFetchPresences (copy), useSortedEntitiesByPresence (copy), useUserListCTAs (copy), useCTAActionHandlers (copy), RowDataProvider (copy), View (copy), Loading (copy), UserListLayoutAdaptor (copy), LayoutMode (copy)
+local function MutualsTabContent() -- line: 26
+	-- upvalues: useSocialTabsContext (copy), useMutualsList (copy), React (copy), Dash (copy), EntityType (copy), FFlagSocialTabsPagePresenceSignalsMigration (copy), useFetchPresences (copy), useSortedEntitiesByPresence (copy), useUserListCTAs (copy), useCTAActionHandlers (copy), RowDataProvider (copy), View (copy), Loading (copy), UserListLayoutAdaptor (copy), LayoutMode (copy)
 	local profileId = useSocialTabsContext().profileId
-	local v21 = useMutualsList(profileId)
-	local v22 = React.useMemo(function() -- line: 29
-		-- upvalues: Dash (copy), v21 (copy), EntityType (copy)
-		return Dash.map(v21.mutualFriends, function(p1) -- line: 30
+	local v22 = useMutualsList(profileId)
+	local v23 = React.useMemo(function() -- line: 32
+		-- upvalues: Dash (copy), v22 (copy), EntityType (copy)
+		return Dash.map(v22.mutualFriends, function(p1) -- line: 33
 			-- upvalues: EntityType (copy)
 			return {
 				id = p1.id,
 				type = EntityType.User
 			}
 		end)
-	end, { v21.mutualFriends })
-	local v23 = React.useMemo(function() -- line: 35
-		-- upvalues: Dash (copy), v22 (copy)
-		return Dash.map(v22, function(p2) -- line: 36
+	end, { v22.mutualFriends })
+	local v24 = React.useMemo(function() -- line: 38
+		-- upvalues: Dash (copy), v23 (copy)
+		return Dash.map(v23, function(p2) -- line: 39
 			return p2.id
 		end)
-	end, { v22 })
+	end, { v23 })
 
-	useFetchPresences(v23)
+	if not FFlagSocialTabsPagePresenceSignalsMigration then
+		useFetchPresences(v24)
+	end
 
-	local v24 = useSortedEntitiesByPresence(v22)
-	local v25 = useUserListCTAs(v23)
-	local v26 = useCTAActionHandlers()
-	local v27 = React.useCallback(function(p3, p4, _: number) -- line: 48
-		-- upvalues: React (copy), RowDataProvider (copy), v25 (copy), v26 (copy)
+	local v25 = useSortedEntitiesByPresence(v23)
+	local v26 = useUserListCTAs(v24)
+	local v27 = useCTAActionHandlers()
+	local v28 = React.useCallback(function(p3, p4, _: number) -- line: 55
+		-- upvalues: React (copy), RowDataProvider (copy), v26 (copy), v27 (copy)
 		return React.createElement(RowDataProvider, {
 			createRow = p3,
 			entity = p4,
-			ctaResult = v25[p4.id],
-			actionHandlers = v26
+			ctaResult = v26[p4.id],
+			actionHandlers = v27
 		})
 	end, {
-		v25,
-		v26
+		v26,
+		v27
 	})
 
-	if v21.isLoading and #v22 == 0 then
+	if v22.isLoading and #v23 == 0 then
 		return React.createElement(View, {
 			tag = "col align-x-center align-y-center size-full"
 		}, {
@@ -69,11 +72,11 @@ local function MutualsTabContent() -- line: 23
 	}, {
 		MutualsList = React.createElement(UserListLayoutAdaptor, {
 			isScrollEnabled = true,
-			entities = v24,
+			entities = v25,
 			layoutMode = LayoutMode.Vertical,
-			hasMore = v21.hasMore,
-			onLoadMore = if not v21.hasMore then nil else v21.loadMore,
-			renderRow = v27
+			hasMore = v22.hasMore,
+			onLoadMore = if not v22.hasMore then nil else v22.loadMore,
+			renderRow = v28
 		})
 	})
 end

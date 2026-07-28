@@ -35,7 +35,7 @@ local function PlaytestCompletedCard(t1: {[any]: any}) -- line: 27
 			text = LocalizationStrings.CHAT_PLAYTEST,
 			icon = IconName.PlaySmall,
 			size = InputSize.Small,
-			variant = ButtonVariant.SoftEmphasis,
+			variant = ButtonVariant.Emphasis,
 			width = UDim.new(1, 0),
 			isLoading = v14,
 			onActivated = t1.onPlaytest

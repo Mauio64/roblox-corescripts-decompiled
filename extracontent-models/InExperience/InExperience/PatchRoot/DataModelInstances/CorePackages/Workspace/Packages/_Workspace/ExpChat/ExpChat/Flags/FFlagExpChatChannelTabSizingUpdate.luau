@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatChannelTabSizingUpdate", false)
+return game:DefineFastFlag("ExpChatChannelTabSizingUpdate2", false)

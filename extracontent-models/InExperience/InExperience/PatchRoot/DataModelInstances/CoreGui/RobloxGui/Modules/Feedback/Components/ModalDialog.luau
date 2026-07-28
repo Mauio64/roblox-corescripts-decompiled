@@ -13,11 +13,9 @@ local HeaderBar = UIBlox.App.Bar.HeaderBar
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
 local Images = UIBlox.App.ImageSet.Images
 local makeBackButton = require(CorePackages.Workspace.Packages.AppHeaderBar).makeBackButton
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
-local v17 = not require(RobloxGui.Modules.Flags.GetFFlagEnableFeedbackReportDialogAdjustments)() and 48 or 60
-local v18 = Roact.Component:extend("ModalDialog")
+local v16 = Roact.Component:extend("ModalDialog")
 
-v18.validateProps = t.strictInterface({
+v16.validateProps = t.strictInterface({
 	visible = t.boolean,
 	screenSize = t.Vector2,
 	titleText = t.optional(t.string),
@@ -31,18 +29,18 @@ v18.validateProps = t.strictInterface({
 	maxWidth = t.optional(t.number)
 })
 
-function v18.init(p1) -- line: 50
-	function p1.onOverlayActivated() -- line: 51
+function v16.init(p1) -- line: 44
+	function p1.onOverlayActivated() -- line: 45
 		-- upvalues: p1 (copy)
 		p1.props.onDismiss()
 	end
 end
-function v18.renderHeaderBarLeft(p2) -- line: 56
+function v16.renderHeaderBarLeft(p2) -- line: 50
 	-- upvalues: Roact (copy), IconButton (copy), IconSize (copy), Images (copy), makeBackButton (copy)
 	local props = p2.props
 
 	if props.showCloseButton then
-		return function() -- line: 60
+		return function() -- line: 54
 			-- upvalues: Roact (copy), IconButton (copy), IconSize (copy), Images (copy), props (copy)
 			return Roact.createElement(IconButton, {
 				iconSize = IconSize.Medium,
@@ -56,31 +54,31 @@ function v18.renderHeaderBarLeft(p2) -- line: 56
 		return makeBackButton(props.onBackButtonActivated)
 	end
 
-	return function() -- line: 72
+	return function() -- line: 66
 		return nil
 	end
 end
-function v18.renderHeaderBarRight(_) -- line: 78
-	return function() -- line: 80
+function v16.renderHeaderBarRight(_) -- line: 72
+	return function() -- line: 74
 		return nil
 	end
 end
-function v18.render(p4) -- line: 85
-	-- upvalues: v17 (copy), withStyle (copy), Roact (copy), ImageSetButton (copy), Assets (copy), HeaderBar (copy), Divider (copy)
+function v16.render(p4) -- line: 79
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetButton (copy), Assets (copy), HeaderBar (copy), Divider (copy)
 	local props = p4.props
-	local v25 = math.min(props.screenSize.Y, 645)
+	local v23 = math.min(props.screenSize.Y, 645)
 
 	if props.maxHeight then
-		v25 = math.min(v25, props.maxHeight)
+		v23 = math.min(v23, props.maxHeight)
 	end
 
-	local v26 = math.min(props.screenSize.X, 540)
+	local v24 = math.min(props.screenSize.X, 540)
 
 	if props.maxWidth then
-		v26 = math.min(v26, props.maxWidth)
+		v24 = math.min(v24, props.maxWidth)
 	end
 
-	local vector2 = Vector2.new(v26, v25)
+	local vector2 = Vector2.new(v24, v23)
 	local vector2_2, uDim2
 
 	if props.screenSize.X < 540 then
@@ -91,14 +89,14 @@ function v18.render(p4) -- line: 85
 		uDim2 = UDim2.fromScale(0.5, 0.5)
 	end
 
-	local u30 = math.min(600, vector2.Y - 49 - v17)
+	local u28 = math.min(600, vector2.Y - 49 - 60)
 
 	if not props.actionButtons then
-		u30 += v17
+		u28 += 60
 	end
 
-	return withStyle(function(p5) -- line: 121
-		-- upvalues: Roact (copy), props (copy), p4 (copy), ImageSetButton (copy), vector2_2 (ref), Assets (copy), uDim2 (ref), vector2 (copy), HeaderBar (copy), Divider (copy), u30 (ref), v17 (copy)
+	return withStyle(function(p5) -- line: 115
+		-- upvalues: Roact (copy), props (copy), p4 (copy), ImageSetButton (copy), vector2_2 (ref), Assets (copy), uDim2 (ref), vector2 (copy), HeaderBar (copy), Divider (copy), u28 (ref)
 		return Roact.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
@@ -150,14 +148,14 @@ function v18.render(p4) -- line: 85
 					BackgroundTransparency = 1,
 					LayoutOrder = 3,
 					ZIndex = 10,
-					Size = UDim2.new(1, 0, 0, u30)
+					Size = UDim2.new(1, 0, 0, u28)
 				}, {
 					Contents = props.contents
 				}),
 				ActionBar = props.actionButtons and Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
 					LayoutOrder = 4,
-					Size = UDim2.new(1, 0, 0, v17)
+					Size = UDim2.new(1, 0, 0, 60)
 				}, {
 					Padding = Roact.createElement("UIPadding", {
 						PaddingTop = UDim.new(0, 8),
@@ -171,9 +169,9 @@ function v18.render(p4) -- line: 85
 		})
 	end)
 end
-function v18.bindActions(p6) -- line: 195
+function v16.bindActions(p6) -- line: 189
 	-- upvalues: ContextActionService (copy)
-	local function dismissFunc(p7) -- line: 196
+	local function dismissFunc(p7) -- line: 190
 		-- upvalues: p6 (copy)
 		if p7 == Enum.UserInputState.Begin then
 			p6.props.onDismiss()
@@ -182,16 +180,16 @@ function v18.bindActions(p6) -- line: 195
 
 	ContextActionService:BindCoreAction("ModalDialogDismiss", dismissFunc, false, Enum.KeyCode.Escape)
 end
-function v18.unbindActions(_) -- line: 204
+function v16.unbindActions(_) -- line: 198
 	-- upvalues: ContextActionService (copy)
 	ContextActionService:UnbindCoreAction("ModalDialogDismiss")
 end
-function v18.didMount(p9) -- line: 208
+function v16.didMount(p9) -- line: 202
 	if p9.props.visible then
 		p9:bindActions()
 	end
 end
-function v18.didUpdate(p10) -- line: 214
+function v16.didUpdate(p10) -- line: 208
 	if p10.props.visible then
 		p10:bindActions()
 
@@ -200,8 +198,8 @@ function v18.didUpdate(p10) -- line: 214
 
 	p10:unbindActions()
 end
-function v18.willUnmount(p11) -- line: 222
+function v16.willUnmount(p11) -- line: 216
 	p11:unbindActions()
 end
 
-return v18
+return v16

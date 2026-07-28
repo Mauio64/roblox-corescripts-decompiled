@@ -420,6 +420,17 @@ return {
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter
 		}}
 	},
+	[EventNames.SchoolButton] = {
+		description = "School button clicked",
+		lastUpdated = {
+			26,
+			7,
+			20
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
 	[EventNames.FriendsButton] = {
 		description = "Friends button clicked",
 		lastUpdated = {
@@ -551,11 +562,11 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryStat,
 			dynamicCustomFields = if not FFlagProfilePlatformEnableStore then nil else if not FFlagProfilePlatformUseCatalogItemOpenedNewFields then {
-				source = function(p11) -- line: 480
+				source = function(p11) -- line: 489
 					return p11
 				end
 			} else {
-				btnContext = function(p12) -- line: 475
+				btnContext = function(p12) -- line: 484
 					return p12
 				end
 			}
@@ -571,7 +582,7 @@ return {
 		backendsList = {{
 			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
 			dynamicCustomFields = {
-				component = function(p13) -- line: 495
+				component = function(p13) -- line: 504
 					return p13
 				end
 			}

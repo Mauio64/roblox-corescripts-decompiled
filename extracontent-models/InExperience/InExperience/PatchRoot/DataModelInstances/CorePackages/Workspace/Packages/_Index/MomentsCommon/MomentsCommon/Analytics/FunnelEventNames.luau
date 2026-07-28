@@ -3,6 +3,7 @@ local t1 = {
 	CreationFlow = "Creation Flow",
 	MusicEnhancement = "Music Enhancement",
 	TextOverlayEnhancement = "Text Enhancement",
+	StickerOverlayEnhancement = "Sticker Enhancement",
 	TrimEnhancement = "Trim Enhancement"
 }
 local t2 = {
@@ -31,10 +32,14 @@ local t6 = {
 	TextOverlayCompleted = "TextOverlayCompleted"
 }
 local t7 = {
+	StickerOverlayButtonPressed = "StickerOverlayButtonPressed",
+	StickerOverlayCompleted = "StickerOverlayCompleted"
+}
+local t8 = {
 	TrimButtonPressed = "TrimButtonPressed",
 	TrimCompleted = "TrimCompleted"
 }
-local t8 = {
+local t9 = {
 	[t1.AppNavigation] = {
 		[t2.AppLaunched] = {
 			stepNumber = 1,
@@ -90,11 +95,11 @@ local t8 = {
 		}
 	},
 	[t1.TrimEnhancement] = {
-		[t7.TrimButtonPressed] = {
+		[t8.TrimButtonPressed] = {
 			stepNumber = 1,
 			stepName = "Trim Button Pressed"
 		},
-		[t7.TrimCompleted] = {
+		[t8.TrimCompleted] = {
 			stepNumber = 2,
 			stepName = "Trim Completed"
 		}
@@ -108,16 +113,27 @@ local t8 = {
 			stepNumber = 2,
 			stepName = "Text Overlay Completed"
 		}
+	},
+	[t1.StickerOverlayEnhancement] = {
+		[t7.StickerOverlayButtonPressed] = {
+			stepNumber = 1,
+			stepName = "Sticker Overlay Button Pressed"
+		},
+		[t7.StickerOverlayCompleted] = {
+			stepNumber = 2,
+			stepName = "Sticker Overlay Completed"
+		}
 	}
 }
 
 return {
 	FunnelTypes = t1,
-	FunnelSteps = t8,
+	FunnelSteps = t9,
 	CreationIntentSource = t3,
 	AppNavigationSteps = t2,
 	CreationFlowSteps = t4,
 	MusicEnhancementSteps = t5,
-	TrimEnhancementSteps = t7,
-	TextOverlayEnhancementSteps = t6
+	TrimEnhancementSteps = t8,
+	TextOverlayEnhancementSteps = t6,
+	StickerOverlayEnhancementSteps = t7
 }

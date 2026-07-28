@@ -11,12 +11,12 @@ return {
 	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
 	fflag = require(ParentParent.flags.getFFlagUGCValidateAQCageQualityLC),
 	run = function(p1, p2) -- line: 16
-		-- upvalues: ErrorSourceStrings (copy), v5 (copy), getFFlagUGCValidateAQScoreWarnings (copy)
+		-- upvalues: v5 (copy), ErrorSourceStrings (copy), getFFlagUGCValidateAQScoreWarnings (copy)
 		local Handle = p2.aqsSummaryData.Measure_Mesh_Outside_OuterCage.Handle
 		local v9 = Handle and tonumber(Handle.mesh_outside_outer_cage_percent)
 
 		if v9 == nil then
-			p1:fail(ErrorSourceStrings.Keys.AQSInputDataError)
+			error("Measure_Mesh_Outside_OuterCage: AQS summary missing required fields")
 
 			return
 		end

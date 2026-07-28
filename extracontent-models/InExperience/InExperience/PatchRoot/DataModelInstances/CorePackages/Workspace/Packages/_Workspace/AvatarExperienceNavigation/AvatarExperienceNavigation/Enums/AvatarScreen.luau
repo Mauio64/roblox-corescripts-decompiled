@@ -1,6 +1,5 @@
 local Parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
 local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local FFlagAXAvatarTimeoutFlow = AvatarExperienceFlags.FFlagAXAvatarTimeoutFlow
 local FFlagAXEditorSubcategoryFilters = AvatarExperienceFlags.FFlagAXEditorSubcategoryFilters
 local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
 local FFlagAXMakeupReleaseFTUX = AvatarExperienceFlags.FFlagAXMakeupReleaseFTUX
@@ -76,6 +75,8 @@ return {
 	AddOutfitDialog = "AddOutfitDialog",
 	DuplicateOutfitDialog = "DuplicateOutfitDialog",
 	DuplicateOutfitNameDialog = "DuplicateOutfitNameDialog",
+	RenameOutfitDialog = "RenameOutfitDialog",
+	DeleteOutfitDialog = "DeleteOutfitDialog",
 	AXTransitionContextualMenu = "AXTransitionContextualMenu",
 	AXTransitionSegmentedMenu = "AXTransitionSegmentedMenu",
 	CollectiblesInfoPrompt = "CollectiblesInfoPrompt",
@@ -103,7 +104,7 @@ return {
 	ItemReplacedOnAvatarPrompt = "ItemReplacedOnAvatarPrompt",
 	ItemsUnavailablePrompt = "ItemsUnavailablePrompt",
 	MakeupMax6LayersPrompt = if not FFlagAXCatalogMakeupSupport then nil else "MakeupMax6LayersPrompt",
-	TimeoutStatusPrompt = if not FFlagAXAvatarTimeoutFlow then nil else "TimeoutStatusPrompt",
+	TimeoutStatusPrompt = "TimeoutStatusPrompt",
 	UpdateOutfitPage = "UpdateOutfitPage",
 	ManageOutfitPage = "ManageOutfitPage",
 	ManageOutfitsPage = "ManageOutfitsPage",

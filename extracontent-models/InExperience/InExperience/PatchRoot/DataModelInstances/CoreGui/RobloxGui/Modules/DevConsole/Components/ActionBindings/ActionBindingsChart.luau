@@ -1,6 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
-local v3 = game:DefineFastFlag("FixActionBindingSecurity", false)
 local Components = script.Parent.Parent.Parent.Components
 local DataConsumer = require(Components.DataConsumer)
 local HeaderButton = require(Components.HeaderButton)
@@ -25,20 +24,20 @@ end
 local t1 = {}
 local t2 = {}
 local t3 = {}
-local v25 = -n1 / 2
+local v24 = -n1 / 2
 
 table.insert(t1, UDim2.new(0, CellPadding, 0, 0))
-table.insert(t2, UDim2.new(0.5, v25 - CellPadding, 0, HeaderFrameHeight))
-table.insert(t3, UDim2.new(0.5, v25 - CellPadding, 0, EntryFrameHeight))
+table.insert(t2, UDim2.new(0.5, v24 - CellPadding, 0, HeaderFrameHeight))
+table.insert(t3, UDim2.new(0.5, v24 - CellPadding, 0, EntryFrameHeight))
 
 for _, v in ipairs(ChartCellWidths) do
-	table.insert(t1, UDim2.new(0.5, v25 + CellPadding, 0, 0))
+	table.insert(t1, UDim2.new(0.5, v24 + CellPadding, 0, 0))
 	table.insert(t2, UDim2.new(0, v - CellPadding, 0, HeaderFrameHeight))
 	table.insert(t3, UDim2.new(0, v - CellPadding, 0, EntryFrameHeight))
-	v25 += v
+	v24 += v
 end
 
-table.insert(t1, UDim2.new(0.5, v25 + CellPadding, 0, 0))
+table.insert(t1, UDim2.new(0.5, v24 + CellPadding, 0, 0))
 table.insert(t2, UDim2.new(0.5, -n1 / 2 - CellPadding, 0, HeaderFrameHeight))
 table.insert(t3, UDim2.new(0.5, -n1 / 2 - CellPadding, 0, EntryFrameHeight))
 
@@ -48,9 +47,9 @@ for i, v in ipairs(t1) do
 	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
 end
 
-local v31 = Roact.Component:extend("ActionBindingsChart")
+local v30 = Roact.Component:extend("ActionBindingsChart")
 
-local function constructHeader(p1, p2) -- line: 63
+local function constructHeader(p1, p2) -- line: 61
 	-- upvalues: ChartHeaderNames (copy), Roact (copy), HeaderButton (copy), t2 (copy), t1 (copy), LineWidth (copy), LineColor (copy), t4 (copy), HeaderFrameHeight (copy)
 	local t5 = {}
 
@@ -90,25 +89,15 @@ local function constructHeader(p1, p2) -- line: 63
 		Size = UDim2.new(0, p2, 0, HeaderFrameHeight)
 	}, t5)
 end
-local function constructEntry(p3, p4, p5) -- line: 105
-	-- upvalues: v3 (copy), t4 (copy), Roact (copy), LineWidth (copy), LineColor (copy), CellLabel (copy), t3 (copy), t1 (copy), EntryFrameHeight (copy)
+local function constructEntry(p3, p4, p5) -- line: 103
+	-- upvalues: t4 (copy), Roact (copy), LineWidth (copy), LineColor (copy), CellLabel (copy), t3 (copy), t1 (copy), EntryFrameHeight (copy)
 	local name = p3.name
 	local actionInfo = p3.actionInfo
 	local str = tostring(actionInfo.inputTypes[1])
-	local s1
+	local s1 = "Developer"
 
-	if v3 then
-		s1 = "Developer"
-
-		if actionInfo.isCore then
-			s1 = "Core"
-		end
-	else
+	if actionInfo.isCore then
 		s1 = "Core"
-
-		if actionInfo.isCore then
-			s1 = "Developer"
-		end
 	end
 
 	local t6 = {}
@@ -161,11 +150,11 @@ local function constructEntry(p3, p4, p5) -- line: 105
 	}, t6)
 end
 
-function v31.init(p6, p7) -- line: 182
+function v30.init(p6, p7) -- line: 172
 	-- upvalues: Roact (copy)
-	local v51 = p7.ActionBindingsData:getCurrentData()
+	local v50 = p7.ActionBindingsData:getCurrentData()
 
-	function p6.onSortChanged(p8) -- line: 185
+	function p6.onSortChanged(p8) -- line: 175
 		-- upvalues: p7 (copy), p6 (copy)
 		if p8 == p7.ActionBindingsData:getSortType() then
 			p6:setState({
@@ -180,7 +169,7 @@ function v31.init(p6, p7) -- line: 182
 			reverseSort = false
 		})
 	end
-	function p6.onCanvasPosChanged() -- line: 199
+	function p6.onCanvasPosChanged() -- line: 189
 		-- upvalues: p6 (copy)
 		local CanvasPosition = p6.scrollingRef.current.CanvasPosition
 
@@ -194,15 +183,15 @@ function v31.init(p6, p7) -- line: 182
 	p6.scrollingRef = Roact.createRef()
 	p6.state = {
 		reverseSort = false,
-		actionBindingEntries = v51
+		actionBindingEntries = v50
 	}
 end
-function v31.willUpdate(p9) -- line: 216
+function v30.willUpdate(p9) -- line: 206
 	if p9.canvasPosConnector then
 		p9.canvasPosConnector:Disconnect()
 	end
 end
-function v31.didUpdate(p10) -- line: 222
+function v30.didUpdate(p10) -- line: 212
 	if p10.scrollingRef.current then
 		p10.canvasPosConnector = p10.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p10.onCanvasPosChanged)
 
@@ -216,8 +205,8 @@ function v31.didUpdate(p10) -- line: 222
 		end
 	end
 end
-function v31.didMount(p11) -- line: 237
-	p11.bindingsUpdated = p11.props.ActionBindingsData:Signal():Connect(function(p12) -- line: 238
+function v30.didMount(p11) -- line: 227
+	p11.bindingsUpdated = p11.props.ActionBindingsData:Signal():Connect(function(p12) -- line: 228
 		-- upvalues: p11 (copy)
 		p11:setState({
 			actionBindingEntries = p12
@@ -232,13 +221,13 @@ function v31.didMount(p11) -- line: 237
 		})
 	end
 end
-function v31.willUnmount(p13) -- line: 255
+function v30.willUnmount(p13) -- line: 245
 	p13.bindingsUpdated:Disconnect()
 	p13.bindingsUpdated = nil
 	p13.canvasPosConnector:Disconnect()
 	p13.canvasPosConnector = nil
 end
-function v31.render(p14) -- line: 262
+function v30.render(p14) -- line: 252
 	-- upvalues: MinFrameWidth (copy), Roact (copy), EntryFrameHeight (copy), constructEntry (copy), LineColor (copy), constructHeader (copy), HeaderFrameHeight (copy), Constants (copy)
 	local t7 = {}
 	local searchTerm = p14.props.searchTerm
@@ -248,7 +237,7 @@ function v31.render(p14) -- line: 262
 	local reverseSort = p14.state.reverseSort
 	local canvasPos = p14.state.canvasPos
 	local absScrollSize = p14.state.absScrollSize
-	local v67 = absScrollSize and math.max(absScrollSize.X, MinFrameWidth) or MinFrameWidth
+	local v66 = absScrollSize and math.max(absScrollSize.X, MinFrameWidth) or MinFrameWidth
 
 	t7.UIListLayout = Roact.createElement("UIListLayout", {
 		HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -256,7 +245,7 @@ function v31.render(p14) -- line: 262
 		SortOrder = Enum.SortOrder.LayoutOrder
 	})
 
-	local v68 = #actionBindingEntries
+	local v67 = #actionBindingEntries
 	local n2 = 0
 
 	if absScrollSize and canvasPos then
@@ -265,20 +254,20 @@ function v31.render(p14) -- line: 262
 		local n5 = 0
 
 		for i, v in ipairs(actionBindingEntries) do
-			local v75 = false
+			local v74 = false
 
 			if searchTerm then
 				local str = tostring(v.actionInfo.inputTypes[1])
 
-				v75 = string.find(str:lower(), searchTerm:lower()) ~= nil or string.find(v.name:lower(), searchTerm:lower()) ~= nil
+				v74 = string.find(str:lower(), searchTerm:lower()) ~= nil or string.find(v.name:lower(), searchTerm:lower()) ~= nil
 			end
 
-			if not searchTerm or v75 then
+			if not searchTerm or v74 then
 				if n2 + EntryFrameHeight >= canvasPos.Y then
 					if n4 < absScrollSize.Y then
-						local v77 = reverseSort and v68 - i or i
+						local v76 = reverseSort and v67 - i or i
 
-						t7[i] = constructEntry(v, v67, v77 + 1)
+						t7[i] = constructEntry(v, v66, v76 + 1)
 					end
 
 					if n3 < 0 then
@@ -317,11 +306,11 @@ function v31.render(p14) -- line: 262
 		Size = size,
 		LayoutOrder = layoutOrder
 	}, {
-		Header = constructHeader(p14.onSortChanged, v67),
+		Header = constructHeader(p14.onSortChanged, v66),
 		MainChart = Roact.createElement("ScrollingFrame", {
 			Position = UDim2.new(0, 0, 0, HeaderFrameHeight),
 			Size = UDim2.new(1, 0, 1, -HeaderFrameHeight),
-			CanvasSize = UDim2.new(0, v67, 0, n2),
+			CanvasSize = UDim2.new(0, v66, 0, n2),
 			ScrollBarThickness = 6,
 			BackgroundColor3 = Constants.Color.BaseGray,
 			BackgroundTransparency = 1,
@@ -330,4 +319,4 @@ function v31.render(p14) -- line: 262
 	})
 end
 
-return DataConsumer(v31, "ActionBindingsData")
+return DataConsumer(v30, "ActionBindingsData")

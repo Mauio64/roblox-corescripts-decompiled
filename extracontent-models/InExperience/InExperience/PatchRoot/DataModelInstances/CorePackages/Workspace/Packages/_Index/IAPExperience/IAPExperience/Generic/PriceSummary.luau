@@ -9,27 +9,26 @@ local LocalizationService = game:GetService("LocalizationService")
 local useLocalization = require(ParentParentParent.Localization).Hooks.useLocalization
 local useRobuxText = require(ParentParent.Generic.Hooks.useRobuxText)
 local FFlagUnifiedPurchaseFlowMarketplaceUIImprovements = require(ParentParent.Parent.SharedFlags).FFlagUnifiedPurchaseFlowMarketplaceUIImprovements
-local FFlagUnifiedPurchaseFlowLowercaseTotalPrice = require(ParentParent.Flags.FFlagUnifiedPurchaseFlowLowercaseTotalPrice)
 
 require(ParentParent.ProductPurchase.PricingTypes)
 
-return function(t1: {[any]: any}) -- line: 31
-	-- upvalues: useLocalization (copy), FFlagUnifiedPurchaseFlowMarketplaceUIImprovements (copy), FFlagUnifiedPurchaseFlowLowercaseTotalPrice (copy), React (copy), formatNumber (copy), LocalizationService (copy), useRobuxText (copy), View (copy), FoundationText (copy)
-	local v14 = if not t1.itemPrice then t1.amount else t1.itemPrice.priceInRobux
-	local v15 = useLocalization({
+return function(t1: {[any]: any}) -- line: 29
+	-- upvalues: useLocalization (copy), FFlagUnifiedPurchaseFlowMarketplaceUIImprovements (copy), React (copy), formatNumber (copy), LocalizationService (copy), useRobuxText (copy), View (copy), FoundationText (copy)
+	local v13 = if not t1.itemPrice then t1.amount else t1.itemPrice.priceInRobux
+	local v14 = useLocalization({
 		Total = "Feature.Catalog.Label.TotalUnformatted",
-		TotalPrice = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then nil else not FFlagUnifiedPurchaseFlowLowercaseTotalPrice and "IAPExperience.PurchasePrompt.Label.TotalPrice" or "IAPExperience.PurchasePrompt.Label.TotalPriceV2"
+		TotalPrice = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then nil else "IAPExperience.PurchasePrompt.Label.TotalPriceV2"
 	})
-	local v16 = React.useMemo(function() -- line: 42
-		-- upvalues: formatNumber (copy), LocalizationService (copy), v14 (copy)
-		return utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, v14 or 0)
+	local v15 = React.useMemo(function() -- line: 38
+		-- upvalues: formatNumber (copy), LocalizationService (copy), v13 (copy)
+		return utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, v13 or 0)
 	end, {
-		v14,
+		v13,
 		LocalizationService.RobloxLocaleId
 	})
 
 	if FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then
-		v16 = useRobuxText(v14)
+		v15 = useRobuxText(v13)
 	end
 
 	return React.createElement(View, {
@@ -45,7 +44,7 @@ return function(t1: {[any]: any}) -- line: 31
 			}, {
 				RobuxAmount = React.createElement(FoundationText, {
 					LayoutOrder = 1,
-					Text = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then v15.Total else v15.TotalPrice,
+					Text = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then v14.Total else v14.TotalPrice,
 					tag = not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements and "auto-xy text-label-medium content-default text-align-x-left padding-y-xsmall" or "auto-xy text-title-medium content-default text-align-x-left padding-y-xsmall"
 				})
 			}),
@@ -57,12 +56,12 @@ return function(t1: {[any]: any}) -- line: 31
 				RobuxPrice = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then React.createElement(FoundationText, {
 					LayoutOrder = 2,
 					tag = "auto-xy text-label-medium content-emphasis text-align-x-right padding-y-xsmall",
-					Text = v16
+					Text = v15
 				}) else React.createElement(FoundationText, {
 					LayoutOrder = 2,
 					tag = "auto-xy text-title-medium content-emphasis text-align-x-right padding-y-xsmall",
 					RichText = true,
-					Text = v16
+					Text = v15
 				})
 			})
 		})

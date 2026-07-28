@@ -21,8 +21,9 @@ local EngineFeature = game:GetEngineFeature("WebViewRedesignEnabled")
 local FFlagAddGamepadBumperNavigation = require(ParentParentParent.SharedFlags).FFlagAddGamepadBumperNavigation
 local FFlagShrinkAppNavBar = require(ParentParentParent.SharedFlags).FFlagShrinkAppNavBar
 local FFlagEnableFlyoutOnNavRail = require(ParentParentParent.SharedFlags).FFlagEnableFlyoutOnNavRail
+local v24 = game:DefineFastFlag("AppNavBarGateFooterVisibleOnPlacement", false)
 
-local function addItems(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}, n1: number) -- line: 53
+local function addItems(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}, n1: number) -- line: 54
 	-- upvalues: Cryo (copy)
 	return Cryo.List.join(t1, t3, t2), n1 + #t1
 end
@@ -33,159 +34,164 @@ local t4 = {
 	clipsDescendants = true
 }
 
-local function AppNavBar(t5: {[any]: any}) -- line: 70
-	-- upvalues: Cryo (copy), t4 (copy), useAppPolicy (copy), useRoactService (copy), RoactServiceTags (copy), React (copy), StudioCTAIcon (copy), EngineFeature (copy), Constants (copy), FFlagEnableFlyoutOnNavRail (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), getScrollAwayEnabled (copy), VisibilityControl (copy), AppNavTelemetry (copy), Placement (copy), NavigationBar (copy), NavigationBarAlignment (copy), NavigationRailV2 (copy), NavigationRailAlignment (copy), FFlagAddGamepadBumperNavigation (copy)
-	local v32 = Cryo.Dictionary.join(t4, t5)
-	local v33 = useAppPolicy(function(p1) -- line: 74
+local function AppNavBar(t5: {[any]: any}) -- line: 71
+	-- upvalues: Cryo (copy), t4 (copy), useAppPolicy (copy), useRoactService (copy), RoactServiceTags (copy), React (copy), StudioCTAIcon (copy), EngineFeature (copy), Constants (copy), FFlagEnableFlyoutOnNavRail (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), getScrollAwayEnabled (copy), VisibilityControl (copy), v24 (copy), Placement (copy), AppNavTelemetry (copy), NavigationBar (copy), NavigationBarAlignment (copy), NavigationRailV2 (copy), NavigationRailAlignment (copy), FFlagAddGamepadBumperNavigation (copy)
+	local v33 = Cryo.Dictionary.join(t4, t5)
+	local v34 = useAppPolicy(function(p1) -- line: 75
 		return p1.getShowStudioCTA()
 	end)
-	local v34 = useRoactService(RoactServiceTags.AppEventIngestService)
-	local v35 = useRoactService(RoactServiceTags.AppLinking)
-	local v36 = React.useCallback(function(_: boolean, p2) -- line: 79
+	local v35 = useRoactService(RoactServiceTags.AppEventIngestService)
+	local v36 = useRoactService(RoactServiceTags.AppLinking)
+	local v37 = React.useCallback(function(_: boolean, p2) -- line: 80
 		-- upvalues: React (copy), StudioCTAIcon (copy), EngineFeature (copy), t5 (copy)
 		return React.createElement(StudioCTAIcon, {
 			controlState = p2,
 			showTooltip = if not EngineFeature then nil else t5.showTooltip
 		})
 	end, { if not EngineFeature then nil else t5.showTooltip })
-	local v37 = React.useCallback(function() -- line: 85
-		-- upvalues: v34 (copy), Constants (copy), v32 (copy), v35 (copy)
-		v34:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_OPEN)
+	local v38 = React.useCallback(function() -- line: 86
+		-- upvalues: v35 (copy), Constants (copy), v33 (copy), v36 (copy)
+		v35:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_OPEN)
 
-		local v53 = v32.buildCreatorWebNavUrl({
+		local v54 = v33.buildCreatorWebNavUrl({
 			utm_content = "side_bar_blue_icon"
 		})
 
-		v35:openURL(v53)
+		v36:openURL(v54)
 	end, {
-		v34,
 		v35,
-		v32.buildCreatorWebNavUrl
+		v36,
+		v33.buildCreatorWebNavUrl
 	})
-	local u44, u45
+	local u45, u46
 
 	if FFlagEnableFlyoutOnNavRail then
 		local t6 = {}
 		local t7 = {}
 
-		if v32.menuItem ~= nil then
-			table.insert(t6, v32.menuItem)
+		if v33.menuItem ~= nil then
+			table.insert(t6, v33.menuItem)
 		end
 
-		if v33 then
+		if v34 then
 			table.insert(t7, {
 				isSecondary = true,
-				renderIcon = v36,
-				onActivated = v37
+				renderIcon = v37,
+				onActivated = v38
 			})
 		end
 
-		local items = v32.items
-		local selectedIndex = v32.selectedIndex
-		local v42 = Cryo.List.join(t6, items, t7)
-		local v43 = selectedIndex + #t6
+		local items = v33.items
+		local selectedIndex = v33.selectedIndex
+		local v43 = Cryo.List.join(t6, items, t7)
+		local v44 = selectedIndex + #t6
 
-		u44 = v42
 		u45 = v43
+		u46 = v44
 	else
-		u44 = v32.items
-		u45 = v32.selectedIndex
+		u45 = v33.items
+		u46 = v33.selectedIndex
 
-		if v33 then
-			u44 = Cryo.List.join(u44)
-			table.insert(u44, {
+		if v34 then
+			u45 = Cryo.List.join(u45)
+			table.insert(u45, {
 				isSecondary = true,
-				renderIcon = v36,
-				onActivated = v37
+				renderIcon = v37,
+				onActivated = v38
 			})
 		end
 	end
 
-	local v46 = nil
-	local v47 = React.useCallback(function(p3, b2: boolean) -- line: 127
-		-- upvalues: React (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), v32 (copy)
+	local v47 = nil
+	local v48 = React.useCallback(function(p3, b2: boolean) -- line: 128
+		-- upvalues: React (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), v33 (copy)
 		return React.createElement(AppNavItem, {
 			isCenterPositioned = true,
 			hasLabel = true,
 			item = p3,
 			isChecked = b2,
-			systemBarLabelTextSizeBinding = if not FFlagShrinkAppNavBar then v32.systemBarLabelTextSizeBinding else nil
+			systemBarLabelTextSizeBinding = if not FFlagShrinkAppNavBar then v33.systemBarLabelTextSizeBinding else nil
 		})
-	end, { v32.systemBarLabelTextSizeBinding })
-	local v48 = React.useCallback(function(p4, b3: boolean) -- line: 137
-		-- upvalues: React (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), v32 (copy)
+	end, { v33.systemBarLabelTextSizeBinding })
+	local v49 = React.useCallback(function(p4, b3: boolean) -- line: 138
+		-- upvalues: React (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), v33 (copy)
 		return React.createElement(AppNavItem, {
 			isCenterPositioned = false,
 			hasLabel = true,
 			item = p4,
 			isChecked = b3,
-			systemBarLabelTextSizeBinding = if not FFlagShrinkAppNavBar then v32.systemBarLabelTextSizeBinding else nil
+			systemBarLabelTextSizeBinding = if not FFlagShrinkAppNavBar then v33.systemBarLabelTextSizeBinding else nil
 		})
-	end, { v32.systemBarLabelTextSizeBinding })
-	local v49 = nil
+	end, { v33.systemBarLabelTextSizeBinding })
+	local v50 = nil
 
 	if getScrollAwayEnabled() then
-		v49 = VisibilityControl.getFooterBinding()
-		React.useEffect(function() -- line: 150
-			-- upvalues: VisibilityControl (copy), v32 (copy)
-			VisibilityControl.setFooterVisible(v32.isVisible)
-		end, { v32.isVisible })
+		v50 = VisibilityControl.getFooterBinding()
+		React.useEffect(function() -- line: 152
+			-- upvalues: v24 (copy), v33 (copy), Placement (copy), VisibilityControl (copy)
+			local v59 = if not v24 then v33.isVisible else v33.isVisible and v33.placement == Placement.Bottom
+
+			VisibilityControl.setFooterVisible(v59)
+		end, {
+			v33.isVisible,
+			if not v24 then nil else v33.placement
+		})
 	end
 
-	React.useEffect(function() -- line: 155
-		-- upvalues: FFlagEnableFlyoutOnNavRail (copy), u44 (ref), u45 (ref), v32 (copy), AppNavTelemetry (copy)
-		local v58 = if not FFlagEnableFlyoutOnNavRail then v32.items[v32.selectedIndex] else u44[u45]
+	React.useEffect(function() -- line: 162
+		-- upvalues: FFlagEnableFlyoutOnNavRail (copy), u45 (ref), u46 (ref), v33 (copy), AppNavTelemetry (copy)
+		local v60 = if not FFlagEnableFlyoutOnNavRail then v33.items[v33.selectedIndex] else u45[u46]
 
-		if v58 ~= nil and v58.page ~= nil then
-			AppNavTelemetry.logSwitchTabEnd(v58.page)
+		if v60 ~= nil and v60.page ~= nil then
+			AppNavTelemetry.logSwitchTabEnd(v60.page)
 		end
 	end, if not FFlagEnableFlyoutOnNavRail then {
-		v32.items,
-		v32.selectedIndex
+		v33.items,
+		v33.selectedIndex
 	} else {
-		u44,
-		u45
+		u45,
+		u46
 	})
-	React.useEffect(function() -- line: 176
-		-- upvalues: AppNavTelemetry (copy), v32 (copy)
-		AppNavTelemetry.logVisibilityEnd(v32.isVisible)
-	end, { v32.isVisible })
-	React.useEffect(function() -- line: 179
-		-- upvalues: AppNavTelemetry (copy), v32 (copy)
-		AppNavTelemetry.logPlacement(v32.placement)
-	end, { v32.placement })
+	React.useEffect(function() -- line: 183
+		-- upvalues: AppNavTelemetry (copy), v33 (copy)
+		AppNavTelemetry.logVisibilityEnd(v33.isVisible)
+	end, { v33.isVisible })
+	React.useEffect(function() -- line: 186
+		-- upvalues: AppNavTelemetry (copy), v33 (copy)
+		AppNavTelemetry.logPlacement(v33.placement)
+	end, { v33.placement })
 
-	if v32.placement == Placement.Bottom then
-		v46 = React.createElement(NavigationBar, {
+	if v33.placement == Placement.Bottom then
+		v47 = React.createElement(NavigationBar, {
 			animated = true,
 			active = true,
 			alignment = NavigationBarAlignment.EvenlyDistributed,
-			items = u44,
-			isVisible = v32.isVisible,
-			size = v32.size,
-			renderItem = v47,
-			position = v32.position,
-			selection = u45,
-			clipsDescendants = v32.clipsDescendants,
-			visibility = v49
+			items = u45,
+			isVisible = v33.isVisible,
+			size = v33.size,
+			renderItem = v48,
+			position = v33.position,
+			selection = u46,
+			clipsDescendants = v33.clipsDescendants,
+			visibility = v50
 		})
-	elseif v32.placement == Placement.Left then
-		v46 = React.createElement(NavigationRailV2, {
+	elseif v33.placement == Placement.Left then
+		v47 = React.createElement(NavigationRailV2, {
 			animated = true,
 			alignment = NavigationRailAlignment.Justified,
-			items = u44,
-			renderItem = v48,
-			size = v32.size,
-			isVisible = v32.isVisible,
-			position = v32.position,
-			selection = u45,
-			clipsDescendants = v32.clipsDescendants,
-			leadingComponent = if not FFlagAddGamepadBumperNavigation then nil else v32.leadingComponent,
-			trailingComponent = if not FFlagAddGamepadBumperNavigation then nil else v32.trailingComponent
+			items = u45,
+			renderItem = v49,
+			size = v33.size,
+			isVisible = v33.isVisible,
+			position = v33.position,
+			selection = u46,
+			clipsDescendants = v33.clipsDescendants,
+			leadingComponent = if not FFlagAddGamepadBumperNavigation then nil else v33.leadingComponent,
+			trailingComponent = if not FFlagAddGamepadBumperNavigation then nil else v33.trailingComponent
 		})
 	end
 
-	return v46
+	return v47
 end
 
 return React.memo(AppNavBar)

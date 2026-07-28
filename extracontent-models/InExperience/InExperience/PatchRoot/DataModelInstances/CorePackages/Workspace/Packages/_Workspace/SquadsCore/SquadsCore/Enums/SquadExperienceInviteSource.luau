@@ -1,4 +1,5 @@
 return {
 	Default = "Default",
-	Regroup = "Regroup"
+	Regroup = "Regroup",
+	LuckyRecommendation = "LuckyRecommendation"
 }

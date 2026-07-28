@@ -1,5 +1,4 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local Flags = require(Foundation.Utility.Flags)
 local ChipSize = require(Foundation.Enums.ChipSize)
 local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 
@@ -7,7 +6,7 @@ require(Foundation.Providers.Style.Tokens)
 
 local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 
-local function variantsFactory(p1) -- line: 19
+local function variantsFactory(p1) -- line: 17
 	-- upvalues: ChipSize (copy)
 	local t1 = {
 		Default = {
@@ -52,21 +51,21 @@ local function variantsFactory(p1) -- line: 19
 	}
 end
 
-return function(p2, p3, b1: boolean, b2: boolean) -- line: 67
-	-- upvalues: VariantsContext (copy), variantsFactory (copy), Flags (copy), composeStyleVariant (copy)
-	local v14 = VariantsContext.useVariants("ChipAccessory", variantsFactory, p2)
-	local v15 = not b2 and "Default" or "Circular"
-	local v16 = not (if not Flags.FoundationChipBeta then b2 else b1) and "Trailing" or "Leading"
+return function(p2, p3, b1: boolean, b2: boolean) -- line: 65
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
+	local v13 = VariantsContext.useVariants("ChipAccessory", variantsFactory, p2)
+	local v14 = not b2 and "Default" or "Circular"
+	local v15 = not b1 and "Trailing" or "Leading"
 
 	return composeStyleVariant({
 		accessory = {
-			Size = v14.accessorySize[v15][p3],
+			Size = v13.accessorySize[v14][p3],
 			padding = if not b1 then {
-				left = v14.textSpacing[v16][p3],
-				right = v14.accessorySpacing[v15][p3]
+				left = v13.textSpacing[v15][p3],
+				right = v13.accessorySpacing[v14][p3]
 			} else {
-				left = v14.accessorySpacing[v15][p3],
-				right = v14.textSpacing[v16][p3]
+				left = v13.accessorySpacing[v14][p3],
+				right = v13.textSpacing[v15][p3]
 			}
 		}
 	})

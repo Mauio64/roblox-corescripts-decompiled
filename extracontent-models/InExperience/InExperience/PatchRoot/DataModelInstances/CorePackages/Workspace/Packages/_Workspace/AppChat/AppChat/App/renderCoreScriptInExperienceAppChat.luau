@@ -12,14 +12,16 @@ local InExperienceAppChat = require(AppChat.App.InExperienceAppChat)
 local InExperienceAppChatProviders = require(AppChat.App.InExperienceAppChatProviders)
 local FFlagAppChatSignalsMessageStore = require(AppChat.Flags.FFlagAppChatSignalsMessageStore)
 local FFlagAppChatConversationStore = require(AppChat.Flags.FFlagAppChatConversationStore)
+local FFlagExpChatEnableFriendsTab = require(AppChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
+local ChatModerationStatusHydrationMiddleware = require(AppChat.Middleware.ChatModerationStatusHydrationMiddleware)
 local SignalsConversationMiddleware = require(AppChat.Middleware.SignalsConversationMiddleware)
 local SignalsMessageIngestionMiddleware = require(AppChat.Middleware.SignalsMessageIngestionMiddleware)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
 
-return function(p1, p2, p3) -- line: 28
-	-- upvalues: CoreGui (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), ChatPlacementContext (copy), ReactRoblox (copy), Rodux (copy), FFlagAppChatSignalsMessageStore (copy), SignalsMessageIngestionMiddleware (copy), FFlagAppChatConversationStore (copy), SignalsConversationMiddleware (copy), AppChatReducer (copy), ReactFocusNavigation (copy), React (copy), Provider (copy), InExperienceAppChatProviders (copy), InExperienceAppChat (copy)
+return function(p1, p2, p3) -- line: 30
+	-- upvalues: CoreGui (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), ChatPlacementContext (copy), ReactRoblox (copy), Rodux (copy), FFlagAppChatSignalsMessageStore (copy), SignalsMessageIngestionMiddleware (copy), FFlagAppChatConversationStore (copy), SignalsConversationMiddleware (copy), FFlagExpChatEnableFriendsTab (copy), AppChat (copy), ChatModerationStatusHydrationMiddleware (copy), AppChatReducer (copy), ReactFocusNavigation (copy), React (copy), Provider (copy), InExperienceAppChatProviders (copy), InExperienceAppChat (copy)
 	local Folder = Instance.new("Folder")
 
 	Folder.Name = "AppChat"
@@ -31,7 +33,7 @@ return function(p1, p2, p3) -- line: 28
 		})
 	end
 
-	local v24 = ReactRoblox.createRoot(Folder)
+	local v26 = ReactRoblox.createRoot(Folder)
 	local t1 = { Rodux.thunkMiddleware }
 
 	if FFlagAppChatSignalsMessageStore then
@@ -42,17 +44,22 @@ return function(p1, p2, p3) -- line: 28
 		table.insert(t1, SignalsConversationMiddleware)
 	end
 
-	local v26 = Rodux.Store.new(AppChatReducer, nil, t1)
-	local v27 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+	if FFlagExpChatEnableFriendsTab then
+		table.insert(t1, require(AppChat.Middleware.SignalsFriendsChatSettingsMiddleware))
+		table.insert(t1, ChatModerationStatusHydrationMiddleware)
+	end
 
-	local function AppChatMainWithFocusRoot() -- line: 64
-		-- upvalues: React (copy), ReactFocusNavigation (copy), v27 (copy), Provider (copy), InExperienceAppChatProviders (copy), v26 (copy), p3 (copy), p2 (copy), p1 (copy), InExperienceAppChat (copy)
+	local v28 = Rodux.Store.new(AppChatReducer, nil, t1)
+	local v29 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+
+	local function AppChatMainWithFocusRoot() -- line: 72
+		-- upvalues: React (copy), ReactFocusNavigation (copy), v29 (copy), Provider (copy), InExperienceAppChatProviders (copy), v28 (copy), p3 (copy), p2 (copy), p1 (copy), InExperienceAppChat (copy)
 		return React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
-			value = v27
+			value = v29
 		}, {
 			FocusNavigationRegistryProvider = React.createElement(Provider, nil, {
 				InExperienceAppChatProviders = React.createElement(InExperienceAppChatProviders, {
-					store = v26,
+					store = v28,
 					updateAppChatUnreadMessagesCount = p3,
 					parentContainerContext = p2,
 					apolloClient = p1
@@ -63,7 +70,7 @@ return function(p1, p2, p3) -- line: 28
 		})
 	end
 
-	v24:render((AppChatMainWithFocusRoot()))
+	v26:render((AppChatMainWithFocusRoot()))
 
-	return v24
+	return v26
 end

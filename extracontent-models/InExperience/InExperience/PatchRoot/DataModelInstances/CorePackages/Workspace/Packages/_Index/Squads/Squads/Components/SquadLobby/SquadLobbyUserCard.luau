@@ -14,6 +14,9 @@ local React = dependencies.React
 local SharedFlags = dependencies.SharedFlags
 local useLocalization = dependencies.Hooks.useLocalization
 local useSelector = dependencies.Hooks.useSelector
+local FFlagSquadsPresenceStoreMigration = require(SquadsParent.SquadsCore.Flags).FFlagSquadsPresenceStoreMigration
+local v18 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.FriendsCommon).Hooks.useGetPresenceByUserId
+local v19 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.DataHydration).Presence.PresenceEnums.PresenceType
 local useParticipant = CrossExperienceVoice.Hooks.useParticipant
 local useIsVoiceConnected = CrossExperienceVoice.Hooks.useIsVoiceConnected
 local useIsActiveParticipant = CrossExperienceVoice.Hooks.useIsActiveParticipant
@@ -36,124 +39,133 @@ local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 require(Squads.Common.ModelTypes)
 
 local SquadUserPartyStatus = require(Squads.Enums.SquadUserPartyStatus)
-local v36 = game:DefineFastInt("PartyVoiceActivityIndicatorDebounceMs", 100)
-local v37 = game:DefineFastInt("PartyVoiceActivityIndicatorAnimationMs", 100)
+local v39 = game:DefineFastInt("PartyVoiceActivityIndicatorDebounceMs", 100)
+local v40 = game:DefineFastInt("PartyVoiceActivityIndicatorAnimationMs", 100)
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
 local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
 local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
 
-return function(t1: {[any]: any}) -- line: 76
-	-- upvalues: useLocalization (copy), useTokens (copy), useAnimatedTransparency (copy), v37 (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), UserProfiles (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), React (copy), useSelector (copy), PresenceType (copy), useLocalUserId (copy), GetFFlagEnableCrossExpVoice (copy), useIsVoiceConnected (copy), useIsMicPermissionsError (copy), useParticipant (copy), useIsVoiceConnecting (copy), useIsActiveParticipant (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), useIsParticipantMutedLocally (copy), useIsParticipantMuted (copy), useIsParticipantInOtherAudioContext (copy), FFlagEnablePartyVoiceChangersInLua (copy), CrossExperienceVoice (copy), v36 (copy), SquadUserPartyStatus (copy), Foundation (copy), IconSize (copy), BuilderIcons (copy), FFlagEnableSquadUserCardHoverFix (copy), useSquadUserDropdownMenuButtons (copy), ImageSetLabel (copy)
-	local v42 = useLocalization({
+return function(t1: {[any]: any}) -- line: 84
+	-- upvalues: useLocalization (copy), useTokens (copy), useAnimatedTransparency (copy), v40 (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), UserProfiles (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), React (copy), FFlagSquadsPresenceStoreMigration (copy), v18 (copy), useSelector (copy), v19 (copy), PresenceType (copy), useLocalUserId (copy), GetFFlagEnableCrossExpVoice (copy), useIsVoiceConnected (copy), useIsMicPermissionsError (copy), useParticipant (copy), useIsVoiceConnecting (copy), useIsActiveParticipant (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), useIsParticipantMutedLocally (copy), useIsParticipantMuted (copy), useIsParticipantInOtherAudioContext (copy), FFlagEnablePartyVoiceChangersInLua (copy), CrossExperienceVoice (copy), v39 (copy), SquadUserPartyStatus (copy), Foundation (copy), IconSize (copy), BuilderIcons (copy), FFlagEnableSquadUserCardHoverFix (copy), useSquadUserDropdownMenuButtons (copy), ImageSetLabel (copy)
+	local v45 = useLocalization({
 		connectingText = "Feature.Squads.Label.Connecting",
 		inExperiencePresenceText = "Common.Presence.Label.InExperience",
 		invitedText = "Feature.Squads.Description.Invited",
 		noResponseText = "Feature.Squads.Description.NoResponse",
 		onlinePresenceText = "Common.Presence.Label.Online"
 	})
-	local v43 = useTokens()
-	local v44, v45 = useAnimatedTransparency(1, v37, Enum.EasingStyle.Cubic)
-	local v46 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else tostring(t1.user.userId))
-	local v47 = UserProfiles.Hooks.useUserProfilesFetch({
+	local v46 = useTokens()
+	local v47, v48 = useAnimatedTransparency(1, v40, Enum.EasingStyle.Cubic)
+	local v49 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else tostring(t1.user.userId))
+	local v50 = UserProfiles.Hooks.useUserProfilesFetch({
 		userIds = { (tostring(t1.user.userId)) },
 		query = UserProfiles.Queries.userProfilesCombinedNameByUserIds
 	})
 	local s1 = ""
 
-	if v47.data then
-		s1 = UserProfiles.Selectors.getCombinedNameFromId(v47.data, t1.user.userId)
+	if v50.data then
+		s1 = UserProfiles.Selectors.getCombinedNameFromId(v50.data, t1.user.userId)
 	end
 
-	local v49 = getStandardSizeAvatarHeadShotRbxthumb((tostring(t1.user.userId)))
-	local v50 = React.useCallback(function(p1) -- line: 103
+	local v52 = getStandardSizeAvatarHeadShotRbxthumb((tostring(t1.user.userId)))
+	local v53 = React.useCallback(function(p1) -- line: 111
 		-- upvalues: t1 (copy)
 		return p1.Squad.Presence.byUserId[tostring(t1.user.userId)]
 	end, { t1.user.userId })
-	local v51 = useSelector(v50)
-	local v52 = v51 and v51.userPresenceType == PresenceType.InGame
-	local u53 = if not v52 then v42.onlinePresenceText else if not v51.lastLocation or v51.lastLocation == "" then v42.inExperiencePresenceText else v51.lastLocation
+	local v54 = if not FFlagSquadsPresenceStoreMigration then useSelector(v53) else v18((tostring(t1.user.userId)))
+	local v55 = v54 and v54.userPresenceType == if not FFlagSquadsPresenceStoreMigration then PresenceType.InGame else v19.InGame
+	local u57
+
+	if v55 then
+		local v56 = if not FFlagSquadsPresenceStoreMigration then v54.lastLocation else v54 and v54.lastLocation
+
+		u57 = if not v56 or v56 == "" then v45.inExperiencePresenceText else v56
+	else
+		u57 = v45.onlinePresenceText
+	end
+
 	local isConnecting = t1.isConnecting
-	local v55 = tonumber(useLocalUserId()) or 0
-	local v56 = v55 == t1.user.userId
-	local u57 = false
-	local u58 = false
-	local u59 = false
-	local u60 = false
+	local v59 = tonumber(useLocalUserId()) or 0
+	local v60 = v59 == t1.user.userId
 	local u61 = false
 	local u62 = false
 	local u63 = false
+	local u64 = false
+	local u65 = false
+	local u66 = false
+	local u67 = false
 
 	if GetFFlagEnableCrossExpVoice() then
-		local v64 = useIsVoiceConnected()
-		local v65 = useIsMicPermissionsError()
-		local v66 = useParticipant(t1.user.userId)
+		local v68 = useIsVoiceConnected()
+		local v69 = useIsMicPermissionsError()
+		local v70 = useParticipant(t1.user.userId)
 
-		u61 = useIsVoiceConnecting() and v56
-		u57 = useIsActiveParticipant(t1.user.userId)
+		u65 = useIsVoiceConnecting() and v60
+		u61 = useIsActiveParticipant(t1.user.userId)
 
-		local v67 = useIsLocalPlayerPartyVoiceEligible()
-		local v68 = useIsUserPartyVoiceEligible(t1.user.userId)
-		local v69 = useIsCurrentSquadPartyVoiceEligible() == true
-		local v70 = useIsParticipantMutedLocally(t1.user.userId) == true
+		local v71 = useIsLocalPlayerPartyVoiceEligible()
+		local v72 = useIsUserPartyVoiceEligible(t1.user.userId)
+		local v73 = useIsCurrentSquadPartyVoiceEligible() == true
+		local v74 = useIsParticipantMutedLocally(t1.user.userId) == true
 
-		u62 = v68 and (v69 and (not v56 and v70))
-		u60 = useIsParticipantMuted(t1.user.userId) and not u62
+		u66 = v72 and (v73 and (not v60 and v74))
+		u64 = useIsParticipantMuted(t1.user.userId) and not u66
 
-		local v71 = useIsParticipantInOtherAudioContext(v55, t1.user.userId) == true
+		local v75 = useIsParticipantInOtherAudioContext(v59, t1.user.userId) == true
 
-		u58 = v69 and (v67 and (v68 and (not v64 or (not v66 or (v71 or v65)))))
-		u59 = v69 and (v67 and not v68)
-		u63 = not not FFlagEnablePartyVoiceChangersInLua and (not not v66 and v66.isVoiceChangerActive)
+		u62 = v73 and (v71 and (v72 and (not v68 or (not v70 or (v75 or v69)))))
+		u63 = v73 and (v71 and not v72)
+		u67 = not not FFlagEnablePartyVoiceChangersInLua and (not not v70 and v70.isVoiceChangerActive)
 	end
 
-	local v72 = React.useMemo(function() -- line: 170
-		-- upvalues: CrossExperienceVoice (copy), v45 (copy), v36 (copy)
-		return CrossExperienceVoice.Utils.debounce(function(n1: number) -- line: 171
-			-- upvalues: v45 (copy)
-			v45(n1)
-		end, v36)
+	local v76 = React.useMemo(function() -- line: 186
+		-- upvalues: CrossExperienceVoice (copy), v48 (copy), v39 (copy)
+		return CrossExperienceVoice.Utils.debounce(function(n1: number) -- line: 187
+			-- upvalues: v48 (copy)
+			v48(n1)
+		end, v39)
 	end, {})
 
-	React.useEffect(function() -- line: 176
-		-- upvalues: GetFFlagEnableCrossExpVoice (copy), u57 (ref), v72 (copy), v45 (copy)
+	React.useEffect(function() -- line: 192
+		-- upvalues: GetFFlagEnableCrossExpVoice (copy), u61 (ref), v76 (copy), v48 (copy)
 		if GetFFlagEnableCrossExpVoice() then
-			if u57 then
-				v72.cancel()
-				v45(0)
+			if u61 then
+				v76.cancel()
+				v48(0)
 
 				return
 			end
 
-			v72.call(1)
+			v76.call(1)
 		end
-	end, { u57 })
+	end, { u61 })
 
-	local v73 = React.useMemo(function() -- line: 188
-		-- upvalues: t1 (copy), SquadUserPartyStatus (copy), v42 (copy), isConnecting (copy), u61 (ref), u53 (ref)
+	local v77 = React.useMemo(function() -- line: 204
+		-- upvalues: t1 (copy), SquadUserPartyStatus (copy), v45 (copy), isConnecting (copy), u65 (ref), u57 (ref)
 		if t1.user.partyStatus == SquadUserPartyStatus.NoResponse then
-			return v42.noResponseText
+			return v45.noResponseText
 		end
 
 		if t1.user.partyStatus == SquadUserPartyStatus.Invited then
-			return v42.invitedText
+			return v45.invitedText
 		end
 
-		if isConnecting or u61 then
-			return v42.connectingText
+		if isConnecting or u65 then
+			return v45.connectingText
 		end
 
-		return u53
+		return u57
 	end, {
 		t1.user and t1.user.partyStatus,
-		u53,
+		u57,
 		isConnecting,
-		u61,
-		v42.noResponse,
-		v42.invitedText,
-		v42.connectingText
+		u65,
+		v45.noResponse,
+		v45.invitedText,
+		v45.connectingText
 	})
-	local v74 = React.useMemo(function() -- line: 210
-		-- upvalues: t1 (copy), SquadUserPartyStatus (copy), React (copy), Foundation (copy), IconSize (copy), v43 (copy), isConnecting (copy), u61 (ref), v52 (copy)
+	local v78 = React.useMemo(function() -- line: 226
+		-- upvalues: t1 (copy), SquadUserPartyStatus (copy), React (copy), Foundation (copy), IconSize (copy), v46 (copy), isConnecting (copy), u65 (ref), v55 (copy)
 		if t1.user.partyStatus == SquadUserPartyStatus.Invited then
 			return React.createElement(Foundation.View, {
 				tag = "auto-xy"
@@ -161,7 +173,7 @@ return function(t1: {[any]: any}) -- line: 76
 				LoadingIcon = React.createElement(Foundation.Loading, {
 					LayoutOrder = 1,
 					size = IconSize.Small,
-					Padding = v43.Padding.XSmall
+					Padding = v46.Padding.XSmall
 				})
 			})
 		end
@@ -170,24 +182,24 @@ return function(t1: {[any]: any}) -- line: 76
 			return nil
 		end
 
-		if isConnecting or u61 then
+		if isConnecting or u65 then
 			return React.createElement(Foundation.View, {
 				tag = "auto-xy"
 			}, {
 				LoadingIcon = React.createElement(Foundation.Loading, {
 					LayoutOrder = 1,
 					size = IconSize.Small,
-					Padding = v43.Padding.XSmall
+					Padding = v46.Padding.XSmall
 				})
 			})
 		end
 
-		if v52 then
+		if v55 then
 			return React.createElement(Foundation.Icon, {
 				LayoutOrder = 1,
 				name = "icons/common/play",
 				size = IconSize.Small,
-				style = v43.Color.Content.Emphasis
+				style = v46.Color.Content.Emphasis
 			})
 		end
 
@@ -195,11 +207,11 @@ return function(t1: {[any]: any}) -- line: 76
 	end, {
 		t1.user and t1.user.partyStatus,
 		isConnecting,
-		u61,
-		v52
+		u65,
+		v55
 	})
-	local v75 = React.useMemo(function() -- line: 242
-		-- upvalues: s1 (ref), React (copy), v43 (copy), t1 (copy), Foundation (copy), IconSize (copy), u62 (ref), u60 (ref), u58 (ref), u59 (ref), FFlagEnablePartyVoiceChangersInLua (copy), u63 (ref), BuilderIcons (copy), FFlagEnableBlackbirdCheck (copy), v46 (copy)
+	local v79 = React.useMemo(function() -- line: 258
+		-- upvalues: s1 (ref), React (copy), v46 (copy), t1 (copy), Foundation (copy), IconSize (copy), u66 (ref), u64 (ref), u62 (ref), u63 (ref), FFlagEnablePartyVoiceChangersInLua (copy), u67 (ref), BuilderIcons (copy), FFlagEnableBlackbirdCheck (copy), v49 (copy)
 		if s1 ~= "" then
 			return (React.createElement("Frame", {
 				BackgroundTransparency = 1,
@@ -209,7 +221,7 @@ return function(t1: {[any]: any}) -- line: 76
 			}, {
 				UIListLayout = React.createElement("UIListLayout", {
 					FillDirection = Enum.FillDirection.Horizontal,
-					Padding = UDim.new(0, v43.Gap.XSmall + 2),
+					Padding = UDim.new(0, v46.Gap.XSmall + 2),
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					VerticalAlignment = Enum.VerticalAlignment.Center
 				}),
@@ -217,44 +229,44 @@ return function(t1: {[any]: any}) -- line: 76
 					LayoutOrder = 1,
 					name = "icons/status/unavailable_small",
 					size = IconSize.Small,
-					style = v43.Color.Extended.Red.Red_800
+					style = v46.Color.Extended.Red.Red_800
 				}),
-				MutedLocallyIcon = if not u62 then nil else React.createElement(Foundation.Icon, {
+				MutedLocallyIcon = if not u66 then nil else React.createElement(Foundation.Icon, {
 					LayoutOrder = 2,
 					name = "icons/controls/voice/microphone_off_small_dark",
 					size = IconSize.Small,
-					style = v43.Color.Extended.Red.Red_800
+					style = v46.Color.Extended.Red.Red_800
 				}),
-				MutedIcon = if not u60 then nil else React.createElement(Foundation.Icon, {
+				MutedIcon = if not u64 then nil else React.createElement(Foundation.Icon, {
 					LayoutOrder = 3,
 					name = "icons/controls/microphoneMute_small",
 					size = IconSize.Small,
-					style = v43.Color.Content.Emphasis
+					style = v46.Color.Content.Emphasis
 				}),
-				NotVoiceParticipantIcon = if not u58 then nil else React.createElement(Foundation.Icon, {
+				NotVoiceParticipantIcon = if not u62 then nil else React.createElement(Foundation.Icon, {
 					LayoutOrder = 4,
 					name = "icons/controls/headphoneDeafen_small",
 					size = IconSize.Small,
-					style = v43.Color.Content.Emphasis
+					style = v46.Color.Content.Emphasis
 				}),
-				NotEligibleVoiceParticipant = if not u59 then nil else React.createElement(Foundation.Icon, {
+				NotEligibleVoiceParticipant = if not u63 then nil else React.createElement(Foundation.Icon, {
 					LayoutOrder = 5,
 					name = "icons/controls/headphoneDeafen_small",
 					size = IconSize.Small,
-					style = v43.Color.System.Warning
+					style = v46.Color.System.Warning
 				}),
-				VoiceChangerActiveIcon = if not FFlagEnablePartyVoiceChangersInLua or not u63 then nil else React.createElement(Foundation.Icon, {
+				VoiceChangerActiveIcon = if not FFlagEnablePartyVoiceChangersInLua or not u67 then nil else React.createElement(Foundation.Icon, {
 					LayoutOrder = 6,
 					size = IconSize.Small,
 					name = BuilderIcons.Icon.DiamondSimplified,
-					style = v43.Color.Content.Emphasis
+					style = v46.Color.Content.Emphasis
 				}),
 				NameTextLabel = if FFlagEnableBlackbirdCheck then nil else React.createElement(Foundation.Text, {
 					TextWrapped = false,
 					AutomaticSize = Enum.AutomaticSize.Y,
-					backgroundStyle = v43.Color.None,
-					colorstyle = v43.Color.Content.Emphasis,
-					fontStyle = v43.Typography.TitleMedium,
+					backgroundStyle = v46.Color.None,
+					colorstyle = v46.Color.Content.Emphasis,
+					fontStyle = v46.Typography.TitleMedium,
 					LayoutOrder = not FFlagEnablePartyVoiceChangersInLua and 6 or 7,
 					Text = s1,
 					TextXAlignment = Enum.TextXAlignment.Left,
@@ -273,7 +285,7 @@ return function(t1: {[any]: any}) -- line: 76
 				}, {
 					Layout = React.createElement("UIListLayout", {
 						FillDirection = Enum.FillDirection.Horizontal,
-						Padding = UDim.new(0, v43.Gap.XSmall),
+						Padding = UDim.new(0, v46.Gap.XSmall),
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						VerticalAlignment = Enum.VerticalAlignment.Center
 					}),
@@ -284,9 +296,9 @@ return function(t1: {[any]: any}) -- line: 76
 						LayoutOrder = 1,
 						TextWrapped = false,
 						AutomaticSize = Enum.AutomaticSize.XY,
-						backgroundStyle = v43.Color.None,
-						colorstyle = v43.Color.Content.Emphasis,
-						fontStyle = v43.Typography.TitleMedium,
+						backgroundStyle = v46.Color.None,
+						colorstyle = v46.Color.Content.Emphasis,
+						fontStyle = v46.Typography.TitleMedium,
 						Text = s1,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						TextYAlignment = Enum.TextYAlignment.Center,
@@ -296,11 +308,11 @@ return function(t1: {[any]: any}) -- line: 76
 							FlexMode = Enum.UIFlexMode.Shrink
 						})
 					}),
-					SubscriptionBadge = if not v46 then nil else React.createElement(Foundation.Icon, {
+					SubscriptionBadge = if not v49 then nil else React.createElement(Foundation.Icon, {
 						LayoutOrder = 2,
 						size = IconSize.Small,
 						name = Foundation.Enums.IconName.RobloxPlus,
-						style = v43.Color.Content.Emphasis
+						style = v46.Color.Content.Emphasis
 					})
 				})
 			}))
@@ -309,17 +321,17 @@ return function(t1: {[any]: any}) -- line: 76
 		return nil
 	end, {
 		s1,
-		u60,
-		u62,
+		u64,
+		u66,
 		t1.isBlocked,
-		v43,
-		u58,
-		u59,
-		if not FFlagEnablePartyVoiceChangersInLua then nil else u63,
-		if not FFlagEnableBlackbirdCheck then nil else v46
+		v46,
+		u62,
+		u63,
+		if not FFlagEnablePartyVoiceChangersInLua then nil else u67,
+		if not FFlagEnableBlackbirdCheck then nil else v49
 	})
-	local v76 = React.useMemo(function() -- line: 378
-		-- upvalues: React (copy), v43 (copy), v74 (copy), Foundation (copy), v73 (copy)
+	local v80 = React.useMemo(function() -- line: 394
+		-- upvalues: React (copy), v46 (copy), v78 (copy), Foundation (copy), v77 (copy)
 		return React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
@@ -328,19 +340,19 @@ return function(t1: {[any]: any}) -- line: 76
 		}, {
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, v43.Gap.XSmall),
+				Padding = UDim.new(0, v46.Gap.XSmall),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center
 			}),
-			PresenceIcon = v74,
+			PresenceIcon = v78,
 			PresenceTextLabel = React.createElement(Foundation.Text, {
 				LayoutOrder = 2,
 				TextWrapped = false,
 				AutomaticSize = Enum.AutomaticSize.Y,
-				backgroundStyle = v43.Color.None,
-				colorstyle = v43.Color.Content.Default,
-				fontStyle = v43.Typography.BodyMedium,
-				Text = v73,
+				backgroundStyle = v46.Color.None,
+				colorstyle = v46.Color.Content.Default,
+				fontStyle = v46.Typography.BodyMedium,
+				Text = v77,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Center,
 				TextTruncate = Enum.TextTruncate.AtEnd
@@ -352,25 +364,25 @@ return function(t1: {[any]: any}) -- line: 76
 		})
 	end, {
 		isConnecting,
-		u61,
-		v52,
-		v42.connectingText,
-		u53,
-		v43,
-		v74,
-		v73
+		u65,
+		v55,
+		v45.connectingText,
+		u57,
+		v46,
+		v78,
+		v77
 	})
-	local v78
+	local v82
 
 	if FFlagEnableSquadUserCardHoverFix then
-		local v77 = #useSquadUserDropdownMenuButtons(t1.user.userId, t1.isInExperience) < 1
+		local v81 = #useSquadUserDropdownMenuButtons(t1.user.userId, t1.isInExperience) < 1
 
-		v78 = not v56 and not v77
+		v82 = not v60 and not v81
 	else
-		v78 = not v56
+		v82 = not v60
 	end
 
-	local v79 = React.useCallback(function() -- line: 431
+	local v83 = React.useCallback(function() -- line: 447
 		-- upvalues: t1 (copy)
 		if t1.onActivated then
 			t1.onActivated((tostring(t1.user.userId)))
@@ -383,19 +395,19 @@ return function(t1: {[any]: any}) -- line: 76
 	return React.createElement(Foundation.View, {
 		LayoutOrder = t1.layoutOrder,
 		Size = t1.size,
-		backgroundStyle = v43.Color.Surface.Surface_200,
-		cornerRadius = UDim.new(0, v43.Radius.Medium),
-		isDisabled = isConnecting or (u61 or (t1.user.partyStatus == SquadUserPartyStatus.Invited or t1.user.partyStatus == SquadUserPartyStatus.NoResponse)),
-		onActivated = if not t1.onActivated or not v78 then nil else v79
+		backgroundStyle = v46.Color.Surface.Surface_200,
+		cornerRadius = UDim.new(0, v46.Radius.Medium),
+		isDisabled = isConnecting or (u65 or (t1.user.partyStatus == SquadUserPartyStatus.Invited or t1.user.partyStatus == SquadUserPartyStatus.NoResponse)),
+		onActivated = if not t1.onActivated or not v82 then nil else v83
 	}, {
 		AvatarImage = React.createElement(ImageSetLabel, {
 			ZIndex = 0,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 			Size = UDim2.fromOffset(96, 96),
-			BackgroundColor3 = v43.Color.Shift.Shift_300.Color3,
-			BackgroundTransparency = v43.Color.Shift.Shift_300.Transparency,
-			Image = v49
+			BackgroundColor3 = v46.Color.Shift.Shift_300.Color3,
+			BackgroundTransparency = v46.Color.Shift.Shift_300.Transparency,
+			Image = v52
 		}, {
 			UICorner = React.createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
@@ -406,11 +418,11 @@ return function(t1: {[any]: any}) -- line: 76
 			Size = UDim2.fromScale(1, 0.5),
 			Position = UDim2.fromScale(0, 1),
 			AnchorPoint = Vector2.new(0, 1),
-			BackgroundColor3 = v43.Color.Surface.Surface_100.Color3,
-			BackgroundTransparency = v43.Color.Surface.Surface_100.Transparency
+			BackgroundColor3 = v46.Color.Surface.Surface_100.Color3,
+			BackgroundTransparency = v46.Color.Surface.Surface_100.Transparency
 		}, {
 			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v43.Radius.Medium)
+				CornerRadius = UDim.new(0, v46.Radius.Medium)
 			}),
 			UIGradient = React.createElement("UIGradient", {
 				Rotation = 90,
@@ -420,11 +432,11 @@ return function(t1: {[any]: any}) -- line: 76
 				})
 			}, {})
 		}),
-		InactiveOverlay = if not isConnecting and (not u58 and (not u61 and (t1.user.partyStatus ~= SquadUserPartyStatus.Invited and t1.user.partyStatus ~= SquadUserPartyStatus.NoResponse))) then nil else React.createElement(Foundation.View, {
+		InactiveOverlay = if not isConnecting and (not u62 and (not u65 and (t1.user.partyStatus ~= SquadUserPartyStatus.Invited and t1.user.partyStatus ~= SquadUserPartyStatus.NoResponse))) then nil else React.createElement(Foundation.View, {
 			tag = "size-full radius-medium",
 			backgroundStyle = {
 				Transparency = 0.25,
-				Color3 = v43.Color.Surface.Surface_100.Color3
+				Color3 = v46.Color.Surface.Surface_100.Color3
 			}
 		}, {}),
 		TextContainer = React.createElement("Frame", {
@@ -442,13 +454,13 @@ return function(t1: {[any]: any}) -- line: 76
 				VerticalAlignment = Enum.VerticalAlignment.Bottom
 			}),
 			UIPadding = React.createElement("UIPadding", {
-				PaddingBottom = UDim.new(0, v43.Padding.Medium),
-				PaddingLeft = UDim.new(0, v43.Padding.Medium),
-				PaddingRight = UDim.new(0, v43.Padding.Medium),
-				PaddingTop = UDim.new(0, v43.Padding.Medium)
+				PaddingBottom = UDim.new(0, v46.Padding.Medium),
+				PaddingLeft = UDim.new(0, v46.Padding.Medium),
+				PaddingRight = UDim.new(0, v46.Padding.Medium),
+				PaddingTop = UDim.new(0, v46.Padding.Medium)
 			}),
-			Name = v75,
-			Presence = if t1.isBlocked then nil else v76
+			Name = v79,
+			Presence = if t1.isBlocked then nil else v80
 		}),
 		ActiveBorder = React.createElement("Frame", {
 			BackgroundTransparency = 1,
@@ -458,12 +470,12 @@ return function(t1: {[any]: any}) -- line: 76
 			Size = UDim2.new(1, -8, 1, -8)
 		}, {
 			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v43.Radius.Medium - 4)
+				CornerRadius = UDim.new(0, v46.Radius.Medium - 4)
 			}),
 			UIStroke = React.createElement("UIStroke", {
 				Thickness = 4,
-				Color = v43.Color.Extended.Green.Green_800.Color3,
-				Transparency = v44
+				Color = v46.Color.Extended.Green.Green_800.Color3,
+				Transparency = v47
 			})
 		}),
 		DefaultBorder = React.createElement("Frame", {
@@ -474,18 +486,18 @@ return function(t1: {[any]: any}) -- line: 76
 			Size = UDim2.new(1, -2, 1, -2)
 		}, {
 			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v43.Radius.Medium - 1)
+				CornerRadius = UDim.new(0, v46.Radius.Medium - 1)
 			}),
 			UIStroke = React.createElement("UIStroke", {
 				Thickness = 1,
-				Color = v43.Color.Stroke.Default.Color3,
-				Transparency = v44:map(function(p2) -- line: 555
-					-- upvalues: v43 (copy)
+				Color = v46.Color.Stroke.Default.Color3,
+				Transparency = v47:map(function(p2) -- line: 571
+					-- upvalues: v46 (copy)
 					if p2 < 0.9 then
 						return 1
 					end
 
-					return v43.Color.Stroke.Default.Transparency
+					return v46.Color.Stroke.Default.Transparency
 				end)
 			})
 		})

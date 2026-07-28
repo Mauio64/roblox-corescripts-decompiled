@@ -17,7 +17,7 @@ local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
 local View = Foundation.View
 local Logger = require(ServerTriggeredModals.Logger)
 local reportPromptImpression = require(ServerTriggeredModals.reportPromptImpression)
-local sendModalImpressionEvent = require(ServerTriggeredModals.sendModalImpressionEvent)
+local sendModalImpressionEvent = require(ServerTriggeredModalsParent.ServerTriggeredModalImpressions).sendModalImpressionEvent
 local fetchPrompts = require(ServerTriggeredModals.SduiV2.fetchPrompts)
 
 require(ServerTriggeredModals.SduiV2.PromptsEntryPoint)

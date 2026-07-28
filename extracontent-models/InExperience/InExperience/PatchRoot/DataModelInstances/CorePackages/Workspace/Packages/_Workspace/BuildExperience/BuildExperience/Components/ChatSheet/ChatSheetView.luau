@@ -17,7 +17,7 @@ local v12 = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil 
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 
-local function ChatSheetContent(t1: {[any]: any}) -- line: 52
+local function ChatSheetContent(t1: {[any]: any}) -- line: 53
 	-- upvalues: React (copy), FFlagEnableBuildExperienceScrollPerformanceTracking (copy), v12 (copy), Sheet (copy)
 	local v18 = React.useRef(nil)
 
@@ -25,7 +25,7 @@ local function ChatSheetContent(t1: {[any]: any}) -- line: 52
 		v12("LuaApp_Build_Chat_Scroll", v18)
 	end
 
-	local v19 = React.useCallback(function(p1) -- line: 62
+	local v19 = React.useCallback(function(p1) -- line: 63
 		-- upvalues: v18 (copy), t1 (copy)
 		v18.current = p1
 		t1.setScrollingFrame(p1)
@@ -35,7 +35,7 @@ local function ChatSheetContent(t1: {[any]: any}) -- line: 52
 		scrollingFrameRef = if not FFlagEnableBuildExperienceScrollPerformanceTracking then t1.setScrollingFrame else v19
 	}, t1.children)
 end
-local function ChatSheetView(t2: {[any]: any}) -- line: 74
+local function ChatSheetView(t2: {[any]: any}) -- line: 75
 	-- upvalues: useTokens (copy), ChatMessageList (copy), React (copy), BuildEmptyState (copy), View (copy), Sheet (copy), ChatSheetContent (copy), ChatActions (copy), LocalizationStrings (copy), BuildPillMenuPortal (copy)
 	local v21 = useTokens()
 	local v22 = ChatMessageList({
@@ -78,6 +78,7 @@ local function ChatSheetView(t2: {[any]: any}) -- line: 74
 				textBoxRef = t2.textBoxRef,
 				isAssistantResponding = t2.isAssistantResponding,
 				canStopAssistantResponse = t2.canStopAssistantResponse,
+				canSendWhileResponding = t2.canSendWhileResponding,
 				onSend = t2.onSend,
 				onStop = t2.onStop
 			})

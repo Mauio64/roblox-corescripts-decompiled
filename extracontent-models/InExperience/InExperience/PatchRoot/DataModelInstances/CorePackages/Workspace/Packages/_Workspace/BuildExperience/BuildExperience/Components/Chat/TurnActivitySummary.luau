@@ -37,10 +37,10 @@ local function useReactiveValue(p1) -- line: 47
 
 	return (SignalsReact.useSignalState(v25))
 end
-local function createThinkingGradient(p3) -- line: 61
+local function createThinkingGradient(p3, b1: boolean) -- line: 61
 	-- upvalues: React (copy), chatConstants (copy)
 	return React.createElement("UIGradient", {
-		Enabled = true,
+		Enabled = b1,
 		Transparency = NumberSequence.new({
 			NumberSequenceKeypoint.new(0, 0.55),
 			NumberSequenceKeypoint.new(0.5, 0),
@@ -68,24 +68,24 @@ local function createActivityItem(p4, n3: number) -- line: 87
 
 	return nil
 end
-local function createActivitySummaryActionText(p5, n4: number, p6, b1: boolean?) -- line: 95
+local function createActivitySummaryActionText(p5, n4: number, p6, b2: boolean) -- line: 95
 	-- upvalues: React (copy), FoundationText (copy), createThinkingGradient (copy)
 	return React.createElement(FoundationText, {
 		tag = "size-full-0 auto-y text-body-medium text-no-wrap text-align-x-left text-truncate-end content-muted",
 		LayoutOrder = n4,
 		Text = p5,
 		Size = UDim2.new(1, 0, 0, 0)
-	}, if not b1 then nil else {
-		ThinkingGradient = createThinkingGradient(p6)
+	}, {
+		ThinkingGradient = createThinkingGradient(p6, b2)
 	})
 end
-local function getActivitySummaryActionText(s2: string, p7, t2: {[any]: any}) -- line: 117
+local function getActivitySummaryActionText(s2: string, p7, t2: {[any]: any}) -- line: 111
 	-- upvalues: chatConstants (copy)
 	if s2 ~= chatConstants.ASSISTANT_LOADING_TEXT then
 		return s2
 	end
 
-	return p7:map(function(n5: number) -- line: 126
+	return p7:map(function(n5: number) -- line: 120
 		-- upvalues: t2 (copy), chatConstants (copy)
 		if not t2.isThinking then
 			return chatConstants.ASSISTANT_LOADING_TEXT
@@ -95,156 +95,159 @@ local function getActivitySummaryActionText(s2: string, p7, t2: {[any]: any}) --
 			t2.startedAt = n5
 		end
 
-		local v73 = math.max(0, n5 - t2.startedAt)
+		local v76 = math.max(0, n5 - t2.startedAt)
 		local ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS = chatConstants.ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS
-		local v75 = if not (v73 >= chatConstants.ASSISTANT_THINKING_DURATION_SUFFIX_DELAY_SECONDS) then chatConstants.ASSISTANT_LOADING_TEXT else chatConstants.formatAssistantLoadingText(v73)
+		local v78 = if not (v76 >= chatConstants.ASSISTANT_THINKING_DURATION_SUFFIX_DELAY_SECONDS) then chatConstants.ASSISTANT_LOADING_TEXT else chatConstants.formatAssistantLoadingText(v76)
 
-		if math.floor(v73 / ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS) % 2 == 0 then
-			return v75
+		if math.floor(v76 / ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS) % 2 == 0 then
+			return v78
 		end
 
 		return chatConstants.ASSISTANT_STILL_WORKING_TEXT
 	end)
 end
-local function TurnActivitySummary(t3: {[any]: any}) -- line: 144
+local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 	-- upvalues: useReactiveValue (copy), t1 (copy), React (copy), Foundation (copy), chatConstants (copy), turnDisplay (copy), FoundationText (copy), View (copy), createActivitySummaryActionText (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), ScrollView (copy)
 	local segment = t3.segment
-	local v40 = useReactiveValue(segment.label)
-	local v41 = useReactiveValue(segment.activityItems or t1)
-	local v42 = useReactiveValue(segment.isLoading or false)
-	local v43, v44 = React.useState(false)
-	local v45, v46 = React.useBinding(0)
-	local v47 = React.useRef(nil)
-	local v48 = React.useRef({
+	local v41 = useReactiveValue(segment.label)
+	local v42 = useReactiveValue(segment.activityItems or t1)
+	local v43 = useReactiveValue(segment.isLoading or false)
+	local v44, v45 = React.useState(false)
+	local v46, v47 = React.useBinding(0)
+	local v48 = React.useRef(nil)
+	local v49 = React.useRef({
 		isThinking = false,
 		startedAt = nil
 	})
-	local v49 = Foundation.Hooks.useTokens()
-	local v50 = v40 == chatConstants.ASSISTANT_LOADING_TEXT
-	local current = v48.current
+	local v50 = Foundation.Hooks.useTokens()
+	local v51 = v41 == chatConstants.ASSISTANT_LOADING_TEXT
+	local current = v49.current
 
-	if v50 ~= current.isThinking then
-		current.isThinking = v50
+	if v51 ~= current.isThinking then
+		current.isThinking = v51
 		current.startedAt = nil
 	end
 
-	local v52 = React.useCallback(function() -- line: 165
-		-- upvalues: v44 (copy)
-		v44(function(b2: boolean) -- line: 166
-			return not b2
+	local v53 = React.useCallback(function() -- line: 159
+		-- upvalues: v45 (copy)
+		v45(function(b3: boolean) -- line: 160
+			return not b3
 		end)
 	end, {})
-	local v53 = React.useCallback(function(p8) -- line: 171
-		-- upvalues: v47 (copy)
+	local v54 = React.useCallback(function(p8) -- line: 165
+		-- upvalues: v48 (copy)
 		if p8 == nil then
 			return
 		end
 
-		task.defer(function() -- line: 176
-			-- upvalues: v47 (copy), p8 (copy)
-			if v47.current ~= p8 then
+		task.defer(function() -- line: 170
+			-- upvalues: v48 (copy), p8 (copy)
+			if v48.current ~= p8 then
 				return
 			end
 
-			local v86 = math.max(0, p8.AbsoluteCanvasSize.Y - p8.AbsoluteWindowSize.Y)
+			local v89 = math.max(0, p8.AbsoluteCanvasSize.Y - p8.AbsoluteWindowSize.Y)
 
-			p8.CanvasPosition = Vector2.new(0, v86)
+			p8.CanvasPosition = Vector2.new(0, v89)
 		end)
 	end, {})
-	local v54 = React.useCallback(function(p9) -- line: 187
-		-- upvalues: v47 (copy), v53 (copy)
-		v47.current = p9
+	local v55 = React.useCallback(function(p9) -- line: 181
+		-- upvalues: v48 (copy), v54 (copy)
+		v48.current = p9
 
 		if p9 then
-			v53(p9)
+			v54(p9)
 		end
-	end, { v53 })
-	local v55 = React.useCallback(function(p10) -- line: 194
-		-- upvalues: v46 (copy), v53 (copy)
-		v46(p10.AbsoluteCanvasSize.Y)
-		v53(p10)
+	end, { v54 })
+	local v56 = React.useCallback(function(p10) -- line: 188
+		-- upvalues: v47 (copy), v54 (copy)
+		v47(p10.AbsoluteCanvasSize.Y)
+		v54(p10)
 	end, {
-		v46,
-		v53
+		v47,
+		v54
 	})
-	local v56 = React.useCallback(function(p11) -- line: 199
-		-- upvalues: v53 (copy)
-		v53(p11)
-	end, { v53 })
+	local v57 = React.useCallback(function(p11) -- line: 193
+		-- upvalues: v54 (copy)
+		v54(p11)
+	end, { v54 })
 
-	React.useEffect(function() -- line: 203
-		-- upvalues: v53 (copy), v47 (copy)
-		v53(v47.current)
+	React.useEffect(function() -- line: 197
+		-- upvalues: v54 (copy), v48 (copy)
+		v54(v48.current)
 
-		return function() -- line: 205
+		return function() -- line: 199
 		end
 	end, {
-		v53,
-		v41
+		v54,
+		v42
 	})
 
 	local t4 = {}
+	local n6 = 0
 
-	for v58, v59 in v41 do
-		local v61
+	for v60, v61 in v42 do
+		local v63
 
-		if v59.kind == "tool_call" then
-			local v60 = turnDisplay.getToolActivityLabel(v59)
+		if v61.kind == "tool_call" then
+			local v62 = turnDisplay.getToolActivityLabel(v61)
 
-			v61 = React.createElement(FoundationText, {
+			v63 = React.createElement(FoundationText, {
 				tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-muted",
-				LayoutOrder = v58,
-				Text = v60
+				LayoutOrder = v60,
+				Text = v62
 			})
 		else
-			v61 = nil
+			v63 = nil
 		end
 
-		if v61 ~= nil then
-			t4[`Tool{ v58 }`] = v61
+		if v63 ~= nil then
+			t4[`Tool{ v60 }`] = v63
+			n6 += 1
 		end
 	end
 
-	local v62 = next(t4) ~= nil
-	local v69
+	local v64 = next(t4) ~= nil
+	local v65 = n6 > 1
+	local v72
 
-	if v42 then
+	if v43 then
 		local createElement = React.createElement
-		local v64 = View
+		local v67 = View
 		local t5 = {
 			LayoutOrder = 2,
 			tag = "col fill gap-xxsmall auto-y"
 		}
 		local t6 = {}
-		local v67 = createActivitySummaryActionText
+		local v70 = createActivitySummaryActionText
 		local clockBinding = t3.clockBinding
 
-		t6.CurrentAction = v67(if v40 == chatConstants.ASSISTANT_LOADING_TEXT then clockBinding:map(function(n6: number) -- line: 126
+		t6.CurrentAction = v70(if v41 == chatConstants.ASSISTANT_LOADING_TEXT then clockBinding:map(function(n7: number) -- line: 120
 			-- upvalues: current (copy), chatConstants (copy)
 			if not current.isThinking then
 				return chatConstants.ASSISTANT_LOADING_TEXT
 			end
 
 			if current.startedAt == nil then
-				current.startedAt = n6
+				current.startedAt = n7
 			end
 
-			local v81 = math.max(0, n6 - current.startedAt)
+			local v84 = math.max(0, n7 - current.startedAt)
 			local ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS = chatConstants.ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS
-			local v83 = if not (v81 >= chatConstants.ASSISTANT_THINKING_DURATION_SUFFIX_DELAY_SECONDS) then chatConstants.ASSISTANT_LOADING_TEXT else chatConstants.formatAssistantLoadingText(v81)
+			local v86 = if not (v84 >= chatConstants.ASSISTANT_THINKING_DURATION_SUFFIX_DELAY_SECONDS) then chatConstants.ASSISTANT_LOADING_TEXT else chatConstants.formatAssistantLoadingText(v84)
 
-			if math.floor(v81 / ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS) % 2 == 0 then
-				return v83
+			if math.floor(v84 / ASSISTANT_STATUS_SWAP_INTERVAL_SECONDS) % 2 == 0 then
+				return v86
 			end
 
 			return chatConstants.ASSISTANT_STILL_WORKING_TEXT
-		end) else v40, 1, t3.clockBinding, true)
-		v69 = createElement(v64, t5, t6)
+		end) else v41, 1, t3.clockBinding, segment.isWaitingForLocalTool ~= true)
+		v72 = createElement(v67, t5, t6)
 	else
-		v69 = React.createElement(FoundationText, {
+		v72 = React.createElement(FoundationText, {
 			LayoutOrder = 2,
 			tag = "fill text-body-medium text-wrap text-align-x-left content-muted",
-			Text = v40
+			Text = v41
 		})
 	end
 
@@ -257,29 +260,30 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 144
 			LayoutOrder = 1,
 			tag = "row align-y-center gap-xsmall size-full-0 auto-y padding-y-xxsmall",
 			testId = "TurnActivitySummary.Summary",
-			onActivated = v52,
+			onActivated = if not v65 then nil else v53,
 			stateLayer = {
 				affordance = StateLayerAffordance.None
 			}
 		}, {
-			Chevron = React.createElement(Icon, {
+			Chevron = if not v65 then nil else React.createElement(Icon, {
 				LayoutOrder = 1,
-				name = if not v43 then IconName.ChevronLargeRight else IconName.ChevronLargeDown,
+				testId = "TurnActivitySummary.Chevron",
+				name = if not v44 then IconName.ChevronLargeRight else IconName.ChevronLargeDown,
 				size = IconSize.XSmall,
-				style = v49.Color.Content.Muted
+				style = v50.Color.Content.Muted
 			}),
-			Label = v69
+			Label = v72
 		}),
-		ActivityHistory = if not v43 or not v62 then nil else React.createElement(ScrollView, {
+		ActivityHistory = if not v44 or (not v64 or not v65) then nil else React.createElement(ScrollView, {
 			LayoutOrder = 2,
 			tag = "size-full-0 clip",
 			testId = "TurnActivitySummary.ActivityHistory",
-			Size = v45:map(function(n7: number) -- line: 258
-				return UDim2.new(1, 0, 0, (math.clamp(n7, 24, 220)))
+			Size = v46:map(function(n8: number) -- line: 260
+				return UDim2.new(1, 0, 0, (math.clamp(n8, 24, 220)))
 			end),
-			scrollingFrameRef = v54,
-			onAbsoluteCanvasSizeChanged = v55,
-			onAbsoluteWindowSizeChanged = v56,
+			scrollingFrameRef = v55,
+			onAbsoluteCanvasSizeChanged = v56,
+			onAbsoluteWindowSizeChanged = v57,
 			scroll = {
 				AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				CanvasSize = UDim2.new(1, 0, 0, 0),

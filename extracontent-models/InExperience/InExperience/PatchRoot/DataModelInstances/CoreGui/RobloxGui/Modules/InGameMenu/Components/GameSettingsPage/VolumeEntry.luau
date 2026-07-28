@@ -6,6 +6,7 @@ local t = InGameMenuDependencies.t
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local PropertyChangedSignal = UserGameSettings:GetPropertyChangedSignal("MasterVolume")
 local ParentParent = script.Parent.Parent.Parent
+local FFlagRenameVolumeToMainVolume = require(CoreGui.RobloxGui.Modules.Flags.FFlagRenameVolumeToMainVolume)
 local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
 local SliderEntry = require(script.Parent.SliderEntry)
 local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
@@ -24,18 +25,18 @@ Sound.Name = "VolumeChangeSound"
 Sound.Volume = 1
 Sound.SoundId = "rbxasset://sounds/uuhhh.mp3"
 
-local v15 = Roact.PureComponent:extend("VolumeEntry")
+local v16 = Roact.PureComponent:extend("VolumeEntry")
 
-v15.validateProps = t.strictInterface({
+v16.validateProps = t.strictInterface({
 	LayoutOrder = t.integer,
 	canCaptureFocus = t.optional(t.boolean),
 	isMenuOpen = t.optional(t.boolean),
 	buttonRef = t.optional(t.table)
 })
 
-function v15.init(p1) -- line: 39
+function v16.init(p1) -- line: 41
 	-- upvalues: UserGameSettings (copy)
-	function p1.onVolumeChanged() -- line: 40
+	function p1.onVolumeChanged() -- line: 42
 		-- upvalues: p1 (copy), UserGameSettings (copy)
 		p1:setState({
 			volume = math.floor(UserGameSettings.MasterVolume * 10 + 0.5)
@@ -44,17 +45,17 @@ function v15.init(p1) -- line: 39
 
 	p1.onVolumeChanged()
 end
-function v15.render(p2) -- line: 49
-	-- upvalues: Roact (copy), SliderEntry (copy), UserGameSettings (copy), Sound (copy), SendAnalytics (copy), Constants (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy)
+function v16.render(p2) -- line: 51
+	-- upvalues: Roact (copy), SliderEntry (copy), FFlagRenameVolumeToMainVolume (copy), UserGameSettings (copy), Sound (copy), SendAnalytics (copy), Constants (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy)
 	return Roact.createFragment({
 		VolumeSlider = Roact.createElement(SliderEntry, {
-			labelKey = "CoreScripts.InGameMenu.GameSettings.Volume",
 			min = 0,
 			max = 10,
 			stepInterval = 1,
+			labelKey = not FFlagRenameVolumeToMainVolume and "CoreScripts.InGameMenu.GameSettings.Volume" or "CoreScripts.InGameMenu.GameSettings.MainVolume",
 			LayoutOrder = p2.props.LayoutOrder,
 			value = p2.state.volume,
-			valueChanged = function(p3) -- line: 58
+			valueChanged = function(p3) -- line: 62
 				-- upvalues: UserGameSettings (copy), Sound (copy), SendAnalytics (copy), Constants (copy)
 				UserGameSettings.MasterVolume = p3 / 10
 				Sound:Play()
@@ -71,4 +72,4 @@ function v15.render(p2) -- line: 49
 	})
 end
 
-return v15
+return v16

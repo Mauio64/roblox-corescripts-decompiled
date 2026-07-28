@@ -17,10 +17,10 @@ local TelemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local FFlagSupportSubmissionOnAllReportNodes = require(GenericAbuseReportingParent.SharedFlags).FFlagSupportSubmissionOnAllReportNodes
 local FFlagAbuseReportMenuV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportMenuV2
-local FFlagAbuseReportVoiceSpeakingIcon = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportVoiceSpeakingIcon
+local FFlagAbuseReportInExpPlayerListV3 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3
 
 local function ContentNode(t1: {[any]: any}) -- line: 40
-	-- upvalues: useAbuseReportAnalytics (copy), React (copy), FFlagAbuseReportMenuV2 (copy), ListNodeV2 (copy), ListNode (copy), Dash (copy), CommentNode (copy), ConfirmationNode (copy), FFlagSupportSubmissionOnAllReportNodes (copy), ParagraphNode (copy), ReviewNode (copy), GenericAbuseReporting (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), TelemetryEventType (copy)
+	-- upvalues: useAbuseReportAnalytics (copy), React (copy), FFlagAbuseReportMenuV2 (copy), ListNodeV2 (copy), ListNode (copy), Dash (copy), CommentNode (copy), ConfirmationNode (copy), FFlagSupportSubmissionOnAllReportNodes (copy), ParagraphNode (copy), ReviewNode (copy), GenericAbuseReporting (copy), FFlagAbuseReportInExpPlayerListV3 (copy), TelemetryEventType (copy)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
 
 	if t1.node.type == "list" then
@@ -143,7 +143,7 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 		}))
 	end
 
-	if FFlagAbuseReportVoiceSpeakingIcon and t1.node.type == "inExpUserSelection" then
+	if FFlagAbuseReportInExpPlayerListV3 and t1.node.type == "inExpUserSelection" then
 		local InExpUserSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpUserSelectionNode)
 		local v30 = if not t1.store then nil else t1.store[t1.node.storeAs]
 		local v31 = if type(v30) ~= "table" then nil else v30.id

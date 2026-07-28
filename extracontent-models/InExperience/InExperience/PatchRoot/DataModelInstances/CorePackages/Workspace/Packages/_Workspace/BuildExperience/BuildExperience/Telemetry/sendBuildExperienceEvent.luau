@@ -2,7 +2,7 @@ local HttpService = game:GetService("HttpService")
 local TelemetryService = game:GetService("TelemetryService")
 local t1 = {
 	eventName = "buildExperienceEvent",
-	description = "Client events for Build tab interactions (impression, clicks, playtest).",
+	description = "Client events for Build tab interactions (impression, clicks, playtest) and the private playtest invite flow (add-to-playtest, picker/management impressions, playtester add/remove, share).",
 	backends = {
 		"Points",
 		"EventIngest"
@@ -10,12 +10,12 @@ local t1 = {
 	throttlingPercentage = game:DefineFastInt("BuildExperienceEventThrottleHundredthsPercent", 0),
 	lastUpdated = {
 		2026,
-		6,
-		24
+		7,
+		23
 	}
 }
 
-local function sendBuildExperienceEvent(s1: string, t2: {[any]: any}, t3: {[any]: any}?) -- line: 28
+local function sendBuildExperienceEvent(s1: string, t2: {[any]: any}, t3: {[any]: any}?) -- line: 36
 	-- upvalues: HttpService (copy), TelemetryService (copy), t1 (copy)
 	local t4 = {
 		eventType = s1,

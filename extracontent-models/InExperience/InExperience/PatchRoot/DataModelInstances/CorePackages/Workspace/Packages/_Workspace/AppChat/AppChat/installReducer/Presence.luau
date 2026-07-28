@@ -2,6 +2,11 @@ local AppChat = script:FindFirstAncestor("AppChat")
 local AppChatParent = AppChat.Parent
 local llama = require(AppChatParent.LuaSocialLibrariesDeps).llama
 local RoduxPresence = require(AppChat.Http.RoduxPresence)
+
+if require(AppChat.Flags.FFlagAppChatPresenceStoreMigration) then
+	return nil
+end
+
 local t1 = {
 	"OFFLINE",
 	"ONLINE",
@@ -9,7 +14,7 @@ local t1 = {
 	"IN_STUDIO"
 }
 
-local function convertFromOldPresenceModel(p1) -- line: 17
+local function convertFromOldPresenceModel(p1) -- line: 23
 	-- upvalues: RoduxPresence (copy), llama (copy), t1 (copy)
 	local v10 = RoduxPresence.Models.Presence.new(llama.Dictionary.join(p1, {
 		presence = llama.None,
@@ -23,7 +28,7 @@ local function convertFromOldPresenceModel(p1) -- line: 17
 end
 
 local t2 = {
-	ReceivedUserPresence = function(p2) -- line: 34
+	ReceivedUserPresence = function(p2) -- line: 40
 		-- upvalues: convertFromOldPresenceModel (copy)
 		if p2.payload then
 			return p2
@@ -34,7 +39,7 @@ local t2 = {
 }
 local v8 = RoduxPresence.installReducer()
 
-return function(p3, p4) -- line: 45
+return function(p3, p4) -- line: 51
 	-- upvalues: t2 (copy), llama (copy), v8 (copy)
 	local v14 = p3 or {
 		byUserId = {},

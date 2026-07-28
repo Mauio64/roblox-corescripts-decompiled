@@ -1,6 +1,12 @@
-local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
 local RoduxNetworking = require(script.Parent.RoduxNetworking)
+local LuaSocialLibrariesDeps = require(SquadsCoreParent.LuaSocialLibrariesDeps)
 
-return (require(Parent.LuaSocialLibrariesDeps).NetworkingPresence.config({
+if require(SquadsCore.Flags.FFlagSquadsPresenceStoreMigration) then
+	return nil
+end
+
+return (LuaSocialLibrariesDeps.NetworkingPresence.config({
 	roduxNetworking = RoduxNetworking
 }))

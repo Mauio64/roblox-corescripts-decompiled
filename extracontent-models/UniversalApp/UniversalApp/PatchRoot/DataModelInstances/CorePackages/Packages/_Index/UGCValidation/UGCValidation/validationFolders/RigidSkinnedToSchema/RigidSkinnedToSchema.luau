@@ -4,14 +4,13 @@ require(ParentParent.util.Types)
 
 local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
 local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
 
 return {
 	fflag = require(ParentParent.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning),
 	categories = { ValidationEnums.UploadCategory.RIGID_ACCESSORY },
 	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
-	run = function(p1, p2) -- line: 13
-		-- upvalues: ErrorSourceStrings (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy)
+	run = function(p1, p2) -- line: 11
+		-- upvalues: ErrorSourceStrings (copy)
 		local Handle = p2.renderMeshesData.Handle
 
 		if Handle == nil then
@@ -19,7 +18,7 @@ return {
 		end
 
 		if #Handle.editable:GetBones() > 0 then
-			p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_RigidIsSkinned, nil, if not getEngineFeatureEngineUGCValidationExpandReturnSchema() then nil else p2.rootInstance:FindFirstChild("Handle"))
+			p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_RigidIsSkinned, nil, p2.rootInstance:FindFirstChild("Handle"))
 		end
 	end
 }

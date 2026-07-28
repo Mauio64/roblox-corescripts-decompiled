@@ -10,7 +10,8 @@ require(ParentParentParent.LeaderboardStore)
 local View = Foundation.View
 local ScrollView = Foundation.ScrollView
 local FFlagPlayerListReskinPreferredTransparency = require(ParentParent.Flags.FFlagPlayerListReskinPreferredTransparency)
-local v10 = if not FFlagPlayerListReskinPreferredTransparency then nil else require(ParentParent.Components.Presentation.PreferredTransparencyView)
+local FFlagPlayerListReskinOptimization = require(ParentParent.Flags.FFlagPlayerListReskinOptimization)
+local v11 = if not FFlagPlayerListReskinPreferredTransparency then nil else require(ParentParent.Components.Presentation.PreferredTransparencyView)
 local useLeaderboardStore = require(ParentParent.Hooks.useLeaderboardStore)
 local usePanelLayout = require(ParentParent.Hooks.usePanelLayout)
 local usePlatformLeaderboard = require(ParentParent.Hooks.usePlatformLeaderboard)
@@ -21,80 +22,98 @@ local openContextMenu = PlayerContextualMenuStore.openContextMenu
 local PanelHeader = require(ParentParent.Components.Presentation.PanelHeader)
 local ColumnHeaderRow = require(ParentParent.Components.Presentation.ColumnHeaderRow)
 local TeamListView = require(ParentParent.Components.Presentation.TeamListView)
+local FFlagPlayerListReskinStickySelfRow = require(ParentParent.Flags.FFlagPlayerListReskinStickySelfRow)
+local v23 = if not FFlagPlayerListReskinStickySelfRow then nil else require(ParentParent.Components.Presentation.EntryView)
 local TabbedLeaderboardBody = require(ParentParent.Components.Presentation.TabbedLeaderboardBody)
 local FFlagPlayerListTwoTabs = require(ParentParent.Flags.FFlagPlayerListTwoTabs)
 local FallbackSignals = require(ParentParent.Common.FallbackSignals)
-local v24 = createSignalMap()
-local v25 = createSignalMap()
+local v27 = createSignalMap()
+local v28 = createSignalMap()
 
-local function PlayerListPanel(t1: {[any]: any}) -- line: 59
-	-- upvalues: useLeaderboardStore (copy), v24 (copy), v25 (copy), SignalsReact (copy), FFlagPlayerListTwoTabs (copy), usePlatformLeaderboard (copy), FallbackSignals (copy), usePanelLayout (copy), PlayerListVisibilityStore (copy), React (copy), PlayerContextualMenuStore (copy), computeStatColumns (copy), TeamListView (copy), openContextMenu (copy), ColumnHeaderRow (copy), ScrollView (copy), PanelHeader (copy), Foundation (copy), View (copy), FFlagPlayerListReskinPreferredTransparency (copy), v10 (copy), TabbedLeaderboardBody (copy)
-	local v28 = t1.isSmallTouchDevice == true
+local function PlayerListPanelContent(t1: {[any]: any}) -- line: 66
+	-- upvalues: useLeaderboardStore (copy), v27 (copy), v28 (copy), SignalsReact (copy), FFlagPlayerListTwoTabs (copy), usePlatformLeaderboard (copy), FallbackSignals (copy), usePanelLayout (copy), PlayerListVisibilityStore (copy), React (copy), PlayerContextualMenuStore (copy), FFlagPlayerListReskinStickySelfRow (copy), computeStatColumns (copy), TeamListView (copy), openContextMenu (copy), v23 (copy), ColumnHeaderRow (copy), ScrollView (copy), FFlagPlayerListReskinOptimization (copy), PanelHeader (copy), Foundation (copy), View (copy), FFlagPlayerListReskinPreferredTransparency (copy), v11 (copy), TabbedLeaderboardBody (copy)
+	local v32 = t1.isSmallTouchDevice == true
 	local title = t1.title
 	local platformLeaderboardOverride = t1.platformLeaderboardOverride
-	local v31 = useLeaderboardStore()
-	local LocalPlayer = game:GetService("Players").LocalPlayer
-	local v33 = if not v31 then v24 else v31.getTeamList()
-	local v34 = if not v31 then v25 else v31.getGameStatsList()
-	local v35 = SignalsReact.useSignalState(v33.getAllData)
-	local v36 = SignalsReact.useSignalState(v34.getAllData)
-	local v37 = v34.getCount(false)
-	local v38 = if not FFlagPlayerListTwoTabs then nil else platformLeaderboardOverride or usePlatformLeaderboard()
-	local v39 = if not v38 then FallbackSignals.getHasActiveLeaderboard else v38.getHasActiveLeaderboard
-	local v40 = not not FFlagPlayerListTwoTabs and SignalsReact.useSignalState(v39)
-	local v41 = usePanelLayout(v28, v37, v40)
-	local v42 = SignalsReact.useSignalBinding(PlayerListVisibilityStore.getEffectiveVisible)
-	local v43 = React.useCallback(function() -- line: 96
+	local v35 = useLeaderboardStore()
+	local v36 = t1.localPlayerOverride or game:GetService("Players").LocalPlayer
+	local v37 = if not v35 then v27 else v35.getTeamList()
+	local v38 = if not v35 then v28 else v35.getGameStatsList()
+	local v39 = SignalsReact.useSignalState(v37.getAllData)
+	local v40 = SignalsReact.useSignalState(v38.getAllData)
+	local v41 = v38.getCount(false)
+	local v42 = if not FFlagPlayerListTwoTabs then nil else platformLeaderboardOverride or usePlatformLeaderboard()
+	local v43 = if not v42 then FallbackSignals.getHasActiveLeaderboard else v42.getHasActiveLeaderboard
+	local v44 = not not FFlagPlayerListTwoTabs and SignalsReact.useSignalState(v43)
+	local v45 = usePanelLayout(v32, v41, v44)
+	local v46 = SignalsReact.useSignalBinding(PlayerListVisibilityStore.getEffectiveVisible)
+	local v47 = React.useCallback(function() -- line: 103
 		-- upvalues: PlayerContextualMenuStore (copy), PlayerListVisibilityStore (copy)
 		PlayerContextualMenuStore.closeContextMenu()
 		PlayerListVisibilityStore.setVisible(false)
 	end, {})
-	local maxStatColumns = v41.maxStatColumns
-	local v45 = React.useMemo(function() -- line: 108
-		-- upvalues: computeStatColumns (copy), v34 (copy), maxStatColumns (copy)
-		return computeStatColumns(v34, maxStatColumns)
+	local v48 = false
+
+	if FFlagPlayerListReskinStickySelfRow and (v32 and v36 ~= nil and v35 ~= nil) then
+		v48 = v37.getCount(false) > 0 or v41 > 0
+	end
+
+	local maxStatColumns = v45.maxStatColumns
+	local v50 = React.useMemo(function() -- line: 124
+		-- upvalues: computeStatColumns (copy), v38 (copy), maxStatColumns (copy)
+		return computeStatColumns(v38, maxStatColumns)
 	end, {
-		v36,
-		v34,
+		v40,
+		v38,
 		maxStatColumns
 	})
 	local t2 = {}
 
-	if v31 then
-		local v47 = false
+	if v35 then
+		local v52 = false
 
-		for k, v in pairs(v35) do
+		for k, v in pairs(v39) do
 			if v and k ~= "Neutral" then
-				v47 = true
+				v52 = true
 
 				break
 			end
 		end
 
-		for k, v in pairs(v35) do
+		for k, v in pairs(v39) do
 			if v then
 				t2[`Team_{ tostring(k) }`] = React.createElement(TeamListView, {
 					teamEntry = v,
 					isNeutral = k == "Neutral",
-					hasNonNeutralTeams = v47,
-					leaderboardStore = v31,
-					statColumns = v45,
-					statWidth = v41.statWidth,
-					rowHeight = v41.rowHeight,
-					columnHeaderHeight = v41.columnHeaderHeight,
+					hasNonNeutralTeams = v52,
+					leaderboardStore = v35,
+					statColumns = v50,
+					statWidth = v45.statWidth,
+					rowHeight = v45.rowHeight,
+					columnHeaderHeight = v45.columnHeaderHeight,
 					onActivated = openContextMenu,
-					localPlayer = LocalPlayer
+					localPlayer = v36
 				})
 			end
 		end
 	end
 
 	local t3 = {
+		StickySelfRow = if not v48 then nil else React.createElement(v23, {
+			isCurrentUser = true,
+			layoutOrder = 0,
+			player = v36,
+			leaderboardStore = v35,
+			statColumns = v50,
+			statWidth = v45.statWidth,
+			rowHeight = v45.rowHeight,
+			onActivated = openContextMenu
+		}),
 		ColumnHeaders = React.createElement(ColumnHeaderRow, {
 			layoutOrder = 1,
-			statColumns = v45,
-			statWidth = v41.statWidth,
-			headerHeight = v41.columnHeaderHeight
+			statColumns = v50,
+			statWidth = v45.statWidth,
+			headerHeight = v45.columnHeaderHeight
 		}),
 		PlayerRows = React.createElement(ScrollView, {
 			LayoutOrder = 2,
@@ -115,56 +134,67 @@ local function PlayerListPanel(t1: {[any]: any}) -- line: 59
 			}
 		}, t2)
 	}
-	local t4 = {
+	local v58 = if not FFlagPlayerListReskinOptimization then {
 		tag = "col radius-medium bg-over-media-200",
-		Size = UDim2.fromOffset(v41.panelWidth, v41.panelHeight),
-		Visible = v42
-	}
-	local v54 = React.createElement(PanelHeader, {
+		Size = UDim2.fromOffset(v45.panelWidth, v45.panelHeight),
+		Visible = v46
+	} else React.useMemo(function() -- line: 206
+		-- upvalues: v45 (copy), v46 (copy)
+		return {
+			tag = "col radius-medium bg-over-media-200",
+			Size = UDim2.fromOffset(v45.panelWidth, v45.panelHeight),
+			Visible = v46
+		}
+	end, {
+		v45.panelWidth,
+		v45.panelHeight,
+		v46
+	})
+	local v59 = React.createElement(PanelHeader, {
 		layoutOrder = 1,
-		onClose = v43,
-		height = v41.headerHeight,
+		onClose = v47,
+		height = v45.headerHeight,
 		title = title
 	})
-	local v55 = React.createElement(Foundation.Divider, {
+	local v60 = React.createElement(Foundation.Divider, {
 		LayoutOrder = 2
 	})
 
 	if FFlagPlayerListTwoTabs then
-		local v56 = React.createElement(View, {
+		local v61 = React.createElement(View, {
 			LayoutOrder = 4,
 			tag = "col fill size-full-0"
 		}, t3)
 
 		if FFlagPlayerListReskinPreferredTransparency then
-			return React.createElement(v10, {
-				size = UDim2.fromOffset(v41.panelWidth, v41.panelHeight),
-				visible = v42
+			return React.createElement(v11, {
+				size = UDim2.fromOffset(v45.panelWidth, v45.panelHeight),
+				visible = v46
 			}, {
 				TabbedBody = React.createElement(TabbedLeaderboardBody, {
-					serverBody = v56,
-					panelHeader = v54,
-					panelDivider = v55,
-					panelProps = t4
+					serverBody = v61,
+					panelHeader = v59,
+					panelDivider = v60,
+					panelProps = v58
 				})
 			})
 		end
 
 		return React.createElement(TabbedLeaderboardBody, {
-			serverBody = v56,
-			panelHeader = v54,
-			panelDivider = v55,
-			panelProps = t4
+			serverBody = v61,
+			panelHeader = v59,
+			panelDivider = v60,
+			panelProps = v58
 		})
 	end
 
 	if FFlagPlayerListReskinPreferredTransparency then
-		return React.createElement(v10, {
-			size = UDim2.fromOffset(v41.panelWidth, v41.panelHeight),
-			visible = v42
+		return React.createElement(v11, {
+			size = UDim2.fromOffset(v45.panelWidth, v45.panelHeight),
+			visible = v46
 		}, {
-			Header = v54,
-			HeaderDivider = v55,
+			Header = v59,
+			HeaderDivider = v60,
 			LeaderboardBody = React.createElement(View, {
 				LayoutOrder = 3,
 				tag = "col fill size-full-0"
@@ -172,14 +202,22 @@ local function PlayerListPanel(t1: {[any]: any}) -- line: 59
 		})
 	end
 
-	return React.createElement(View, t4, {
-		Header = v54,
-		HeaderDivider = v55,
+	return React.createElement(View, v58, {
+		Header = v59,
+		HeaderDivider = v60,
 		LeaderboardBody = React.createElement(View, {
 			LayoutOrder = 3,
 			tag = "col fill size-full-0"
 		}, t3)
 	})
 end
+local function PlayerListPanelUnmountable(t4: {[any]: any}) -- line: 282
+	-- upvalues: SignalsReact (copy), PlayerListVisibilityStore (copy), React (copy), PlayerListPanelContent (copy)
+	if not SignalsReact.useSignalState(PlayerListVisibilityStore.getEffectiveVisible) then
+		return nil
+	end
 
-return React.memo(PlayerListPanel)
+	return React.createElement(PlayerListPanelContent, t4)
+end
+
+return React.memo(if not FFlagPlayerListReskinOptimization then PlayerListPanelContent else PlayerListPanelUnmountable)

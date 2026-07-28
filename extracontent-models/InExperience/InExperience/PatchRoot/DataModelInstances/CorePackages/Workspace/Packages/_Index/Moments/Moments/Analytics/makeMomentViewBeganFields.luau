@@ -5,7 +5,7 @@ require(Parent.MomentsTypes)
 
 local GetFFlagMomentsAnalyticsSchemaIdentity = MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity
 
-local function makeMomentViewBeganFields(p1, s1: string) -- line: 34
+local function makeMomentViewBeganFields(p1, s1: string) -- line: 31
 	-- upvalues: GetFFlagMomentsAnalyticsSchemaIdentity (copy), MomentsCommon (copy)
 	local recommendationMetadata = p1.recommendationMetadata
 
@@ -34,7 +34,7 @@ local function makeMomentViewBeganFields(p1, s1: string) -- line: 34
 	return {
 		viewMode = "vertical",
 		momentId = p1.momentId,
-		itemId = recommendationMetadata.itemId,
+		itemId = recommendationMetadata.feedItemId,
 		tracingId = recommendationMetadata.tracingId or ""
 	}
 end

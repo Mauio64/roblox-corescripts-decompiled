@@ -423,6 +423,13 @@ return {
 			btnContext = v16
 		}
 	},
+	[EventNames.SchoolButton] = {
+		context = Contexts.PlayerProfile,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			btn = AnalyticsConstants.Btns.School
+		}
+	},
 	[EventNames.FriendsButton] = {
 		context = Contexts.PlayerProfile,
 		eventType = EventTypes.ButtonClick,

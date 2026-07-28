@@ -6,5 +6,6 @@ return {
 	experienceStoreImpressions = "experienceStoreImpressions",
 	marketplaceItemImpressions = "marketplaceItemImpressions",
 	devStoreSeeAllImpressions = "devStoreSeeAllImpressions",
-	queryImpressions = "queryImpressions"
+	queryImpressions = "queryImpressions",
+	promptImpressions = "promptImpressions"
 }

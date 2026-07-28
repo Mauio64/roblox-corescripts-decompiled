@@ -10,35 +10,34 @@ local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconVariant = Foundation.Enums.IconVariant
 local InputSize = Foundation.Enums.InputSize
 
-local function UserFeedback(t1: {[any]: any}) -- line: 32
-	-- upvalues: React (copy), IconVariant (copy), IconButton (copy), InputSize (copy), ButtonVariant (copy), View (copy)
+local function UserFeedback(t1: {[any]: any}) -- line: 33
+	-- upvalues: IconVariant (copy), React (copy), IconButton (copy), InputSize (copy), ButtonVariant (copy), View (copy)
 	local v11 = t1.testId or "user-feedback"
 	local onActivated = t1.onActivated
-	local v13, v14 = React.useState(nil)
+	local selectedAction = t1.selectedAction
 	local t2 = {}
 
-	for v16, v17 in t1.icons do
-		local v18 = if v13 ~= v17.action then v17.iconName else {
-			name = v17.iconName,
+	for v15, v16 in t1.icons do
+		local v17 = if selectedAction ~= v16.action then v16.iconName else {
+			name = v16.iconName,
 			variant = IconVariant.Filled
 		}
 
-		t2[`{ v17.iconName }-{ v16 }`] = React.createElement(IconButton, {
-			LayoutOrder = v16,
-			icon = v18,
-			isDisabled = v17.isDisabled,
+		t2[`{ v16.iconName }-{ v15 }`] = React.createElement(IconButton, {
+			LayoutOrder = v15,
+			icon = v17,
+			isDisabled = v16.isDisabled,
 			onActivated = function() -- line: 49
-				-- upvalues: v13 (copy), v17 (copy), v14 (copy), onActivated (copy)
-				if v13 == v17.action and v17.allowRepeatedActivation ~= true then
+				-- upvalues: selectedAction (copy), v16 (copy), onActivated (copy)
+				if selectedAction == v16.action and v16.allowRepeatedActivation ~= true then
 					return
 				end
 
-				v14(v17.action)
-				onActivated(v17)
+				onActivated(v16)
 			end,
 			size = InputSize.Small,
 			variant = ButtonVariant.Utility,
-			testId = `{ v11 }-{ v17.iconName }`
+			testId = `{ v11 }-{ v16.iconName }`
 		})
 	end
 

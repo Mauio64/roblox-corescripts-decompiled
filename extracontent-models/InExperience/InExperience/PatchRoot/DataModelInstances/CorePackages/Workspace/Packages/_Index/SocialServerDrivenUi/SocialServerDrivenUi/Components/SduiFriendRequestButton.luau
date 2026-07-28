@@ -7,13 +7,13 @@ local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local FriendsStore = require(Parent.DataHydration).Friends.FriendsStore
 local SetCurrentToastMessage = require(Parent.ToastRodux).Actions.SetCurrentToastMessage
 local Enums = require(Parent.FriendsNetworking).Enums
-local Button = Foundation.Button
+local IconButton = Foundation.IconButton
 local Enums2 = Foundation.Enums
 local Small = Enums2.InputSize.Small
 local v13 = Enums.FriendshipOriginSourceType.PlayerSearch.rawValue()
 
 local function SduiFriendRequestButton(t1: {[any]: any}) -- line: 46
-	-- upvalues: useDispatch (copy), SignalsReact (copy), FriendsStore (copy), React (copy), v13 (copy), SetCurrentToastMessage (copy), Button (copy), Enums2 (copy), Small (copy)
+	-- upvalues: useDispatch (copy), SignalsReact (copy), FriendsStore (copy), React (copy), v13 (copy), SetCurrentToastMessage (copy), IconButton (copy), Enums2 (copy), Small (copy)
 	local userId = t1.userId
 	local v17 = useDispatch()
 	local v18 = SignalsReact.useSignalState(FriendsStore.get().GetFriendshipStatus(userId or "").data)
@@ -57,12 +57,13 @@ local function SduiFriendRequestButton(t1: {[any]: any}) -- line: 46
 		LayoutOrder = t1.layoutOrder,
 		Visible = t1.visible == nil or t1.visible
 	}, {
-		Button = React.createElement(Button, {
-			icon = "icons/common/plus",
+		Button = React.createElement(IconButton, {
+			icon = "icons/common/plus_small",
+			isCircular = true,
 			variant = if not v19 then Enums2.ButtonVariant.OverMedia else Enums2.ButtonVariant.SubEmphasis,
 			isDisabled = v19,
 			size = t1.size or Small,
-			onActivated = if v19 then nil else v20
+			onActivated = v20
 		})
 	})
 end

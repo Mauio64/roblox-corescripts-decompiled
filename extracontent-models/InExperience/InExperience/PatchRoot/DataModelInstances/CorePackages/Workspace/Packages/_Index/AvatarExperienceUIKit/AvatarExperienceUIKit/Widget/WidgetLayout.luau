@@ -1,11 +1,10 @@
 local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
 local React = require(Parent.React)
-local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
 local useDesignTokens = require(Parent.Style).useDesignTokens
 
-local function WidgetLayout(t1: {[any]: any}) -- line: 21
-	-- upvalues: useDesignTokens (copy), React (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
-	local v7 = useDesignTokens()
+local function WidgetLayout(t1: {[any]: any}) -- line: 19
+	-- upvalues: useDesignTokens (copy), React (copy)
+	local v6 = useDesignTokens()
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
@@ -23,7 +22,7 @@ local function WidgetLayout(t1: {[any]: any}) -- line: 21
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v7.Global.Space_150 else v7.Size.Size_300)
+			Padding = UDim.new(0, v6.Size.Size_300)
 		}),
 		TopContent = if not t1.headerSlot then nil else React.createElement("Frame", {
 			LayoutOrder = 1,

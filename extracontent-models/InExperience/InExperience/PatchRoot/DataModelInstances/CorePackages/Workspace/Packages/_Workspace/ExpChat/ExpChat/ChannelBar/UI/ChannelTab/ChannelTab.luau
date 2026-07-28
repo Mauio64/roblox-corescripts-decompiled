@@ -14,13 +14,15 @@ local FFlagExpChatFocusChannelBarSupport = require(ExpChat.Flags.FFlagExpChatFoc
 local FFlagExpChatChannelTabSizingUpdate = require(ExpChat.Flags.FFlagExpChatChannelTabSizingUpdate)
 local FFlagExpChatChannelTabRefactor = SharedFlags.FFlagExpChatChannelTabRefactor
 local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local v17 = if not FFlagExpChatChannelTabSizingUpdate then nil else game:GetService("TextService")
 local GameLocalization = require(ExpChat.GameLocalization)
 local Localization = require(ExpChat.Localization)
 local getOtherDisplayNameInWhisperChannel = require(ExpChat.getOtherDisplayNameInWhisperChannel)
+local getUnreadIndicatorLayout = require(script.Parent.getUnreadIndicatorLayout)
 local unreachable = ExpChatShared.TabTypes.unreachable
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 local GetFFlagEnableExpChatUniverseChatTabNames = ExpChatShared.Flags.GetFFlagEnableExpChatUniverseChatTabNames
-local v23 = not FFlagExpChatChannelTabSizingUpdate and 20 or 12
+local v25 = not FFlagExpChatChannelTabSizingUpdate and 20 or 12
 local color3 = Color3.fromRGB(255, 255, 255)
 local t1 = {
 	channelName = "",
@@ -32,39 +34,54 @@ local t1 = {
 	setTransparency = nil
 }
 
-local function ChannelTab(t2: {[any]: any}) -- line: 62
-	-- upvalues: Dictionary (copy), t1 (copy), FFlagExpChatChannelTabRefactor (copy), GetFFlagEnableExpChatUniverseChatTabNames (copy), Localization (copy), Players (copy), getOtherDisplayNameInWhisperChannel (copy), FFlagExpChatEnableFriendsTab (copy), unreachable (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), React (copy), FFlagExpChatFocusChannelBarSupport (copy), useSelectionCursor (copy), CursorKind (copy), Interactable (copy), v23 (copy), Config (copy), color3 (copy)
-	local v28 = Dictionary.join(t1, t2)
-	local channelName = v28.channelName
+local function createUnreadDot(uDim2: UDim2, n1: number) -- line: 65
+	-- upvalues: React (copy), Config (copy)
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, 8, 0, 8),
+		Position = uDim2,
+		AnchorPoint = Vector2.new(1, 0.5),
+		BackgroundColor3 = Config.ChannelTabsSettings.UnreadDotColor3,
+		BackgroundTransparency = n1
+	}, {
+		UICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(1, 0)
+		})
+	})
+end
+local function ChannelTab(t2: {[any]: any}) -- line: 80
+	-- upvalues: Dictionary (copy), t1 (copy), FFlagExpChatChannelTabRefactor (copy), GetFFlagEnableExpChatUniverseChatTabNames (copy), Localization (copy), Players (copy), getOtherDisplayNameInWhisperChannel (copy), FFlagExpChatEnableFriendsTab (copy), unreachable (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), React (copy), FFlagExpChatFocusChannelBarSupport (copy), useSelectionCursor (copy), CursorKind (copy), FFlagExpChatChannelTabSizingUpdate (copy), v17 (copy), getUnreadIndicatorLayout (copy), v25 (copy), Interactable (copy), createUnreadDot (copy), color3 (copy), Config (copy)
+	local v33 = Dictionary.join(t1, t2)
+	local channelName = v33.channelName
 
 	if FFlagExpChatChannelTabRefactor or GetFFlagEnableExpChatUniverseChatTabNames() then
-		local v30 = Localization.useLocalization({
+		local v35 = Localization.useLocalization({
 			yourServer = "CoreScripts.TextChat.ChannelTabs.Here",
 			moreServers = "CoreScripts.TextChat.ChannelTabs.Global2"
 		})
 
 		if FFlagExpChatChannelTabRefactor then
-			local tabType = v28.tabType
+			local tabType = v33.tabType
 
 			if tabType == "TextChat" then
-				local channelName2 = v28.channelName
+				local channelName2 = v33.channelName
 
 				if string.find(channelName2, "RBXGeneral") then
-					channelName = v30.yourServer
+					channelName = v35.yourServer
 				elseif string.find(channelName2, "RBXSystem") then
 					channelName = "System"
 				elseif string.find(channelName2, "^RBXTeam") then
 					channelName = "Team"
-				elseif string.find(channelName2, "^RBXWhisper") and v28.textChannel and Players.LocalPlayer then
-					local v33 = getOtherDisplayNameInWhisperChannel(v28.textChannel, Players.LocalPlayer)
+				elseif string.find(channelName2, "^RBXWhisper") and v33.textChannel and Players.LocalPlayer then
+					local v38 = getOtherDisplayNameInWhisperChannel(v33.textChannel, Players.LocalPlayer)
 
-					if v33 then
-						channelName = v33
+					if v38 then
+						channelName = v38
 					end
 				end
 			elseif tabType == "UniverseChat" then
-				if string.find(v28.channelName, "RBXGlobal") then
-					channelName = v30.moreServers
+				if string.find(v33.channelName, "RBXGlobal") then
+					channelName = v35.moreServers
 				end
 			elseif FFlagExpChatEnableFriendsTab and tabType == "FriendsChat" then
 				channelName = "Friends"
@@ -72,92 +89,167 @@ local function ChannelTab(t2: {[any]: any}) -- line: 62
 				unreachable(tabType)
 			end
 		elseif GetFFlagEnableExpChatUniverseChatTabNames() then
-			if string.find(v28.channelName, "RBXGeneral") then
-				channelName = v30.yourServer
-			elseif GetFFlagTextChatEnableUniverseChatTabs() and string.find(v28.channelName, "RBXGlobal") then
-				channelName = v30.moreServers
+			if string.find(v33.channelName, "RBXGeneral") then
+				channelName = v35.yourServer
+			elseif GetFFlagTextChatEnableUniverseChatTabs() and string.find(v33.channelName, "RBXGlobal") then
+				channelName = v35.moreServers
 			end
 		end
 	end
 
-	local v34, v35 = React.useState(v28.channelTabsSettings.BackgroundColor3)
-	local v36 = if not FFlagExpChatFocusChannelBarSupport then nil else useSelectionCursor(CursorKind.RoundedSlot)
+	local v39 = if not FFlagExpChatChannelTabRefactor and not GetFFlagEnableExpChatUniverseChatTabNames() then v33.channelName else channelName
+	local v40, v41 = React.useState(v33.channelTabsSettings.BackgroundColor3)
+	local v42 = if not FFlagExpChatFocusChannelBarSupport then nil else useSelectionCursor(CursorKind.RoundedSlot)
+	local v43 = FFlagExpChatChannelTabSizingUpdate and (v33.hasUnreadMessages and not v33.isTabCollapsed)
+	local v44 = nil
+	local v45 = nil
+	local v46 = nil
+
+	if FFlagExpChatChannelTabSizingUpdate then
+		local v47, v48 = React.useBinding(nil)
+		local v49, v50 = React.useBinding(nil)
+
+		function v44(p1) -- line: 145
+			-- upvalues: v50 (copy)
+			v50(p1.AbsoluteSize.X)
+		end
+
+		React.useEffect(function() -- line: 150
+			-- upvalues: v48 (copy), v33 (copy), v39 (copy), v17 (copy)
+			v48(nil)
+
+			if not v33.hasUnreadMessages or v33.isTabCollapsed then
+				return
+			end
+
+			local u56 = false
+
+			task.spawn(function() -- line: 157
+				-- upvalues: v39 (copy), v33 (copy), v17 (copy), u56 (ref), v48 (copy)
+				local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
+
+				GetTextBoundsParams.Text = v39
+				GetTextBoundsParams.Font = v33.channelTabsSettings.FontFace
+				GetTextBoundsParams.Size = v33.channelTabsSettings.TextSize
+				GetTextBoundsParams.Width = 1e999
+
+				local ok, result = pcall(function() -- line: 164
+					-- upvalues: v17 (copy), GetTextBoundsParams (copy)
+					return v17:GetTextBoundsAsync(GetTextBoundsParams)
+				end)
+
+				if ok and not u56 then
+					v48((math.ceil(result.X)))
+				end
+			end)
+
+			return function() -- line: 172
+				-- upvalues: u56 (ref)
+				u56 = true
+			end
+		end, {
+			v33.channelTabsSettings.FontFace,
+			v33.channelTabsSettings.TextSize,
+			v33.hasUnreadMessages,
+			v33.isTabCollapsed,
+			v39
+		})
+
+		if v43 then
+			local v51 = React.joinBindings({
+				naturalTextWidth = v47,
+				tabWidth = v49
+			}):map(function(p2) -- line: 189
+				-- upvalues: getUnreadIndicatorLayout (copy), v33 (copy), v25 (copy)
+				return getUnreadIndicatorLayout(v33.hasUnreadMessages, v33.isTabCollapsed, p2.tabWidth, p2.naturalTextWidth, v25, 8, 8)
+			end)
+
+			v45 = v51:map(function(p3) -- line: 200
+				-- upvalues: v25 (copy)
+				if p3 then
+					return (UDim2.new(0, p3.textWidth, 1, 0))
+				end
+
+				return (UDim2.new(1, -(v25 * 2 + 8 + 8), 1, 0))
+			end)
+			v46 = v51:map(function(p4) -- line: 205
+				-- upvalues: v25 (copy)
+				if p4 then
+					return (UDim2.fromOffset(p4.textLeft, 0))
+				end
+
+				return (UDim2.fromOffset(v25 + 8 + 8, 0))
+			end)
+		end
+	end
 
 	return React.createElement(Interactable, {
 		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = v28.isTabCollapsed and v28.setTransparency(v28.channelTabsSettings.BackgroundTransparency) or 1,
-		BackgroundColor3 = v28.isTabCollapsed and v34 or v28.channelTabsSettings.BackgroundColor3,
+		BackgroundTransparency = v33.isTabCollapsed and v33.setTransparency(v33.channelTabsSettings.BackgroundTransparency) or 1,
+		BackgroundColor3 = v33.isTabCollapsed and v40 or v33.channelTabsSettings.BackgroundColor3,
 		BorderSizePixel = 0,
-		SelectionImageObject = v36,
-		onStateChanged = function() -- line: 125
+		SelectionImageObject = v42,
+		onStateChanged = function() -- line: 221
 		end,
-		[React.Event.Activated] = v28.onTabSelected,
-		[React.Event.MouseEnter] = function() -- line: 127
-			-- upvalues: v28 (copy), v35 (copy)
-			if v28.isTabCollapsed then
-				v35(v28.channelTabsSettings.HoverBackgroundColor3)
+		[React.Change.AbsoluteSize] = v44,
+		[React.Event.Activated] = v33.onTabSelected,
+		[React.Event.MouseEnter] = function() -- line: 224
+			-- upvalues: v33 (copy), v41 (copy)
+			if v33.isTabCollapsed then
+				v41(v33.channelTabsSettings.HoverBackgroundColor3)
 			end
 		end,
-		[React.Event.MouseLeave] = function() -- line: 132
-			-- upvalues: v28 (copy), v35 (copy)
-			if v28.isTabCollapsed then
-				v35(v28.channelTabsSettings.BackgroundColor3)
+		[React.Event.MouseLeave] = function() -- line: 229
+			-- upvalues: v33 (copy), v41 (copy)
+			if v33.isTabCollapsed then
+				v41(v33.channelTabsSettings.BackgroundColor3)
 			end
 		end
 	}, {
 		TextLabel = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1),
-			Text = if not FFlagExpChatChannelTabRefactor and not GetFFlagEnableExpChatUniverseChatTabNames() then v28.channelName else channelName,
-			FontFace = v28.channelTabsSettings.FontFace,
-			TextSize = v28.channelTabsSettings.TextSize,
-			TextColor3 = v28.isTabSelected and v28.channelTabsSettings.SelectedTabTextColor3 or v28.channelTabsSettings.TextColor3,
-			TextTransparency = v28.setTransparency(0),
-			TextStrokeColor3 = v28.channelTabsSettings.TextStrokeColor3,
-			TextStrokeTransparency = v28.setTransparency(v28.channelTabsSettings.TextStrokeTransparency),
-			TextXAlignment = v28.isTabCollapsed and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+			Size = v45 or UDim2.fromScale(1, 1),
+			Position = v46,
+			Text = v39,
+			FontFace = v33.channelTabsSettings.FontFace,
+			TextSize = v33.channelTabsSettings.TextSize,
+			TextColor3 = v33.isTabSelected and v33.channelTabsSettings.SelectedTabTextColor3 or v33.channelTabsSettings.TextColor3,
+			TextTransparency = v33.setTransparency(0),
+			TextStrokeColor3 = v33.channelTabsSettings.TextStrokeColor3,
+			TextStrokeTransparency = v33.setTransparency(v33.channelTabsSettings.TextStrokeTransparency),
+			TextXAlignment = if not v43 then if not v33.isTabCollapsed then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left else Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			TextTruncate = Enum.TextTruncate.AtEnd
 		}, {
-			UIPadding = React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v23 + (not v28.isTabCollapsed and 0 or 4)),
-				PaddingRight = UDim.new(0, v23)
-			})
+			UIPadding = if not v43 then React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v25 + (not v33.isTabCollapsed and 0 or 4)),
+				PaddingRight = UDim.new(0, v25)
+			}) else nil,
+			UnreadDot = v43 and createUnreadDot(UDim2.new(0, -8, 0.5, 0), v33.setTransparency(0))
 		}),
-		UnreadDot = v28.hasUnreadMessages and React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = UDim2.new(0, 8, 0, 8),
-			Position = UDim2.new(0, v23 - 2, 0.5, 0),
-			AnchorPoint = Vector2.new(1, 0.5),
-			BackgroundColor3 = Config.ChannelTabsSettings.UnreadDotColor3,
-			BackgroundTransparency = v28.setTransparency(0)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			})
-		}),
-		Highlight = v28.isTabSelected and React.createElement("Frame", {
+		UnreadDot = v33.hasUnreadMessages and (not v43 and createUnreadDot(UDim2.new(0, v25 - 2, 0.5, 0), v33.setTransparency(0))),
+		Highlight = v33.isTabSelected and React.createElement("Frame", {
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 4),
 			Position = UDim2.new(0, 0, 1, -4),
 			BackgroundColor3 = color3,
-			BackgroundTransparency = v28.setTransparency(0)
+			BackgroundTransparency = v33.setTransparency(0)
 		}),
-		Divider = v28.isDividerVisible and React.createElement("Frame", {
+		Divider = v33.isDividerVisible and React.createElement("Frame", {
 			BorderSizePixel = 0,
-			AnchorPoint = v28.isTabCollapsed and Vector2.new(0, 1) or Vector2.new(0, 0.5),
-			Position = v28.isTabCollapsed and UDim2.fromScale(0, 1) or UDim2.fromScale(1, 0.5),
-			Size = v28.isTabCollapsed and UDim2.new(1, 0, 0, Config.ChannelTabsSettings.DividerSize) or UDim2.new(0, Config.ChannelTabsSettings.DividerSize, 0.8, 0),
-			BackgroundTransparency = v28.setTransparency(Config.ChannelTabsSettings.DividerTransparency),
+			AnchorPoint = v33.isTabCollapsed and Vector2.new(0, 1) or Vector2.new(0, 0.5),
+			Position = v33.isTabCollapsed and UDim2.fromScale(0, 1) or UDim2.fromScale(1, 0.5),
+			Size = v33.isTabCollapsed and UDim2.new(1, 0, 0, Config.ChannelTabsSettings.DividerSize) or UDim2.new(0, Config.ChannelTabsSettings.DividerSize, 0.8, 0),
+			BackgroundTransparency = v33.setTransparency(Config.ChannelTabsSettings.DividerTransparency),
 			BackgroundColor3 = Config.ChannelTabsSettings.DividerColor3
 		})
 	})
 end
 
-return GameLocalization.connect(function(p1) -- line: 192
+return GameLocalization.connect(function(p5) -- line: 286
 	-- upvalues: FFlagExpChatChannelTabRefactor (copy), GetFFlagEnableExpChatUniverseChatTabNames (copy), Players (copy), getOtherDisplayNameInWhisperChannel (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
-	local channelName = p1.channelName
+	local channelName = p5.channelName
 
 	if FFlagExpChatChannelTabRefactor then
 		return {}
@@ -174,11 +266,11 @@ return GameLocalization.connect(function(p1) -- line: 192
 	elseif string.find(channelName, "^RBXTeam") then
 		channelName = "Team"
 	elseif string.find(channelName, "^RBXWhisper") then
-		if p1.textChannel and Players.LocalPlayer then
-			local v39 = getOtherDisplayNameInWhisperChannel(p1.textChannel, Players.LocalPlayer)
+		if p5.textChannel and Players.LocalPlayer then
+			local v54 = getOtherDisplayNameInWhisperChannel(p5.textChannel, Players.LocalPlayer)
 
-			if v39 then
-				channelName = v39
+			if v54 then
+				channelName = v54
 			end
 		end
 	elseif GetFFlagTextChatEnableUniverseChatTabs() and string.find(channelName, "RBXGlobal") then

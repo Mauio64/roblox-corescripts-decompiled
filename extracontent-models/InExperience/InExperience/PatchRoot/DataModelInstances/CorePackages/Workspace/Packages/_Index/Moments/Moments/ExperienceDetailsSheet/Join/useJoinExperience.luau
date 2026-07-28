@@ -58,21 +58,22 @@ local function useJoinExperience() -- line: 59
 		local v31 = n1 or p1.placeId
 		local v32 = v25.getMomentsSessionId(false)
 		local v33 = p1.itemId or ""
-		local v34 = p1.tracingId or ""
+		local v34 = p1.feedItemId or ""
+		local v35 = p1.tracingId or ""
 
 		if GetFFlagMomentsAnalyticsSchemaIdentity() then
 			if p1.feedItemId ~= nil and p1.feedItemId ~= "" then
 				fireAnalyticsEvent(EventNames.FeedExperienceJoinAttempted, {
 					feedItemId = p1.feedItemId,
-					feedSessionId = v34,
+					feedSessionId = v35,
 					placeId = tostring(p1.placeId),
 					universeId = tostring(p1.universeId),
 					destinationPlaceId = tostring(v31)
 				})
 			else
-				local v35 = p1.feedItemId ~= nil and "empty" or "nil"
+				local v36 = p1.feedItemId ~= nil and "empty" or "nil"
 
-				Analytics.reportMomentSkip("feed_action", v35, {
+				Analytics.reportMomentSkip("feed_action", v36, {
 					action = "join"
 				})
 			end
@@ -80,46 +81,30 @@ local function useJoinExperience() -- line: 59
 			fireAnalyticsEvent(EventNames.FeedExperienceJoinAttempted, {
 				moments_session_id = v32,
 				item_id = v33,
-				tracing_id = v34,
+				tracing_id = v35,
 				destination_placeid = tostring(v31)
 			})
 		end
 
-		local v36 = nil
-
-		if GetFFlagMomentsAnalyticsSchemaIdentity() then
-			local feedItemId = p1.feedItemId
-
-			if feedItemId ~= nil and feedItemId ~= "" then
-				v36 = emitRecommendationAction({
-					itemId = feedItemId,
-					tracingId = v34,
-					momentsSessionId = v32,
-					actionType = Constants.RecommendationActionType.Play,
-					destinationPlaceId = v31
-				})
-			end
-		else
-			v36 = emitRecommendationAction({
-				itemId = v33,
-				tracingId = v34,
-				momentsSessionId = v32,
-				actionType = Constants.RecommendationActionType.Play,
-				destinationPlaceId = v31
-			})
-		end
+		local v37 = emitRecommendationAction({
+			itemId = v34,
+			tracingId = v35,
+			momentsSessionId = v32,
+			actionType = Constants.RecommendationActionType.Play,
+			destinationPlaceId = v31
+		})
 
 		GetToastStore(false).triggerToast({
 			text = "",
 			title = v24.joining
 		})
 
-		if v36 then
-			sessionUtil.setPlayIntent(v36)
+		if v37 then
+			sessionUtil.setPlayIntent(v37)
 		end
 
 		if v30 then
-			v26.current = listenForTeleportFailure(function() -- line: 169
+			v26.current = listenForTeleportFailure(function() -- line: 155
 				-- upvalues: v26 (copy), v29 (copy)
 				v26.current = nil
 				v29.setTeleporting(false)
@@ -127,11 +112,11 @@ local function useJoinExperience() -- line: 59
 		end
 
 		LaunchGame(tostring(v31), Constants2.JoinReferralPage, {
-			moments_play_intent_id = v36
+			moments_play_intent_id = v37
 		}, nil, Constants2.JoinLaunchSource)
 
 		if not v30 then
-			task.delay(6, function() -- line: 186
+			task.delay(6, function() -- line: 172
 				-- upvalues: v29 (copy)
 				v29.setTeleporting(false)
 			end)

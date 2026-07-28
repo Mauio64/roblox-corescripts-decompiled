@@ -42,6 +42,7 @@ local t5 = {
 	AddTrustedConnection = "AddTrustedConnection",
 	SendTransfer = "SendTransfer",
 	ReceiveTransfer = "ReceiveTransfer",
+	LiftRestriction = "LiftRestriction",
 	Unknown = "Unknown"
 }
 local t6 = {

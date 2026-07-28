@@ -92,7 +92,7 @@ local t6 = {}
 
 t6.__index = t6
 
-function t6.new(n7: number) -- line: 159
+function t6.new(n7: number) -- line: 161
 	-- upvalues: t6 (copy)
 	return (setmetatable({
 		_displayLabel = nil,
@@ -105,6 +105,8 @@ function t6.new(n7: number) -- line: 159
 		_minPercentSeen = nil,
 		_maxPercentSeen = nil,
 		_latchedGeometry = nil,
+		_pausedAtMs = nil,
+		_pausedDurationMs = 0,
 		_finalized = false,
 		startTimestampMs = n7,
 		_achieved = {},
@@ -128,7 +130,7 @@ function t6.new(n7: number) -- line: 159
 		}
 	}, t6))
 end
-function t6._classifyDisplayOnce(p1, vector2: Vector2) -- line: 182
+function t6._classifyDisplayOnce(p1, vector2: Vector2) -- line: 186
 	-- upvalues: t1 (copy)
 	if p1._displayLabel ~= nil then
 		return
@@ -142,7 +144,7 @@ function t6._classifyDisplayOnce(p1, vector2: Vector2) -- line: 182
 
 	p1._displayLabel = if not (v31 > 242500) then t1.IabDisplayStandard else t1.IabDisplayLarge
 end
-function t6._tryFire(p2, t7: {[any]: any}, s1: string, n8: number, t8: {[any]: any}, t9: {[any]: any}) -- line: 195
+function t6._tryFire(p2, t7: {[any]: any}, s1: string, n8: number, t8: {[any]: any}, t9: {[any]: any}) -- line: 199
 	if p2._achieved[s1] then
 		return
 	end
@@ -222,7 +224,7 @@ function t6._tryFire(p2, t7: {[any]: any}, s1: string, n8: number, t8: {[any]: a
 		maxContinuous100PercentInViewDurationMs = maxContinuousMs3
 	})
 end
-function t6._accumulate(p3, n9: number, n10: number, t10: {[any]: any}?) -- line: 242
+function t6._accumulate(p3, n9: number, n10: number, t10: {[any]: any}?) -- line: 246
 	local _lastSampleMs = p3._lastSampleMs
 
 	if _lastSampleMs ~= nil and p3._lastRatio > 0 then
@@ -261,79 +263,146 @@ function t6._accumulate(p3, n9: number, n10: number, t10: {[any]: any}?) -- line
 		end
 	end
 end
-function t6.advance(p4, n12: number, n13: number, t11: {[any]: any}?) -- line: 274
+function t6.pause(p4, n12: number) -- line: 276
+	assert(not p4._finalized, "pause called after finalize")
+	assert(p4._pausedAtMs == nil, "pause called while already paused")
+	assert(n12 >= (p4._lastSampleMs or p4.startTimestampMs), "pause timestamp precedes the last sample")
+	p4:_accumulate(n12, 0, nil)
+
+	local _band30 = p4._band30
+	local enteredAtMs = _band30.enteredAtMs
+
+	if enteredAtMs ~= nil then
+		local v67 = n12 - enteredAtMs
+
+		_band30.cumulativeMs = _band30.cumulativeMs + v67
+
+		if v67 > _band30.maxContinuousMs then
+			_band30.maxContinuousMs = v67
+		end
+
+		_band30.enteredAtMs = nil
+	end
+
+	local _band50 = p4._band50
+	local enteredAtMs5 = _band50.enteredAtMs
+
+	if enteredAtMs5 ~= nil then
+		local v70 = n12 - enteredAtMs5
+
+		_band50.cumulativeMs = _band50.cumulativeMs + v70
+
+		if v70 > _band50.maxContinuousMs then
+			_band50.maxContinuousMs = v70
+		end
+
+		_band50.enteredAtMs = nil
+	end
+
+	local _band100 = p4._band100
+	local enteredAtMs6 = _band100.enteredAtMs
+
+	if enteredAtMs6 ~= nil then
+		local v73 = n12 - enteredAtMs6
+
+		_band100.cumulativeMs = _band100.cumulativeMs + v73
+
+		if v73 > _band100.maxContinuousMs then
+			_band100.maxContinuousMs = v73
+		end
+
+		_band100.enteredAtMs = nil
+	end
+
+	p4._pausedAtMs = n12
+end
+function t6.resume(p5, n13: number) -- line: 288
+	assert(not p5._finalized, "resume called after finalize")
+
+	local _pausedAtMs = p5._pausedAtMs
+
+	assert(_pausedAtMs ~= nil, "resume called while not paused")
+	assert(_pausedAtMs <= n13, "resume timestamp precedes pause")
+	p5._pausedDurationMs = p5._pausedDurationMs + (n13 - _pausedAtMs)
+	p5._pausedAtMs = nil
+	p5._lastSampleMs = n13
+	p5._lastRatio = 0
+	p5._lastRealEstate = 0
+end
+function t6.advance(p6, n14: number, n15: number, t11: {[any]: any}?) -- line: 303
 	-- upvalues: t1 (copy)
-	assert(not p4._finalized, "advance called after finalize")
+	assert(not p6._finalized, "advance called after finalize")
+	assert(p6._pausedAtMs == nil, "advance called while paused")
 
 	local t12 = {}
 
 	if t11 ~= nil then
-		p4:_classifyDisplayOnce(t11.adSize)
-		p4._latchedGeometry = t11
+		p6:_classifyDisplayOnce(t11.adSize)
+		p6._latchedGeometry = t11
 	end
 
-	p4:_accumulate(n12, n13, t11)
+	p6:_accumulate(n14, n15, t11)
 
-	local _band30 = p4._band30
+	local _band30 = p6._band30
 
-	if n13 >= _band30.threshold then
+	if n15 >= _band30.threshold then
 		if _band30.enteredAtMs == nil then
-			_band30.enteredAtMs = n12
+			_band30.enteredAtMs = n14
 		end
 	else
 		local enteredAtMs = _band30.enteredAtMs
 
 		if enteredAtMs ~= nil then
-			local v70 = n12 - enteredAtMs
+			local v84 = n14 - enteredAtMs
 
-			_band30.cumulativeMs = _band30.cumulativeMs + v70
+			_band30.cumulativeMs = _band30.cumulativeMs + v84
 
-			if v70 > _band30.maxContinuousMs then
-				_band30.maxContinuousMs = v70
+			if v84 > _band30.maxContinuousMs then
+				_band30.maxContinuousMs = v84
 			end
 
 			_band30.enteredAtMs = nil
 		end
 	end
 
-	local _band50 = p4._band50
+	local _band50 = p6._band50
 
-	if n13 >= _band50.threshold then
+	if n15 >= _band50.threshold then
 		if _band50.enteredAtMs == nil then
-			_band50.enteredAtMs = n12
+			_band50.enteredAtMs = n14
 		end
 	else
 		local enteredAtMs = _band50.enteredAtMs
 
 		if enteredAtMs ~= nil then
-			local v73 = n12 - enteredAtMs
+			local v87 = n14 - enteredAtMs
 
-			_band50.cumulativeMs = _band50.cumulativeMs + v73
+			_band50.cumulativeMs = _band50.cumulativeMs + v87
 
-			if v73 > _band50.maxContinuousMs then
-				_band50.maxContinuousMs = v73
+			if v87 > _band50.maxContinuousMs then
+				_band50.maxContinuousMs = v87
 			end
 
 			_band50.enteredAtMs = nil
 		end
 	end
 
-	local _band100 = p4._band100
+	local _band100 = p6._band100
 
-	if n13 >= _band100.threshold then
+	if n15 >= _band100.threshold then
 		if _band100.enteredAtMs == nil then
-			_band100.enteredAtMs = n12
+			_band100.enteredAtMs = n14
 		end
 	else
 		local enteredAtMs = _band100.enteredAtMs
 
 		if enteredAtMs ~= nil then
-			local v76 = n12 - enteredAtMs
+			local v90 = n14 - enteredAtMs
 
-			_band100.cumulativeMs = _band100.cumulativeMs + v76
+			_band100.cumulativeMs = _band100.cumulativeMs + v90
 
-			if v76 > _band100.maxContinuousMs then
-				_band100.maxContinuousMs = v76
+			if v90 > _band100.maxContinuousMs then
+				_band100.maxContinuousMs = v90
 			end
 
 			_band100.enteredAtMs = nil
@@ -344,68 +413,75 @@ function t6.advance(p4, n12: number, n13: number, t11: {[any]: any}?) -- line: 2
 		return t12
 	end
 
-	local _displayLabel = p4._displayLabel
+	local _displayLabel = p6._displayLabel
 
 	if _displayLabel ~= nil then
-		p4:_tryFire(if _displayLabel ~= t1.IabDisplayLarge then p4._band50 else p4._band30, _displayLabel, n12, t11, t12)
+		p6:_tryFire(if _displayLabel ~= t1.IabDisplayLarge then p6._band50 else p6._band30, _displayLabel, n14, t11, t12)
 	end
 
-	p4:_tryFire(p4._band100, t1.FullView, n12, t11, t12)
+	p6:_tryFire(p6._band100, t1.FullView, n14, t11, t12)
 
 	return t12
 end
-function t6.finalize(p5, n14: number) -- line: 309
-	assert(not p5._finalized, "finalize called more than once on the same session")
-	p5._finalized = true
-	p5:_accumulate(n14, p5._lastRatio, p5._latchedGeometry)
+function t6.finalize(p7, n16: number) -- line: 339
+	assert(not p7._finalized, "finalize called more than once on the same session")
+	p7._finalized = true
+	p7:_accumulate(n16, p7._lastRatio, p7._latchedGeometry)
 
-	local _band30 = p5._band30
+	local _band30 = p7._band30
 	local enteredAtMs = _band30.enteredAtMs
 
 	if enteredAtMs ~= nil then
-		local v82 = n14 - enteredAtMs
+		local v96 = n16 - enteredAtMs
 
-		_band30.cumulativeMs = _band30.cumulativeMs + v82
+		_band30.cumulativeMs = _band30.cumulativeMs + v96
 
-		if v82 > _band30.maxContinuousMs then
-			_band30.maxContinuousMs = v82
+		if v96 > _band30.maxContinuousMs then
+			_band30.maxContinuousMs = v96
 		end
 
 		_band30.enteredAtMs = nil
 	end
 
-	local _band50 = p5._band50
-	local enteredAtMs5 = _band50.enteredAtMs
+	local _band50 = p7._band50
+	local enteredAtMs7 = _band50.enteredAtMs
 
-	if enteredAtMs5 ~= nil then
-		local v85 = n14 - enteredAtMs5
+	if enteredAtMs7 ~= nil then
+		local v99 = n16 - enteredAtMs7
 
-		_band50.cumulativeMs = _band50.cumulativeMs + v85
+		_band50.cumulativeMs = _band50.cumulativeMs + v99
 
-		if v85 > _band50.maxContinuousMs then
-			_band50.maxContinuousMs = v85
+		if v99 > _band50.maxContinuousMs then
+			_band50.maxContinuousMs = v99
 		end
 
 		_band50.enteredAtMs = nil
 	end
 
-	local _band100 = p5._band100
-	local enteredAtMs6 = _band100.enteredAtMs
+	local _band100 = p7._band100
+	local enteredAtMs8 = _band100.enteredAtMs
 
-	if enteredAtMs6 ~= nil then
-		local v88 = n14 - enteredAtMs6
+	if enteredAtMs8 ~= nil then
+		local v102 = n16 - enteredAtMs8
 
-		_band100.cumulativeMs = _band100.cumulativeMs + v88
+		_band100.cumulativeMs = _band100.cumulativeMs + v102
 
-		if v88 > _band100.maxContinuousMs then
-			_band100.maxContinuousMs = v88
+		if v102 > _band100.maxContinuousMs then
+			_band100.maxContinuousMs = v102
 		end
 
 		_band100.enteredAtMs = nil
 	end
 
-	local _visibleWeightedMs = p5._visibleWeightedMs
-	local _latchedGeometry = p5._latchedGeometry
+	local _visibleWeightedMs = p7._visibleWeightedMs
+	local _latchedGeometry = p7._latchedGeometry
+	local _pausedDurationMs = p7._pausedDurationMs
+	local _pausedAtMs = p7._pausedAtMs
+
+	if _pausedAtMs ~= nil then
+		assert(_pausedAtMs <= n16, "session end precedes pause")
+		_pausedDurationMs += n16 - _pausedAtMs
+	end
 
 	return {
 		geometry = if _latchedGeometry == nil then {
@@ -421,19 +497,19 @@ function t6.finalize(p5, n14: number) -- line: 309
 				max = _latchedGeometry.viewportBounds.max
 			}
 		},
-		viewabilitySessionStartTimestampMs = p5.startTimestampMs,
-		viewabilitySessionEndTimestampMs = n14,
-		dwellDurationMs = n14 - p5.startTimestampMs,
-		cumulative30PercentInViewDurationMs = p5._band30.cumulativeMs,
-		cumulative50PercentInViewDurationMs = p5._band50.cumulativeMs,
-		cumulative100PercentInViewDurationMs = p5._band100.cumulativeMs,
-		maxContinuous30PercentInViewDurationMs = p5._band30.maxContinuousMs,
-		maxContinuous50PercentInViewDurationMs = p5._band50.maxContinuousMs,
-		maxContinuous100PercentInViewDurationMs = p5._band100.maxContinuousMs,
-		averagePercentSeen = not (_visibleWeightedMs > 0) and 0 or p5._percentWeightedSum / _visibleWeightedMs,
-		minPercentSeen = p5._minPercentSeen or 0,
-		maxPercentSeen = p5._maxPercentSeen or 0,
-		averageOnScreenRealEstate = not (_visibleWeightedMs > 0) and 0 or p5._realEstateWeightedSum / _visibleWeightedMs
+		viewabilitySessionStartTimestampMs = p7.startTimestampMs,
+		viewabilitySessionEndTimestampMs = n16,
+		dwellDurationMs = n16 - p7.startTimestampMs - _pausedDurationMs,
+		cumulative30PercentInViewDurationMs = p7._band30.cumulativeMs,
+		cumulative50PercentInViewDurationMs = p7._band50.cumulativeMs,
+		cumulative100PercentInViewDurationMs = p7._band100.cumulativeMs,
+		maxContinuous30PercentInViewDurationMs = p7._band30.maxContinuousMs,
+		maxContinuous50PercentInViewDurationMs = p7._band50.maxContinuousMs,
+		maxContinuous100PercentInViewDurationMs = p7._band100.maxContinuousMs,
+		averagePercentSeen = not (_visibleWeightedMs > 0) and 0 or p7._percentWeightedSum / _visibleWeightedMs,
+		minPercentSeen = p7._minPercentSeen or 0,
+		maxPercentSeen = p7._maxPercentSeen or 0,
+		averageOnScreenRealEstate = not (_visibleWeightedMs > 0) and 0 or p7._realEstateWeightedSum / _visibleWeightedMs
 	}
 end
 

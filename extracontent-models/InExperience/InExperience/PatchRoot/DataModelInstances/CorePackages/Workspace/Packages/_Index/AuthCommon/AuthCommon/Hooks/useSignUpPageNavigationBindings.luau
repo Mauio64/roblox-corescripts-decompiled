@@ -18,7 +18,7 @@ local function useSignUpPageNavigationBindings(p1: ((...any) -> ...any)?) -- lin
 		-- upvalues: p1 (copy)
 		p2:cancel()
 
-		if p2.eventData and p2.eventData.KeyCode == Enum.KeyCode.Unknown then
+		if p2.eventData and p2.eventData.KeyCode == Enum.KeyCode.None then
 			return
 		end
 

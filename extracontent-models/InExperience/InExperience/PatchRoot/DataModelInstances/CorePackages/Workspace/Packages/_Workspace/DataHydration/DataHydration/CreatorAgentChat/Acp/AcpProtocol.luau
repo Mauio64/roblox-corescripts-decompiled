@@ -31,7 +31,8 @@ local t4 = {
 	NotFound = -32002,
 	Conflict = -32003,
 	UpstreamUnavailable = -32004,
-	Gone = -32005
+	Gone = -32005,
+	OutOfCredits = -32006
 }
 
 return {

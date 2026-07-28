@@ -5,9 +5,13 @@ local convertUserPresenceTypeToString = require(SocialTabsPageParent.SocialCommo
 local RoduxPresence = require(SocialTabsPage.Rodux.RoduxPresence)
 local PresenceType = RoduxPresence.Enums.PresenceType
 
-local function useUserPresence(s1: string) -- line: 14
+if require(SocialTabsPage.Flags.FFlagSocialTabsPagePresenceSignalsMigration) then
+	return nil
+end
+
+return function(s1: string) -- line: 19
 	-- upvalues: useSelector (copy), RoduxPresence (copy), PresenceType (copy), convertUserPresenceTypeToString (copy)
-	local v9 = useSelector(function(p1) -- line: 15
+	local v8 = useSelector(function(p1) -- line: 20
 		-- upvalues: s1 (copy), RoduxPresence (copy)
 		if not s1 or s1 == "" then
 			return nil
@@ -15,9 +19,7 @@ local function useUserPresence(s1: string) -- line: 14
 
 		return RoduxPresence.Selectors.getUserPresenceByUserId(p1, s1)
 	end)
-	local v10 = if not v9 then PresenceType.Offline else v9.userPresenceType
+	local v9 = if not v8 then PresenceType.Offline else v8.userPresenceType
 
-	return (convertUserPresenceTypeToString(v10))
+	return (convertUserPresenceTypeToString(v9))
 end
-
-return useUserPresence

@@ -11,7 +11,8 @@ return {
 		Body = "composition-content-body"
 	},
 	SupportRegion = if not FFlagEnableSplitPane then nil else {
-		Root = "composition-support-root"
+		Root = "composition-support-root",
+		Collapsed = "composition-support-collapsed"
 	},
 	Layout = {
 		Discovery = "composition-layout-discovery",

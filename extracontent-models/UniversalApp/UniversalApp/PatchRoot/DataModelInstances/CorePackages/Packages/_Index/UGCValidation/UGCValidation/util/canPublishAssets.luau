@@ -29,7 +29,7 @@ local function getWhitelistIds() -- line: 35
 
 	return t1
 end
-local function createCanPublishPromise(s1: string, t2: {[any]: any}, p1, s2: string, n1: number?) -- line: 49
+local function createCanPublishPromise(s1: string, t2: {[any]: any}, p1, s2: string?, n1: number?) -- line: 49
 	-- upvalues: Promise (copy), HttpService (copy), Constants (copy)
 	if #t2 == 0 then
 		return Promise.resolve()
@@ -63,7 +63,7 @@ local function createCanPublishPromise(s1: string, t2: {[any]: any}, p1, s2: str
 		end)
 	end)
 end
-local function canPublishAssets(p4, p5, s3: string, n2: number?, b1: boolean) -- line: 86
+local function canPublishAssets(p4, p5, s3: string?, n2: number?, b1: boolean) -- line: 86
 	-- upvalues: v8 (copy), createCanPublishPromise (copy), Promise (copy), getFStringUGCValidationReferenceMeshIdWhitelistForIEC (copy), getWhitelistIds (copy)
 	local FastInt = game:GetFastInt("UGCValidationCanPublishRequestPageSize")
 	local FastInt2 = game:GetFastInt("UGCValidationMaxAssetSizeAllowed")

@@ -14,10 +14,9 @@ require(CollectionViews.CollectionViewTypes)
 
 local useCollectionLayout = require(CollectionViews.CollectionLayoutStore.useCollectionLayout)
 local SharedFlags = require(CollectionViewsParent.SharedFlags)
-local FFlagRenameDeprecatedUIBloxTokens = SharedFlags.FFlagRenameDeprecatedUIBloxTokens
 local FFlagLuaAppRfyRevealRows = SharedFlags.FFlagLuaAppRfyRevealRows
 local FFlagLuaAppSortHeaderAnchorTag = SharedFlags.FFlagLuaAppSortHeaderAnchorTag
-local v17 = t.strictInterface({
+local v16 = t.strictInterface({
 	testId = t.optional(t.string),
 	Position = t.optional(t.UDim2),
 	LayoutOrder = t.optional(t.number),
@@ -59,45 +58,44 @@ local t1 = {
 	verticalPadding = 0
 }
 
-local function CollectionGrid(t2: {[any]: any}) -- line: 173
-	-- upvalues: validateProps (copy), v17 (copy), Cryo (copy), t1 (copy), useCollectionLayout (copy), ArgCheck (copy), useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), useCollectionSizeBindings (copy), React (copy), FFlagLuaAppRfyRevealRows (copy), CollectionHeader (copy), FFlagLuaAppSortHeaderAnchorTag (copy), GridOfCollectionItems (copy)
-	validateProps(v17, t2)
+local function CollectionGrid(t2: {[any]: any}) -- line: 172
+	-- upvalues: validateProps (copy), v16 (copy), Cryo (copy), t1 (copy), useCollectionLayout (copy), ArgCheck (copy), useDesignTokens (copy), useCollectionSizeBindings (copy), React (copy), FFlagLuaAppRfyRevealRows (copy), CollectionHeader (copy), FFlagLuaAppSortHeaderAnchorTag (copy), GridOfCollectionItems (copy)
+	validateProps(v16, t2)
 
-	local v21 = Cryo.Dictionary.join(t1, t2)
-	local sideMargin = v21.sideMargin
-	local v23 = useCollectionLayout(v21.collectionItemSize)
-	local v24 = t2.numColumns or v23.itemsPerRow
-	local v25 = t2.columnGap or v23.gutter
-	local v26 = t2.verticalPadding or v23.verticalGap
+	local v20 = Cryo.Dictionary.join(t1, t2)
+	local sideMargin = v20.sideMargin
+	local v22 = useCollectionLayout(v20.collectionItemSize)
+	local v23 = t2.numColumns or v22.itemsPerRow
+	local v24 = t2.columnGap or v22.gutter
+	local v25 = t2.verticalPadding or v22.verticalGap
 
-	ArgCheck.assert(v24 >= 1)
+	ArgCheck.assert(v23 >= 1)
 	ArgCheck.assert(sideMargin >= 0)
-	ArgCheck.assert(v26 >= 0)
 	ArgCheck.assert(v25 >= 0)
+	ArgCheck.assert(v24 >= 0)
 
-	local v27 = useDesignTokens()
-	local v28 = if not FFlagRenameDeprecatedUIBloxTokens then v27.Global.Size_200 else v27.Size.Size_400
-	local v29, _, v31, v32 = useCollectionSizeBindings(v24, v25, sideMargin, 0, v21.getItemHeight, v21.onContainerSizeChanged)
-	local v33 = v21.title and v21.title ~= ""
+	local Size_400 = useDesignTokens().Size.Size_400
+	local v27, _, v29, v30 = useCollectionSizeBindings(v23, v24, sideMargin, 0, v20.getItemHeight, v20.onContainerSizeChanged)
+	local v31 = v20.title and v20.title ~= ""
 
 	return React.createElement("Frame", {
-		ref = v21.containerRef,
+		ref = v20.containerRef,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = v21.Position,
+		Position = v20.Position,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		LayoutOrder = v21.LayoutOrder,
-		ZIndex = if not FFlagLuaAppRfyRevealRows then nil else v21.ZIndex,
-		[React.Tag] = if not v21.testId then nil else `data-testid={ v21.testId }`
+		LayoutOrder = v20.LayoutOrder,
+		ZIndex = if not FFlagLuaAppRfyRevealRows then nil else v20.ZIndex,
+		[React.Tag] = if not v20.testId then nil else `data-testid={ v20.testId }`
 	}, {
 		CollectionContent = React.createElement("Frame", {
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Size = UDim2.new(1, 0, 0, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			[React.Change.AbsoluteSize] = v31,
-			ref = v32
+			[React.Change.AbsoluteSize] = v29,
+			ref = v30
 		}, {
 			UIPadding = if not (sideMargin > 0) then nil else React.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, sideMargin),
@@ -107,38 +105,38 @@ local function CollectionGrid(t2: {[any]: any}) -- line: 173
 				FillDirection = Enum.FillDirection.Vertical,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, if not v33 and not v21.headerComponent then nil else v28)
+				Padding = UDim.new(0, if not v31 and not v20.headerComponent then nil else Size_400)
 			}),
-			Header = if not v21.headerComponent then React.createElement(CollectionHeader, {
+			Header = if not v20.headerComponent then React.createElement(CollectionHeader, {
 				LayoutOrder = 1,
-				title = v21.title,
-				subtitle = v21.subtitle,
-				tooltipInfoText = v21.tooltipInfoText,
-				onActivateInfoIcon = v21.onActivateInfoIcon,
-				tooltipSupportsVR = v21.tooltipSupportsVR,
-				tooltipSupportsTenFootUi = v21.tooltipSupportsTenFootUi,
-				hideButton = #v21.items < 1 or (v21.hideHeaderButton or not v33),
-				onActivate = v21.onActivateHeader,
-				buttonText = v21.headerButtonText,
-				headerTag = if not FFlagLuaAppSortHeaderAnchorTag then nil else v21.headerTag
-			}) else v21.headerComponent,
+				title = v20.title,
+				subtitle = v20.subtitle,
+				tooltipInfoText = v20.tooltipInfoText,
+				onActivateInfoIcon = v20.onActivateInfoIcon,
+				tooltipSupportsVR = v20.tooltipSupportsVR,
+				tooltipSupportsTenFootUi = v20.tooltipSupportsTenFootUi,
+				hideButton = #v20.items < 1 or (v20.hideHeaderButton or not v31),
+				onActivate = v20.onActivateHeader,
+				buttonText = v20.headerButtonText,
+				headerTag = if not FFlagLuaAppSortHeaderAnchorTag then nil else v20.headerTag
+			}) else v20.headerComponent,
 			GridOfItems = React.createElement(GridOfCollectionItems, {
 				LayoutOrder = 2,
-				verticalScrollingFrameRef = v21.verticalScrollingFrameRef,
-				onViewableItemsChanged = v21.onViewableItemsChanged,
-				itemSizeBinding = v29,
-				maxNumRows = v21.maxNumRows,
-				numColumns = v24,
-				items = v21.items,
-				renderItem = v21.renderItem,
-				columnGap = v25,
+				verticalScrollingFrameRef = v20.verticalScrollingFrameRef,
+				onViewableItemsChanged = v20.onViewableItemsChanged,
+				itemSizeBinding = v27,
+				maxNumRows = v20.maxNumRows,
+				numColumns = v23,
+				items = v20.items,
+				renderItem = v20.renderItem,
+				columnGap = v24,
 				sideMargin = sideMargin,
-				verticalPadding = v26,
-				bufferRowsBelowScreen = v21.bufferRowsBelowScreen,
-				bufferRowsAboveScreen = v21.bufferRowsAboveScreen,
-				disableRelativeGap = v21.disableRelativeGap,
-				thresholdRowsFromBottom = v21.thresholdRowsFromBottom,
-				onReachedThresholdFromEnd = v21.onReachedThresholdFromEnd
+				verticalPadding = v25,
+				bufferRowsBelowScreen = v20.bufferRowsBelowScreen,
+				bufferRowsAboveScreen = v20.bufferRowsAboveScreen,
+				disableRelativeGap = v20.disableRelativeGap,
+				thresholdRowsFromBottom = v20.thresholdRowsFromBottom,
+				onReachedThresholdFromEnd = v20.onReachedThresholdFromEnd
 			})
 		})
 	})

@@ -7,7 +7,6 @@ require(GameTile.GameTileTypes)
 local GameTileParent = GameTile.Parent
 local React = require(GameTileParent.React)
 local UIBlox = require(GameTileParent.UIBlox)
-local FFlagRenameDeprecatedUIBloxTokens = require(GameTileParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
 local useStyle = UIBlox.Core.Style.useStyle
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local StatGroup = UIBlox.App.Indicator.StatGroup
@@ -23,29 +22,29 @@ local ArgCheck = require(GameTileParent.ArgCheck)
 local getUserInputIsSelectionOnly = require(GameTile.Footer.getUserInputIsSelectionOnly)
 local uDim2 = UDim2.fromScale(1, 1)
 
-return function(p1) -- line: 30
-	-- upvalues: ArgCheck (copy), usePlayerCountText (copy), useStyle (copy), useDesignTokens (copy), useLocalization (copy), getUserInputIsSelectionOnly (copy), React (copy), StyledTextLabel (copy), SponsoredTooltipHover (copy), TooltipOrientation (copy), FFlagRenameDeprecatedUIBloxTokens (copy), uDim2 (copy), CoPlayFooter2 (copy), Colors (copy), CoPlayFooter (copy), TextFooter (copy), SocialProofFooter (copy), StatGroup (copy)
+return function(p1) -- line: 28
+	-- upvalues: ArgCheck (copy), usePlayerCountText (copy), useStyle (copy), useDesignTokens (copy), useLocalization (copy), getUserInputIsSelectionOnly (copy), React (copy), StyledTextLabel (copy), SponsoredTooltipHover (copy), TooltipOrientation (copy), uDim2 (copy), CoPlayFooter2 (copy), Colors (copy), CoPlayFooter (copy), TextFooter (copy), SocialProofFooter (copy), StatGroup (copy)
 	if p1.automaticSize then
 		ArgCheck.isNotNil(p1.size, "If props.automaticSize is defined, props.size should also be defined.  Otherwise size falls back to a 1, 1 scale for this component.")
 	end
 
-	local v23 = p1.isSponsored and p1.isShowSponsoredLabel
+	local v22 = p1.isSponsored and p1.isShowSponsoredLabel
 	local isStatsOnly = p1.isStatsOnly
 	local isPlayable = p1.isPlayable
 	local requiresPurchase = p1.requiresPurchase
-	local v27 = p1.rating or ""
-	local v28 = p1.playingCount or 0
+	local v26 = p1.rating or ""
+	local v27 = p1.playingCount or 0
 	local coPlayFriends = p1.coPlayFriends
 	local showAgeRating = p1.showAgeRating
 	local ageRatingTextLabel = p1.ageRatingTextLabel
 	local useExperienceTileMetadata = p1.useExperienceTileMetadata
 	local onActivateSponsoredTooltip = p1.onActivateSponsoredTooltip
-	local v34 = usePlayerCountText(v28)
-	local v35 = useStyle()
-	local Font = v35.Font
-	local Theme = v35.Theme
+	local v33 = usePlayerCountText(v27)
+	local v34 = useStyle()
+	local Font = v34.Font
+	local Theme = v34.Theme
 	local Global = useDesignTokens().Global
-	local v39 = useLocalization({
+	local v38 = useLocalization({
 		sponsoredText = "Feature.GamePage.Label.Sponsored",
 		notPlayableText = "Feature.ExperienceDetails.Label.NotPlayable",
 		ageRatingText = ageRatingTextLabel or nil,
@@ -53,9 +52,9 @@ return function(p1) -- line: 30
 	})
 
 	if not isStatsOnly then
-		if v23 then
-			local v40 = getUserInputIsSelectionOnly()
-			local v41 = React.createElement("Frame", {
+		if v22 then
+			local v39 = getUserInputIsSelectionOnly()
+			local v40 = React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 1, 0)
@@ -77,7 +76,7 @@ return function(p1) -- line: 30
 					textYAlignment = Enum.TextYAlignment.Center,
 					automaticSize = Enum.AutomaticSize.X,
 					size = UDim2.new(0, 0, 1, 0),
-					text = v39.sponsoredText,
+					text = v38.sponsoredText,
 					textTruncate = Enum.TextTruncate.AtEnd
 				}),
 				SponsoredTooltip = React.createElement(SponsoredTooltipHover, {
@@ -86,7 +85,7 @@ return function(p1) -- line: 30
 					onActivateTooltip = onActivateSponsoredTooltip,
 					size = UDim2.new(0, 16, 0, 16),
 					color = Theme.TextEmphasis.Color,
-					selectable = v40
+					selectable = v39
 				})
 			})
 
@@ -94,8 +93,8 @@ return function(p1) -- line: 30
 				return (React.createElement("Frame", {
 					BorderSizePixel = 0,
 					Size = UDim2.fromScale(1, 1),
-					BackgroundColor3 = ((if not FFlagRenameDeprecatedUIBloxTokens then v35.Tokens.Semantic.Color.Ui.Default else v35.Tokens.Color.Shift.Shift_200)).Color3,
-					BackgroundTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then v35.Tokens.Semantic.Color.Ui.Default else v35.Tokens.Color.Shift.Shift_200)).Transparency
+					BackgroundColor3 = v34.Tokens.Color.Shift.Shift_200.Color3,
+					BackgroundTransparency = v34.Tokens.Color.Shift.Shift_200.Transparency
 				}, {
 					Layout = React.createElement("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
@@ -110,13 +109,13 @@ return function(p1) -- line: 30
 						LayoutOrder = 1,
 						Size = UDim2.new(0, 0, 1, 0),
 						AutomaticSize = Enum.AutomaticSize.X,
-						Text = v39.sponsoredText,
+						Text = v38.sponsoredText,
 						TextXAlignment = Enum.TextXAlignment.Center,
 						TextYAlignment = Enum.TextYAlignment.Center,
-						Font = v35.Font.CaptionHeader.Font,
-						TextSize = v35.Font.BaseSize * v35.Font.CaptionHeader.RelativeSize,
-						TextColor3 = ((if not FFlagRenameDeprecatedUIBloxTokens then v35.Tokens.Semantic.Color.Text.Emphasis else v35.Tokens.Color.Content.Emphasis)).Color3,
-						TextTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then v35.Tokens.Semantic.Color.Text.Emphasis else v35.Tokens.Color.Content.Emphasis)).Transparency
+						Font = v34.Font.CaptionHeader.Font,
+						TextSize = v34.Font.BaseSize * v34.Font.CaptionHeader.RelativeSize,
+						TextColor3 = v34.Tokens.Color.Content.Emphasis.Color3,
+						TextTransparency = v34.Tokens.Color.Content.Emphasis.Transparency
 					}),
 					SponsoredTooltip = React.createElement(SponsoredTooltipHover, {
 						layoutOrder = 2,
@@ -124,12 +123,12 @@ return function(p1) -- line: 30
 						tooltipOrientation = TooltipOrientation.Bottom,
 						onActivateTooltip = onActivateSponsoredTooltip,
 						size = UDim2.new(0, 16, 0, 16),
-						color = ((if not FFlagRenameDeprecatedUIBloxTokens then v35.Tokens.Semantic.Color.Text.Emphasis else v35.Tokens.Color.Content.Emphasis)).Color3,
-						selectable = v40
+						color = v34.Tokens.Color.Content.Emphasis.Color3,
+						selectable = v39
 					})
 				}, {
 					UICorner = React.createElement("UICorner", {
-						CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v35.Tokens.Semantic.Radius.Small else v35.Tokens.Radius.Small)
+						CornerRadius = UDim.new(0, v34.Tokens.Radius.Small)
 					})
 				}))
 			end
@@ -146,7 +145,7 @@ return function(p1) -- line: 30
 				UICorner = React.createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4)
 				}),
-				SponsoredLabel = v41
+				SponsoredLabel = v40
 			})
 		end
 
@@ -156,7 +155,7 @@ return function(p1) -- line: 30
 					showEmphasisBorder = true,
 					faceGroupCount = 2,
 					users = coPlayFriends,
-					labelText = v39.friendsText,
+					labelText = v38.friendsText,
 					styleProps = {
 						badgeBorderWidth = 3,
 						faceWidth = Global.Size_250,
@@ -164,7 +163,7 @@ return function(p1) -- line: 30
 						faceGroupGap = -Global.Space_75,
 						containerGap = Global.Space_50,
 						badgeHeight = Global.Size_250,
-						fontStyle = v35.Font.CaptionHeader,
+						fontStyle = v34.Font.CaptionHeader,
 						badgeSpacingLeading = Global.Space_50,
 						badgeSpacingTrailing = Global.Space_50,
 						badgeBackgroundColor = {
@@ -179,7 +178,7 @@ return function(p1) -- line: 30
 				})
 			end
 
-			local v42 = React.createElement(CoPlayFooter, {
+			local v41 = React.createElement(CoPlayFooter, {
 				friends = coPlayFriends
 			})
 
@@ -191,16 +190,16 @@ return function(p1) -- line: 30
 				LayoutOrder = p1.layoutOrder,
 				AutomaticSize = p1.automaticSize
 			}, {
-				CoPlayFooter = v42
+				CoPlayFooter = v41
 			})
 		end
 
 		if showAgeRating then
-			local v43 = if not p1.localizedAgeRatingTextLabel then v39.ageRatingText else p1.localizedAgeRatingTextLabel
+			local v42 = if not p1.localizedAgeRatingTextLabel then v38.ageRatingText else p1.localizedAgeRatingTextLabel
 
 			if useExperienceTileMetadata then
 				return React.createElement(TextFooter, {
-					text = v43
+					text = v42
 				})
 			end
 
@@ -226,7 +225,7 @@ return function(p1) -- line: 30
 					textXAlignment = Enum.TextXAlignment.Left,
 					textYAlignment = Enum.TextYAlignment.Center,
 					size = UDim2.new(1, 0, 2, 0),
-					text = v43,
+					text = v42,
 					textTruncate = Enum.TextTruncate.AtEnd
 				})
 			})
@@ -234,7 +233,7 @@ return function(p1) -- line: 30
 
 		if p1.showFriendActivity and not useExperienceTileMetadata then
 			local BodyFont = Font.Body.Font
-			local v45 = Font.BaseSize * Font.Body.RelativeSize
+			local v44 = Font.BaseSize * Font.Body.RelativeSize
 
 			return React.createElement("TextLabel", {
 				BackgroundTransparency = 1,
@@ -245,7 +244,7 @@ return function(p1) -- line: 30
 				TextYAlignment = Enum.TextYAlignment.Center,
 				Text = p1.friendActivityTitle,
 				TextTruncate = Enum.TextTruncate.AtEnd,
-				TextSize = v45,
+				TextSize = v44,
 				TextTransparency = Theme.TextMuted.Transparency
 			})
 		end
@@ -253,7 +252,7 @@ return function(p1) -- line: 30
 		if isPlayable == false and not requiresPurchase then
 			if useExperienceTileMetadata then
 				return React.createElement(TextFooter, {
-					text = v39.notPlayableText
+					text = v38.notPlayableText
 				})
 			end
 
@@ -276,7 +275,7 @@ return function(p1) -- line: 30
 					textXAlignment = Enum.TextXAlignment.Left,
 					textYAlignment = Enum.TextYAlignment.Center,
 					size = UDim2.new(1, 0, 1, 0),
-					text = v39.notPlayableText,
+					text = v38.notPlayableText,
 					textTruncate = Enum.TextTruncate.AtEnd
 				})
 			})
@@ -285,14 +284,14 @@ return function(p1) -- line: 30
 
 	if useExperienceTileMetadata then
 		return React.createElement(SocialProofFooter, {
-			ratingText = v27,
-			playingText = v34
+			ratingText = v26,
+			playingText = v33
 		})
 	end
 
-	local v46 = React.createElement(StatGroup, {
-		ratingText = v27,
-		playingText = v34
+	local v45 = React.createElement(StatGroup, {
+		ratingText = v26,
+		playingText = v33
 	})
 
 	return React.createElement("Frame", {
@@ -303,6 +302,6 @@ return function(p1) -- line: 30
 		LayoutOrder = p1.layoutOrder,
 		AutomaticSize = p1.automaticSize
 	}, {
-		ExperienceStats = v46
+		ExperienceStats = v45
 	})
 end

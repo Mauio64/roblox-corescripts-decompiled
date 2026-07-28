@@ -9,129 +9,134 @@ local ExpChatConversationListAdapter = require(script.Parent.Parent.Conversation
 local GetFriendsChatNavigationStore = require(script.Parent.Parent.Stores.GetFriendsChatNavigationStore)
 local GetFriendsChatRealtimeStore = require(script.Parent.Parent.Stores.GetFriendsChatRealtimeStore)
 local FStringDebugFriendsChatConversationId = require(script.Parent.Parent.Flags.FStringDebugFriendsChatConversationId)
-local v12 = ExpChatShared.Logger:new(script.Name)
+local FFlagFriendsChatTabUnreadBadgeFix = require(script.Parent.Parent.Flags.FFlagFriendsChatTabUnreadBadgeFix)
+local v13 = ExpChatShared.Logger:new(script.Name)
 
-local function fetchNewerMessagesSafe(s1: string) -- line: 52
-	-- upvalues: ExpChatConversationListAdapter (copy), fetchNewerMessages (copy), GetFriendsChatRealtimeStore (copy), Players (copy), v12 (copy)
-	local v20 = ExpChatConversationListAdapter.getConversationStore().getConversation(s1, false)
-	local v21 = v20 and v20.lastUpdated
+local function fetchNewerMessagesSafe(s1: string) -- line: 53
+	-- upvalues: ExpChatConversationListAdapter (copy), fetchNewerMessages (copy), GetFriendsChatRealtimeStore (copy), Players (copy), FFlagFriendsChatTabUnreadBadgeFix (copy), v13 (copy)
+	local v21 = ExpChatConversationListAdapter.getConversationStore().getConversation(s1, false)
+	local v22 = v21 and v21.lastUpdated
 
-	fetchNewerMessages(s1):andThen(function(p1) -- line: 58
-		-- upvalues: GetFriendsChatRealtimeStore (copy), Players (copy), s1 (copy), ExpChatConversationListAdapter (copy), v21 (copy)
-		local v36 = p1 and p1.response
-		local v37 = v36 and v36.responseBody
-		local v38 = if not v37 then {} else v37.messages or {}
-		local v39 = GetFriendsChatRealtimeStore(false)
-		local v40 = v39.getActiveConversationId(false)
+	fetchNewerMessages(s1):andThen(function(p1) -- line: 59
+		-- upvalues: GetFriendsChatRealtimeStore (copy), Players (copy), s1 (copy), ExpChatConversationListAdapter (copy), v22 (copy), FFlagFriendsChatTabUnreadBadgeFix (copy)
+		local v37 = p1 and p1.response
+		local v38 = v37 and v37.responseBody
+		local v39 = if not v38 then {} else v38.messages or {}
+		local v40 = GetFriendsChatRealtimeStore(false)
+		local v41 = v40.getActiveConversationId(false)
 		local LocalPlayer = Players.LocalPlayer
-		local v42 = v40 ~= s1
-		local _, v44 = ExpChatConversationListAdapter.updateConversationPreviewFromMessages(s1, v38, {
+		local v43 = v41 ~= s1
+		local _, v45 = ExpChatConversationListAdapter.updateConversationPreviewFromMessages(s1, v39, {
 			refreshListOnMissingConversation = true,
-			hasUnreadMessages = v42,
+			hasUnreadMessages = v43,
 			localUserId = not LocalPlayer and 0 or LocalPlayer.UserId,
-			unreadFreshnessLastUpdated = v21
+			unreadFreshnessLastUpdated = v22
 		})
 
-		if v44 then
-			v39.setHasLocalUnread(true)
+		if v45 then
+			if FFlagFriendsChatTabUnreadBadgeFix then
+				v40.addLocalUnread(s1)
+			else
+				v40.setHasLocalUnread(true)
+			end
 		end
 
-		if v40 == s1 then
+		if v41 == s1 then
 			ExpChatConversationListAdapter.markConversationRead(s1, true)
 		end
-	end):catch(function(p2) -- line: 82
-		-- upvalues: v12 (copy), s1 (copy)
-		v12:warning(`Failed to fetch newer messages for { s1 }: { tostring(p2) }`)
+	end):catch(function(p2) -- line: 87
+		-- upvalues: v13 (copy), s1 (copy)
+		v13:warning(`Failed to fetch newer messages for { s1 }: { tostring(p2) }`)
 	end)
 end
-local function getFirstConversationResponse(p3) -- line: 89
-	local v23 = if p3 == nil then nil else p3.responseBody or p3
-	local v24 = v23 and v23.conversations
+local function getFirstConversationResponse(p3) -- line: 94
+	local v24 = if p3 == nil then nil else p3.responseBody or p3
+	local v25 = v24 and v24.conversations
 
-	if v24 ~= nil then
-		return v24[1]
+	if v25 ~= nil then
+		return v25[1]
 	end
 
 	return nil
 end
-local function updateSelectedFriendPlaceholder(s2: string, p4) -- line: 95
+local function updateSelectedFriendPlaceholder(s2: string, p4) -- line: 100
 	-- upvalues: ConversationChannels (copy), GetFriendsChatNavigationStore (copy)
-	local v27 = if p4 == nil then nil else p4.responseBody or p4
-	local v28 = v27 and v27.conversations
-	local v29 = if v28 == nil then nil else v28[1]
+	local v28 = if p4 == nil then nil else p4.responseBody or p4
+	local v29 = v28 and v28.conversations
+	local v30 = if v29 == nil then nil else v29[1]
 
-	if v29 == nil or (v29.source ~= ConversationChannels.Source.Channels or v29.type ~= ConversationChannels.Type.OneToOne or v29.participant_user_ids == nil) then
+	if v30 == nil or (v30.source ~= ConversationChannels.Source.Channels or v30.type ~= ConversationChannels.Type.OneToOne or v30.participant_user_ids == nil) then
 		return
 	end
 
-	local v30 = ConversationChannels.getFriendConversationId(v29.participant_user_ids)
-	local v31 = GetFriendsChatNavigationStore(false)
+	local v31 = ConversationChannels.getFriendConversationId(v30.participant_user_ids)
+	local v32 = GetFriendsChatNavigationStore(false)
 
-	if v30 == v31.getSelectedConversationId(false) then
-		v31.setSelectedConversationId(v29.id or s2)
+	if v31 == v32.getSelectedConversationId(false) then
+		v32.setSelectedConversationId(v30.id or s2)
 	end
 end
-local function fetchConversationDetailsSafe(s3: string) -- line: 114
-	-- upvalues: ExpChatConversationListAdapter (copy), updateSelectedFriendPlaceholder (copy), v12 (copy)
-	ExpChatConversationListAdapter.fetchConversationDetailsToSignals(s3):andThen(function(p5) -- line: 116
+local function fetchConversationDetailsSafe(s3: string) -- line: 119
+	-- upvalues: ExpChatConversationListAdapter (copy), updateSelectedFriendPlaceholder (copy), v13 (copy)
+	ExpChatConversationListAdapter.fetchConversationDetailsToSignals(s3):andThen(function(p5) -- line: 121
 		-- upvalues: updateSelectedFriendPlaceholder (copy), s3 (copy)
 		updateSelectedFriendPlaceholder(s3, p5)
-	end):catch(function(p6) -- line: 119
-		-- upvalues: v12 (copy), s3 (copy)
-		v12:warning(`Failed to fetch conversation details for { s3 }: { tostring(p6) }`)
+	end):catch(function(p6) -- line: 124
+		-- upvalues: v13 (copy), s3 (copy)
+		v13:warning(`Failed to fetch conversation details for { s3 }: { tostring(p6) }`)
 	end)
 end
-local function handleRemove(s4: string) -- line: 125
+local function handleRemove(s4: string) -- line: 130
 	-- upvalues: ExpChatConversationListAdapter (copy), GetFriendsChatNavigationStore (copy)
 	ExpChatConversationListAdapter.removeConversation(s4)
 
-	local v34 = GetFriendsChatNavigationStore(false)
+	local v35 = GetFriendsChatNavigationStore(false)
 
-	if s4 == v34.getSelectedConversationId(false) then
-		v34.setSelectedConversationId(nil)
+	if s4 == v35.getSelectedConversationId(false) then
+		v35.setSelectedConversationId(nil)
 	end
 end
-local function FriendsChatRealtimeSubscriber() -- line: 133
+local function FriendsChatRealtimeSubscriber() -- line: 138
 	-- upvalues: RealtimeDelivery (copy), classifyCommunicationChannelsEvent (copy), fetchNewerMessagesSafe (copy), ExpChatConversationListAdapter (copy), GetFriendsChatNavigationStore (copy), fetchConversationDetailsSafe (copy), GetFriendsChatRealtimeStore (copy), FStringDebugFriendsChatConversationId (copy)
-	RealtimeDelivery.useRealtimeNamespace("CommunicationChannels", function(p7) -- line: 134
+	RealtimeDelivery.useRealtimeNamespace("CommunicationChannels", function(p7) -- line: 139
 		-- upvalues: classifyCommunicationChannelsEvent (copy), fetchNewerMessagesSafe (copy), ExpChatConversationListAdapter (copy), GetFriendsChatNavigationStore (copy), fetchConversationDetailsSafe (copy)
-		local v49 = classifyCommunicationChannelsEvent(p7)
-		local channelId = v49.channelId
+		local v50 = classifyCommunicationChannelsEvent(p7)
+		local channelId = v50.channelId
 
 		if channelId == nil then
 			return
 		end
 
-		if v49.kind == "fetchMessage" then
+		if v50.kind == "fetchMessage" then
 			fetchNewerMessagesSafe(channelId)
 
 			return
 		end
 
-		if v49.kind == "removeConversation" then
+		if v50.kind == "removeConversation" then
 			ExpChatConversationListAdapter.removeConversation(channelId)
 
-			local v51 = GetFriendsChatNavigationStore(false)
+			local v52 = GetFriendsChatNavigationStore(false)
 
-			if channelId == v51.getSelectedConversationId(false) then
-				v51.setSelectedConversationId(nil)
+			if channelId == v52.getSelectedConversationId(false) then
+				v52.setSelectedConversationId(nil)
 
 				return
 			end
-		elseif v49.kind == "fetchConversationDetails" then
+		elseif v50.kind == "fetchConversationDetails" then
 			fetchConversationDetailsSafe(channelId)
 		end
 	end, {})
-	RealtimeDelivery.useRealtimeConnectionStateChanged("CommunicationChannels", function(p8, b1: boolean) -- line: 152
+	RealtimeDelivery.useRealtimeConnectionStateChanged("CommunicationChannels", function(p8, b1: boolean) -- line: 157
 		-- upvalues: GetFriendsChatRealtimeStore (copy), FStringDebugFriendsChatConversationId (copy), fetchNewerMessagesSafe (copy)
 		if p8 ~= Enum.ConnectionState.Connected or not b1 then
 			return
 		end
 
-		local v54 = GetFriendsChatRealtimeStore(false).getActiveConversationId(false) or FStringDebugFriendsChatConversationId
+		local v55 = GetFriendsChatRealtimeStore(false).getActiveConversationId(false) or FStringDebugFriendsChatConversationId
 
-		if v54 ~= "" then
-			fetchNewerMessagesSafe(v54)
+		if v55 ~= "" then
+			fetchNewerMessagesSafe(v55)
 		end
 	end, {})
 

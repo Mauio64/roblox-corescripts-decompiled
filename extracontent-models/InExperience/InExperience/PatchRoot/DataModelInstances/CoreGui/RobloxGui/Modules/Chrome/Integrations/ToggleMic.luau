@@ -17,61 +17,65 @@ local Service = require(Chrome.Service)
 local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
 local RedVoiceDot = require(Chrome.Integrations.RedVoiceDot)
 local UnibarStyle = require(CorePackages.Workspace.Packages.Chrome).UnibarStyle
+local useIsPlaytestMode = require(Chrome.ChromeShared.Hooks.useIsPlaytestMode)
+local FFlagEnablePlaytestModeUnibar = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnablePlaytestModeUnibar
 local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
 local MappedSignal = ChromeUtils.MappedSignal
-local v22 = if not FFlagChromeActivatedMappedSignal then nil else MappedSignal.new(default.muteChanged.Event, function() -- line: 33
+local v24 = if not FFlagChromeActivatedMappedSignal then nil else MappedSignal.new(default.muteChanged.Event, function() -- line: 35
 	-- upvalues: default (copy)
 	return default.localMuted == false
 end)
 local Constants = require(Chrome.ChromeShared.Unibar.Constants)
-local v24 = require(RobloxGui.Modules.SelfView.Analytics).new()
-local u25 = nil
+local v26 = require(RobloxGui.Modules.SelfView.Analytics).new()
+local u27 = nil
 
 if GetFFlagEnableVoiceMuteAnalytics() then
-	u25 = VoiceAnalytics.new(RbxAnalyticsService, "Chrome.Integrations.ToggleMic")
+	u27 = VoiceAnalytics.new(RbxAnalyticsService, "Chrome.Integrations.ToggleMic")
 end
 
-local function v26(_) -- line: 49
-	-- upvalues: default (copy), v24 (copy), u25 (ref)
+local function v28(_) -- line: 51
+	-- upvalues: default (copy), v26 (copy), u27 (ref)
 	default:ToggleMic("ChromeIntegrationsToggleMic")
-	v24:setLastCtx("SelfView")
+	v26:setLastCtx("SelfView")
 
-	if u25 then
-		u25:onToggleMuteSelf(not default.localMuted)
+	if u27 then
+		u27:onToggleMuteSelf(not default.localMuted)
 	end
 end
-local function v27(_) -- line: 57
+local function v29(_) -- line: 59
 	-- upvalues: default (copy)
 	default:RejoinPreviousChannel()
 end
-local function v28(_) -- line: 61
+local function v30(_) -- line: 63
 	-- upvalues: default (copy)
 	default:ShowVoiceChatLoadingMessage()
 end
 
 local FFlagChangeToggleMicText = require(Chrome.Flags.FFlagChangeToggleMicText)
-local u30 = Service:register({
+local u32 = Service:register({
 	id = "toggle_mic_mute",
 	label = not FFlagChangeToggleMicText and "CoreScripts.TopBar.ToggleMic" or "CoreScripts.TopBar.Mic",
 	sideSheetPlacement = SideSheetPlacement.Unibar,
-	activated = v26,
-	isActivated = if not FFlagChromeActivatedMappedSignal then nil else v22,
+	activated = v28,
+	isActivated = if not FFlagChromeActivatedMappedSignal then nil else v24,
 	components = {
-		Icon = function(_) -- line: 75
-			-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), VoiceIndicatorFunc (copy), Players (copy), RedVoiceDot (copy)
-			local v37 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_SIZE else UnibarStyle.use().ICON_SIZE
+		Icon = function(_) -- line: 77
+			-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), FFlagEnablePlaytestModeUnibar (copy), useIsPlaytestMode (copy), React (copy), VoiceIndicatorFunc (copy), Players (copy), RedVoiceDot (copy)
+			local v39 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_SIZE else UnibarStyle.use().ICON_SIZE
+			local v40 = if not FFlagEnablePlaytestModeUnibar then nil else useIsPlaytestMode()
+			local v41 = (not FFlagEnablePlaytestModeUnibar or not v40) and "MicLight" or "MicDark"
 
 			return React.createElement("Frame", {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, v37, 0, v37)
+				Size = UDim2.new(0, v39, 0, v39)
 			}, {
 				React.createElement(VoiceIndicatorFunc, {
 					hideOnError = false,
-					iconStyle = "MicLight",
 					selectable = false,
 					showConnectingShimmer = true,
 					userId = tostring(Players.LocalPlayer.UserId),
-					size = UDim2.new(0, v37, 0, v37)
+					iconStyle = v41,
+					size = UDim2.new(0, v39, 0, v39)
 				}),
 				(React.createElement(RedVoiceDot, {
 					position = UDim2.new(1, -7, 1, -7)
@@ -81,59 +85,59 @@ local u30 = Service:register({
 	}
 })
 
-local function applyVoiceUIVisibility() -- line: 104
-	-- upvalues: default (copy), u30 (ref)
+local function applyVoiceUIVisibility() -- line: 109
+	-- upvalues: default (copy), u32 (ref)
 	if default.voiceUIVisible then
-		u30.availability:pinned()
+		u32.availability:pinned()
 
 		return
 	end
 
-	u30.availability:unavailable()
+	u32.availability:unavailable()
 end
-local function updateVoiceState(_, p6) -- line: 112
-	-- upvalues: v13 (copy), default (copy), u30 (ref), v27 (copy), v28 (copy), v26 (copy)
+local function updateVoiceState(_, p6) -- line: 117
+	-- upvalues: v13 (copy), default (copy), u32 (ref), v29 (copy), v30 (copy), v28 (copy)
 	if p6 ~= Enum.VoiceChatState.Ended then
 		if v13 then
 			if default.voiceUIVisible then
-				u30.availability:pinned()
+				u32.availability:pinned()
 			else
-				u30.availability:unavailable()
+				u32.availability:unavailable()
 			end
 		else
-			u30.availability:pinned()
+			u32.availability:pinned()
 		end
 	else
-		u30.availability:unavailable()
+		u32.availability:unavailable()
 	end
 
-	local v40 = p6 == Enum.VoiceChatState.Failed
-	local v41 = p6 == Enum.VoiceChatState.Joining or p6 == Enum.VoiceChatState.JoiningRetry
+	local v44 = p6 == Enum.VoiceChatState.Failed
+	local v45 = p6 == Enum.VoiceChatState.Joining or p6 == Enum.VoiceChatState.JoiningRetry
 
-	if v40 then
-		u30.activated = v27
+	if v44 then
+		u32.activated = v29
 
 		return
 	end
 
-	if v41 then
-		u30.activated = v28
+	if v45 then
+		u32.activated = v30
 
 		return
 	end
 
-	u30.activated = v26
+	u32.activated = v28
 end
 
 if game:GetEngineFeature("VoiceChatSupported") then
-	task.spawn(function() -- line: 138
-		-- upvalues: default (copy), updateVoiceState (copy), v13 (copy), applyVoiceUIVisibility (copy), u30 (ref)
-		default:asyncInit():andThen(function() -- line: 140
-			-- upvalues: default (copy), updateVoiceState (copy), v13 (copy), applyVoiceUIVisibility (copy), u30 (ref)
-			local v42 = default:getService()
+	task.spawn(function() -- line: 143
+		-- upvalues: default (copy), updateVoiceState (copy), v13 (copy), applyVoiceUIVisibility (copy), u32 (ref)
+		default:asyncInit():andThen(function() -- line: 145
+			-- upvalues: default (copy), updateVoiceState (copy), v13 (copy), applyVoiceUIVisibility (copy), u32 (ref)
+			local v46 = default:getService()
 
-			if v42 then
-				v42.StateChanged:Connect(updateVoiceState)
+			if v46 then
+				v46.StateChanged:Connect(updateVoiceState)
 				default:SetupParticipantListeners()
 
 				if v13 then
@@ -141,21 +145,21 @@ if game:GetEngineFeature("VoiceChatSupported") then
 					default.hideVoiceUI.Event:Connect(applyVoiceUIVisibility)
 
 					if default.voiceUIVisible then
-						u30.availability:pinned()
+						u32.availability:pinned()
 
 						return
 					end
 
-					u30.availability:unavailable()
+					u32.availability:unavailable()
 
 					return
 				end
 
-				u30.availability:pinned()
+				u32.availability:pinned()
 			end
-		end):catch(function() -- line: 154
+		end):catch(function() -- line: 159
 		end)
 	end)
 end
 
-return u30
+return u32

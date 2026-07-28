@@ -1,9 +1,9 @@
 local Parent = script:FindFirstAncestor("Moments").Parent
 local MomentsGetMomentsShareLinkStore = require(Parent.DataHydration.MomentsGetMomentsShareLinkStore)
 
-local function fetchShareLink(t1: {[any]: any}) -- line: 13
+local function fetchShareLink(t1: {[any]: any}) -- line: 16
 	-- upvalues: MomentsGetMomentsShareLinkStore (copy)
-	local v5 = MomentsGetMomentsShareLinkStore(false).getAndFetchShareLink(t1.momentId, t1.description, t1.title)
+	local v5 = MomentsGetMomentsShareLinkStore(false).getAndFetchShareLink(t1.momentId, t1.description, t1.title, t1.feedItemId)
 
 	while v5.status(false) == "NotReady" do
 		task.wait()

@@ -84,12 +84,9 @@ local function Sheet(p1, p2) -- line: 26
 	v26.isOpen = nil
 	v26.ref = p2
 	v26.sheetRef = v20
+	v26.displaySize = v24
 
-	if not Flags.FoundationSideSheetNewWidthCalculation then
-		v26.displaySize = v24
-	end
-
-	function v26.onClose() -- line: 85
+	function v26.onClose() -- line: 83
 		-- upvalues: v17 (copy), v19 (copy)
 		if v17.onClose then
 			v17.onClose()

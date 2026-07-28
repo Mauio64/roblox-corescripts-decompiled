@@ -30,27 +30,34 @@ local setRegroupPromptShown = require(SquadsCore.Thunks.setRegroupPromptShown)
 local GuiService = game:GetService("GuiService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local v29 = game:DefineFastInt("SquadRegroupPromptDebounceTimeMs", 20000)
+local FFlagSquadsPresenceStoreMigration = require(SquadsCore.Flags.FFlagSquadsPresenceStoreMigration)
+local v31 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsCoreParent.DataHydration)
+local v32 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsCoreParent.Signals)
+local v33 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsCoreParent.SignalsReact)
+local v34 = if not FFlagSquadsPresenceStoreMigration then nil else v31.Presence.PresenceStore.get()
+local v35 = if not FFlagSquadsPresenceStoreMigration then nil else v31.Presence.normalizePresenceRawData
+local v36 = if not FFlagSquadsPresenceStoreMigration then nil else v31.Presence.PresenceEnums.PresenceType
+local v37 = if not FFlagSquadsPresenceStoreMigration then nil else v33.useSignalState
 
-return function(t1: {[any]: any}) -- line: 43
-	-- upvalues: React (copy), SquadExternalContractContext (copy), useLocalization (copy), useDispatch (copy), useLocalUserId (copy), Cryo (copy), NetworkingPresence (copy), PresenceType (copy), Logger (copy), serializeTable (copy), useSelector (copy), v29 (copy), Dash (copy), SquadRegroupExperimentation (copy), GuiService (copy), EventNames (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), SquadExperienceInviteSource (copy), setRegroupPromptShown (copy), RealtimeDelivery (copy), Constants2 (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy)
-	local v31 = React.useContext(SquadExternalContractContext)
-	local v32 = useLocalization({
+return function(t1: {[any]: any}) -- line: 58
+	-- upvalues: React (copy), SquadExternalContractContext (copy), useLocalization (copy), useDispatch (copy), useLocalUserId (copy), Cryo (copy), FFlagSquadsPresenceStoreMigration (copy), v32 (copy), v34 (copy), v37 (copy), NetworkingPresence (copy), PresenceType (copy), Logger (copy), serializeTable (copy), useSelector (copy), v29 (copy), Dash (copy), v36 (copy), SquadRegroupExperimentation (copy), GuiService (copy), EventNames (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), SquadExperienceInviteSource (copy), setRegroupPromptShown (copy), RealtimeDelivery (copy), Constants2 (copy), v35 (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy)
+	local v39 = React.useContext(SquadExternalContractContext)
+	local v40 = useLocalization({
 		RegroupPromptTitle = "Notifications.SquadRegroupPrompt.ToastLabel.ContinuePlayingTogether",
 		RegroupPromptBody = "Notifications.SquadRegroupPrompt.ToastLabel.JoinANewServer",
 		Dismiss = "Notifications.SquadRegroupPrompt.ToastAction.Dismiss",
 		Join = "Notifications.SquadRegroupPrompt.ToastAction.Join"
 	})
-	local v33 = useDispatch()
-	local v34 = tonumber(useLocalUserId()) or 0
-	local v35 = React.useRef(false)
-	local v36 = React.useMemo(function() -- line: 57
+	local v41 = useDispatch()
+	local v42 = tonumber(useLocalUserId()) or 0
+	local v43 = React.useRef(false)
+	local v44 = React.useMemo(function() -- line: 72
 		-- upvalues: Cryo (copy), t1 (copy)
-		return Cryo.List.map(t1.currentSquadMembers, function(p1) -- line: 58
+		return Cryo.List.map(t1.currentSquadMembers, function(p1) -- line: 73
 			return p1.userId
 		end)
 	end, { t1.currentSquadMembers })
-	local v37, v38 = React.useState({})
-	local v39 = React.useMemo(function() -- line: 64
+	local v45 = React.useMemo(function() -- line: 78
 		-- upvalues: t1 (copy)
 		local t2 = {}
 
@@ -60,239 +67,280 @@ return function(t1: {[any]: any}) -- line: 43
 
 		return t2
 	end, { t1.currentSquadMembers })
-	local v40 = React.useCallback(function() -- line: 73
-		-- upvalues: v33 (copy), NetworkingPresence (copy), v36 (copy), Cryo (copy), PresenceType (copy), v38 (copy), Logger (copy), serializeTable (copy)
-		v33(NetworkingPresence.GetPresencesFromUserIds.API(v36)):andThen(function(p2) -- line: 75
-			-- upvalues: Cryo (copy), PresenceType (copy), v38 (copy)
-			local v73 = p2 and (not not p2.responseBody and p2.responseBody.userPresences) or {}
+	local v46 = if not FFlagSquadsPresenceStoreMigration then nil else React.useMemo(function() -- line: 89
+		-- upvalues: v32 (copy), v44 (copy), v34 (copy)
+		return v32.createComputed(function(p2) -- line: 90
+			-- upvalues: v44 (copy), v34 (copy)
 			local t3 = {}
 
-			for _, v in pairs(v73) do
+			for _, v in ipairs(v44) do
+				local str = tostring(v)
+
+				t3[str] = v34.GetPresenceByUserId(str).data(p2)
+			end
+
+			return t3
+		end)
+	end, { v44 })
+	local u47 = nil
+	local u48
+
+	if FFlagSquadsPresenceStoreMigration then
+		u48 = v37(v46)
+	else
+		local v49, v50 = React.useState({})
+
+		u48 = v49
+		u47 = v50
+	end
+
+	local v51 = React.useCallback(function() -- line: 110
+		-- upvalues: FFlagSquadsPresenceStoreMigration (copy), v44 (copy), v34 (copy), v41 (copy), NetworkingPresence (copy), Cryo (copy), PresenceType (copy), u47 (ref), Logger (copy), serializeTable (copy)
+		if FFlagSquadsPresenceStoreMigration then
+			for _, v in ipairs(v44) do
+				v34.RefreshPresenceByUserId((tostring(v)))
+			end
+
+			return
+		end
+
+		v41(NetworkingPresence.GetPresencesFromUserIds.API(v44)):andThen(function(p3) -- line: 117
+			-- upvalues: Cryo (copy), PresenceType (copy), u47 (ref)
+			local v91 = p3 and (not not p3.responseBody and p3.responseBody.userPresences) or {}
+			local t4 = {}
+
+			for _, v in pairs(v91) do
 				if v.userId and v.userPresenceType then
-					t3[tostring(v.userId)] = Cryo.Dictionary.join(v, {
+					t4[tostring(v.userId)] = Cryo.Dictionary.join(v, {
 						userPresenceType = PresenceType.fromRawValue(v.userPresenceType)
 					})
 				end
 			end
 
-			v38(function(p3) -- line: 85
-				-- upvalues: Cryo (copy), t3 (copy)
-				return Cryo.Dictionary.join(p3 or {}, t3)
+			u47(function(p4) -- line: 127
+				-- upvalues: Cryo (copy), t4 (copy)
+				return Cryo.Dictionary.join(p4 or {}, t4)
 			end)
-		end):catch(function(p4) -- line: 89
+		end):catch(function(p5) -- line: 131
 			-- upvalues: Logger (copy), serializeTable (copy)
-			Logger:warning("SquadRegroupPromptEventReceiver: initial presence fetch failed. err={}", serializeTable(p4))
+			Logger:warning("SquadRegroupPromptEventReceiver: initial presence fetch failed. err={}", serializeTable(p5))
 		end)
 	end, {
-		v33,
-		v36,
-		v34
+		v41,
+		v44,
+		v42
 	})
-	local v41 = React.useRef(true)
+	local v52 = React.useRef(true)
 
-	React.useEffect(function() -- line: 98
-		-- upvalues: v41 (copy), v40 (copy)
-		v41.current = true
-		v40()
+	React.useEffect(function() -- line: 141
+		-- upvalues: v52 (copy), v51 (copy)
+		v52.current = true
+		v51()
 
-		return function() -- line: 102
-			-- upvalues: v41 (copy)
-			v41.current = false
+		return function() -- line: 145
+			-- upvalues: v52 (copy)
+			v52.current = false
 		end
 	end, {})
 
-	local v42 = React.useCallback(function(p5) -- line: 107
-		if p5.Squad and p5.Squad.Squad then
-			return p5.Squad.Squad.currentExperienceInvite
+	local v53 = React.useCallback(function(p6) -- line: 150
+		if p6.Squad and p6.Squad.Squad then
+			return p6.Squad.Squad.currentExperienceInvite
 		end
 
 		return nil
 	end, {})
-	local v43 = useSelector(v42)
-	local v44 = React.useRef(nil)
+	local v54 = useSelector(v53)
+	local v55 = React.useRef(nil)
 
-	v44.current = v43
+	v55.current = v54
 
-	local v45 = v29 / 1000
-	local v46 = React.useRef(nil)
+	local v56 = v29 / 1000
+	local v57 = React.useRef(nil)
 
-	if v46.current == nil then
-		v46.current = Dash.debounce(function(t4: {[any]: any}, p6, p7, s1: string) -- line: 120
-			-- upvalues: v41 (copy), v35 (copy), v44 (copy), PresenceType (copy), SquadRegroupExperimentation (copy), GuiService (copy), v32 (copy), v31 (copy), EventNames (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), Logger (copy), serializeTable (copy), v33 (copy), SquadExperienceInviteSource (copy), setRegroupPromptShown (copy)
-			if not v41.current or (v35.current or v44.current ~= nil) then
+	if v57.current == nil then
+		v57.current = Dash.debounce(function(t5: {[any]: any}, p7, p8, s1: string) -- line: 163
+			-- upvalues: v52 (copy), v43 (copy), v55 (copy), FFlagSquadsPresenceStoreMigration (copy), v36 (copy), PresenceType (copy), SquadRegroupExperimentation (copy), GuiService (copy), v40 (copy), v39 (copy), EventNames (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), Logger (copy), serializeTable (copy), v41 (copy), SquadExperienceInviteSource (copy), setRegroupPromptShown (copy)
+			if not v52.current or (v43.current or v55.current ~= nil) then
 				return
 			end
 
-			local v55 = t4[tostring(p6)]
+			local v68 = t5[tostring(p7)]
 
-			if v55 == nil then
+			if v68 == nil then
 				return
 			end
 
-			for _, v in pairs(t4) do
-				if v and (v.userPresenceType == PresenceType.Online or v.userPresenceType == PresenceType.InGame and (v55.gameId ~= nil and (v.gameId ~= nil and v55.gameId ~= v.gameId))) then
+			for _, v in pairs(t5) do
+				if v and (v.userPresenceType == (if not FFlagSquadsPresenceStoreMigration then PresenceType.Online else v36.Online) or v.userPresenceType == (if not FFlagSquadsPresenceStoreMigration then PresenceType.InGame else v36.InGame) and (v68.gameId ~= (if not FFlagSquadsPresenceStoreMigration then nil else "") and (v.gameId ~= (if not FFlagSquadsPresenceStoreMigration then nil else "") and v68.gameId ~= v.gameId))) then
 					SquadRegroupExperimentation.logExposure()
 
 					if not SquadRegroupExperimentation.getSquadRegroupEnabled() then
 						return
 					end
 
-					local u58 = nil
+					local u71 = nil
 
-					u58 = GuiService:SendNotification({
-						Title = v32.RegroupPromptTitle,
-						Text = v32.RegroupPromptBody,
+					u71 = GuiService:SendNotification({
+						Title = v40.RegroupPromptTitle,
+						Text = v40.RegroupPromptBody,
 						Icon = s1,
 						Buttons = {
 							{
-								Text = v32.Dismiss,
+								Text = v40.Dismiss,
 								ButtonType = Enum.NotificationButtonType.Secondary,
-								OnActivated = function() -- line: 166
-									-- upvalues: v31 (copy), EventNames (copy), p7 (copy), p6 (copy), v55 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), u58 (ref), v35 (copy)
-									v31.fireSquadAnalytics(EventNames.SquadRegroupPromptClicked, {
+								OnActivated = function() -- line: 215
+									-- upvalues: v39 (copy), EventNames (copy), p8 (copy), p7 (copy), v68 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), u71 (ref), v43 (copy)
+									v39.fireSquadAnalytics(EventNames.SquadRegroupPromptClicked, {
 										clientTimestamp = os.time(),
-										squadId = p7,
-										initiatorId = p6,
-										gameInstanceId = v55.gameId,
-										rootPlaceId = v55.rootPlaceId,
-										placeId = v55.placeId,
-										universeId = v55.universeId,
+										squadId = p8,
+										initiatorId = p7,
+										gameInstanceId = v68.gameId,
+										rootPlaceId = v68.rootPlaceId,
+										placeId = v68.placeId,
+										universeId = v68.universeId,
 										playSessionId = RbxAnalyticsService:GetPlaySessionId(),
 										button = SquadToastActionsAndStates.RegroupDismiss,
 										entryPoint = SquadRegroupEntryPoint.ToastPrompt
 									})
-									RegroupPromptNotificationState.dismissNotification(u58)
-									v35.current = false
+									RegroupPromptNotificationState.dismissNotification(u71)
+									v43.current = false
 								end
 							},
 							{
-								Text = v32.Join,
+								Text = v40.Join,
 								ButtonType = Enum.NotificationButtonType.Primary,
-								OnActivated = function() -- line: 186
-									-- upvalues: v55 (copy), v31 (copy), Logger (copy), serializeTable (copy), v33 (copy), SquadExperienceInviteSource (copy), EventNames (copy), p7 (copy), p6 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), u58 (ref), v35 (copy)
-									local rootPlaceId = v55.rootPlaceId
+								OnActivated = function() -- line: 235
+									-- upvalues: v68 (copy), v39 (copy), Logger (copy), FFlagSquadsPresenceStoreMigration (copy), serializeTable (copy), v41 (copy), SquadExperienceInviteSource (copy), EventNames (copy), p8 (copy), p7 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy), RegroupPromptNotificationState (copy), u71 (ref), v43 (copy)
+									local rootPlaceId = v68.rootPlaceId
 
-									if v31.createExperienceInvite == nil then
+									if v39.createExperienceInvite == nil then
 										Logger:warning("SquadRegroupEventReceiver: Join clicked but createExperienceInvite was not supplied in the external contract")
-									elseif rootPlaceId == nil then
-										Logger:warning("SquadRegroupEventReceiver: Join clicked but rootPlaceId is missing from local presence. localPresence={}", serializeTable(v55))
+									elseif rootPlaceId == nil or FFlagSquadsPresenceStoreMigration and rootPlaceId == "" then
+										Logger:warning("SquadRegroupEventReceiver: Join clicked but rootPlaceId is missing from local presence. localPresence={}", serializeTable(v68))
 									else
-										v33(v31.createExperienceInvite(tostring(rootPlaceId), SquadExperienceInviteSource.Regroup)):andThen(function(p8) -- line: 204
-											-- upvalues: v31 (copy), EventNames (copy), p7 (copy), p6 (copy), v55 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
-											v31.fireSquadAnalytics(EventNames.SquadRegroupPromptClicked, {
+										v41(v39.createExperienceInvite(tostring(rootPlaceId), SquadExperienceInviteSource.Regroup)):andThen(function(p9) -- line: 256
+											-- upvalues: v39 (copy), EventNames (copy), p8 (copy), p7 (copy), v68 (copy), RbxAnalyticsService (copy), SquadToastActionsAndStates (copy), SquadRegroupEntryPoint (copy)
+											v39.fireSquadAnalytics(EventNames.SquadRegroupPromptClicked, {
 												clientTimestamp = os.time(),
-												squadId = p7,
-												initiatorId = p6,
-												gameInstanceId = v55.gameId,
-												rootPlaceId = v55.rootPlaceId,
-												placeId = v55.placeId,
-												universeId = v55.universeId,
+												squadId = p8,
+												initiatorId = p7,
+												gameInstanceId = v68.gameId,
+												rootPlaceId = v68.rootPlaceId,
+												placeId = v68.placeId,
+												universeId = v68.universeId,
 												playSessionId = RbxAnalyticsService:GetPlaySessionId(),
-												experienceInviteId = p8,
+												experienceInviteId = p9,
 												button = SquadToastActionsAndStates.RegroupJoin,
 												entryPoint = SquadRegroupEntryPoint.ToastPrompt
 											})
-										end):catch(function(p9) -- line: 222
+										end):catch(function(p10) -- line: 274
 											-- upvalues: Logger (copy), serializeTable (copy)
-											Logger:warning("SquadRegroupEventReceiver: createExperienceInvite failed. err={}", serializeTable(p9))
+											Logger:warning("SquadRegroupEventReceiver: createExperienceInvite failed. err={}", serializeTable(p10))
 										end)
 									end
 
-									RegroupPromptNotificationState.dismissNotification(u58)
-									v35.current = false
+									RegroupPromptNotificationState.dismissNotification(u71)
+									v43.current = false
 								end
 							}
 						}
 					})
-					v35.current = true
-					RegroupPromptNotificationState.setActive(u58, p7)
-					v31.fireSquadAnalytics(EventNames.SquadRegroupPromptShown, {
+					v43.current = true
+					RegroupPromptNotificationState.setActive(u71, p8)
+					v39.fireSquadAnalytics(EventNames.SquadRegroupPromptShown, {
 						clientTimestamp = os.time(),
-						squadId = p7,
-						initiatorId = p6,
-						gameInstanceId = v55.gameId,
-						rootPlaceId = v55.rootPlaceId,
-						placeId = v55.placeId,
-						universeId = v55.universeId,
+						squadId = p8,
+						initiatorId = p7,
+						gameInstanceId = v68.gameId,
+						rootPlaceId = v68.rootPlaceId,
+						placeId = v68.placeId,
+						universeId = v68.universeId,
 						playSessionId = RbxAnalyticsService:GetPlaySessionId(),
 						entryPoint = SquadRegroupEntryPoint.ToastPrompt
 					})
 
-					if p7 then
-						v33(setRegroupPromptShown(p7))
+					if p8 then
+						v41(setRegroupPromptShown(p8))
 					end
 
 					return
 				end
 			end
-		end, v45, {
+		end, v56, {
 			leading = false,
 			trailing = true
 		})
 	end
 
-	RealtimeDelivery.useRealtimeNamespace(Constants2.PRESENCE_BULK_RTN_NAMESPACE, function(p10) -- line: 266
-		-- upvalues: v39 (copy), PresenceType (copy), v38 (copy)
-		if type(p10) ~= "table" then
+	RealtimeDelivery.useRealtimeNamespace(Constants2.PRESENCE_BULK_RTN_NAMESPACE, function(p11) -- line: 318
+		-- upvalues: v45 (copy), FFlagSquadsPresenceStoreMigration (copy), v34 (copy), v35 (copy), PresenceType (copy), u47 (ref)
+		if type(p11) ~= "table" then
 			return
 		end
 
-		local u60 = nil
+		local u73 = nil
 
-		for _, v in ipairs(p10) do
-			local v63 = v and v.UserId
+		for _, v in ipairs(p11) do
+			local v76 = v and v.UserId
 
-			if v63 ~= nil then
-				local str = tostring(v63)
+			if v76 ~= nil then
+				local str = tostring(v76)
 
-				if v39[str] then
-					local v65 = v and v.PresenceReport
+				if v45[str] then
+					local v78 = v and v.PresenceReport
 
-					if v65 ~= nil then
-						v65.userPresenceType = PresenceType.fromRawValue(v65.userPresenceType)
-						u60 = u60 or {}
-						u60[str] = v65
+					if v78 ~= nil then
+						if FFlagSquadsPresenceStoreMigration then
+							v34.UpdateUserPresence(str, v35(v78), {
+								isUpdatedRealtime = true
+							})
+						else
+							v78.userPresenceType = PresenceType.fromRawValue(v78.userPresenceType)
+							u73 = u73 or {}
+							u73[str] = v78
+						end
 					end
 				end
 			end
 		end
 
-		if u60 ~= nil then
-			v38(function(p11) -- line: 290
-				-- upvalues: u60 (ref)
-				local v80 = table.clone(p11 or {})
+		if not FFlagSquadsPresenceStoreMigration and u73 ~= nil then
+			u47(function(p12) -- line: 350
+				-- upvalues: u73 (ref)
+				local v98 = table.clone(p12 or {})
 
-				for k, v in pairs(u60) do
-					v80[k] = v
+				for k, v in pairs(u73) do
+					v98[k] = v
 				end
 
-				return v80
+				return v98
 			end)
 		end
 	end, {
-		v33,
+		v41,
 		t1.currentSquadId,
-		v39
+		v45
 	})
-	RealtimeDelivery.useRealtimeConnectionStateChanged(Constants2.PRESENCE_BULK_RTN_NAMESPACE, function(p12, p13) -- line: 303
-		-- upvalues: Logger (copy), v40 (copy)
-		if p12 == Enum.ConnectionState.Connected and p13 then
+	RealtimeDelivery.useRealtimeConnectionStateChanged(Constants2.PRESENCE_BULK_RTN_NAMESPACE, function(p13, p14) -- line: 363
+		-- upvalues: Logger (copy), v51 (copy)
+		if p13 == Enum.ConnectionState.Connected and p14 then
 			Logger:info("Connection re-established, fetching squad presences.")
-			v40()
+			v51()
 		end
-	end, { v40 })
-	React.useEffect(function() -- line: 312
-		-- upvalues: v35 (copy), v37 (copy), v34 (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), v46 (copy), t1 (copy)
-		if not v35.current then
-			local v68 = v37[tostring(v34)]
-			local v69 = v68 and (v68.universeId or v68.gameId) or nil
-			local v70 = if v69 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v69), Constants.RbxthumbTypes.GameIcon, 128, false)
+	end, { v51 })
+	React.useEffect(function() -- line: 372
+		-- upvalues: v43 (copy), u48 (ref), v42 (copy), FFlagSquadsPresenceStoreMigration (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), v57 (copy), t1 (copy)
+		if not v43.current then
+			local v81 = u48[tostring(v42)]
+			local v82 = if not FFlagSquadsPresenceStoreMigration then v81 and (v81.universeId or v81.gameId) or nil else v81 and (v81.universeId ~= "" and v81.universeId) or (v81 and (v81.gameId ~= "" and v81.gameId) or nil)
+			local v83 = if v82 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v82), Constants.RbxthumbTypes.GameIcon, 128, false)
 
-			v46.current(v37, v34, t1.currentSquadId, v70)
+			v57.current(u48, v42, t1.currentSquadId, v83)
 		end
 	end, {
-		v37,
-		v34,
+		u48,
+		v42,
 		t1.currentSquadId
 	})
 

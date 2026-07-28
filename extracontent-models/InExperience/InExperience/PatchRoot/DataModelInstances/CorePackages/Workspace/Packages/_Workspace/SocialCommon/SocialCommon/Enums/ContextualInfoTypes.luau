@@ -7,7 +7,5 @@ return {
 	MutualFriends = "mutualFriends",
 	Frequents = "frequents",
 	Contacts = "Contacts",
-	OffNetworkFriendRequest = "OffNetworkFriendRequest",
-	FromQR = "FromQR",
-	FromSearch = "FromSearch"
+	OffNetworkFriendRequest = "OffNetworkFriendRequest"
 }

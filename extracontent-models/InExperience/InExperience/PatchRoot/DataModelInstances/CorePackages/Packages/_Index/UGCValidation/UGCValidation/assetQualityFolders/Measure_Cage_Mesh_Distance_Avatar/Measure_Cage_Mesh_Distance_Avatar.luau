@@ -12,11 +12,11 @@ return {
 	categories = { ValidationEnums.UploadCategory.FULL_BODY },
 	fflag = require(ParentParent.flags.getFFlagUGCValidateAQCageQualityAvatar),
 	run = function(p1, p2) -- line: 16
-		-- upvalues: ErrorSourceStrings (copy), v4 (copy), v5 (copy), getFFlagUGCValidateAQScoreWarnings (copy)
+		-- upvalues: v4 (copy), ErrorSourceStrings (copy), v5 (copy), getFFlagUGCValidateAQScoreWarnings (copy)
 		local full_body_cage = p2.aqsSummaryData.Measure_Cage_Mesh_Distance_Avatar.full_body_cage
 
 		if full_body_cage == nil or (full_body_cage.max_distance == nil or full_body_cage.negative_sdf_percent == nil) then
-			p1:fail(ErrorSourceStrings.Keys.AQSInputDataError)
+			error("Measure_Cage_Mesh_Distance_Avatar: AQS summary missing required fields")
 
 			return
 		end

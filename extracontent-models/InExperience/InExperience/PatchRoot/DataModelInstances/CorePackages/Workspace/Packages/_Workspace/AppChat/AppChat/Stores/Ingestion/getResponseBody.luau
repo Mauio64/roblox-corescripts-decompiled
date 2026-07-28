@@ -1,8 +1,4 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-
-require(Parent.AppChatNetworking)
-
-local function getResponseBody(p1) -- line: 6
+local function getResponseBody(p1) -- line: 1
 	if p1 == nil then
 		return nil
 	end

@@ -14,37 +14,36 @@ local Theme = Foundation.Enums.Theme
 local getUIScale = require(StyleParent.Display).GetDisplayStore(false).getUIScale
 local v15 = game:DefineFastFlag("LuaAppEnableWindowsHandheldTokenScale", false) and game:GetEngineFeature("EnableDisplaySize")
 local v16 = game:DefineFastFlag("DebugLuaAppEnableTokenScale", false)
-local FFlagEnableCoreContentTheme = require(StyleParent.SharedFlags).FFlagEnableCoreContentTheme
-local v18 = v15 or v16
+local v17 = v15 or v16
 local t1 = {
 	dark = Theme.Dark,
 	light = Theme.Light
 }
 
-local function useTokenScale() -- line: 51
+local function useTokenScale() -- line: 50
 	-- upvalues: SignalsReact (copy), getUIScale (copy)
 	return (SignalsReact.useSignalState(getUIScale))
 end
-local function UiModeStyleProvider(t2: {[any]: any}) -- line: 56
-	-- upvalues: useDeviceType (copy), v18 (copy), SignalsReact (copy), getUIScale (copy), React (copy), UserGameSettings (copy), Cryo (copy), FoundationProvider (copy), t1 (copy), FFlagEnableCoreContentTheme (copy), SceneOverridesRegistry (copy), AppStyleProvider (copy)
-	local v24 = useDeviceType()
-	local u25 = nil
+local function UiModeStyleProvider(t2: {[any]: any}) -- line: 55
+	-- upvalues: useDeviceType (copy), v17 (copy), SignalsReact (copy), getUIScale (copy), React (copy), UserGameSettings (copy), Cryo (copy), FoundationProvider (copy), t1 (copy), SceneOverridesRegistry (copy), AppStyleProvider (copy)
+	local v23 = useDeviceType()
+	local u24 = nil
 
-	if v18 then
-		u25 = SignalsReact.useSignalState(getUIScale)
+	if v17 then
+		u24 = SignalsReact.useSignalState(getUIScale)
 	end
 
-	local v26, v27 = React.useState({
+	local v25, v26 = React.useState({
 		preferredTransparency = UserGameSettings.PreferredTransparency,
 		reducedMotion = UserGameSettings.ReducedMotion,
 		preferredTextSize = UserGameSettings.PreferredTextSize
 	})
 
-	React.useEffect(function() -- line: 70
-		-- upvalues: v27 (copy), UserGameSettings (copy)
-		local function updateSettings() -- line: 71
-			-- upvalues: v27 (copy), UserGameSettings (copy)
-			v27({
+	React.useEffect(function() -- line: 69
+		-- upvalues: v26 (copy), UserGameSettings (copy)
+		local function updateSettings() -- line: 70
+			-- upvalues: v26 (copy), UserGameSettings (copy)
+			v26({
 				preferredTransparency = UserGameSettings.PreferredTransparency,
 				reducedMotion = UserGameSettings.ReducedMotion,
 				preferredTextSize = UserGameSettings.PreferredTextSize
@@ -55,7 +54,7 @@ local function UiModeStyleProvider(t2: {[any]: any}) -- line: 56
 		local connection2 = UserGameSettings:GetPropertyChangedSignal("ReducedMotion"):Connect(updateSettings)
 		local connection3 = UserGameSettings:GetPropertyChangedSignal("PreferredTextSize"):Connect(updateSettings)
 
-		return function() -- line: 85
+		return function() -- line: 84
 			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()
@@ -64,59 +63,57 @@ local function UiModeStyleProvider(t2: {[any]: any}) -- line: 56
 	end, {})
 
 	local style = t2.style
-	local v29 = React.useMemo(function() -- line: 93
-		-- upvalues: Cryo (copy), style (copy), v24 (copy), v18 (copy), v26 (copy), u25 (ref)
+	local v28 = React.useMemo(function() -- line: 92
+		-- upvalues: Cryo (copy), style (copy), v23 (copy), v17 (copy), v25 (copy), u24 (ref)
 		return Cryo.Dictionary.join({
-			deviceType = style.deviceType or v24
+			deviceType = style.deviceType or v23
 		}, style, {
-			settings = if not v18 then v26 else Cryo.Dictionary.join(v26, {
-				scale = u25
+			settings = if not v17 then v25 else Cryo.Dictionary.join(v25, {
+				scale = u24
 			})
 		})
 	end, {
 		style,
-		v24,
-		v26,
-		u25
+		v23,
+		v25,
+		u24
 	})
-	local v30 = v29.tokenOverrides ~= nil
+	local v29 = v28.tokenOverrides ~= nil
 
 	return React.createElement(FoundationProvider, {
-		device = v29.deviceType,
-		theme = t1[v29.themeName:lower()],
-		preferences = v29.settings,
-		tokenOverrides = if not FFlagEnableCoreContentTheme then nil else v29.tokenOverrides
-	}, if not FFlagEnableCoreContentTheme and v29.tokenOverrides == nil then React.createElement(AppStyleProvider, {
-		style = v29
-	}, t2.children) else React.createElement(SceneOverridesRegistry, {
-		isActive = v30
+		device = v28.deviceType,
+		theme = t1[v28.themeName:lower()],
+		preferences = v28.settings,
+		tokenOverrides = v28.tokenOverrides
+	}, React.createElement(SceneOverridesRegistry, {
+		isActive = v29
 	}, React.createElement(AppStyleProvider, {
-		style = v29
+		style = v28
 	}, t2.children)))
 end
-local function ThemeProvider(t3: {[any]: any}) -- line: 133
-	-- upvalues: React (copy), FFlagEnableCoreContentTheme (copy), t1 (copy), Cryo (copy), ThemeContext (copy), UiModeStyleProvider (copy)
-	local v32, v33 = React.useState(t3.style.themeName)
-	local v34 = table.clone(t3)
-	local v35 = if not FFlagEnableCoreContentTheme then nil else t3.style.tokenOverrides
+local function ThemeProvider(t3: {[any]: any}) -- line: 130
+	-- upvalues: React (copy), t1 (copy), Cryo (copy), ThemeContext (copy), UiModeStyleProvider (copy)
+	local v31, v32 = React.useState(t3.style.themeName)
+	local v33 = table.clone(t3)
+	local tokenOverrides = t3.style.tokenOverrides
 
-	if FFlagEnableCoreContentTheme and t3.tokenOverridesByTheme then
-		local v36 = t1[v32:lower()]
+	if t3.tokenOverridesByTheme then
+		local v35 = t1[v31:lower()]
 
-		v35 = t3.tokenOverridesByTheme[v36] or v35
+		tokenOverrides = t3.tokenOverridesByTheme[v35] or tokenOverrides
 	end
 
-	v34.style = Cryo.Dictionary.join(v34.style, {
-		themeName = v32,
-		tokenOverrides = if not FFlagEnableCoreContentTheme then nil else v35 or Cryo.None
+	v33.style = Cryo.Dictionary.join(v33.style, {
+		themeName = v31,
+		tokenOverrides = tokenOverrides or Cryo.None
 	})
 
 	return React.createElement(ThemeContext.Provider, {
 		value = {
-			theme = v32,
-			setTheme = v33
+			theme = v31,
+			setTheme = v32
 		}
-	}, React.createElement(UiModeStyleProvider, v34))
+	}, React.createElement(UiModeStyleProvider, v33))
 end
 
 return ThemeProvider

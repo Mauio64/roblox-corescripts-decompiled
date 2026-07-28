@@ -106,7 +106,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 	local v56 = React.useRef(0)
 	local v57, v58 = React.useState(false)
 	local v59, v60 = React.useState(false)
-	local v61 = useTextInputVariants(v46, v45.size, v45.variant, v45.radius, v59, v57, v45.hasError)
+	local v61 = useTextInputVariants(v46, v45.size, v45.variant, v45.radius, v59, v45.hasError)
 	local container = v61.container
 	local v63 = if not v45.trailingElement or typeof(container.tag) ~= "string" then container.tag else string.gsub(container.tag, "gap%-large", "gap-xsmall")
 	local v64 = useStyleTags(v61.textBox.tag)
@@ -132,20 +132,20 @@ local function InternalTextInput(p2, p3) -- line: 192
 	local v79, v80 = React.useState(1)
 	local v81, v82 = React.useState(v78)
 	local v83 = v45.maxLines ~= nil
-	local v84, v85 = React.useState(function() -- line: 249
+	local v84, v85 = React.useState(function() -- line: 248
 		-- upvalues: getBindableValue (copy), v45 (copy)
 		return getBindableValue(v45.text)
 	end)
 
-	React.useEffect(function() -- line: 253
+	React.useEffect(function() -- line: 252
 		-- upvalues: chatTextAreaDebug (copy), v45 (copy)
 		chatTextAreaDebug.setEnabled(v45.composerDebug == true)
 
-		return function() -- line: 255
+		return function() -- line: 254
 		end
 	end, { v45.composerDebug })
 
-	local v86 = React.useCallback(function() -- line: 258
+	local v86 = React.useCallback(function() -- line: 257
 		-- upvalues: v47 (copy), v48 (copy)
 		local v146 = v47.current or v48.current
 
@@ -155,7 +155,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		return 0
 	end, {})
-	local v87 = React.useCallback(function(s1: string) -- line: 267
+	local v87 = React.useCallback(function(s1: string) -- line: 266
 		-- upvalues: measureTextLineCount (copy), v45 (copy), v78 (copy), v86 (copy), fontStyle (copy), FontSize (copy), v82 (copy)
 		local v148 = measureTextLineCount({
 			text = s1,
@@ -182,10 +182,10 @@ local function InternalTextInput(p2, p3) -- line: 192
 	local v89 = if not v45.maxLines then math.max(1, v45.numLines) else v79
 	local v90 = not not v45.alwaysMultiLine or v89 > 1
 
-	React.useEffect(function() -- line: 298
+	React.useEffect(function() -- line: 297
 		-- upvalues: v83 (copy), getBindableValue (copy), v45 (copy), v52 (copy), chatTextAreaDebug (copy), v85 (copy), v80 (copy), v87 (copy)
 		if not v83 then
-			return function() -- line: 300
+			return function() -- line: 299
 			end
 		end
 
@@ -196,13 +196,13 @@ local function InternalTextInput(p2, p3) -- line: 192
 			v52.current = v150
 			v85(v150)
 			v80(v87(v150))
-			task.defer(function() -- line: 308
+			task.defer(function() -- line: 307
 				-- upvalues: v80 (copy), v87 (copy), v150 (copy)
 				v80(v87(v150))
 			end)
 		end
 
-		return function() -- line: 312
+		return function() -- line: 311
 		end
 	end, {
 		v45.text,
@@ -210,7 +210,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v83
 	})
 
-	local v91 = React.useCallback(function(p4) -- line: 315
+	local v91 = React.useCallback(function(p4) -- line: 314
 		-- upvalues: v47 (copy), v48 (copy)
 		if v47.current then
 			v47.current.SelectionStart = p4
@@ -220,7 +220,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 			v48.current.SelectionStart = p4
 		end
 	end, {})
-	local v92 = React.useCallback(function(p5) -- line: 324
+	local v92 = React.useCallback(function(p5) -- line: 323
 		-- upvalues: v47 (copy), v48 (copy)
 		if v47.current then
 			v47.current.CursorPosition = p5
@@ -230,7 +230,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 			v48.current.CursorPosition = p5
 		end
 	end, {})
-	local v93 = React.useCallback(function() -- line: 333
+	local v93 = React.useCallback(function() -- line: 332
 		-- upvalues: v47 (copy), v48 (copy), v91 (copy), v92 (copy)
 		local v153 = v47.current or v48.current
 
@@ -249,27 +249,21 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v92
 	})
 	local v94 = React.useCallback(function() -- line: 346
-		-- upvalues: Flags (copy), v47 (copy), v45 (copy), InputFocusBehavior (copy), v93 (copy)
-		if Flags.FoundationTextInputHighlightFix then
-			if v47.current == nil then
-				return
-			end
+		-- upvalues: v47 (copy), v45 (copy), InputFocusBehavior (copy), v93 (copy)
+		if v47.current == nil then
+			return
+		end
 
-			v47.current:CaptureFocus()
+		v47.current:CaptureFocus()
 
-			if v45.focusBehavior == InputFocusBehavior.Highlight then
-				task.spawn(v93)
-
-				return
-			end
-		elseif v47.current then
-			v47.current:CaptureFocus()
+		if v45.focusBehavior == InputFocusBehavior.Highlight then
+			task.spawn(v93)
 		end
 	end, {
-		if not Flags.FoundationTextInputHighlightFix then nil else v93,
-		if not Flags.FoundationTextInputHighlightFix then nil else v45.focusBehavior
+		v93,
+		v45.focusBehavior
 	})
-	local v95 = React.useCallback(function() -- line: 367
+	local v95 = React.useCallback(function() -- line: 363
 		-- upvalues: v47 (copy), v48 (copy), v69 (copy), v60 (copy)
 		if v47.current then
 			v47.current:ReleaseFocus()
@@ -282,7 +276,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v69(false)
 		v60(false)
 	end, {})
-	local v96 = React.useCallback(function() -- line: 378
+	local v96 = React.useCallback(function() -- line: 374
 		-- upvalues: v47 (copy)
 		if v47.current then
 			return (v47.current:IsFocused())
@@ -290,7 +284,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		return nil
 	end, {})
-	local v97 = React.useCallback(function() -- line: 385
+	local v97 = React.useCallback(function() -- line: 381
 		-- upvalues: v47 (copy)
 		if v47.current then
 			return v47.current.SelectionStart
@@ -298,7 +292,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		return nil
 	end, {})
-	local v98 = React.useCallback(function() -- line: 392
+	local v98 = React.useCallback(function() -- line: 388
 		-- upvalues: v47 (copy)
 		if v47.current then
 			return v47.current.CursorPosition
@@ -306,14 +300,14 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		return nil
 	end, {})
-	local v99 = React.useCallback(function() -- line: 399
+	local v99 = React.useCallback(function() -- line: 395
 		-- upvalues: v47 (copy)
 		if v47.current then
 			v47.current.Text = ""
 		end
 	end, {})
 
-	React.useImperativeHandle(p3, function() -- line: 407
+	React.useImperativeHandle(p3, function() -- line: 403
 		-- upvalues: v96 (copy), v94 (copy), v95 (copy), v58 (copy), v97 (copy), v98 (copy), v92 (copy), v91 (copy)
 		return {
 			getIsFocused = v96,
@@ -335,7 +329,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v91
 	})
 
-	local v100 = React.useCallback(function(p6) -- line: 431
+	local v100 = React.useCallback(function(p6) -- line: 427
 		-- upvalues: v51 (copy), v55 (copy), v52 (copy), v90 (copy), v49 (copy), v83 (copy), v85 (copy), v45 (copy), v80 (copy), v87 (copy)
 		if p6 == nil or (p6.Parent == nil or v51.current ~= "") then
 			return
@@ -363,7 +357,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		if v45.maxLines then
 			v80(v87(p6Text))
-			task.defer(function() -- line: 457
+			task.defer(function() -- line: 453
 				-- upvalues: v80 (copy), v87 (copy), p6Text (copy)
 				v80(v87(p6Text))
 			end)
@@ -379,22 +373,14 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v83
 	})
 	local v101 = React.useRef(false)
-	local v102 = React.useCallback(function(_, p8) -- line: 469
-		-- upvalues: Flags (copy), v101 (copy)
-		if not Flags.FoundationTextInputHighlightFix then
-			return
-		end
-
+	local v102 = React.useCallback(function(_, p8) -- line: 465
+		-- upvalues: v101 (copy)
 		if p8.UserInputType == Enum.UserInputType.MouseMovement then
 			v101.current = false
 		end
 	end, {})
-	local v103 = React.useCallback(function(_, p10) -- line: 480
-		-- upvalues: Flags (copy), v101 (copy), v93 (copy)
-		if not Flags.FoundationTextInputHighlightFix then
-			return
-		end
-
+	local v103 = React.useCallback(function(_, p10) -- line: 472
+		-- upvalues: v101 (copy), v93 (copy)
 		if not v101.current then
 			return
 		end
@@ -407,11 +393,11 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		v93()
 	end, {
-		if not Flags.FoundationTextInputHighlightFix then nil else v91,
-		if not Flags.FoundationTextInputHighlightFix then nil else v92,
-		if not Flags.FoundationTextInputHighlightFix then nil else v93
+		v91,
+		v92,
+		v93
 	})
-	local v104 = React.useCallback(function(s2: string) -- line: 503
+	local v104 = React.useCallback(function(s2: string) -- line: 491
 		-- upvalues: v52 (copy), v83 (copy), v85 (copy), v45 (copy), v80 (copy), v87 (copy)
 		v52.current = s2
 
@@ -431,7 +417,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v83
 	})
 	local v105 = v45.onReturnPressed ~= nil and not v70
-	local v106 = React.useCallback(function(_, s3: string) -- line: 516
+	local v106 = React.useCallback(function(_, s3: string) -- line: 504
 		-- upvalues: v45 (copy), v56 (copy), chatTextAreaDebug (copy), v55 (copy)
 		if v45.onReturnPressed == nil then
 			return
@@ -449,12 +435,12 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v56.current = elapsed
 		v55.current = true
 		v45.onReturnPressed()
-		task.delay(0.15, function() -- line: 532
+		task.delay(0.15, function() -- line: 520
 			-- upvalues: v55 (copy)
 			v55.current = false
 		end)
 	end, { v45.onReturnPressed })
-	local v107 = React.useCallback(function(_: boolean, b2: boolean) -- line: 537
+	local v107 = React.useCallback(function(_: boolean, b2: boolean) -- line: 525
 		-- upvalues: v47 (copy), chatTextAreaDebug (copy), v104 (copy), v106 (copy)
 		local current = v47.current
 
@@ -465,7 +451,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		if b2 then
 			local currentText = current.Text
 
-			task.defer(function() -- line: 545
+			task.defer(function() -- line: 533
 				-- upvalues: current (copy), currentText (copy), chatTextAreaDebug (copy), v104 (copy)
 				if current.Parent == nil then
 					return
@@ -493,8 +479,8 @@ local function InternalTextInput(p2, p3) -- line: 192
 	})
 	local connect = v108.connect
 	local disconnect = v108.disconnect
-	local v111 = React.useCallback(function() -- line: 574
-		-- upvalues: isDisabled (copy), v90 (copy), v70 (copy), v47 (copy), v51 (copy), v69 (copy), v60 (copy), v45 (copy), v105 (copy), connect (copy), InputFocusBehavior (copy), v48 (copy), Flags (copy), v101 (copy), v91 (copy), v92 (copy)
+	local v111 = React.useCallback(function() -- line: 562
+		-- upvalues: isDisabled (copy), v90 (copy), v70 (copy), v47 (copy), v51 (copy), v69 (copy), v60 (copy), v45 (copy), v105 (copy), connect (copy), InputFocusBehavior (copy), v48 (copy), v101 (copy)
 		if isDisabled then
 			return
 		end
@@ -532,25 +518,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 				return
 			end
 		elseif focusBehavior == InputFocusBehavior.Highlight then
-			if Flags.FoundationTextInputHighlightFix then
-				v101.current = true
-
-				return
-			end
-
-			task.spawn(function() -- line: 612
-				-- upvalues: v47 (copy), v48 (copy), v91 (copy), v92 (copy)
-				local v204 = v47.current or v48.current
-
-				if v204 and v204.Parent ~= nil then
-					local v205 = utf8.len(v204.Text)
-
-					if v205 then
-						v91(0)
-						v92(v205 + 1)
-					end
-				end
-			end)
+			v101.current = true
 		end
 	end, {
 		v45.onFocus,
@@ -559,15 +527,13 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v90,
 		v45.focusBehavior,
 		v105,
-		connect,
-		if Flags.FoundationTextInputHighlightFix then nil else v91,
-		if Flags.FoundationTextInputHighlightFix then nil else v92
+		connect
 	})
-	local v112 = React.useCallback(function(p12, p13) -- line: 638
+	local v112 = React.useCallback(function(p12, p13) -- line: 610
 		-- upvalues: v103 (copy)
 		v103(p12, p13)
 	end, { v103 })
-	local v113 = React.useCallback(function(p14, b3: boolean, p15) -- line: 643
+	local v113 = React.useCallback(function(p14, b3: boolean, p15) -- line: 615
 		-- upvalues: chatTextAreaDebug (copy), v105 (copy), disconnect (copy), v60 (copy), v101 (copy), v90 (copy), v69 (copy), v45 (copy), v106 (copy)
 		chatTextAreaDebug.log("textBox.FocusLost", `enterPressed={ b3 }`)
 
@@ -596,11 +562,11 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v106,
 		disconnect
 	})
-	local v114 = React.useCallback(function(p16) -- line: 674
+	local v114 = React.useCallback(function(p16) -- line: 646
 		-- upvalues: v58 (copy), ControlState (copy)
 		v58(p16 == ControlState.Hover)
 	end, {})
-	local v115 = React.useCallback(function(p17, vector2: Vector2) -- line: 678
+	local v115 = React.useCallback(function(p17, vector2: Vector2) -- line: 650
 		-- upvalues: v53 (copy), v45 (copy)
 		v53.current = vector2
 
@@ -608,13 +574,13 @@ local function InternalTextInput(p2, p3) -- line: 192
 			v45.onDragStarted(p17, vector2)
 		end
 	end, { v45.onDragStarted })
-	local v116 = React.useCallback(function(p18, vector2: Vector2) -- line: 685
+	local v116 = React.useCallback(function(p18, vector2: Vector2) -- line: 657
 		-- upvalues: v45 (copy)
 		if v45.onDrag then
 			v45.onDrag(p18, vector2)
 		end
 	end, { v45.onDrag })
-	local v117 = React.useCallback(function(p19, vector2: Vector2) -- line: 691
+	local v117 = React.useCallback(function(p19, vector2: Vector2) -- line: 663
 		-- upvalues: v53 (copy), v94 (copy), v95 (copy), v60 (copy), v45 (copy)
 		if vector2 == v53.current then
 			v94()
@@ -634,7 +600,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v95
 	})
 	local v118 = if not v45.maxLines then nil else getMultiLineTextHeight(FontSize, v45.maxLines, LineHeight)
-	local v119 = React.useMemo(function() -- line: 708
+	local v119 = React.useMemo(function() -- line: 680
 		-- upvalues: v45 (copy), v78 (copy), v81 (copy), v118 (copy), getMultiLineTextHeight (copy), FontSize (copy), v89 (copy), LineHeight (copy)
 		if v45.maxLines then
 			return (math.clamp(math.max(v78, v81), v78, v118))
@@ -650,7 +616,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v89,
 		LineHeight
 	})
-	local v120 = React.useMemo(function() -- line: 730
+	local v120 = React.useMemo(function() -- line: 702
 		-- upvalues: getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), container (copy), v72 (copy)
 		local v182 = getMultiLineTextHeight(FontSize, 1, LineHeight)
 		local v183 = v182 + math.round(math.round((container.minHeight - v72 - v182) * 2) / 2) + v72
@@ -662,7 +628,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		FontSize,
 		LineHeight
 	})
-	local v121 = React.useMemo(function() -- line: 739
+	local v121 = React.useMemo(function() -- line: 711
 		-- upvalues: v45 (copy), v120 (copy), Radius (copy), container (copy)
 		if v45.maxLines then
 			return v120
@@ -679,7 +645,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		container.minHeight,
 		v45.radius
 	})
-	local v122 = React.useMemo(function() -- line: 749
+	local v122 = React.useMemo(function() -- line: 721
 		-- upvalues: v121 (copy), container (copy), v46 (copy)
 		return {
 			radius = if not v121 then UDim.new(0, container.radius) else v121,
@@ -691,7 +657,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		container.radius,
 		v121
 	})
-	local v123, v124 = React.useMemo(function() -- line: 758
+	local v123, v124 = React.useMemo(function() -- line: 730
 		-- upvalues: container (copy), v72 (copy), getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), v119 (copy)
 		local v184 = math.round((container.minHeight - v72 - getMultiLineTextHeight(FontSize, 1, LineHeight)) * 2) / 2
 		local uDim = UDim.new(0, (math.floor(v184 / 2)))
@@ -723,13 +689,13 @@ local function InternalTextInput(p2, p3) -- line: 192
 	local uDim2 = UDim2.new(1, 0, 0, v131)
 	local uDim2_2 = UDim2.new(1, 0, 0, v128)
 
-	React.useEffect(function() -- line: 806
+	React.useEffect(function() -- line: 778
 		-- upvalues: v45 (copy), chatTextAreaDebug (copy), v89 (copy), v124 (copy)
 		if v45.maxLines then
 			chatTextAreaDebug.log("layout", `lineCount={ v89 } borderFrameHeight={ v124 }`)
 		end
 
-		return function() -- line: 810
+		return function() -- line: 782
 		end
 	end, {
 		v89,
@@ -737,7 +703,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v45.maxLines
 	})
 
-	local v135 = React.useMemo(function() -- line: 813
+	local v135 = React.useMemo(function() -- line: 785
 		-- upvalues: v90 (copy), v45 (copy)
 		if v90 then
 			return {
@@ -751,7 +717,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 		v90,
 		v45.maxLines
 	})
-	local v136 = React.useMemo(function() -- line: 824
+	local v136 = React.useMemo(function() -- line: 796
 		-- upvalues: v90 (copy)
 		if v90 then
 			return {
@@ -764,7 +730,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 		return nil
 	end, { v90 })
-	local v137 = React.useCallback(function(p20) -- line: 835
+	local v137 = React.useCallback(function(p20) -- line: 807
 		-- upvalues: v50 (copy), v49 (copy), truncateTextToCursor (copy), v123 (copy)
 		local current = v50.current
 		local current2 = v49.current
@@ -790,7 +756,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v195)
 		end
 	end, { v123 })
-	local v138 = React.useCallback(function(p21) -- line: 868
+	local v138 = React.useCallback(function(p21) -- line: 840
 		-- upvalues: v50 (copy), v54 (copy)
 		if p21 == nil then
 			return
@@ -800,14 +766,14 @@ local function InternalTextInput(p2, p3) -- line: 192
 		p21.ClipsDescendants = true
 		p21.CanvasPosition = v54.current
 	end, {})
-	local v139 = React.useCallback(function(p22) -- line: 878
+	local v139 = React.useCallback(function(p22) -- line: 850
 		-- upvalues: v51 (copy), Flags (copy)
 		if p22 then
 			p22.Text = v51.current
 			v51.current = ""
 
 			if Flags.FoundationTextAreaDelayMobileFocus then
-				task.delay(0, function() -- line: 883
+				task.delay(0, function() -- line: 855
 					-- upvalues: p22 (copy)
 					if p22.Parent ~= nil then
 						p22:CaptureFocus()
@@ -820,11 +786,11 @@ local function InternalTextInput(p2, p3) -- line: 192
 			p22:CaptureFocus()
 		end
 	end, {})
-	local v140 = React.useCallback(function(p23) -- line: 894
+	local v140 = React.useCallback(function(p23) -- line: 866
 		-- upvalues: v54 (copy)
 		v54.current = p23.CanvasPosition
 	end, {})
-	local v141 = React.useMemo(function() -- line: 899
+	local v141 = React.useMemo(function() -- line: 871
 		-- upvalues: v45 (copy), React (copy), v115 (copy), v116 (copy), v117 (copy), v59 (copy), isDisabled (copy)
 		if not v45.onDragStarted and (not v45.onDrag and not v45.onDragEnded) then
 			return nil
@@ -849,7 +815,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 	})
 	local v142 = useBindable(if not v45.horizontalPadding then UDim.new(0, 0) else v45.horizontalPadding.left or UDim.new(0, 0))
 	local v143 = useBindable(if not v45.horizontalPadding then UDim.new(0, 0) else v45.horizontalPadding.right or UDim.new(0, 0))
-	local v144 = React.useMemo(function() -- line: 930
+	local v144 = React.useMemo(function() -- line: 902
 		-- upvalues: v45 (copy), container (copy), v46 (copy)
 		if v45.hasClearButton then
 			return (UDim2.fromOffset(0, (container.minHeight - v46.Stroke.Standard) / 2))
@@ -881,11 +847,11 @@ local function InternalTextInput(p2, p3) -- line: 192
 		},
 		cornerRadius = v121,
 		padding = {
-			left = v142:map(function(p24) -- line: 972
+			left = v142:map(function(p24) -- line: 944
 				-- upvalues: Standard (copy)
 				return UDim.new(0, Standard) + p24
 			end),
-			right = if v45.trailingElement ~= nil or not v45.hasClearButton then v143:map(function(p25) -- line: 978
+			right = if v45.trailingElement ~= nil or not v45.hasClearButton then v143:map(function(p25) -- line: 950
 				-- upvalues: Standard (copy)
 				return UDim.new(0, Standard) + p25
 			end) else UDim.new(0, Standard),
@@ -950,7 +916,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 					ref = v47,
 					tag = `{ v64 or "" } data-testid={ v45.testId }--textbox`,
 					Size = if not v90 then nil else uDim2,
-					automaticSize = if not v45.maxLines then if not v83 then mapBindable(v45.text, function(p26) -- line: 1048
+					automaticSize = if not v45.maxLines then if not v83 then mapBindable(v45.text, function(p26) -- line: 1020
 						-- upvalues: v90 (copy), v68 (copy)
 						if v90 and (not v68 and p26 ~= "") then
 							return Enum.AutomaticSize.Y
@@ -1003,7 +969,7 @@ local function InternalTextInput(p2, p3) -- line: 192
 			LayoutOrder = 3,
 			isDisabled = isDisabled,
 			GroupTransparency = if not isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-			Visible = mapBindable(v45.text, function(p27) -- line: 1121
+			Visible = mapBindable(v45.text, function(p27) -- line: 1093
 				return p27 ~= ""
 			end),
 			tag = v61.clearButton.tag

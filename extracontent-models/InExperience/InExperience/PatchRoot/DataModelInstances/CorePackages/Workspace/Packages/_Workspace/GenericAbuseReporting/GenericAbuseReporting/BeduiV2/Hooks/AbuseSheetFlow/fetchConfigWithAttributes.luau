@@ -7,7 +7,7 @@ local Url = require(GenericAbuseReportingParent.Http).Url
 
 require(GenericAbuseReporting.Enums.AbuseVector)
 
-local v7 = not require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportVoiceSpeakingIcon and "&version=2" or "&version=3"
+local v7 = not require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3 and "&version=2" or "&version=3"
 
 return function(p1, p2, t1: {[any]: any}?) -- line: 19
 	-- upvalues: ArgCheck (copy), LocalizationService (copy), HttpService (copy), Url (copy), v7 (copy)

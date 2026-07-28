@@ -7,37 +7,36 @@ local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 
-local function RestoreVersionDialog(t1: {[any]: any}) -- line: 24
+local function RestoreVersionDialog(t1: {[any]: any}) -- line: 23
 	-- upvalues: React (copy), LocalizationStrings (copy), ButtonVariant (copy), Dialog (copy), DialogSize (copy)
-	local v11 = t1.testId or "restore-version-dialog"
-	local v12 = React.useCallback(function() -- line: 26
+	local v11 = React.useCallback(function() -- line: 24
 		-- upvalues: t1 (copy)
 		t1.onRestore()
 	end, { t1.onRestore })
-	local v13 = React.useCallback(function() -- line: 29
+	local v12 = React.useCallback(function() -- line: 27
 		-- upvalues: t1 (copy)
 		t1.onCancel()
 	end, { t1.onCancel })
-	local v14 = React.useMemo(function() -- line: 33
-		-- upvalues: LocalizationStrings (copy), ButtonVariant (copy), v12 (copy), v13 (copy)
+	local v13 = React.useMemo(function() -- line: 31
+		-- upvalues: LocalizationStrings (copy), ButtonVariant (copy), v11 (copy), v12 (copy)
 		return {
 			LayoutOrder = 3,
 			actions = {
 				{
 					text = LocalizationStrings.VERSION_HISTORY_RESTORE,
 					variant = ButtonVariant.Emphasis,
-					onActivated = v12
+					onActivated = v11
 				},
 				{
 					text = LocalizationStrings.VERSION_HISTORY_CANCEL,
 					variant = ButtonVariant.Standard,
-					onActivated = v13
+					onActivated = v12
 				}
 			}
 		}
 	end, {
-		v12,
-		v13
+		v11,
+		v12
 	})
 
 	if t1.isOpen == false then
@@ -47,8 +46,8 @@ local function RestoreVersionDialog(t1: {[any]: any}) -- line: 24
 	return React.createElement(Dialog.Root, {
 		disablePortal = false,
 		hasBackdrop = true,
-		size = DialogSize.Small,
-		testId = v11
+		testId = "restore-version-dialog",
+		size = DialogSize.Small
 	}, {
 		Title = React.createElement(Dialog.Title, {
 			LayoutOrder = 1,
@@ -61,7 +60,7 @@ local function RestoreVersionDialog(t1: {[any]: any}) -- line: 24
 				Text = t1.description
 			})
 		}),
-		Actions = React.createElement(Dialog.Actions, v14)
+		Actions = React.createElement(Dialog.Actions, v13)
 	})
 end
 

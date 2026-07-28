@@ -3,9 +3,7 @@ local BuildExperienceParent = BuildExperience.Parent
 local GuiService = game:GetService("GuiService")
 local MessageBusService = game:GetService("MessageBusService")
 local UserInputService = game:GetService("UserInputService")
-
-require(BuildExperienceParent.DataHydration.CreatorAgentChat)
-
+local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
 local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
@@ -22,6 +20,9 @@ local GetCreatorAgentResumeStore = require(BuildExperience.Stores.GetCreatorAgen
 
 require(script.Parent.BuildChatPageView)
 
+local useCreatorCreditChatUpsellViewModel = require(script.Parent.useCreatorCreditChatUpsellViewModel)
+local EngineFeature = game:GetEngineFeature("BuildAppStorageKey")
+local v19 = if not EngineFeature then nil else require(BuildExperience.Storage.BuildAppStorage)
 local default = require(BuildExperienceParent.LinkingProtocol).LinkingProtocol.default
 local PermissionsProtocol = require(BuildExperienceParent.PermissionsProtocol).PermissionsProtocol
 local useTokens = Foundation.Hooks.useTokens
@@ -31,7 +32,7 @@ local t1 = {
 	groups = {}
 }
 
-local function getKeyboardTop() -- line: 55
+local function getKeyboardTop() -- line: 71
 	-- upvalues: UserInputService (copy), GuiService (copy)
 	if not UserInputService.OnScreenKeyboardVisible then
 		return 0
@@ -41,48 +42,53 @@ local function getKeyboardTop() -- line: 55
 
 	return (math.max(0, UserInputService.OnScreenKeyboardPosition.Y - GuiInset.Y))
 end
-local function useUniverseSummary(n1: number?) -- line: 63
+local function useUniverseSummary(n1: number?) -- line: 79
 	-- upvalues: UniverseConfiguration (copy), React (copy), Signals (copy), SignalsReact (copy)
-	local v27 = UniverseConfiguration.getUniverseConfigurationStore()
-	local v28 = React.useMemo(function() -- line: 65
-		-- upvalues: Signals (copy), n1 (copy), v27 (copy)
-		return Signals.createComputed(function(p1) -- line: 66
-			-- upvalues: n1 (copy), v27 (copy)
+	local v31 = UniverseConfiguration.getUniverseConfigurationStore()
+	local v32 = React.useMemo(function() -- line: 81
+		-- upvalues: Signals (copy), n1 (copy), v31 (copy)
+		return Signals.createComputed(function(p1) -- line: 82
+			-- upvalues: n1 (copy), v31 (copy)
 			if n1 == nil or n1 == 0 then
 				return nil
 			end
 
-			return v27.getAndFetchSummary(n1).data(p1)
+			return v31.getAndFetchSummary(n1).data(p1)
 		end)
 	end, {
-		v27,
+		v31,
 		n1
 	})
 
-	return SignalsReact.useSignalState(v28)
+	return SignalsReact.useSignalState(v32)
 end
-local function getHydratedExperienceName(s1: string, p2) -- line: 77
-	local v31 = if p2 == nil then nil else p2.name
+local function getHydratedExperienceName(s1: string, p2) -- line: 93
+	local v35 = if p2 == nil then nil else p2.name
 
-	if typeof(v31) == "string" and v31 ~= "" then
-		return v31
+	if typeof(v35) == "string" and v35 ~= "" then
+		return v35
 	end
 
 	return s1
 end
-local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 85
-	-- upvalues: useTokens (copy), useUniverseSummary (copy), GetBuildOverflowMenuStore (copy), GetCreatorAgentResumeStore (copy), React (copy), UserInputService (copy), GuiService (copy), PermissionsProtocol (copy), MessageBusService (copy), MessageId (copy), default (copy), useChatSessionCore (copy), useChatPlaytestFooter (copy), UniverseConfiguration (copy), sendBuildExperienceEvent (copy), t1 (copy)
-	local v33 = useTokens()
-	local v34 = useUniverseSummary(t2.target.universeId)
-	local v35 = GetBuildOverflowMenuStore()
-	local v36 = GetCreatorAgentResumeStore()
-	local v37, v38 = React.useState(nil)
-	local v39, v40 = React.useState(false)
+local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
+	-- upvalues: useTokens (copy), useUniverseSummary (copy), GetBuildOverflowMenuStore (copy), GetCreatorAgentResumeStore (copy), React (copy), EngineFeature (copy), v19 (copy), UserInputService (copy), GuiService (copy), PermissionsProtocol (copy), MessageBusService (copy), MessageId (copy), default (copy), CreatorAgentChat (copy), useChatSessionCore (copy), useChatPlaytestFooter (copy), UniverseConfiguration (copy), useCreatorCreditChatUpsellViewModel (copy), sendBuildExperienceEvent (copy), t1 (copy)
+	local v37 = useTokens()
+	local v38 = useUniverseSummary(t2.target.universeId)
+	local v39 = GetBuildOverflowMenuStore()
+	local v40 = GetCreatorAgentResumeStore()
 	local v41, v42 = React.useState(nil)
 	local v43, v44 = React.useState(false)
-	local v45, v46 = React.useState(false)
+	local v45, v46 = React.useState(nil)
 	local v47, v48 = React.useState(false)
-	local v49 = React.useRef(false)
+	local v49, v50 = React.useState(false)
+	local v51, v52 = React.useState(false)
+	local v53, v54 = React.useState(function() -- line: 114
+		-- upvalues: EngineFeature (copy), v19 (copy)
+		return EngineFeature and v19.wasPushNotificationsUpsellShownToday()
+	end)
+	local v55, v56 = React.useState(false)
+	local v57 = React.useRef(false)
 	local useState = React.useState
 	local n2
 
@@ -94,76 +100,76 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 85
 		n2 = math.max(0, UserInputService.OnScreenKeyboardPosition.Y - GuiInset.Y)
 	end
 
-	local v53, v54 = useState(n2)
-	local v55, v56 = React.useState(0)
-	local v57 = React.useCallback(function() -- line: 102
-		-- upvalues: PermissionsProtocol (copy), v49 (copy), v42 (copy), v48 (copy)
-		return PermissionsProtocol.default:hasPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p3) -- line: 107
-			-- upvalues: v49 (copy), v42 (copy), PermissionsProtocol (copy), v48 (copy)
-			if v49.current then
-				v42(p3.status)
+	local v61, v62 = useState(n2)
+	local v63, v64 = React.useState(0)
+	local v65 = React.useCallback(function() -- line: 124
+		-- upvalues: PermissionsProtocol (copy), v57 (copy), v46 (copy), v52 (copy)
+		return PermissionsProtocol.default:hasPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p3) -- line: 129
+			-- upvalues: v57 (copy), v46 (copy), PermissionsProtocol (copy), v52 (copy)
+			if v57.current then
+				v46(p3.status)
 
 				if p3.status == PermissionsProtocol.Status.AUTHORIZED then
-					v48(false)
+					v52(false)
 				end
 			end
-		end, function() -- line: 114
+		end, function() -- line: 136
 		end)
 	end, {})
 
-	React.useEffect(function() -- line: 119
-		-- upvalues: v49 (copy), v57 (copy), MessageBusService (copy), MessageId (copy)
-		v49.current = true
-		v57()
+	React.useEffect(function() -- line: 141
+		-- upvalues: v57 (copy), v65 (copy), MessageBusService (copy), MessageId (copy)
+		v57.current = true
+		v65()
 
-		local v80 = MessageBusService:Subscribe(MessageId, v57, false, true)
+		local v98 = MessageBusService:Subscribe(MessageId, v65, false, true)
 
-		return function() -- line: 124
-			-- upvalues: v49 (copy), v80 (copy)
-			v49.current = false
-			v80:Disconnect()
+		return function() -- line: 146
+			-- upvalues: v57 (copy), v98 (copy)
+			v57.current = false
+			v98:Disconnect()
 		end
-	end, { v57 })
+	end, { v65 })
 
-	local v58 = React.useCallback(function() -- line: 130
-		-- upvalues: v45 (copy), v46 (copy), PermissionsProtocol (copy), v49 (copy), v42 (copy), v48 (copy)
-		if v45 then
+	local v66 = React.useCallback(function() -- line: 152
+		-- upvalues: v49 (copy), v50 (copy), PermissionsProtocol (copy), v57 (copy), v46 (copy), v52 (copy)
+		if v49 then
 			return
 		end
 
-		v46(true)
-		PermissionsProtocol.default:requestPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p4) -- line: 140
-			-- upvalues: v49 (copy), v42 (copy), PermissionsProtocol (copy), v48 (copy), v46 (copy)
-			if not v49.current then
+		v50(true)
+		PermissionsProtocol.default:requestPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p4) -- line: 162
+			-- upvalues: v57 (copy), v46 (copy), PermissionsProtocol (copy), v52 (copy), v50 (copy)
+			if not v57.current then
 				return
 			end
 
-			v42(p4.status)
+			v46(p4.status)
 
 			if p4.status == PermissionsProtocol.Status.DENIED then
-				v48(true)
+				v52(true)
 			end
 
-			v46(false)
-		end, function() -- line: 149
-			-- upvalues: v49 (copy), v46 (copy)
-			if v49.current then
-				v46(false)
+			v50(false)
+		end, function() -- line: 171
+			-- upvalues: v57 (copy), v50 (copy)
+			if v57.current then
+				v50(false)
 			end
 		end)
-	end, { v45 })
-	local v59 = React.useCallback(function() -- line: 156
+	end, { v49 })
+	local v67 = React.useCallback(function() -- line: 178
 		-- upvalues: default (copy)
-		default:switchToSettingsApp():catch(function() -- line: 157
+		default:switchToSettingsApp():catch(function() -- line: 179
 		end)
 	end, {})
-	local v60 = React.useCallback(function() -- line: 160
-		-- upvalues: v44 (copy)
-		v44(true)
+	local v68 = React.useCallback(function() -- line: 182
+		-- upvalues: v48 (copy)
+		v48(true)
 	end, {})
-	local v61 = React.useCallback(function() -- line: 164
-		-- upvalues: v54 (copy), UserInputService (copy), GuiService (copy)
-		local v81 = v54
+	local v69 = React.useCallback(function() -- line: 186
+		-- upvalues: v62 (copy), UserInputService (copy), GuiService (copy)
+		local v99 = v62
 		local n3
 
 		if not UserInputService.OnScreenKeyboardVisible then
@@ -174,49 +180,49 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 85
 			n3 = math.max(0, UserInputService.OnScreenKeyboardPosition.Y - GuiInset.Y)
 		end
 
-		v81(n3)
+		v99(n3)
 	end, {})
 
-	React.useEffect(function() -- line: 168
-		-- upvalues: v61 (copy), UserInputService (copy)
-		v61()
+	React.useEffect(function() -- line: 190
+		-- upvalues: v69 (copy), UserInputService (copy)
+		v69()
 
-		local connection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(v61)
-		local connection2 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(v61)
-		local connection3 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(v61)
+		local connection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(v69)
+		local connection2 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(v69)
+		local connection3 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(v69)
 
-		return function() -- line: 176
+		return function() -- line: 198
 			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()
 			connection3:Disconnect()
 		end
-	end, { v61 })
+	end, { v69 })
 
-	local v62 = React.useCallback(function(p5) -- line: 183
-		-- upvalues: v56 (copy)
-		v56(p5.AbsolutePosition.Y + p5.AbsoluteSize.Y)
+	local v70 = React.useCallback(function(p5) -- line: 205
+		-- upvalues: v64 (copy)
+		v64(p5.AbsolutePosition.Y + p5.AbsoluteSize.Y)
 	end, {})
-	local v63 = React.useCallback(function(p6) -- line: 187
-		-- upvalues: v40 (copy)
+	local v71 = React.useCallback(function(p6) -- line: 209
+		-- upvalues: v44 (copy)
 		local AbsoluteWindowSizeY = p6.AbsoluteWindowSize.Y
 
-		v40(AbsoluteWindowSizeY > 0 and AbsoluteWindowSizeY < p6.AbsoluteCanvasSize.Y)
+		v44(AbsoluteWindowSizeY > 0 and AbsoluteWindowSizeY < p6.AbsoluteCanvasSize.Y)
 	end, {})
-	local v64 = if not (v53 <= 0) and not (v55 <= 0) then math.max(0, v55 - v53) else 0
-	local v65 = t2.target.isNewGameTarget == true
-	local v66 = React.useMemo(function() -- line: 195
-		-- upvalues: t2 (copy), v34 (copy)
+	local v72 = if not (v61 <= 0) and not (v63 <= 0) then math.max(0, v63 - v61) else 0
+	local v73 = t2.target.isNewGameTarget == true
+	local v74 = React.useMemo(function() -- line: 217
+		-- upvalues: t2 (copy), v38 (copy)
 		local t3 = {
 			universeId = t2.target.universeId,
 			placeId = t2.target.placeId,
 			sessionId = t2.target.sessionId
 		}
 		local experienceName = t2.target.experienceName
-		local v92 = v34
-		local v93 = if v92 == nil then nil else v92.name
+		local v110 = v38
+		local v111 = if v110 == nil then nil else v110.name
 
-		t3.experienceName = if typeof(v93) ~= "string" or v93 == "" then experienceName else v93
+		t3.experienceName = if typeof(v111) ~= "string" or v111 == "" then experienceName else v111
 		t3.isNewGameTarget = t2.target.isNewGameTarget
 		t3.creatorName = t2.target.creatorName
 		t3.gameIcon = t2.target.gameIcon
@@ -230,185 +236,275 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 85
 		t2.target.isNewGameTarget,
 		t2.target.creatorName,
 		t2.target.gameIcon,
-		v34
+		v38
 	})
-	local v67 = React.useCallback(function(t4: {[any]: any}) -- line: 218
-		-- upvalues: t2 (copy), v66 (copy)
+	local v75 = React.useCallback(function(t4: {[any]: any}) -- line: 240
+		-- upvalues: t2 (copy), v74 (copy)
 		if t2.onNavigateToResolvedTarget ~= nil then
 			t2.onNavigateToResolvedTarget({
 				universeId = t4.universeId,
 				placeId = t4.placeId,
 				sessionId = t4.sessionId,
-				experienceName = v66.experienceName,
-				isNewGameTarget = v66.isNewGameTarget,
-				creatorName = v66.creatorName,
-				gameIcon = v66.gameIcon
+				experienceName = v74.experienceName,
+				isNewGameTarget = v74.isNewGameTarget,
+				creatorName = v74.creatorName,
+				gameIcon = v74.gameIcon
 			})
 		end
 	end, {
 		t2.onNavigateToResolvedTarget,
-		v66.experienceName,
-		v66.isNewGameTarget,
-		v66.creatorName,
-		v66.gameIcon
+		v74.experienceName,
+		v74.isNewGameTarget,
+		v74.creatorName,
+		v74.gameIcon
 	})
-	local v68 = useChatSessionCore({
+	local v76, v77 = React.useState({
+		count = 0,
+		reason = nil
+	})
+	local v78 = React.useCallback(function(n4: number?, p7) -- line: 266
+		-- upvalues: CreatorAgentChat (copy), v77 (copy)
+		if n4 == CreatorAgentChat.ErrorCodes.OutOfCredits then
+			v77(function(p8) -- line: 268
+				-- upvalues: p7 (copy)
+				return {
+					count = p8.count + 1,
+					reason = p7
+				}
+			end)
+		end
+	end, {})
+	local v79 = useChatSessionCore({
 		autoFocusComposer = false,
 		universeId = t2.target.universeId,
 		placeId = t2.target.placeId,
 		sessionId = t2.target.sessionId,
-		createUniverseOnFirstPrompt = v65,
-		onProjectResolved = v67
+		createUniverseOnFirstPrompt = v73,
+		onProjectResolved = v75,
+		onPromptFailure = v78
 	})
-	local v69 = useChatPlaytestFooter(v68, "BuildChatPlaytestCta")
-	local subagentTaskState = v68.subagentTaskState
-	local v71 = subagentTaskState ~= nil and #subagentTaskState.groups > 0
-	local v72 = #v68.messages == 0
-	local v73 = React.useRef(false)
+	local v80 = useChatPlaytestFooter(v79, "BuildChatPlaytestCta")
+	local subagentTaskState = v79.subagentTaskState
+	local v82 = subagentTaskState ~= nil and #subagentTaskState.groups > 0
+	local v83 = #v79.messages == 0
+	local u84 = false
 
-	React.useEffect(function() -- line: 254
-		-- upvalues: t2 (copy), v73 (copy), v68 (copy), UniverseConfiguration (copy)
-		local universeId = t2.target.universeId
-		local v96 = v73.current and not v68.isAssistantResponding
+	for _, v86 in v79.messages do
+		if v86.kind == "user_message" then
+			u84 = true
 
-		v73.current = v68.isAssistantResponding
+			break
+		end
+	end
 
-		if not v96 or (universeId == nil or universeId == 0) then
-			return function() -- line: 260
+	local v87 = v45 == PermissionsProtocol.Status.DENIED and (not v47 and (not v53 or v55))
+	local v88 = React.useRef(false)
+
+	React.useEffect(function() -- line: 304
+		-- upvalues: EngineFeature (copy), v87 (copy), u84 (ref), v79 (copy), v55 (copy), v56 (copy), v54 (copy), v19 (copy)
+		if not EngineFeature then
+			return function() -- line: 306
 			end
 		end
 
-		local v97 = UniverseConfiguration.getUniverseConfigurationStore()
+		local v115 = v87 and (u84 and v79.isAssistantResponding)
 
-		if v97.getSummary(universeId).data(false) ~= nil then
-			v97.fetchSummary(universeId)
+		if v115 and not v55 then
+			v56(true)
+			v54(true)
+			v19.markPushNotificationsUpsellShown()
+		elseif not v115 and v55 then
+			v56(false)
 		end
 
-		return function() -- line: 267
+		return function() -- line: 320
+		end
+	end, {
+		v87,
+		u84,
+		v79.isAssistantResponding,
+		v53,
+		v55
+	})
+	React.useEffect(function() -- line: 331
+		-- upvalues: t2 (copy), v88 (copy), v79 (copy), UniverseConfiguration (copy)
+		local universeId = t2.target.universeId
+		local v117 = v88.current and not v79.isAssistantResponding
+
+		v88.current = v79.isAssistantResponding
+
+		if not v117 or (universeId == nil or universeId == 0) then
+			return function() -- line: 337
+			end
+		end
+
+		local v118 = UniverseConfiguration.getUniverseConfigurationStore()
+
+		if v118.getSummary(universeId).data(false) ~= nil then
+			v118.fetchSummary(universeId)
+		end
+
+		return function() -- line: 344
 		end
 	end, {
 		t2.target.universeId,
-		v68.isAssistantResponding
+		v79.isAssistantResponding
 	})
-	React.useEffect(function() -- line: 270
-		-- upvalues: v36 (copy), t2 (copy)
-		v36.setActiveTarget({
+	React.useEffect(function() -- line: 347
+		-- upvalues: v40 (copy), t2 (copy)
+		v40.setActiveTarget({
 			universeId = t2.target.universeId,
 			sessionId = t2.target.sessionId
 		})
 
-		return function() -- line: 275
-			-- upvalues: v36 (copy)
-			v36.setActiveTarget(nil)
+		return function() -- line: 352
+			-- upvalues: v40 (copy)
+			v40.setActiveTarget(nil)
 		end
 	end, {
-		v36,
+		v40,
 		t2.target.universeId,
 		t2.target.sessionId
 	})
 
-	local v74 = React.useCallback(function() -- line: 280
-		-- upvalues: v68 (copy)
-		if v68.textBoxRef.current then
-			v68.textBoxRef.current.releaseFocus()
+	local v89 = React.useCallback(function() -- line: 357
+		-- upvalues: v79 (copy)
+		if v79.textBoxRef.current then
+			v79.textBoxRef.current.releaseFocus()
 		end
-	end, { v68.textBoxRef })
-	local v75 = React.useCallback(function() -- line: 286
-		-- upvalues: v74 (copy), t2 (copy)
-		v74()
+	end, { v79.textBoxRef })
+	local v90 = React.useCallback(function() -- line: 363
+		-- upvalues: v89 (copy), t2 (copy)
+		v89()
+
+		if t2.onOpenCreatorCreditPage ~= nil then
+			t2.onOpenCreatorCreditPage()
+		end
+	end, {
+		v89,
+		t2.onOpenCreatorCreditPage
+	})
+	local v91 = if t2.onOpenCreatorCreditPage == nil then nil else v90
+	local v92 = useCreatorCreditChatUpsellViewModel({
+		onOpenCreatorCreditPage = v91,
+		outOfCreditsPromptFailureCount = v76.count,
+		outOfCreditsPromptFailureReason = v76.reason,
+		isAssistantResponding = v79.isAssistantResponding
+	})
+	local v93 = React.useCallback(function() -- line: 378
+		-- upvalues: v89 (copy), t2 (copy)
+		v89()
 		t2.onClose()
 	end, {
-		v74,
+		v89,
 		t2.onClose
 	})
-	local v76 = React.useCallback(function(p7) -- line: 291
-		-- upvalues: v74 (copy), t2 (copy)
-		if p7.type == "openPage" then
-			v74()
+	local v94 = React.useCallback(function(p9) -- line: 383
+		-- upvalues: v89 (copy), t2 (copy)
+		if p9.type == "openPage" then
+			v89()
 
 			if t2.onOpenConfigurationPage then
-				t2.onOpenConfigurationPage(p7.page)
+				t2.onOpenConfigurationPage(p9.page)
+
+				return
+			end
+		elseif p9.type == "openInvitePicker" then
+			v89()
+
+			if t2.onOpenInvitePicker then
+				t2.onOpenInvitePicker()
 			end
 		end
 	end, {
-		v74,
-		t2.onOpenConfigurationPage
+		v89,
+		t2.onOpenConfigurationPage,
+		t2.onOpenInvitePicker
 	})
-	local v77 = React.useCallback(function() -- line: 300
-		-- upvalues: sendBuildExperienceEvent (copy), t2 (copy), v68 (copy)
+	local v95 = React.useCallback(function() -- line: 397
+		-- upvalues: sendBuildExperienceEvent (copy), t2 (copy), v79 (copy)
 		sendBuildExperienceEvent("PLAY_CLICK", {
 			universeId = t2.target.universeId,
-			placeId = v68.playtestPlaceId
+			placeId = v79.playtestPlaceId
 		})
 
-		if v68.launchPlaytest then
-			v68.launchPlaytest("BuildChatPage")
+		if v79.launchPlaytest then
+			v79.launchPlaytest("BuildChatPage")
 		end
 	end, {
-		v68.launchPlaytest,
-		v68.playtestPlaceId,
+		v79.launchPlaytest,
+		v79.playtestPlaceId,
 		t2.target.universeId
 	})
-	local v78 = React.useCallback(function() -- line: 310
-		-- upvalues: v74 (copy), t2 (copy), subagentTaskState (copy), t1 (copy)
-		v74()
+	local v96 = React.useCallback(function() -- line: 407
+		-- upvalues: v89 (copy), t2 (copy), subagentTaskState (copy), t1 (copy)
+		v89()
 		t2.onOpenAgentsPage(subagentTaskState or t1)
 	end, {
-		v74,
+		v89,
 		t2.onOpenAgentsPage,
 		subagentTaskState
 	})
-	local v79 = React.useCallback(function(s2: string) -- line: 315
-		-- upvalues: v74 (copy), v38 (copy)
-		v74()
-		v38(s2)
-	end, { v74 })
+	local v97 = React.useCallback(function(s2: string) -- line: 412
+		-- upvalues: v89 (copy), v42 (copy)
+		v89()
+		v42(s2)
+	end, { v89 })
 
 	return {
-		target = v66,
-		keyboardOverlap = v64,
-		onPageMetricsChanged = v62,
-		selectedChipGroupName = v37,
-		onChipActivated = v79,
-		onChipBottomSheetClose = function() -- line: 326
-			-- upvalues: v38 (copy)
-			v38(nil)
+		target = v74,
+		keyboardOverlap = v72,
+		onPageMetricsChanged = v70,
+		selectedChipGroupName = v41,
+		onChipActivated = v97,
+		onChipBottomSheetClose = function() -- line: 423
+			-- upvalues: v42 (copy)
+			v42(nil)
 		end,
-		onClose = v75,
-		onOverflowMenuAction = v76,
-		onPlayActivated = v77,
-		onOpenAgentsPage = v78,
-		buildOverflowMenuStore = v35,
-		messages = v68.messages,
-		localToolActions = v68.localToolActions,
-		clockBinding = v68.clockBinding,
-		onPlaytest = v69.onPlaytest,
-		isPlaytestLoading = v69.isPlaytestLoading,
-		showPushNotificationsUpsell = v41 == PermissionsProtocol.Status.DENIED and not v43,
-		isPushNotificationsRequestPending = v45,
-		shouldOpenPushNotificationsSettings = v47,
-		onNotifyMe = v58,
-		onOpenPushNotificationsSettings = v59,
-		onNotNow = v60,
-		isChatEmpty = v72,
-		isNewGameTarget = v65,
-		hasPublishedTurn = v68.hasPublishedTurn,
-		hasPublishedVersion = v34 ~= nil and v34.isActive,
-		hasTaskGroups = v71,
+		onClose = v93,
+		onOverflowMenuAction = v94,
+		onPlayActivated = v95,
+		onOpenAgentsPage = v96,
+		onOpenCreatorCreditPage = v91,
+		buildOverflowMenuStore = v39,
+		messages = v79.messages,
+		localToolActions = v79.localToolActions,
+		clockBinding = v79.clockBinding,
+		onPlaytest = v80.onPlaytest,
+		isPlaytestLoading = v80.isPlaytestLoading,
+		showPushNotificationsUpsell = if not EngineFeature then v87 else v55 and v87,
+		isPushNotificationsRequestPending = v49,
+		shouldOpenPushNotificationsSettings = v51,
+		onNotifyMe = v66,
+		onOpenPushNotificationsSettings = v67,
+		onNotNow = v68,
+		showBuyMoreRobuxCard = v92.showBuyMoreRobuxCard,
+		buyMoreRobuxCardTitle = v92.buyMoreRobuxCardTitle,
+		buyMoreRobuxCardDescription = v92.buyMoreRobuxCardDescription,
+		buyMoreRobuxCardPrimaryActionText = v92.buyMoreRobuxCardPrimaryActionText,
+		onBuyMoreRobuxCardPrimaryAction = v92.onBuyMoreRobuxCardPrimaryAction,
+		buyMoreRobuxCardSecondaryActionText = v92.buyMoreRobuxCardSecondaryActionText,
+		onBuyMoreRobuxCardSecondaryAction = v92.onBuyMoreRobuxCardSecondaryAction,
+		isChatEmpty = v83,
+		isNewGameTarget = v73,
+		hasPublishedTurn = v79.hasPublishedTurn,
+		hasPublishedVersion = v38 ~= nil and v38.isActive,
+		hasTaskGroups = v82,
 		taskState = subagentTaskState,
-		scrollingFrameRef = v68.setScrollingFrame,
-		onChatViewportChanged = v63,
-		isChatScrollable = v39,
-		composerText = v68.composerText,
-		composerErrorText = v68.composerErrorText,
-		onComposerChanged = v68.setComposerText,
-		textBoxRef = v68.textBoxRef,
-		isAssistantResponding = v68.isAssistantResponding,
-		canStopAssistantResponse = v68.canStopAssistantResponse,
-		onSend = v68.sendMessage,
-		onStop = v68.stopAssistantResponse,
-		statusChipGap = v33.Gap.Small,
-		paddingBottom = v33.Padding.Small + v64
+		scrollingFrameRef = v79.setScrollingFrame,
+		onChatViewportChanged = v71,
+		isChatScrollable = v43,
+		composerText = v79.composerText,
+		composerErrorText = v79.composerErrorText,
+		onComposerChanged = v79.setComposerText,
+		textBoxRef = v79.textBoxRef,
+		isAssistantResponding = v79.isAssistantResponding,
+		canStopAssistantResponse = v79.canStopAssistantResponse,
+		canSendWhileResponding = v79.canSendWhileResponding,
+		onSend = v79.sendMessage,
+		onStop = v79.stopAssistantResponse,
+		statusChipGap = v37.Gap.Small,
+		paddingBottom = v37.Padding.Small + v72
 	}
 end
 

@@ -46,49 +46,65 @@ local t2 = {}
 
 t2.__index = t2
 
-function t2.new(t3: {[any]: any}) -- line: 101
+function t2.new(t3: {[any]: any}) -- line: 102
 	-- upvalues: t2 (copy)
 	return (setmetatable({
 		_surfaceScope = nil,
 		_viewportBounds = nil,
 		_running = false,
+		_paused = false,
 		_scanThread = nil,
 		_callbacks = t3,
 		_sessions = {}
 	}, t2))
 end
-function t2.setSurfaceScope(p4, p5) -- line: 112
+function t2.setSurfaceScope(p4, p5) -- line: 114
 	p4._surfaceScope = p5
 end
-function t2.setViewportBounds(p6, p7) -- line: 116
+function t2.setViewportBounds(p6, p7) -- line: 118
 	p6._viewportBounds = p7
 end
-function t2.start(p8) -- line: 123
+function t2.start(p8) -- line: 125
 	if p8._running then
 		return
 	end
 
 	p8._running = true
-	p8:_scheduleNextScan()
+
+	if not p8._paused then
+		p8:_scheduleNextScan()
+	end
 end
-function t2._scheduleNextScan(p9) -- line: 131
-	p9._scanThread = task.delay(0.2, function() -- line: 132
-		-- upvalues: p9 (copy)
-		if not p9._running then
+function t2._cancelScheduledScan(p9) -- line: 135
+	local _scanThread = p9._scanThread
+
+	if _scanThread ~= nil and coroutine.status(_scanThread) == "suspended" then
+		task.cancel(_scanThread)
+	end
+
+	p9._scanThread = nil
+end
+function t2._scheduleNextScan(p10) -- line: 143
+	assert(p10._scanThread == nil, "scan is already scheduled")
+	p10._scanThread = task.delay(0.2, function() -- line: 145
+		-- upvalues: p10 (copy)
+		p10._scanThread = nil
+
+		if not p10._running or p10._paused then
 			return
 		end
 
-		p9:_scanTick(DateTime.now().UnixTimestampMillis)
+		p10:_scanTick(DateTime.now().UnixTimestampMillis)
 
-		if p9._running then
-			p9:_scheduleNextScan()
+		if p10._running and not p10._paused then
+			p10:_scheduleNextScan()
 		end
 	end)
 end
-function t2._scanTick(p10, n1: number) -- line: 145
+function t2._scanTick(p11, n1: number) -- line: 159
 	-- upvalues: CollectionService (copy), Constants (copy), measureTile (copy), sponsoredAdViewabilityState (copy)
-	local _surfaceScope = p10._surfaceScope
-	local _viewportBounds = p10._viewportBounds
+	local _surfaceScope = p11._surfaceScope
+	local _viewportBounds = p11._viewportBounds
 
 	if _surfaceScope == nil or _viewportBounds == nil then
 		return
@@ -100,65 +116,89 @@ function t2._scanTick(p10, n1: number) -- line: 145
 
 	local t4 = {}
 
-	for _, v28 in CollectionService:GetTagged(Constants.CandidateTag) do
-		local v29 = measureTile(v28, _surfaceScope, _viewportBounds)
+	for _, v30 in CollectionService:GetTagged(Constants.CandidateTag) do
+		local v31 = measureTile(v30, _surfaceScope, _viewportBounds)
 
-		if v29 then
-			local metadata = v29.metadata
+		if v31 then
+			local metadata = v31.metadata
 			local encryptedAdTrackingData = metadata.encryptedAdTrackingData
 
 			t4[encryptedAdTrackingData] = true
 
-			local v32 = p10._sessions[encryptedAdTrackingData]
+			local v34 = p11._sessions[encryptedAdTrackingData]
 
-			if not v32 then
-				v32 = {
+			if not v34 then
+				v34 = {
 					state = sponsoredAdViewabilityState.new(n1),
 					metadata = metadata
 				}
-				p10._sessions[encryptedAdTrackingData] = v32
-				p10._callbacks.onSessionStart(metadata, v29.geometry, n1)
+				p11._sessions[encryptedAdTrackingData] = v34
+				p11._callbacks.onSessionStart(metadata, v31.geometry, n1)
 			end
 
-			for _, v34 in v32.state:advance(n1, v29.ratio, v29.geometry) do
-				p10._callbacks.onMilestone(metadata, v34)
+			for _, v36 in v34.state:advance(n1, v31.ratio, v31.geometry) do
+				p11._callbacks.onMilestone(metadata, v36)
 			end
 		end
 	end
 
-	for v35, v36 in p10._sessions do
-		if not t4[v35] then
-			v36.state:advance(n1, 0, nil)
+	for v37, v38 in p11._sessions do
+		if not t4[v37] then
+			v38.state:advance(n1, 0, nil)
 		end
 	end
 end
-function t2._terminateAllSessions(p11, n2: number, s1: string) -- line: 187
-	local _sessions = p11._sessions
-
-	p11._sessions = {}
-
-	for _, v42 in _sessions do
-		local v43 = v42.state:finalize(n2)
-
-		p11._callbacks.onUnload(v42.metadata, v43, s1)
-	end
-end
-function t2.onFeedRefresh(p12, n3: number?) -- line: 203
-	-- upvalues: t1 (copy)
-	p12:_terminateAllSessions(n3 or DateTime.now().UnixTimestampMillis, t1.FeedRefresh)
-end
-function t2.reset(p13, n4: number?) -- line: 208
-	-- upvalues: t1 (copy)
-	p13._running = false
-
-	local _scanThread = p13._scanThread
-
-	if _scanThread ~= nil and coroutine.status(_scanThread) == "suspended" then
-		task.cancel(_scanThread)
+function t2.pause(p12, n2: number?) -- line: 200
+	if p12._paused then
+		return
 	end
 
-	p13._scanThread = nil
-	p13:_terminateAllSessions(n4 or DateTime.now().UnixTimestampMillis, t1.SurfaceTeardown)
+	local v41 = n2 or DateTime.now().UnixTimestampMillis
+
+	for _, v43 in p12._sessions do
+		v43.state:pause(v41)
+	end
+
+	p12._paused = true
+	p12:_cancelScheduledScan()
+end
+function t2.resume(p13, n3: number?) -- line: 212
+	if not p13._paused then
+		return
+	end
+
+	local v46 = n3 or DateTime.now().UnixTimestampMillis
+
+	for _, v48 in p13._sessions do
+		v48.state:resume(v46)
+	end
+
+	p13._paused = false
+
+	if p13._running then
+		p13:_scheduleNextScan()
+	end
+end
+function t2._terminateAllSessions(p14, n4: number, s1: string) -- line: 227
+	local _sessions = p14._sessions
+
+	p14._sessions = {}
+
+	for _, v54 in _sessions do
+		local v55 = v54.state:finalize(n4)
+
+		p14._callbacks.onUnload(v54.metadata, v55, s1)
+	end
+end
+function t2.onFeedRefresh(p15, n5: number?) -- line: 243
+	-- upvalues: t1 (copy)
+	p15:_terminateAllSessions(n5 or DateTime.now().UnixTimestampMillis, t1.FeedRefresh)
+end
+function t2.reset(p16, n6: number?) -- line: 248
+	-- upvalues: t1 (copy)
+	p16._running = false
+	p16:_cancelScheduledScan()
+	p16:_terminateAllSessions(n6 or DateTime.now().UnixTimestampMillis, t1.SurfaceTeardown)
 end
 
 t2.TerminalReason = t1

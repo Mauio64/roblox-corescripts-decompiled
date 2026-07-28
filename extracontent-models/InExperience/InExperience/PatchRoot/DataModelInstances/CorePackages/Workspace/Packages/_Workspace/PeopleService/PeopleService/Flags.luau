@@ -26,5 +26,7 @@ return {
 	FFlagPeoplePageRemoveUseMemoElements = require(script.UI.FFlagPeoplePageRemoveUseMemoElements),
 	FFlagPeopleCardsEnableVirtualizedGrid = require(script.UI.FFlagPeopleCardsEnableVirtualizedGrid),
 	FFlagFixVirtualizedGridNumItems = require(script.UI.FFlagFixVirtualizedGridNumItems),
-	FFlagEnablePeoplePageButtonOnMount = require(script.UI.FFlagEnablePeoplePageButtonOnMount)
+	FFlagVoiceVolumeControlsPerUserPlayerListButton = require(script.UI.FFlagVoiceVolumeControlsPerUserPlayerListButton),
+	FFlagEnablePeoplePageButtonOnMount = require(script.UI.FFlagEnablePeoplePageButtonOnMount),
+	FFlagVoiceChatVolumePerUserMuteVolumeSync = require(script.UI.FFlagVoiceChatVolumePerUserMuteVolumeSync)
 }

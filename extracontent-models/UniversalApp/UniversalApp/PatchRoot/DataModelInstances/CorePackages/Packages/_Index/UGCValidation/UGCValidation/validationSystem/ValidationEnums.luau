@@ -1,30 +1,28 @@
-local ParentParent = script.Parent.Parent
-local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
 local t1 = {}
 
-local function createEnumMetatable(s1: string) -- line: 12
+local function createEnumMetatable(s1: string) -- line: 8
 	return {
 		__metatable = "This metatable is protected",
-		__index = function(_, p2) -- line: 14
+		__index = function(_, p2) -- line: 10
 			-- upvalues: s1 (copy)
 			error("Invalid ValidationEnums." .. s1 .. " enum value: " .. tostring(p2))
 		end,
-		__newindex = function(_, _, _) -- line: 17
+		__newindex = function(_, _, _) -- line: 13
 			error("Cannot add new keys to ValidationEnums")
 		end
 	}
 end
-local function finalizeEnumTable(s2: string) -- line: 24
+local function finalizeEnumTable(s2: string) -- line: 20
 	-- upvalues: t1 (copy), createEnumMetatable (copy)
 	if t1[s2] == nil then
 		error(s2 .. " enum table is not found")
 	end
 
-	for v8, v9 in t1[s2] do
-		if typeof(v8) ~= "string" then
-			error(s2 .. " enum table has non string key " .. tostring(v8))
-		elseif v8 ~= v9 then
-			error(s2 .. " enum table has non-matching key and value for key " .. tostring(v8))
+	for v6, v7 in t1[s2] do
+		if typeof(v6) ~= "string" then
+			error(s2 .. " enum table has non string key " .. tostring(v6))
+		elseif v6 ~= v7 then
+			error(s2 .. " enum table has non-matching key and value for key " .. tostring(v6))
 		end
 	end
 
@@ -152,7 +150,6 @@ t1.ValidationConfig = {
 	prereqTests = "prereqTests",
 	requiredData = "requiredData",
 	conditionalData = "conditionalData",
-	expectedAqsData = "expectedAqsData",
 	knownAqsUserErrors = "knownAqsUserErrors",
 	expectedFailures = "expectedFailures",
 	run = "run"
@@ -180,32 +177,27 @@ t1.Status = {
 	IN_PROGRESS = "IN_PROGRESS"
 }
 finalizeEnumTable("Status")
-
-if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
-	t1.AssetQualityCheck = {
-		Measure_Dynamic_Head = "Measure_Dynamic_Head",
-		Measure_Cage_Distance_Head = "Measure_Cage_Distance_Head",
-		Measure_Cage_Mesh_Distance = "Measure_Cage_Mesh_Distance",
-		Measure_Cage_Mesh_Distance_Avatar = "Measure_Cage_Mesh_Distance_Avatar",
-		Measure_Cage_UV = "Measure_Cage_UV",
-		Measure_Cage_UV_Avatar = "Measure_Cage_UV_Avatar",
-		Measure_Cage_Relevancy = "Measure_Cage_Relevancy",
-		Measure_Mesh_Outside_OuterCage = "Measure_Mesh_Outside_OuterCage",
-		Measure_Degen_Triangles = "Measure_Degen_Triangles",
-		Measure_Mesh_Manifold = "Measure_Mesh_Manifold",
-		Measure_Triangle_Intersection = "Measure_Triangle_Intersection",
-		Measure_UV_Bound = "Measure_UV_Bound",
-		Measure_Vertex_Similarity = "Measure_Vertex_Similarity",
-		Measure_Joint_Number = "Measure_Joint_Number",
-		Measure_Texture_Complexity = "Measure_Texture_Complexity",
-		Measure_Texture_Resolution = "Measure_Texture_Resolution"
-	}
-	finalizeEnumTable("AssetQualityCheck")
-else
-	t1.ValidationModule.HeadIsDynamic = "HeadIsDynamic"
-	t1.ValidationModule.MeasureCageMeshDistanceHead = "MeasureCageMeshDistanceHead"
-end
-
+t1.AssetQualityCheck = {
+	Measure_Dynamic_Head = "Measure_Dynamic_Head",
+	Measure_Cage_Distance_Head = "Measure_Cage_Distance_Head",
+	Measure_Cage_Mesh_Distance = "Measure_Cage_Mesh_Distance",
+	Measure_Cage_Mesh_Distance_Avatar = "Measure_Cage_Mesh_Distance_Avatar",
+	Measure_Cage_UV = "Measure_Cage_UV",
+	Measure_Cage_UV_Avatar = "Measure_Cage_UV_Avatar",
+	Measure_Cage_Relevancy = "Measure_Cage_Relevancy",
+	Measure_Mesh_Outside_OuterCage = "Measure_Mesh_Outside_OuterCage",
+	Measure_Degen_Triangles = "Measure_Degen_Triangles",
+	Measure_Mesh_Manifold = "Measure_Mesh_Manifold",
+	Measure_Mesh_Watertight = "Measure_Mesh_Watertight",
+	Measure_Triangle_Intersection = "Measure_Triangle_Intersection",
+	Measure_UV_Bound = "Measure_UV_Bound",
+	Measure_Vertex_Similarity = "Measure_Vertex_Similarity",
+	Measure_Joint_Number = "Measure_Joint_Number",
+	Measure_Texture_Complexity = "Measure_Texture_Complexity",
+	Measure_Texture_Resolution = "Measure_Texture_Resolution",
+	Measure_Mesh_Island_Volume = "Measure_Mesh_Island_Volume"
+}
+finalizeEnumTable("AssetQualityCheck")
 finalizeEnumTable("ValidationModule")
 t1.UploadCategory = {
 	TORSO_AND_LIMBS = "TORSO_AND_LIMBS",

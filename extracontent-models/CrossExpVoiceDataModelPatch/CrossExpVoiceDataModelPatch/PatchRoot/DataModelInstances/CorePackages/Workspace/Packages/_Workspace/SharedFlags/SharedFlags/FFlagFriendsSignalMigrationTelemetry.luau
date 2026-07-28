@@ -1,1 +1,3 @@
-return game:DefineFastFlag("FriendsSignalMigrationTelemetry", false)
+local FFlagFriendSortedByPresenceSignalsImplementation = require(script.Parent.FFlagFriendSortedByPresenceSignalsImplementation)
+
+return game:DefineFastFlag("FriendsSignalMigrationTelemetry_v1", false) and FFlagFriendSortedByPresenceSignalsImplementation

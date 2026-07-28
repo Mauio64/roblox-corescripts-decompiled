@@ -56,7 +56,8 @@ return {
 		getUnifiedEventsForMIS = require(script.Utils.getUnifiedEventsForMIS),
 		getUnifiedLoggingSurface = require(script.Utils.getUnifiedLoggingSurface),
 		getUnifiedLoggingSurfaceForAppPage = require(script.Utils.getUnifiedLoggingSurfaceForAppPage),
-		getItemSelectionAction = require(script.Utils.getItemSelectionAction)
+		getItemSelectionAction = require(script.Utils.getItemSelectionAction),
+		getCatalogItemUnifiedLoggingFields = require(script.Utils.getCatalogItemUnifiedLoggingFields)
 	},
 	Constants = require(script.Constants),
 	ImpressionsReporter = {

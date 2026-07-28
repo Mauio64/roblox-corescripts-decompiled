@@ -1,8 +1,9 @@
 local Moments = script:FindFirstAncestor("Moments")
 local MomentsParent = Moments.Parent
-local MomentsCommon = require(MomentsParent.MomentsCommon)
+
+require(MomentsParent.MomentsCommon)
+
 local React = require(MomentsParent.React)
-local GetFFlagMomentsAnalyticsSchemaIdentity = MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity
 local MomentContext = require(script.Parent.Parent.MomentContext)
 local ReactionEffectsContext = require(script.Parent.ReactionEffectsContext)
 local reactionTruthTable = require(script.Parent.reactionTruthTable)
@@ -10,44 +11,44 @@ local SignalActionType = require(Moments.Enums.SignalActionType)
 local useFeedOptional = require(Moments.Components.Feed.FeedContext).useFeedOptional
 local useReactionEffects = ReactionEffectsContext.useReactionEffects
 
-local function useReactionCommit() -- line: 32
-	-- upvalues: MomentContext (copy), useReactionEffects (copy), useFeedOptional (copy), React (copy), reactionTruthTable (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), SignalActionType (copy)
+local function useReactionCommit() -- line: 31
+	-- upvalues: MomentContext (copy), useReactionEffects (copy), useFeedOptional (copy), React (copy), reactionTruthTable (copy), SignalActionType (copy)
 	local store = MomentContext.useMoment().store
-	local v14 = useReactionEffects()
-	local v15 = useFeedOptional()
+	local v12 = useReactionEffects()
+	local v13 = useFeedOptional()
 
-	return React.useCallback(function(p1, vector2: Vector2?, p2) -- line: 41
-		-- upvalues: store (copy), reactionTruthTable (copy), v15 (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), SignalActionType (copy), v14 (copy)
-		local v19 = store.getSelectedReaction(false)
-		local v20 = reactionTruthTable.decide(v19, p1, p2)
+	return React.useCallback(function(p1, vector2: Vector2?, p2) -- line: 40
+		-- upvalues: store (copy), reactionTruthTable (copy), v13 (copy), SignalActionType (copy), v12 (copy)
+		local v17 = store.getSelectedReaction(false)
+		local v18 = reactionTruthTable.decide(v17, p1, p2)
 
-		if v20.action == "commit" and v20.reaction ~= nil then
-			store.commitReaction(v20.reaction)
-		elseif v20.action == "clear" then
+		if v18.action == "commit" and v18.reaction ~= nil then
+			store.commitReaction(v18.reaction)
+		elseif v18.action == "clear" then
 			store.clearReaction()
 		end
 
-		if v15 ~= nil and v20.action ~= "none" then
-			local v21 = store.getData(false)
-			local v22 = if not GetFFlagMomentsAnalyticsSchemaIdentity() then v21.feedItemId else v21.feedItemIdRaw
+		if v13 ~= nil and v18.action ~= "none" then
+			local v19 = store.getData(false)
+			local feedItemId = v19.feedItemId
 
-			if v22 ~= nil and v22 ~= "" then
+			if feedItemId ~= nil and feedItemId ~= "" then
 				local t1 = {
-					itemId = v22,
-					tracingId = v21.feedSessionId
+					itemId = feedItemId,
+					tracingId = v19.feedSessionId
 				}
-				local ok, result = pcall(function() -- line: 67
-					-- upvalues: v20 (copy), v15 (copy), SignalActionType (copy), t1 (copy)
-					if v20.action == "commit" and v20.reaction ~= nil then
-						v15.logAction(SignalActionType.AddReaction, t1, {
-							reactionType = v20.reaction
+				local ok, result = pcall(function() -- line: 64
+					-- upvalues: v18 (copy), v13 (copy), SignalActionType (copy), t1 (copy)
+					if v18.action == "commit" and v18.reaction ~= nil then
+						v13.logAction(SignalActionType.AddReaction, t1, {
+							reactionType = v18.reaction
 						})
 
 						return
 					end
 
-					if v20.action == "clear" then
-						v15.logAction(SignalActionType.RemoveReaction, t1, {})
+					if v18.action == "clear" then
+						v13.logAction(SignalActionType.RemoveReaction, t1, {})
 					end
 				end)
 
@@ -57,13 +58,13 @@ local function useReactionCommit() -- line: 32
 			end
 		end
 
-		if v14 ~= nil and v20.effectReaction ~= nil then
-			v14.spawnExplosion(v20.effectReaction, vector2)
+		if v12 ~= nil and v18.effectReaction ~= nil then
+			v12.spawnExplosion(v18.effectReaction, vector2)
 		end
 	end, {
 		store,
-		v14,
-		v15
+		v12,
+		v13
 	})
 end
 

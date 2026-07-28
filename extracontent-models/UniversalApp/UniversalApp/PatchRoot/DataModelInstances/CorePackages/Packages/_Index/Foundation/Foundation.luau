@@ -68,6 +68,7 @@ local Accordion = require(script.Components.Accordion)
 local Avatar = require(script.Components.Avatar)
 local AvatarGroup = require(script.Components.AvatarGroup)
 local AvatarIcon = require(script.Components.AvatarIcon)
+local AvatarIconGroup = require(script.Components.AvatarIconGroup)
 local Badge = require(script.Components.Badge)
 local BaseMenu = require(script.Components.BaseMenu)
 local Button = require(script.Components.Button)
@@ -121,11 +122,12 @@ local Toggle = require(script.Components.Toggle)
 local Tooltip = require(script.Components.Tooltip)
 local Toast = require(script.Components.Toast)
 local View = require(script.Components.View)
-local v115 = strict({
+local v116 = strict({
 	Accordion = Accordion,
 	Avatar = Avatar,
 	AvatarGroup = AvatarGroup,
 	AvatarIcon = AvatarIcon,
+	AvatarIconGroup = AvatarIconGroup,
 	Badge = Badge,
 	Button = Button,
 	ButtonGroup = ButtonGroup,
@@ -295,11 +297,11 @@ local v115 = strict({
 if _G.__FOUNDATION_TRACK_USAGE__ then
 	local UsageTracker = require(script.Parent.UsageTracker)
 
-	v115 = UsageTracker.trackMemberAccess("Foundation", v115, UsageTracker.isReactComponent)
+	v116 = UsageTracker.trackMemberAccess("Foundation", v116, UsageTracker.isReactComponent)
 end
 
 if _G.__FOUNDATION_TRACE_LOG__ then
 	require(script.Utility.Logger):enableTraceLog()
 end
 
-return v115
+return v116

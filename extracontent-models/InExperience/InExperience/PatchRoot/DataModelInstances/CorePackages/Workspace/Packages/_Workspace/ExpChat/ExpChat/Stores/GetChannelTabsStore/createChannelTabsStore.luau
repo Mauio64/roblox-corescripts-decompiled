@@ -86,7 +86,7 @@ function getFixedTabPriority(s1: string?) -- line: 125
 end
 
 local function createChannelTabsStore() -- line: 136
-	-- upvalues: createSignal (copy), createComputed (copy), tutils (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), getFixedTabPriority (ref)
+	-- upvalues: createSignal (copy), createComputed (copy), tutils (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), getFixedTabPriority (ref), FFlagExpChatEnableFriendsTab (copy)
 	local t7 = {
 		selectedTabName = nil,
 		allChannelTabs = {}
@@ -233,11 +233,11 @@ local function createChannelTabsStore() -- line: 136
 			end)
 		end,
 		addChannelTab = function(p9, n1: number?) -- line: 302
-			-- upvalues: v33 (copy), reorderTabs (copy), getFixedTabPriority (ref)
+			-- upvalues: v33 (copy), reorderTabs (copy), getFixedTabPriority (ref), FFlagExpChatEnableFriendsTab (copy)
 			local name = p9.name
 
 			v33(function(p10) -- line: 305
-				-- upvalues: n1 (copy), p9 (copy), name (copy), reorderTabs (copy), getFixedTabPriority (ref)
+				-- upvalues: n1 (copy), p9 (copy), name (copy), reorderTabs (copy), getFixedTabPriority (ref), FFlagExpChatEnableFriendsTab (copy)
 				local v83 = table.clone(p10)
 				local allChannelTabs = v83.allChannelTabs
 
@@ -276,16 +276,16 @@ local function createChannelTabsStore() -- line: 136
 					return v83
 				end
 
-				if v90 ~= nil and (v91 == nil or v90 < v91) then
+				if v90 ~= nil and v90 < (v91 or 1e999) and (not FFlagExpChatEnableFriendsTab or v91 ~= nil) then
 					v83.selectedTabName = name
 				end
 
 				return v83
 			end)
 		end,
-		removeChannelTab = function(s5: string) -- line: 347
+		removeChannelTab = function(s5: string) -- line: 352
 			-- upvalues: v33 (copy)
-			v33(function(p11) -- line: 348
+			v33(function(p11) -- line: 353
 				-- upvalues: s5 (copy)
 				local v93 = table.clone(p11)
 
@@ -309,9 +309,9 @@ local function createChannelTabsStore() -- line: 136
 				return v93
 			end)
 		end,
-		handleChannelRemoved = function(s6: string) -- line: 372
+		handleChannelRemoved = function(s6: string) -- line: 377
 			-- upvalues: v33 (copy), reorderTabs (copy)
-			v33(function(p12) -- line: 373
+			v33(function(p12) -- line: 378
 				-- upvalues: s6 (copy), reorderTabs (copy)
 				local v99 = p12.allChannelTabs[s6]
 

@@ -10,15 +10,17 @@ local Interactable = UIBlox.Core.Control.Interactable
 local t1 = {
 	bodyText = "Chat Disabled",
 	defaultCountdownString = "",
-	onActivated = function() -- line: 26
-	end
+	onActivated = function() -- line: 27
+	end,
+	contentVerticalAlignment = Enum.VerticalAlignment.Top
 }
 
-local function ChatInputBoxDisabled(t2: {[any]: any}) -- line: 29
+local function ChatInputBoxDisabled(t2: {[any]: any}) -- line: 31
 	-- upvalues: Cryo (copy), t1 (copy), Foundation (copy), useCountdownBinding (copy), React (copy), Interactable (copy), ImageSetLabel (copy), Images (copy)
 	local v13 = Cryo.Dictionary.union(t1, t2)
 	local v14 = Foundation.Hooks.useTokens()
 	local v15 = useCountdownBinding(v13.endTimestamp, v13.defaultCountdownString)
+	local v16 = if v13.contentVerticalAlignment ~= Enum.VerticalAlignment.Center then if v13.contentVerticalAlignment ~= Enum.VerticalAlignment.Bottom then Enum.TextYAlignment.Top else Enum.TextYAlignment.Bottom else Enum.TextYAlignment.Center
 
 	return React.createElement(Interactable, {
 		BackgroundTransparency = 1,
@@ -29,7 +31,7 @@ local function ChatInputBoxDisabled(t2: {[any]: any}) -- line: 29
 			Padding = UDim.new(0, v14.Gap.Small),
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Top,
+			VerticalAlignment = v13.contentVerticalAlignment,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
 		disabledText = React.createElement(Foundation.Text, {
@@ -43,7 +45,7 @@ local function ChatInputBoxDisabled(t2: {[any]: any}) -- line: 29
 			TextSize = v13.contentSize,
 			textStyle = v14.Color.System.Alert,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
+			TextYAlignment = v16,
 			TextTruncate = Enum.TextTruncate.AtEnd
 		}),
 		countdownText = if v13.endTimestamp == nil then nil else React.createElement(Foundation.Text, {
@@ -57,7 +59,7 @@ local function ChatInputBoxDisabled(t2: {[any]: any}) -- line: 29
 			TextSize = v13.contentSize,
 			textStyle = v14.Color.Content.Emphasis,
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Top
+			TextYAlignment = v16
 		}),
 		icon = React.createElement(ImageSetLabel, {
 			BackgroundTransparency = 1,

@@ -13,7 +13,7 @@ local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
 
-local function OverflowMenuPageShell(t1: {[any]: any}) -- line: 34
+local function OverflowMenuPageShell(t1: {[any]: any}) -- line: 35
 	-- upvalues: React (copy), FFlagEnableBuildExperienceScrollPerformanceTracking (copy), v6 (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), FoundationText (copy), ScrollView (copy), Divider (copy)
 	local v17 = t1.testId or "overflow-menu-page"
 	local v18 = React.useRef(nil)
@@ -45,6 +45,13 @@ local function OverflowMenuPageShell(t1: {[any]: any}) -- line: 34
 				LayoutOrder = 2,
 				tag = "fill text-heading-medium text-align-x-left text-truncate-end content-emphasis",
 				Text = t1.title
+			}),
+			Trailing = if t1.headerTrailing == nil then nil else React.createElement(View, {
+				LayoutOrder = 3,
+				tag = "auto-xy",
+				testId = `{ v17 }-header-trailing`
+			}, {
+				Content = t1.headerTrailing
 			})
 		}),
 		Body = React.createElement(ScrollView, {

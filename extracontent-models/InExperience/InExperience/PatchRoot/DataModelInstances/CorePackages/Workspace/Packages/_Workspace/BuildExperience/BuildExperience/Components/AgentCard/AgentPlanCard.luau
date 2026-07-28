@@ -103,7 +103,7 @@ local function AgentPlanCard(t2: {[any]: any}) -- line: 93
 					LayoutOrder = 1,
 					text = LocalizationStrings.AGENT_PLAN_BUILD,
 					size = InputSize.Small,
-					variant = ButtonVariant.SoftEmphasis,
+					variant = ButtonVariant.Emphasis,
 					fillBehavior = FillBehavior.Fill,
 					isDisabled = t2.isBuildDisabled == true,
 					onActivated = v28,

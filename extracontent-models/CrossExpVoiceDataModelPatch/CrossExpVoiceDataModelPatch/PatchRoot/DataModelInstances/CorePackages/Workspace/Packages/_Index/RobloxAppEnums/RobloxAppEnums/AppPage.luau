@@ -114,6 +114,7 @@ return {
 	ReportDialog = "ReportDialog",
 	AccountSettingsUpsell = "AccountSettingsUpsell",
 	AmpWizardContainer = "AmpWizardContainer",
+	AmpV2Wizard = "AmpV2Wizard",
 	AccountUnlock = "AccountUnlock",
 	ParentVerification = "ParentVerification",
 	EmailVerification = "EmailVerification",

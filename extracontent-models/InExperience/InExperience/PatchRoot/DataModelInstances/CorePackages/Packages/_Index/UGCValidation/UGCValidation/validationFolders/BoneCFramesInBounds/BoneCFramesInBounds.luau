@@ -4,13 +4,12 @@ require(ParentParent.util.Types)
 
 local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
 local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
 local getAllInstancesIsA = require(ParentParent.util.getAllInstancesIsA)
 local R15plusUtils = require(ParentParent.util.R15plusUtils)
 local Vector3Utils = require(ParentParent.util.Vector3Utils)
 local CFrameUtils = require(ParentParent.util.CFrameUtils)
 local t1 = {}
-local v10 = game:DefineFastInt("UGCValidationBoneCFrameBoundsMultiplierHundredths", 110)
+local v9 = game:DefineFastInt("UGCValidationBoneCFrameBoundsMultiplierHundredths", 110)
 
 t1.categories = {
 	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
@@ -22,43 +21,41 @@ t1.requiredData = {
 }
 t1.fflag = R15plusUtils.checkFlagEnabledForAllowHrd
 
-local v11 = game:DefineFastInt("UGCValidationMinimumJointDistanceHundredths", 5) / 100
+local v10 = game:DefineFastInt("UGCValidationMinimumJointDistanceHundredths", 5) / 100
 
-function t1.run(p1, p2) -- line: 24
-	-- upvalues: v10 (copy), getAllInstancesIsA (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy), Vector3Utils (copy), ErrorSourceStrings (copy), CFrameUtils (copy), v11 (copy)
+function t1.run(p1, p2) -- line: 22
+	-- upvalues: v9 (copy), getAllInstancesIsA (copy), Vector3Utils (copy), ErrorSourceStrings (copy), CFrameUtils (copy), v10 (copy)
 	local rootInstance = p2.rootInstance
-	local v15 = v10 / 100
+	local v14 = v9 / 100
 
-	for _, v17 in (getAllInstancesIsA(rootInstance, "MeshPart")) do
-		local v18 = p2.renderMeshesData[v17.Name]
+	for _, v16 in (getAllInstancesIsA(rootInstance, "MeshPart")) do
+		local v17 = p2.renderMeshesData[v16.Name]
 
-		if v18 then
-			local v19 = v18.originalSize * v18.scale * v15 / 2
-			local v20 = v17.CFrame:Inverse()
+		if v17 then
+			local v18 = v17.originalSize * v17.scale * v14 / 2
+			local v19 = v16.CFrame:Inverse()
 
-			for _, v22 in (getAllInstancesIsA(v17, "Bone")) do
-				if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
-					p1:setReportingInstance(v22)
-				end
+			for _, v21 in (getAllInstancesIsA(v16, "Bone")) do
+				p1:setReportingInstance(v21)
 
-				local Position = (v20 * v22.WorldCFrame).Position
+				local Position = (v19 * v21.WorldCFrame).Position
 
-				if not Vector3Utils.isInRange(Position, -v19, v19) then
+				if not Vector3Utils.isInRange(Position, -v18, v18) then
 					p1:fail(ErrorSourceStrings.Keys.HrdBone_OutOfBounds, {
-						bonePath = v22:GetFullName(),
-						partName = v17.Name
+						bonePath = v21:GetFullName(),
+						partName = v16.Name
 					})
 				end
 
-				if not CFrameUtils.fuzzyEq(v22.Transform, CFrame.identity) then
+				if not CFrameUtils.fuzzyEq(v21.Transform, CFrame.identity) then
 					p1:fail(ErrorSourceStrings.Keys.HrdBone_TransformNotIdentity, {
-						bonePath = v22:GetFullName()
+						bonePath = v21:GetFullName()
 					})
 				end
 
-				if v22.Parent:IsA("Bone") and v22.Position.Magnitude < v11 then
+				if v21.Parent:IsA("Bone") and v21.Position.Magnitude < v10 then
 					p1:fail(ErrorSourceStrings.Keys.HrdBone_TooCloseToParent, {
-						bonePath = v22:GetFullName()
+						bonePath = v21:GetFullName()
 					})
 				end
 			end

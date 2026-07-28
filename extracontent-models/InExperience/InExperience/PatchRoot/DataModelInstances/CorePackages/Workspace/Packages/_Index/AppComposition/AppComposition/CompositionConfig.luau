@@ -15,15 +15,13 @@ local function getRegionOverrides(p1) -- line: 27
 	-- upvalues: RegionName (copy)
 	if p1 == RegionName.SupportRegion then
 		return {
-			width = 532,
-			minWidth = 224,
-			maxWidth = 640
+			widthScale = 0.33
 		}
 	end
 
 	return nil
 end
-local function getBaseConfig(p2, p3) -- line: 38
+local function getBaseConfig(p2, p3) -- line: 36
 	-- upvalues: Breakpoint (copy), FFlagEnableLeftNavOnConsole (copy), HardwareSafeAreaInsets (copy)
 	local t1
 
@@ -79,21 +77,20 @@ local function getBaseConfig(p2, p3) -- line: 38
 
 	return t1
 end
-local function resolveLayout(p4, p5) -- line: 97
+local function resolveLayout(p4, p5) -- line: 95
 	-- upvalues: getBaseConfig (copy)
 	return (getBaseConfig(p4, p5))
 end
-local function getRegionLayout(p6, p7, p8) -- line: 101
+local function getRegionLayout(p6, p7, p8) -- line: 99
 	-- upvalues: getBaseConfig (copy), RegionName (copy)
 	local v29 = getBaseConfig(p7, p8)
 	local v30 = if p6 ~= RegionName.SupportRegion then nil else {
-		width = 532,
-		minWidth = 224,
-		maxWidth = 640
+		widthScale = 0.33
 	}
 
 	if v30 then
 		v29.width = v30.width
+		v29.widthScale = v30.widthScale
 		v29.minWidth = v30.minWidth
 		v29.maxWidth = v30.maxWidth
 	end

@@ -1,13 +1,13 @@
 local Parent = script:FindFirstAncestor("AppChat").Parent
 local React = require(Parent.React)
 local Foundation = require(Parent.Foundation)
-local SmartSuggestionActionHandler = require(script.Parent.SmartSuggestionActionHandler)
+local Types = require(script.Parent.Types)
 local useSmartSuggestions = require(script.Parent.useSmartSuggestions)
 local Chip = Foundation.Chip
 local ChipSize = Foundation.Enums.ChipSize
 local useTokens = Foundation.Hooks.useTokens
 local t1 = {
-	[SmartSuggestionActionHandler.SuggestionType.GameCard] = Foundation.Enums.IconName.Controller
+	[Types.SuggestionType.GameCard] = Foundation.Enums.IconName.Controller
 }
 
 local function attachGrowFlexItem(p1) -- line: 45

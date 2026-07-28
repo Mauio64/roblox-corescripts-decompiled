@@ -2,28 +2,38 @@ local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
 
 require(GenericAbuseReporting.BeduiV2.Types)
 
-local function transformJsonLeafFirst(p1, p2: ((...any) -> ...any)) -- line: 12
-	-- upvalues: transformJsonLeafFirst (copy)
+local FFlagAbuseReportDensifyResolvedArrays = require(GenericAbuseReporting.Flags.FFlagAbuseReportDensifyResolvedArrays)
+
+local function transformJsonLeafFirst(p1, p2: ((...any) -> ...any)) -- line: 13
+	-- upvalues: FFlagAbuseReportDensifyResolvedArrays (copy), transformJsonLeafFirst (copy)
 	if type(p1) == "table" then
-		local v5 = false
-		local n1 = 0
+		local v6 = false
 
 		for k, _ in pairs(p1) do
 			if type(k) ~= "number" then
-				v5 = false
+				v6 = false
 
 				break
 			end
 
-			v5 = true
-			n1 = math.max(n1, k)
+			v6 = true
 		end
 
-		if v5 then
+		if v6 then
 			local t1 = {}
 
-			for i, v in ipairs(p1) do
-				t1[i] = transformJsonLeafFirst(v, p2)
+			if FFlagAbuseReportDensifyResolvedArrays then
+				for _, v in ipairs(p1) do
+					local v12 = transformJsonLeafFirst(v, p2)
+
+					if v12 ~= nil then
+						table.insert(t1, v12)
+					end
+				end
+			else
+				for i, v in ipairs(p1) do
+					t1[i] = transformJsonLeafFirst(v, p2)
+				end
 			end
 
 			return p2(t1)

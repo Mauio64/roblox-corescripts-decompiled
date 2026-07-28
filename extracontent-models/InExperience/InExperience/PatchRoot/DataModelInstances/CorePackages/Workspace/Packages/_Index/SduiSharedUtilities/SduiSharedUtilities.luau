@@ -47,6 +47,7 @@ return {
 	usePageEntrySnackbar = require(script.usePageEntrySnackbar),
 	useComponentConfig = require(script.hooks.useComponentConfig),
 	useEntrySurfacing = require(script.hooks.useEntrySurfacing),
+	useInputData = require(script.hooks.useInputData),
 	useSduiPageScopeField = require(script.hooks.useSduiPageScopeField),
 	useUiStatus = require(script.hooks.useUiStatus),
 	UiStatus = require(script.SduiIntegrationTypes).UiStatus,

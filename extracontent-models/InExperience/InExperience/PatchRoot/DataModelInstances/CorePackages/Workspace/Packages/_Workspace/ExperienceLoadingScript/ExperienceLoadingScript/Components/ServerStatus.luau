@@ -3,7 +3,7 @@ local ExperienceLoadingScriptParent = ExperienceLoadingScript.Parent
 local CoreGui = game:GetService("CoreGui")
 local ExperienceService = game:GetService("ExperienceService")
 local GuiService = game:GetService("GuiService")
-local LoadingScreenTelemetry = require(ExperienceLoadingScript.LoadingScreenTelemetry)
+local LoadingScreenTelemetry = require(ExperienceLoadingScriptParent.ProgressLoading.LoadingScreenTelemetry)
 local PlaceLauncherState = require(ExperienceLoadingScript.Enums.PlaceLauncherState)
 local getLoadingScreenStore = require(ExperienceLoadingScript.Store.getLoadingScreenStore)
 local Foundation = require(ExperienceLoadingScriptParent.Foundation)
@@ -15,7 +15,7 @@ require(ExperienceLoadingScriptParent.Signals)
 local SignalsReact = require(ExperienceLoadingScriptParent.SignalsReact)
 local useTokens = Foundation.Hooks.useTokens
 local EngineFeature = game:GetEngineFeature("QueuePositionEnabled")
-local FFlagEnableLuaAppsFollowUserId = require(ExperienceLoadingScript.Flags.FFlagEnableLuaAppsFollowUserId)
+local FFlagEnableLuaAppsFollowUserId = require(ExperienceLoadingScriptParent.SharedFlags).FFlagEnableLuaAppsFollowUserId
 local v16 = game:GetEngineFeature("ExperienceServiceFollowUserIdEnabled") and FFlagEnableLuaAppsFollowUserId
 
 local function getStoreJoinState(p1) -- line: 29

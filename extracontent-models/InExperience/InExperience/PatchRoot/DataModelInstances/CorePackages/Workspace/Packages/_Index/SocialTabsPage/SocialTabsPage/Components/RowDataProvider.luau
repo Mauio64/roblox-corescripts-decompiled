@@ -4,34 +4,38 @@ local React = require(SocialTabsPageParent.React)
 local useJoinUserInExperience = require(SocialTabsPageParent.SocialExperienceJoin).useJoinUserInExperience
 local useSelector = require(SocialTabsPageParent.RoactUtils).Hooks.RoactRodux.useSelector
 local convertUserPresenceTypeToString = require(SocialTabsPageParent.SocialCommon).Utils.convertUserPresenceTypeToString
-
-require(SocialTabsPageParent.DataHydration)
-
+local DataHydration = require(SocialTabsPageParent.DataHydration)
 local useCTAForRow = require(SocialTabsPage.Hooks.useCTAForRow)
 local RoduxPresence = require(SocialTabsPage.Rodux.RoduxPresence)
 
 require(SocialTabsPage.Common.Types)
 
+local FFlagSocialTabsPagePresenceSignalsMigration = require(SocialTabsPage.Flags.FFlagSocialTabsPagePresenceSignalsMigration)
+local v11 = if not FFlagSocialTabsPagePresenceSignalsMigration then nil else require(SocialTabsPageParent.FriendsCommon).Hooks.useGetPresenceByUserId
 local t1 = {
 	lastLocation = "",
 	userPresenceType = RoduxPresence.Enums.PresenceType.Offline
 }
+local v13 = if not FFlagSocialTabsPagePresenceSignalsMigration then nil else {
+	lastLocation = "",
+	userPresenceType = DataHydration.Presence.PresenceEnums.PresenceType.Offline
+}
 
-local function RowDataProvider(t2: {[any]: any}) -- line: 35
-	-- upvalues: useSelector (copy), RoduxPresence (copy), t1 (copy), convertUserPresenceTypeToString (copy), useJoinUserInExperience (copy), useCTAForRow (copy)
-	local v12 = useSelector(function(p1) -- line: 36
+local function RowDataProvider(t2: {[any]: any}) -- line: 49
+	-- upvalues: FFlagSocialTabsPagePresenceSignalsMigration (copy), v11 (copy), v13 (copy), useSelector (copy), RoduxPresence (copy), t1 (copy), convertUserPresenceTypeToString (copy), useJoinUserInExperience (copy), useCTAForRow (copy)
+	local v16 = if not FFlagSocialTabsPagePresenceSignalsMigration then useSelector(function(p1) -- line: 55
 		-- upvalues: RoduxPresence (copy), t2 (copy), t1 (copy)
 		return RoduxPresence.Selectors.getUserPresenceByUserId(p1, t2.entity.id) or t1
-	end)
-	local v13 = convertUserPresenceTypeToString(v12.userPresenceType)
-	local v14 = useJoinUserInExperience(t2.entity.id, {
-		presence = v12
+	end) else v11(t2.entity.id) or v13
+	local v17 = if not FFlagSocialTabsPagePresenceSignalsMigration then convertUserPresenceTypeToString(v16.userPresenceType) else v16.userPresenceType
+	local v18 = useJoinUserInExperience(t2.entity.id, {
+		presence = v16
 	})
-	local v15 = useCTAForRow(t2.ctaResult, t2.actionHandlers, t2.entity.id, v14)
+	local v19 = useCTAForRow(t2.ctaResult, t2.actionHandlers, t2.entity.id, v18)
 
 	return t2.createRow({
-		presence = v13,
-		primaryCta = v15
+		presence = v17,
+		primaryCta = v19
 	})
 end
 

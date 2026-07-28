@@ -10,7 +10,7 @@ local HttpService = game:GetService("HttpService")
 local getFFlagExpChatProtectedChatInternalAPIs = require(ParentParent.SharedFlags).getFFlagExpChatProtectedChatInternalAPIs
 local getTextAndTranslation = require(script.Parent.getTextAndTranslation)
 
-local function createUserMessage(t1: {[any]: any}) -- line: 64
+local function createUserMessage(t1: {[any]: any}) -- line: 71
 	return {
 		messageType = "user",
 		messageId = t1.messageId,
@@ -21,12 +21,13 @@ local function createUserMessage(t1: {[any]: any}) -- line: 64
 		isOutgoing = t1.isOutgoing,
 		status = t1.status,
 		wasRewritten = t1.wasRewritten,
-		originalText = t1.originalText
+		originalText = t1.originalText,
+		textChatMessageInstance = t1.textChatMessageInstance
 	}
 end
 
 return {
-	createSystemMessage = function(s1: string, s2: string?) -- line: 32
+	createSystemMessage = function(s1: string, s2: string?) -- line: 37
 		-- upvalues: HttpService (copy)
 		return {
 			messageType = "system-roblox",
@@ -35,17 +36,18 @@ return {
 			timestamp = DateTime.now()
 		}
 	end,
-	createSystemMessageFromTextChatMessage = function(p1) -- line: 43
+	createSystemMessageFromTextChatMessage = function(p1) -- line: 48
 		-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy)
 		return {
 			messageType = "system-roblox",
 			messageId = p1.MessageId,
 			content = if not getFFlagExpChatProtectedChatInternalAPIs() then p1.Text else p1.TextInternal,
-			timestamp = p1.Timestamp
+			timestamp = p1.Timestamp,
+			textChatMessageInstance = p1
 		}
 	end,
 	createUserMessage = createUserMessage,
-	createUserMessageFromTextChatMessage = function(p2, s3: string) -- line: 79
+	createUserMessageFromTextChatMessage = function(p2, s3: string) -- line: 87
 		-- upvalues: createUserMessage (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), getTextAndTranslation (copy)
 		local TextSource = p2.TextSource
 
@@ -58,7 +60,8 @@ return {
 			wasRewritten = not not p2.WasRewritten or nil,
 			originalText = if not p2.WasRewritten then nil else p2.OriginalText,
 			timestamp = p2.Timestamp,
-			isOutgoing = s3 == tostring(TextSource.UserId)
+			isOutgoing = s3 == tostring(TextSource.UserId),
+			textChatMessageInstance = p2
 		}))
 	end
 }

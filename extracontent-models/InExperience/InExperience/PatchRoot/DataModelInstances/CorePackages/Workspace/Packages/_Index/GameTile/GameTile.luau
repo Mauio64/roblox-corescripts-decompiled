@@ -1,3 +1,5 @@
+local scriptParent = script.Parent
+local FFlagLuaAppHomeThumbnailPrefetch = require(scriptParent.SharedFlags).FFlagLuaAppHomeThumbnailPrefetch
 local OpenCentralOverlayForPlacesList = require(script.OpenCentralOverlayForPlacesList)
 local GameTileConstants = require(script.GameTileConstants)
 local GameTileTypes = require(script.GameTileTypes)
@@ -26,6 +28,7 @@ local useVideoAnalytics = require(script.Video.Analytics.useVideoAnalytics)
 local formatExperienceIcon = require(script.formatExperienceIcon)
 local formatExperienceRating = require(script.formatExperienceRating)
 local formatExperienceThumbnail = require(script.formatExperienceThumbnail)
+local v31 = if not FFlagLuaAppHomeThumbnailPrefetch then nil else require(script.resolveGameTileThumbnailUri)
 local useNavigateToGameDetails = require(script.useNavigateToGameDetails)
 local TwoByOneGameTileTelemetry = require(script.TwoByOneGameTileTelemetry)
 local ItemLayoutDataParsingUtils = require(script.ItemLayoutDataParsingUtils)
@@ -58,6 +61,7 @@ return {
 	formatExperienceIcon = formatExperienceIcon,
 	formatExperienceRating = formatExperienceRating,
 	formatExperienceThumbnail = formatExperienceThumbnail,
+	resolveGameTileThumbnailUri = v31,
 	useNavigateToGameDetails = useNavigateToGameDetails,
 	NotInterestedUserSignalTelemetryEventConfigs = require(script.NotInterestedUserSignalTelemetryEventConfigs),
 	getGameTileHiddenStore = require(script.HiddenGameTile.getGameTileHiddenStore),

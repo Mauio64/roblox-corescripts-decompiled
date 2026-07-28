@@ -6,6 +6,9 @@ local dependencies = require(Squads.dependencies)
 local React = dependencies.React
 local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
 local SharedFlags = dependencies.SharedFlags
+local FFlagSquadsPresenceStoreMigration = require(SquadsParent.SquadsCore.Flags).FFlagSquadsPresenceStoreMigration
+local v10 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.FriendsCommon).Hooks.useGetPresenceByUserId
+local v11 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.DataHydration).Presence.PresenceEnums.PresenceType
 local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
 local Constants = require(SquadsParent.SquadsCore.Constants)
 local Hooks = require(SquadsParent.SquadsCore.Hooks)
@@ -18,74 +21,74 @@ local useSelector = dependencies.Hooks.useSelector
 local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
 local getFFlagEnableCrossExpVoiceAbuseReport = SharedFlags.getFFlagEnableCrossExpVoiceAbuseReport
 
-local function useSquadUserDropdownMenuButtons(p1, b1: boolean) -- line: 25
-	-- upvalues: useLocalUserId (copy), GetFFlagEnableCrossExpVoice (copy), useBackgroundExperience (copy), React (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), SquadExternalContractContext (copy), useCurrentSquadParentChannelId (copy), useSelector (copy), PresenceType (copy), Constants (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy)
-	local v23 = useLocalUserId()
-	local v24 = tostring(v23) == tostring(p1)
-	local u25 = nil
-	local u26 = nil
-	local u27 = false
-	local u28 = false
+local function useSquadUserDropdownMenuButtons(p1, b1: boolean) -- line: 33
+	-- upvalues: useLocalUserId (copy), GetFFlagEnableCrossExpVoice (copy), useBackgroundExperience (copy), React (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), SquadExternalContractContext (copy), useCurrentSquadParentChannelId (copy), FFlagSquadsPresenceStoreMigration (copy), v10 (copy), useSelector (copy), v11 (copy), PresenceType (copy), Constants (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy)
+	local v26 = useLocalUserId()
+	local v27 = tostring(v26) == tostring(p1)
+	local u28 = nil
+	local u29 = nil
+	local u30 = false
+	local u31 = false
 
 	if GetFFlagEnableCrossExpVoice() then
-		local v29 = if not p1 then nil else tonumber(p1)
+		local v32 = if not p1 then nil else tonumber(p1)
 
-		u25 = useBackgroundExperience()
-		u26 = React.useMemo(function() -- line: 38
-			-- upvalues: u25 (ref)
-			if u25 then
-				return u25.voiceChannelId
+		u28 = useBackgroundExperience()
+		u29 = React.useMemo(function() -- line: 46
+			-- upvalues: u28 (ref)
+			if u28 then
+				return u28.voiceChannelId
 			end
 
 			return nil
-		end, { u25 })
+		end, { u28 })
 
-		if v29 then
-			local v30 = useIsLocalPlayerPartyVoiceEligible()
-			local v31 = useIsUserPartyVoiceEligible(v29)
-			local v32 = useIsCurrentSquadPartyVoiceEligible() == true
+		if v32 then
+			local v33 = useIsLocalPlayerPartyVoiceEligible()
+			local v34 = useIsUserPartyVoiceEligible(v32)
+			local v35 = useIsCurrentSquadPartyVoiceEligible() == true
 
-			u27 = v32 and (v30 and not v31)
-			u28 = v30 and (v32 and (v31 and not v24))
+			u30 = v35 and (v33 and not v34)
+			u31 = v33 and (v35 and (v34 and not v27))
 		end
 	end
 
-	local v33 = React.useContext(SquadExternalContractContext)
-	local v34 = useCurrentSquadParentChannelId()
-	local v35 = v33.useGetConversationFromId(v34 or "")
-	local v36 = React.useCallback(function(p2) -- line: 61
+	local v36 = React.useContext(SquadExternalContractContext)
+	local v37 = useCurrentSquadParentChannelId()
+	local v38 = v36.useGetConversationFromId(v37 or "")
+	local v39 = React.useCallback(function(p2) -- line: 69
 		-- upvalues: p1 (copy)
 		return p2.Squad.Presence.byUserId[tostring(p1)]
 	end, { p1 })
-	local v37 = useSelector(v36)
+	local v40 = if not FFlagSquadsPresenceStoreMigration then useSelector(v39) else v10((tostring(p1)))
 
-	return React.useMemo(function() -- line: 67
-		-- upvalues: u27 (ref), v37 (copy), PresenceType (copy), v35 (copy), Constants (copy), v23 (copy), b1 (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy), u26 (ref), v24 (copy), u28 (ref)
+	return React.useMemo(function() -- line: 77
+		-- upvalues: u30 (ref), v40 (copy), FFlagSquadsPresenceStoreMigration (copy), v11 (copy), PresenceType (copy), v38 (copy), Constants (copy), v26 (copy), b1 (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy), u29 (ref), v27 (copy), u31 (ref)
 		local t1 = {}
 
-		for v40, v41 in {
-			VoiceIneligibleButton = u27,
-			JoinButton = v37 and (v37.userPresenceType == PresenceType.InGame and (v37.placeId and v37.gameId ~= game.JobId)),
-			RemoveUserButton = v35 and (v35.type == Constants.CONVERSATION_CHANNEL_GROUP_TYPE and v35.initiator == v23),
+		for v43, v44 in {
+			VoiceIneligibleButton = u30,
+			JoinButton = v40 and (v40.userPresenceType == (if not FFlagSquadsPresenceStoreMigration then PresenceType.InGame else v11.InGame) and (((if not FFlagSquadsPresenceStoreMigration then v40.placeId else v40.placeId ~= "")) and v40.gameId ~= game.JobId)),
+			RemoveUserButton = v38 and (v38.type == Constants.CONVERSATION_CHANNEL_GROUP_TYPE and v38.initiator == v26),
 			ViewProfileButton = not b1,
-			ReportButton = getFFlagEnableCrossExpVoiceAbuseReport() and (u26 and not v24),
-			MuteVoiceButton = u28
+			ReportButton = getFFlagEnableCrossExpVoiceAbuseReport() and (u29 and not v27),
+			MuteVoiceButton = u31
 		} do
-			if v41 then
-				table.insert(t1, v40)
+			if v44 then
+				table.insert(t1, v43)
 			end
 		end
 
 		return t1
 	end, {
-		u27,
+		u30,
 		b1,
-		u26,
-		v24,
-		v37,
-		v35,
-		v23,
-		u28
+		u29,
+		v27,
+		v40,
+		v38,
+		v26,
+		u31
 	})
 end
 

@@ -2,6 +2,7 @@ require(script.types)
 
 local ViewState = require(script.ViewState)
 local createSignalsNavigationObject = require(script.createSignalsNavigationObject)
+local createProjectedNavigationObject = require(script.createProjectedNavigationObject)
 
 return {
 	canGoBack = require(script.canGoBack),
@@ -24,6 +25,7 @@ return {
 	inspectRouteEntry = require(script.inspectRouteEntry),
 	ViewState = ViewState,
 	createSignalsNavigationObject = createSignalsNavigationObject,
+	createProjectedNavigationObject = createProjectedNavigationObject,
 	SignalsNavigationContainer = require(script.SignalsNavigationContainer),
 	["jest.config"] = script["jest.config"]
 }

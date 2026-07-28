@@ -5,7 +5,7 @@ require(Parent.DataHydration.MomentsStoreTypes)
 
 local GetFFlagMomentsAnalyticsSchemaIdentity = MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity
 
-local function buildTileFields(p1, s1: string, s2: string, n1: number, s3: string?) -- line: 68
+local function buildTileFields(p1, s1: string, s2: string, n1: number, s3: string?) -- line: 65
 	-- upvalues: GetFFlagMomentsAnalyticsSchemaIdentity (copy), MomentsCommon (copy)
 	if GetFFlagMomentsAnalyticsSchemaIdentity() then
 		local recommendationMetadata = p1.recommendationMetadata
@@ -42,7 +42,7 @@ local function buildTileFields(p1, s1: string, s2: string, n1: number, s3: strin
 	}
 	local recommendationMetadata = p1.recommendationMetadata
 
-	t2.itemId = if recommendationMetadata ~= nil then if not GetFFlagMomentsAnalyticsSchemaIdentity() then recommendationMetadata.itemId or "" else recommendationMetadata.feedItemId or "" else ""
+	t2.itemId = if recommendationMetadata ~= nil then recommendationMetadata.feedItemId or "" else ""
 	t2.gridIndex = tostring(n1)
 
 	return t2
@@ -51,24 +51,19 @@ end
 return {
 	INTERACTION_OPEN = "open",
 	getTileMomentId = function(p2) -- line: 43
-		-- upvalues: GetFFlagMomentsAnalyticsSchemaIdentity (copy)
 		local recommendationMetadata = p2.recommendationMetadata
 
 		if recommendationMetadata == nil then
 			return ""
 		end
 
-		if GetFFlagMomentsAnalyticsSchemaIdentity() then
-			return recommendationMetadata.feedItemId or ""
-		end
-
-		return recommendationMetadata.itemId or ""
+		return recommendationMetadata.feedItemId or ""
 	end,
-	makeProfileTileImpressionFields = function(p3, s4: string, s5: string, n2: number) -- line: 111
+	makeProfileTileImpressionFields = function(p3, s4: string, s5: string, n2: number) -- line: 108
 		-- upvalues: buildTileFields (copy)
 		return (buildTileFields(p3, s4, s5, n2, nil))
 	end,
-	makeProfileTileInteractionFields = function(p4, s6: string, s7: string, n3: number) -- line: 122
+	makeProfileTileInteractionFields = function(p4, s6: string, s7: string, n3: number) -- line: 119
 		-- upvalues: buildTileFields (copy)
 		return (buildTileFields(p4, s6, s7, n3, "open"))
 	end

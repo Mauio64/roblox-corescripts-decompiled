@@ -17,56 +17,62 @@ local FFlagExpChatChannelTabRefactor = SharedFlags.FFlagExpChatChannelTabRefacto
 local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagExpChatUseChatConfigStore = SharedFlags.FFlagExpChatUseChatConfigStore
 local FFlagExpChatLogGlobalChatTabClicked = require(ExpChat.Flags.FFlagExpChatLogGlobalChatTabClicked)
+local v20 = game:DefineFastFlag("GlobalTextChatAddPlaySessionField", false)
 local GetChatConfigurationStore = require(ExpChat.Stores.GetChatConfigurationStore)
 local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
 local createEffect = require(ExpChatParent.Signals).createEffect
 local ChannelBar = require(script.Parent.UI.ChannelBar)
-local v24 = Roact.Component:extend("ChannelBarApp")
+local v25 = Roact.Component:extend("ChannelBarApp")
 
 if FFlagExpChatUseChatConfigStore then
-	function v24.init(p1) -- line: 33
+	function v25.init(p1) -- line: 34
 		-- upvalues: GetChatConfigurationStore (copy)
 		p1.chatConfigStore = GetChatConfigurationStore(false)
 		p1.state = {
 			channelTabsSettings = p1.chatConfigStore.getChannelTabsSettings(false)
 		}
 	end
-	function v24.didMount(p2) -- line: 40
+	function v25.didMount(p2) -- line: 41
 		-- upvalues: createEffect (copy)
-		p2.updateChannelTabsSettingsEffect = createEffect(function(p3) -- line: 42
+		p2.updateChannelTabsSettingsEffect = createEffect(function(p3) -- line: 43
 			-- upvalues: p2 (copy)
-			local v33 = p2.chatConfigStore.getChannelTabsSettings(p3)
+			local v34 = p2.chatConfigStore.getChannelTabsSettings(p3)
 
 			p2:setState({
-				channelTabsSettings = v33
+				channelTabsSettings = v34
 			})
 		end)
 	end
-	function v24.willUnmount(p4) -- line: 50
+	function v25.willUnmount(p4) -- line: 51
 		p4.updateChannelTabsSettingsEffect()
 		p4.updateChannelTabsSettingsEffect = nil
 	end
 end
 
-function v24.render(p5) -- line: 56
-	-- upvalues: FFlagExpChatUseChatConfigStore (copy), React (copy), ChannelBar (copy), FFlagExpChatChannelTabRefactor (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatLogGlobalChatTabClicked (copy), Analytics (copy)
-	local v29 = if not FFlagExpChatUseChatConfigStore then p5.props.channelTabsSettings else p5.state.channelTabsSettings
+function v25.render(p5) -- line: 57
+	-- upvalues: FFlagExpChatUseChatConfigStore (copy), React (copy), ChannelBar (copy), FFlagExpChatChannelTabRefactor (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatLogGlobalChatTabClicked (copy), Analytics (copy), v20 (copy)
+	local v30 = if not FFlagExpChatUseChatConfigStore then p5.props.channelTabsSettings else p5.state.channelTabsSettings
 
 	return React.createElement(ChannelBar, {
-		channelTabsSettings = v29,
+		channelTabsSettings = v30,
 		chatWindowSettings = p5.props.chatWindowSettings,
 		allChannelTabs = p5.props.allChannelTabs,
 		allTextChannels = p5.props.allTextChannels,
 		selectedTabName = p5.props.selectedTabName,
-		onTabSelected = function(p6, p7, p8, p9) -- line: 72
-			-- upvalues: FFlagExpChatChannelTabRefactor (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatLogGlobalChatTabClicked (copy), p5 (copy), Analytics (copy)
+		onTabSelected = function(p6, p7, p8, p9) -- line: 73
+			-- upvalues: FFlagExpChatChannelTabRefactor (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatLogGlobalChatTabClicked (copy), p5 (copy), Analytics (copy), v20 (copy)
 			if ((if not FFlagExpChatChannelTabRefactor then not not GetFFlagTextChatEnableUniverseChatTabs() and not p6 else p9 == "UniverseChat")) and (FFlagExpChatLogGlobalChatTabClicked and p8 ~= p5.props.selectedTabName) then
-				local v38 = table.clone(Analytics.DefaultStandardizedFields)
+				local v39 = table.clone(Analytics.DefaultStandardizedFields)
 
-				table.insert(v38, "addPlaceInstanceId")
+				table.insert(v39, "addPlaceInstanceId")
+
+				if v20 then
+					table.insert(v39, "addPlaySessionId")
+				end
+
 				Analytics:TelemetryLogEvent(Analytics.ExpChatGlobalChatTabClickedConfig, {
 					channelName = p8
-				}, v38)
+				}, v39)
 			end
 
 			p5.props.onTabSelected(p6, p7, p8, p9)
@@ -79,7 +85,7 @@ function v24.render(p5) -- line: 56
 	})
 end
 
-return RoactRodux.connect(function(p10) -- line: 100
+return RoactRodux.connect(function(p10) -- line: 104
 	-- upvalues: FFlagExpChatUseChatConfigStore (copy), getFFlagExpChatEnableChannelTabsUI (copy), Config (copy)
 	return {
 		channelTabsSettings = if not FFlagExpChatUseChatConfigStore then getFFlagExpChatEnableChannelTabsUI() and p10.ChatLayout.ChannelTabsSettings or {
@@ -97,10 +103,10 @@ return RoactRodux.connect(function(p10) -- line: 100
 		selectedTabName = getFFlagExpChatEnableChannelTabsUI() and p10.ChannelTabs.selectedTabName or "",
 		allTextChannels = p10.TextChannels.allTextChannels
 	}
-end, function(p11) -- line: 119
+end, function(p11) -- line: 123
 	-- upvalues: FFlagExpChatChannelTabRefactor (copy), UniverseChatChannelSelected (copy), FFlagExpChatEnableFriendsTab (copy), FriendsChatChannelSelected (copy), TargetTextChannelPropertyChanged (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), getFFlagExpChatEnableChannelTabsUI (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy)
 	return {
-		onTabSelected = function(p12, p13, p14, p15) -- line: 122
+		onTabSelected = function(p12, p13, p14, p15) -- line: 126
 			-- upvalues: FFlagExpChatChannelTabRefactor (copy), p11 (copy), UniverseChatChannelSelected (copy), FFlagExpChatEnableFriendsTab (copy), FriendsChatChannelSelected (copy), TargetTextChannelPropertyChanged (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), getFFlagExpChatEnableChannelTabsUI (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy)
 			if FFlagExpChatChannelTabRefactor then
 				if p15 == "UniverseChat" then
@@ -128,10 +134,10 @@ end, function(p11) -- line: 119
 				end
 
 				if GetFFlagTextChatEnableUniverseChatTabs() then
-					local v43 = GetChannelTabsStore(false)
-					local v44 = p14 or p12 and p12.Name
+					local v44 = GetChannelTabsStore(false)
+					local v45 = p14 or p12 and p12.Name
 
-					v43.setTargetChannel(v44, p13)
+					v44.setTargetChannel(v45, p13)
 
 					return
 				end
@@ -142,4 +148,4 @@ end, function(p11) -- line: 119
 			end
 		end
 	}
-end)(v24)
+end)(v25)

@@ -550,7 +550,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 					return
 				end
 
-				v133.fail(("CAS session/prompt failed: %s"):format(p19), p20)
+				v133.fail(p19, p20)
 
 				local v204 = v133
 

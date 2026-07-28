@@ -13,6 +13,7 @@ local function DisabledPlaytestTooltip(t1: {[any]: any}) -- line: 19
 		hasActions = false,
 		hasSecondaryButtons = false,
 		showSteps = false,
+		testId = "build-disabled-playtest-tooltip",
 		LayoutOrder = t1.LayoutOrder,
 		align = PopoverAlign.End,
 		isOpen = t1.isOpen,

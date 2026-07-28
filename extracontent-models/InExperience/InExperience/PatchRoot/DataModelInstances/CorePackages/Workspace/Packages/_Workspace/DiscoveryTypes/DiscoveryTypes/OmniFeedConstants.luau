@@ -8,6 +8,7 @@ local FFlagLuaAppUsePrevalidatedVideoGamePlayability = require(Parent.SharedFlag
 local FFlagLuaAppRfyRevealRows = require(Parent.SharedFlags).FFlagLuaAppRfyRevealRows
 local FFlagLuaAppSortHeaderAnchorTag = require(Parent.SharedFlags).FFlagLuaAppSortHeaderAnchorTag
 local FFlagSduiGenreSelector = require(Parent.SharedFlags).FFlagSduiGenreSelector
+local FFlagLuaAppSupportHomeBackToTop = require(Parent.SharedFlags).FFlagLuaAppSupportHomeBackToTop
 
 require(script.Parent.RoduxTypes)
 
@@ -18,7 +19,8 @@ return {
 		Success = "Success"
 	},
 	GlobalLayoutDataKeys = {
-		JYFRefresh = "JYFRefresh"
+		JYFRefresh = "JYFRefresh",
+		ShowBackToTop = if not FFlagLuaAppSupportHomeBackToTop then nil else "showBackToTop"
 	},
 	TopicLayoutDataKeys = {
 		PYMKFindFriendsEnabled = "PYMKFindFriendsEnabled",
@@ -47,7 +49,7 @@ return {
 		HasPrevalidatedVideoGamePlayability = if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else "hasPrevalidatedVideoGamePlayability",
 		EnableSignalApportioning = if not FFlagLuaAppRfySignalApportioningIxp then nil else "enableSignalApportioning",
 		SortHeaderAnchorTag = if not FFlagLuaAppSortHeaderAnchorTag then nil else "sortHeaderAnchorTag",
-		InitialVisibleRows = if not FFlagLuaAppRfyRevealRows then nil else "initialVisibleRows",
+		InitialFeedVisibleRows = if not FFlagLuaAppRfyRevealRows then nil else "initialFeedVisibleRows",
 		VisibleRowsPerReveal = if not FFlagLuaAppRfyRevealRows then nil else "visibleRowsPerReveal",
 		EnableReportAd = if not FFlagLuaAppEnableSponsoredReportAd then nil else "enableReportAd",
 		AmpUpsellFeatureName = if not FFlagLuaAppGameCarouselAmpUpsellAction then nil else "ampUpsellFeatureName",

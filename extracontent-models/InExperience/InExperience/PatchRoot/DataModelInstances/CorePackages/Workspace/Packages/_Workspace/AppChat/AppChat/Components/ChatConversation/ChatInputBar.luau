@@ -81,12 +81,12 @@ local function ChatInputBar(t2: {[any]: any}) -- line: 90
 		u47 = v39.inputBarRef
 	end
 
-	local v49 = React.useRef(Enum.KeyCode.Unknown)
+	local v49 = React.useRef(Enum.KeyCode.None)
 	local v50 = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, function(p9) -- line: 109
 		-- upvalues: v49 (copy)
 		if p9.eventData and v49.current == p9.eventData.KeyCode then
 			p9:cancel()
-			v49.current = Enum.KeyCode.Unknown
+			v49.current = Enum.KeyCode.None
 		end
 	end, "Bubble", u47)
 	local v51 = React.useRef(v39.initialInputText or "")
@@ -282,7 +282,7 @@ local function ChatInputBar(t2: {[any]: any}) -- line: 90
 			u46.current.Selectable = false
 			connection = u46.current.FocusLost:Connect(function(_: boolean, p17) -- line: 324
 				-- upvalues: v49 (copy)
-				v49.current = if not p17 then Enum.KeyCode.Unknown else p17.KeyCode
+				v49.current = if not p17 then Enum.KeyCode.None else p17.KeyCode
 			end)
 		end
 

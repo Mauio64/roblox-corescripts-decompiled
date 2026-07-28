@@ -53,7 +53,6 @@ local v49 = game:DefineFastInt("LuaAppTwoByOneTileLogoHeightPercentSquare", 36)
 local v50 = game:DefineFastInt("LuaAppTwoByOneTileGradientStartOpacityPercent", 30)
 local v51 = game:DefineFastInt("LuaAppTwoByOneTileGradientEndOpacityPercent", 100)
 local v52 = game:DefineFastInt("LuaAppTwoByOneTileGradientWidthPercent", 50)
-local FFlagLuaAppSupportSponsoredExplicitFeedback = SharedFlags.FFlagLuaAppSupportSponsoredExplicitFeedback
 local FFlagLuaAppFixExplicitFeedbackTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackTelemetry
 local FFlagLuaAppHomePageFirstImageLoadObserver = SharedFlags.FFlagLuaAppHomePageFirstImageLoadObserver
 local FFlagLuaAppHapticTriggeredTelemetry = SharedFlags.FFlagLuaAppHapticTriggeredTelemetry
@@ -63,14 +62,16 @@ local FFlagLuaAppFixCustomTileBugs = SharedFlags.FFlagLuaAppFixCustomTileBugs
 local FFlagLuaAppSponsoredAdViewabilityEnabled = SharedFlags.FFlagLuaAppSponsoredAdViewabilityEnabled
 local FFlagLuaAppDemoModePlayButton = SharedFlags.FFlagLuaAppDemoModePlayButton
 local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags.FFlagLuaAppDemoModePlayButtonTelemetry
+local FFlagLuaAppHomeThumbnailPrefetch = SharedFlags.FFlagLuaAppHomeThumbnailPrefetch
+local v63 = if not FFlagLuaAppHomeThumbnailPrefetch then nil else require(GameTile.resolveGameTileThumbnailUri)
 local gameTileOverflowMenuAction = DiscoveryAnalytics.Events.gameTileOverflowMenuAction
 local color3 = Color3.new(1, 1, 1)
 local color3_2 = Color3.new(0, 0, 0)
-local v66 = v48 / 100
-local v67 = v49 / 100
-local v68 = v50 / 100
-local v69 = v51 / 100
-local v70 = v52 / 100
+local v67 = v48 / 100
+local v68 = v49 / 100
+local v69 = v50 / 100
+local v70 = v51 / 100
+local v71 = v52 / 100
 local _ = {
 	JoinGame = "JoinGame",
 	OpenEdp = "OpenEdp"
@@ -102,103 +103,103 @@ local t1 = {
 	}
 }
 
-return function(t2: {[any]: any}) -- line: 166
-	-- upvalues: useNavigateToGameDetails (copy), useRoactService (copy), RoactNetworking (copy), AppSessionService (copy), useLocalization (copy), t1 (copy), useTokens (copy), Responsive (copy), v47 (copy), ButtonSize (copy), React (copy), GetTextSize (copy), v66 (copy), v67 (copy), useValidTileBadges (copy), useTriggerFeedback (copy), useOverflowMenuOpen (copy), useIsHoveredTile (copy), sponsoredGamesRecordClick (copy), FFlagLuaAppFixTwoByOneOverflowMenuTelemetry (copy), getOverflowMenuSignalStore (copy), GameCollectionItemTypes (copy), TwoByOneGameTileTelemetry (copy), getAvailableGameTileOverflowMenuItems (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), gameTileOverflowMenuAction (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), SetGamePlaySession (copy), SessionType (copy), HoverTileCoordinator (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), usePlayButtonState (copy), useOnPlayButtonCallback (copy), useSelector (copy), GameInfosReducer (copy), getGameTileLayoutData (copy), ItemLayoutDataParsingUtils (copy), formatExperienceThumbnail (copy), ImpressionsTagUtility (copy), useTagAsViewportAutoplayCandidate (copy), FFlagLuaAppTileVideoCandidateOnly (copy), FFlagLuaAppSponsoredAdViewabilityEnabled (copy), useTagAsSponsoredAdViewabilityCandidate (copy), FFlagLuaAppFixCustomTileBugs (copy), HiddenTileContent (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy), v70 (copy), color3 (copy), v68 (copy), v69 (copy), color3_2 (copy), GameTileThumbnailBadges (copy), FoundationImage (copy), PlayButton (copy), FFlagLuaAppDemoModePlayButton (copy), GameTileOverflowMenu (copy)
-	local v75 = useNavigateToGameDetails()
-	local v76 = useRoactService(RoactNetworking)
-	local v77 = useRoactService(AppSessionService)
-	local v78 = useLocalization({
+return function(t2: {[any]: any}) -- line: 169
+	-- upvalues: useNavigateToGameDetails (copy), useRoactService (copy), RoactNetworking (copy), AppSessionService (copy), useLocalization (copy), t1 (copy), useTokens (copy), Responsive (copy), v47 (copy), ButtonSize (copy), React (copy), GetTextSize (copy), v67 (copy), v68 (copy), useValidTileBadges (copy), useTriggerFeedback (copy), useOverflowMenuOpen (copy), useIsHoveredTile (copy), sponsoredGamesRecordClick (copy), FFlagLuaAppFixTwoByOneOverflowMenuTelemetry (copy), getOverflowMenuSignalStore (copy), GameCollectionItemTypes (copy), TwoByOneGameTileTelemetry (copy), getAvailableGameTileOverflowMenuItems (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), gameTileOverflowMenuAction (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), SetGamePlaySession (copy), SessionType (copy), HoverTileCoordinator (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), usePlayButtonState (copy), useOnPlayButtonCallback (copy), useSelector (copy), GameInfosReducer (copy), FFlagLuaAppHomeThumbnailPrefetch (copy), v63 (copy), getGameTileLayoutData (copy), ItemLayoutDataParsingUtils (copy), formatExperienceThumbnail (copy), ImpressionsTagUtility (copy), useTagAsViewportAutoplayCandidate (copy), FFlagLuaAppTileVideoCandidateOnly (copy), FFlagLuaAppSponsoredAdViewabilityEnabled (copy), useTagAsSponsoredAdViewabilityCandidate (copy), FFlagLuaAppFixCustomTileBugs (copy), HiddenTileContent (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy), v71 (copy), color3 (copy), v69 (copy), v70 (copy), color3_2 (copy), GameTileThumbnailBadges (copy), FoundationImage (copy), PlayButton (copy), FFlagLuaAppDemoModePlayButton (copy), GameTileOverflowMenu (copy)
+	local v76 = useNavigateToGameDetails()
+	local v77 = useRoactService(RoactNetworking)
+	local v78 = useRoactService(AppSessionService)
+	local v79 = useLocalization({
 		sponsoredText = "Feature.GamePage.Label.Sponsored",
 		joinButtonText = "Common.VisitGame.Label.Play"
 	})
-	local v79 = if not t2.ctaText then v78.joinButtonText else t2.ctaText
-	local v80 = t1[t2.tileVariant] or t1.Default
-	local v81 = useTokens()
-	local uDim = UDim.new(0, v81.Radius.Medium)
+	local v80 = if not t2.ctaText then v79.joinButtonText else t2.ctaText
+	local v81 = t1[t2.tileVariant] or t1.Default
+	local v82 = useTokens()
+	local uDim = UDim.new(0, v82.Radius.Medium)
 	local Medium, Medium2, TitleLarge, BodySmall, CaptionSmall, XXSmall, Small, Size_800, TitleSmall
 
 	if Responsive.useResponsive({{
 		Key = "Smaller",
 		maxWidth = v47
 	}}) == "Smaller" then
-		Medium = v81.Padding.Medium
-		Medium2 = v81.Padding.Medium
-		TitleLarge = v81.Typography.TitleLarge
-		BodySmall = v81.Typography.BodySmall
-		CaptionSmall = v81.Typography.CaptionSmall
-		XXSmall = v81.Gap.XXSmall
+		Medium = v82.Padding.Medium
+		Medium2 = v82.Padding.Medium
+		TitleLarge = v82.Typography.TitleLarge
+		BodySmall = v82.Typography.BodySmall
+		CaptionSmall = v82.Typography.CaptionSmall
+		XXSmall = v82.Gap.XXSmall
 		Small = ButtonSize.Small
-		Size_800 = v81.Size.Size_800
-		TitleSmall = v81.Typography.TitleSmall
+		Size_800 = v82.Size.Size_800
+		TitleSmall = v82.Typography.TitleSmall
 	else
-		Medium = v81.Padding.Large
-		Medium2 = v81.Padding.Large
-		TitleLarge = v81.Typography.HeadingMedium
-		BodySmall = v81.Typography.BodyMedium
-		CaptionSmall = v81.Typography.CaptionMedium
-		XXSmall = v81.Gap.XSmall
+		Medium = v82.Padding.Large
+		Medium2 = v82.Padding.Large
+		TitleLarge = v82.Typography.HeadingMedium
+		BodySmall = v82.Typography.BodyMedium
+		CaptionSmall = v82.Typography.CaptionMedium
+		XXSmall = v82.Gap.XSmall
 		Small = ButtonSize.Medium
-		Size_800 = v81.Size.Size_1000
-		TitleSmall = v81.Typography.TitleMedium
+		Size_800 = v82.Size.Size_1000
+		TitleSmall = v82.Typography.TitleMedium
 	end
 
-	local v92 = v81.Padding.Large * 4
-	local v93 = React.useMemo(function() -- line: 213
-		-- upvalues: GetTextSize (copy), v79 (copy), TitleSmall (ref), v92 (copy)
-		local v134 = GetTextSize(v79, TitleSmall.FontSize, TitleSmall.Font, Vector2.new(1e999, 1e999))
+	local v93 = v82.Padding.Large * 4
+	local v94 = React.useMemo(function() -- line: 216
+		-- upvalues: GetTextSize (copy), v80 (copy), TitleSmall (ref), v93 (copy)
+		local v135 = GetTextSize(v80, TitleSmall.FontSize, TitleSmall.Font, Vector2.new(1e999, 1e999))
 
-		return UDim.new(0, v134.X + v92)
+		return UDim.new(0, v135.X + v93)
 	end, {
-		v79,
+		v80,
 		TitleSmall,
-		v92
+		v93
 	})
-	local v94 = if v80.ctaStyle ~= "StandardLight" then v81.LightMode.ActionOverMedia.Background.Color3 else v81.Color.Extended.White.White_20.Color3
-	local v95 = if v80.ctaStyle ~= "StandardLight" then v81.LightMode.ActionOverMedia.Background.Transparency else v81.Color.Extended.White.White_20.Transparency
+	local v95 = if v81.ctaStyle ~= "StandardLight" then v82.LightMode.ActionOverMedia.Background.Color3 else v82.Color.Extended.White.White_20.Color3
+	local v96 = if v81.ctaStyle ~= "StandardLight" then v82.LightMode.ActionOverMedia.Background.Transparency else v82.Color.Extended.White.White_20.Transparency
 	local num = tonumber(t2.logoAspectRatio)
-	local v97 = (not num or not (num > 0)) and 1 or num
-	local v98 = if v97 ~= 3 then v67 else v66
+	local v98 = (not num or not (num > 0)) and 1 or num
+	local v99 = if v98 ~= 3 then v68 else v67
 	local universeId = t2.universeId
 	local placeId = t2.placeId
-	local v101 = useValidTileBadges(universeId, t2.topicId, t2.badgeOverride)
+	local v102 = useValidTileBadges(universeId, t2.topicId, t2.badgeOverride)
 	local hoverKey = t2.hoverKey
-	local v103, v104 = React.useState(false)
-	local v105 = React.useRef(nil)
-	local v106 = useTriggerFeedback()
-	local v107 = useOverflowMenuOpen(hoverKey)
-	local v108 = useIsHoveredTile(v105, hoverKey, true)
-	local v109 = React.useRef(false)
-	local v110 = React.useCallback(function() -- line: 258
-		-- upvalues: t2 (copy), sponsoredGamesRecordClick (copy), v76 (copy)
+	local v104, v105 = React.useState(false)
+	local v106 = React.useRef(nil)
+	local v107 = useTriggerFeedback()
+	local v108 = useOverflowMenuOpen(hoverKey)
+	local v109 = useIsHoveredTile(v106, hoverKey, true)
+	local v110 = React.useRef(false)
+	local v111 = React.useCallback(function() -- line: 261
+		-- upvalues: t2 (copy), sponsoredGamesRecordClick (copy), v77 (copy)
 		if t2.isSponsored and t2.adId then
-			sponsoredGamesRecordClick(v76, t2.adId)
+			sponsoredGamesRecordClick(v77, t2.adId)
 		end
 	end, {
-		v76,
+		v77,
 		t2.isSponsored,
 		t2.adId
 	})
-	local v111 = React.useCallback(function() -- line: 264
-		-- upvalues: v109 (copy)
-		v109.current = false
+	local v112 = React.useCallback(function() -- line: 267
+		-- upvalues: v110 (copy)
+		v110.current = false
 	end, {})
-	local v112 = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then React.useCallback(function() -- line: 270
-		-- upvalues: v109 (copy), v106 (copy), t2 (copy), getOverflowMenuSignalStore (copy), hoverKey (copy)
-		local current = v109.current
+	local v113 = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then React.useCallback(function() -- line: 273
+		-- upvalues: v110 (copy), v107 (copy), t2 (copy), getOverflowMenuSignalStore (copy), hoverKey (copy)
+		local current = v110.current
 
-		v109.current = true
+		v110.current = true
 
 		if current == false then
-			v106("TwoByOneTileLongPress", "Press", t2.appPage, nil)
+			v107("TwoByOneTileLongPress", "Press", t2.appPage, nil)
 			getOverflowMenuSignalStore().openMenu(hoverKey)
 		end
 	end, {
 		hoverKey,
 		t2.appPage,
-		v106
+		v107
 	}) else nil
-	local v113 = React.useCallback(function() -- line: 280
-		-- upvalues: t2 (copy), GameCollectionItemTypes (copy), v75 (copy), universeId (copy), TwoByOneGameTileTelemetry (copy)
+	local v114 = React.useCallback(function() -- line: 283
+		-- upvalues: t2 (copy), GameCollectionItemTypes (copy), v76 (copy), universeId (copy), TwoByOneGameTileTelemetry (copy)
 		local t3 = {
 			index = t2.index,
 			placeIdOverride = t2.placeIdOverride,
@@ -209,14 +210,14 @@ return function(t2: {[any]: any}) -- line: 166
 			}
 		}
 
-		v75(universeId, t3)
+		v76(universeId, t3)
 		TwoByOneGameTileTelemetry.logTwoByOneTileViewGameDetailsActivated()
 
 		if t2.reportGameDetailOpened then
 			t2.reportGameDetailOpened(t2.index, universeId)
 		end
 	end, {
-		v75,
+		v76,
 		universeId,
 		t2.index,
 		t2.placeIdOverride,
@@ -224,30 +225,30 @@ return function(t2: {[any]: any}) -- line: 166
 		t2.reportGameDetailOpened,
 		t2.adId
 	})
-	local v114 = React.useCallback(function() -- line: 311
-		-- upvalues: v104 (copy), t2 (copy)
-		v104(true)
+	local v115 = React.useCallback(function() -- line: 314
+		-- upvalues: v105 (copy), t2 (copy)
+		v105(true)
 
 		if t2.onSelectionGained then
 			t2.onSelectionGained()
 		end
 	end, { t2.onSelectionGained })
-	local v115 = React.useCallback(function() -- line: 323
-		-- upvalues: v104 (copy), t2 (copy)
-		v104(false)
+	local v116 = React.useCallback(function() -- line: 326
+		-- upvalues: v105 (copy), t2 (copy)
+		v105(false)
 
 		if t2.onSelectionLost then
 			t2.onSelectionLost()
 		end
 	end, { t2.onSelectionLost })
 	local isSponsored = t2.isSponsored
-	local v117 = React.useMemo(function() -- line: 335
-		-- upvalues: getAvailableGameTileOverflowMenuItems (copy), isSponsored (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), t2 (copy)
+	local v118 = React.useMemo(function() -- line: 338
+		-- upvalues: getAvailableGameTileOverflowMenuItems (copy), isSponsored (copy), t2 (copy)
 		return getAvailableGameTileOverflowMenuItems({
 			isSponsored = isSponsored,
-			enableSponsoredFeedback = if not FFlagLuaAppSupportSponsoredExplicitFeedback then isSponsored else t2.enableSponsoredFeedback,
-			enableReportAd = if not FFlagLuaAppSupportSponsoredExplicitFeedback then isSponsored else t2.enableReportAd,
-			enableExplicitFeedback = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else t2.enableExplicitFeedback
+			enableSponsoredFeedback = t2.enableSponsoredFeedback,
+			enableReportAd = t2.enableReportAd,
+			enableExplicitFeedback = t2.enableExplicitFeedback
 		})
 	end, {
 		isSponsored,
@@ -255,8 +256,8 @@ return function(t2: {[any]: any}) -- line: 166
 		t2.enableReportAd,
 		t2.enableExplicitFeedback
 	})
-	local v118 = (v108 or (v103 or v107)) and next(v117) ~= nil
-	local v119 = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else React.useCallback(function(b1: boolean, s1: string?) -- line: 351
+	local v119 = (v109 or (v104 or v108)) and next(v118) ~= nil
+	local v120 = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else React.useCallback(function(b1: boolean, s1: string?) -- line: 350
 		-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t2 (copy), universeId (copy), gameTileOverflowMenuAction (copy)
 		local t4 = {
 			ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t2.appPage else nil,
@@ -274,51 +275,51 @@ return function(t2: {[any]: any}) -- line: 166
 	})
 
 	if FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then
-		v112 = React.useCallback(function() -- line: 371
-			-- upvalues: v109 (copy), v117 (copy), v106 (copy), v107 (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), universeId (copy), t2 (copy), getOverflowMenuSignalStore (copy), hoverKey (copy), v119 (copy)
-			local current = v109.current
+		v113 = React.useCallback(function() -- line: 370
+			-- upvalues: v110 (copy), v118 (copy), v107 (copy), v108 (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), universeId (copy), t2 (copy), getOverflowMenuSignalStore (copy), hoverKey (copy), v120 (copy)
+			local current = v110.current
 
-			v109.current = true
+			v110.current = true
 
-			if current == false and next(v117) ~= nil then
-				if v106 and not v107 then
-					local v141 = if not FFlagLuaAppHapticTriggeredTelemetry then nil else {
+			if current == false and next(v118) ~= nil then
+				if v107 and not v108 then
+					local v142 = if not FFlagLuaAppHapticTriggeredTelemetry then nil else {
 						universeId = universeId,
 						sortId = t2.topicId
 					}
 
-					v106("TwoByOneTileLongPress", "Press", if not FFlagLuaAppHapticTriggeredTelemetry then nil else t2.appPage or "Unknown", if not FFlagLuaAppHapticTriggeredTelemetry then nil else v141)
+					v107("TwoByOneTileLongPress", "Press", if not FFlagLuaAppHapticTriggeredTelemetry then nil else t2.appPage or "Unknown", if not FFlagLuaAppHapticTriggeredTelemetry then nil else v142)
 				end
 
 				getOverflowMenuSignalStore().openMenu(hoverKey)
 
 				local t5 = {}
 
-				for v143, _ in v117 do
-					table.insert(t5, v143)
+				for v144, _ in v118 do
+					table.insert(t5, v144)
 				end
 
-				v119(false, table.concat(t5, ","))
+				v120(false, table.concat(t5, ","))
 			end
 		end, {
 			hoverKey,
 			t2.appPage,
 			t2.topicId,
-			v106,
-			v117,
 			v107,
+			v118,
+			v108,
 			universeId,
-			v119
+			v120
 		})
 	end
 
-	local v120 = React.useCallback(function(s2: string?) -- line: 413
-		-- upvalues: v77 (copy), SetGamePlaySession (copy), SessionType (copy), v108 (copy), HoverTileCoordinator (copy), t2 (copy), placeId (copy), universeId (copy), GameCollectionItemTypes (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy)
-		if v77 then
-			SetGamePlaySession(v77, SessionType.StructuralIdentifier.GamePlayFromHoverTile, true)
+	local v121 = React.useCallback(function(s2: string?) -- line: 412
+		-- upvalues: v78 (copy), SetGamePlaySession (copy), SessionType (copy), v109 (copy), HoverTileCoordinator (copy), t2 (copy), placeId (copy), universeId (copy), GameCollectionItemTypes (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy)
+		if v78 then
+			SetGamePlaySession(v78, SessionType.StructuralIdentifier.GamePlayFromHoverTile, true)
 		end
 
-		if v108 then
+		if v109 then
 			HoverTileCoordinator.default:reset()
 		end
 
@@ -335,7 +336,7 @@ return function(t2: {[any]: any}) -- line: 166
 			t2.reportExperienceLaunched(t6, t2.appPage, GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile, GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile, t2.index, if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else s2)
 		end
 	end, {
-		v77,
+		v78,
 		t2.reportExperienceLaunched,
 		placeId,
 		universeId,
@@ -344,92 +345,107 @@ return function(t2: {[any]: any}) -- line: 166
 		t2.adId,
 		t2.placeIdOverride,
 		t2.launchDataOverride,
-		v108
+		v109
 	})
-	local v121 = usePlayButtonState(v76, universeId)
-	local v122 = useOnPlayButtonCallback(universeId, t2.appPage, "TwoByOneTile", nil, "TwoByOneTile", {
+	local v122 = usePlayButtonState(v77, universeId)
+	local v123 = useOnPlayButtonCallback(universeId, t2.appPage, "TwoByOneTile", nil, "TwoByOneTile", {
 		launchData = t2.launchDataOverride,
 		tileType = GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile,
 		nativeAdData = t2.adId
 	}, if not t2.placeIdOverride then t2.placeId else t2.placeIdOverride)
-	local v123 = React.useCallback(function() -- line: 471
-		-- upvalues: TwoByOneGameTileTelemetry (copy), v110 (copy)
+	local v124 = React.useCallback(function() -- line: 470
+		-- upvalues: TwoByOneGameTileTelemetry (copy), v111 (copy)
 		TwoByOneGameTileTelemetry.logTwoByOneTileGameJoinInitiated()
 		TwoByOneGameTileTelemetry.logTwoByOneTileCtaActivated()
-		v110()
-	end, { v110 })
-	local v124 = React.useCallback(function() -- line: 477
-		-- upvalues: TwoByOneGameTileTelemetry (copy), v110 (copy), v113 (copy)
+		v111()
+	end, { v111 })
+	local v125 = React.useCallback(function() -- line: 476
+		-- upvalues: TwoByOneGameTileTelemetry (copy), v111 (copy), v114 (copy)
 		TwoByOneGameTileTelemetry.logTwoByOneTileCtaActivated()
-		v110()
-		v113()
+		v111()
+		v114()
 	end, {
-		v110,
-		v113
+		v111,
+		v114
 	})
-	local v125 = React.useCallback(function() -- line: 483
-		-- upvalues: TwoByOneGameTileTelemetry (copy), v122 (copy), v121 (copy), v120 (copy)
+	local v126 = React.useCallback(function() -- line: 482
+		-- upvalues: TwoByOneGameTileTelemetry (copy), v123 (copy), v122 (copy), v121 (copy)
 		TwoByOneGameTileTelemetry.logTwoByOneTileGameJoinInitiated()
-		v122(v121.playButtonState, v120)
+		v123(v122.playButtonState, v121)
 	end, {
-		v122,
-		v121.playButtonState,
-		v120
+		v123,
+		v122.playButtonState,
+		v121
 	})
-	local v126 = React.useCallback(function() -- line: 495
-		-- upvalues: v109 (copy), v108 (copy), HoverTileCoordinator (copy), TwoByOneGameTileTelemetry (copy), v110 (copy), v80 (copy), v113 (copy), v125 (copy)
-		if v109.current then
-			v109.current = false
+	local v127 = React.useCallback(function() -- line: 494
+		-- upvalues: v110 (copy), v109 (copy), HoverTileCoordinator (copy), TwoByOneGameTileTelemetry (copy), v111 (copy), v81 (copy), v114 (copy), v126 (copy)
+		if v110.current then
+			v110.current = false
 
 			return
 		end
 
-		if v108 then
+		if v109 then
 			HoverTileCoordinator.default:reset()
 		end
 
 		TwoByOneGameTileTelemetry.logTwoByOneTileActivated()
-		v110()
+		v111()
 
-		if v80.onTileActivation == "OpenEdp" then
-			v113()
+		if v81.onTileActivation == "OpenEdp" then
+			v114()
 
 			return
 		end
 
-		if v80.onTileActivation == "JoinGame" then
-			v125()
+		if v81.onTileActivation == "JoinGame" then
+			v126()
 		end
 	end, {
-		v108,
-		v80.onTileActivation,
-		v113,
-		v125,
-		v110
+		v109,
+		v81.onTileActivation,
+		v114,
+		v126,
+		v111
 	})
-	local v127 = useSelector(function(p1) -- line: 523
+	local v128 = useSelector(function(p1) -- line: 522
 		-- upvalues: GameInfosReducer (copy), universeId (copy)
 		return p1.Personalization[GameInfosReducer.key][universeId]
 	end)
-	local v128 = getGameTileLayoutData(v127, t2.topicId)
-	local v129 = ((if not t2.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v128) else t2.primaryWideImageAssetId)) or (v127 and v127.primaryWideAssetId or nil)
-	local v130 = formatExperienceThumbnail(v129, placeId, true)
-	local v131 = v127 and v127.ageRecommendationDisplayName or nil
-	local v132 = React.useRef(nil)
+	local v129
 
-	React.useEffect(function() -- line: 537
-		-- upvalues: ImpressionsTagUtility (copy), v132 (copy), t2 (copy)
-		ImpressionsTagUtility.AddTag(v132, t2.impressionsTag, t2.index)
+	if FFlagLuaAppHomeThumbnailPrefetch then
+		v129 = v63({
+			useGridTile = true,
+			isEmphasized = true,
+			placeId = placeId,
+			perEntryWideAssetId = t2.primaryWideImageAssetId,
+			game = v128,
+			topicId = t2.topicId
+		})
+	else
+		local v130 = getGameTileLayoutData(v128, t2.topicId)
+		local v131 = ((if not t2.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v130) else t2.primaryWideImageAssetId)) or (v128 and v128.primaryWideAssetId or nil)
 
-		return function() -- line: 539
-			-- upvalues: ImpressionsTagUtility (copy), v132 (copy), t2 (copy)
-			ImpressionsTagUtility.RemoveTag(v132, t2.impressionsTag, t2.index)
+		v129 = formatExperienceThumbnail(v131, placeId, true)
+	end
+
+	local v132 = v128 and v128.ageRecommendationDisplayName or nil
+	local v133 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 548
+		-- upvalues: ImpressionsTagUtility (copy), v133 (copy), t2 (copy)
+		ImpressionsTagUtility.AddTag(v133, t2.impressionsTag, t2.index)
+
+		return function() -- line: 550
+			-- upvalues: ImpressionsTagUtility (copy), v133 (copy), t2 (copy)
+			ImpressionsTagUtility.RemoveTag(v133, t2.impressionsTag, t2.index)
 		end
 	end, {
 		t2.impressionsTag,
 		t2.index
 	})
-	useTagAsViewportAutoplayCandidate(v132, t2.videoPlaybackContext, not FFlagLuaAppTileVideoCandidateOnly and nil)
+	useTagAsViewportAutoplayCandidate(v133, t2.videoPlaybackContext, not FFlagLuaAppTileVideoCandidateOnly and nil)
 
 	if FFlagLuaAppSponsoredAdViewabilityEnabled then
 		local t7 = nil
@@ -441,21 +457,21 @@ return function(t2: {[any]: any}) -- line: 166
 			}
 		end
 
-		useTagAsSponsoredAdViewabilityCandidate(v132, t7)
+		useTagAsSponsoredAdViewabilityCandidate(v133, t7)
 	end
 
-	if FFlagLuaAppSupportSponsoredExplicitFeedback and t2.isHidden then
+	if t2.isHidden then
 		return React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			LayoutOrder = t2.layoutOrder,
 			ZIndex = t2.zIndex,
-			ref = v132
+			ref = v133
 		}, {
 			TwoByOneTileContainer = React.createElement("TextButton", {
 				BackgroundTransparency = 1,
 				Selectable = false,
 				Size = t2.size or UDim2.fromScale(1, 1),
-				ref = v105,
+				ref = v106,
 				SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t2.SelectionOrder
 			}, {
 				HiddenTileContent = React.createElement(HiddenTileContent, {
@@ -463,7 +479,7 @@ return function(t2: {[any]: any}) -- line: 166
 					collectionId = t2.topicId,
 					setGameHidden = t2.setGameHidden,
 					universeId = universeId,
-					parentRef = v105,
+					parentRef = v106,
 					isSponsored = isSponsored
 				})
 			})
@@ -474,26 +490,26 @@ return function(t2: {[any]: any}) -- line: 166
 		BackgroundTransparency = 1,
 		LayoutOrder = t2.layoutOrder,
 		ZIndex = t2.zIndex,
-		ref = v132
+		ref = v133
 	}, {
 		TwoByOneTileContainer = React.createElement("TextButton", {
 			Size = t2.size or UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			Text = "",
 			AutoButtonColor = false,
-			ref = v105,
+			ref = v106,
 			SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t2.SelectionOrder,
-			[React.Event.TouchLongPress] = v112,
-			[React.Event.Activated] = v126,
-			[React.Event.SelectionGained] = v114,
-			[React.Event.SelectionLost] = v115,
-			[React.Change.GuiState] = v111
+			[React.Event.TouchLongPress] = v113,
+			[React.Event.Activated] = v127,
+			[React.Event.SelectionGained] = v115,
+			[React.Event.SelectionLost] = v116,
+			[React.Change.GuiState] = v112
 		}, {
 			BackgroundImage = React.createElement("ImageLabel", {
 				[React.Tag] = if not FFlagLuaAppHomePageFirstImageLoadObserver then nil else "observed-image",
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
-				Image = v130,
+				Image = v129,
 				ScaleType = Enum.ScaleType.Crop,
 				ZIndex = 0
 			}, {
@@ -507,7 +523,7 @@ return function(t2: {[any]: any}) -- line: 166
 				ZIndex = 1,
 				AnchorPoint = Vector2.new(0, 1),
 				Position = UDim2.new(0, 0, 1, 0),
-				Size = UDim2.new(v70, 0, 1, 0),
+				Size = UDim2.new(v71, 0, 1, 0),
 				BackgroundColor3 = color3
 			}, {
 				UICorner = React.createElement("UICorner", {
@@ -516,8 +532,8 @@ return function(t2: {[any]: any}) -- line: 166
 				UIGradientLeft = React.createElement("UIGradient", {
 					Rotation = 0,
 					Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, v68),
-						NumberSequenceKeypoint.new(1, v69)
+						NumberSequenceKeypoint.new(0, v69),
+						NumberSequenceKeypoint.new(1, v70)
 					}),
 					Color = ColorSequence.new({
 						ColorSequenceKeypoint.new(0, color3_2),
@@ -531,7 +547,7 @@ return function(t2: {[any]: any}) -- line: 166
 				ZIndex = 1,
 				AnchorPoint = Vector2.new(0, 1),
 				Position = UDim2.new(0, 0, 1, 0),
-				Size = UDim2.new(1, 0, v70, 0),
+				Size = UDim2.new(1, 0, v71, 0),
 				BackgroundColor3 = color3
 			}, {
 				UICorner = React.createElement("UICorner", {
@@ -540,8 +556,8 @@ return function(t2: {[any]: any}) -- line: 166
 				UIGradientBottom = React.createElement("UIGradient", {
 					Rotation = 90,
 					Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, v69),
-						NumberSequenceKeypoint.new(1, v68)
+						NumberSequenceKeypoint.new(0, v70),
+						NumberSequenceKeypoint.new(1, v69)
 					}),
 					Color = ColorSequence.new({
 						ColorSequenceKeypoint.new(0, color3_2),
@@ -549,13 +565,13 @@ return function(t2: {[any]: any}) -- line: 166
 					})
 				})
 			}),
-			TileBadge = v101 and React.createElement("Frame", {
+			TileBadge = v102 and React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				ZIndex = 2,
 				Size = UDim2.fromScale(1, 1)
 			}, {
 				Badge = React.createElement(GameTileThumbnailBadges, {
-					tileBadgesByPosition = v101
+					tileBadgesByPosition = v102
 				})
 			}),
 			ContentOverlay = React.createElement("Frame", {
@@ -573,8 +589,8 @@ return function(t2: {[any]: any}) -- line: 166
 					Position = UDim2.new(1, 0, 0, 0),
 					AnchorPoint = Vector2.new(1, 0),
 					Image = "rbxassetid://" .. tostring(t2.logoImageAssetId),
-					Size = UDim2.new(1, 0, v98, 0),
-					aspectRatio = v97
+					Size = UDim2.new(1, 0, v99, 0),
+					aspectRatio = v98
 				}),
 				HeaderFrame = React.createElement("Frame", {
 					BackgroundTransparency = 1,
@@ -615,7 +631,7 @@ return function(t2: {[any]: any}) -- line: 166
 						TextYAlignment = Enum.TextYAlignment.Top
 					})
 				}),
-				JoinButtonContainer = v80.onCtaActivation == "JoinGame" and React.createElement("Frame", {
+				JoinButtonContainer = v81.onCtaActivation == "JoinGame" and React.createElement("Frame", {
 					BackgroundTransparency = 1,
 					AutomaticSize = Enum.AutomaticSize.XY,
 					Position = UDim2.new(0, 0, 1, 0),
@@ -628,69 +644,69 @@ return function(t2: {[any]: any}) -- line: 166
 						universeId = universeId,
 						placeId = if not t2.placeIdOverride then placeId else t2.placeIdOverride,
 						referralSource = t2.appPage,
-						playableText = v79,
+						playableText = v80,
 						buttonSize = Small,
-						width = v93,
+						width = v94,
 						preferSecondaryPlayButton = not not FFlagLuaAppDemoModePlayButton or nil,
-						onActivated = v123,
-						reportExperienceLaunched = v120,
+						onActivated = v124,
+						reportExperienceLaunched = v121,
 						experienceJoinData = if not t2.launchDataOverride then nil else {
 							launchData = t2.launchDataOverride
 						}
 					})
 				}),
-				ViewGameDetailsButton = v80.onCtaActivation == "OpenEdp" and React.createElement("TextButton", {
-					Size = UDim2.new(v93.Scale, v93.Offset, 0, Size_800),
+				ViewGameDetailsButton = v81.onCtaActivation == "OpenEdp" and React.createElement("TextButton", {
+					Size = UDim2.new(v94.Scale, v94.Offset, 0, Size_800),
 					Position = UDim2.new(0, 0, 1, 0),
 					AnchorPoint = Vector2.new(0, 1),
-					BackgroundColor3 = v94,
-					BackgroundTransparency = v95,
-					Text = v79,
-					TextColor3 = v81.LightMode.ActionOverMedia.Foreground.Color3,
+					BackgroundColor3 = v95,
+					BackgroundTransparency = v96,
+					Text = v80,
+					TextColor3 = v82.LightMode.ActionOverMedia.Foreground.Color3,
 					Font = TitleSmall.Font,
 					TextSize = TitleSmall.FontSize,
-					[React.Event.Activated] = v124
+					[React.Event.Activated] = v125
 				}, {
 					UICorner = React.createElement("UICorner", {
-						CornerRadius = UDim.new(0, v81.Radius.Medium)
+						CornerRadius = UDim.new(0, v82.Radius.Medium)
 					})
 				}),
 				BottomRightLabel = React.createElement("TextLabel", {
 					BackgroundTransparency = 1,
 					AutomaticSize = Enum.AutomaticSize.X,
 					Size = UDim2.new(0, 0, 0, CaptionSmall.FontSize * CaptionSmall.LineHeight),
-					Text = v131,
+					Text = v132,
 					TextSize = CaptionSmall.FontSize,
 					Font = CaptionSmall.Font,
-					TextColor3 = v81.Color.Extended.Gray.Gray_400.Color3,
+					TextColor3 = v82.Color.Extended.Gray.Gray_400.Color3,
 					TextXAlignment = Enum.TextXAlignment.Right,
 					TextTruncate = Enum.TextTruncate.SplitWord,
 					AnchorPoint = Vector2.new(1, 1),
 					Position = UDim2.new(1, 0, 1, 0)
 				})
 			}),
-			OverflowMenuContainer = v118 and React.createElement("Frame", {
+			OverflowMenuContainer = v119 and React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				ZIndex = 4,
 				Size = UDim2.fromScale(1, 1)
 			}, {
 				OverflowMenu = React.createElement(GameTileOverflowMenu, {
-					isHovered = v108,
-					isSelected = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else v103,
+					isHovered = v109,
+					isSelected = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else v104,
 					universeId = universeId,
 					collectionId = t2.topicId,
 					appPage = t2.appPage,
-					setGameHidden = t2.setGameHidden or function() -- line: 818
+					setGameHidden = t2.setGameHidden or function() -- line: 829
 					end,
 					menuKey = hoverKey,
-					menuOpen = v107,
-					onMenuOpenChanged = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else v119,
-					parentRef = v105,
+					menuOpen = v108,
+					onMenuOpenChanged = if not FFlagLuaAppFixTwoByOneOverflowMenuTelemetry then nil else v120,
+					parentRef = v106,
 					isSponsored = t2.isSponsored,
 					payerName = t2.payerName,
 					sponsoredUserCohort = t2.sponsoredUserCohort,
 					adId = t2.adId,
-					availableMenuItems = v117
+					availableMenuItems = v118
 				})
 			})
 		})

@@ -1,11 +1,8 @@
 local ProductPurchaseSurface = require(script.Enums.ProductPurchaseSurface)
-local ProductKind = require(script.Enums.ProductKind)
 
 return {
-	FFlagUnifiedPurchaseFlowShouldCacheExperimentResult = require(script.Flags.FFlagUnifiedPurchaseFlowShouldCacheExperimentResult),
-	GetFFlagDevSubsEligibleForUnifiedPurchaseFlow = require(script.Flags.GetFFlagDevSubsEligibleForUnifiedPurchaseFlow),
 	Enums = {
-		ProductKind = ProductKind,
+		ProductKind = require(script.Enums.ProductKind),
 		ProductPurchaseSurface = ProductPurchaseSurface,
 		PurchaseLookItemStatusEnum = require(script.Enums.PurchaseLookItemStatusEnum),
 		PurchaseLookStatusEnum = require(script.Enums.PurchaseLookStatusEnum)

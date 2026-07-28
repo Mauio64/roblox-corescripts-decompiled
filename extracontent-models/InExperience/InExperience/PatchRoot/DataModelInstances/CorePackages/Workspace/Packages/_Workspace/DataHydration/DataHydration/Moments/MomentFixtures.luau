@@ -80,88 +80,115 @@ local t6 = {
 	"trust the process they said",
 	"peak gameplay right here"
 }
+local t7 = {
+	"rbxasset://textures/ui/Moments/Reactions/thumbs-up-large.png",
+	"rbxasset://textures/ui/Moments/Reactions/heart-large.png",
+	"rbxasset://textures/ui/Moments/Reactions/laugh-joy-large.png",
+	"rbxasset://textures/ui/Moments/Reactions/fire-large.png",
+	"rbxasset://textures/ui/Moments/Reactions/crying-large.png",
+	"rbxasset://textures/ui/Moments/Reactions/skull-large.png"
+}
 
-local function rngFor(n1: number) -- line: 123
+local function rngFor(n1: number) -- line: 133
 	return Random.new(n1 * 2654435761 + 2026)
 end
-local function cycle(t7: {[any]: any}, n2: number) -- line: 127
-	return t7[(n2 - 1) % #t7 + 1]
+local function cycle(t8: {[any]: any}, n2: number) -- line: 137
+	return t8[(n2 - 1) % #t8 + 1]
 end
-local function makeMomentFeedItem(n3: number) -- line: 133
-	-- upvalues: t6 (copy), t1 (copy), t2 (copy), t5 (copy), t4 (copy), t3 (copy), MomentStatus (copy)
+local function makeMomentFeedItem(n3: number) -- line: 143
+	-- upvalues: t6 (copy), t1 (copy), t2 (copy), t5 (copy), t7 (copy), t4 (copy), t3 (copy), MomentStatus (copy)
 	local random = Random.new(n3 * 2654435761 + 2026)
-	local v17 = random:NextNumber()
-	local v18 = n3 > 1 and v17 < 0.28
-	local v19 = t6[random:NextInteger(1, #t6)]
-	local v20 = t1[random:NextInteger(1, #t1)]
-	local v21 = t2[random:NextInteger(1, #t2)]
-	local v22 = random:NextNumber()
-	local v23 = random:NextInteger(0, 12)
-	local t8
+	local v18 = random:NextNumber()
+	local v19 = n3 > 1 and v18 < 0.28
+	local v20 = t6[random:NextInteger(1, #t6)]
+	local v21 = t1[random:NextInteger(1, #t1)]
+	local v22 = t2[random:NextInteger(1, #t2)]
+	local v23 = random:NextNumber()
+	local v24 = random:NextInteger(0, 12)
+	local t9
 
-	if #t5 > 0 and (v18 or v22 < 0.45) then
-		t8 = {}
+	if #t5 > 0 and (v19 or v23 < 0.45) then
+		t9 = {}
 
-		local v25 = t5
+		local v26 = t5
 
-		t8.assetId = v25[(n3 - 1) % #v25 + 1]
-		t8.startTime = v23
+		t9.assetId = v26[(n3 - 1) % #v26 + 1]
+		t9.startTime = v24
 	else
-		t8 = nil
+		t9 = nil
 	end
 
-	local v27
+	local t10 = nil
 
-	if v18 then
-		local v26 = t4
+	if random:NextNumber() < 0.6 then
+		t10 = {}
 
-		v27 = v26[(n3 - 1) % #v26 + 1]
-	else
-		local v28 = t3
+		local t11 = {
+			rotation = 0,
+			scale = 1,
+			zIndex = 1
+		}
+		local v29 = t7
 
-		v27 = v28[(n3 - 1) % #v28 + 1]
+		t11.stickerURI = v29[(n3 - 1) % #v29 + 1]
+		t11.position = UDim2.fromScale(random:NextNumber() * 0.6 + 0.2, random:NextNumber() * 0.5 + 0.25)
+		t11.stickerSize = random:NextInteger(50, 200)
+		t10[1] = t11
 	end
 
-	local t9 = {
+	local v31
+
+	if v19 then
+		local v30 = t4
+
+		v31 = v30[(n3 - 1) % #v30 + 1]
+	else
+		local v32 = t3
+
+		v31 = v32[(n3 - 1) % #v32 + 1]
+	end
+
+	local t12 = {
 		isModerated = false,
-		assetId = v27,
-		creatorId = v21,
+		assetId = v31,
+		creatorId = v22,
 		momentId = `mock-moment-{ n3 }`,
 		status = MomentStatus.Public,
 		metadata = {
 			assetTotalDuration = 10,
-			captureType = if not v18 then Enum.CaptureType.Video else Enum.CaptureType.Screenshot,
-			description = v19,
-			placeId = v20.placeId,
-			universeId = v20.universeId,
+			captureType = if not v19 then Enum.CaptureType.Video else Enum.CaptureType.Screenshot,
+			description = v20,
+			placeId = v21.placeId,
+			universeId = v21.universeId,
 			edits = {
-				music = t8
+				music = t9,
+				stickerOverlays = t10
 			}
 		},
 		recommendationMetadata = {
 			configName = "MaximizeJoins",
 			locationId = "Trending",
-			itemId = `mock-item-{ n3 }`,
+			feedItemId = `mock-item-{ n3 }`,
 			tracingId = `mock-trace-{ n3 }`
 		}
 	}
 
 	return {
 		kind = "moment",
-		moment = t9
+		moment = t12
 	}
 end
 
 return {
 	makeMomentFeedItem = makeMomentFeedItem,
-	buildMomentFeedItems = function(n4: number, n5: number) -- line: 217
+	buildMomentFeedItems = function(n4: number, n5: number) -- line: 245
 		-- upvalues: makeMomentFeedItem (copy)
-		local t10 = {}
+		local t13 = {}
 
 		for i = 0, n5 - 1 do
-			table.insert(t10, (makeMomentFeedItem(n4 + i)))
+			table.insert(t13, (makeMomentFeedItem(n4 + i)))
 		end
 
-		return t10
+		return t13
 	end
 }

@@ -60,43 +60,26 @@ local function Tabs(p1, p2) -- line: 45
 		end, {})
 	end
 
-	local u33
+	local v32 = React.useRef({})
+	local u33 = React.useMemo(function() -- line: 78
+		-- upvalues: v32 (copy), v20 (copy), React (copy)
+		local current = v32.current
 
-	if Flags.FoundationFixStaleAnimatedHighlightRefs then
-		local v32 = React.useRef({})
-
-		u33 = React.useMemo(function() -- line: 79
-			-- upvalues: v32 (copy), v20 (copy), React (copy)
-			local current = v32.current
-
-			for _, v45 in v20.tabs do
-				if v45.ref then
-					current[v45.id] = v45.ref
-				elseif not current[v45.id] then
-					current[v45.id] = React.createRef()
-				end
+		for _, v45 in v20.tabs do
+			if v45.ref then
+				current[v45.id] = v45.ref
+			elseif not current[v45.id] then
+				current[v45.id] = React.createRef()
 			end
+		end
 
-			return current
-		end, { v20.tabs })
-	else
-		u33 = React.useMemo(function() -- line: 91
-			-- upvalues: v20 (copy), React (copy)
-			local t2 = {}
-
-			for _, v48 in v20.tabs do
-				t2[v48.id] = v48.ref or React.createRef()
-			end
-
-			return t2
-		end, { v20.tabs })
-	end
-
+		return current
+	end, { v20.tabs })
 	local v34 = useAnimatedHighlight(v25, p2 or v27, u33, v20.size, v20.fillBehavior)
 	local highlightPosition = v34.highlightPosition
 	local highlightWidth = v34.highlightWidth
 	local activeItemHeight = v34.activeItemHeight
-	local v38 = if not Flags.FoundationFixTabsFitBorderWidth then nil else React.useMemo(function() -- line: 112
+	local v38 = if not Flags.FoundationFixTabsFitBorderWidth then nil else React.useMemo(function() -- line: 102
 		-- upvalues: v24 (copy)
 		return {
 			outer = {
@@ -160,7 +143,7 @@ local function Tabs(p1, p2) -- line: 45
 						},
 						Size = if not Flags.FoundationTabsInlineSizeFull or not v24 then nil else UDim2.fromScale(1, 0),
 						testId = `{ v20.testId }--list`
-					}, Dash.map(v20.tabs, function(p6, p7) -- line: 221
+					}, Dash.map(v20.tabs, function(p6, p7) -- line: 211
 						-- upvalues: React (copy), TabItem (copy), v25 (copy), v23 (copy), v20 (copy), u33 (ref)
 						return React.createElement(TabItem, {
 							id = p6.id,
@@ -182,7 +165,7 @@ local function Tabs(p1, p2) -- line: 45
 				Border = React.createElement(View, {
 					LayoutOrder = 2,
 					AnchorPoint = Vector2.new(0, 1),
-					Size = if not Flags.FoundationFixTabsFitBorderWidth then UDim2.new(1, 0, 0, v19.Stroke.Thick) else if not v24 then v28:map(function(p8) -- line: 246
+					Size = if not Flags.FoundationFixTabsFitBorderWidth then UDim2.new(1, 0, 0, v19.Stroke.Thick) else if not v24 then v28:map(function(p8) -- line: 236
 						-- upvalues: v19 (copy)
 						return UDim2.fromOffset(p8, v19.Stroke.Thick)
 					end) else UDim2.new(1, 0, 0, v19.Stroke.Thick),
@@ -205,19 +188,19 @@ local function Tabs(p1, p2) -- line: 45
 		AnimatedBorder = React.createElement(View, {
 			LayoutOrder = 0,
 			ZIndex = v20.ZIndex + 1,
-			Size = highlightWidth:map(function(p9) -- line: 279
+			Size = highlightWidth:map(function(p9) -- line: 269
 				-- upvalues: v19 (copy)
 				return UDim2.fromOffset(p9, v19.Stroke.Thick)
 			end),
 			Position = React.joinBindings({
 				highlightPosition,
 				activeItemHeight
-			}):map(function(p10) -- line: 282
+			}):map(function(p10) -- line: 272
 				-- upvalues: v19 (copy)
-				local v54 = p10[1]
-				local v55 = p10[2]
+				local v51 = p10[1]
+				local v52 = p10[2]
 
-				return UDim2.fromOffset(v54, v55 - v19.Stroke.Thick)
+				return UDim2.fromOffset(v51, v52 - v19.Stroke.Thick)
 			end),
 			backgroundStyle = v19.Color.System.Contrast,
 			testId = `{ v20.testId }--animated-border`

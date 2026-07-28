@@ -4,9 +4,7 @@ local React = require(BulkPurchaseAppParent.React)
 local useLocalization = require(BulkPurchaseAppParent.Localization).Hooks.useLocalization
 local LocalizationRoactContext = require(BulkPurchaseAppParent.Localization).LocalizationRoactContext
 local useDesignTokens = require(BulkPurchaseAppParent.Style).useDesignTokens
-local UIBlox = require(BulkPurchaseAppParent.UIBlox)
-local FFlagRenameDeprecatedUIBloxTokens = require(BulkPurchaseAppParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local StyledTextLabel = require(BulkPurchaseAppParent.UIBlox).App.Text.StyledTextLabel
 local ReactFocusNavigation = require(BulkPurchaseAppParent.ReactFocusNavigation)
 local FullPagePrompt = require(BulkPurchaseApp.Components.FullPagePrompt)
 local PriceBox = require(BulkPurchaseApp.Components.PriceBox)
@@ -38,53 +36,53 @@ local t1 = {
 	itemOwned = "CoreScripts.BulkPurchasePrompt.RequestPrompt.ItemOwned"
 }
 
-local function BulkPurchaseRequest(t2: {[any]: any}) -- line: 63
-	-- upvalues: useLocalization (copy), t1 (copy), React (copy), LocalizationRoactContext (copy), ReactFocusNavigation (copy), FFlagFixVP8143 (copy), useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), ItemStatusKeyToLocalizationKey (copy), mapItemsToRowPresentation (copy), FFlagBulkPurchaseEnablePurchaseOptions (copy), mapOwnedItemsToRowPresentation (copy), mapUnpurchasableItemsToRowPresentation (copy), FullPagePrompt (copy), FullPagePromptTwoPanelLayout (copy), LineItemLayout (copy), StyledTextLabel (copy), FullPagePromptScrollList (copy), ItemList (copy), Divider (copy), PriceBox (copy)
-	local v28 = useLocalization(t1)
-	local v29 = React.useContext(LocalizationRoactContext)
-	local v30, v31 = ReactFocusNavigation.useDefaultFocusBehavior()
-	local v32 = if not FFlagFixVP8143 then nil else React.useCallback(function(p1) -- line: 68
-		-- upvalues: t2 (copy), v30 (copy)
+local function BulkPurchaseRequest(t2: {[any]: any}) -- line: 61
+	-- upvalues: useLocalization (copy), t1 (copy), React (copy), LocalizationRoactContext (copy), ReactFocusNavigation (copy), FFlagFixVP8143 (copy), useDesignTokens (copy), ItemStatusKeyToLocalizationKey (copy), mapItemsToRowPresentation (copy), FFlagBulkPurchaseEnablePurchaseOptions (copy), mapOwnedItemsToRowPresentation (copy), mapUnpurchasableItemsToRowPresentation (copy), FullPagePrompt (copy), FullPagePromptTwoPanelLayout (copy), LineItemLayout (copy), StyledTextLabel (copy), FullPagePromptScrollList (copy), ItemList (copy), Divider (copy), PriceBox (copy)
+	local v26 = useLocalization(t1)
+	local v27 = React.useContext(LocalizationRoactContext)
+	local v28, v29 = ReactFocusNavigation.useDefaultFocusBehavior()
+	local v30 = if not FFlagFixVP8143 then nil else React.useCallback(function(p1) -- line: 66
+		-- upvalues: t2 (copy), v28 (copy)
 		if typeof(t2.purchaseButtonRef) == "table" then
 			t2.purchaseButtonRef.current = p1
 		end
 
-		if typeof(v30) == "function" then
-			v30(p1)
+		if typeof(v28) == "function" then
+			v28(p1)
 
 			return
 		end
 
-		if typeof(v30) == "table" then
-			v30.current = p1
+		if typeof(v28) == "table" then
+			v28.current = p1
 		end
 	end, { t2.purchaseButtonRef })
-	local v33 = useDesignTokens()
+	local v31 = useDesignTokens()
 	local t3 = {
-		LineHeight = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Typography.Body.LineHeight else v33.Typography.BodyLarge.LineHeight,
-		Font = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Typography.Subheader.Font else v33.Typography.TitleLarge.Font,
-		FontSize = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Typography.Body.FontSize else v33.Typography.BodyLarge.FontSize,
-		LetterSpacing = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Typography.Body.LetterSpacing else v33.Typography.BodyLarge.LetterSpacing
+		LineHeight = v31.Typography.BodyLarge.LineHeight,
+		Font = v31.Typography.TitleLarge.Font,
+		FontSize = v31.Typography.BodyLarge.FontSize,
+		LetterSpacing = v31.Typography.BodyLarge.LetterSpacing
 	}
-	local v35 = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Color.Text.Emphasis else v33.Color.Content.Emphasis
-	local v36, v37 = React.useBinding(Vector2.new(0, 0))
-	local v38 = useLocalization(ItemStatusKeyToLocalizationKey)
-	local v39 = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Color.Common.Success else v33.Color.System.Success
-	local v40 = if not FFlagRenameDeprecatedUIBloxTokens then v33.Semantic.Color.Common.Alert else v33.Color.System.Alert
-	local v41 = mapItemsToRowPresentation(t2.items, if not FFlagBulkPurchaseEnablePurchaseOptions then nil else v29)
+	local Emphasis = v31.Color.Content.Emphasis
+	local v34, v35 = React.useBinding(Vector2.new(0, 0))
+	local v36 = useLocalization(ItemStatusKeyToLocalizationKey)
+	local Success = v31.Color.System.Success
+	local Alert = v31.Color.System.Alert
+	local v39 = mapItemsToRowPresentation(t2.items, if not FFlagBulkPurchaseEnablePurchaseOptions then nil else v27)
 	local t4 = {}
-	local v43 = mapOwnedItemsToRowPresentation(t2.ownedItems, v35, v28)
-	local v44 = mapUnpurchasableItemsToRowPresentation(t2.unpurchasableItems, v38, v39, v40)
+	local v41 = mapOwnedItemsToRowPresentation(t2.ownedItems, Emphasis, v26)
+	local v42 = mapUnpurchasableItemsToRowPresentation(t2.unpurchasableItems, v36, Success, Alert)
 
-	table.move(v43, 1, #v43, #t4 + 1, t4)
-	table.move(v44, 1, #v44, #t4 + 1, t4)
+	table.move(v41, 1, #v41, #t4 + 1, t4)
+	table.move(v42, 1, #v42, #t4 + 1, t4)
 
-	local v45 = #t4 > 0
+	local v43 = #t4 > 0
 
 	return React.createElement(FullPagePrompt, {
 		onClose = t2.onClose,
-		title = v28.heading,
-		ref = v31
+		title = v26.heading,
+		ref = v29
 	}, React.createElement(FullPagePromptTwoPanelLayout, {
 		size = React.createBinding(UDim2.fromScale(1, 1)),
 		startSlot = React.createElement("Frame", {
@@ -95,40 +93,40 @@ local function BulkPurchaseRequest(t2: {[any]: any}) -- line: 63
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
-			Padding = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v33.Global.Space_300 else v33.Size.Size_600)
+			Padding = UDim.new(0, v31.Size.Size_600)
 		}), React.createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			LayoutOrder = 1,
-			[React.Change.AbsoluteSize] = function(p2) -- line: 163
-				-- upvalues: v37 (copy)
-				v37(p2.AbsoluteSize)
+			[React.Change.AbsoluteSize] = function(p2) -- line: 134
+				-- upvalues: v35 (copy)
+				v35(p2.AbsoluteSize)
 			end
 		}, React.createElement("UIPadding", {
-			PaddingRight = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v33.Global.Space_125 else v33.Size.Size_250)
+			PaddingRight = UDim.new(0, v31.Size.Size_250)
 		}), React.createElement(LineItemLayout, {
 			LayoutOrder = 1,
 			startSlot = React.createElement(StyledTextLabel, {
 				fontStyle = t3,
-				colorStyle = v35,
-				text = v28.listHeading
+				colorStyle = Emphasis,
+				text = v26.listHeading
 			}),
 			endSlot = React.createElement(StyledTextLabel, {
 				fontStyle = t3,
-				colorStyle = v35,
-				text = v28.itemCount:gsub("{.*}", (tostring(#t2.items)))
+				colorStyle = Emphasis,
+				text = v26.itemCount:gsub("{.*}", (tostring(#t2.items)))
 			})
 		})), React.createElement(FullPagePromptScrollList, {
 			LayoutOrder = 2,
-			size = v36:map(function(vector2: Vector2) -- line: 194
-				-- upvalues: FFlagRenameDeprecatedUIBloxTokens (copy), v33 (copy)
-				return UDim2.new(1, 0, 1, -(vector2.Y + if not FFlagRenameDeprecatedUIBloxTokens then v33.Global.Space_300 else v33.Size.Size_600))
+			size = v34:map(function(vector2: Vector2) -- line: 158
+				-- upvalues: v31 (copy)
+				return UDim2.new(1, 0, 1, -(vector2.Y + v31.Size.Size_600))
 			end)
 		}, React.createElement(ItemList, {
-			items = v41
-		}), if not v45 then nil else React.createElement(Divider), if not v45 then nil else React.createElement(ItemList, {
+			items = v39
+		}), if not v43 then nil else React.createElement(Divider), if not v43 then nil else React.createElement(ItemList, {
 			items = t4
 		}))),
 		endSlot = React.createElement(PriceBox, {
@@ -137,7 +135,7 @@ local function BulkPurchaseRequest(t2: {[any]: any}) -- line: 63
 			discountInformation = t2.discountInformation,
 			missingRobux = t2.currentBalance - t2.totalCost < 0,
 			onAccept = t2.onAccept,
-			buttonRef = if not FFlagFixVP8143 then v30 else v32,
+			buttonRef = if not FFlagFixVP8143 then v28 else v30,
 			isDisabled = t2.isDisabled
 		})
 	}))

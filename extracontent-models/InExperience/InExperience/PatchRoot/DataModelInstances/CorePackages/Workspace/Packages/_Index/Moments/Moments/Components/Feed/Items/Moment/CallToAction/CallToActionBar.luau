@@ -89,8 +89,8 @@ local function CallToActionBar(t2: {[any]: any}) -- line: 57
 			getExperienceDetailsSheetStore(false).open({
 				placeId = v35,
 				universeId = v36,
-				itemId = v32.feedItemId or v32.momentId,
-				feedItemId = v32.feedItemIdRaw,
+				itemId = v32.feedItemId,
+				feedItemId = v32.feedItemId,
 				tracingId = v32.feedSessionId
 			})
 		end,
@@ -115,8 +115,8 @@ local function CallToActionBar(t2: {[any]: any}) -- line: 57
 			context = {
 				placeId = v35,
 				universeId = v36,
-				itemId = v32.feedItemId or v32.momentId,
-				feedItemId = v32.feedItemIdRaw,
+				itemId = v32.feedItemId,
+				feedItemId = v32.feedItemId,
 				tracingId = v32.feedSessionId
 			},
 			text = v47,

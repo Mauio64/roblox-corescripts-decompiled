@@ -5,6 +5,7 @@ return {
 	useIsCurrentSquadPartyVoiceEligible = require(script.useIsCurrentSquadPartyVoiceEligible),
 	useIsLocalPlayerPartyVoiceEligible = require(script.useIsLocalPlayerPartyVoiceEligible),
 	useIsUserPartyVoiceEligible = require(script.useIsUserPartyVoiceEligible),
+	useLuckyRecommendation = require(script.useLuckyRecommendation),
 	useOneToOnePartyNudgeStartPartyRejected = require(script.useOneToOnePartyNudgeStartPartyRejected),
 	useScheduledSquad = require(script.useScheduledSquad),
 	useSquadState = require(script.useSquadState)

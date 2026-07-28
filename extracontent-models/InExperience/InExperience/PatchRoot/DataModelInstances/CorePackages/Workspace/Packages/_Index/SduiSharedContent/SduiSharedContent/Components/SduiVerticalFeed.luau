@@ -11,6 +11,7 @@ local useLastInputMode = require(SduiSharedContentParent.FocusNavigationUtils).u
 local Responsive = require(SduiSharedContentParent.Responsive)
 local usePreferredInput = Responsive.usePreferredInput
 local AppCommonLib = require(SduiSharedContentParent.AppCommonLib)
+local ScrollMovementDirection = require(SduiSharedContentParent.RobloxAppEnums).ScrollMovementDirection
 
 require(SduiSharedContentParent.SduiCompat)
 
@@ -26,240 +27,288 @@ local useVerticalScrolledToEndThreshold = require(SduiSharedContent.Components.u
 local useProgressiveRowCap = require(SduiSharedContent.Components.useProgressiveRowCap)
 local buildSduiFeedChildren = require(SduiSharedContent.Components.buildSduiFeedChildren)
 local SduiFeedImpressionsDetector = require(SduiSharedContent.Components.SduiFeedImpressionsDetector)
-local FFlagSduiPoolBackedFeed = require(SduiSharedContentParent.SharedFlags).FFlagSduiPoolBackedFeed
+local SharedFlags = require(SduiSharedContentParent.SharedFlags)
+local FFlagSduiPoolBackedFeed = SharedFlags.FFlagSduiPoolBackedFeed
+local FFlagSduiSrpScrollAway = SharedFlags.FFlagSduiSrpScrollAway
 
-local function PoolStoreLayoutStoreWiring(t1: {[any]: any}) -- line: 100
+local function PoolStoreLayoutStoreWiring(t1: {[any]: any}) -- line: 104
 	-- upvalues: React (copy), CollectionLayoutStoreContext (copy), SduiPoolStore (copy)
-	local v30 = React.useContext(CollectionLayoutStoreContext)
+	local v33 = React.useContext(CollectionLayoutStoreContext)
 
-	React.useEffect(function() -- line: 102
-		-- upvalues: v30 (copy), SduiPoolStore (copy), t1 (copy)
-		if v30 == nil then
+	React.useEffect(function() -- line: 106
+		-- upvalues: v33 (copy), SduiPoolStore (copy), t1 (copy)
+		if v33 == nil then
 			return
 		end
 
-		local v71 = SduiPoolStore.getSduiPoolStore(t1.configKey)
+		local v77 = SduiPoolStore.getSduiPoolStore(t1.configKey)
 
-		v71.setLayoutStore(v30)
+		v77.setLayoutStore(v33)
 
-		return function() -- line: 108
-			-- upvalues: v71 (copy)
-			v71.setLayoutStore(nil)
+		return function() -- line: 112
+			-- upvalues: v77 (copy)
+			v77.setLayoutStore(nil)
 		end
 	end, {
 		t1.configKey,
-		v30
+		v33
 	})
 
 	return nil
 end
-local function SduiVerticalFeed(t2: {[any]: any}) -- line: 115
-	-- upvalues: useTokens (copy), useNavBarPlacement (copy), AppNavBar (copy), usePreferredInput (copy), Responsive (copy), React (copy), AppCommonLib (copy), useAnimateScrollViewToSelection (copy), useLastInputMode (copy), useProgressiveRowCap (copy), useVerticalScrolledToEndThreshold (copy), FFlagSduiPoolBackedFeed (copy), PoolStoreLayoutStoreWiring (copy), SduiFeedImpressionsDetector (copy), buildSduiFeedChildren (copy), SduiFeedContext (copy), CollectionLayoutStoreProvider (copy), View (copy), SduiStickyHeader (copy), PullToRefreshSpinner (copy)
+local function SduiVerticalFeed(t2: {[any]: any}) -- line: 119
+	-- upvalues: useTokens (copy), useNavBarPlacement (copy), AppNavBar (copy), usePreferredInput (copy), Responsive (copy), React (copy), AppCommonLib (copy), FFlagSduiSrpScrollAway (copy), ScrollMovementDirection (copy), useAnimateScrollViewToSelection (copy), useLastInputMode (copy), useProgressiveRowCap (copy), useVerticalScrolledToEndThreshold (copy), FFlagSduiPoolBackedFeed (copy), PoolStoreLayoutStoreWiring (copy), SduiFeedImpressionsDetector (copy), buildSduiFeedChildren (copy), SduiFeedContext (copy), CollectionLayoutStoreProvider (copy), View (copy), SduiStickyHeader (copy), PullToRefreshSpinner (copy)
 	local analyticsContext = t2.analyticsContext
 	local sduiContext = t2.sduiContext
 	local feedItems = t2.feedItems
 	local debugName = t2.debugName
-	local v36 = t2.contentTag or t2.defaultContentTag
-	local v37 = v36 ~= nil and v36 ~= ""
-	local v38 = useTokens()
-	local v39 = t2.stickyItems ~= nil
-	local v40 = t2.onRefresh ~= nil
-	local v41 = t2.stickyContentTag or t2.defaultStickyContentTag
-	local v42 = t2.stickyBackgroundStyle or v38.Color.Surface.Surface_0
+	local v39 = t2.contentTag or t2.defaultContentTag
+	local v40 = v39 ~= nil and v39 ~= ""
+	local v41 = useTokens()
+	local v42 = t2.stickyItems ~= nil
+	local v43 = t2.onRefresh ~= nil
+	local v44 = t2.stickyContentTag or t2.defaultStickyContentTag
+	local v45 = t2.stickyBackgroundStyle or v41.Color.Surface.Surface_0
 	local stickyPaddingTop = t2.stickyPaddingTop
 	local stickyPaddingBottom = t2.stickyPaddingBottom
-	local v45 = t2.gapBetweenStickyItems or v38.Gap.Medium
-	local v46 = t2.gapAfterStickyItems or v38.Gap.Medium
-	local v47 = useNavBarPlacement()
-	local v48 = t2.impressionsTag or (sduiContext.routeName or sduiContext.appPage)
-	local v49 = t2.selectionBehaviorLeft or if v47 ~= AppNavBar.Placement.Left then Enum.SelectionBehavior.Stop else Enum.SelectionBehavior.Escape
-	local v50 = t2.selectionBehaviorRight or Enum.SelectionBehavior.Stop
-	local v51 = usePreferredInput()
-	local v52 = t2.scrollBarThickness or (v51 ~= Responsive.Input.Pointer and 0 or 4)
-	local v53, v54 = React.useState(nil)
-	local v55 = React.useRef(nil)
-	local v56 = React.useRef(nil)
+	local v48 = t2.gapBetweenStickyItems or v41.Gap.Medium
+	local v49 = t2.gapAfterStickyItems or v41.Gap.Medium
+	local v50 = useNavBarPlacement()
+	local v51 = t2.impressionsTag or (sduiContext.routeName or sduiContext.appPage)
+	local v52 = t2.selectionBehaviorLeft or if v50 ~= AppNavBar.Placement.Left then Enum.SelectionBehavior.Stop else Enum.SelectionBehavior.Escape
+	local v53 = t2.selectionBehaviorRight or Enum.SelectionBehavior.Stop
+	local v54 = usePreferredInput()
+	local v55 = t2.scrollBarThickness or (v54 ~= Responsive.Input.Pointer and 0 or 4)
+	local v56, v57 = React.useState(nil)
+	local v58 = React.useRef(nil)
+	local v59 = React.useRef(nil)
 
-	if v56.current == nil then
-		v56.current = AppCommonLib.Signal.new()
+	if v59.current == nil then
+		v59.current = AppCommonLib.Signal.new()
 	end
 
-	local v57 = React.useCallback(function() -- line: 154
-		-- upvalues: v56 (copy)
-		v56.current:fire()
+	local v60 = React.useCallback(function() -- line: 158
+		-- upvalues: v59 (copy)
+		v59.current:fire()
 	end, {})
-	local v58 = React.useMemo(function() -- line: 158
-		-- upvalues: v56 (copy), v55 (copy)
-		return {
-			scrollViewPositionChangedSignal = v56.current,
-			verticalScrollingFrameRef = v55
-		}
-	end, {
-		v56,
-		v55
-	})
-	local v59 = t2.gapBetweenFeedItems or v38.Gap.Large
-	local v60 = React.useMemo(function() -- line: 167
-		-- upvalues: v56 (copy), v55 (copy)
-		return {
-			scrollViewPositionChangedSignal = v56.current,
-			verticalScrollingFrameRef = v55
-		}
-	end, {
-		v56,
-		v55
-	})
-	local v61 = t2.scrollingFrameRef or v55
+	local v61 = if not FFlagSduiSrpScrollAway then nil else React.useRef(0)
+	local v62 = if not FFlagSduiSrpScrollAway then nil else React.useRef(ScrollMovementDirection.Backward)
+	local v63 = if not FFlagSduiSrpScrollAway then nil else React.useCallback(function(p1) -- line: 166
+		-- upvalues: v60 (copy), t2 (copy), v61 (copy), ScrollMovementDirection (copy), v62 (copy)
+		v60()
 
-	React.useEffect(function() -- line: 180
-		-- upvalues: t2 (copy), v57 (copy)
+		local onScrollDirectionChanged = t2.onScrollDirectionChanged
+
+		if not onScrollDirectionChanged then
+			return
+		end
+
+		local CanvasPositionY = p1.CanvasPosition.Y
+
+		if CanvasPositionY < 0 then
+			return
+		end
+
+		if CanvasPositionY == v61.current then
+			return
+		end
+
+		local v81 = if not (CanvasPositionY > v61.current) then ScrollMovementDirection.Backward else ScrollMovementDirection.Forward
+
+		if v81 ~= v62.current then
+			onScrollDirectionChanged(v81)
+			v62.current = v81
+		end
+
+		v61.current = CanvasPositionY
+	end, {
+		v60,
+		t2.onScrollDirectionChanged
+	})
+	local v64 = React.useMemo(function() -- line: 194
+		-- upvalues: v59 (copy), v58 (copy)
+		return {
+			scrollViewPositionChangedSignal = v59.current,
+			verticalScrollingFrameRef = v58
+		}
+	end, {
+		v59,
+		v58
+	})
+	local v65 = t2.gapBetweenFeedItems or v41.Gap.Large
+	local v66 = React.useMemo(function() -- line: 203
+		-- upvalues: v59 (copy), v58 (copy)
+		return {
+			scrollViewPositionChangedSignal = v59.current,
+			verticalScrollingFrameRef = v58
+		}
+	end, {
+		v59,
+		v58
+	})
+	local v67 = t2.scrollingFrameRef or v58
+
+	React.useEffect(function() -- line: 217
+		-- upvalues: t2 (copy), FFlagSduiSrpScrollAway (copy), v61 (copy), v63 (copy), v60 (copy)
 		if not t2.scrollingFrameRef or not t2.scrollingFrameRef.current then
 			return nil
 		end
 
 		local current = t2.scrollingFrameRef.current
-		local t3 = {
-			current:GetPropertyChangedSignal("CanvasPosition"):Connect(v57),
-			current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(v57)
+
+		if FFlagSduiSrpScrollAway then
+			v61.current = current.CanvasPosition.Y
+		end
+
+		local v83 = if not FFlagSduiSrpScrollAway then {
+			current:GetPropertyChangedSignal("CanvasPosition"):Connect(v60),
+			current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(v60)
+		} else {
+			current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 230
+				-- upvalues: v63 (copy), current (copy)
+				v63(current)
+			end),
+			current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(v60)
 		}
 
-		return function() -- line: 191
-			-- upvalues: t3 (copy)
-			for _, v79 in t3 do
-				v79:Disconnect()
+		return function() -- line: 240
+			-- upvalues: v83 (copy)
+			for _, v89 in v83 do
+				v89:Disconnect()
 			end
 		end
 	end, {
 		t2.scrollingFrameRef,
-		v57
+		v60,
+		if not FFlagSduiSrpScrollAway then nil else v63
 	})
-	useAnimateScrollViewToSelection(v61, 0.4)
+	useAnimateScrollViewToSelection(v67, 0.4)
 
-	local v62 = useLastInputMode() ~= "Cursor"
-	local v63 = t2.thresholdFromEnd or 600
-	local v64, v65 = useProgressiveRowCap(not feedItems and 0 or #feedItems, t2.initialNumToRender, t2.progressiveFillRate, t2.progressiveFillIntervalMs)
+	local v68 = useLastInputMode() ~= "Cursor"
+	local v69 = t2.thresholdFromEnd or 600
+	local v70, v71 = useProgressiveRowCap(not feedItems and 0 or #feedItems, t2.initialNumToRender, t2.progressiveFillRate, t2.progressiveFillIntervalMs)
 
-	useVerticalScrolledToEndThreshold(v61, v63, if not v65 then t2.onScrollToEnd else nil)
+	useVerticalScrolledToEndThreshold(v67, v69, if not v71 then t2.onScrollToEnd else nil)
 
-	local v66 = React.useMemo(function() -- line: 220
-		-- upvalues: feedItems (copy), t2 (copy), React (copy), v59 (copy), v39 (copy), v46 (copy), FFlagSduiPoolBackedFeed (copy), sduiContext (copy), PoolStoreLayoutStoreWiring (copy), v48 (copy), SduiFeedImpressionsDetector (copy), v61 (copy), v56 (copy), buildSduiFeedChildren (copy), debugName (copy), v49 (copy), v50 (copy), v60 (copy), v64 (copy)
+	local v72 = React.useMemo(function() -- line: 275
+		-- upvalues: feedItems (copy), t2 (copy), React (copy), v65 (copy), v42 (copy), v49 (copy), FFlagSduiPoolBackedFeed (copy), sduiContext (copy), PoolStoreLayoutStoreWiring (copy), v51 (copy), SduiFeedImpressionsDetector (copy), v67 (copy), v59 (copy), buildSduiFeedChildren (copy), debugName (copy), v52 (copy), v53 (copy), v66 (copy), v70 (copy)
 		if feedItems == nil then
 			return nil
 		end
 
-		local v74 = t2.pageBottomPadding or 80
-		local t4 = {
+		local v84 = t2.pageBottomPadding or 80
+		local t3 = {
 			BottomSpacer = React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				LayoutOrder = 1e999,
-				Size = UDim2.new(1, 0, 0, v74)
+				Size = UDim2.new(1, 0, 0, v84)
 			}),
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, v59)
+				Padding = UDim.new(0, v65)
 			}),
-			StickyGap = if not v39 or (not v46 or not (v46 > 0)) then nil else React.createElement("Frame", {
+			StickyGap = if not v42 or (not v49 or not (v49 > 0)) then nil else React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				LayoutOrder = 0,
-				Size = UDim2.new(1, 0, 0, (math.max(0, v46 - v59)))
+				Size = UDim2.new(1, 0, 0, (math.max(0, v49 - v65)))
 			}),
 			PoolStoreLayoutStoreWiring = if not FFlagSduiPoolBackedFeed or sduiContext.configKey == nil then nil else React.createElement(PoolStoreLayoutStoreWiring, {
 				configKey = sduiContext.configKey
 			}),
-			FeedImpressionsDetector = if not v48 or not feedItems then nil else React.createElement(SduiFeedImpressionsDetector, {
+			FeedImpressionsDetector = if not v51 or not feedItems then nil else React.createElement(SduiFeedImpressionsDetector, {
 				sduiContext = sduiContext,
 				feedItems = feedItems,
-				parentRef = v61,
-				impressionsTag = v48,
-				scrollViewPositionChangedSignal = v56.current
+				parentRef = v67,
+				impressionsTag = v51,
+				scrollViewPositionChangedSignal = v59.current
 			})
 		}
 
-		for v76, v77 in (buildSduiFeedChildren({
+		for v86, v87 in (buildSduiFeedChildren({
 			componentType = "VerticalFeed",
 			configs = feedItems,
 			sduiContext = sduiContext,
 			debugName = debugName,
-			impressionsTag = v48,
-			selectionBehaviorLeft = v49,
-			selectionBehaviorRight = v50,
-			extraLocalProps = v60,
-			maxConfigs = v64
+			impressionsTag = v51,
+			selectionBehaviorLeft = v52,
+			selectionBehaviorRight = v53,
+			extraLocalProps = v66,
+			maxConfigs = v70
 		})) do
-			t4[v76] = v77
+			t3[v86] = v87
 		end
 
-		return t4
+		return t3
 	end, {
 		feedItems,
 		debugName,
-		v55,
-		v56,
+		v58,
+		v59,
 		sduiContext,
 		analyticsContext,
-		v59,
-		v48,
+		v65,
+		v51,
+		v52,
+		v53,
+		v42,
 		v49,
-		v50,
-		v39,
-		v46,
-		v60,
-		v37,
+		v66,
+		v40,
 		t2.pageBottomPadding,
-		v61,
-		v64
+		v67,
+		v70
 	})
 
-	if v58 then
-		v66 = React.createElement(SduiFeedContext.Provider, {
-			value = v58
-		}, v66)
+	if v64 then
+		v72 = React.createElement(SduiFeedContext.Provider, {
+			value = v64
+		}, v72)
 	end
 
-	local v67 = React.createElement(CollectionLayoutStoreProvider, {
-		container = v53
-	}, v66)
-	local t5 = {
+	local v73 = React.createElement(CollectionLayoutStoreProvider, {
+		container = v56
+	}, v72)
+	local t4 = {
 		["size-full-0 auto-y"] = true
 	}
 
-	if v37 then
-		t5[v36] = true
+	if v40 then
+		t4[v39] = true
 	end
 
-	local v69 = React.createElement(View, {
-		tag = t5,
+	local v75 = React.createElement(View, {
+		tag = t4,
 		LayoutOrder = t2.layoutOrder,
-		ref = v54
-	}, v67)
+		ref = v57
+	}, v73)
 
 	if t2.scrollingFrameRef ~= nil then
-		return v69
+		return v75
 	end
 
-	local v70 = React.createElement("ScrollingFrame", {
+	local v76 = React.createElement("ScrollingFrame", {
 		LayoutOrder = 3,
-		ref = v55,
-		[React.Change.CanvasPosition] = v57,
-		[React.Change.CanvasSize] = v57,
-		BackgroundColor3 = if not t2.backgroundStyle then v38.Color.Surface.Surface_0.Color3 else t2.backgroundStyle.Color3,
+		ref = v58,
+		[React.Change.CanvasPosition] = if not FFlagSduiSrpScrollAway then v60 else v63,
+		[React.Change.CanvasSize] = v60,
+		BackgroundColor3 = if not t2.backgroundStyle then v41.Color.Surface.Surface_0.Color3 else t2.backgroundStyle.Color3,
 		BackgroundTransparency = if not t2.backgroundStyle then nil else t2.backgroundStyle.Transparency,
 		Size = UDim2.fromScale(1, 0),
 		CanvasSize = UDim2.new(1, 0, 0, 0),
 		AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		BorderSizePixel = 0,
-		ScrollBarThickness = v52,
+		ScrollBarThickness = v55,
 		ElasticBehavior = Enum.ElasticBehavior.Always,
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 		Selectable = false,
-		ScrollingEnabled = not v62,
+		ScrollingEnabled = not v68,
 		ClipsDescendants = false
 	}, {
 		FlexFill = React.createElement("UIFlexItem", {
 			FlexMode = Enum.UIFlexMode.Fill
 		}),
-		Content = v69
+		Content = v75
 	})
 
 	return React.createElement(View, {
@@ -270,28 +319,28 @@ local function SduiVerticalFeed(t2: {[any]: any}) -- line: 115
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}
 	}, {
-		Sticky = if not v39 then nil else React.createElement(SduiStickyHeader, {
+		Sticky = if not v42 then nil else React.createElement(SduiStickyHeader, {
 			zIndex = 2,
 			stickyItems = t2.stickyItems,
 			sduiContext = sduiContext,
 			debugName = `{ debugName }.StickyHeader`,
-			contentTag = v41,
-			backgroundStyle = v42,
+			contentTag = v44,
+			backgroundStyle = v45,
 			paddingTop = stickyPaddingTop,
 			paddingBottom = stickyPaddingBottom,
-			gapBetweenItems = v45,
-			extraLocalProps = v60,
-			impressionsTag = v48,
-			selectionBehaviorLeft = v49,
-			selectionBehaviorRight = v50
+			gapBetweenItems = v48,
+			extraLocalProps = v66,
+			impressionsTag = v51,
+			selectionBehaviorLeft = v52,
+			selectionBehaviorRight = v53
 		}),
-		RefreshSpinner = if not v40 then nil else React.createElement(PullToRefreshSpinner, {
+		RefreshSpinner = if not v43 then nil else React.createElement(PullToRefreshSpinner, {
 			LayoutOrder = 2,
 			onRefresh = t2.onRefresh,
-			scrollingFrameRef = v55,
+			scrollingFrameRef = v58,
 			appEventName = sduiContext.appPage
 		}),
-		Scroll = v70
+		Scroll = v76
 	})
 end
 

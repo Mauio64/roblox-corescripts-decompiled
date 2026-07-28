@@ -13,38 +13,29 @@ local addUnifiedEventLogging = AvatarExperienceAnalytics.addUnifiedEventLogging
 local UnifiedEventLogEnums = AvatarExperienceAnalytics.UnifiedEventLogEnums
 local UnifiedLoggingSurface = require(AvatarSwitcherParent.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface
 local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
-local AvatarExperienceFlags = require(AvatarSwitcherParent.AvatarExperienceFlags)
-local AvatarExperienceCommon = require(AvatarSwitcherParent.AvatarExperienceCommon)
-local FFlagAXAvatarTimeoutFlowIE = AvatarExperienceFlags.FFlagAXAvatarTimeoutFlowIE
-local getTimeoutStatusStore = AvatarExperienceCommon.Stores.getTimeoutStatusStore
+local getTimeoutStatusStore = require(AvatarSwitcherParent.AvatarExperienceCommon).Stores.getTimeoutStatusStore
 
-local function SwitchAvatarButton(t1: {[any]: any}) -- line: 31
-	-- upvalues: SignalsReact (copy), getAvatarSwitcherStore (copy), FFlagAXAvatarTimeoutFlowIE (copy), getTimeoutStatusStore (copy), useLocalization (copy), React (copy), addUnifiedEventLogging (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy), Foundation (copy), ButtonSize (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v22 = SignalsReact.useSignalState(getAvatarSwitcherStore)
-	local v23 = SignalsReact.useSignalState(v22.getIsSwitching)
-	local v24 = SignalsReact.useSignalState(v22.getSelectedOutfitId)
-	local v25 = SignalsReact.useSignalState(v22.getSelectedOutfitDetails)
-	local v26 = nil
-
-	if FFlagAXAvatarTimeoutFlowIE then
-		local v27 = getTimeoutStatusStore()
-
-		v26 = SignalsReact.useSignalState(v27.getIsTimedOut)
-	end
-
-	local v28 = useLocalization({
+local function SwitchAvatarButton(t1: {[any]: any}) -- line: 29
+	-- upvalues: SignalsReact (copy), getAvatarSwitcherStore (copy), getTimeoutStatusStore (copy), useLocalization (copy), React (copy), addUnifiedEventLogging (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy), Foundation (copy), ButtonSize (copy), ButtonVariant (copy), FillBehavior (copy)
+	local v19 = SignalsReact.useSignalState(getAvatarSwitcherStore)
+	local v20 = SignalsReact.useSignalState(v19.getIsSwitching)
+	local v21 = SignalsReact.useSignalState(v19.getSelectedOutfitId)
+	local v22 = SignalsReact.useSignalState(v19.getSelectedOutfitDetails)
+	local v23 = getTimeoutStatusStore()
+	local v24 = SignalsReact.useSignalState(v23.getIsTimedOut)
+	local v25 = useLocalization({
 		buttonText = "Feature.AvatarSwitcher.Action.Continue"
 	})
-	local v29 = v24 ~= nil and v25 == nil
-	local v30 = v23 or v29
-	local v31 = v30 or (v24 == nil or FFlagAXAvatarTimeoutFlowIE and v26)
-	local v32 = React.useRef(nil)
+	local v26 = v21 ~= nil and v22 == nil
+	local v27 = v20 or v26
+	local v28 = v27 or (v21 == nil or v24)
+	local v29 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 53
-		-- upvalues: addUnifiedEventLogging (copy), v32 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy)
-		task.delay(0, function() -- line: 56
-			-- upvalues: addUnifiedEventLogging (copy), v32 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy)
-			addUnifiedEventLogging(v32, {
+	React.useEffect(function() -- line: 47
+		-- upvalues: addUnifiedEventLogging (copy), v29 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy)
+		task.delay(0, function() -- line: 50
+			-- upvalues: addUnifiedEventLogging (copy), v29 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy)
+			addUnifiedEventLogging(v29, {
 				elementName = "SWITCH_AVATAR_BUTTON",
 				action = UnifiedEventLogEnums.MarketplaceUnifiedAction.UI_ELEMENT_CLICK,
 				surface = UnifiedLoggingSurface.IN_EXPERIENCE_AVATAR_SWITCHER
@@ -55,14 +46,14 @@ local function SwitchAvatarButton(t1: {[any]: any}) -- line: 31
 	end, {})
 
 	return (React.createElement(Foundation.Button, {
-		text = v28.buttonText,
+		text = v25.buttonText,
 		size = ButtonSize.Small,
-		variant = if not v31 then ButtonVariant.Emphasis else ButtonVariant.Standard,
+		variant = if not v28 then ButtonVariant.Emphasis else ButtonVariant.Standard,
 		fillBehavior = FillBehavior.Fill,
 		onActivated = t1.onActivated,
-		isLoading = v30,
-		isDisabled = v31,
-		ref = v32
+		isLoading = v27,
+		isDisabled = v28,
+		ref = v29
 	}))
 end
 

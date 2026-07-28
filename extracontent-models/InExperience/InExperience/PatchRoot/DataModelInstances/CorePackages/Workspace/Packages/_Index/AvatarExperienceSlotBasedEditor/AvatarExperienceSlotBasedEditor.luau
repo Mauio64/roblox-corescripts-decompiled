@@ -19,6 +19,7 @@ local createSortAndFiltersStore = require(script.Stores.createSortAndFiltersStor
 local createAvatarEditorStores = require(script.Stores.createAvatarEditorStores)
 local createSlotBasedEditorStore = require(script.Stores.createSlotBasedEditorStore)
 local createStaleInventoryGrantStore = require(script.Stores.createStaleInventoryGrantStore)
+local createThumbnailLatencyStore = require(script.Stores.createThumbnailLatencyStore)
 local SlotBasedEditorContext = require(script.Context.SlotBasedEditorContext)
 local AvatarEditorStores = require(script.Context.AvatarEditorStores)
 
@@ -50,6 +51,7 @@ return {
 		createAvatarEditorStores = createAvatarEditorStores,
 		createSlotBasedEditorStore = createSlotBasedEditorStore,
 		createStaleInventoryGrantStore = createStaleInventoryGrantStore,
+		createThumbnailLatencyStore = createThumbnailLatencyStore,
 		getStaleInventoryGrantStore = require(script.Stores.getStaleInventoryGrantStore)
 	},
 	Enums = {
@@ -71,7 +73,9 @@ return {
 		buildSlots = require(script.Utils.buildSlots),
 		getAssetTypesByCategory = require(script.Utils.getAssetTypesByCategory),
 		buildBodySlotViewportProps = require(script.Utils.buildBodySlotViewportProps),
-		getRemainingTimeFromExpiration = require(script.Utils.getRemainingTimeFromExpiration)
+		getRemainingTimeFromExpiration = require(script.Utils.getRemainingTimeFromExpiration),
+		buildSlotCategoryTabItems = require(script.Utils.buildSlotCategoryTabItems),
+		buildSlotCategoryLocalizationKeys = require(script.Utils.buildSlotCategoryLocalizationKeys)
 	},
 	["jest.config"] = script["jest.config"]
 }

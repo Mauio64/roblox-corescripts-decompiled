@@ -5,60 +5,66 @@ local ExpChatShared = require(ExpChatParent.ExpChatShared)
 local SharedFlags = require(ExpChatParent.SharedFlags)
 local displaySystemMessage = require(ExpChat.displaySystemMessage)
 local ExpChatLocalChatEnabledMessageExperimentation = require(ExpChatParent.SocialExperiments).ExpChatLocalChatEnabledMessageExperimentation
+local Analytics = ExpChatShared.Analytics
 local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
 local FFlagExpChatUseUpdatedUserCountStrings = ExpChatShared.Flags.FFlagExpChatUseUpdatedUserCountStrings
+local v11 = game:DefineFastFlag("ExpChatReportChatEnabledUserCountMetrics", false)
 local EngineFeature = game:GetEngineFeature("ExpChatLocalUserCountEnabled")
-local v11 = game:DefineFastInt("ExpChatChatableUserCountSystemMessageMinUsers", 5)
-local v12 = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
+local v13 = game:DefineFastInt("ExpChatChatableUserCountSystemMessageMinUsers", 5)
+local v14 = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
 
-local function createDisplayChatEnabledMessage(t1: {[any]: any}) -- line: 30
-	-- upvalues: FFlagConnectionsToFriendsRename (copy), displaySystemMessage (copy), ExpChatLocalChatEnabledMessageExperimentation (copy), EngineFeature (copy), TextChatService (copy), v12 (copy), FFlagExpChatUseUpdatedUserCountStrings (copy), v11 (copy)
+local function createDisplayChatEnabledMessage(t1: {[any]: any}) -- line: 33
+	-- upvalues: FFlagConnectionsToFriendsRename (copy), displaySystemMessage (copy), ExpChatLocalChatEnabledMessageExperimentation (copy), EngineFeature (copy), TextChatService (copy), v11 (copy), Analytics (copy), v14 (copy), FFlagExpChatUseUpdatedUserCountStrings (copy), v13 (copy)
 	local translator = t1.translator
 	local defaultSystemTextChannel = t1.defaultSystemTextChannel
 	local localPlayer = t1.localPlayer
-	local u18 = false
+	local u20 = false
 
-	return function() -- line: 37
-		-- upvalues: FFlagConnectionsToFriendsRename (copy), displaySystemMessage (copy), translator (copy), defaultSystemTextChannel (copy), ExpChatLocalChatEnabledMessageExperimentation (copy), EngineFeature (copy), TextChatService (copy), localPlayer (copy), v12 (copy), FFlagExpChatUseUpdatedUserCountStrings (copy), v11 (copy), u18 (ref)
-		local v19 = not FFlagConnectionsToFriendsRename and "CoreScripts.TextChat.ChatWindow.ChatEnabled.ChatWithAgeGroupAndTC" or "CoreScripts.TextChat.ChatWindow.ChatEnabled.ChatWithAgeGroupAAndTF"
-		local v20 = not FFlagConnectionsToFriendsRename and "Only people in similar age groups and your Trusted Connections can chat with you." or "Only people in similar age groups and your trusted friends can chat with you."
+	return function() -- line: 40
+		-- upvalues: FFlagConnectionsToFriendsRename (copy), displaySystemMessage (copy), translator (copy), defaultSystemTextChannel (copy), ExpChatLocalChatEnabledMessageExperimentation (copy), EngineFeature (copy), TextChatService (copy), localPlayer (copy), v11 (copy), Analytics (copy), v14 (copy), FFlagExpChatUseUpdatedUserCountStrings (copy), v13 (copy), u20 (ref)
+		local v21 = not FFlagConnectionsToFriendsRename and "CoreScripts.TextChat.ChatWindow.ChatEnabled.ChatWithAgeGroupAndTC" or "CoreScripts.TextChat.ChatWindow.ChatEnabled.ChatWithAgeGroupAAndTF"
+		local v22 = not FFlagConnectionsToFriendsRename and "Only people in similar age groups and your Trusted Connections can chat with you." or "Only people in similar age groups and your trusted friends can chat with you."
 
-		local function displayControlMessage() -- line: 45
-			-- upvalues: displaySystemMessage (copy), v19 (copy), translator (copy), defaultSystemTextChannel (copy), v20 (copy)
-			displaySystemMessage(v19, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+		local function displayControlMessage() -- line: 48
+			-- upvalues: displaySystemMessage (copy), v21 (copy), translator (copy), defaultSystemTextChannel (copy), v22 (copy)
+			displaySystemMessage(v21, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 		end
 
 		if ExpChatLocalChatEnabledMessageExperimentation.isExperimentEnabled and EngineFeature then
-			task.spawn(function() -- line: 60
-				-- upvalues: TextChatService (copy), localPlayer (copy), v12 (copy), displaySystemMessage (copy), v19 (copy), translator (copy), defaultSystemTextChannel (copy), v20 (copy), ExpChatLocalChatEnabledMessageExperimentation (copy), FFlagExpChatUseUpdatedUserCountStrings (copy), v11 (copy), u18 (ref)
-				local ok, result = pcall(function() -- line: 61
+			task.spawn(function() -- line: 63
+				-- upvalues: TextChatService (copy), localPlayer (copy), v11 (copy), Analytics (copy), v14 (copy), displaySystemMessage (copy), v21 (copy), translator (copy), defaultSystemTextChannel (copy), v22 (copy), ExpChatLocalChatEnabledMessageExperimentation (copy), FFlagExpChatUseUpdatedUserCountStrings (copy), v13 (copy), u20 (ref)
+				local ok, result = pcall(function() -- line: 64
 					-- upvalues: TextChatService (copy), localPlayer (copy)
 					return TextChatService:GetChatableUserCountAsync(localPlayer.UserId, "local")
 				end)
 
+				if v11 then
+					Analytics.reportChatEnabledUserCountFetchResult(ok and result ~= nil)
+				end
+
 				if not ok then
-					v12:warning("GetChatableUserCountAsync (local) failed: {}", (tostring(result)))
-					displaySystemMessage(v19, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+					v14:warning("GetChatableUserCountAsync (local) failed: {}", (tostring(result)))
+					displaySystemMessage(v21, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 
 					return
 				end
 
 				if result == nil then
-					displaySystemMessage(v19, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+					displaySystemMessage(v21, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 
 					return
 				end
 
-				local v24 = ExpChatLocalChatEnabledMessageExperimentation.getSystemMessageKey()
+				local v26 = ExpChatLocalChatEnabledMessageExperimentation.getSystemMessageKey()
 
-				if v24 == nil then
-					displaySystemMessage(v19, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+				if v26 == nil then
+					displaySystemMessage(v21, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 
 					return
 				end
 
-				local function GetSystemMessageKey(s1: string) -- line: 83
-					-- upvalues: FFlagExpChatUseUpdatedUserCountStrings (copy), v19 (copy), result (copy), v11 (copy)
+				local function GetSystemMessageKey(s1: string) -- line: 90
+					-- upvalues: FFlagExpChatUseUpdatedUserCountStrings (copy), v21 (copy), result (copy), v13 (copy)
 					local t2 = {
 						FRIENDLY = "CoreScripts.TextChat.ChatWindow.ChatWithOnlinePlayers.Local.Friendly",
 						WITH_COUNT_ABOVE_THRESHOLD = not FFlagExpChatUseUpdatedUserCountStrings and "CoreScripts.TextChat.ChatWindow.ChatWithOnlinePlayers.Local.WithCount" or "CoreScripts.TextChat.ChatWindow.ChatEnabled.ChatWithOnlinePlayers.Local.WithCount",
@@ -66,11 +72,11 @@ local function createDisplayChatEnabledMessage(t1: {[any]: any}) -- line: 30
 					}
 
 					if s1 == "CONTROL" then
-						return v19
+						return v21
 					end
 
 					if s1 == "V1_WITH_COUNT" then
-						if result >= v11 then
+						if result >= v13 then
 							return t2.WITH_COUNT_ABOVE_THRESHOLD
 						end
 
@@ -88,29 +94,29 @@ local function createDisplayChatEnabledMessage(t1: {[any]: any}) -- line: 30
 					return nil
 				end
 
-				local v26 = GetSystemMessageKey(v24)
+				local v28 = GetSystemMessageKey(v26)
 
-				if v26 == nil then
-					v12:warning("LocalChatEnabledMessage: IXP returned unrecognized identifier '{}'; showing control message, not logging exposure", v24)
-					displaySystemMessage(v19, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+				if v28 == nil then
+					v14:warning("LocalChatEnabledMessage: IXP returned unrecognized identifier '{}'; showing control message, not logging exposure", v26)
+					displaySystemMessage(v21, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 
 					return
 				end
 
-				if not u18 then
-					u18 = true
+				if not u20 then
+					u20 = true
 					ExpChatLocalChatEnabledMessageExperimentation.logExposure()
 				end
 
-				displaySystemMessage(v26, {
+				displaySystemMessage(v28, {
 					RBX_COUNT = result
-				}, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+				}, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 			end)
 
 			return
 		end
 
-		displaySystemMessage(v19, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v20)
+		displaySystemMessage(v21, nil, "Roblox.ChatEnabled.Info", translator, defaultSystemTextChannel, v22)
 	end
 end
 

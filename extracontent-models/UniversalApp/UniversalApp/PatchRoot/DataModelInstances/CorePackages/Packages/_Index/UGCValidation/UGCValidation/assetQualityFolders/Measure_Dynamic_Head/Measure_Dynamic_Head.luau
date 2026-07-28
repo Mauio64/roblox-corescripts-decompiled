@@ -26,11 +26,11 @@ local t2 = {
 }
 
 function t1.run(p1, p2) -- line: 31
-	-- upvalues: getFFlagUGCValidationAddGeometryToExports (copy), ErrorSourceStrings (copy), t2 (copy), getFIntUGCValidationDynamicHeadMinimumQualityPercent (copy), getFFlagUGCValidateAQScoreWarnings (copy)
+	-- upvalues: getFFlagUGCValidationAddGeometryToExports (copy), t2 (copy), getFIntUGCValidationDynamicHeadMinimumQualityPercent (copy), getFFlagUGCValidateAQScoreWarnings (copy), ErrorSourceStrings (copy)
 	local v11 = if not getFFlagUGCValidationAddGeometryToExports() then p2.aqsSummaryData.Measure_Dynamic_Head.Head else p2.aqsSummaryData.Measure_Dynamic_Head.Head or p2.aqsSummaryData.Measure_Dynamic_Head.Head_Geo
 
 	if v11 == nil then
-		p1:fail(ErrorSourceStrings.Keys.AQSInputDataError)
+		error("Measure_Dynamic_Head: AQS summary missing required fields")
 
 		return
 	end

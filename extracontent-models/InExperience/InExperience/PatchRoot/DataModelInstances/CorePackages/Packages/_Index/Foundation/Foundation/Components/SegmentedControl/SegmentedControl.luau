@@ -16,135 +16,117 @@ local useAnimatedHighlight = require(Foundation.Utility.useAnimatedHighlight)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local Segment = require(script.Parent.Segment)
 local useSegmentedControlVariants = require(script.Parent.useSegmentedControlVariants)
-local Flags = require(Foundation.Utility.Flags)
 local t1 = {
 	testId = "--foundation-segmented-control",
 	ZIndex = 1,
 	size = InputSize.Medium
 }
 
-local function SegmentedControl(p1, p2) -- line: 44
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useSegmentedControlVariants (copy), React (copy), Flags (copy), useAnimatedHighlight (copy), View (copy), withCommonProps (copy), Dash (copy), Segment (copy)
-	local v18 = withDefaults(p1, t1)
-	local v19 = useTokens()
-	local v20 = useSegmentedControlVariants(v19, v18.size, v18.isCircular)
-	local u21 = React.useRef(nil)
-	local u23
+local function SegmentedControl(p1, p2) -- line: 42
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useSegmentedControlVariants (copy), React (copy), useAnimatedHighlight (copy), View (copy), withCommonProps (copy), Dash (copy), Segment (copy)
+	local v17 = withDefaults(p1, t1)
+	local v18 = useTokens()
+	local v19 = useSegmentedControlVariants(v18, v17.size, v17.isCircular)
+	local u20 = React.useRef(nil)
+	local v21 = React.useRef({})
+	local u22 = React.useMemo(function() -- line: 60
+		-- upvalues: v21 (copy), v17 (copy), React (copy)
+		local current = v21.current
 
-	if Flags.FoundationFixStaleAnimatedHighlightRefs then
-		local v22 = React.useRef({})
-
-		u23 = React.useMemo(function() -- line: 63
-			-- upvalues: v22 (copy), v18 (copy), React (copy)
-			local current = v22.current
-
-			for _, v36 in v18.segments do
-				if v36.ref then
-					current[v36.id] = v36.ref
-				elseif not current[v36.id] then
-					current[v36.id] = React.createRef()
-				end
+		for _, v35 in v17.segments do
+			if v35.ref then
+				current[v35.id] = v35.ref
+			elseif not current[v35.id] then
+				current[v35.id] = React.createRef()
 			end
-
-			return current
-		end, { v18.segments })
-	else
-		u23 = React.useMemo(function() -- line: 75
-			-- upvalues: v18 (copy), React (copy)
-			local t2 = {}
-
-			for _, v39 in v18.segments do
-				t2[v39.id] = v39.ref or React.createRef()
-			end
-
-			return t2
-		end, { v18.segments })
-	end
-
-	local v24 = useAnimatedHighlight(v18.value, p2 or u21, u23)
-	local activeItemHeight = v24.activeItemHeight
-	local highlightPosition = v24.highlightPosition
-	local highlightWidth = v24.highlightWidth
-	local v28, v29 = React.useBinding(Vector2.new(0, 0))
-	local u30 = v29
-	local u31 = React.useCallback(function(p3) -- line: 89
-		-- upvalues: u30 (ref)
-		u30(p3.AbsoluteSize)
-	end, { v20.container.tag })
-	local v32 = React.useCallback(function(p4) -- line: 93
-		-- upvalues: v18 (copy), u31 (ref)
-		if v18.onAbsoluteSizeChanged then
-			v18.onAbsoluteSizeChanged(p4)
 		end
 
-		u31(p4)
+		return current
+	end, { v17.segments })
+	local v23 = useAnimatedHighlight(v17.value, p2 or u20, u22)
+	local activeItemHeight = v23.activeItemHeight
+	local highlightPosition = v23.highlightPosition
+	local highlightWidth = v23.highlightWidth
+	local v27, v28 = React.useBinding(Vector2.new(0, 0))
+	local u29 = v28
+	local u30 = React.useCallback(function(p3) -- line: 77
+		-- upvalues: u29 (ref)
+		u29(p3.AbsoluteSize)
+	end, { v19.container.tag })
+	local v31 = React.useCallback(function(p4) -- line: 81
+		-- upvalues: v17 (copy), u30 (ref)
+		if v17.onAbsoluteSizeChanged then
+			v17.onAbsoluteSizeChanged(p4)
+		end
+
+		u30(p4)
 	end, {
-		v18.onAbsoluteSizeChanged,
-		u31
+		v17.onAbsoluteSizeChanged,
+		u30
 	})
-	local u33 = React.useCallback(function(t3: {[any]: any}) -- line: 100
-		-- upvalues: u23 (ref), v18 (copy)
+	local u32 = React.useCallback(function(t2: {[any]: any}) -- line: 88
+		-- upvalues: u22 (ref), v17 (copy)
 		local n1 = 0
 
-		if t3.current then
-			local current = u23[v18.value].current
+		if t2.current then
+			local current = u22[v17.value].current
 
 			if current then
-				n1 = current.AbsolutePosition.Y - t3.current.AbsolutePosition.Y
+				n1 = current.AbsolutePosition.Y - t2.current.AbsolutePosition.Y
 			end
 		end
 
 		return n1
-	end, { v18.value })
+	end, { v17.value })
 
-	return React.createElement(View, withCommonProps(v18, {
-		Size = v28:map(function(vector2: Vector2) -- line: 116
+	return React.createElement(View, withCommonProps(v17, {
+		Size = v27:map(function(vector2: Vector2) -- line: 104
 			return UDim2.fromOffset(vector2.X, vector2.Y)
 		end)
 	}), {
 		SegmentsContainer = React.createElement(View, withDefaults({
-			tag = v20.container.tag,
-			ref = p2 or u21
+			tag = v19.container.tag,
+			ref = p2 or u20
 		}, {
-			onAbsoluteSizeChanged = v32
-		}), Dash.map(v18.segments, function(p5, n2: number) -- line: 129
-			-- upvalues: React (copy), Segment (copy), v18 (copy), u23 (ref)
-			local v48 = (n2 - 1) * 2 + 1
+			onAbsoluteSizeChanged = v31
+		}), Dash.map(v17.segments, function(p5, n2: number) -- line: 117
+			-- upvalues: React (copy), Segment (copy), v17 (copy), u22 (ref)
+			local v44 = (n2 - 1) * 2 + 1
 
 			return React.createElement(React.Fragment, {
 				key = tostring(p5.id)
 			}, {
 				Segment = React.createElement(Segment, {
 					id = p5.id,
-					size = v18.size,
-					isCircular = v18.isCircular,
+					size = v17.size,
+					isCircular = v17.isCircular,
 					text = p5.text,
 					icon = p5.icon,
-					isActive = p5.id == v18.value,
-					onActivated = v18.onActivated,
-					LayoutOrder = v48,
-					testId = `{ v18.testId }--segment-{ p5.id }`,
-					ref = u23[p5.id]
+					isActive = p5.id == v17.value,
+					onActivated = v17.onActivated,
+					LayoutOrder = v44,
+					testId = `{ v17.testId }--segment-{ p5.id }`,
+					ref = u22[p5.id]
 				})
 			})
 		end)),
 		Overlay = React.createElement(View, {
 			testId = "--foundation-segmented-control--animated-overlay",
-			backgroundStyle = v19.Color.Shift.Shift_400,
-			tag = v20.segment.tag,
+			backgroundStyle = v18.Color.Shift.Shift_400,
+			tag = v19.segment.tag,
 			Size = React.joinBindings({
 				highlightWidth,
 				activeItemHeight
-			}):map(function(p6) -- line: 152
+			}):map(function(p6) -- line: 140
 				return UDim2.fromOffset(p6[1], p6[2])
 			end),
-			Position = highlightPosition:map(function(n3: number) -- line: 155
-				-- upvalues: u33 (ref), p2 (copy), u21 (ref)
-				local v51 = u33(p2 or u21)
+			Position = highlightPosition:map(function(n3: number) -- line: 143
+				-- upvalues: u32 (ref), p2 (copy), u20 (ref)
+				local v47 = u32(p2 or u20)
 
-				return UDim2.fromOffset(n3, v51)
+				return UDim2.fromOffset(n3, v47)
 			end),
-			ZIndex = v18.ZIndex + 1
+			ZIndex = v17.ZIndex + 1
 		})
 	})
 end

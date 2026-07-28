@@ -1,9 +1,10 @@
 local Players = game:GetService("Players")
 local InsertService = game:GetService("InsertService")
-local v3 = game:DefineFastInt("UGCEmoteSkinningDisableTranslationThresholdMillistuds", 100) * 0.001
+local v3 = game:DefineFastFlag("EmoteSkinningDisableUseClassLookup", false)
+local v4 = game:DefineFastInt("UGCEmoteSkinningDisableTranslationThresholdMillistuds", 100) * 0.001
 local t1 = {}
 
-local function getClipMetadata(s1: string) -- line: 15
+local function getClipMetadata(s1: string) -- line: 16
 	-- upvalues: t1 (copy), InsertService (copy)
 	if t1[s1] then
 		return t1[s1]
@@ -15,7 +16,7 @@ local function getClipMetadata(s1: string) -- line: 15
 		return nil
 	end
 
-	local ok, result = pcall(function() -- line: 25
+	local ok, result = pcall(function() -- line: 26
 		-- upvalues: InsertService (copy), num (copy)
 		return InsertService:LoadAsset(num)
 	end)
@@ -46,7 +47,7 @@ local function getClipMetadata(s1: string) -- line: 15
 
 	return t2
 end
-local function setAllJointsSkinning(p1, b1: boolean) -- line: 52
+local function setAllJointsSkinning(p1, b1: boolean) -- line: 53
 	for _, descendant in p1:GetDescendants() do
 		if descendant:IsA("Motor6D") or descendant:IsA("AnimationConstraint") or descendant:IsA("BallSocketConstraint") or descendant:IsA("Weld") or descendant:IsA("RigidConstraint") then
 			descendant.EnableSkinning = b1
@@ -56,22 +57,22 @@ end
 
 local t3 = {}
 
-local function clearActiveEmoteConnection(p2) -- line: 64
+local function clearActiveEmoteConnection(p2) -- line: 65
 	-- upvalues: t3 (copy)
 	if t3[p2] then
 		t3[p2]:Disconnect()
 		t3[p2] = nil
 	end
 end
-local function onCharacterRemoving(p3) -- line: 71
+local function onCharacterRemoving(p3) -- line: 72
 	-- upvalues: t3 (copy)
 	if t3[p3] then
 		t3[p3]:Disconnect()
 		t3[p3] = nil
 	end
 end
-local function onAnimationPlayed(p4, p5) -- line: 75
-	-- upvalues: getClipMetadata (copy), v3 (copy), t3 (copy), setAllJointsSkinning (copy)
+local function onAnimationPlayed(p4, p5) -- line: 76
+	-- upvalues: getClipMetadata (copy), v4 (copy), t3 (copy), setAllJointsSkinning (copy)
 	local Animation = p5.Animation
 
 	if not Animation then
@@ -84,15 +85,15 @@ local function onAnimationPlayed(p4, p5) -- line: 75
 		return
 	end
 
-	task.spawn(function() -- line: 86
-		-- upvalues: getClipMetadata (copy), AnimationId (copy), v3 (copy), p5 (copy), p4 (copy), t3 (copy), setAllJointsSkinning (copy)
-		local v36 = getClipMetadata(AnimationId)
+	task.spawn(function() -- line: 87
+		-- upvalues: getClipMetadata (copy), AnimationId (copy), v4 (copy), p5 (copy), p4 (copy), t3 (copy), setAllJointsSkinning (copy)
+		local v38 = getClipMetadata(AnimationId)
 
-		if not v36 or not v36.isUGCEmote then
+		if not v38 or not v38.isUGCEmote then
 			return
 		end
 
-		if v36.maxTranslation <= v3 then
+		if v38.maxTranslation <= v4 then
 			return
 		end
 
@@ -100,32 +101,50 @@ local function onAnimationPlayed(p4, p5) -- line: 75
 			return
 		end
 
-		local v37 = p4
+		local v39 = p4
 
-		if t3[v37] then
-			t3[v37]:Disconnect()
-			t3[v37] = nil
+		if t3[v39] then
+			t3[v39]:Disconnect()
+			t3[v39] = nil
 		end
 
 		setAllJointsSkinning(p4, false)
-		t3[p4] = p5.Stopped:Connect(function() -- line: 102
+		t3[p4] = p5.Stopped:Connect(function() -- line: 103
 			-- upvalues: setAllJointsSkinning (copy), p4 (copy), t3 (copy)
 			setAllJointsSkinning(p4, true)
 
-			local v46 = p4
+			local v44 = p4
 
-			if t3[v46] then
-				t3[v46]:Disconnect()
-				t3[v46] = nil
+			if t3[v44] then
+				t3[v44]:Disconnect()
+				t3[v44] = nil
 			end
 		end)
 	end)
 end
-local function onCharacterAdded(p6) -- line: 109
-	-- upvalues: getClipMetadata (copy), v3 (copy), t3 (copy), setAllJointsSkinning (copy)
-	p6:WaitForChild("Humanoid"):WaitForChild("Animator").AnimationPlayed:Connect(function(animation) -- line: 113
-		-- upvalues: p6 (copy), getClipMetadata (copy), v3 (copy), t3 (copy), setAllJointsSkinning (copy)
-		local v39 = p6
+local function onCharacterAdded(p6) -- line: 110
+	-- upvalues: v3 (copy), getClipMetadata (copy), v4 (copy), t3 (copy), setAllJointsSkinning (copy)
+	local Animator
+
+	if v3 then
+		local Humanoid = p6:FindFirstChildOfClass("Humanoid")
+
+		if not Humanoid then
+			return
+		end
+
+		Animator = Humanoid:FindFirstChildOfClass("Animator")
+
+		if not Animator then
+			return
+		end
+	else
+		Animator = p6:WaitForChild("Humanoid"):WaitForChild("Animator")
+	end
+
+	Animator.AnimationPlayed:Connect(function(animation) -- line: 127
+		-- upvalues: p6 (copy), getClipMetadata (copy), v4 (copy), t3 (copy), setAllJointsSkinning (copy)
+		local v41 = p6
 		local Animation = animation.Animation
 
 		if not Animation then
@@ -138,15 +157,15 @@ local function onCharacterAdded(p6) -- line: 109
 			return
 		end
 
-		task.spawn(function() -- line: 86
-			-- upvalues: getClipMetadata (copy), AnimationId (copy), v3 (copy), animation (copy), v39 (copy), t3 (copy), setAllJointsSkinning (copy)
-			local v47 = getClipMetadata(AnimationId)
+		task.spawn(function() -- line: 87
+			-- upvalues: getClipMetadata (copy), AnimationId (copy), v4 (copy), animation (copy), v41 (copy), t3 (copy), setAllJointsSkinning (copy)
+			local v45 = getClipMetadata(AnimationId)
 
-			if not v47 or not v47.isUGCEmote then
+			if not v45 or not v45.isUGCEmote then
 				return
 			end
 
-			if v47.maxTranslation <= v3 then
+			if v45.maxTranslation <= v4 then
 				return
 			end
 
@@ -154,85 +173,32 @@ local function onCharacterAdded(p6) -- line: 109
 				return
 			end
 
-			local v48 = v39
+			local v46 = v41
 
-			if t3[v48] then
-				t3[v48]:Disconnect()
-				t3[v48] = nil
+			if t3[v46] then
+				t3[v46]:Disconnect()
+				t3[v46] = nil
 			end
 
-			setAllJointsSkinning(v39, false)
-			t3[v39] = animation.Stopped:Connect(function() -- line: 102
-				-- upvalues: setAllJointsSkinning (copy), v39 (copy), t3 (copy)
-				setAllJointsSkinning(v39, true)
+			setAllJointsSkinning(v41, false)
+			t3[v41] = animation.Stopped:Connect(function() -- line: 103
+				-- upvalues: setAllJointsSkinning (copy), v41 (copy), t3 (copy)
+				setAllJointsSkinning(v41, true)
 
-				local v51 = v39
+				local v47 = v41
 
-				if t3[v51] then
-					t3[v51]:Disconnect()
-					t3[v51] = nil
+				if t3[v47] then
+					t3[v47]:Disconnect()
+					t3[v47] = nil
 				end
 			end)
 		end)
 	end)
 end
-local function onPlayerAdded(p7) -- line: 118
-	-- upvalues: getClipMetadata (copy), v3 (copy), t3 (copy), setAllJointsSkinning (copy), onCharacterAdded (copy), onCharacterRemoving (copy)
+local function onPlayerAdded(p7) -- line: 132
+	-- upvalues: onCharacterAdded (copy), onCharacterRemoving (copy)
 	if p7.Character then
-		local Character = p7.Character
-
-		Character:WaitForChild("Humanoid"):WaitForChild("Animator").AnimationPlayed:Connect(function(animation) -- line: 113
-			-- upvalues: Character (copy), getClipMetadata (copy), v3 (copy), t3 (copy), setAllJointsSkinning (copy)
-			local v43 = Character
-			local Animation = animation.Animation
-
-			if not Animation then
-				return
-			end
-
-			local AnimationId = Animation.AnimationId
-
-			if AnimationId == "" then
-				return
-			end
-
-			task.spawn(function() -- line: 86
-				-- upvalues: getClipMetadata (copy), AnimationId (copy), v3 (copy), animation (copy), v43 (copy), t3 (copy), setAllJointsSkinning (copy)
-				local v49 = getClipMetadata(AnimationId)
-
-				if not v49 or not v49.isUGCEmote then
-					return
-				end
-
-				if v49.maxTranslation <= v3 then
-					return
-				end
-
-				if not animation.IsPlaying then
-					return
-				end
-
-				local v50 = v43
-
-				if t3[v50] then
-					t3[v50]:Disconnect()
-					t3[v50] = nil
-				end
-
-				setAllJointsSkinning(v43, false)
-				t3[v43] = animation.Stopped:Connect(function() -- line: 102
-					-- upvalues: setAllJointsSkinning (copy), v43 (copy), t3 (copy)
-					setAllJointsSkinning(v43, true)
-
-					local v52 = v43
-
-					if t3[v52] then
-						t3[v52]:Disconnect()
-						t3[v52] = nil
-					end
-				end)
-			end)
-		end)
+		onCharacterAdded(p7.Character)
 	end
 
 	p7.CharacterAdded:Connect(onCharacterAdded)

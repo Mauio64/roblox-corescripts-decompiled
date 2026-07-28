@@ -31,60 +31,63 @@ local GetFFlagEnableAppChatInExperience = require(AppChatParent.SharedFlags).Get
 local FFlagEnablePartyQuickStartButton = require(AppChatParent.SharedFlags).FFlagEnablePartyQuickStartButton
 local GetFFlagEnablePushNotificationsUpsellModalChat = require(AppChatParent.SharedFlags).GetFFlagEnablePushNotificationsUpsellModalChat
 local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local FFlagEnableHeaderBarButtonsUpdate = require(AppChatParent.SharedFlags).FFlagEnableHeaderBarButtonsUpdate
-local FFlagAppChatChatLandingScreenRenameFixEnabled = require(AppChatParent.SharedFlags).FFlagAppChatChatLandingScreenRenameFixEnabled
+local SharedFlags = require(AppChatParent.SharedFlags)
+local FFlagEnableHeaderBarButtonsUpdate = SharedFlags.FFlagEnableHeaderBarButtonsUpdate
+local FFlagAppChatChatLandingScreenRenameFixEnabled = SharedFlags.FFlagAppChatChatLandingScreenRenameFixEnabled
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local FFlagAppChatDomLocatorFoundationMigration = require(AppChat.Flags.FFlagAppChatDomLocatorFoundationMigration)
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
 local FFlagAppChatTopBarSignalsStore = require(AppChat.Flags.FFlagAppChatTopBarSignalsStore)
 local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
 local ArgoPartyExperimentation = require(AppChatParent.SocialExperiments).ArgoPartyExperimentation
-local v42 = Roact.PureComponent:extend("ChatLandingScreen")
+local FFlagAppChatIxpScreenExposure = require(AppChat.Flags.FFlagAppChatIxpScreenExposure)
+local IXPNavigationUtils = require(AppChat.Utils.IXPNavigationUtils)
+local v45 = Roact.PureComponent:extend("ChatLandingScreen")
 
-v42.defaultProps = {
+v45.defaultProps = {
 	navigation = nil
 }
 
-local function v43() -- line: 60
+local function v46() -- line: 63
 	-- upvalues: Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), withLocalization (copy), SearchTopBar (copy)
 	return Roact.createElement(TopBarProvider, {
 		screenName = EnumScreens.ChatLanding,
-		render = function(p1) -- line: 63
+		render = function(p1) -- line: 66
 			-- upvalues: EnumScreens (copy), ArgCheck (copy), withLocalization (copy), Roact (copy), SearchTopBar (copy)
-			local v68 = p1.getScreenTopBar(EnumScreens.ChatLanding)
+			local v72 = p1.getScreenTopBar(EnumScreens.ChatLanding)
 
-			ArgCheck.isType(v68, "table", "screenTopBar")
+			ArgCheck.isType(v72, "table", "screenTopBar")
 
 			return withLocalization({
 				searchPlaceholderText = "Feature.Chat.Label.SearchWord",
 				cancelText = "Feature.Chat.Action.Cancel"
-			})(function(p2) -- line: 70
-				-- upvalues: Roact (copy), SearchTopBar (copy), v68 (copy), p1 (copy), EnumScreens (copy)
+			})(function(p2) -- line: 73
+				-- upvalues: Roact (copy), SearchTopBar (copy), v72 (copy), p1 (copy), EnumScreens (copy)
 				return Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0)
 				}, {
 					filterBox = Roact.createElement(SearchTopBar, {
-						initialInputText = v68.filterText,
+						initialInputText = v72.filterText,
 						cancelText = p2.cancelText,
 						searchPlaceholderText = p2.searchPlaceholderText,
-						captureFocusOnMount = v68.shouldAutoFocusCenter,
-						onSelectCallback = v68.closeInputBar or function() -- line: 80
+						captureFocusOnMount = v72.shouldAutoFocusCenter,
+						onSelectCallback = v72.closeInputBar or function() -- line: 83
 						end,
-						resetOnMount = function() -- line: 82
+						resetOnMount = function() -- line: 85
 							-- upvalues: p1 (copy), EnumScreens (copy)
 							p1.setScreenTopBar(EnumScreens.ChatLanding, {
 								shouldAutoFocusCenter = false
 							})
 						end,
-						cancelCallback = function() -- line: 88
+						cancelCallback = function() -- line: 91
 							-- upvalues: p1 (copy), EnumScreens (copy)
 							p1.setScreenTopBar(EnumScreens.ChatLanding, {
 								shouldRenderCenter = false,
 								filterText = ""
 							})
 						end,
-						textChangedCallback = function(p3) -- line: 95
+						textChangedCallback = function(p3) -- line: 98
 							-- upvalues: p1 (copy), EnumScreens (copy)
 							p1.setScreenTopBar(EnumScreens.ChatLanding, {
 								filterText = p3
@@ -97,22 +100,22 @@ local function v43() -- line: 60
 	})
 end
 
-function v42.navigationOptions(p4) -- line: 107
-	-- upvalues: Constants (copy), GetFFlagEnableAppChatInExperience (copy), FFlagEnableHeaderBarButtonsUpdate (copy), ArgoPartyExperimentation (copy), UniversalAppPolicy (copy), GetFFlagIsSquadEnabled (copy), FFlagAppChatTopBarConfigDriven (copy), v43 (copy), withTelemetry (copy), ChatLandingTelemetryLayer (copy), Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy)
+function v45.navigationOptions(p4) -- line: 110
+	-- upvalues: Constants (copy), GetFFlagEnableAppChatInExperience (copy), FFlagEnableHeaderBarButtonsUpdate (copy), ArgoPartyExperimentation (copy), UniversalAppPolicy (copy), GetFFlagIsSquadEnabled (copy), FFlagAppChatTopBarConfigDriven (copy), v46 (copy), withTelemetry (copy), ChatLandingTelemetryLayer (copy), Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy)
 	local navigation = p4.navigation
-	local v46 = navigation.getScreenProps("navigateToRootStack", nil)
-	local v47 = navigation.getScreenProps("wideMode", false)
-	local IconButtonWidth = Constants:GetIconButtonWidth(v47)
-	local v49 = navigation.getScreenProps("isInExperience", false)
-	local v50 = not not v46
-	local v51 = GetFFlagEnableAppChatInExperience() and v49
-	local v52 = if not navigation.getScreenProps("wideMode", false) then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12)
+	local v49 = navigation.getScreenProps("navigateToRootStack", nil)
+	local v50 = navigation.getScreenProps("wideMode", false)
+	local IconButtonWidth = Constants:GetIconButtonWidth(v50)
+	local v52 = navigation.getScreenProps("isInExperience", false)
+	local v53 = not not v49
+	local v54 = GetFFlagEnableAppChatInExperience() and v52
+	local v55 = if not navigation.getScreenProps("wideMode", false) then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12)
 
 	if FFlagEnableHeaderBarButtonsUpdate then
-		v52 -= navigation.getScreenProps("topBarUtilityIconSideMargin", 0)
+		v55 -= navigation.getScreenProps("topBarUtilityIconSideMargin", 0)
 	end
 
-	local v53 = if not ArgoPartyExperimentation.getIsRenameEnabled() then if not GetFFlagIsSquadEnabled() then {
+	local v56 = if not ArgoPartyExperimentation.getIsRenameEnabled() then if not GetFFlagIsSquadEnabled() then {
 		raw = "CommonUI.Features.Label.Chat",
 		shouldLocalize = true
 	} else {
@@ -132,11 +135,11 @@ function v42.navigationOptions(p4) -- line: 107
 			isRoot = true,
 			isTitleLeftAligned = true,
 			shouldBoldHeader = true,
-			headerText = v53,
-			closeButtonEnabled = v51 and v50,
-			tabBarVisible = not v46 or nil,
+			headerText = v56,
+			closeButtonEnabled = v54 and v53,
+			tabBarVisible = not v49 or nil,
 			leftPaddingOverride = navigation.getScreenProps("appChatOuterPadding", 12),
-			rightPaddingOverride = v52
+			rightPaddingOverride = v55
 		}
 	end
 
@@ -144,32 +147,32 @@ function v42.navigationOptions(p4) -- line: 107
 		isRoot = true,
 		isTitleLeftAligned = true,
 		shouldBoldHeader = true,
-		headerText = v53,
-		backButtonEnabled = not v51 and v50,
-		closeButtonEnabled = v51 and v50,
-		tabBarVisible = not v46 or nil,
+		headerText = v56,
+		backButtonEnabled = not v54 and v53,
+		closeButtonEnabled = v54 and v53,
+		tabBarVisible = not v49 or nil,
 		leftPaddingOverride = navigation.getScreenProps("appChatOuterPadding", 12),
-		rightPaddingOverride = v52,
-		renderCenter = v43,
-		renderRight = function() -- line: 178
-			-- upvalues: withTelemetry (copy), ChatLandingTelemetryLayer (copy), Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), navigation (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), IconButtonWidth (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy), GetFFlagIsSquadEnabled (copy), v47 (copy)
-			return withTelemetry(ChatLandingTelemetryLayer.Context)(function(p5) -- line: 179
-				-- upvalues: Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), navigation (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), IconButtonWidth (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy), GetFFlagIsSquadEnabled (copy), v47 (copy)
+		rightPaddingOverride = v55,
+		renderCenter = v46,
+		renderRight = function() -- line: 182
+			-- upvalues: withTelemetry (copy), ChatLandingTelemetryLayer (copy), Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), navigation (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), IconButtonWidth (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy), GetFFlagIsSquadEnabled (copy), v50 (copy)
+			return withTelemetry(ChatLandingTelemetryLayer.Context)(function(p5) -- line: 183
+				-- upvalues: Roact (copy), TopBarProvider (copy), EnumScreens (copy), ArgCheck (copy), navigation (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), IconButtonWidth (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy), GetFFlagIsSquadEnabled (copy), v50 (copy)
 				return Roact.createElement(TopBarProvider, {
 					screenName = EnumScreens.ChatLanding,
-					render = function(p6) -- line: 182
-						-- upvalues: EnumScreens (copy), ArgCheck (copy), navigation (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Roact (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), p5 (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), IconButtonWidth (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy), GetFFlagIsSquadEnabled (copy), v47 (copy)
-						local v85 = p6.getScreenTopBar(EnumScreens.ChatLanding)
+					render = function(p6) -- line: 186
+						-- upvalues: EnumScreens (copy), ArgCheck (copy), navigation (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Roact (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), p5 (copy), ChatLandingTelemetryEvents (copy), StreamNotificationsBellIcon (copy), FFlagStreamNotificationBellEntryPoint (copy), AppPage (copy), SnoozeToastNotificationsButton (copy), IconButtonWidth (copy), FFlagAppChatDomLocatorFoundationMigration (copy), IconButton (copy), Images (copy), GetFFlagIsSquadEnabled (copy), v50 (copy)
+						local v89 = p6.getScreenTopBar(EnumScreens.ChatLanding)
 
-						ArgCheck.isType(v85, "table", "screenTopBar")
+						ArgCheck.isType(v89, "table", "screenTopBar")
 
-						local v86 = navigation.getScreenProps("notificationCount", 0)
-						local v87 = navigation.getScreenProps("topBarShowSearch", false)
-						local v88 = navigation.getScreenProps("topBarShowCreateChatGroup", false)
-						local v89 = navigation.getScreenProps("topBarShowNotifications", false)
-						local v90 = navigation.getScreenProps("topBarShowSnoozeNotifications", false)
+						local v90 = navigation.getScreenProps("notificationCount", 0)
+						local v91 = navigation.getScreenProps("topBarShowSearch", false)
+						local v92 = navigation.getScreenProps("topBarShowCreateChatGroup", false)
+						local v93 = navigation.getScreenProps("topBarShowNotifications", false)
+						local v94 = navigation.getScreenProps("topBarShowSnoozeNotifications", false)
 
-						if v85.shouldRenderCenter then
+						if v89.shouldRenderCenter then
 							return nil
 						end
 
@@ -177,13 +180,13 @@ function v42.navigationOptions(p4) -- line: 107
 							return Roact.createElement(Foundation.View, {
 								tag = "auto-xy row align-x-right align-y-center gap-xsmall"
 							}, {
-								filter = if not v87 then nil else Roact.createElement(Foundation.IconButton, {
+								filter = if not v91 then nil else Roact.createElement(Foundation.IconButton, {
 									isCircular = true,
 									LayoutOrder = 1,
 									size = Foundation.Enums.InputSize.Medium,
 									icon = Foundation.Enums.IconName.MagnifyingGlass,
 									testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("search"),
-									onActivated = function() -- line: 210
+									onActivated = function() -- line: 214
 										-- upvalues: p6 (copy), EnumScreens (copy), p5 (copy), ChatLandingTelemetryEvents (copy)
 										p6.setScreenTopBar(EnumScreens.ChatLanding, {
 											shouldRenderCenter = true,
@@ -193,25 +196,25 @@ function v42.navigationOptions(p4) -- line: 107
 										p5.emit(ChatLandingTelemetryEvents.ChatLandingSearchBtnClicked, {})
 									end
 								}),
-								createNewChat = if not v88 then nil else Roact.createElement(Foundation.IconButton, {
+								createNewChat = if not v92 then nil else Roact.createElement(Foundation.IconButton, {
 									isCircular = true,
 									LayoutOrder = 2,
 									size = Foundation.Enums.InputSize.Medium,
 									icon = Foundation.Enums.IconName.PlusLarge,
 									testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("createChat"),
-									onActivated = function() -- line: 230
+									onActivated = function() -- line: 234
 										-- upvalues: navigation (copy), EnumScreens (copy), p5 (copy), ChatLandingTelemetryEvents (copy)
 										navigation.navigate(EnumScreens.CreateNewChat)
 										p5.emit(ChatLandingTelemetryEvents.ChatLandingComposeBtnClicked, {})
 									end
 								}),
-								notifications = if not v89 then nil else Roact.createElement(StreamNotificationsBellIcon, {
+								notifications = if not v93 then nil else Roact.createElement(StreamNotificationsBellIcon, {
 									layoutOrder = 3,
-									notificationCount = v86,
+									notificationCount = v90,
 									entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else AppPage.Chat,
 									testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("notifications")
 								}),
-								snoozeChatNotifications = if not v90 then nil else Roact.createElement(SnoozeToastNotificationsButton, {
+								snoozeChatNotifications = if not v94 then nil else Roact.createElement(SnoozeToastNotificationsButton, {
 									layoutOrder = 4,
 									size = UDim2.new(0, IconButtonWidth, 1, 0)
 								})
@@ -219,11 +222,11 @@ function v42.navigationOptions(p4) -- line: 107
 						end
 
 						return Roact.createFragment({
-							filter = v87 and if not FFlagAppChatDomLocatorFoundationMigration then Roact.createElement(IconButton, {
+							filter = v91 and if not FFlagAppChatDomLocatorFoundationMigration then Roact.createElement(IconButton, {
 								layoutOrder = 1,
 								size = UDim2.new(0, IconButtonWidth, 1, 0),
 								icon = Images["icons/common/search"],
-								onActivated = function() -- line: 281
+								onActivated = function() -- line: 285
 									-- upvalues: p6 (copy), EnumScreens (copy), p5 (copy), ChatLandingTelemetryEvents (copy)
 									p6.setScreenTopBar(EnumScreens.ChatLanding, {
 										shouldRenderCenter = true,
@@ -238,7 +241,7 @@ function v42.navigationOptions(p4) -- line: 107
 								size = Foundation.Enums.InputSize.Medium,
 								icon = Foundation.Enums.IconName.MagnifyingGlass,
 								testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("search"),
-								onActivated = function() -- line: 267
+								onActivated = function() -- line: 271
 									-- upvalues: p6 (copy), EnumScreens (copy), p5 (copy), ChatLandingTelemetryEvents (copy)
 									p6.setScreenTopBar(EnumScreens.ChatLanding, {
 										shouldRenderCenter = true,
@@ -248,11 +251,11 @@ function v42.navigationOptions(p4) -- line: 107
 									p5.emit(ChatLandingTelemetryEvents.ChatLandingSearchBtnClicked, {})
 								end
 							}),
-							createNewChat = v88 and if not FFlagAppChatDomLocatorFoundationMigration then Roact.createElement(IconButton, {
+							createNewChat = v92 and if not FFlagAppChatDomLocatorFoundationMigration then Roact.createElement(IconButton, {
 								layoutOrder = 2,
 								size = UDim2.new(0, IconButtonWidth, 1, 0),
 								icon = if not GetFFlagIsSquadEnabled() then Images["icons/actions/compose"] else Images["icons/common/plus"],
-								onActivated = function() -- line: 316
+								onActivated = function() -- line: 320
 									-- upvalues: navigation (copy), EnumScreens (copy), p5 (copy), ChatLandingTelemetryEvents (copy)
 									navigation.navigate(EnumScreens.CreateNewChat)
 									p5.emit(ChatLandingTelemetryEvents.ChatLandingComposeBtnClicked, {})
@@ -263,16 +266,16 @@ function v42.navigationOptions(p4) -- line: 107
 								size = Foundation.Enums.InputSize.Medium,
 								icon = Foundation.Enums.IconName.PlusLarge,
 								testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("createChat"),
-								onActivated = function() -- line: 302
+								onActivated = function() -- line: 306
 									-- upvalues: navigation (copy), EnumScreens (copy), p5 (copy), ChatLandingTelemetryEvents (copy)
 									navigation.navigate(EnumScreens.CreateNewChat)
 									p5.emit(ChatLandingTelemetryEvents.ChatLandingComposeBtnClicked, {})
 								end
 							}),
-							notifications = v89 and if not FFlagAppChatDomLocatorFoundationMigration then Roact.createElement(StreamNotificationsBellIcon, {
+							notifications = v93 and if not FFlagAppChatDomLocatorFoundationMigration then Roact.createElement(StreamNotificationsBellIcon, {
 								layoutOrder = 3,
-								notificationCount = v86,
-								compactWidth = not v47,
+								notificationCount = v90,
+								compactWidth = not v50,
 								entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else AppPage.Chat
 							}) else Roact.createElement(Foundation.View, {
 								tag = "radius-circle row align-x-center align-y-center",
@@ -280,12 +283,12 @@ function v42.navigationOptions(p4) -- line: 107
 								testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("notifications")
 							}, {
 								BellIcon = Roact.createElement(StreamNotificationsBellIcon, {
-									notificationCount = v86,
-									compactWidth = not v47,
+									notificationCount = v90,
+									compactWidth = not v50,
 									entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else AppPage.Chat
 								})
 							}),
-							snoozeChatNotifications = if not v90 then nil else Roact.createElement(SnoozeToastNotificationsButton, {
+							snoozeChatNotifications = if not v94 then nil else Roact.createElement(SnoozeToastNotificationsButton, {
 								layoutOrder = 4,
 								size = UDim2.new(0, IconButtonWidth, 1, 0)
 							})
@@ -296,9 +299,11 @@ function v42.navigationOptions(p4) -- line: 107
 		end
 	}
 end
-function v42.init(p7) -- line: 361
-	-- upvalues: Logger (copy), EnumScreens (copy), getCurrentRoute (copy), FFlagEnablePartyQuickStartButton (copy), resetForSquadLobbyForCompactMode (copy), RoactNavigation (copy), FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), ArgCheck (copy)
-	function p7.navigateToConversation(p8) -- line: 362
+function v45.init(p7) -- line: 365
+	-- upvalues: FFlagAppChatIxpScreenExposure (copy), IXPNavigationUtils (copy), Logger (copy), EnumScreens (copy), getCurrentRoute (copy), FFlagEnablePartyQuickStartButton (copy), resetForSquadLobbyForCompactMode (copy), RoactNavigation (copy), FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), ArgCheck (copy)
+	p7.ixpSubscription = if not FFlagAppChatIxpScreenExposure then nil else IXPNavigationUtils.registerExposureOnFocus(p7.props.navigation, "Party.LandingPage")
+
+	function p7.navigateToConversation(p8) -- line: 370
 		-- upvalues: Logger (copy), p7 (copy), EnumScreens (copy)
 		Logger:info("Navigate To Conversation: {} from {screen}", p8)
 		p7.props.navigation.navigate(EnumScreens.ChatConversation, {
@@ -307,36 +312,36 @@ function v42.init(p7) -- line: 361
 		})
 		p7.resetScreenTopBar()
 	end
-	function p7.navigateToCreateChat() -- line: 371
+	function p7.navigateToCreateChat() -- line: 379
 		-- upvalues: Logger (copy), p7 (copy), EnumScreens (copy)
 		Logger:info("Navigate To CreateNewChat from {screen}")
 		p7.props.navigation.push(EnumScreens.CreateNewChat)
 	end
-	function p7.navigateToToast(p9) -- line: 376
+	function p7.navigateToToast(p9) -- line: 384
 		-- upvalues: Logger (copy), p7 (copy), EnumScreens (copy)
 		Logger:info("Navigate To Toast from {screen}")
 		p7.props.navigation.navigate(EnumScreens.RoactChatToast, p9)
 	end
-	function p7.navigateToPrivacy() -- line: 381
+	function p7.navigateToPrivacy() -- line: 389
 		-- upvalues: p7 (copy), EnumScreens (copy), Logger (copy)
-		local v71 = p7.props.navigation.getScreenProps("navigateToLuaAppPages", {})[EnumScreens.PrivacySettings]
+		local v75 = p7.props.navigation.getScreenProps("navigateToLuaAppPages", {})[EnumScreens.PrivacySettings]
 
-		if v71 then
+		if v75 then
 			Logger:info("Navigate To PrivacySettings from {screen}")
-			v71()
+			v75()
 
 			return
 		end
 
 		Logger:warning("PrivacySettings page was not set in navigateToLuaAppPages screenProps")
 	end
-	function p7.navigateToSquadLobby(p10) -- line: 392
+	function p7.navigateToSquadLobby(p10) -- line: 400
 		-- upvalues: Logger (copy), getCurrentRoute (copy), p7 (copy), EnumScreens (copy), FFlagEnablePartyQuickStartButton (copy), resetForSquadLobbyForCompactMode (copy), RoactNavigation (copy)
 		Logger:info("Navigate To SquadLobby from {screen}")
 
-		local v73 = getCurrentRoute(p7.props.navigation.state)
+		local v77 = getCurrentRoute(p7.props.navigation.state)
 
-		if v73 and (v73.params and p10 == v73.params.conversationId and v73.routeName == EnumScreens.ChatConversation) then
+		if v77 and (v77.params and p10 == v77.params.conversationId and v77.routeName == EnumScreens.ChatConversation) then
 			p7.props.navigation.navigate(EnumScreens.SquadLobby, {
 				conversationId = p10
 			})
@@ -368,7 +373,7 @@ function v42.init(p7) -- line: 361
 			})
 		}, 3)
 	end
-	function p7.setScreenTopBar(p11) -- line: 424
+	function p7.setScreenTopBar(p11) -- line: 432
 		-- upvalues: FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), EnumScreens (copy), p7 (copy), ArgCheck (copy)
 		if FFlagAppChatTopBarSignalsStore then
 			GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatLanding, p11)
@@ -376,16 +381,16 @@ function v42.init(p7) -- line: 361
 			return
 		end
 
-		local v75 = p7.props.navigation.getScreenProps("setScreenTopBar", nil)
+		local v79 = p7.props.navigation.getScreenProps("setScreenTopBar", nil)
 
-		ArgCheck.isNotNil(v75, "setScreenTopBar in screenProps")
-		v75(EnumScreens.ChatLanding, p11)
+		ArgCheck.isNotNil(v79, "setScreenTopBar in screenProps")
+		v79(EnumScreens.ChatLanding, p11)
 	end
-	function p7.resetScreenTopBar() -- line: 434
+	function p7.resetScreenTopBar() -- line: 442
 		-- upvalues: FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), EnumScreens (copy), ArgCheck (copy), p7 (copy)
-		local v76 = if not FFlagAppChatTopBarSignalsStore then ArgCheck.isNotNil(p7.props.navigation.getScreenProps("getScreenTopBar", nil), "getScreenTopBar in screenProps")(EnumScreens.ChatLanding) else GetTopBarStore(false).getScreenTopBar(EnumScreens.ChatLanding)(false) or {}
+		local v80 = if not FFlagAppChatTopBarSignalsStore then ArgCheck.isNotNil(p7.props.navigation.getScreenProps("getScreenTopBar", nil), "getScreenTopBar in screenProps")(EnumScreens.ChatLanding) else GetTopBarStore(false).getScreenTopBar(EnumScreens.ChatLanding)(false) or {}
 
-		if v76.filterText == "" and v76.shouldRenderCenter then
+		if v80.filterText == "" and v80.shouldRenderCenter then
 			p7.setScreenTopBar({
 				shouldRenderCenter = false,
 				isSecondary = false
@@ -393,37 +398,37 @@ function v42.init(p7) -- line: 361
 		end
 	end
 end
-function v42.render(p12) -- line: 454
+function v45.render(p12) -- line: 462
 	-- upvalues: Logger (copy), ArgCheck (copy), Roact (copy), TopBarProvider (copy), EnumScreens (copy), ChatLandingContainer (copy), ChatSearchBox (copy), GetFFlagEnablePushNotificationsUpsellModalChat (copy), CheckAndOpenChatPushUpsell (copy)
 	Logger:info("{screen} render")
 
-	local v56 = ArgCheck.isNotNil(p12.props.navigation, "navigation in ChatLandingScreen")
-	local v57 = v56 and v56.getParam("key", "") or ""
-	local v58 = v56.getScreenProps("showSearchRow", true)
-	local v59 = v56.getScreenProps("topBarHeight", 0)
+	local v59 = ArgCheck.isNotNil(p12.props.navigation, "navigation in ChatLandingScreen")
+	local v60 = v59 and v59.getParam("key", "") or ""
+	local v61 = v59.getScreenProps("showSearchRow", true)
+	local v62 = v59.getScreenProps("topBarHeight", 0)
 
 	return Roact.createElement(TopBarProvider, {
 		screenName = EnumScreens.ChatLanding,
-		render = function(p13) -- line: 463
-			-- upvalues: EnumScreens (copy), ArgCheck (copy), Roact (copy), ChatLandingContainer (copy), v56 (copy), p12 (copy), v57 (copy), v58 (copy), ChatSearchBox (copy), v59 (copy), GetFFlagEnablePushNotificationsUpsellModalChat (copy), CheckAndOpenChatPushUpsell (copy)
-			local v78 = p13.getScreenTopBar(EnumScreens.ChatLanding)
+		render = function(p13) -- line: 471
+			-- upvalues: EnumScreens (copy), ArgCheck (copy), Roact (copy), ChatLandingContainer (copy), v59 (copy), p12 (copy), v60 (copy), v61 (copy), ChatSearchBox (copy), v62 (copy), GetFFlagEnablePushNotificationsUpsellModalChat (copy), CheckAndOpenChatPushUpsell (copy)
+			local v82 = p13.getScreenTopBar(EnumScreens.ChatLanding)
 
-			ArgCheck.isType(v78, "table", "screenTopBar")
+			ArgCheck.isType(v82, "table", "screenTopBar")
 
-			local v79 = Roact.createElement(ChatLandingContainer, {
-				isShowingFilterBox = v78.shouldRenderCenter,
-				filterText = v78.filterText,
-				topBarHeight = v56.getScreenProps("topBarHeight", 0),
+			local v83 = Roact.createElement(ChatLandingContainer, {
+				isShowingFilterBox = v82.shouldRenderCenter,
+				filterText = v82.filterText,
+				topBarHeight = v59.getScreenProps("topBarHeight", 0),
 				navigateToAddFriends = p12.props.navigation.getScreenProps("navigateToAddFriends", {}),
 				navigateToConversation = p12.navigateToConversation,
 				navigateToCreateChat = p12.navigateToCreateChat,
 				navigateToPrivacy = p12.navigateToPrivacy,
 				navigateToSquadLobby = p12.navigateToSquadLobby,
 				navigateToToast = p12.navigateToToast,
-				key = "ChatLanding" .. v57
+				key = "ChatLanding" .. v60
 			})
 
-			if v58 then
+			if v61 then
 				return Roact.createElement("Frame", {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0)
@@ -436,41 +441,46 @@ function v42.render(p12) -- line: 454
 						Padding = UDim.new(0, 0)
 					}),
 					ChatSearchBox = Roact.createElement(ChatSearchBox, {
-						height = v59,
-						initialText = v78.filterText,
-						onFilter = function(p14) -- line: 494
+						height = v62,
+						initialText = v82.filterText,
+						onFilter = function(p14) -- line: 502
 							-- upvalues: p13 (copy), EnumScreens (copy)
 							p13.setScreenTopBar(EnumScreens.ChatLanding, {
 								filterText = p14
 							})
 						end
 					}),
-					v79
+					v83
 				})
 			end
 
 			if GetFFlagEnablePushNotificationsUpsellModalChat() then
 				return Roact.createFragment({
-					v79,
+					v83,
 					CheckAndOpenChatPushUpsell = Roact.createElement(CheckAndOpenChatPushUpsell)
 				})
 			end
 
-			return v79
+			return v83
 		end
 	})
 end
-function v42.didMount(p15) -- line: 515
-	-- upvalues: Logger (copy), FFlagAppChatTopBarConfigDriven (copy), GetFFlagEnableAppChatInExperience (copy), FFlagAppChatChatLandingScreenRenameFixEnabled (copy), ArgoPartyExperimentation (copy), UniversalAppPolicy (copy), GetFFlagIsSquadEnabled (copy)
+function v45.didMount(p15) -- line: 523
+	-- upvalues: Logger (copy), FFlagAppChatTopBarConfigDriven (copy), GetFFlagEnableAppChatInExperience (copy), SharedFlags (copy), FFlagAppChatChatLandingScreenRenameFixEnabled (copy), ArgoPartyExperimentation (copy), UniversalAppPolicy (copy), GetFFlagIsSquadEnabled (copy)
 	Logger:info("{screen} mounted")
 
 	if FFlagAppChatTopBarConfigDriven() then
 		local navigation = p15.props.navigation
-		local v62 = navigation.getScreenProps("navigateToRootStack", nil)
-		local v63 = navigation.getScreenProps("isInExperience", false)
-		local v64 = GetFFlagEnableAppChatInExperience() and v63
-		local v65 = if not navigation.getScreenProps("wideMode", false) then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12)
-		local v66 = if not FFlagAppChatChatLandingScreenRenameFixEnabled then if ArgoPartyExperimentation.getIsRenameEnabled() or not GetFFlagIsSquadEnabled() then {
+		local v65 = navigation.getScreenProps("navigateToRootStack", nil)
+		local v66 = navigation.getScreenProps("isInExperience", false)
+		local v67 = GetFFlagEnableAppChatInExperience() and v66
+		local v68 = if not navigation.getScreenProps("wideMode", false) then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12)
+
+		if SharedFlags.FFlagEnableHeaderBarButtonsUpdate then
+			v68 -= navigation.getScreenProps("topBarUtilityIconSideMargin", 0)
+		end
+
+		local v69 = if not FFlagAppChatChatLandingScreenRenameFixEnabled then if ArgoPartyExperimentation.getIsRenameEnabled() or not GetFFlagIsSquadEnabled() then {
 			raw = "CommonUI.Features.Label.Chat",
 			shouldLocalize = true
 		} else {
@@ -497,10 +507,10 @@ function v42.didMount(p15) -- line: 515
 			isRoot = true,
 			isTitleLeftAligned = true,
 			shouldBoldHeader = true,
-			headerText = v66,
-			closeButtonEnabled = v64 and not not v62,
+			headerText = v69,
+			closeButtonEnabled = v67 and not not v65,
 			leftPaddingOverride = navigation.getScreenProps("appChatOuterPadding", 12),
-			rightPaddingOverride = v65
+			rightPaddingOverride = v68
 		})
 
 		return
@@ -511,5 +521,10 @@ function v42.didMount(p15) -- line: 515
 		filterText = ""
 	})
 end
+function v45.willUnmount(p16) -- line: 596
+	if p16.ixpSubscription then
+		p16.ixpSubscription.remove()
+	end
+end
 
-return v42
+return v45

@@ -1,157 +1,269 @@
+local GamepadService = game:GetService("GamepadService")
 local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
 local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
 local React = require(AvatarExperienceUIKitParent.React)
-local useAnimatedBinding = require(AvatarExperienceUIKitParent.ReactOtter).useAnimatedBinding
+local ReactOtter = require(AvatarExperienceUIKitParent.ReactOtter)
+local useAnimatedBinding = ReactOtter.useAnimatedBinding
 local Foundation = require(AvatarExperienceUIKitParent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
 local ScrollingFrameWithIndicators = require(AvatarExperienceUIKit.ScrollingFrameWithIndicators.ScrollingFrameWithIndicators)
 local makeOtterSpringValue = require(AvatarExperienceUIKit.Utils.makeOtterSpringValue)
-local FFlagAXResetSubcategoryRowOnCategoryChange = require(AvatarExperienceUIKitParent.AvatarExperienceFlags).FFlagAXResetSubcategoryRowOnCategoryChange
-local TabGroupTab = require(script.Parent.TabGroupTab)
+local getCenterScrollOffset = require(AvatarExperienceUIKit.Utils.getCenterScrollOffset)
+local AvatarExperienceFlags = require(AvatarExperienceUIKitParent.AvatarExperienceFlags)
+local FFlagAXCategoryMenuVisualFixes = AvatarExperienceFlags.FFlagAXCategoryMenuVisualFixes
+local FFlagAXScrollHighlightedTabIntoView = AvatarExperienceFlags.FFlagAXScrollHighlightedTabIntoView
 local t1 = {
+	Transparency = 1
+}
+local TabGroupTab = require(script.Parent.TabGroupTab)
+local t2 = {
 	FillDirection = Enum.FillDirection.Horizontal,
 	SortOrder = Enum.SortOrder.LayoutOrder,
 	HorizontalFlex = Enum.UIFlexAlignment.None
 }
-local t2 = {
+local t3 = {
 	Transparency = 1
 }
-local t3 = {
+local t4 = {
 	dampingRatio = 1,
 	frequency = 5
 }
 
-local function getActiveTabPosition(n1: number) -- line: 62
+local function getActiveTabPosition(n1: number) -- line: 70
 	return UDim2.new(0, n1, 1, 0)
 end
-local function getActiveTabSize(n2: number) -- line: 66
+local function getActiveTabSize(n2: number) -- line: 74
 	return UDim2.new(0, n2, 0, 3)
 end
-local function TabGroup(t4: {[any]: any}, p1) -- line: 70
-	-- upvalues: useTokens (copy), useAnimatedBinding (copy), React (copy), makeOtterSpringValue (copy), t3 (copy), FFlagAXResetSubcategoryRowOnCategoryChange (copy), TabGroupTab (copy), getActiveTabPosition (copy), getActiveTabSize (copy), ScrollingFrameWithIndicators (copy), View (copy), t2 (copy), t1 (copy)
-	local v22 = useTokens()
-	local v23, v24 = useAnimatedBinding(0)
-	local v25, v26 = useAnimatedBinding(0)
-	local v27 = React.useRef(nil)
-	local v28 = React.useRef(nil)
-	local v29 = React.useRef(nil)
-	local v30 = React.useCallback(function() -- line: 81
-		-- upvalues: v29 (copy), v27 (copy), v28 (copy)
-		local current = v29.current
-		local current2 = v27.current
-		local current3 = v28.current
+local function TabGroup(t5: {[any]: any}, p1) -- line: 78
+	-- upvalues: useTokens (copy), useAnimatedBinding (copy), React (copy), FFlagAXCategoryMenuVisualFixes (copy), makeOtterSpringValue (copy), t4 (copy), ReactOtter (copy), FFlagAXScrollHighlightedTabIntoView (copy), getCenterScrollOffset (copy), GamepadService (copy), TabGroupTab (copy), getActiveTabPosition (copy), getActiveTabSize (copy), View (copy), t3 (copy), t2 (copy), ScrollingFrameWithIndicators (copy), t1 (copy)
+	local v28 = useTokens()
+	local v29, v30 = useAnimatedBinding(0)
+	local v31, v32 = useAnimatedBinding(0)
+	local v33 = React.useRef(nil)
+	local v34 = React.useRef(nil)
+	local v35 = React.useRef(nil)
+	local v36 = React.useCallback(function(n3: number, n4: number, b1: boolean?) -- line: 87
+		-- upvalues: FFlagAXCategoryMenuVisualFixes (copy), v31 (copy), v30 (copy), makeOtterSpringValue (copy), t4 (copy), v32 (copy), ReactOtter (copy)
+		if not b1 and (not FFlagAXCategoryMenuVisualFixes or v31:getValue() > 0) then
+			v30(makeOtterSpringValue(n3, t4))
+			v32(makeOtterSpringValue(n4, t4))
+
+			return
+		end
+
+		v30(ReactOtter.instant(n3))
+		v32(ReactOtter.instant(n4))
+	end, {})
+	local v37 = React.useCallback(function() -- line: 100
+		-- upvalues: v35 (copy), v33 (copy), v34 (copy)
+		local current = v35.current
+		local current2 = v33.current
+		local current3 = v34.current
 
 		if not current or (not current2 or not current3) then
 			return
 		end
 
-		local v41 = current.getScrollingFrame()
+		local v54 = current.getScrollingFrame()
 
-		if not v41 then
+		if not v54 then
 			return
 		end
 
-		local AbsoluteSizeX = v41.AbsoluteSize.X
+		local AbsoluteSizeX = v54.AbsoluteSize.X
 
 		if AbsoluteSizeX <= 0 then
 			return
 		end
 
-		local CanvasPositionX = v41.CanvasPosition.X
-		local v44 = current3.AbsolutePosition.X - current2.AbsolutePosition.X
-		local v45 = v44 + current3.AbsoluteSize.X
+		local CanvasPositionX = v54.CanvasPosition.X
+		local v57 = current3.AbsolutePosition.X - current2.AbsolutePosition.X
+		local v58 = v57 + current3.AbsoluteSize.X
 
-		if v44 < CanvasPositionX then
-			current.scrollToOffset(v44)
+		if v57 < CanvasPositionX then
+			current.scrollToOffset(v57)
 
 			return
 		end
 
-		if v45 > CanvasPositionX + AbsoluteSizeX then
-			current.scrollToOffset(v45 - AbsoluteSizeX)
+		if v58 > CanvasPositionX + AbsoluteSizeX then
+			current.scrollToOffset(v58 - AbsoluteSizeX)
 		end
 	end, {})
-	local v31 = React.useCallback(function(p2) -- line: 110
-		-- upvalues: v27 (copy), v28 (copy), t4 (copy), v24 (copy), makeOtterSpringValue (copy), t3 (copy), v26 (copy), v30 (copy)
-		local current = v27.current
+	local u38 = nil
 
-		v28.current = p2
+	if FFlagAXScrollHighlightedTabIntoView then
+		u38 = React.useCallback(function(p2) -- line: 137
+			-- upvalues: v35 (copy), getCenterScrollOffset (copy)
+			local current = v35.current
 
-		for _, v49 in t4.items do
-			if v49.id == t4.activeTabId and v49.ref then
-				v49.ref.current = p2
+			if not current then
+				return
+			end
+
+			local v61 = current.getScrollingFrame()
+
+			if not v61 then
+				return
+			end
+
+			if not p2 or not p2:IsDescendantOf(game) or not p2:IsDescendantOf(v61) then
+				return
+			end
+
+			local AbsoluteWindowSizeX = v61.AbsoluteWindowSize.X
+			local CanvasPositionX = v61.CanvasPosition.X
+			local v64 = p2.AbsolutePosition.X - v61.AbsolutePosition.X + CanvasPositionX
+			local v65 = getCenterScrollOffset(v64, p2.AbsoluteSize.X, CanvasPositionX, AbsoluteWindowSizeX)
+
+			if v65 == nil then
+				return
+			end
+
+			current.scrollToOffset(v65)
+		end, {})
+	end
+
+	local v39 = React.useCallback(function(p3) -- line: 167
+		-- upvalues: v33 (copy), v34 (copy), t5 (copy), v36 (copy), FFlagAXScrollHighlightedTabIntoView (copy), u38 (ref), v37 (copy)
+		local current = v33.current
+
+		v34.current = p3
+
+		for _, v69 in t5.items do
+			if v69.id == t5.activeTabId and v69.ref then
+				v69.ref.current = p3
 			end
 		end
 
-		if p2 and current then
-			v24(makeOtterSpringValue(p2.AbsolutePosition.X - current.AbsolutePosition.X, t3))
-			v26(makeOtterSpringValue(p2.AbsoluteSize.X, t3))
-			v30()
+		if p3 and current then
+			local v70 = p3.AbsolutePosition.X - current.AbsolutePosition.X
+			local AbsoluteSizeX = p3.AbsoluteSize.X
+
+			v36(v70, AbsoluteSizeX)
+
+			if FFlagAXScrollHighlightedTabIntoView and u38 then
+				u38(p3)
+
+				return
+			end
+
+			v37()
 		end
 	end, {
-		t4.activeTabId,
-		t4.items,
-		v30
+		t5.activeTabId,
+		t5.items,
+		v37,
+		u38,
+		v36
 	})
 
-	React.useEffect(function() -- line: 133
-		-- upvalues: v27 (copy), v28 (copy), v24 (copy), makeOtterSpringValue (copy), t3 (copy), v26 (copy), v30 (copy)
-		local current = v27.current
-		local current4 = v28.current
+	React.useEffect(function() -- line: 198
+		-- upvalues: v33 (copy), v34 (copy), v36 (copy), FFlagAXCategoryMenuVisualFixes (copy), FFlagAXScrollHighlightedTabIntoView (copy), u38 (ref), v37 (copy)
+		local current = v33.current
+		local current4 = v34.current
 
 		if current4 and current then
-			v24(makeOtterSpringValue(current4.AbsolutePosition.X - current.AbsolutePosition.X, t3))
-			v26(makeOtterSpringValue(current4.AbsoluteSize.X, t3))
-			v30()
+			local v74 = current4.AbsolutePosition.X - current.AbsolutePosition.X
+			local AbsoluteSizeX = current4.AbsoluteSize.X
+
+			v36(v74, AbsoluteSizeX, FFlagAXCategoryMenuVisualFixes)
+
+			if FFlagAXScrollHighlightedTabIntoView and u38 then
+				u38(current4)
+
+				return
+			end
+
+			v37()
 		end
-	end, { v30 })
+	end, {
+		v37,
+		u38,
+		v36
+	})
 
-	if FFlagAXResetSubcategoryRowOnCategoryChange then
-		React.useEffect(function() -- line: 155
-			-- upvalues: t4 (copy), v28 (copy), v26 (copy), makeOtterSpringValue (copy), t3 (copy)
-			local v52 = false
+	if FFlagAXScrollHighlightedTabIntoView then
+		React.useEffect(function() -- line: 220
+			-- upvalues: v35 (copy), GamepadService (copy), u38 (ref)
+			local current = v35.current
 
-			if t4.activeTabId ~= nil then
-				for _, v54 in t4.items do
-					if v54.id == t4.activeTabId then
-						v52 = true
+			if not current then
+				return
+			end
+
+			local v77 = current.getScrollingFrame()
+
+			if not v77 then
+				return
+			end
+
+			local connection = v77.SelectionChanged:Connect(function(_: boolean, _, p5) -- line: 232
+				-- upvalues: GamepadService (copy), u38 (ref)
+				if GamepadService.GamepadCursorEnabled then
+					return
+				end
+
+				if u38 then
+					u38(p5)
+				end
+			end)
+
+			return function() -- line: 244
+				-- upvalues: connection (copy)
+				connection:Disconnect()
+			end
+		end, {})
+	end
+
+	if FFlagAXCategoryMenuVisualFixes then
+		React.useEffect(function() -- line: 257
+			-- upvalues: t5 (copy), v34 (copy), v30 (copy), ReactOtter (copy), v32 (copy)
+			local v79 = false
+
+			if t5.activeTabId ~= nil then
+				for _, v81 in t5.items do
+					if v81.id == t5.activeTabId then
+						v79 = true
 
 						break
 					end
 				end
 			end
 
-			if not v52 then
-				v28.current = nil
-				v26(makeOtterSpringValue(0, t3))
+			if not v79 then
+				v34.current = nil
+				v30(ReactOtter.instant(0))
+				v32(ReactOtter.instant(0))
 			end
 		end, {
-			t4.activeTabId,
-			t4.items
+			t5.activeTabId,
+			t5.items
 		})
-		React.useImperativeHandle(t4.controllerRef, function() -- line: 173
-			-- upvalues: v29 (copy)
+		React.useImperativeHandle(t5.controllerRef, function() -- line: 276
+			-- upvalues: v35 (copy)
 			return {
-				scrollToOffset = function(n3: number) -- line: 175
-					-- upvalues: v29 (copy)
-					local current = v29.current
+				scrollToOffset = function(n5: number) -- line: 278
+					-- upvalues: v35 (copy)
+					local current = v35.current
 
 					if current then
-						current.scrollToOffset(n3)
+						current.scrollToOffset(n5)
 					end
 				end,
-				setOffset = function(n4: number) -- line: 181
-					-- upvalues: v29 (copy)
-					local current = v29.current
+				setOffset = function(n6: number) -- line: 284
+					-- upvalues: v35 (copy)
+					local current = v35.current
 
 					if current then
-						current.setOffset(n4)
+						current.setOffset(n6)
 					end
 				end,
-				getScrollingFrame = function() -- line: 187
-					-- upvalues: v29 (copy)
-					local current = v29.current
+				getScrollingFrame = function() -- line: 290
+					-- upvalues: v35 (copy)
+					local current = v35.current
 
 					if current then
 						return (current.getScrollingFrame())
@@ -163,62 +275,72 @@ local function TabGroup(t4: {[any]: any}, p1) -- line: 70
 		end, {})
 	end
 
-	local t5 = {}
+	local t6 = {}
 
-	for v33, v34 in t4.items do
-		local v35 = t4.activeTabId == v34.id
+	for v41, v42 in t5.items do
+		local v43 = t5.activeTabId == v42.id
 
-		t5[v34.id] = React.createElement(TabGroupTab, {
-			ref = if not v35 then v34.ref else v31,
-			text = v34.text,
-			onActivated = if not t4.onTabActivated then nil else function() -- line: 202
-				-- upvalues: t4 (copy), v34 (copy)
-				t4.onTabActivated(v34.id)
+		t6[v42.id] = React.createElement(TabGroupTab, {
+			ref = if not v43 then v42.ref else v39,
+			text = v42.text,
+			onActivated = if not t5.onTabActivated then nil else function() -- line: 305
+				-- upvalues: t5 (copy), v42 (copy)
+				t5.onTabActivated(v42.id)
 			end,
-			isActive = v35,
-			fontStyle = t4.tabFontStyle,
-			padding = t4.tabPadding,
-			textStyle = t4.tabTextStyle,
-			activeTextStyle = t4.tabActiveTextStyle,
-			LayoutOrder = v33
+			isActive = v43,
+			fontStyle = t5.tabFontStyle,
+			padding = t5.tabPadding,
+			textStyle = t5.tabTextStyle,
+			activeTextStyle = t5.tabActiveTextStyle,
+			LayoutOrder = v41
 		})
 	end
 
-	local v36 = React.useMemo(function() -- line: 215
-		-- upvalues: v23 (copy), getActiveTabPosition (copy)
-		return v23:map(getActiveTabPosition)
+	local v44 = React.useMemo(function() -- line: 318
+		-- upvalues: v29 (copy), getActiveTabPosition (copy)
+		return v29:map(getActiveTabPosition)
 	end, {})
-	local v37 = React.useMemo(function() -- line: 219
-		-- upvalues: v25 (copy), getActiveTabSize (copy)
-		return v25:map(getActiveTabSize)
+	local v45 = React.useMemo(function() -- line: 322
+		-- upvalues: v31 (copy), getActiveTabSize (copy)
+		return v31:map(getActiveTabSize)
 	end, {})
+	local v46 = React.createElement(View, {
+		ZIndex = -1,
+		ref = v33,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.XY,
+		backgroundStyle = t3,
+		layout = t2
+	}, t6)
+	local v47 = React.createElement("Frame", {
+		BorderSizePixel = 0,
+		Position = v44,
+		Size = v45,
+		BackgroundColor3 = v28.Color.Content.Emphasis.Color3,
+		AnchorPoint = Vector2.new(0, 1)
+	})
 
 	return React.createElement(ScrollingFrameWithIndicators, {
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = t4.BackgroundTransparency,
-		BackgroundColor3 = t4.BackgroundColor3,
-		LayoutOrder = t4.LayoutOrder,
-		Position = t4.Position,
-		ZIndex = t4.ZIndex,
+		BackgroundTransparency = t5.BackgroundTransparency,
+		BackgroundColor3 = t5.BackgroundColor3,
+		LayoutOrder = t5.LayoutOrder,
+		Position = t5.Position,
+		ZIndex = t5.ZIndex,
 		ref = p1,
-		controllerRef = v29
-	}, {
-		InnerNavigation = React.createElement(View, {
-			ClipsDescendants = false,
-			ZIndex = -1,
-			ref = v27,
-			Size = UDim2.fromScale(1, 0),
+		controllerRef = v35
+	}, if not FFlagAXCategoryMenuVisualFixes then {
+		InnerNavigation = v46,
+		ActiveTabIndicator = v47
+	} else {
+		Content = React.createElement(View, {
+			Size = UDim2.fromScale(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY,
-			backgroundStyle = t2,
-			layout = t1
-		}, t5),
-		ActiveTabIndicator = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Position = v36,
-			Size = v37,
-			BackgroundColor3 = v22.Color.Content.Emphasis.Color3,
-			AnchorPoint = Vector2.new(0, 1)
+			backgroundStyle = t1
+		}, {
+			InnerNavigation = v46,
+			ActiveTabIndicator = v47
 		})
 	})
 end

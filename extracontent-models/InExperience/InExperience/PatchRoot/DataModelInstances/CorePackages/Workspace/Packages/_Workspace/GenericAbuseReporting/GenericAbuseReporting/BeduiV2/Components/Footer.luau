@@ -13,14 +13,15 @@ local TextWithTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translat
 
 require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
 
+local FFlagAbuseReportDensifyResolvedArrays = require(GenericAbuseReporting.Flags.FFlagAbuseReportDensifyResolvedArrays)
 local FFlagAbuseReportLinkOpenedAnalytics = SharedFlags.FFlagAbuseReportLinkOpenedAnalytics
 local LinkOpenedSource = analyticsService.LinkOpenedSource
 
-local function Footer(t1: {[any]: any}) -- line: 34
-	-- upvalues: useDefaultTags (copy), React (copy), TextWithTranslation (copy), FFlagAbuseReportLinkOpenedAnalytics (copy), LinkOpenedSource (copy), View (copy)
-	local v14 = useDefaultTags(t1.additionalTag, "col gap-small size-full-0 auto-y")
+local function Footer(t1: {[any]: any}) -- line: 35
+	-- upvalues: useDefaultTags (copy), FFlagAbuseReportDensifyResolvedArrays (copy), React (copy), TextWithTranslation (copy), FFlagAbuseReportLinkOpenedAnalytics (copy), LinkOpenedSource (copy), View (copy)
+	local v15 = useDefaultTags(t1.additionalTag, "col gap-small size-full-0 auto-y")
 
-	if not t1.footerItems then
+	if not t1.footerItems or FFlagAbuseReportDensifyResolvedArrays and #t1.footerItems == 0 then
 		return nil
 	end
 
@@ -32,13 +33,14 @@ local function Footer(t1: {[any]: any}) -- line: 34
 			input = v.label,
 			linkId = if not FFlagAbuseReportLinkOpenedAnalytics then nil else v.id,
 			linkSource = if not FFlagAbuseReportLinkOpenedAnalytics then nil else LinkOpenedSource.Footer,
-			LayoutOrder = i
+			layoutOrder = if not FFlagAbuseReportDensifyResolvedArrays then nil else i,
+			LayoutOrder = if not FFlagAbuseReportDensifyResolvedArrays then i else nil
 		}))
 	end
 
 	return React.createElement(View, {
 		padding = t1.padding,
-		tag = v14,
+		tag = v15,
 		LayoutOrder = t1.layoutOrder
 	}, t2)
 end

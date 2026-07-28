@@ -16,12 +16,16 @@ local t2 = {
 }
 
 function t1.run(p1, p2) -- line: 19
-	-- upvalues: t2 (copy), ErrorSourceStrings (copy), v5 (copy), getFFlagUGCValidateAQScoreWarnings (copy)
+	-- upvalues: t2 (copy), v5 (copy), ErrorSourceStrings (copy), getFFlagUGCValidateAQScoreWarnings (copy)
 	local Measure_Cage_UV = p2.aqsSummaryData.Measure_Cage_UV
+
+	if Measure_Cage_UV == nil then
+		error("Measure_Cage_UV: AQS summary data is nil")
+	end
 
 	for _, v12 in t2 do
 		if Measure_Cage_UV[v12] == nil or Measure_Cage_UV[v12].incorrect_uv_count == nil then
-			p1:fail(ErrorSourceStrings.Keys.AQSInputDataError)
+			error("Measure_Cage_UV: AQS summary missing required fields for cage " .. v12)
 		else
 			if tonumber(Measure_Cage_UV[v12].incorrect_uv_count) > v5 then
 				p1:fail(ErrorSourceStrings.Keys.MeasureCageUV, {

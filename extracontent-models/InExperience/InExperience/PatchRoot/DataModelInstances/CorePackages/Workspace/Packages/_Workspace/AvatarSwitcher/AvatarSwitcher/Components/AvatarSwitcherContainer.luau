@@ -18,34 +18,32 @@ local RespawnDialogContainer = require(AvatarSwitcher.Components.Modals.RespawnD
 local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
 local ExperienceAvatarSupportType = require(AvatarSwitcher.Enums.ExperienceAvatarSupportType)
 local AvatarExperienceCommon = require(AvatarSwitcherParent.AvatarExperienceCommon)
-local AvatarExperienceFlags = require(AvatarSwitcherParent.AvatarExperienceFlags)
-local FFlagAvatarSwitcherUiFixes = AvatarExperienceFlags.FFlagAvatarSwitcherUiFixes
-local FFlagAXAvatarTimeoutFlowIE = AvatarExperienceFlags.FFlagAXAvatarTimeoutFlowIE
+local FFlagAvatarSwitcherUiFixes = require(AvatarSwitcherParent.AvatarExperienceFlags).FFlagAvatarSwitcherUiFixes
 local TimeoutBanner = AvatarExperienceCommon.Components.TimeoutBanner
 
-local function AvatarSwitcherContainer(t1: {[any]: any}) -- line: 43
-	-- upvalues: useTokens (copy), useSignalState (copy), getAvatarSwitcherStore (copy), SignalsReact (copy), ExperienceAvatarSupportType (copy), useUnifiedEventListenerInExperience (copy), React (copy), TopBar (copy), FFlagAXAvatarTimeoutFlowIE (copy), Foundation (copy), TimeoutBanner (copy), OutfitsGridWithMessage (copy), PreviewPanel (copy), FFlagAvatarSwitcherUiFixes (copy), GuiService (copy), EmptyState (copy), SingleItemLayout (copy), VerticalLayout (copy), HorizontalLayout (copy), RespawnDialogContainer (copy)
-	local v27 = useTokens()
-	local v28 = useSignalState(getAvatarSwitcherStore)
-	local v29 = useSignalState(v28.getIsEmpty)
-	local v30 = SignalsReact.useSignalState(v28.getExperienceAvatarSupportType) == ExperienceAvatarSupportType.NoSupport
+local function AvatarSwitcherContainer(t1: {[any]: any}) -- line: 42
+	-- upvalues: useTokens (copy), useSignalState (copy), getAvatarSwitcherStore (copy), SignalsReact (copy), ExperienceAvatarSupportType (copy), useUnifiedEventListenerInExperience (copy), React (copy), TopBar (copy), Foundation (copy), TimeoutBanner (copy), OutfitsGridWithMessage (copy), PreviewPanel (copy), FFlagAvatarSwitcherUiFixes (copy), GuiService (copy), EmptyState (copy), SingleItemLayout (copy), VerticalLayout (copy), HorizontalLayout (copy), RespawnDialogContainer (copy)
+	local v25 = useTokens()
+	local v26 = useSignalState(getAvatarSwitcherStore)
+	local v27 = useSignalState(v26.getIsEmpty)
+	local v28 = SignalsReact.useSignalState(v26.getExperienceAvatarSupportType) == ExperienceAvatarSupportType.NoSupport
 
 	useUnifiedEventListenerInExperience()
-	React.useEffect(function() -- line: 52
-		-- upvalues: v28 (copy)
-		task.spawn(function() -- line: 53
-			-- upvalues: v28 (copy)
-			v28.fetchExperienceAvatarSupportType()
+	React.useEffect(function() -- line: 51
+		-- upvalues: v26 (copy)
+		task.spawn(function() -- line: 52
+			-- upvalues: v26 (copy)
+			v26.fetchExperienceAvatarSupportType()
 		end)
 	end, {})
 
-	local v31 = React.createElement(TopBar, {
+	local v29 = React.createElement(TopBar, {
 		onClose = t1.toggleWindow
 	})
-	local v32 = if not FFlagAXAvatarTimeoutFlowIE then v31 else React.createElement(Foundation.View, {
+	local v30 = React.createElement(Foundation.View, {
 		tag = "auto-y size-full-0 col gap-0"
 	}, {
-		TopBar = v31,
+		TopBar = v29,
 		TimeoutBanner = React.createElement(Foundation.View, {
 			tag = "auto-y size-full-0 bg-surface-200"
 		}, {
@@ -55,48 +53,45 @@ local function AvatarSwitcherContainer(t1: {[any]: any}) -- line: 43
 			})
 		})
 	})
-	local v33 = React.createElement(OutfitsGridWithMessage)
-	local v34 = React.createElement(PreviewPanel, {
+	local v31 = React.createElement(OutfitsGridWithMessage)
+	local v32 = React.createElement(PreviewPanel, {
 		compactLayout = t1.verticalLayout
 	})
 
 	return (React.createElement("Frame", {
 		Active = true,
 		Size = UDim2.fromScale(1, 1),
-		BackgroundColor3 = v27.Color.OverMedia.OverMedia_0.Color3,
-		BackgroundTransparency = if not FFlagAvatarSwitcherUiFixes then v27.Color.OverMedia.OverMedia_0.Transparency else v27.Color.OverMedia.OverMedia_0.Transparency * GuiService.PreferredTransparency
+		BackgroundColor3 = v25.Color.OverMedia.OverMedia_0.Color3,
+		BackgroundTransparency = if not FFlagAvatarSwitcherUiFixes then v25.Color.OverMedia.OverMedia_0.Transparency else v25.Color.OverMedia.OverMedia_0.Transparency * GuiService.PreferredTransparency
 	}, {
 		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, v27.Radius.Medium)
+			CornerRadius = UDim.new(0, v25.Radius.Medium)
 		}),
-		Layout = if not v29 then if not v30 then if not t1.verticalLayout then React.createElement(HorizontalLayout, {
-			headerHeight = if not FFlagAXAvatarTimeoutFlowIE then v27.Size.Size_1200 else nil,
-			headerSlot = if not FFlagAXAvatarTimeoutFlowIE then v31 else v32,
+		Layout = if not v27 then if not v28 then if not t1.verticalLayout then React.createElement(HorizontalLayout, {
+			headerSlot = v30,
 			leftItemSlot = React.createElement(Foundation.View, {
 				tag = "size-full-full padding-x-xlarge"
 			}, {
-				OutfitsGrid = v33
+				OutfitsGrid = v31
 			}),
-			rightItemSlot = v34
+			rightItemSlot = v32
 		}) else React.createElement(VerticalLayout, {
-			headerHeight = if not FFlagAXAvatarTimeoutFlowIE then v27.Size.Size_1200 else nil,
-			headerSlot = if not FFlagAXAvatarTimeoutFlowIE then v31 else v32,
-			topItemSlot = v34,
+			headerSlot = v30,
+			topItemSlot = v32,
 			bottomItemSlot = React.createElement(Foundation.View, {
 				tag = "size-full-full padding-x-xlarge padding-top-xlarge"
 			}, {
-				OutfitsGrid = v33
+				OutfitsGrid = v31
 			})
 		}) else React.createElement(SingleItemLayout, {
-			headerHeight = if not FFlagAXAvatarTimeoutFlowIE then v27.Size.Size_1200 else nil,
-			headerSlot = if not FFlagAXAvatarTimeoutFlowIE then v31 else v32,
+			headerSlot = v30,
 			contentSlot = React.createElement(Foundation.View, {
 				tag = "size-full-full padding-x-xlarge col gap-medium"
 			}, {
-				OutfitsGrid = v33
+				OutfitsGrid = v31
 			})
 		}, {}) else React.createElement(EmptyState, {
-			headerSlot = if not FFlagAXAvatarTimeoutFlowIE then v31 else v32
+			headerSlot = v30
 		}),
 		RespawnDialogContainer = React.createElement(RespawnDialogContainer, {
 			toggleWindow = t1.toggleWindow,

@@ -33,12 +33,12 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
 			return
 		end
 
-		local v34 = v21
-		local v35 = v22
-		local v36 = if not v35:IsA("GuiObject") then Vector2.zero else v35.AbsolutePosition
-		local v37 = v34.AbsolutePosition - v36
+		local v37 = v21
+		local v38 = v22
+		local v39 = if not v38:IsA("GuiObject") then Vector2.zero else v38.AbsolutePosition
+		local v40 = v37.AbsolutePosition - v39
 
-		current.Position = UDim2.fromOffset(v37.X, v37.Y)
+		current.Position = UDim2.fromOffset(v40.X, v40.Y)
 	end, {
 		v21,
 		v22
@@ -63,10 +63,28 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
 	end, {})
 	local v31 = React.useCallback(function() -- line: 69
 		-- upvalues: v26 (copy)
+		v26({
+			type = "invitePicker"
+		})
+	end, {})
+	local v32 = React.useCallback(function() -- line: 75
+		-- upvalues: v26 (copy)
+		v26({
+			type = "playtestManagement"
+		})
+	end, {})
+	local v33 = React.useCallback(function() -- line: 81
+		-- upvalues: v26 (copy)
+		v26({
+			type = "creator-credit"
+		})
+	end, {})
+	local v34 = React.useCallback(function() -- line: 87
+		-- upvalues: v26 (copy)
 		v26(nil)
 	end, {})
 
-	React.useLayoutEffect(function() -- line: 73
+	React.useLayoutEffect(function() -- line: 91
 		-- upvalues: v21 (copy), v22 (copy), v27 (copy)
 		if v21 == nil or v22 == nil then
 			return
@@ -75,14 +93,14 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
 		v27()
 
 		local connection = v21:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
-		local v41 = if not v22:IsA("GuiObject") then nil else v22:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
+		local v44 = if not v22:IsA("GuiObject") then nil else v22:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
 
-		return function() -- line: 86
-			-- upvalues: connection (copy), v41 (copy)
+		return function() -- line: 104
+			-- upvalues: connection (copy), v44 (copy)
 			connection:Disconnect()
 
-			if v41 ~= nil then
-				v41:Disconnect()
+			if v44 ~= nil then
+				v44:Disconnect()
 			end
 		end
 	end, {
@@ -95,7 +113,7 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
 		return nil
 	end
 
-	local v32 = React.createElement(React.Fragment, nil, {
+	local v35 = React.createElement(React.Fragment, nil, {
 		StyleLink = React.createElement("StyleLink", {
 			StyleSheet = v23
 		}),
@@ -110,17 +128,21 @@ local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
 				target = t1.target,
 				testId = t1.testId,
 				onOpenPage = v29,
-				onOpenAgentsPage = v30
+				onOpenInvitePicker = v31,
+				onOpenAgentsPage = v30,
+				onOpenCreatorCreditPage = v33
 			})
 		})
 	})
 
 	return React.createElement(React.Fragment, nil, {
-		Pill = ReactRoblox.createPortal(v32, v22),
+		Pill = ReactRoblox.createPortal(v35, v22),
 		Page = React.createElement(BuildPillMenuPageHost, {
 			activePage = v25,
 			target = t1.target,
-			onClose = v31
+			onClose = v34,
+			onInvitesSent = v32,
+			onOpenInvitePicker = v31
 		})
 	})
 end

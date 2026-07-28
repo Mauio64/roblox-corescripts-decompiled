@@ -264,7 +264,7 @@ local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
 				bottom = UDim.new(0, v56.Padding.XLarge)
 			}
 		}, {
-			Title = React.createElement(FoundationText, {
+			Title = not FFlagIntegrateTraversalHistoryInSideSheet and React.createElement(FoundationText, {
 				tag = "auto-xy text-heading-small text-truncate-split",
 				Text = v57.historyTitle
 			}),

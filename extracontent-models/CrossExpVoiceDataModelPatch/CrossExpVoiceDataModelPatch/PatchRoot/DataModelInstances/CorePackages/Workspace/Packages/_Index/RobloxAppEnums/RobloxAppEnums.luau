@@ -6,6 +6,7 @@ local AppPage = require(script.AppPage)
 local SwitchTab = require(script.SwitchTab)
 local CentralOverlayType = require(script.CentralOverlayType)
 local LayoutConfig = require(script.LayoutConfig)
+local ScrollMovementDirection = require(script.ScrollMovementDirection)
 
 return {
 	DeviceOrientationMode = DeviceOrientationMode,
@@ -16,6 +17,7 @@ return {
 	SwitchTab = SwitchTab,
 	CentralOverlayType = CentralOverlayType,
 	LayoutConfig = LayoutConfig,
+	ScrollMovementDirection = ScrollMovementDirection,
 	MemStorageKeys = require(script.MemStorageKeys),
 	NotificationType = require(script.NotificationType),
 	SearchTypes = require(script.SearchTypes)

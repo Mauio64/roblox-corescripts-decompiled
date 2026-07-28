@@ -46,6 +46,7 @@ return {
 	Btns = {
 		Friends = "friends",
 		Followers = "followers",
+		School = "school",
 		ViewPlayerProfile = "viewPlayerProfile",
 		ContextualMenu = "contextualMenu",
 		Following = "following",

@@ -38,94 +38,99 @@ local FFlagLuaAppSduiPageEntryPointSnackbar = require(SduiSharedUtilitiesParent.
 local FFlagSduiExperienceDetailsSupport = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiExperienceDetailsSupport
 local FFlagSduiEventDetailsSupport = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiEventDetailsSupport
 local FFlagSduiPageEntryUseSharedHooks = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiPageEntryUseSharedHooks
+local FFlagSduiPageEntryPointResolvedSlot = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiPageEntryPointResolvedSlot
 local FFlagSduiUseSharedUiStatusHook = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiUseSharedUiStatusHook
 local FFlagSduiChartsSupport = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiChartsSupport
 local FFlagLuaAppSduiPageEntryScrollAway = require(SduiSharedUtilitiesParent.SharedFlags).FFlagLuaAppSduiPageEntryScrollAway
+local FFlagSduiSrpScrollAway = require(SduiSharedUtilitiesParent.SharedFlags).FFlagSduiSrpScrollAway
 
-local function SduiPageEntryPoint(t1: {[any]: any}, p1) -- line: 135
-	-- upvalues: useTokens (copy), useDispatch (copy), FFlagSduiPageEntryUseSharedHooks (copy), useComponentConfig (copy), React (copy), getSduiApiStore (copy), SignalsReact (copy), FFlagSduiUseSharedUiStatusHook (copy), useUiStatus (copy), UiStatus (copy), DataHydrationTypes (copy), useComponentLifecycleTiming (copy), useLocalAnalyticsData (copy), useStatefulRef (copy), FFlagSignalsNavP3Dispatch (copy), v14 (copy), NavigateBack (copy), ReactFocusNavigation (copy), useCloseWithBackButton (copy), FFlagLuaAppSduiPageEntryPointSnackbar (copy), usePageEntrySnackbar (copy), FFlagSduiChartsSupport (copy), useDataUpdatedTimestamp (copy), useCreateClientBindingSduiContext (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiEventDetailsSupport (copy), getSduiComponentWrapper (copy), SduiPageNavigationHeader (copy), CompositionTags (copy), NavButtonType (copy), FFlagLuaAppSduiPageEntryScrollAway (copy), Foundation (copy), Loading (copy), SduiPageErrorState (copy), ReactRoblox (copy), Snackbar (copy), CoreGui (copy)
+local function SduiPageEntryPoint(t1: {[any]: any}, p1) -- line: 139
+	-- upvalues: useTokens (copy), useDispatch (copy), FFlagSduiPageEntryUseSharedHooks (copy), useComponentConfig (copy), React (copy), getSduiApiStore (copy), SignalsReact (copy), FFlagSduiUseSharedUiStatusHook (copy), useUiStatus (copy), UiStatus (copy), DataHydrationTypes (copy), FFlagSduiPageEntryPointResolvedSlot (copy), useComponentLifecycleTiming (copy), useLocalAnalyticsData (copy), useStatefulRef (copy), FFlagSignalsNavP3Dispatch (copy), v14 (copy), NavigateBack (copy), ReactFocusNavigation (copy), useCloseWithBackButton (copy), FFlagLuaAppSduiPageEntryPointSnackbar (copy), usePageEntrySnackbar (copy), FFlagSduiChartsSupport (copy), useDataUpdatedTimestamp (copy), useCreateClientBindingSduiContext (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiEventDetailsSupport (copy), getSduiComponentWrapper (copy), FFlagSduiSrpScrollAway (copy), SduiPageNavigationHeader (copy), CompositionTags (copy), NavButtonType (copy), FFlagLuaAppSduiPageEntryScrollAway (copy), Foundation (copy), Loading (copy), SduiPageErrorState (copy), ReactRoblox (copy), Snackbar (copy), CoreGui (copy)
 	local appPage = t1.appPage
-	local v45 = t1.configKey or appPage
-	local v46 = `SduiPageEntryPoint-{ v45 }`
+	local v47 = t1.configKey or appPage
+	local v48 = `SduiPageEntryPoint-{ v47 }`
 	local pageTimer = t1.pageTimer
-	local v48 = useTokens()
-	local v49 = useDispatch()
-	local u50
+	local v50 = useTokens()
+	local v51 = useDispatch()
+	local u52
 
 	if FFlagSduiPageEntryUseSharedHooks then
-		u50 = useComponentConfig(v45, t1.identifier)
+		u52 = useComponentConfig(v47, t1.identifier)
 	else
-		local v51 = React.useCallback(function(p2) -- line: 149
-			-- upvalues: getSduiApiStore (copy), v45 (copy), t1 (copy)
-			return getSduiApiStore().getRootConfig(v45, p2, t1.identifier)
+		local v53 = React.useCallback(function(p2) -- line: 153
+			-- upvalues: getSduiApiStore (copy), v47 (copy), t1 (copy)
+			return getSduiApiStore().getRootConfig(v47, p2, t1.identifier)
 		end, {
-			v45,
+			v47,
 			t1.identifier
 		})
 
-		u50 = SignalsReact.useSignalState(v51)
+		u52 = SignalsReact.useSignalState(v53)
 	end
 
-	local v52 = React.useCallback(function(p3) -- line: 156
-		-- upvalues: getSduiApiStore (copy), v45 (copy)
-		return getSduiApiStore().getTitle(v45, p3)
-	end, { v45 })
-	local v53 = SignalsReact.useSignalState(v52) or t1.pageTitle
-	local v55, v56
+	local v54 = React.useCallback(function(p3) -- line: 160
+		-- upvalues: getSduiApiStore (copy), v47 (copy)
+		return getSduiApiStore().getTitle(v47, p3)
+	end, { v47 })
+	local v55 = SignalsReact.useSignalState(v54) or t1.pageTitle
+	local v57, v58
 
 	if FFlagSduiUseSharedUiStatusHook then
-		local v54 = useUiStatus(v45)
+		local v56 = useUiStatus(v47)
 
-		v55 = v54 == UiStatus.Loading
-		v56 = v54 == UiStatus.Error
+		v57 = v56 == UiStatus.Loading
+		v58 = v56 == UiStatus.Error
 	else
-		local v57 = SignalsReact.useSignalState(getSduiApiStore().getData(v45).status)
+		local v59 = SignalsReact.useSignalState(getSduiApiStore().getData(v47).status)
 
-		v55 = v57 == DataHydrationTypes.DataStatus.NotReady
-		v56 = v57 == DataHydrationTypes.DataStatus.Failed
+		v57 = v59 == DataHydrationTypes.DataStatus.NotReady
+		v58 = v59 == DataHydrationTypes.DataStatus.Failed
 	end
 
+	local v60 = FFlagSduiPageEntryPointResolvedSlot and (t1.resolvedSlot ~= nil and (not v57 and not v58))
+
 	if FFlagSduiPageEntryUseSharedHooks then
-		useComponentLifecycleTiming(pageTimer, typeof(u50) == "table")
+		useComponentLifecycleTiming(pageTimer, typeof(u52) == "table" or FFlagSduiPageEntryPointResolvedSlot and v60)
 	else
-		React.useEffect(function() -- line: 176
+		React.useEffect(function() -- line: 187
 			-- upvalues: pageTimer (copy)
 			if pageTimer then
 				pageTimer.logComponentMounted()
 			end
 		end, { pageTimer })
-		React.useEffect(function() -- line: 182
-			-- upvalues: pageTimer (copy), u50 (ref)
-			if pageTimer and u50 then
+		React.useEffect(function() -- line: 194
+			-- upvalues: pageTimer (copy), u52 (ref), FFlagSduiPageEntryPointResolvedSlot (copy), v60 (copy)
+			if pageTimer and (u52 or FFlagSduiPageEntryPointResolvedSlot and v60) then
 				pageTimer.logComponentReady()
 			end
 		end, {
 			pageTimer,
-			u50
+			u52,
+			if not FFlagSduiPageEntryPointResolvedSlot then nil else v60
 		})
 	end
 
-	local v58 = if not FFlagSduiPageEntryUseSharedHooks then React.useMemo(function() -- line: 191
-		-- upvalues: v45 (copy), appPage (copy)
+	local v61 = if not FFlagSduiPageEntryUseSharedHooks then React.useMemo(function() -- line: 209
+		-- upvalues: v47 (copy), appPage (copy)
 		return {
-			configKey = v45,
+			configKey = v47,
 			appPage = appPage
 		}
 	end, {
-		v45,
+		v47,
 		appPage
-	}) else useLocalAnalyticsData(v45, appPage, t1.additionalAnalyticsData)
-	local v59, v60
+	}) else useLocalAnalyticsData(v47, appPage, t1.additionalAnalyticsData)
+	local v62, v63
 
 	if FFlagSduiPageEntryUseSharedHooks then
-		v59, v60 = useStatefulRef(p1)
+		v62, v63 = useStatefulRef(p1)
 	else
-		v59, v60 = React.useState(nil)
-		React.useRef(v59).current = v59
+		v62, v63 = React.useState(nil)
+		React.useRef(v62).current = v62
 	end
 
-	local v61 = React.useCallback(function() -- line: 208
-		-- upvalues: t1 (copy), FFlagSignalsNavP3Dispatch (copy), v14 (copy), v49 (copy), NavigateBack (copy)
+	local v64 = React.useCallback(function() -- line: 226
+		-- upvalues: t1 (copy), FFlagSignalsNavP3Dispatch (copy), v14 (copy), v51 (copy), NavigateBack (copy)
 		if t1.onCloseActivated then
 			t1.onCloseActivated()
 
@@ -138,63 +143,65 @@ local function SduiPageEntryPoint(t1: {[any]: any}, p1) -- line: 135
 			return
 		end
 
-		v49(NavigateBack())
+		v51(NavigateBack())
 	end, {
-		v49,
+		v51,
 		t1.onCloseActivated
 	})
-	local _, v63 = ReactFocusNavigation.useMostRecentOrDefaultFocusBehavior(v60)
-	local v64 = useCloseWithBackButton(v63, v61)
-	local v65 = if not FFlagLuaAppSduiPageEntryPointSnackbar then nil else usePageEntrySnackbar(v45)
-	local v66 = nil
+	local _, v66 = ReactFocusNavigation.useMostRecentOrDefaultFocusBehavior(v63)
+	local v67 = useCloseWithBackButton(v66, v64)
+	local v68 = if not FFlagLuaAppSduiPageEntryPointSnackbar then nil else usePageEntrySnackbar(v47)
+	local v69 = nil
 
 	if FFlagSduiChartsSupport then
-		v66 = useDataUpdatedTimestamp(v45, t1.identifier)
+		v69 = useDataUpdatedTimestamp(v47, t1.identifier)
 	end
 
-	local v67, v68 = React.useState(nil)
-	local v69 = useCreateClientBindingSduiContext(appPage, v67, nil, if not FFlagSduiChartsSupport then nil else v66, if not FFlagSduiExperienceDetailsSupport and not FFlagSduiEventDetailsSupport then nil else v45, nil, t1.routeName)
-	local v70 = v59 == nil
-	local v71 = React.useMemo(function() -- line: 245
-		-- upvalues: u50 (ref), getSduiComponentWrapper (copy), React (copy), v46 (copy), v69 (copy), v58 (copy), t1 (copy), FFlagSduiChartsSupport (copy)
-		if u50 == nil then
+	local v70, v71 = React.useState(nil)
+	local v72 = useCreateClientBindingSduiContext(appPage, v70, nil, if not FFlagSduiChartsSupport then nil else v69, if not FFlagSduiExperienceDetailsSupport and not FFlagSduiEventDetailsSupport then nil else v47, nil, t1.routeName)
+	local v73 = v62 == nil
+	local v74 = React.useMemo(function() -- line: 263
+		-- upvalues: u52 (ref), getSduiComponentWrapper (copy), React (copy), v48 (copy), v72 (copy), v61 (copy), t1 (copy), FFlagSduiSrpScrollAway (copy), FFlagSduiChartsSupport (copy)
+		if u52 == nil then
 			return nil
 		end
 
-		local v75 = getSduiComponentWrapper(u50)
+		local v78 = getSduiComponentWrapper(u52)
 
-		return React.createElement(v75, {
-			debugName = v46,
-			componentConfig = u50,
-			sduiContext = v69,
-			localAnalyticsData = v58,
+		return React.createElement(v78, {
+			debugName = v48,
+			componentConfig = u52,
+			sduiContext = v72,
+			localAnalyticsData = v61,
 			extraLocalProps = {
 				pageBottomPadding = t1.pageBottomPadding,
 				scrollingFrameRef = t1.scrollingFrameRef,
+				onScrollDirectionChanged = if not FFlagSduiSrpScrollAway then nil else t1.onScrollDirectionChanged,
 				defaultContentTag = t1.contentTag,
 				defaultStickyContentTag = if not FFlagSduiChartsSupport then nil else t1.stickyContentTag
 			}
 		})
 	end, {
-		u50,
-		v46,
-		v69,
-		v58,
+		u52,
+		v48,
+		v72,
+		v61,
 		t1.contentTag,
 		if not FFlagSduiChartsSupport then nil else t1.stickyContentTag,
 		t1.pageBottomPadding,
-		t1.scrollingFrameRef
+		t1.scrollingFrameRef,
+		if not FFlagSduiSrpScrollAway then nil else t1.onScrollDirectionChanged
 	})
-	local v72 = t1.scrollingFrameRef ~= nil
+	local v75 = t1.scrollingFrameRef ~= nil
 
 	return React.createElement("Frame", {
 		[React.Tag] = t1.layoutTag,
-		Size = UDim2.new(1, 0, not v72 and 1 or 0, 0),
-		AutomaticSize = if not v72 then nil else Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, not v75 and 1 or 0, 0),
+		AutomaticSize = if not v75 then nil else Enum.AutomaticSize.Y,
 		BorderSizePixel = 0,
 		BackgroundTransparency = not t1.backgroundStyle and 0 or t1.backgroundStyle.Transparency,
-		BackgroundColor3 = if not t1.backgroundStyle then v48.Color.Surface.Surface_0.Color3 else t1.backgroundStyle.Color3,
-		ref = v64,
+		BackgroundColor3 = if not t1.backgroundStyle then v50.Color.Surface.Surface_0.Color3 else t1.backgroundStyle.Color3,
+		ref = v67,
 		ClipsDescendants = not FFlagSduiExperienceDetailsSupport or (t1.clipsDescendantsOverride == nil or t1.clipsDescendantsOverride)
 	}, {
 		UIListLayout = React.createElement("UIListLayout", {
@@ -205,27 +212,27 @@ local function SduiPageEntryPoint(t1: {[any]: any}, p1) -- line: 135
 		PageTopPadding = if not FFlagSduiChartsSupport or (not t1.pageTopPadding or not (t1.pageTopPadding > 0)) then nil else React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, t1.pageTopPadding)
 		}),
-		PageHeader = if not v70 then if not t1.includeNavigationHeaderBar then nil else React.createElement(SduiPageNavigationHeader, {
+		PageHeader = if not v73 then if not t1.includeNavigationHeaderBar then nil else React.createElement(SduiPageNavigationHeader, {
 			layoutOrder = 1,
-			title = v53,
+			title = v55,
 			contentTag = t1.headerContentTag or CompositionTags.ContentRegion.Header,
 			renderUtilities = t1.renderUtilities,
 			navButtonType = t1.navButtonType or NavButtonType.back,
-			closeCallback = v61,
+			closeCallback = v64,
 			scrollAwayHeader = if not FFlagLuaAppSduiPageEntryScrollAway then nil else t1.scrollAwayHeader
 		}) else nil,
-		PageBody = if not v55 then if not v56 then React.createElement("Frame", {
+		PageBody = if not v57 then if not v58 then React.createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, not v72 and 1 or 0, 0),
-			AutomaticSize = if not v72 then nil else Enum.AutomaticSize.Y,
-			ref = v68
+			Size = UDim2.new(1, 0, not v75 and 1 or 0, 0),
+			AutomaticSize = if not v75 then nil else Enum.AutomaticSize.Y,
+			ref = v71
 		}, {
-			UIFlexItem = if not v72 then React.createElement("UIFlexItem", {
+			UIFlexItem = if not v75 then React.createElement("UIFlexItem", {
 				FlexMode = Enum.UIFlexMode.Fill
 			}) else nil,
-			Content = if not v70 then v71 else nil
+			Content = if not v73 then if not FFlagSduiPageEntryPointResolvedSlot or not t1.resolvedSlot then v74 else t1.resolvedSlot else nil
 		}) else if not t1.errorSlot then React.createElement(SduiPageErrorState, {
 			refresh = t1.refresh
 		}) else t1.errorSlot else if not t1.loadingSlot then React.createElement(Foundation.View, {
@@ -234,19 +241,19 @@ local function SduiPageEntryPoint(t1: {[any]: any}, p1) -- line: 135
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5)
 		})) else t1.loadingSlot,
-		SnackbarPortal = if not v65 or not v65.snackbarConfig then nil else ReactRoblox.createPortal({
+		SnackbarPortal = if not v68 or not v68.snackbarConfig then nil else ReactRoblox.createPortal({
 			SduiSnackbarScreenGui = React.createElement("ScreenGui", {
 				IgnoreGuiInset = true,
 				DisplayOrder = t1.snackbarPortalLayoutOrder,
 				ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 			}, {
 				Snackbar = React.createElement(Snackbar, {
-					title = v65.snackbarConfig.title,
-					icon = v65.snackbarConfig.icon,
-					Position = UDim2.new(0.5, 0, 1, -v48.Padding.XLarge),
+					title = v68.snackbarConfig.title,
+					icon = v68.snackbarConfig.icon,
+					Position = UDim2.new(0.5, 0, 1, -v50.Padding.XLarge),
 					AnchorPoint = Vector2.new(0.5, 1),
 					AutomaticSize = Enum.AutomaticSize.XY,
-					onClose = v65.onDismiss
+					onClose = v68.onDismiss
 				})
 			})
 		}, CoreGui)

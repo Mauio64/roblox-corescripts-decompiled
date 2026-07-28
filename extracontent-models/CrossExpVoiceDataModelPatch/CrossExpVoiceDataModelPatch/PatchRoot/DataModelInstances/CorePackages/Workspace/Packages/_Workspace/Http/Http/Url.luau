@@ -62,24 +62,25 @@ local v40 = string.format("https://contacts.%s", v7)
 local v41 = string.format("https://search.%s", v7)
 local v42 = string.format("https://static.%s", v7)
 local v43 = string.format("https://gamesearchuitreatments.api.%s", v7)
-local v44 = string.format("https://economycreatorstats.%s", v7)
-local v45 = string.format("https://usermoderation.%s", v7)
-local v46 = string.gsub(v5, "http://", "https://")
-local v47 = string.format("https://voice.%s", v7)
-local v48 = string.format("https://translations.%s", v7)
-local v49 = string.format("https://twostepverification.%s", v7)
-local v50 = string.format("https://privatemessages.%sv1", v7)
-local v51 = v42
+local v44 = string.format("https://gameinternationalization.%s", v7)
+local v45 = string.format("https://economycreatorstats.%s", v7)
+local v46 = string.format("https://usermoderation.%s", v7)
+local v47 = string.gsub(v5, "http://", "https://")
+local v48 = string.format("https://voice.%s", v7)
+local v49 = string.format("https://translations.%s", v7)
+local v50 = string.format("https://twostepverification.%s", v7)
+local v51 = string.format("https://privatemessages.%sv1", v7)
+local v52 = v42
 
 if v7 == "roblox.com/" then
-	v51 = string.gsub(v51, v7, "rbxcdn.com/")
+	v52 = string.gsub(v52, v7, "rbxcdn.com/")
 end
 
 local t2 = {
 	DOMAIN = v7,
 	PREFIX = v6,
-	BASE_URL = v46,
-	BASE_URL_SECURE = v46,
+	BASE_URL = v47,
+	BASE_URL_SECURE = v47,
 	API_URL = v8,
 	APIS_URL = v9,
 	AUTH_URL = v10,
@@ -103,6 +104,7 @@ local t2 = {
 	AD_CONFIGURATION_URL = v28,
 	SEARCH_URL = v41,
 	GAME_SEARCH_UI_TREATMENTS = v43,
+	GAME_INTERNATIONALIZATION_URL = v44,
 	FOLLOWINGS_URL = v29,
 	ECONOMY_URL = v30,
 	THUMBNAILS_URL = v31,
@@ -116,32 +118,32 @@ local t2 = {
 	DISCUSSIONS_URL = v39,
 	CONTACTS_URL = v40,
 	STATIC_URL = v42,
-	STATIC_CDN_URL = v51,
+	STATIC_CDN_URL = v52,
 	BLOG_URL = "https://blog.roblox.com/",
 	CORP_URL = "https://corp.roblox.com/",
 	STORE_URL = "https://www.amazon.com/roblox",
-	ECNOMY_CREATOR_STATS = v44,
-	USER_MODERATION_URL = v45,
-	VOICE_URL = v47,
-	TRANSLATIONS_URL = v48,
-	TWOSTEPVERIFICATION_URL = v49,
-	PRIVATEMESSAGES_URL = v50,
-	getUserProfileUrl = function(p5, p6) -- line: 153
+	ECNOMY_CREATOR_STATS = v45,
+	USER_MODERATION_URL = v46,
+	VOICE_URL = v48,
+	TRANSLATIONS_URL = v49,
+	TWOSTEPVERIFICATION_URL = v50,
+	PRIVATEMESSAGES_URL = v51,
+	getUserProfileUrl = function(p5, p6) -- line: 155
 		return string.format("%susers/%s/profile", p5.BASE_URL, p6)
 	end,
-	getUserFriendsUrl = function(p7, p8) -- line: 157
+	getUserFriendsUrl = function(p7, p8) -- line: 159
 		return string.format("%susers/%s/friends", p7.BASE_URL, p8)
 	end,
-	getUserInventoryUrl = function(p9, p10) -- line: 161
+	getUserInventoryUrl = function(p9, p10) -- line: 163
 		return string.format("%susers/%s/inventory", p9.BASE_URL, p10)
 	end,
-	getPlaceDefaultThumbnailUrl = function(p11, p12, p13, p14) -- line: 165
+	getPlaceDefaultThumbnailUrl = function(p11, p12, p13, p14) -- line: 167
 		return string.format("%sThumbs/Asset.ashx?width=%d&height=%d&assetId=%s&ignorePlaceMediaItems=true", p11.BASE_URL, p13, p14, (tostring(p12)))
 	end,
-	isVanitySite = function(p15) -- line: 175
+	isVanitySite = function(p15) -- line: 177
 		return p15.PREFIX ~= "www"
 	end,
-	makeQueryString = function(_, p17) -- line: 180
+	makeQueryString = function(_, p17) -- line: 182
 		local t1 = {}
 
 		for k, v in pairs(p17) do
@@ -158,7 +160,7 @@ local t2 = {
 
 		return table.concat(t1, "&")
 	end,
-	stripHttpsAndTrailingSlash = function(s1: string) -- line: 203
+	stripHttpsAndTrailingSlash = function(s1: string) -- line: 205
 		return (string.gsub(string.gsub(s1, "^https://", ""), "/*$", ""))
 	end
 }

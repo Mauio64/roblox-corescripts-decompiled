@@ -123,15 +123,20 @@ local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: 
 		-- upvalues: getAssetUserAuthStore (copy)
 		return getAssetUserAuthStore().pollUntilDone(p3)
 	end):andThen(function(p4) -- line: 138
-		-- upvalues: debug (copy)
-		local v47 = p4.response or p4
+		-- upvalues: Promise (copy), debug (copy)
+		if typeof(p4) == "table" and p4.status == "timed_out" then
+			return Promise.reject("Operation did not complete in time")
+		end
+
+		local v47 = if p4.status ~= "done" then p4 else p4.operation
+		local v48 = v47.response or v47
 
 		debug.log("info", "create_image_asset succeeded", {
-			assetId = v47.assetId
+			assetId = v48.assetId
 		})
 
 		return {
-			assetId = v47.assetId
+			assetId = v48.assetId
 		}
 	end)
 end

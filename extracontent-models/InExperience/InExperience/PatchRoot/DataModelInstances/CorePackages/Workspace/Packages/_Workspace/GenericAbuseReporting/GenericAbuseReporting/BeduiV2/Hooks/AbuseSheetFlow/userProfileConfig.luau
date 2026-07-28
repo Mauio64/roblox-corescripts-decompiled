@@ -1,6 +1,4 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local FFlagRemoveHardcodedStringsInReportNodes = require(Parent.SharedFlags).FFlagRemoveHardcodedStringsInReportNodes
-local t1 = {
+return {
 	name = "user_profile",
 	version = 2,
 	attributes = {
@@ -220,6 +218,12 @@ local t1 = {
 			nextButtonText = {
 				["$translate"] = "Action.Continue"
 			},
+			errorText = {
+				["$translate"] = "Description.GeneralError"
+			},
+			retryButtonText = {
+				["$translate"] = "Action.Retry"
+			},
 			next = {
 				["$switch"] = {
 					{
@@ -254,6 +258,12 @@ local t1 = {
 			},
 			nextButtonText = {
 				["$translate"] = "Action.Continue"
+			},
+			errorText = {
+				["$translate"] = "Description.GeneralError"
+			},
+			retryButtonText = {
+				["$translate"] = "Action.Retry"
 			}
 		},
 		voiceEducation = {
@@ -369,6 +379,8 @@ local t1 = {
 	},
 	translations = {
 		["Action.Close"] = "Close",
+		["Action.Retry"] = "Retry",
+		["Description.GeneralError"] = "Something went wrong. Please try again later.",
 		["Label.WhatPartOfTheirProfile"] = "What part of their profile?",
 		["Label.WhatWasTheIssue"] = "What was the issue?",
 		["Label.UsernameDisplayNameDescription"] = "Username, display name, description",
@@ -430,22 +442,3 @@ local t1 = {
 		["Title.ReportAPerson"] = "Report a person"
 	}
 }
-
-if FFlagRemoveHardcodedStringsInReportNodes then
-	t1.nodes.root.errorText = {
-		["$translate"] = "Description.GeneralError"
-	}
-	t1.nodes.root.retryButtonText = {
-		["$translate"] = "Action.Retry"
-	}
-	t1.nodes.abuseType.errorText = {
-		["$translate"] = "Description.GeneralError"
-	}
-	t1.nodes.abuseType.retryButtonText = {
-		["$translate"] = "Action.Retry"
-	}
-	t1.translations["Description.GeneralError"] = "Something went wrong. Please try again later."
-	t1.translations["Action.Retry"] = "Retry"
-end
-
-return t1

@@ -138,8 +138,7 @@ local function VersionHistoryBottomSheet(t2: {[any]: any}) -- line: 58
 			title = v22.versionLabel,
 			description = v22.description,
 			onRestore = v29,
-			onCancel = v28,
-			testId = `{ v19 }-restore-dialog`
+			onCancel = v28
 		})
 	})
 end

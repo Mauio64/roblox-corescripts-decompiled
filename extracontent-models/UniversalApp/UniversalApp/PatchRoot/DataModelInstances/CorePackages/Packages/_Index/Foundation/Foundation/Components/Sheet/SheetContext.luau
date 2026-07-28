@@ -23,6 +23,7 @@ return React.createContext({
 	testId = nil,
 	closeAffordanceRef = nil,
 	contentStartRef = nil,
+	isVerticalSheetGesture = nil,
 	setSheetHeightAvailable = function(_: number) -- line: 11
 		error("No SheetContext available")
 	end,

@@ -224,7 +224,8 @@ return {
 		isMakeupOrEyebrowEyelashAssetType = require(script.Utils.isMakeupOrEyebrowEyelashAssetType),
 		isLayeredClothingAssetType = require(script.Utils.isLayeredClothingAssetType),
 		isDurableItemExpired = require(script.Utils.isDurableItemExpired),
-		formatTimeoutEndTime = require(script.Utils.formatTimeoutEndTime)
+		formatTimeoutEndTime = require(script.Utils.formatTimeoutEndTime),
+		isOutfitNameValid = require(script.Utils.isOutfitNameValid)
 	},
 	Backgrounds = {
 		loadBackgroundAsset = require(script.Backgrounds.loadBackgroundAsset),

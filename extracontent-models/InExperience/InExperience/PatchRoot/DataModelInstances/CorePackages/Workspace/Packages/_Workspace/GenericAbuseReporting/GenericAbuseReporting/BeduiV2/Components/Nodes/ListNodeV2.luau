@@ -35,7 +35,7 @@ local useListLoader = require(GenericAbuseReporting.BeduiV2.Loaders.useLoader).u
 local TelemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useLayoutSlots = LayoutSlots.useLayoutSlots
-local FFlagAbuseReportVoiceSpeakingIcon = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportVoiceSpeakingIcon
+local FFlagAbuseReportInExpPlayerListV3 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3
 local t1 = {
 	chevron = nil,
 	radio = ListItemInputType.Radio,
@@ -117,7 +117,7 @@ local function ListNodeError(t3: {[any]: any}) -- line: 125
 	})
 end
 local function ListNode(t4: {[any]: any}) -- line: 166
-	-- upvalues: useTokens (copy), React (copy), useArTranslation (copy), useAbuseReportAnalytics (copy), useListLoader (copy), useLayoutSlots (copy), ReactFocusNavigation (copy), FocusBehaviors (copy), scrollToItem (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), Dash (copy), ListNodeLoading (copy), ListNodeError (copy), Empty (copy), Eyebrow (copy), View (copy), List (copy), IconName (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), t1 (copy), Footer (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
+	-- upvalues: useTokens (copy), React (copy), useArTranslation (copy), useAbuseReportAnalytics (copy), useListLoader (copy), useLayoutSlots (copy), ReactFocusNavigation (copy), FocusBehaviors (copy), scrollToItem (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), Dash (copy), ListNodeLoading (copy), ListNodeError (copy), Empty (copy), Eyebrow (copy), View (copy), List (copy), FFlagAbuseReportInExpPlayerListV3 (copy), IconName (copy), t1 (copy), Footer (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
 	local v44 = useTokens()
 	local v45, v46 = React.useState(t4.initialValue or nil)
 	local translateIntoString = useArTranslation().translateIntoString
@@ -178,9 +178,9 @@ local function ListNode(t4: {[any]: any}) -- line: 166
 
 		local function checkScrollbar() -- line: 219
 			-- upvalues: ScrollingFrame (copy), v51 (copy)
-			local v92 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
+			local v93 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
 
-			v51(v92)
+			v51(v93)
 		end
 		local function onScroll() -- line: 224
 			-- upvalues: ScrollingFrame (copy), v53 (copy)
@@ -364,17 +364,19 @@ local function ListNode(t4: {[any]: any}) -- line: 166
 					hasMargin = true
 				}
 			}, { Dash.map(data, function(p4, n3: number) -- line: 387
-				-- upvalues: React (copy), List (copy), IconName (copy), translateIntoString (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), t4 (copy), v68 (copy), v69 (copy), FFlagAbuseReportSelectItemAddId (copy), v70 (copy), t1 (copy), v67 (copy), v45 (copy), v65 (copy), v64 (copy)
+				-- upvalues: FFlagAbuseReportInExpPlayerListV3 (copy), t4 (copy), React (copy), List (copy), IconName (copy), translateIntoString (copy), v68 (copy), v69 (copy), FFlagAbuseReportSelectItemAddId (copy), v70 (copy), t1 (copy), v67 (copy), v45 (copy), v65 (copy), v64 (copy)
+				local v92 = if not FFlagAbuseReportInExpPlayerListV3 or not t4.renderTrailingAccessory then nil else t4.renderTrailingAccessory(p4)
+
 				return React.createElement(List.Item, {
 					leading = if type(p4.leading) ~= "string" then p4.leading else IconName[p4.leading],
 					title = translateIntoString(p4.label),
 					description = if not p4.description then nil else translateIntoString(p4.description),
-					trailing = if not FFlagAbuseReportVoiceSpeakingIcon or not t4.renderTrailingAccessory then nil else t4.renderTrailingAccessory(p4),
+					trailing = v92,
 					onActivated = {
-						onActivated = not v68 and function() -- line: 408
+						onActivated = not v68 and function() -- line: 410
 							-- upvalues: v70 (copy), p4 (copy)
 							v70(p4.id)
-						end or function() -- line: 399
+						end or function() -- line: 401
 							-- upvalues: v69 (copy), n3 (copy), FFlagAbuseReportSelectItemAddId (copy), p4 (copy), t4 (copy)
 							v69(n3, if not FFlagAbuseReportSelectItemAddId then nil else p4.id)
 
@@ -386,7 +388,7 @@ local function ListNode(t4: {[any]: any}) -- line: 166
 						isChecked = v45 == p4.id
 					},
 					LayoutOrder = n3,
-					ref = function(p5) -- line: 415
+					ref = function(p5) -- line: 417
 						-- upvalues: v65 (copy), p4 (copy), n3 (copy), v64 (copy)
 						v65.current[p4.id] = p5
 

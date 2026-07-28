@@ -7,6 +7,7 @@ local React = require(BuildExperienceParent.React)
 local SignalsReact = require(BuildExperienceParent.SignalsReact)
 local Time = require(BuildExperienceParent.Time)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local FFlagisPublishOnBuildRevert = require(BuildExperience.Flags.FFlagisPublishOnBuildRevert)
 local GetPlaytestLoadingStore = require(BuildExperience.Stores.GetPlaytestLoadingStore)
 local rollbackPlaceWithRetry = require(BuildExperience.utils.rollbackPlaceWithRetry)
 local VersionHistoryBottomSheet = require(script.Parent.VersionHistoryBottomSheet)
@@ -16,7 +17,7 @@ local DataStatus = DataHydration.DataStatus
 local DateHelper = Time.DateHelper
 local useLocalization = Localization.Hooks.useLocalization
 
-local function toNumber(p1) -- line: 35
+local function toNumber(p1) -- line: 36
 	if type(p1) == "number" then
 		return p1
 	end
@@ -27,48 +28,48 @@ local function toNumber(p1) -- line: 35
 
 	return nil
 end
-local function getVersionNumber(p2) -- line: 45
+local function getVersionNumber(p2) -- line: 46
 	local version = p2.version
 
 	return assert(if type(version) ~= "number" then if type(version) ~= "string" then nil else tonumber(version) else version, `Place version must be numeric: { p2.version }`)
 end
-local function getRequiredString(s1: string?, s2: string) -- line: 49
+local function getRequiredString(s1: string?, s2: string) -- line: 50
 	assert(type(s1) == "string" and s1 ~= "", `Place version { s2 } must not be empty`)
 
 	return s1
 end
-local function formatCreatedDate(s3: string?, t1: {[any]: any}) -- line: 54
+local function formatCreatedDate(s3: string?, t1: {[any]: any}) -- line: 55
 	-- upvalues: LocalizationStrings (copy)
 	assert(type(s3) == "string" and s3 ~= "", "Place version createdTime must not be empty")
 
-	local v33, v34, v35 = string.match(s3, "^(%d%d%d%d)%-(%d%d)%-(%d%d)")
-	local v36 = if not v34 then nil else tonumber(v34)
+	local v34, v35, v36 = string.match(s3, "^(%d%d%d%d)%-(%d%d)%-(%d%d)")
 	local v37 = if not v35 then nil else tonumber(v35)
+	local v38 = if not v36 then nil else tonumber(v36)
 
-	assert(v33 ~= nil and (v36 ~= nil and (v37 ~= nil and t1[v36] ~= nil)), `Place version createdTime must be an ISO date: { s3 }`)
+	assert(v34 ~= nil and (v37 ~= nil and (v38 ~= nil and t1[v37] ~= nil)), `Place version createdTime must be an ISO date: { s3 }`)
 
-	return LocalizationStrings.formatVersionHistoryCreatedDate(t1[v36], v37, v33)
+	return LocalizationStrings.formatVersionHistoryCreatedDate(t1[v37], v38, v34)
 end
-local function mapVersionToEntry(p3, t2: {[any]: any}) -- line: 67
+local function mapVersionToEntry(p3, t2: {[any]: any}) -- line: 68
 	-- upvalues: LocalizationStrings (copy), formatCreatedDate (copy), VersionHistoryUtils (copy)
 	local version = p3.version
-	local v41 = assert(if type(version) ~= "number" then if type(version) ~= "string" then nil else tonumber(version) else version, `Place version must be numeric: { p3.version }`)
-	local v42 = if p3.title == nil or p3.title == "" then LocalizationStrings.formatVersionHistoryVersionTitle(v41) else p3.title
-	local v43 = if p3.description == nil or p3.description == "" then LocalizationStrings.VERSION_HISTORY_FALLBACK_DESCRIPTION else p3.description
-	local v44 = formatCreatedDate(p3.createdTime, t2)
+	local v42 = assert(if type(version) ~= "number" then if type(version) ~= "string" then nil else tonumber(version) else version, `Place version must be numeric: { p3.version }`)
+	local v43 = if p3.title == nil or p3.title == "" then LocalizationStrings.formatVersionHistoryVersionTitle(v42) else p3.title
+	local v44 = if p3.description == nil or p3.description == "" then LocalizationStrings.VERSION_HISTORY_FALLBACK_DESCRIPTION else p3.description
+	local v45 = formatCreatedDate(p3.createdTime, t2)
 
 	return {
-		id = tostring(v41),
-		versionNumber = v41,
-		versionLabel = LocalizationStrings.formatVersionHistoryVersionLabel(v41, v44),
-		title = v42,
-		description = v43,
+		id = tostring(v42),
+		versionNumber = v42,
+		versionLabel = LocalizationStrings.formatVersionHistoryVersionLabel(v42, v45),
+		title = v43,
+		description = v44,
 		noteTitle = p3.title,
 		noteDescription = p3.description,
 		badgeText = VersionHistoryUtils.getBadgeText(p3)
 	}
 end
-local function mapHistoryToEntries(p4, t3: {[any]: any}) -- line: 89
+local function mapHistoryToEntries(p4, t3: {[any]: any}) -- line: 90
 	-- upvalues: mapVersionToEntry (copy)
 	if p4 == nil or p4.placeVersions == nil then
 		return {}
@@ -76,13 +77,13 @@ local function mapHistoryToEntries(p4, t3: {[any]: any}) -- line: 89
 
 	local t4 = {}
 
-	for _, v49 in p4.placeVersions do
-		table.insert(t4, (mapVersionToEntry(v49, t3)))
+	for _, v50 in p4.placeVersions do
+		table.insert(t4, (mapVersionToEntry(v50, t3)))
 	end
 
 	return t4
 end
-local function getStatusText(s4: string, t5: {[any]: any}, s5: string?) -- line: 104
+local function getStatusText(s4: string, t5: {[any]: any}, s5: string?) -- line: 105
 	-- upvalues: DataStatus (copy), LocalizationStrings (copy)
 	if s5 ~= nil then
 		return s5
@@ -102,78 +103,79 @@ local function getStatusText(s4: string, t5: {[any]: any}, s5: string?) -- line:
 
 	return nil
 end
-local function VersionHistoryContainer(t6: {[any]: any}) -- line: 118
-	-- upvalues: useLocalization (copy), DateHelper (copy), React (copy), PlaceVersionHistory (copy), SignalsReact (copy), useScrollToTopAfterRestore (copy), GetPlaytestLoadingStore (copy), mapHistoryToEntries (copy), DataStatus (copy), LocalizationStrings (copy), rollbackPlaceWithRetry (copy), VersionHistoryBottomSheet (copy)
-	local v54 = useLocalization(DateHelper.MonthsLocalizationKeys)
-	local v55 = React.useMemo(function() -- line: 120
+local function VersionHistoryContainer(t6: {[any]: any}) -- line: 119
+	-- upvalues: useLocalization (copy), DateHelper (copy), React (copy), PlaceVersionHistory (copy), SignalsReact (copy), useScrollToTopAfterRestore (copy), GetPlaytestLoadingStore (copy), mapHistoryToEntries (copy), DataStatus (copy), LocalizationStrings (copy), rollbackPlaceWithRetry (copy), FFlagisPublishOnBuildRevert (copy), VersionHistoryBottomSheet (copy)
+	local v55 = useLocalization(DateHelper.MonthsLocalizationKeys)
+	local v56 = React.useMemo(function() -- line: 121
 		-- upvalues: t6 (copy), PlaceVersionHistory (copy)
 		return t6.store or PlaceVersionHistory.getPlaceVersionHistoryStore()
 	end, { t6.store })
-	local v56 = React.useMemo(function() -- line: 123
-		-- upvalues: v55 (copy), t6 (copy)
-		return v55.getAndFetchHistory(t6.placeId)
+	local v57 = React.useMemo(function() -- line: 124
+		-- upvalues: v56 (copy), t6 (copy)
+		return v56.getAndFetchHistory(t6.placeId)
 	end, {
-		v55,
+		v56,
 		t6.placeId
 	})
-	local v57 = SignalsReact.useSignalState(v56.data)
-	local v58 = SignalsReact.useSignalState(v56.status)
-	local v59, v60 = React.useState(false)
-	local v61, v62 = React.useState(nil)
-	local v63 = useScrollToTopAfterRestore()
-	local v64 = React.useCallback(function(p5) -- line: 131
+	local v58 = SignalsReact.useSignalState(v57.data)
+	local v59 = SignalsReact.useSignalState(v57.status)
+	local v60, v61 = React.useState(false)
+	local v62, v63 = React.useState(nil)
+	local v64 = useScrollToTopAfterRestore()
+	local v65 = React.useCallback(function(p5) -- line: 132
 		-- upvalues: GetPlaytestLoadingStore (copy), t6 (copy)
 		return GetPlaytestLoadingStore(p5).getAgentStatusForPlaceId(t6.placeId)(p5) == "Loading"
 	end, { t6.placeId })
-	local v65 = SignalsReact.useSignalState(v64)
-	local v66 = React.useMemo(function() -- line: 136
-		-- upvalues: mapHistoryToEntries (copy), v57 (copy), v54 (copy)
-		return (mapHistoryToEntries(v57, v54))
+	local v66 = SignalsReact.useSignalState(v65)
+	local v67 = React.useMemo(function() -- line: 137
+		-- upvalues: mapHistoryToEntries (copy), v58 (copy), v55 (copy)
+		return (mapHistoryToEntries(v58, v55))
 	end, {
-		v57,
-		v54
+		v58,
+		v55
 	})
-	local v67 = if v61 == nil then if v58 ~= DataStatus.NotReady then if v58 ~= DataStatus.Failed then if #v66 ~= 0 then nil else LocalizationStrings.VERSION_HISTORY_EMPTY else LocalizationStrings.VERSION_HISTORY_LOAD_FAILED else LocalizationStrings.VERSION_HISTORY_LOADING else v61
-	local v68 = React.useCallback(function(p6) -- line: 141
-		-- upvalues: v59 (copy), v65 (copy), v60 (copy), v62 (copy), rollbackPlaceWithRetry (copy), t6 (copy), v63 (copy), LocalizationStrings (copy)
-		if v59 or v65 then
+	local v68 = if v62 == nil then if v59 ~= DataStatus.NotReady then if v59 ~= DataStatus.Failed then if #v67 ~= 0 then nil else LocalizationStrings.VERSION_HISTORY_EMPTY else LocalizationStrings.VERSION_HISTORY_LOAD_FAILED else LocalizationStrings.VERSION_HISTORY_LOADING else v62
+	local v69 = React.useCallback(function(p6) -- line: 142
+		-- upvalues: v60 (copy), v66 (copy), v61 (copy), v63 (copy), rollbackPlaceWithRetry (copy), t6 (copy), FFlagisPublishOnBuildRevert (copy), v64 (copy), LocalizationStrings (copy)
+		if v60 or v66 then
 			return
 		end
 
-		v60(true)
-		v62(nil)
+		v61(true)
+		v63(nil)
 		rollbackPlaceWithRetry(t6.placeId, p6.versionNumber, {
 			debugSource = "version_history restore",
 			note = {
 				title = p6.noteTitle,
 				description = p6.noteDescription
-			}
-		}):andThen(function() -- line: 155
-			-- upvalues: v63 (copy)
-			v63.scrollToTopAfterRestore()
-		end):catch(function(_) -- line: 158
-			-- upvalues: v62 (copy), LocalizationStrings (copy)
-			v62(LocalizationStrings.VERSION_HISTORY_RESTORE_FAILED)
-		end):finally(function() -- line: 161
-			-- upvalues: v60 (copy)
-			v60(false)
+			},
+			published = FFlagisPublishOnBuildRevert
+		}):andThen(function() -- line: 157
+			-- upvalues: v64 (copy)
+			v64.scrollToTopAfterRestore()
+		end):catch(function(_) -- line: 160
+			-- upvalues: v63 (copy), LocalizationStrings (copy)
+			v63(LocalizationStrings.VERSION_HISTORY_RESTORE_FAILED)
+		end):finally(function() -- line: 163
+			-- upvalues: v61 (copy)
+			v61(false)
 		end)
 	end, {
-		v59,
-		v65,
-		v63,
-		v55,
+		v60,
+		v66,
+		v64,
+		v56,
 		t6.placeId
 	})
 
 	return React.createElement(VersionHistoryBottomSheet, {
 		isOpen = t6.isOpen,
-		entries = v66,
-		statusText = v67,
-		isRestoreDisabled = v59 or v65,
+		entries = v67,
+		statusText = v68,
+		isRestoreDisabled = v60 or v66,
 		onClose = t6.onClose,
-		onRestore = v68,
-		scrollingFrameRef = v63.scrollingFrameRef,
+		onRestore = v69,
+		scrollingFrameRef = v64.scrollingFrameRef,
 		testId = t6.testId
 	})
 end

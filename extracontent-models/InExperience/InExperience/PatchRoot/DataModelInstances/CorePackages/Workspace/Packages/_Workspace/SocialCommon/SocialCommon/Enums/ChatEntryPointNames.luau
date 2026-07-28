@@ -13,5 +13,6 @@ return {
 	ToastUniversalApp = "ToastUniversalApp",
 	PartyNotificationPush = "PartyNotificationPush",
 	ChatDetailsParticipantDialog = "ChatDetailsParticipantDialog",
+	SchoolMemberList = "SchoolMemberList",
 	Unknown = "Unknown"
 }

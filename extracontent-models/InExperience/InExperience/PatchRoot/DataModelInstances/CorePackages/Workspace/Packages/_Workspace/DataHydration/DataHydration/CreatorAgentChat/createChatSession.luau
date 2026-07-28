@@ -200,14 +200,18 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 	local v36 = historyPolling.createHistoryPolling({
 		deps = p1,
 		rpcTimeoutSeconds = v22,
-		getNextHistoryPageToken = function() -- line: 194
+		getCasSessionId = function() -- line: 194
+			-- upvalues: v20 (copy)
+			return v20.getCasSessionId(false)
+		end,
+		getNextHistoryPageToken = function() -- line: 197
 			-- upvalues: v20 (copy)
 			return v20.getNextHistoryPageToken(false)
 		end,
 		mergeHistoryPage = mergeHistoryPage
 	})
 
-	local function ensureInitialized() -- line: 200
+	local function ensureInitialized() -- line: 203
 		-- upvalues: v20 (copy), p1 (copy), AcpProtocol (copy), historyPageUtils (copy), v22 (copy)
 		if v20.getInitialized(false) then
 			return true, nil
@@ -229,7 +233,7 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 
 	local v38 = sendPrompt.createSendPrompt({
 		ensureInitialized = ensureInitialized,
-		ensureCasSession = function() -- line: 213
+		ensureCasSession = function() -- line: 216
 			-- upvalues: v20 (copy), n1 (copy), n2 (copy), ensureInitialized (copy), p1 (copy), experimentOverride (copy), historyPageUtils (copy), v22 (copy), setCasSessionIdInternal (copy)
 			local v60 = v20.getCasSessionId(false)
 
@@ -281,7 +285,7 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 
 			return v66, nil
 		end,
-		getLatestObservedHistorySequenceId = function() -- line: 245
+		getLatestObservedHistorySequenceId = function() -- line: 248
 			-- upvalues: v20 (copy)
 			return v20.getLatestObservedHistorySequenceId(false)
 		end,
@@ -294,13 +298,13 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 			end
 		end,
 		startPollingTurnFromHistory = v36.startPollingTurnFromHistory,
-		getAssistantTurnSequence = function() -- line: 250
+		getAssistantTurnSequence = function() -- line: 253
 			-- upvalues: v20 (copy)
 			return v20.getAssistantTurnSequence(false)
 		end,
 		incrementAssistantTurnSequence = v20.incrementAssistantTurnSequence,
 		sessionPrompt = p1.sessionPrompt,
-		setActiveStop = function(p3: ((...any) -> ...any)?) -- line: 255
+		setActiveStop = function(p3: ((...any) -> ...any)?) -- line: 258
 			-- upvalues: u21 (ref)
 			u21 = p3
 		end
@@ -309,17 +313,17 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 	return {
 		universeId = n1,
 		placeId = n2,
-		getCasSessionId = function() -- line: 296
+		getCasSessionId = function() -- line: 299
 			-- upvalues: v20 (copy)
 			return v20.getCasSessionId(false)
 		end,
 		setCasSessionId = setCasSessionIdInternal,
-		hasLoadedHistory = function() -- line: 300
+		hasLoadedHistory = function() -- line: 303
 			-- upvalues: v20 (copy)
 			return v20.getHasLoadedHistory(false)
 		end,
 		markHistoryLoaded = v20.markHistoryLoaded,
-		getNextHistoryPageToken = function() -- line: 304
+		getNextHistoryPageToken = function() -- line: 307
 			-- upvalues: v20 (copy)
 			return v20.getNextHistoryPageToken(false)
 		end,
@@ -335,13 +339,13 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 		refreshSession = v35.refreshSession,
 		loadOlderHistory = v35.loadOlderHistory,
 		sendPrompt = v38.sendPrompt,
-		stopActiveTurn = function() -- line: 287
+		stopActiveTurn = function() -- line: 290
 			-- upvalues: u21 (ref)
 			if u21 ~= nil then
 				u21()
 			end
 		end,
-		submitActiveToolResult = function(t7: {[any]: any}, b1: boolean?, n5: number?, s5: string?) -- line: 268
+		submitActiveToolResult = function(t7: {[any]: any}, b1: boolean?, n5: number?, s5: string?) -- line: 271
 			-- upvalues: v20 (copy), p1 (copy)
 			local v73 = v20.getCasSessionId(false)
 
@@ -357,7 +361,7 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 				isError = b1 ~= nil and b1
 			})
 		end,
-		getActiveTurnHandle = function() -- line: 260
+		getActiveTurnHandle = function() -- line: 263
 			-- upvalues: v20 (copy), p1 (copy)
 			local v68 = v20.getCasSessionId(false)
 
@@ -367,12 +371,12 @@ local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- l
 
 			return p1.getActiveTurnHandle(v68)
 		end,
-		startPollingActiveTurn = function(p5) -- line: 316
+		startPollingActiveTurn = function(p5) -- line: 319
 			-- upvalues: v20 (copy), v36 (copy)
 			local v75 = v20.getCasSessionId(false)
 
 			if v75 == nil then
-				return function() -- line: 319
+				return function() -- line: 322
 				end
 			end
 

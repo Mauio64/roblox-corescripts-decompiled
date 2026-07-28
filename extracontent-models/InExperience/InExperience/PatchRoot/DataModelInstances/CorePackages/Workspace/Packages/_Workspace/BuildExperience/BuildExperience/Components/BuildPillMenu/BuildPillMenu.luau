@@ -12,15 +12,21 @@ require(BuildExperience.Stores.GetBuildOverflowMenuStore.createBuildOverflowMenu
 
 local PublishStatus = require(BuildExperience.Chat.PublishStatus)
 
-local function BuildPillMenu(t1: {[any]: any}) -- line: 41
+local function BuildPillMenu(t1: {[any]: any}) -- line: 46
 	-- upvalues: GetBuildOverflowMenuStore (copy), PublishStatus (copy), React (copy), View (copy), AgentDetailMenu (copy), BuildOverflowMenuButton (copy), IconName (copy)
 	local v13 = t1.store or GetBuildOverflowMenuStore()
 	local v14 = PublishStatus.usePublishStatus(t1.target)
-	local v15 = React.useCallback(function(p1) -- line: 45
+	local v15 = React.useCallback(function(p1) -- line: 50
 		-- upvalues: t1 (copy)
 		if p1.type == "openPage" then
 			if t1.onOpenPage then
 				t1.onOpenPage(p1.page)
+
+				return
+			end
+		elseif p1.type == "openInvitePicker" then
+			if t1.onOpenInvitePicker then
+				t1.onOpenInvitePicker()
 
 				return
 			end
@@ -29,9 +35,10 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 41
 		end
 	end, {
 		t1.onAction,
-		t1.onOpenPage
+		t1.onOpenPage,
+		t1.onOpenInvitePicker
 	})
-	local v16 = React.useCallback(function() -- line: 55
+	local v16 = React.useCallback(function() -- line: 64
 		-- upvalues: t1 (copy)
 		if t1.onOpenAgentsPage then
 			t1.onOpenAgentsPage()
@@ -57,7 +64,8 @@ local function BuildPillMenu(t1: {[any]: any}) -- line: 41
 				target = t1.target,
 				hasPublishedTurn = v14.hasPublishedTurn,
 				hasPublishedVersion = v14.hasPublishedVersion,
-				onAction = v15
+				onAction = v15,
+				onOpenCreatorCreditPage = t1.onOpenCreatorCreditPage
 			})
 		})
 	})

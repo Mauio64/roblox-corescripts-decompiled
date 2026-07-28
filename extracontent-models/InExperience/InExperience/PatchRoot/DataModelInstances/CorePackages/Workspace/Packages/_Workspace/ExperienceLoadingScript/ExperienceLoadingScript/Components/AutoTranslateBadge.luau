@@ -11,7 +11,7 @@ local IconPosition = Foundation.Enums.IconPosition
 local useLocalization = require(ExperienceLoadingScriptParent.Localization).Hooks.useLocalization
 local SignalsReact = require(ExperienceLoadingScriptParent.SignalsReact)
 local getLoadingScreenStore = require(ExperienceLoadingScript.Store.getLoadingScreenStore)
-local LoadingScreenTelemetry = require(ExperienceLoadingScript.LoadingScreenTelemetry)
+local LoadingScreenTelemetry = require(ExperienceLoadingScriptParent.ProgressLoading.LoadingScreenTelemetry)
 
 local function AutoTranslateBadge(t1: {[any]: any}) -- line: 27
 	-- upvalues: useLocalization (copy), React (copy), getLoadingScreenStore (copy), SignalsReact (copy), LoadingScreenTelemetry (copy), View (copy), Badge (copy), BadgeVariant (copy), IconName (copy), IconSize (copy), IconPosition (copy)

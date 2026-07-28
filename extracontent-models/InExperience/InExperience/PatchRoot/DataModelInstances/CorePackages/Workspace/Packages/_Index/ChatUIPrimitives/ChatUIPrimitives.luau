@@ -19,7 +19,8 @@ return {
 		useFinishChatWindowMessageRenderIntervals = require(script.Hooks.useFinishChatWindowMessageRenderIntervals)
 	},
 	Telemetry = {
-		ExpChatPerfTracker = require(script.Telemetry.ExpChatPerfTracker)
+		ExpChatPerfTracker = require(script.Telemetry.ExpChatPerfTracker),
+		TextChannelWindowPerfTracker = require(script.Telemetry.TextChannelWindowPerfTracker)
 	},
 	Flags = {
 		FFlagExpChatScrollPerfTracking = require(script.Flags.FFlagExpChatScrollPerfTracking),

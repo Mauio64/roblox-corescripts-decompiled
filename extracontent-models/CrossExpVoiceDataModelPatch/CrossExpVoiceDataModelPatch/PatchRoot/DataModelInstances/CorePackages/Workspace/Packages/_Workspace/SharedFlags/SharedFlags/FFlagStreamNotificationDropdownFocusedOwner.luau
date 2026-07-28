@@ -1,0 +1,4 @@
+local FFlagAppChatRemoveNotifications = require(script.Parent.FFlagAppChatRemoveNotifications)
+local FFlagStreamNotificationDropdownSingleOwner = require(script.Parent.FFlagStreamNotificationDropdownSingleOwner)
+
+return game:DefineFastFlag("StreamNotificationDropdownFocusedOwner", false) and (FFlagAppChatRemoveNotifications and FFlagStreamNotificationDropdownSingleOwner)

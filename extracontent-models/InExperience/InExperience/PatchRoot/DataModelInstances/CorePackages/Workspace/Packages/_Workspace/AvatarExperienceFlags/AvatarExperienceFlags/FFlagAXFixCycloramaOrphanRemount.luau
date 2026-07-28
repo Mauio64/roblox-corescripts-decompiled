@@ -1,0 +1,3 @@
+local FFlagAXBackgroundCycloramaRendering = require(script.Parent.FFlagAXBackgroundCycloramaRendering)
+
+return game:DefineFastFlag("AXFixCycloramaOrphanRemount", false) and FFlagAXBackgroundCycloramaRendering

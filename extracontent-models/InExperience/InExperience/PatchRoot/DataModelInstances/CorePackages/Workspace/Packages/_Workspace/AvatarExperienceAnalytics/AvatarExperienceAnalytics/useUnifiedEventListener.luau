@@ -5,6 +5,7 @@ local React = require(AvatarExperienceAnalyticsParent.React)
 local Cryo = require(AvatarExperienceAnalyticsParent.Cryo)
 local sendUnifiedEventLogForInstance = require(script.Parent.sendUnifiedEventLogForInstance)
 local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
+local resolveClickSurface = require(script.Parent.resolveClickSurface)
 local UnifiedEventLoggingUtils = require(AvatarExperienceAnalytics.Utils.UnifiedEventLoggingUtils)
 local UnifiedSelectionListStore = require(AvatarExperienceAnalytics.Store.UnifiedSelectionListStore)
 local CartIdService = require(AvatarExperienceAnalytics.Lib.CartIdService)
@@ -14,27 +15,30 @@ local selectSearchKeyword = AvatarExperienceCommon.State.Selectors.selectSearchK
 local AvatarExperienceNavigation = require(AvatarExperienceAnalyticsParent.AvatarExperienceNavigation)
 local useAvatarRoute = AvatarExperienceNavigation.AvatarRoute.Hooks.useAvatarRoute
 local AvatarScreenProperties = AvatarExperienceNavigation.AvatarRoute.AvatarScreenProperties
-local FFlagAXMISEnableMultiShoppingUnifiedEvents = require(AvatarExperienceAnalyticsParent.AvatarExperienceFlags).FFlagAXMISEnableMultiShoppingUnifiedEvents
+local UnifiedLoggingSurface = AvatarExperienceNavigation.Enums.UnifiedLoggingSurface
+local AvatarExperienceFlags = require(AvatarExperienceAnalyticsParent.AvatarExperienceFlags)
+local FFlagAXMISEnableMultiShoppingUnifiedEvents = AvatarExperienceFlags.FFlagAXMISEnableMultiShoppingUnifiedEvents
+local FFlagAXUnifiedImpressionsOnThumbnail = AvatarExperienceFlags.FFlagAXUnifiedImpressionsOnThumbnail
 
-local function markLastActivated(p1) -- line: 22
+local function markLastActivated(p1) -- line: 25
 	-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy)
-	for _, v24 in (CollectionService:GetTagged(UnifiedEventLogConstants.LAST_ACTIVATED_TAG_NAME)) do
-		CollectionService:RemoveTag(v24, UnifiedEventLogConstants.LAST_ACTIVATED_TAG_NAME)
+	for _, v28 in (CollectionService:GetTagged(UnifiedEventLogConstants.LAST_ACTIVATED_TAG_NAME)) do
+		CollectionService:RemoveTag(v28, UnifiedEventLogConstants.LAST_ACTIVATED_TAG_NAME)
 	end
 
 	CollectionService:AddTag(p1, UnifiedEventLogConstants.LAST_ACTIVATED_TAG_NAME)
 end
-local function markSelectionListStatus(p2, b1: boolean) -- line: 33
+local function markSelectionListStatus(p2, b1: boolean) -- line: 36
 	-- upvalues: FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), UnifiedEventLoggingUtils (copy), UnifiedEventLogConstants (copy), UnifiedSelectionListStore (copy)
 	local Attributes = p2:GetAttributes()
 
 	if FFlagAXMISEnableMultiShoppingUnifiedEvents then
-		for v28, v29 in UnifiedEventLoggingUtils.getScreenSize(p2) do
-			Attributes[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. v28] = v29
+		for v32, v33 in UnifiedEventLoggingUtils.getScreenSize(p2) do
+			Attributes[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. v32] = v33
 		end
 
-		for v30, v31 in UnifiedEventLoggingUtils.getElementSizeAndPosition(p2) do
-			Attributes[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. v30] = v31
+		for v34, v35 in UnifiedEventLoggingUtils.getElementSizeAndPosition(p2) do
+			Attributes[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. v34] = v35
 		end
 	end
 
@@ -46,7 +50,7 @@ local function markSelectionListStatus(p2, b1: boolean) -- line: 33
 
 	UnifiedSelectionListStore.addToSelectionList(Attributes)
 end
-local function getChildButton(p3) -- line: 58
+local function getChildButton(p3) -- line: 61
 	if not p3 then
 		return nil
 	end
@@ -63,39 +67,39 @@ local function getChildButton(p3) -- line: 58
 
 	return nil
 end
-local function AnalyticsMetadataSelector(t1: {[any]: any}) -- line: 76
+local function AnalyticsMetadataSelector(t1: {[any]: any}) -- line: 79
 	return t1.AvatarExperience.AnalyticsMetadata
 end
 
 return {
-	useUnifiedEventListener = function() -- line: 161
-		-- upvalues: useSelectorSignal (copy), AnalyticsMetadataSelector (copy), selectSearchKeyword (copy), useAvatarRoute (copy), React (copy), CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), Cryo (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
-		local v38 = useSelectorSignal(AnalyticsMetadataSelector)
-		local v39 = useSelectorSignal(selectSearchKeyword)
-		local v40 = useAvatarRoute()
-		local v41 = React.useRef(v40)
+	useUnifiedEventListener = function() -- line: 182
+		-- upvalues: useSelectorSignal (copy), AnalyticsMetadataSelector (copy), selectSearchKeyword (copy), useAvatarRoute (copy), React (copy), CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
+		local v42 = useSelectorSignal(AnalyticsMetadataSelector)
+		local v43 = useSelectorSignal(selectSearchKeyword)
+		local v44 = useAvatarRoute()
+		local v45 = React.useRef(v44)
 
-		React.useEffect(function() -- line: 167
-			-- upvalues: v41 (copy), v40 (copy)
-			v41.current = v40
-		end, { v40 })
+		React.useEffect(function() -- line: 188
+			-- upvalues: v45 (copy), v44 (copy)
+			v45.current = v44
+		end, { v44 })
 
 		local t2 = {
-			getAnalyticsMetadata = v38,
-			getSearchKeyword = v39
+			getAnalyticsMetadata = v42,
+			getSearchKeyword = v43
 		}
 
-		React.useEffect(function() -- line: 81
-			-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), t2 (copy), Cryo (copy), v41 (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
+		React.useEffect(function() -- line: 84
+			-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), t2 (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), v45 (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
 			local t3 = {}
 
-			t3.instanceAdded = CollectionService:GetInstanceAddedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p4) -- line: 89
-				-- upvalues: getChildButton (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), t2 (copy), Cryo (copy), v41 (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy), t3 (ref)
-				local v55 = getChildButton(p4)
+			t3.instanceAdded = CollectionService:GetInstanceAddedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p4) -- line: 92
+				-- upvalues: getChildButton (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), t2 (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), v45 (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy), t3 (ref)
+				local v59 = getChildButton(p4)
 
-				if v55 then
-					t3[p4] = v55.Activated:Connect(function() -- line: 92
-						-- upvalues: p4 (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), t2 (copy), Cryo (copy), v41 (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
+				if v59 then
+					t3[p4] = v59.Activated:Connect(function() -- line: 95
+						-- upvalues: p4 (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), t2 (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), v45 (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
 						local Attributes = p4:GetAttributes()
 
 						if Attributes[UnifiedEventLogConstants.HAS_DEFERRED_ACTION] then
@@ -114,11 +118,22 @@ return {
 							})
 						end
 
-						if v41 and v41.current and v41.current.current then
-							local v71 = AvatarScreenProperties[v41.current.opaque.name]
+						if FFlagAXUnifiedImpressionsOnThumbnail then
+							local v77 = p4:GetAttribute(UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "surface")
+							local v78 = resolveClickSurface(p4, if not v45 then nil else v45.current)
 
-							if v71 and v71.analyticsData then
-								t4.surface = v71.analyticsData.unifiedLoggingSurface
+							if v78 ~= nil then
+								t4.surface = v78
+							end
+
+							if ((if v77 == nil then v78 else v77)) ~= UnifiedLoggingSurface.SEARCH_RESULTS then
+								t4.keyword = nil
+							end
+						elseif v45 and v45.current and v45.current.current then
+							local v79 = AvatarScreenProperties[v45.current.opaque.name]
+
+							if v79 and v79.analyticsData then
+								t4.surface = v79.analyticsData.unifiedLoggingSurface
 							end
 						end
 
@@ -133,43 +148,43 @@ return {
 					end)
 				end
 			end)
-			t3.instanceRemoved = CollectionService:GetInstanceRemovedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p5) -- line: 142
+			t3.instanceRemoved = CollectionService:GetInstanceRemovedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p5) -- line: 163
 				-- upvalues: t3 (ref)
-				local v57 = t3[p5]
+				local v61 = t3[p5]
 
-				if v57 then
-					v57:Disconnect()
+				if v61 then
+					v61:Disconnect()
 				end
 
 				t3[p5] = nil
 			end)
 
-			return function() -- line: 151
+			return function() -- line: 172
 				-- upvalues: t3 (ref)
-				for _, v59 in t3 do
-					v59:Disconnect()
+				for _, v63 in t3 do
+					v63:Disconnect()
 				end
 
 				t3 = {}
 			end
 		end, {})
 	end,
-	useUnifiedEventListenerInExperience = function() -- line: 177
-		-- upvalues: React (copy), CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), Cryo (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
-		local v43 = nil
-		local v44 = nil
+	useUnifiedEventListenerInExperience = function() -- line: 198
+		-- upvalues: React (copy), CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
+		local v47 = nil
+		local v48 = nil
 
-		React.useEffect(function() -- line: 81
-			-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), v43 (copy), Cryo (copy), v44 (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
+		React.useEffect(function() -- line: 84
+			-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy), getChildButton (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), v47 (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), v48 (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
 			local t5 = {}
 
-			t5.instanceAdded = CollectionService:GetInstanceAddedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p6) -- line: 89
-				-- upvalues: getChildButton (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), v43 (copy), Cryo (copy), v44 (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy), t5 (ref)
-				local v61 = getChildButton(p6)
+			t5.instanceAdded = CollectionService:GetInstanceAddedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p6) -- line: 92
+				-- upvalues: getChildButton (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), v47 (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), v48 (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy), t5 (ref)
+				local v65 = getChildButton(p6)
 
-				if v61 then
-					t5[p6] = v61.Activated:Connect(function() -- line: 92
-						-- upvalues: p6 (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), v43 (copy), Cryo (copy), v44 (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
+				if v65 then
+					t5[p6] = v65.Activated:Connect(function() -- line: 95
+						-- upvalues: p6 (copy), UnifiedEventLogConstants (copy), markLastActivated (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), markSelectionListStatus (copy), v47 (copy), Cryo (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), resolveClickSurface (copy), v48 (copy), UnifiedLoggingSurface (copy), AvatarScreenProperties (copy), CartIdService (copy), sendUnifiedEventLogForInstance (copy)
 						local Attributes = p6:GetAttributes()
 
 						if Attributes[UnifiedEventLogConstants.HAS_DEFERRED_ACTION] then
@@ -182,17 +197,28 @@ return {
 
 						local t6 = {}
 
-						if v43 then
-							t6 = Cryo.Dictionary.join(v43.getAnalyticsMetadata(false), {
-								keyword = v43.getSearchKeyword(false)
+						if v47 then
+							t6 = Cryo.Dictionary.join(v47.getAnalyticsMetadata(false), {
+								keyword = v47.getSearchKeyword(false)
 							})
 						end
 
-						if v44 and v44.current and v44.current.current then
-							local v74 = AvatarScreenProperties[v44.current.opaque.name]
+						if FFlagAXUnifiedImpressionsOnThumbnail then
+							local v82 = p6:GetAttribute(UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "surface")
+							local v83 = resolveClickSurface(p6, if not v48 then nil else v48.current)
 
-							if v74 and v74.analyticsData then
-								t6.surface = v74.analyticsData.unifiedLoggingSurface
+							if v83 ~= nil then
+								t6.surface = v83
+							end
+
+							if ((if v82 == nil then v83 else v82)) ~= UnifiedLoggingSurface.SEARCH_RESULTS then
+								t6.keyword = nil
+							end
+						elseif v48 and v48.current and v48.current.current then
+							local v84 = AvatarScreenProperties[v48.current.opaque.name]
+
+							if v84 and v84.analyticsData then
+								t6.surface = v84.analyticsData.unifiedLoggingSurface
 							end
 						end
 
@@ -207,21 +233,21 @@ return {
 					end)
 				end
 			end)
-			t5.instanceRemoved = CollectionService:GetInstanceRemovedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p7) -- line: 142
+			t5.instanceRemoved = CollectionService:GetInstanceRemovedSignal(UnifiedEventLogConstants.TAG_NAME):Connect(function(p7) -- line: 163
 				-- upvalues: t5 (ref)
-				local v63 = t5[p7]
+				local v67 = t5[p7]
 
-				if v63 then
-					v63:Disconnect()
+				if v67 then
+					v67:Disconnect()
 				end
 
 				t5[p7] = nil
 			end)
 
-			return function() -- line: 151
+			return function() -- line: 172
 				-- upvalues: t5 (ref)
-				for _, v65 in t5 do
-					v65:Disconnect()
+				for _, v69 in t5 do
+					v69:Disconnect()
 				end
 
 				t5 = {}

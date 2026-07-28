@@ -19,30 +19,29 @@ local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
 local SideModalDropdownButton = require(AuthCommon.Components.SideModalDropdownButton)
 local ReactFocusNavigation = require(AuthCommonParent.ReactFocusNavigation)
-local FFlagUseBirthdayDropdownForGamepad = require(AuthCommonParent.SharedFlags).FFlagUseBirthdayDropdownForGamepad
 
-local function selectScreenSize(p1) -- line: 54
+local function selectScreenSize(p1) -- line: 52
 	return p1.ScreenSize
 end
-local function DropdownWithPopover(t1: {[any]: any}) -- line: 58
-	-- upvalues: useTokens (copy), useSelector (copy), selectScreenSize (copy), React (copy), FFlagUseBirthdayDropdownForGamepad (copy), useLastInputMode (copy), ReactFocusNavigation (copy), View (copy), FoundationText (copy), Popover (copy), SideModalDropdownButton (copy), PopoverAlign (copy), PopoverSide (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), ScrollView (copy), ScrollBarVisibility (copy)
-	local v27 = useTokens()
-	local v28 = useSelector(selectScreenSize)
-	local v29, v30 = React.useState(false)
-	local v31, v32 = React.useState({})
-	local v33, v34 = React.useState(Vector2.new(0, 0))
-	local v35, v36 = React.useState(Vector2.new(0, 0))
+local function DropdownWithPopover(t1: {[any]: any}) -- line: 56
+	-- upvalues: useTokens (copy), useSelector (copy), selectScreenSize (copy), React (copy), useLastInputMode (copy), ReactFocusNavigation (copy), View (copy), FoundationText (copy), Popover (copy), SideModalDropdownButton (copy), PopoverAlign (copy), PopoverSide (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), ScrollView (copy), ScrollBarVisibility (copy)
+	local v26 = useTokens()
+	local v27 = useSelector(selectScreenSize)
+	local v28, v29 = React.useState(false)
+	local v30, v31 = React.useState({})
+	local v32, v33 = React.useState(Vector2.new(0, 0))
+	local v34, v35 = React.useState(Vector2.new(0, 0))
+	local v36 = React.useRef(nil)
 	local v37 = React.useRef(nil)
-	local v38 = React.useRef(nil)
-	local v39 = if not FFlagUseBirthdayDropdownForGamepad then nil else useLastInputMode() == "Focus"
-	local v40 = if not FFlagUseBirthdayDropdownForGamepad then nil else ReactFocusNavigation.useFocusGuiObject()
+	local v38 = useLastInputMode() == "Focus"
+	local v39 = ReactFocusNavigation.useFocusGuiObject()
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: t1 (copy), v32 (copy)
+	React.useEffect(function() -- line: 70
+		-- upvalues: t1 (copy), v31 (copy)
 		if t1.value ~= nil then
 			for _, v in ipairs(t1.cellDatas) do
 				if v.value == t1.value then
-					v32(v)
+					v31(v)
 
 					return
 				end
@@ -51,47 +50,55 @@ local function DropdownWithPopover(t1: {[any]: any}) -- line: 58
 			return
 		end
 
-		v32({})
+		v31({})
 	end, {
 		t1.value,
 		t1.cellDatas
 	})
 
-	local v41 = React.useCallback(function() -- line: 86
-		-- upvalues: FFlagUseBirthdayDropdownForGamepad (copy), v40 (copy), v39 (copy), v37 (copy), v30 (copy)
-		if FFlagUseBirthdayDropdownForGamepad and (v40 and v39) then
-			v40(v37.current)
+	local v40 = React.useCallback(function() -- line: 84
+		-- upvalues: v39 (copy), v38 (copy), v36 (copy), v29 (copy)
+		if v39 and v38 then
+			v39(v36.current)
 		end
 
-		v30(false)
+		v29(false)
 	end, {
-		v37.current,
+		v36.current,
+		v38,
 		v39
 	})
 
-	React.useEffect(function() -- line: 93
-		-- upvalues: FFlagUseBirthdayDropdownForGamepad (copy), v40 (copy), t1 (copy), v37 (copy)
-		if FFlagUseBirthdayDropdownForGamepad and (v40 and t1.focusOnMount) then
-			v40(v37.current)
+	React.useEffect(function() -- line: 91
+		-- upvalues: v39 (copy), t1 (copy), v36 (copy)
+		if v39 and t1.focusOnMount then
+			v39(v36.current)
 		end
-	end, { v37.current })
-	React.useEffect(function() -- line: 99
-		-- upvalues: t1 (copy), v29 (copy)
+	end, {
+		v36.current,
+		v39,
+		t1.focusOnMount
+	})
+	React.useEffect(function() -- line: 97
+		-- upvalues: t1 (copy), v28 (copy)
 		if t1.onDropdownOpened then
-			t1.onDropdownOpened(v29)
+			t1.onDropdownOpened(v28)
 		end
-	end, { v29 })
+	end, {
+		v28,
+		t1.onDropdownOpened
+	})
 
-	local v42 = React.useMemo(function() -- line: 106
-		-- upvalues: t1 (copy), v41 (copy), React (copy), View (copy), v31 (copy), FoundationText (copy)
+	local v41 = React.useMemo(function() -- line: 104
+		-- upvalues: t1 (copy), v40 (copy), React (copy), View (copy), v30 (copy), FoundationText (copy)
 		local t2 = {}
 
 		for _, v in ipairs(t1.cellDatas) do
 			table.insert(t2, React.createElement(View, {
-				onActivated = function() -- line: 109
-					-- upvalues: t1 (copy), v (copy), v41 (copy)
+				onActivated = function() -- line: 107
+					-- upvalues: t1 (copy), v (copy), v40 (copy)
 					t1.onChange(v.value)
-					v41()
+					v40()
 				end,
 				selection = {
 					Selectable = true
@@ -101,7 +108,7 @@ local function DropdownWithPopover(t1: {[any]: any}) -- line: 58
 					["auto-y"] = true,
 					["padding-small"] = true,
 					["radius-medium"] = true,
-					["bg-shift-200"] = v == v31
+					["bg-shift-200"] = v == v30
 				}
 			}, {
 				TextContainer = React.createElement(View, {
@@ -120,37 +127,37 @@ local function DropdownWithPopover(t1: {[any]: any}) -- line: 58
 		return t2
 	end, {
 		t1.cellDatas,
-		v31,
+		v30,
 		t1.onChange,
-		v41
+		v40
 	})
-	local v43 = React.useCallback(function() -- line: 147
-		-- upvalues: v30 (copy), v29 (copy)
-		v30(not v29)
-	end, { v29 })
+	local v42 = React.useCallback(function() -- line: 145
+		-- upvalues: v29 (copy), v28 (copy)
+		v29(not v28)
+	end, { v28 })
 
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y",
-		ref = v37,
-		onAbsoluteSizeChanged = function(p2) -- line: 154
-			-- upvalues: v34 (copy)
-			v34(p2.AbsoluteSize)
+		ref = v36,
+		onAbsoluteSizeChanged = function(p2) -- line: 152
+			-- upvalues: v33 (copy)
+			v33(p2.AbsoluteSize)
 		end,
 		LayoutOrder = t1.layoutOrder
 	}, {
 		Popover = React.createElement(Popover.Root, {
-			isOpen = v29
+			isOpen = v28
 		}, {
 			Anchor = React.createElement(Popover.Anchor, nil, React.createElement(View, {
-				Size = UDim2.new(0, v33.X, 0, v33.Y)
+				Size = UDim2.new(0, v32.X, 0, v32.Y)
 			}, {
 				DropdownButton = React.createElement(SideModalDropdownButton, {
-					onActivated = v43,
-					text = if not v31.text or not (#v31.text > 0) then not t1.placeholder and "" or t1.placeholder else v31.text,
+					onActivated = v42,
+					text = if not v30.text or not (#v30.text > 0) then not t1.placeholder and "" or t1.placeholder else v30.text,
 					isDropdownError = t1.errorState,
-					backgroundColorToken = if not FFlagUseBirthdayDropdownForGamepad then nil else t1.backgroundColorToken,
-					height = if not FFlagUseBirthdayDropdownForGamepad then nil else t1.dropdownHeight,
-					fixSizeToParent = if not FFlagUseBirthdayDropdownForGamepad then nil else t1.fixSizeToParent
+					backgroundColorToken = t1.backgroundColorToken,
+					height = t1.dropdownHeight,
+					fixSizeToParent = t1.fixSizeToParent
 				})
 			})),
 			Content = React.createElement(Popover.Content, {
@@ -165,16 +172,16 @@ local function DropdownWithPopover(t1: {[any]: any}) -- line: 58
 					tag = "auto-xy"
 				}, {
 					AppFocusRoot = React.createElement(AppFocusRoot, {
-						surfaceIdentifier = if not v29 then FocusNavigableSurfaceIdentifierEnum.PopUp else FocusNavigableSurfaceIdentifierEnum.ModerationOverlay,
-						isIsolated = v29,
+						surfaceIdentifier = if not v28 then FocusNavigableSurfaceIdentifierEnum.PopUp else FocusNavigableSurfaceIdentifierEnum.ModerationOverlay,
+						isIsolated = v28,
 						customEventHandlers = {
 							[FocusNavigationEventNameEnum.NavigateBack] = {
-								handler = InputHandlers.onRelease(v41)
+								handler = InputHandlers.onRelease(v40)
 							}
 						}
 					}, { React.createElement(ScrollView, {
 						gradientHeight = 15,
-						Size = UDim2.new(0, math.min(v28.X, v35.X), 0, (math.min(500, v28.Y - (t1.topOffset or 0), v35.Y))),
+						Size = UDim2.new(0, math.min(v27.X, v34.X), 0, (math.min(500, v27.Y - (t1.topOffset or 0), v34.Y))),
 						scroll = {
 							AutomaticCanvasSize = Enum.AutomaticSize.Y,
 							CanvasSize = UDim2.new(1, 0, 0, 0),
@@ -184,13 +191,13 @@ local function DropdownWithPopover(t1: {[any]: any}) -- line: 58
 					}, {
 						BaseMenu = React.createElement(View, {
 							tag = "auto-y col align-y-center gap-xsmall padding-xsmall",
-							Size = UDim2.new(0, v33.X + v27.Stroke.Standard * 2, 0, 0),
-							onAbsoluteSizeChanged = function(p3) -- line: 231
-								-- upvalues: v36 (copy)
-								v36(p3.AbsoluteSize)
+							Size = UDim2.new(0, v32.X + v26.Stroke.Standard * 2, 0, 0),
+							onAbsoluteSizeChanged = function(p3) -- line: 227
+								-- upvalues: v35 (copy)
+								v35(p3.AbsoluteSize)
 							end,
-							ref = v38
-						}, v42)
+							ref = v37
+						}, v41)
 					}) })
 				})
 			})

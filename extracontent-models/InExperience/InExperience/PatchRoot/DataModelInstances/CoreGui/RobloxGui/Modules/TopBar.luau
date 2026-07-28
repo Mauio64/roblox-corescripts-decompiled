@@ -47,25 +47,26 @@ local FFlagTopBarDeprecateChatRodux = require(script.Flags.FFlagTopBarDeprecateC
 local FFlagTopBarDeprecateDisplayOptionsRodux = require(script.Flags.FFlagTopBarDeprecateDisplayOptionsRodux)
 local FFlagTopBarRefactor = require(CorePackages.Workspace.Packages.InExperienceTopBar).Flags.FFlagTopBarRefactor
 local FFlagAddTopBarPoliciesToUniversalPolicies = SharedFlags.FFlagAddTopBarPoliciesToUniversalPolicies
+local FFlagEnablePlaytestModeUnibar = SharedFlags.FFlagEnablePlaytestModeUnibar
 
 if v30 then
-	local function SetGlobalGuiInset() -- line: 63
+	local function SetGlobalGuiInset() -- line: 64
 		-- upvalues: GuiService (copy), Constants2 (copy), Display (copy)
-		local v70, v71 = GuiService:GetGuiInset()
+		local v71, v72 = GuiService:GetGuiInset()
 
-		GuiService:SetGlobalGuiInset(v70.X, Constants2.ApplyDisplayScale(Constants2.TopBarHeight), v71.X, v71.Y)
+		GuiService:SetGlobalGuiInset(v71.X, Constants2.ApplyDisplayScale(Constants2.TopBarHeight), v72.X, v72.Y)
 		Display.GetDisplayStore().setGuiInset({
-			left = v70.X,
+			left = v71.X,
 			top = Constants2.ApplyDisplayScale(Constants2.TopBarHeight),
-			right = v71.X,
-			bottom = v71.Y
+			right = v72.X,
+			bottom = v72.Y
 		})
 	end
 
 	SetGlobalGuiInset()
 end
 
-local v45 = if not FFlagTopBarRefactor then require(script.Components.TopBarApp) else require(script.ComponentsV2.TopBarApp)
+local v46 = if not FFlagTopBarRefactor then require(script.Components.TopBarApp) else require(script.ComponentsV2.TopBarApp)
 local Reducer = require(script.Reducer)
 local TopBarAppPolicy = require(script.TopBarAppPolicy)
 local SetSmallTouchDevice = require(script.Actions.SetSmallTouchDevice)
@@ -93,8 +94,8 @@ local t1 = {}
 
 t1.__index = t1
 
-function t1.new() -- line: 119
-	-- upvalues: t1 (copy), GlobalConfig (copy), Roact (copy), TenFootInterface (copy), v30 (copy), GuiService (copy), Constants2 (copy), Rodux (copy), Reducer (copy), FFlagTopBarSignalizeSetCores (copy), registerSetCores (copy), FFlagTopBarDeprecateChatRodux (copy), GetCanChat (copy), FFlagTopBarDeprecateGameInfoRodux (copy), GetGameName (copy), GetFFlagDebugEnableVRFTUXExperienceInStudio (copy), isRunningInStudio (copy), FTUX2 (copy), PlatformEnum (copy), GetFFlagEnableVRFTUXExperience (copy), IsFTUXExperience (copy), isNewInGameMenuEnabled (copy), RobloxGui (copy), FFlagTopBarDeprecateDisplayOptionsRodux (copy), SetSmallTouchDevice (copy), Utility (copy), Constants (copy), UiModeStyleProvider (copy), v45 (copy), FFlagAddMenuNavigationToggleDialog (copy), FFlagGamepadNavigationDialogABTest (copy), DesignTokenProvider (copy), MenuNavigationPromptTokenMapper (copy), Service (ref), FFlagAddTopBarScrim (copy), React (copy), TopBarScrim (ref), RoactRodux (copy), FFlagTopBarRefactor (copy), FFlagAddTopBarPoliciesToUniversalPolicies (copy), RoactAppPolicy (copy), TopBarAppPolicy (copy), AppFeaturePolicies (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), RoactAppExperiment (copy), IXPService (copy), GetFFlagEnableCrossExpVoice (copy), Component (copy), ReactSceneUnderstanding (copy), Songbird (copy), VoiceStateContext (copy), CoreGui (copy), UpdateUnreadMessagesBadge (copy), FFlagTopBarDeprecateGamepadNavigationDialogRodux (copy)
+function t1.new() -- line: 120
+	-- upvalues: t1 (copy), GlobalConfig (copy), Roact (copy), TenFootInterface (copy), v30 (copy), GuiService (copy), Constants2 (copy), FFlagEnablePlaytestModeUnibar (copy), Rodux (copy), Reducer (copy), FFlagTopBarSignalizeSetCores (copy), registerSetCores (copy), FFlagTopBarDeprecateChatRodux (copy), GetCanChat (copy), FFlagTopBarDeprecateGameInfoRodux (copy), GetGameName (copy), GetFFlagDebugEnableVRFTUXExperienceInStudio (copy), isRunningInStudio (copy), FTUX2 (copy), PlatformEnum (copy), GetFFlagEnableVRFTUXExperience (copy), IsFTUXExperience (copy), isNewInGameMenuEnabled (copy), RobloxGui (copy), FFlagTopBarDeprecateDisplayOptionsRodux (copy), SetSmallTouchDevice (copy), Utility (copy), Constants (copy), UiModeStyleProvider (copy), v46 (copy), FFlagAddMenuNavigationToggleDialog (copy), FFlagGamepadNavigationDialogABTest (copy), DesignTokenProvider (copy), MenuNavigationPromptTokenMapper (copy), Service (ref), FFlagAddTopBarScrim (copy), React (copy), TopBarScrim (ref), RoactRodux (copy), FFlagTopBarRefactor (copy), FFlagAddTopBarPoliciesToUniversalPolicies (copy), RoactAppPolicy (copy), TopBarAppPolicy (copy), AppFeaturePolicies (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), RoactAppExperiment (copy), IXPService (copy), GetFFlagEnableCrossExpVoice (copy), Component (copy), ReactSceneUnderstanding (copy), Songbird (copy), VoiceStateContext (copy), CoreGui (copy), UpdateUnreadMessagesBadge (copy), FFlagTopBarDeprecateGamepadNavigationDialogRodux (copy)
 	local self = setmetatable({}, t1)
 
 	if GlobalConfig.propValidation then
@@ -111,6 +112,10 @@ function t1.new() -- line: 119
 
 	if not TenFootInterface:IsEnabled() and not v30 then
 		GuiService:SetGlobalGuiInset(0, Constants2.TopBarHeight, 0, 0)
+	end
+
+	if FFlagEnablePlaytestModeUnibar then
+		require(script.initPlaytestMode)()
 	end
 
 	self.store = Rodux.Store.new(Reducer, nil, { Rodux.thunkMiddleware })
@@ -140,7 +145,7 @@ function t1.new() -- line: 119
 	end
 
 	if not FFlagTopBarDeprecateDisplayOptionsRodux then
-		coroutine.wrap(function() -- line: 171
+		coroutine.wrap(function() -- line: 177
 			-- upvalues: self (copy), SetSmallTouchDevice (copy), Utility (copy)
 			self.store:dispatch(SetSmallTouchDevice(Utility:IsSmallTouchScreen()))
 		end)()
@@ -151,7 +156,7 @@ function t1.new() -- line: 119
 		fontName = Constants.FontName.Gotham
 	}
 
-	local function wrapWithUiModeStyleProvider(p1) -- line: 181
+	local function wrapWithUiModeStyleProvider(p1) -- line: 187
 		-- upvalues: Roact (copy), UiModeStyleProvider (copy), t2 (copy)
 		return {
 			UiModeStyleProvider = Roact.createElement(UiModeStyleProvider, {
@@ -160,19 +165,19 @@ function t1.new() -- line: 119
 		}
 	end
 
-	local v75 = Roact.createElement(v45)
+	local v76 = Roact.createElement(v46)
 
 	if FFlagAddMenuNavigationToggleDialog or FFlagGamepadNavigationDialogABTest then
-		v75 = Roact.createElement(DesignTokenProvider, {
+		v76 = Roact.createElement(DesignTokenProvider, {
 			tokenMappers = {
 				MenuNavigationPrompt = if not FFlagGamepadNavigationDialogABTest then nil else MenuNavigationPromptTokenMapper
 			}
 		}, {
-			TopBarApp = v75
+			TopBarApp = v76
 		})
 	end
 
-	local v76 = Service and (FFlagAddTopBarScrim and React.createElement("ScreenGui", {
+	local v77 = Service and (FFlagAddTopBarScrim and React.createElement("ScreenGui", {
 		IgnoreGuiInset = true,
 		DisplayOrder = -2,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -193,8 +198,8 @@ function t1.new() -- line: 119
 					RoactAppExperimentProvider = Roact.createElement(RoactAppExperiment.Provider, {
 						value = IXPService
 					}, {
-						TopBarApp = v75,
-						TopBarScrim = v76
+						TopBarApp = v76,
+						TopBarScrim = v77
 					}),
 					CrossExperienceVoice = GetFFlagEnableCrossExpVoice() and Roact.createElement(Component) or nil
 				})
@@ -210,7 +215,7 @@ function t1.new() -- line: 119
 	self.element = Roact.mount(self.root, CoreGui, "TopBar")
 
 	if not FFlagTopBarDeprecateChatRodux then
-		game:GetService("TextChatService").MessageReceived:Connect(function() -- line: 262
+		game:GetService("TextChatService").MessageReceived:Connect(function() -- line: 268
 			-- upvalues: self (copy), UpdateUnreadMessagesBadge (copy)
 			self.store:dispatch(UpdateUnreadMessagesBadge(1))
 		end)
@@ -218,26 +223,26 @@ function t1.new() -- line: 119
 
 	if FFlagGamepadNavigationDialogABTest and not FFlagTopBarDeprecateGamepadNavigationDialogRodux then
 		local UserInputService = game:GetService("UserInputService")
-		local u78 = nil
+		local u79 = nil
 
-		local function disconnectGamepadConnected() -- line: 270
-			-- upvalues: u78 (ref)
-			if u78 then
-				u78:Disconnect()
-				u78 = nil
+		local function disconnectGamepadConnected() -- line: 276
+			-- upvalues: u79 (ref)
+			if u79 then
+				u79:Disconnect()
+				u79 = nil
 			end
 		end
 
 		if UserInputService:GetGamepadConnected(Enum.UserInputType.Gamepad1) then
 			self:setGamepadNavigationDialogOpen(true)
 		else
-			u78 = UserInputService.GamepadConnected:Connect(function() -- line: 279
-				-- upvalues: self (copy), u78 (ref)
+			u79 = UserInputService.GamepadConnected:Connect(function() -- line: 285
+				-- upvalues: self (copy), u79 (ref)
 				self:setGamepadNavigationDialogOpen(true)
 
-				if u78 then
-					u78:Disconnect()
-					u78 = nil
+				if u79 then
+					u79:Disconnect()
+					u79 = nil
 				end
 			end)
 		end
@@ -247,7 +252,7 @@ function t1.new() -- line: 119
 
 	return self
 end
-function t1.setInspectMenuOpen(p2, p3) -- line: 291
+function t1.setInspectMenuOpen(p2, p3) -- line: 297
 	-- upvalues: FFlagTopBarSignalizeMenuOpen (copy), SetInspectMenuOpen (copy)
 	if FFlagTopBarSignalizeMenuOpen then
 		return
@@ -255,11 +260,11 @@ function t1.setInspectMenuOpen(p2, p3) -- line: 291
 
 	p2.store:dispatch(SetInspectMenuOpen(p3))
 end
-function t1.setGamepadMenuOpen(p4, p5) -- line: 298
+function t1.setGamepadMenuOpen(p4, p5) -- line: 304
 	-- upvalues: SetGamepadMenuOpen (copy)
 	p4.store:dispatch(SetGamepadMenuOpen(p5))
 end
-function t1.setGamepadNavigationDialogOpen(p6, p7) -- line: 302
+function t1.setGamepadNavigationDialogOpen(p6, p7) -- line: 308
 	-- upvalues: FFlagTopBarDeprecateDisplayOptionsRodux (copy), SetGamepadNavigationDialogOpen (copy)
 	if not FFlagTopBarDeprecateDisplayOptionsRodux then
 		p6.store:dispatch(SetGamepadNavigationDialogOpen(p7))

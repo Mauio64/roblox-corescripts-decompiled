@@ -3,24 +3,22 @@ local BulkPurchaseAppParent = BulkPurchaseApp.Parent
 local React = require(BulkPurchaseAppParent.React)
 local useLocalization = require(BulkPurchaseAppParent.Localization).Hooks.useLocalization
 local useDesignTokens = require(BulkPurchaseAppParent.Style).useDesignTokens
-local UIBlox = require(BulkPurchaseAppParent.UIBlox)
-local FFlagRenameDeprecatedUIBloxTokens = require(BulkPurchaseAppParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local StyledTextLabel = require(BulkPurchaseAppParent.UIBlox).App.Text.StyledTextLabel
 local IAPExperience = require(BulkPurchaseAppParent.IAPExperience)
 local formatEconomicRestrictionText = IAPExperience.Utility.formatEconomicRestrictionText
 local addEconomicRestrictionKeysToLocalization = IAPExperience.Utility.addEconomicRestrictionKeysToLocalization
 local AlertPrompt = require(BulkPurchaseApp.Components.AlertPrompt)
 local ErrorCodeEnum = require(BulkPurchaseApp.Enums.ErrorCodeEnum)
 
-local function BulkPurchaseErrorText(t1: {[any]: any}) -- line: 24
-	-- upvalues: useDesignTokens (copy), React (copy), StyledTextLabel (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
-	local v19 = useDesignTokens()
+local function BulkPurchaseErrorText(t1: {[any]: any}) -- line: 22
+	-- upvalues: useDesignTokens (copy), React (copy), StyledTextLabel (copy)
+	local v17 = useDesignTokens()
 
 	return React.createElement(StyledTextLabel, {
 		size = UDim2.fromScale(1, 0),
 		automaticSize = Enum.AutomaticSize.Y,
-		fontStyle = if not FFlagRenameDeprecatedUIBloxTokens then v19.Semantic.Typography.Body else v19.Typography.BodyLarge,
-		colorStyle = if not FFlagRenameDeprecatedUIBloxTokens then v19.Semantic.Color.Text.Default else v19.Color.Content.Default,
+		fontStyle = v17.Typography.BodyLarge,
+		colorStyle = v17.Color.Content.Default,
 		textXAlignment = Enum.TextXAlignment.Center,
 		text = t1.text,
 		layoutOrder = t1.layoutOrder
@@ -58,9 +56,9 @@ local t3 = {
 	[ErrorCodeEnum.PlaceInvalid] = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.ErrorPrompt.TryAgainOtherItems"
 }
 
-local function BulkPurchaseError(t4: {[any]: any}) -- line: 80
-	-- upvalues: useDesignTokens (copy), t2 (copy), t3 (copy), addEconomicRestrictionKeysToLocalization (copy), useLocalization (copy), ErrorCodeEnum (copy), formatEconomicRestrictionText (copy), React (copy), FFlagRenameDeprecatedUIBloxTokens (copy), BulkPurchaseErrorText (copy), AlertPrompt (copy)
-	local v21 = useDesignTokens()
+local function BulkPurchaseError(t4: {[any]: any}) -- line: 74
+	-- upvalues: useDesignTokens (copy), t2 (copy), t3 (copy), addEconomicRestrictionKeysToLocalization (copy), useLocalization (copy), ErrorCodeEnum (copy), formatEconomicRestrictionText (copy), React (copy), BulkPurchaseErrorText (copy), AlertPrompt (copy)
+	local v19 = useDesignTokens()
 	local t5 = {
 		title = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.ErrorHeading",
 		dismissCTA = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.DismissCTA",
@@ -70,18 +68,18 @@ local function BulkPurchaseError(t4: {[any]: any}) -- line: 80
 
 	addEconomicRestrictionKeysToLocalization(t5)
 
-	local u23 = useLocalization(t5)
+	local u21 = useLocalization(t5)
 
 	if t4.errorCode == ErrorCodeEnum.EconomicRestriction and t4.errorMetadata then
-		u23.errorReason = formatEconomicRestrictionText(u23, t4.errorMetadata, true)
+		u21.errorReason = formatEconomicRestrictionText(u21, t4.errorMetadata, true)
 	end
 
 	return React.createElement(AlertPrompt, {
-		title = u23.title,
-		dismissCTA = u23.dismissCTA,
+		title = u21.title,
+		dismissCTA = u21.dismissCTA,
 		onDismiss = t4.onDismiss,
-		middleContent = function() -- line: 95
-			-- upvalues: React (copy), FFlagRenameDeprecatedUIBloxTokens (copy), v21 (copy), BulkPurchaseErrorText (copy), u23 (ref)
+		middleContent = function() -- line: 89
+			-- upvalues: React (copy), v19 (copy), BulkPurchaseErrorText (copy), u21 (ref)
 			return React.createElement("Frame", {
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
@@ -92,15 +90,15 @@ local function BulkPurchaseError(t4: {[any]: any}) -- line: 80
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Top,
-					Padding = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_200 else v21.Size.Size_400)
+					Padding = UDim.new(0, v19.Size.Size_400)
 				}),
 				ErrorReason = React.createElement(BulkPurchaseErrorText, {
 					layoutOrder = 1,
-					text = u23.errorReason
+					text = u21.errorReason
 				}),
-				TryAgain = if not u23.tryAgain then nil else React.createElement(BulkPurchaseErrorText, {
+				TryAgain = if not u21.tryAgain then nil else React.createElement(BulkPurchaseErrorText, {
 					layoutOrder = 2,
-					text = u23.tryAgain
+					text = u21.tryAgain
 				})
 			})
 		end

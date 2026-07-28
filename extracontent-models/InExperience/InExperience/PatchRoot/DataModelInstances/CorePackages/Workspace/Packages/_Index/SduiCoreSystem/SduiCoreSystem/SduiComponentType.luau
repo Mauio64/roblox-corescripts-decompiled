@@ -11,6 +11,7 @@ return {
 	Card = "Card",
 	CatalogCategoryMenu = "CatalogCategoryMenu",
 	CatalogItemCarousel = "CatalogItemCarousel",
+	CatalogItemGrid = "CatalogItemGrid",
 	CatalogItemGroup = "CatalogItemGroup",
 	CatalogVirtualizedFeed = "CatalogVirtualizedFeed",
 	Chip = "Chip",

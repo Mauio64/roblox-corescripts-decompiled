@@ -11,7 +11,7 @@ local Display = require(Parent.Display)
 local useSignalState = require(Parent.SignalsReact).useSignalState
 local View = require(Parent.Foundation).View
 
-return function(t1: {[any]: any}) -- line: 30
+return function(t1: {[any]: any}) -- line: 31
 	-- upvalues: useStyle (copy), FFlagEnableLeftNavOnConsole (copy), useSignalState (copy), Display (copy), React (copy), InputHandlers (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), View (copy)
 	local v14 = useStyle()
 	local v15 = if not FFlagEnableLeftNavOnConsole then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
@@ -19,11 +19,11 @@ return function(t1: {[any]: any}) -- line: 30
 		BorderSizePixel = 0,
 		AnchorPoint = Vector2.new(1, 0),
 		Position = UDim2.fromScale(1, 0),
-		Size = UDim2.new(0, t1.viewWidth, 1, 0),
+		Size = if not t1.fillPane then UDim2.new(0, t1.viewWidth, 1, 0) else UDim2.fromScale(1, 1),
 		BackgroundTransparency = v14.Theme.BackgroundDefault.Transparency,
 		BackgroundColor3 = v14.Theme.BackgroundDefault.Color
 	}
-	local v17 = React.useCallback(function(p1) -- line: 49
+	local v17 = React.useCallback(function(p1) -- line: 50
 		-- upvalues: React (copy)
 		return React.createElement("TextButton", {
 			BackgroundTransparency = 1,
@@ -33,9 +33,9 @@ return function(t1: {[any]: any}) -- line: 30
 			Position = UDim2.fromScale(0, 0)
 		}, { p1 })
 	end)
-	local v18 = React.useMemo(function() -- line: 59
+	local v18 = React.useMemo(function() -- line: 60
 		-- upvalues: InputHandlers (copy), t1 (copy)
-		return InputHandlers.onRelease(function(p2) -- line: 60
+		return InputHandlers.onRelease(function(p2) -- line: 61
 			-- upvalues: t1 (copy)
 			p2:cancel()
 			t1.navigateBack()

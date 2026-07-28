@@ -39,9 +39,6 @@ return function() -- line: 8
 	end
 
 	table.insert(t1, "SetDialogInUse")
-	table.insert(t1, "ContactListInvokeIrisInvite")
-	table.insert(t1, "ContactListIrisInviteTeleport")
-	table.insert(t1, "UpdateCurrentCall")
 	table.insert(t1, "RequestDeviceCameraOrientationCapability")
 	table.insert(t1, "RequestDeviceCameraCFrame")
 	table.insert(t1, "ReplicateDeviceCameraCFrame")

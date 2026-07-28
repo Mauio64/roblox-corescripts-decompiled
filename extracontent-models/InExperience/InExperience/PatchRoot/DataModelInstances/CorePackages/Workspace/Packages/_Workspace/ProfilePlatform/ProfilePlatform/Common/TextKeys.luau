@@ -159,5 +159,6 @@ return {
 	NoPreviousName = "Feature.Profile.Label.NoPreviousName",
 	Statistics = "Feature.Profile.Heading.Statistics",
 	JoinedInYear = "Feature.Friends.Label.JoinedInYear",
-	EventsListTitle = "Feature.VirtualEvents.EventsListTitle"
+	EventsListTitle = "Feature.VirtualEvents.EventsListTitle",
+	MomentsFeedEndTitle = "Feature.Moments.Label.FeedEndTitle"
 }

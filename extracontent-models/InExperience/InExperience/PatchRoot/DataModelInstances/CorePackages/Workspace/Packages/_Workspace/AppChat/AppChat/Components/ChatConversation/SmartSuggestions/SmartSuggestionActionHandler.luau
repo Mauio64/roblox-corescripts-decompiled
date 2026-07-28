@@ -1,32 +1,28 @@
-local t1 = {
-	Message = "message",
-	GameCard = "game_card"
-}
+local SuggestionType = require(script.Parent.Types).SuggestionType
 
 return {
-	SuggestionType = t1,
-	createSmartSuggestionActionHandler = function(t2: {[any]: any}) -- line: 44
-		-- upvalues: t1 (copy)
-		local t5 = {
-			[t1.Message] = function(t3: {[any]: any}, s1: string) -- line: 48
-				-- upvalues: t2 (copy)
-				return t2.sendMessage(s1, t3.message.text)
+	createSmartSuggestionActionHandler = function(t1: {[any]: any}) -- line: 19
+		-- upvalues: SuggestionType (copy)
+		local t2 = {
+			[SuggestionType.Message] = function(p1, s1: string) -- line: 23
+				-- upvalues: t1 (copy)
+				return t1.sendMessage(s1, p1.message.text)
 			end,
-			[t1.GameCard] = function(t4: {[any]: any}, s2: string) -- line: 51
-				-- upvalues: t2 (copy)
-				return t2.sendGameLinkChatMessage(s2, t4.game_card.universe_id)
+			[SuggestionType.GameCard] = function(p2, s2: string) -- line: 26
+				-- upvalues: t1 (copy)
+				return t1.sendGameLinkChatMessage(s2, p2.game_card.universe_id)
 			end
 		}
 
-		return function(p1, s3: string) -- line: 56
-			-- upvalues: t5 (copy)
-			local v10 = t5[p1.type]
+		return function(p3, s3: string) -- line: 31
+			-- upvalues: t2 (copy)
+			local v10 = t2[p3.type]
 
 			if not v10 then
-				error(`SmartSuggestionActionHandler: unknown suggestion type "{ tostring(p1.type) }"`)
+				error(`SmartSuggestionActionHandler: unknown suggestion type "{ tostring(p3.type) }"`)
 			end
 
-			return v10(p1, s3)
+			return v10(p3, s3)
 		end
 	end
 }

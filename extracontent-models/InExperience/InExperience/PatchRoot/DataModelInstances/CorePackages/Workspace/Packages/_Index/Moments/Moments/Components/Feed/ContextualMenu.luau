@@ -33,6 +33,7 @@ local GetModeratedItemsStore = require(Moments.Stores.GetModeratedItemsStore)
 local GetToastStore = require(Moments.Stores.GetToastStore)
 local SignalActionType = require(Moments.Enums.SignalActionType)
 local FFlagMomentsIPReporting = SharedFlags.FFlagMomentsIPReporting
+local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
 local ReportMomentDialog = require(Moments.Components.Feed.ReportMomentDialog)
 local LocalPlayer = Players.LocalPlayer
 local t1 = {
@@ -46,83 +47,83 @@ local t1 = {
 	reportSubmittedBody = "Feature.Moments.Label.ReportSubmittedBody"
 }
 
-return function(t2: {[any]: any}) -- line: 76
-	-- upvalues: useLocalization (copy), t1 (copy), useFeed (copy), useToggleState (copy), FFlagMomentsIPReporting (copy), React (copy), useMomentsSession (copy), GetMomentsPreferencesStore (copy), GetModeratedItemsStore (copy), GetToastStore (copy), SignalsReact (copy), fireAnalyticsEvent (copy), EventNames (copy), checkDebugAccess (copy), reportMoment (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), makeRecommendationAttribution (copy), SignalActionType (copy), makeFeedActionFields (copy), MomentsCommon (copy), LocalPlayer (copy), Menu (copy), Foundation (copy), IconButton (copy), ThreeDotsVertical (copy), ReportMomentDialog (copy), View (copy), SpeakerSlash (copy), Speaker (copy)
-	local v37 = useLocalization(t1)
-	local v38 = useFeed()
-	local v39 = useToggleState()
-	local v40 = nil
-	local u41 = nil
+return function(t2: {[any]: any}) -- line: 77
+	-- upvalues: useLocalization (copy), t1 (copy), useFeed (copy), useToggleState (copy), FFlagMomentsIPReporting (copy), React (copy), useMomentsSession (copy), GetMomentsPreferencesStore (copy), GetModeratedItemsStore (copy), GetToastStore (copy), SignalsReact (copy), fireAnalyticsEvent (copy), EventNames (copy), checkDebugAccess (copy), reportMoment (copy), makeRecommendationAttribution (copy), SignalActionType (copy), makeFeedActionFields (copy), MomentsCommon (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), LocalPlayer (copy), Menu (copy), Foundation (copy), IconButton (copy), ThreeDotsVertical (copy), ReportMomentDialog (copy), View (copy), SpeakerSlash (copy), Speaker (copy)
+	local v38 = useLocalization(t1)
+	local v39 = useFeed()
+	local v40 = useToggleState()
+	local v41 = nil
+	local u42 = nil
 
 	if FFlagMomentsIPReporting then
-		local v42
+		local v43
 
-		v40, v42 = React.useState(false)
-		u41 = v42
+		v41, v43 = React.useState(false)
+		u42 = v43
 	end
 
-	local v43 = React.useCallback(function() -- line: 88
-		-- upvalues: v39 (copy)
-		if v39.enabled then
-			v39.disable()
+	local v44 = React.useCallback(function() -- line: 89
+		-- upvalues: v40 (copy)
+		if v40.enabled then
+			v40.disable()
 
 			return
 		end
 
-		v39.enable()
+		v40.enable()
 	end, {
-		v39.enabled,
-		v39.enable,
-		v39.disable
+		v40.enabled,
+		v40.enable,
+		v40.disable
 	})
-	local v44 = useMomentsSession()
-	local v45 = GetMomentsPreferencesStore(false)
-	local v46 = GetModeratedItemsStore(false)
-	local v47 = GetToastStore(false)
-	local v48 = SignalsReact.useSignalState(v44.getHideDetails)
-	local v49 = SignalsReact.useSignalState(v45.getMinimized)
-	local v50 = React.useCallback(function() -- line: 104
-		-- upvalues: v39 (copy), v44 (copy), fireAnalyticsEvent (copy), EventNames (copy), t2 (copy)
-		v39.disable()
-		v44.toggleFeedDetailVisibility()
+	local v45 = useMomentsSession()
+	local v46 = GetMomentsPreferencesStore(false)
+	local v47 = GetModeratedItemsStore(false)
+	local v48 = GetToastStore(false)
+	local v49 = SignalsReact.useSignalState(v45.getHideDetails)
+	local v50 = SignalsReact.useSignalState(v46.getMinimized)
+	local v51 = React.useCallback(function() -- line: 105
+		-- upvalues: v40 (copy), v45 (copy), fireAnalyticsEvent (copy), EventNames (copy), t2 (copy)
+		v40.disable()
+		v45.toggleFeedDetailVisibility()
 		fireAnalyticsEvent(EventNames.FeedHideDetailsButtonPressed, {
 			momentId = t2.moment.momentId
 		})
 	end, {
 		t2.moment,
-		v39.disable,
-		v44.toggleFeedDetailVisibility
+		v40.disable,
+		v45.toggleFeedDetailVisibility
 	})
-	local v51 = React.useCallback(function() -- line: 112
-		-- upvalues: v39 (copy), v45 (copy), fireAnalyticsEvent (copy), EventNames (copy), t2 (copy)
-		v39.disable()
-		v45.toggleFeedScaleType()
+	local v52 = React.useCallback(function() -- line: 113
+		-- upvalues: v40 (copy), v46 (copy), fireAnalyticsEvent (copy), EventNames (copy), t2 (copy)
+		v40.disable()
+		v46.toggleFeedScaleType()
 		fireAnalyticsEvent(EventNames.FeedMinimizeButtonPressed, {
 			momentId = t2.moment.momentId
 		})
 	end, {
 		t2.moment,
-		v39.disable,
-		v45.toggleFeedScaleType
+		v40.disable,
+		v46.toggleFeedScaleType
 	})
-	local v52 = React.useCallback(function() -- line: 120
-		-- upvalues: checkDebugAccess (copy), v45 (copy), v39 (copy)
+	local v53 = React.useCallback(function() -- line: 121
+		-- upvalues: checkDebugAccess (copy), v46 (copy), v40 (copy)
 		if checkDebugAccess() then
-			v45.toggleFeedDebugMode()
+			v46.toggleFeedDebugMode()
 		end
 
-		v39.disable()
+		v40.disable()
 	end, {
-		v39.disable,
-		v45.toggleFeedDebugMode
+		v40.disable,
+		v46.toggleFeedDebugMode
 	})
-	local v53 = React.useCallback(function(s1: string?, b1: boolean?) -- line: 128
-		-- upvalues: t2 (copy), FFlagMomentsIPReporting (copy), reportMoment (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), makeRecommendationAttribution (copy), v38 (copy), SignalActionType (copy), makeFeedActionFields (copy), MomentsCommon (copy), fireAnalyticsEvent (copy), EventNames (copy), v46 (copy), v47 (copy), v37 (copy)
+	local v54 = React.useCallback(function(s1: string?, b1: boolean?) -- line: 129
+		-- upvalues: t2 (copy), FFlagMomentsIPReporting (copy), reportMoment (copy), makeRecommendationAttribution (copy), v39 (copy), SignalActionType (copy), makeFeedActionFields (copy), MomentsCommon (copy), fireAnalyticsEvent (copy), EventNames (copy), v47 (copy), v48 (copy), v38 (copy)
 		if not t2.moment then
 			return nil
 		end
 
-		local ok, result, v67 = pcall(function() -- line: 133
+		local ok, result, v68 = pcall(function() -- line: 134
 			-- upvalues: FFlagMomentsIPReporting (copy), reportMoment (copy), t2 (copy), s1 (copy)
 			if FFlagMomentsIPReporting then
 				return reportMoment(t2.moment.momentId, s1):await()
@@ -131,101 +132,88 @@ return function(t2: {[any]: any}) -- line: 76
 			return reportMoment(t2.moment.momentId):await()
 		end)
 		local recommendationMetadata = t2.moment.recommendationMetadata
+		local v70 = makeRecommendationAttribution(recommendationMetadata)
 
-		if GetFFlagMomentsAnalyticsSchemaIdentity() then
-			local v69 = makeRecommendationAttribution(recommendationMetadata)
-
-			if v69 then
-				local ok2, result2 = pcall(function() -- line: 153
-					-- upvalues: v38 (copy), SignalActionType (copy), v69 (copy)
-					v38.logAction(SignalActionType.Report, v69, {})
-				end)
-
-				if not ok2 then
-					warn("Failed to log action event", result2)
-				end
-			end
-		elseif recommendationMetadata then
-			local ok3, result3 = pcall(function() -- line: 163
-				-- upvalues: v38 (copy), SignalActionType (copy), recommendationMetadata (copy)
-				v38.logAction(SignalActionType.Report, {
-					itemId = recommendationMetadata.itemId,
-					tracingId = recommendationMetadata.tracingId
-				}, {})
+		if v70 then
+			local ok2, result2 = pcall(function() -- line: 150
+				-- upvalues: v39 (copy), SignalActionType (copy), v70 (copy)
+				v39.logAction(SignalActionType.Report, v70, {})
 			end)
 
-			if not ok3 then
-				warn("Failed to log action event", result3)
+			if not ok2 then
+				warn("Failed to log action event", result2)
 			end
 		end
 
-		local v74 = makeFeedActionFields(t2.moment.momentId, recommendationMetadata and recommendationMetadata.feedItemId, recommendationMetadata and recommendationMetadata.tracingId, if not MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity() then nil else "report")
+		local v73 = makeFeedActionFields(t2.moment.momentId, recommendationMetadata and recommendationMetadata.feedItemId, recommendationMetadata and recommendationMetadata.tracingId, if not MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity() then nil else "report")
 
-		if v74 then
-			fireAnalyticsEvent(EventNames.FeedAbuseReported, v74)
+		if v73 then
+			fireAnalyticsEvent(EventNames.FeedAbuseReported, v73)
 		end
 
 		if not b1 then
-			v46.markReported(t2.moment.momentId)
-			v38.removeCurrentItem()
-			v47.triggerToast({
-				title = v37.reportSubmittedTitle,
-				text = v37.reportSubmittedBody
+			v47.markReported(t2.moment.momentId)
+			v39.removeCurrentItem()
+			v48.triggerToast({
+				title = v38.reportSubmittedTitle,
+				text = v38.reportSubmittedBody
 			})
 		end
 
-		if ok and result and type(v67) == "table" then
-			return v67.reportCode
+		if ok and result and type(v68) == "table" then
+			return v68.reportCode
 		end
 
 		return nil
 	end, {
 		t2.moment,
-		v38.logAction,
-		v38.removeCurrentItem,
-		v46.markReported,
-		v47.triggerToast,
-		v37
+		v39.logAction,
+		v39.removeCurrentItem,
+		v47.markReported,
+		v48.triggerToast,
+		v38
 	})
-	local v54 = React.useCallback(function() -- line: 213
-		-- upvalues: v39 (copy), FFlagMomentsIPReporting (copy), u41 (ref), v53 (copy)
-		v39.disable()
+	local v55 = React.useCallback(function() -- line: 197
+		-- upvalues: v40 (copy), FFlagMomentsIPReporting (copy), u42 (ref), v54 (copy)
+		v40.disable()
 
 		if FFlagMomentsIPReporting then
-			u41(true)
+			u42(true)
 
 			return
 		end
 
-		task.spawn(function() -- line: 218
-			-- upvalues: v53 (copy)
-			v53(nil, false)
+		task.spawn(function() -- line: 202
+			-- upvalues: v54 (copy)
+			v54(nil, false)
 		end)
 	end, {
-		v39.disable,
-		v53
+		v40.disable,
+		v54
 	})
-	local v55 = if not FFlagMomentsIPReporting then nil else React.useCallback(function() -- line: 225
-		-- upvalues: u41 (ref)
-		u41(false)
+	local v56 = if not FFlagMomentsIPReporting then nil else React.useCallback(function() -- line: 209
+		-- upvalues: u42 (ref)
+		u42(false)
 	end, {})
-	local v56 = React.useCallback(function() -- line: 230
-		-- upvalues: v39 (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), v44 (copy), t2 (copy)
-		v39.disable()
+	local v57 = React.useCallback(function() -- line: 214
+		-- upvalues: v40 (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), v45 (copy), t2 (copy)
+		v40.disable()
 
-		if GetFFlagMomentsAnalyticsSchemaIdentity() then
-			v44.requestDeletion(t2.moment.momentId, t2.moment.recommendationMetadata and t2.moment.recommendationMetadata.feedItemId, t2.moment.recommendationMetadata and t2.moment.recommendationMetadata.tracingId)
+		local v74 = GetFFlagMomentsAnalyticsSchemaIdentity()
+
+		if FFlagMomentsPassFeedItemIdToBackendApis or v74 then
+			v45.requestDeletion(t2.moment.momentId, t2.moment.recommendationMetadata and t2.moment.recommendationMetadata.feedItemId, if not v74 or not t2.moment.recommendationMetadata then nil else t2.moment.recommendationMetadata.tracingId)
 
 			return
 		end
 
-		v44.requestDeletion(t2.moment.momentId)
+		v45.requestDeletion(t2.moment.momentId)
 	end, {
 		t2.moment,
-		v39.disable,
-		v44.requestDeletion
+		v40.disable,
+		v45.requestDeletion
 	})
-	local v57 = React.useCallback(function() -- line: 246
+	local v58 = React.useCallback(function() -- line: 233
 		-- upvalues: t2 (copy)
 		if t2.isDisabled then
 			return
@@ -236,7 +224,7 @@ return function(t2: {[any]: any}) -- line: 76
 		t2.isDisabled,
 		t2.playbackVolume
 	})
-	local v58 = React.useCallback(function() -- line: 259
+	local v59 = React.useCallback(function() -- line: 246
 		-- upvalues: t2 (copy), fireAnalyticsEvent (copy), EventNames (copy)
 		if t2.isDisabled then
 			return
@@ -251,21 +239,21 @@ return function(t2: {[any]: any}) -- line: 76
 		t2.playbackVolume,
 		t2.moment
 	})
-	local v59 = if not t2.isFeedMuteButtonAnalyticsEnabled then v57 else v58
-	local v60 = React.useMemo(function() -- line: 285
-		-- upvalues: v48 (copy), v37 (copy), v50 (copy), v49 (copy), v51 (copy), t2 (copy), LocalPlayer (copy), v54 (copy), v56 (copy), checkDebugAccess (copy), v52 (copy)
+	local v60 = if not t2.isFeedMuteButtonAnalyticsEnabled then v58 else v59
+	local v61 = React.useMemo(function() -- line: 272
+		-- upvalues: v49 (copy), v38 (copy), v51 (copy), v50 (copy), v52 (copy), t2 (copy), LocalPlayer (copy), v55 (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), v57 (copy), checkDebugAccess (copy), v53 (copy)
 		local t3 = {
 			{
 				id = "details",
-				icon = not v48 and "icons/actions/viewOff" or "icons/actions/viewOn",
-				text = if not v48 then v37.hideDetails else v37.showDetails,
-				onActivated = v50
+				icon = not v49 and "icons/actions/viewOff" or "icons/actions/viewOn",
+				text = if not v49 then v38.hideDetails else v38.showDetails,
+				onActivated = v51
 			},
 			{
 				id = "minimize",
-				icon = not v49 and "icons/actions/previewShrink" or "icons/actions/previewExpand",
-				text = if not v49 then v37.minimize else v37.expand,
-				onActivated = v51
+				icon = not v50 and "icons/actions/previewShrink" or "icons/actions/previewExpand",
+				text = if not v50 then v38.minimize else v38.expand,
+				onActivated = v52
 			}
 		}
 
@@ -273,15 +261,15 @@ return function(t2: {[any]: any}) -- line: 76
 			table.insert(t3, {
 				id = "reportAbuse",
 				icon = "icons/actions/feedback",
-				text = v37.report,
-				onActivated = v54
+				text = v38.report,
+				onActivated = v55
 			})
-		else
+		elseif not FFlagMomentsPassFeedItemIdToBackendApis or t2.moment.recommendationMetadata ~= nil and t2.moment.recommendationMetadata.feedItemId ~= nil and t2.moment.recommendationMetadata.feedItemId ~= "" then
 			table.insert(t3, {
 				id = "delete",
 				icon = "icons/actions/delete",
-				text = v37.delete,
-				onActivated = v56
+				text = v38.delete,
+				onActivated = v57
 			})
 		end
 
@@ -290,41 +278,41 @@ return function(t2: {[any]: any}) -- line: 76
 				id = "debug",
 				icon = "icons/logo/block",
 				text = "Toggle Debug Mode",
-				onActivated = v52
+				onActivated = v53
 			})
 		end
 
 		return t3
 	end, {
 		t2.moment,
-		v48,
 		v49,
-		v37,
-		v52,
 		v50,
+		v38,
+		v53,
 		v51,
-		v54,
-		v56
+		v52,
+		v55,
+		v57
 	})
-	local v61 = React.createElement(Menu, {
+	local v62 = React.createElement(Menu, {
 		align = Foundation.Enums.PopoverAlign.End,
-		isOpen = v39.enabled,
-		items = v60,
-		onPressedOutside = v39.disable,
+		isOpen = v40.enabled,
+		items = v61,
+		onPressedOutside = v40.disable,
 		side = Foundation.Enums.PopoverSide.Left
 	}, {
 		ContextualMenuButton = React.createElement(IconButton, {
 			testId = "FeedContextualMenuButton",
 			icon = ThreeDotsVertical,
 			isDisabled = t2.isDisabled,
-			onActivated = v43,
+			onActivated = v44,
 			size = Foundation.Enums.InputSize.Large
 		})
 	})
-	local v62 = if not FFlagMomentsIPReporting then nil else React.createElement(ReportMomentDialog, {
-		isOpen = v40,
-		onClose = v55,
-		onSubmitReport = v53
+	local v63 = if not FFlagMomentsIPReporting then nil else React.createElement(ReportMomentDialog, {
+		isOpen = v41,
+		onClose = v56,
+		onSubmitReport = v54
 	})
 
 	if not t2.isFeedMuteEnabled then
@@ -332,8 +320,8 @@ return function(t2: {[any]: any}) -- line: 76
 			tag = "col align-x-center auto-xy",
 			LayoutOrder = t2.layoutOrder
 		}, {
-			ContextMenuPopover = v61,
-			ReportDialog = v62
+			ContextMenuPopover = v62,
+			ReportDialog = v63
 		})
 	end
 
@@ -349,11 +337,11 @@ return function(t2: {[any]: any}) -- line: 76
 				testId = "FeedMuteButton",
 				icon = if not t2.playbackVolume.isMuted then Speaker else SpeakerSlash,
 				isDisabled = t2.isDisabled,
-				onActivated = v59,
+				onActivated = v60,
 				size = Foundation.Enums.InputSize.Medium
 			}),
-			ContextMenuPopover = v61
+			ContextMenuPopover = v62
 		}),
-		ReportDialog = v62
+		ReportDialog = v63
 	})
 end

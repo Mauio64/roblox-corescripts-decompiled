@@ -24,6 +24,7 @@ local FoundationText = Foundation.Text
 local View = Foundation.View
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
+local IconVariant = Foundation.Enums.IconVariant
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local MarkdownViewer = Markdown.Components.MarkdownViewer
 local t1 = {}
@@ -33,12 +34,12 @@ local t2 = {
 	onPlanAcceptedByToolCallId = {}
 }
 
-local function constantSource() -- line: 79
+local function constantSource() -- line: 80
 	return 0
 end
-local function useReactiveValue(p1) -- line: 83
+local function useReactiveValue(p1) -- line: 84
 	-- upvalues: React (copy), constantSource (copy), SignalsReact (copy)
-	local v39 = React.useCallback(function(p2) -- line: 84
+	local v40 = React.useCallback(function(p2) -- line: 85
 		-- upvalues: p1 (copy), constantSource (copy)
 		if typeof(p1) == "function" then
 			return (p1(p2))
@@ -51,9 +52,9 @@ local function useReactiveValue(p1) -- line: 83
 		return p1
 	end, { p1 })
 
-	return (SignalsReact.useSignalState(v39))
+	return (SignalsReact.useSignalState(v40))
 end
-local function hasSelectedOptions(p3) -- line: 97
+local function hasSelectedOptions(p3) -- line: 98
 	if typeof(p3) == "string" then
 		return true
 	end
@@ -64,16 +65,16 @@ local function hasSelectedOptions(p3) -- line: 97
 
 	return #p3 > 0
 end
-local function AnswerStackSection(t3: {[any]: any}) -- line: 107
+local function AnswerStackSection(t3: {[any]: any}) -- line: 108
 	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), OptionSelector (copy), AnswerStack (copy)
 	local prompt = t3.prompt
 	local question = prompt.question
 	local customResponseText = prompt.customResponseText
-	local v45 = t3.isActive == true
-	local v46 = question.responseType == "multi_select"
-	local v47 = if prompt.isLastQuestion ~= false then LocalizationStrings.ANSWER_STACK_SUBMIT else LocalizationStrings.ANSWER_STACK_NEXT
+	local v46 = t3.isActive == true
+	local v47 = question.responseType == "multi_select"
+	local v48 = if prompt.isLastQuestion ~= false then LocalizationStrings.ANSWER_STACK_SUBMIT else LocalizationStrings.ANSWER_STACK_NEXT
 	local createElement = React.createElement
-	local v49 = View
+	local v50 = View
 	local t4 = {
 		tag = "col gap-medium size-full-0 auto-y",
 		LayoutOrder = t3.LayoutOrder,
@@ -86,42 +87,42 @@ local function AnswerStackSection(t3: {[any]: any}) -- line: 107
 			Text = question.question
 		})
 	}
-	local v52
+	local v53
 
 	if customResponseText ~= nil then
-		v52 = React.createElement(OptionSelector, {
+		v53 = React.createElement(OptionSelector, {
 			LayoutOrder = 2,
 			isSelected = true,
 			title = LocalizationStrings.ANSWER_STACK_CUSTOM_ANSWER,
 			description = customResponseText,
 			testId = `AnswerStack.{ question.id }.CustomAnswer`,
-			onActivated = function() -- line: 134
+			onActivated = function() -- line: 135
 			end
 		})
 	elseif #question.options > 0 then
 		local createElement2 = React.createElement
-		local v54 = AnswerStack
+		local v55 = AnswerStack
 		local t6 = {
 			LayoutOrder = 2,
 			options = question.options,
 			selectedOptionId = prompt.selectedOptionId,
-			selectionMode = not v46 and "single" or "multi",
-			confirmLabel = v47
+			selectionMode = not v47 and "single" or "multi",
+			confirmLabel = v48
 		}
 		local selectedOptionId = prompt.selectedOptionId
 
 		t6.isConfirmDisabled = not (typeof(selectedOptionId) == "string" or typeof(selectedOptionId) == "table" and #selectedOptionId > 0)
-		t6.onConfirm = if not v46 or not v45 then nil else t3.onAnswerConfirmed
+		t6.onConfirm = if not v47 or not v46 then nil else t3.onAnswerConfirmed
 		t6.testId = `AnswerStack.{ question.id }`
 
-		function t6.onOptionSelected(p4) -- line: 145
-			-- upvalues: t3 (copy), v46 (copy), v45 (copy), question (copy), prompt (copy)
+		function t6.onOptionSelected(p4) -- line: 146
+			-- upvalues: t3 (copy), v47 (copy), v46 (copy), question (copy), prompt (copy)
 			if t3.onAnswerSelected == nil then
 				return
 			end
 
-			if v46 then
-				if v45 then
+			if v47 then
+				if v46 then
 					t3.onAnswerSelected(question, p4)
 				end
 
@@ -133,28 +134,28 @@ local function AnswerStackSection(t3: {[any]: any}) -- line: 107
 			end
 		end
 
-		v52 = createElement2(v54, t6)
+		v53 = createElement2(v55, t6)
 	else
-		v52 = nil
+		v53 = nil
 	end
 
-	t5.Answers = v52
+	t5.Answers = v53
 
-	return createElement(v49, t4, t5)
+	return createElement(v50, t4, t5)
 end
-local function PlanProposalSection(t7: {[any]: any}) -- line: 164
+local function PlanProposalSection(t7: {[any]: any}) -- line: 165
 	-- upvalues: React (copy), AgentPlanCard (copy), View (copy), ChatUserMessage (copy)
 	local planProposal = t7.planProposal
-	local v59 = planProposal.isAccepted ~= true and planProposal.feedbackText == nil
-	local v60 = React.createElement(AgentPlanCard, {
+	local v60 = planProposal.isAccepted ~= true and planProposal.feedbackText == nil
+	local v61 = React.createElement(AgentPlanCard, {
 		layoutOrder = 1,
 		testId = "ChatTurnBlock.PlanProposal",
 		title = planProposal.title,
 		textContent = planProposal.textContent,
 		summary = planProposal.summary,
-		onBuild = t7.onPlanAccepted or function() -- line: 172
+		onBuild = t7.onPlanAccepted or function() -- line: 173
 		end,
-		isBuildDisabled = not v59
+		isBuildDisabled = not v60
 	})
 
 	if planProposal.feedbackText == nil then
@@ -162,7 +163,7 @@ local function PlanProposalSection(t7: {[any]: any}) -- line: 164
 			tag = "col gap-medium size-full-0 auto-y",
 			LayoutOrder = t7.LayoutOrder
 		}, {
-			Plan = v60
+			Plan = v61
 		})
 	end
 
@@ -170,7 +171,7 @@ local function PlanProposalSection(t7: {[any]: any}) -- line: 164
 		tag = "col gap-medium size-full-0 auto-y",
 		LayoutOrder = t7.LayoutOrder
 	}, {
-		Plan = v60,
+		Plan = v61,
 		Feedback = React.createElement(ChatUserMessage, {
 			LayoutOrder = 2,
 			message = {
@@ -180,32 +181,54 @@ local function PlanProposalSection(t7: {[any]: any}) -- line: 164
 		})
 	})
 end
-local function AgentMessageSegment(t8: {[any]: any}) -- line: 201
-	-- upvalues: useReactiveValue (copy), Foundation (copy), React (copy), getMarkdownRendererProps (copy), MarkdownViewer (copy)
-	local v62 = useReactiveValue(t8.segment.text)
-	local v63 = Foundation.Hooks.useTokens()
-	local v64 = React.useMemo(function() -- line: 204
-		-- upvalues: getMarkdownRendererProps (copy), v63 (copy), t8 (copy)
-		return getMarkdownRendererProps(v63, t8.markdownTextStyle)
+local function AgentMessageSegment(t8: {[any]: any}) -- line: 202
+	-- upvalues: useReactiveValue (copy), Foundation (copy), React (copy), getMarkdownRendererProps (copy), View (copy), Icon (copy), IconName (copy), IconVariant (copy), IconSize (copy), FoundationText (copy), MarkdownViewer (copy)
+	local v63 = useReactiveValue(t8.segment.text)
+	local v64 = Foundation.Hooks.useTokens()
+	local v65 = React.useMemo(function() -- line: 205
+		-- upvalues: getMarkdownRendererProps (copy), v64 (copy), t8 (copy)
+		return getMarkdownRendererProps(v64, t8.markdownTextStyle)
 	end, {
-		v63,
+		v64,
 		t8.markdownTextStyle
 	})
 
-	if v62 == "" then
+	if v63 == "" then
 		return nil
 	end
 
+	if t8.segment.isError then
+		return React.createElement(View, {
+			tag = "row align-y-center gap-xsmall size-full-0 auto-y",
+			testId = "ChatTurnBlock.ErrorMessage",
+			LayoutOrder = t8.LayoutOrder
+		}, {
+			Icon = React.createElement(Icon, {
+				LayoutOrder = 1,
+				testId = "ChatTurnBlock.ErrorMessage.Icon",
+				name = IconName.CircleX,
+				variant = IconVariant.Filled,
+				size = IconSize.Small,
+				style = v64.Color.System.Alert
+			}),
+			Text = React.createElement(FoundationText, {
+				LayoutOrder = 2,
+				tag = "fill text-body-medium text-wrap text-align-x-left content-emphasis",
+				Text = v63
+			})
+		})
+	end
+
 	return React.createElement(MarkdownViewer, {
-		Markdown = v62,
+		Markdown = v63,
 		WrapperProps = {
 			tag = "size-full-0 auto-y text-body-medium content-emphasis",
 			LayoutOrder = t8.LayoutOrder
 		},
-		MarkdownRendererProps = v64
+		MarkdownRendererProps = v65
 	})
 end
-local function renderClientToolSegment(p5, n1: number, p6) -- line: 224
+local function renderClientToolSegment(p5, n1: number, p6) -- line: 247
 	-- upvalues: React (copy), AnswerStackSection (copy), PlanProposalSection (copy)
 	if p5.answerStackPrompt ~= nil then
 		return React.createElement(AnswerStackSection, {
@@ -227,7 +250,7 @@ local function renderClientToolSegment(p5, n1: number, p6) -- line: 224
 
 	return nil
 end
-local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 254
+local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 277
 	-- upvalues: React (copy), AgentMessageSegment (copy), TurnActivitySummary (copy), renderClientToolSegment (copy)
 	if p7.kind == "agent_message" then
 		return React.createElement(AgentMessageSegment, {
@@ -251,30 +274,30 @@ local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 254
 
 	return nil
 end
-local function TurnWorkSegment(t9: {[any]: any}) -- line: 280
+local function TurnWorkSegment(t9: {[any]: any}) -- line: 303
 	-- upvalues: useReactiveValue (copy), React (copy), Foundation (copy), renderWorkSegment (copy), View (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy)
-	local v74 = useReactiveValue(t9.segment.label)
-	local v75 = useReactiveValue(t9.segment.segments)
-	local v76, v77 = React.useState(false)
-	local v78 = Foundation.Hooks.useTokens()
+	local v75 = useReactiveValue(t9.segment.label)
+	local v76 = useReactiveValue(t9.segment.segments)
+	local v77, v78 = React.useState(false)
+	local v79 = Foundation.Hooks.useTokens()
 	local isDone = t9.isDone
-	local v80 = not t9.isDone or v76
-	local v81 = React.useCallback(function() -- line: 288
-		-- upvalues: v77 (copy)
-		v77(function(b1: boolean) -- line: 289
+	local v81 = not t9.isDone or v77
+	local v82 = React.useCallback(function() -- line: 311
+		-- upvalues: v78 (copy)
+		v78(function(b1: boolean) -- line: 312
 			return not b1
 		end)
 	end, {})
 	local t10 = {}
 
-	if v80 then
+	if v81 then
 		local n3 = 1
 
-		for _, v85 in v75 do
-			local v86 = renderWorkSegment(v85, n3, t9.markdownTextStyle, t9.clockBinding, t9.localToolActions)
+		for _, v86 in v76 do
+			local v87 = renderWorkSegment(v86, n3, t9.markdownTextStyle, t9.clockBinding, t9.localToolActions)
 
-			if v86 ~= nil then
-				t10[v85.key] = v86
+			if v87 ~= nil then
+				t10[v86.key] = v87
 				n3 += 1
 			end
 		end
@@ -289,24 +312,24 @@ local function TurnWorkSegment(t9: {[any]: any}) -- line: 280
 			LayoutOrder = 1,
 			tag = "row align-y-center gap-xsmall size-full-0 auto-y padding-y-xxsmall",
 			testId = "ChatTurnBlock.TurnWork.Summary",
-			onActivated = v81,
+			onActivated = v82,
 			stateLayer = {
 				affordance = StateLayerAffordance.None
 			}
 		}, {
 			Chevron = React.createElement(Icon, {
 				LayoutOrder = 1,
-				name = if not v76 then IconName.ChevronLargeRight else IconName.ChevronLargeDown,
+				name = if not v77 then IconName.ChevronLargeRight else IconName.ChevronLargeDown,
 				size = IconSize.XSmall,
-				style = v78.Color.Content.Muted
+				style = v79.Color.Content.Muted
 			}),
 			Label = React.createElement(FoundationText, {
 				LayoutOrder = 2,
 				tag = "fill text-body-medium text-wrap text-align-x-left content-muted",
-				Text = v74
+				Text = v75
 			})
 		}),
-		Work = if not v80 then nil else React.createElement(View, {
+		Work = if not v81 then nil else React.createElement(View, {
 			testId = "ChatTurnBlock.TurnWork.Content",
 			LayoutOrder = not isDone and 1 or 2,
 			tag = {
@@ -316,7 +339,7 @@ local function TurnWorkSegment(t9: {[any]: any}) -- line: 280
 		}, t10)
 	})
 end
-local function ChatTurnBlock(t11: {[any]: any}) -- line: 351
+local function ChatTurnBlock(t11: {[any]: any}) -- line: 374
 	-- upvalues: React (copy), turnProjection (copy), reportTurnActivityGap (copy), useReactiveValue (copy), t1 (copy), t2 (copy), Foundation (copy), sendBuildExperienceEvent (copy), renderWorkSegment (copy), TurnWorkSegment (copy), PlaytestCompletedCard (copy), View (copy), AgentTurnFeedback (copy)
 	local turn = t11.turn
 	local turnState = turn.turnState
@@ -328,7 +351,7 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 351
 	local universeId = turn.universeId
 	local sessionId = turn.sessionId
 	local isDone = turn.isDone
-	local v98 = React.useMemo(function() -- line: 365
+	local v99 = React.useMemo(function() -- line: 388
 		-- upvalues: turnState (copy), turnProjection (copy), turnKey (copy), universeId (copy), sessionId (copy), startSequenceId (copy), endSequenceId (copy), optimisticLocalTools (copy), setupErrorText (copy)
 		if turnState ~= nil then
 			return turnProjection.projectActiveTurnSegments(turnState, {
@@ -360,39 +383,39 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 351
 		universeId,
 		sessionId
 	})
-	local v99 = React.useRef(nil)
+	local v100 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 394
-		-- upvalues: isDone (copy), v99 (copy), reportTurnActivityGap (copy), universeId (copy)
+	React.useEffect(function() -- line: 417
+		-- upvalues: isDone (copy), v100 (copy), reportTurnActivityGap (copy), universeId (copy)
 		if isDone then
-			v99.current = nil
+			v100.current = nil
 
 			return
 		end
 
 		local elapsed = os.clock()
-		local v114 = v99.current == nil
-		local v115 = v99.current == nil and 0 or (elapsed - v99.current) * 1000
+		local v115 = v100.current == nil
+		local v116 = v100.current == nil and 0 or (elapsed - v100.current) * 1000
 
-		reportTurnActivityGap.log(v115, v114, universeId)
-		v99.current = elapsed
+		reportTurnActivityGap.log(v116, v115, universeId)
+		v100.current = elapsed
 	end, {
 		isDone,
-		v98,
+		v99,
 		universeId
 	})
 
-	local v100 = useReactiveValue(turn.turnFeedbackIds or t1)
-	local v101 = t11.localToolActions or t2
+	local v101 = useReactiveValue(turn.turnFeedbackIds or t1)
+	local v102 = t11.localToolActions or t2
 	local Emphasis = Foundation.Hooks.useTokens().Color.Content.Emphasis
 	local onPlaytest = t11.onPlaytest
-	local v104 = React.useCallback(function() -- line: 413
-		-- upvalues: sendBuildExperienceEvent (copy), v100 (copy), onPlaytest (copy)
+	local v105 = React.useCallback(function() -- line: 436
+		-- upvalues: sendBuildExperienceEvent (copy), v101 (copy), onPlaytest (copy)
 		sendBuildExperienceEvent("PLAYTEST_CLICK", {
-			universeId = v100.universeId,
-			placeId = v100.placeId,
-			conversationId = v100.sessionId,
-			messageId = v100.sequenceId
+			universeId = v101.universeId,
+			placeId = v101.placeId,
+			conversationId = v101.sessionId,
+			messageId = v101.sequenceId
 		})
 
 		if onPlaytest ~= nil then
@@ -400,70 +423,70 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 351
 		end
 	end, {
 		onPlaytest,
-		v100
+		v101
 	})
-	local v105 = React.useRef(false)
+	local v106 = React.useRef(false)
 
-	React.useEffect(function() -- line: 426
-		-- upvalues: v105 (copy), onPlaytest (copy), v98 (copy), sendBuildExperienceEvent (copy), v100 (copy)
-		if v105.current or onPlaytest == nil then
+	React.useEffect(function() -- line: 449
+		-- upvalues: v106 (copy), onPlaytest (copy), v99 (copy), sendBuildExperienceEvent (copy), v101 (copy)
+		if v106.current or onPlaytest == nil then
 			return
 		end
 
-		local v116 = false
+		local v117 = false
 
-		for _, v118 in v98 do
-			if v118.kind == "playtest_cta" then
-				v116 = true
+		for _, v119 in v99 do
+			if v119.kind == "playtest_cta" then
+				v117 = true
 
 				break
 			end
 		end
 
-		if not v116 then
+		if not v117 then
 			return
 		end
 
-		v105.current = true
+		v106.current = true
 		sendBuildExperienceEvent("PLAYTEST_IMPRESSION", {
-			universeId = v100.universeId,
-			placeId = v100.placeId,
-			conversationId = v100.sessionId,
-			messageId = v100.sequenceId
+			universeId = v101.universeId,
+			placeId = v101.placeId,
+			conversationId = v101.sessionId,
+			messageId = v101.sequenceId
 		})
 	end, {
-		v98,
+		v99,
 		onPlaytest,
-		v100
+		v101
 	})
 
 	local t12 = {}
 	local n4 = 1
 
-	for _, v109 in v98 do
-		local v110 = nil
+	for _, v110 in v99 do
+		local v111 = nil
 
-		if v109.kind == "agent_message" or v109.kind == "activity_summary" or v109.kind == "client_tool" then
-			v110 = renderWorkSegment(v109, n4, Emphasis, t11.clockBinding, v101)
-		elseif v109.kind == "turn_work" then
-			v110 = React.createElement(TurnWorkSegment, {
+		if v110.kind == "agent_message" or v110.kind == "activity_summary" or v110.kind == "client_tool" then
+			v111 = renderWorkSegment(v110, n4, Emphasis, t11.clockBinding, v102)
+		elseif v110.kind == "turn_work" then
+			v111 = React.createElement(TurnWorkSegment, {
 				LayoutOrder = n4,
-				segment = v109,
+				segment = v110,
 				isDone = isDone,
 				markdownTextStyle = Emphasis,
 				clockBinding = t11.clockBinding,
-				localToolActions = v101
+				localToolActions = v102
 			})
-		elseif v109.kind == "playtest_cta" and onPlaytest ~= nil then
-			v110 = React.createElement(PlaytestCompletedCard, {
+		elseif v110.kind == "playtest_cta" and onPlaytest ~= nil then
+			v111 = React.createElement(PlaytestCompletedCard, {
 				LayoutOrder = n4,
-				onPlaytest = v104,
+				onPlaytest = v105,
 				isLoading = t11.isPlaytestLoading
 			})
 		end
 
-		if v110 ~= nil then
-			t12[v109.key] = v110
+		if v111 ~= nil then
+			t12[v110.key] = v111
 			n4 += 1
 		end
 	end
@@ -485,7 +508,7 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 351
 			Feedback = if not isDone then nil else React.createElement(AgentTurnFeedback, {
 				LayoutOrder = 2,
 				testId = "ChatTurnBlock.UserFeedback",
-				turnFeedbackIds = v100
+				turnFeedbackIds = v101
 			})
 		})
 	})

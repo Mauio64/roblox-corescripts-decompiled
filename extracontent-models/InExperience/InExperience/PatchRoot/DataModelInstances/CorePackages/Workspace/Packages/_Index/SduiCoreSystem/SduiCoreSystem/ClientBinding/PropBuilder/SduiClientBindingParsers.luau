@@ -11,52 +11,53 @@ local ProtoVariableMapper = require(SduiCoreSystem.ClientBinding.ProtoVariableMa
 local splitDottedPath = require(SduiCoreSystem.ClientBinding.splitDottedPath)
 local FFlagSduiStringPropToString = require(SduiCoreSystemParent.SharedFlags).FFlagSduiStringPropToString
 local FFlagSduiPropParsersShouldHandleTokens = require(SduiCoreSystemParent.SharedFlags).FFlagSduiPropParsersShouldHandleTokens
+local FFlagLuaAppSduiColorPropMigration = require(SduiCoreSystemParent.SharedFlags).FFlagLuaAppSduiColorPropMigration
 local FFlagSduiFocusNavActionsStructured = require(SduiCoreSystemParent.SharedFlags).FFlagSduiFocusNavActionsStructured
 local FFlagSduiRenderPerf = require(SduiCoreSystemParent.SharedFlags).FFlagSduiRenderPerf
 
-local function resolveTokenValueToNumber(p1, s1: string) -- line: 21
+local function resolveTokenValueToNumber(p1, s1: string) -- line: 22
 	-- upvalues: FFlagSduiRenderPerf (copy), splitDottedPath (copy)
-	local v23 = string.sub(s1, 1, 1) == "-"
-	local v24 = if not v23 then s1 else string.sub(s1, 2)
-	local v25 = if not FFlagSduiRenderPerf then string.split(v24, ".") else splitDottedPath(v24)
-	local v26 = #v25
+	local v26 = string.sub(s1, 1, 1) == "-"
+	local v27 = if not v26 then s1 else string.sub(s1, 2)
+	local v28 = if not FFlagSduiRenderPerf then string.split(v27, ".") else splitDottedPath(v27)
+	local v29 = #v28
 
-	for v27, v28 in v25 do
-		local v29 = p1[v28]
+	for v30, v31 in v28 do
+		local v32 = p1[v31]
 
-		if v27 ~= v26 and typeof(v29) ~= "table" then
-			error(`Token path { v24 } invalid`)
+		if v30 ~= v29 and typeof(v32) ~= "table" then
+			error(`Token path { v27 } invalid`)
 		end
 
-		p1 = p1[v28]
+		p1 = p1[v31]
 	end
 
 	if typeof(p1) ~= "number" then
-		error(`Token path { v24 } did not resolve to a number: { s1 }`)
+		error(`Token path { v27 } did not resolve to a number: { s1 }`)
 	end
 
-	if v23 then
+	if v26 then
 		return p1 * -1
 	end
 
 	return p1
 end
-local function getTokenOrNumber(p2, p3, b1: boolean, s2: string) -- line: 47
+local function getTokenOrNumber(p2, p3, b1: boolean, s2: string) -- line: 48
 	-- upvalues: getSduiTokensStore (copy), resolveTokenValueToNumber (copy)
 	local num = tonumber(p2)
 
 	if num then
 		if b1 then
-			local v35 = getSduiTokensStore().getTokens(p3, s2)
+			local v38 = getSduiTokensStore().getTokens(p3, s2)
 
-			return num * (v35 and v35.Config.UI.Scale or 1)
+			return num * (v38 and v38.Config.UI.Scale or 1)
 		end
 
 		return num
 	end
 
 	if typeof(p2) == "string" then
-		local ok, result = pcall(function() -- line: 62
+		local ok, result = pcall(function() -- line: 63
 			-- upvalues: resolveTokenValueToNumber (copy), getSduiTokensStore (copy), p3 (copy), s2 (copy), p2 (copy)
 			return (resolveTokenValueToNumber(getSduiTokensStore().getTokens(p3, s2), p2))
 		end)
@@ -73,24 +74,24 @@ local function getTokenOrNumber(p2, p3, b1: boolean, s2: string) -- line: 47
 	error("Expected number or token string, got " .. typeof(p2))
 end
 
-local v13 = not FFlagSduiPropParsersShouldHandleTokens and function(s3: string, p4, b2: boolean) -- line: 97
+local v14 = not FFlagSduiPropParsersShouldHandleTokens and function(s3: string, p4, b2: boolean) -- line: 98
 	-- upvalues: getSduiTokensStore (copy)
-	local ok, result = pcall(function() -- line: 98
+	local ok, result = pcall(function() -- line: 99
 		-- upvalues: s3 (copy), b2 (copy), getSduiTokensStore (copy), p4 (copy)
 		local parts = string.split(s3, ",")
 
 		if #parts == 4 then
-			local v92 = tonumber(parts[2]) or 0
-			local v93 = tonumber(parts[4]) or 0
+			local v99 = tonumber(parts[2]) or 0
+			local v100 = tonumber(parts[4]) or 0
 
 			if b2 then
-				local v94 = getSduiTokensStore().getTokens(p4, "parseUDim2")
+				local v101 = getSduiTokensStore().getTokens(p4, "parseUDim2")
 
-				v92 *= v94 and v94.Config.UI.Scale or 1
-				v93 *= v94 and v94.Config.UI.Scale or 1
+				v99 *= v101 and v101.Config.UI.Scale or 1
+				v100 *= v101 and v101.Config.UI.Scale or 1
 			end
 
-			return UDim2.new(tonumber(parts[1]) or 0, v92, tonumber(parts[3]) or 0, v93)
+			return UDim2.new(tonumber(parts[1]) or 0, v99, tonumber(parts[3]) or 0, v100)
 		end
 
 		error("Not enough components in string to parse UDim2")
@@ -101,17 +102,17 @@ local v13 = not FFlagSduiPropParsersShouldHandleTokens and function(s3: string, 
 	end
 
 	error(if typeof(result) ~= "string" then nil else result)
-end or function(s4: string, p5, b3: boolean) -- line: 79
+end or function(s4: string, p5, b3: boolean) -- line: 80
 	-- upvalues: getTokenOrNumber (copy)
-	local ok, result = pcall(function() -- line: 80
+	local ok, result = pcall(function() -- line: 81
 		-- upvalues: s4 (copy), getTokenOrNumber (copy), p5 (copy), b3 (copy)
 		local parts = string.split(s4, ",")
 
 		if #parts == 4 then
-			local v89 = getTokenOrNumber(parts[2], p5, b3, "parseUDim2")
-			local v90 = getTokenOrNumber(parts[4], p5, b3, "parseUDim2")
+			local v96 = getTokenOrNumber(parts[2], p5, b3, "parseUDim2")
+			local v97 = getTokenOrNumber(parts[4], p5, b3, "parseUDim2")
 
-			return UDim2.new(tonumber(parts[1]) or 0, v89, tonumber(parts[3]) or 0, v90)
+			return UDim2.new(tonumber(parts[1]) or 0, v96, tonumber(parts[3]) or 0, v97)
 		end
 
 		error("Not enough components in string to parse UDim2")
@@ -123,22 +124,22 @@ end or function(s4: string, p5, b3: boolean) -- line: 79
 
 	error(if typeof(result) ~= "string" then nil else result)
 end
-local v14 = not FFlagSduiPropParsersShouldHandleTokens and function(s5: string, p6, b4: boolean) -- line: 142
+local v15 = not FFlagSduiPropParsersShouldHandleTokens and function(s5: string, p6, b4: boolean) -- line: 143
 	-- upvalues: getSduiTokensStore (copy)
-	local ok, result = pcall(function() -- line: 143
+	local ok, result = pcall(function() -- line: 144
 		-- upvalues: s5 (copy), b4 (copy), getSduiTokensStore (copy), p6 (copy)
 		local parts = string.split(s5, ",")
 
 		if #parts == 2 then
-			local v98 = tonumber(parts[2]) or 0
+			local v105 = tonumber(parts[2]) or 0
 
 			if b4 then
-				local v99 = getSduiTokensStore().getTokens(p6, "parseUDim2")
+				local v106 = getSduiTokensStore().getTokens(p6, "parseUDim2")
 
-				v98 *= v99 and v99.Config.UI.Scale or 1
+				v105 *= v106 and v106.Config.UI.Scale or 1
 			end
 
-			return UDim.new(tonumber(parts[1]) or 0, v98)
+			return UDim.new(tonumber(parts[1]) or 0, v105)
 		end
 
 		error("Not enough components in string to parse UDim")
@@ -149,16 +150,16 @@ local v14 = not FFlagSduiPropParsersShouldHandleTokens and function(s5: string, 
 	end
 
 	error(if typeof(result) ~= "string" then nil else result)
-end or function(s6: string, p7, b5: boolean) -- line: 125
+end or function(s6: string, p7, b5: boolean) -- line: 126
 	-- upvalues: getTokenOrNumber (copy)
-	local ok, result = pcall(function() -- line: 126
+	local ok, result = pcall(function() -- line: 127
 		-- upvalues: s6 (copy), getTokenOrNumber (copy), p7 (copy), b5 (copy)
 		local parts = string.split(s6, ",")
 
 		if #parts == 2 then
-			local v96 = getTokenOrNumber(parts[2], p7, b5, "parseUDim")
+			local v103 = getTokenOrNumber(parts[2], p7, b5, "parseUDim")
 
-			return UDim.new(tonumber(parts[1]) or 0, v96)
+			return UDim.new(tonumber(parts[1]) or 0, v103)
 		end
 
 		error("Not enough components in string to parse UDim")
@@ -171,18 +172,18 @@ end or function(s6: string, p7, b5: boolean) -- line: 125
 	error(if typeof(result) ~= "string" then nil else result)
 end
 
-local function parseNumber(p8, p9, b6: boolean) -- line: 168
+local function parseNumber(p8, p9, b6: boolean) -- line: 169
 	-- upvalues: getSduiTokensStore (copy)
-	local ok, result = pcall(function() -- line: 173
+	local ok, result = pcall(function() -- line: 174
 		-- upvalues: p8 (copy)
 		return (tonumber(p8))
 	end)
 
 	if ok and result then
 		if b6 then
-			local v63 = getSduiTokensStore().getTokens(p9, "parseUDim2")
+			local v66 = getSduiTokensStore().getTokens(p9, "parseUDim2")
 
-			return result * (v63 and v63.Config.UI.Scale or 1)
+			return result * (v66 and v66.Config.UI.Scale or 1)
 		end
 
 		return result
@@ -190,7 +191,7 @@ local function parseNumber(p8, p9, b6: boolean) -- line: 168
 
 	error(if typeof(result) ~= "string" then nil else result)
 end
-local function parseStruct(p10) -- line: 201
+local function parseStruct(p10) -- line: 202
 	-- upvalues: ProtoVariableMapper (copy), parseStruct (copy)
 	if typeof(p10) ~= "table" then
 		return p10
@@ -199,42 +200,73 @@ local function parseStruct(p10) -- line: 201
 	local mapPropName = ProtoVariableMapper.mapPropName
 	local t1 = {}
 
-	for v73, v74 in p10 do
-		t1[if typeof(v73) ~= "string" then v73 else mapPropName(v73)] = if typeof(v74) ~= "table" then v74 else parseStruct(v74)
+	for v76, v77 in p10 do
+		t1[if typeof(v76) ~= "string" then v76 else mapPropName(v76)] = if typeof(v77) ~= "table" then v77 else parseStruct(v77)
 	end
 
 	return t1
 end
-local function parseToString(p11) -- line: 227
+local function parseToString(p11) -- line: 228
 	if p11 == nil then
 		return nil
 	end
 
 	return (tostring(p11))
 end
-local function parseFocusNavActions(p12) -- line: 247
+local function parseColor3(p12) -- line: 249
+	if typeof(p12) == "Color3" then
+		return p12
+	end
+
+	if typeof(p12) == "string" then
+		local ok, result = pcall(function() -- line: 254
+			-- upvalues: p12 (copy)
+			return Color3.fromHex(p12)
+		end)
+
+		if ok then
+			return result
+		end
+
+		return nil
+	end
+
+	if typeof(p12) == "table" and typeof(p12.Color3) == "Color3" then
+		return p12.Color3
+	end
+
+	error(`Could not resolve Color3 from input: { p12 }`)
+end
+local function parseColorPropLegacy(p13) -- line: 271
+	if typeof(p13) == "string" then
+		return Color3.fromHex(p13)
+	end
+
+	return p13
+end
+local function parseFocusNavActions(p14) -- line: 281
 	-- upvalues: InputHandlers (copy)
-	if typeof(p12) ~= "table" then
+	if typeof(p14) ~= "table" then
 		return nil
 	end
 
 	local t2 = {}
 
-	if typeof(p12.keys) == "table" then
-		for v83, v84 in p12.keys do
-			if typeof(v84) == "EnumItem" and typeof(v83) == "string" then
-				t2[v84] = v83
+	if typeof(p14.keys) == "table" then
+		for v90, v91 in p14.keys do
+			if typeof(v91) == "EnumItem" and typeof(v90) == "string" then
+				t2[v91] = v90
 			end
 		end
 	end
 
 	local t3 = {}
 
-	if typeof(p12.events) == "table" then
-		for v86, v87 in p12.events do
-			if typeof(v86) == "string" and typeof(v87) == "function" then
-				t3[v86] = {
-					handler = InputHandlers.onRelease(v87)
+	if typeof(p14.events) == "table" then
+		for v93, v94 in p14.events do
+			if typeof(v93) == "string" and typeof(v94) == "function" then
+				t3[v93] = {
+					handler = InputHandlers.onRelease(v94)
 				}
 			end
 		end
@@ -247,46 +279,48 @@ local function parseFocusNavActions(p12) -- line: 247
 end
 
 return {
-	parseUDim = v14,
-	parseUDim2 = v13,
+	parseUDim = v15,
+	parseUDim2 = v14,
 	parseNumber = parseNumber,
-	applyTokenScaling = function(n1: number, p13) -- line: 16
-		return n1 * (p13 and p13.Config.UI.Scale or 1)
+	applyTokenScaling = function(n1: number, p15) -- line: 17
+		return n1 * (p15 and p15.Config.UI.Scale or 1)
 	end,
-	parseUiScaledNumber = function(p14, p15) -- line: 187
+	parseUiScaledNumber = function(p16, p17) -- line: 188
 		-- upvalues: parseNumber (copy)
-		return parseNumber(p14, p15, true)
+		return parseNumber(p16, p17, true)
 	end,
-	parseUiScaledUDim = function(s7: string, p16) -- line: 191
+	parseUiScaledUDim = function(s7: string, p18) -- line: 192
+		-- upvalues: v15 (copy)
+		return v15(s7, p18, true)
+	end,
+	parseUiScaledUDim2 = function(s8: string, p19) -- line: 196
 		-- upvalues: v14 (copy)
-		return v14(s7, p16, true)
-	end,
-	parseUiScaledUDim2 = function(s8: string, p17) -- line: 195
-		-- upvalues: v13 (copy)
-		return v13(s8, p17, true)
+		return v14(s8, p19, true)
 	end,
 	parseStruct = parseStruct,
-	parseArrayOfStruct = function(p18) -- line: 216
+	parseArrayOfStruct = function(p20) -- line: 217
 		-- upvalues: parseStruct (copy)
-		if typeof(p18) ~= "table" then
-			return p18
+		if typeof(p20) ~= "table" then
+			return p20
 		end
 
 		local t4 = {}
 
-		for v77, v78 in p18 do
-			t4[v77] = parseStruct(v78)
+		for v80, v81 in p20 do
+			t4[v80] = parseStruct(v81)
 		end
 
 		return t4
 	end,
-	parseStringArray = function(p19) -- line: 238
-		if typeof(p19) ~= "table" then
+	parseStringArray = function(p21) -- line: 239
+		if typeof(p21) ~= "table" then
 			return nil
 		end
 
-		return p19.items or p19
+		return p21.items or p21
 	end,
 	parseToString = if not FFlagSduiStringPropToString then nil else parseToString,
+	parseColor3 = if not FFlagLuaAppSduiColorPropMigration then nil else parseColor3,
+	parseColorPropLegacy = if not FFlagLuaAppSduiColorPropMigration then nil else parseColorPropLegacy,
 	parseFocusNavActions = if not FFlagSduiFocusNavActionsStructured then nil else parseFocusNavActions
 }

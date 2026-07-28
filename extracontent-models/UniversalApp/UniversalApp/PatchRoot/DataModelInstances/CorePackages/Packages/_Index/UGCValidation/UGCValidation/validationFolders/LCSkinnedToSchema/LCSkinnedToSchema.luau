@@ -6,14 +6,13 @@ require(ParentParent.util.Types)
 
 local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
 local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
 
 return {
 	fflag = require(ParentParent.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning),
 	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
 	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
-	run = function(p1, p2) -- line: 15
-		-- upvalues: UGCValidationService (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy), Constants (copy), ErrorSourceStrings (copy)
+	run = function(p1, p2) -- line: 13
+		-- upvalues: UGCValidationService (copy), Constants (copy), ErrorSourceStrings (copy)
 		local Handle = p2.rootInstance:FindFirstChild("Handle")
 		local Handle2 = p2.renderMeshesData.Handle
 
@@ -23,8 +22,8 @@ return {
 
 		local t1 = {}
 
-		for _, v13 in Handle2.editable:GetBones() do
-			table.insert(t1, Handle2.editable:GetBoneName(v13))
+		for _, v12 in Handle2.editable:GetBones() do
+			table.insert(t1, Handle2.editable:GetBoneName(v12))
 		end
 
 		local t2 = { UGCValidationService:GetSkinnedJointNamesFromEditableMesh(Handle2.editable) }
@@ -33,28 +32,26 @@ return {
 
 		assert(WrapLayer, "WrapLayer not found on handle")
 
-		local v17 = WrapLayer.AutoSkin == Enum.WrapLayerAutoSkin.EnabledOverride
+		local v16 = WrapLayer.AutoSkin == Enum.WrapLayerAutoSkin.EnabledOverride
 
-		if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
-			p1:setReportingInstance(Handle)
-		end
+		p1:setReportingInstance(Handle)
 
-		for _, v19 in t1 do
-			if Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES[v19] then
-				if not v17 then
+		for _, v18 in t1 do
+			if Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES[v18] then
+				if not v16 then
 					p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_TransferJointWithoutAutoSkin, {
-						jointName = v19
+						jointName = v18
 					})
 				end
-			elseif not Constants.R15_STANDARD_JOINT_NAMES[v19] then
+			elseif not Constants.R15_STANDARD_JOINT_NAMES[v18] then
 				p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_ExtraJoint, {
-					jointName = v19
+					jointName = v18
 				})
 			end
 		end
 
-		for _, v21 in EditableMeshSkinningTransferJointsInfo do
-			if not v21 then
+		for _, v20 in EditableMeshSkinningTransferJointsInfo do
+			if not v20 then
 				p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_WeightNotFull)
 
 				break
@@ -62,31 +59,31 @@ return {
 		end
 
 		if Constants.SkinningTransferRequiredTypes[p2.uploadEnum.assetType] then
-			if not v17 then
+			if not v16 then
 				p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_RequiredSkinningTransfer, {
 					assetType = p2.uploadEnum.assetType.Name
 				})
 			end
 
-			for v22, _ in Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES do
-				if table.find(t2, v22) == nil then
+			for v21, _ in Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES do
+				if table.find(t2, v21) == nil then
 					p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_MissingTransferJoint, {
 						assetType = p2.uploadEnum.assetType.Name,
-						requiredJointName = v22
+						requiredJointName = v21
 					})
 				end
 			end
 
-			for _, v25 in t2 do
-				if Constants.R15_STANDARD_JOINT_NAMES[v25] then
+			for _, v24 in t2 do
+				if Constants.R15_STANDARD_JOINT_NAMES[v24] then
 					local t3 = {}
 
-					for v27, _ in Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES do
-						table.insert(t3, v27)
+					for v26, _ in Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES do
+						table.insert(t3, v26)
 					end
 
 					p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_NotLeaderOrFollower, {
-						jointName = v25,
+						jointName = v24,
 						validJointNameList = table.concat(t3, ", ")
 					})
 				end

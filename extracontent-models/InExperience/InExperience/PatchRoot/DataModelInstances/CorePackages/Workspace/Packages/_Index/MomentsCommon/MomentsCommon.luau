@@ -14,17 +14,20 @@ local ScrollingGridView = require(script.Components.ScrollingGridView)
 local OverlayDisplay = require(script.Components.OverlayDisplay)
 local TextOverlay = require(script.Components.TextOverlay)
 local TextOverlayDisplay = require(script.Components.TextOverlayDisplay)
+local StickerOverlay = require(script.Components.StickerOverlay)
+local ReactionAssets = require(script.Components.Reaction.ReactionAssets)
 local Performance = require(script.Performance)
 local ArgusExperiment = require(script.Flags.ArgusExperiment)
 local GetFFlagMomentsAnalyticsProducerPrereqs = require(script.Flags.GetFFlagMomentsAnalyticsProducerPrereqs)
 local GetFFlagMomentsStickerButton = require(script.Flags.GetFFlagMomentsStickerButton)
 local GetFFlagMomentsAnalyticsSchemaIdentity = require(script.Flags.GetFFlagMomentsAnalyticsSchemaIdentity)
 local FFlagMomentsFeedHealthAnalytics = require(script.Flags.FFlagMomentsFeedHealthAnalytics)
+local FFlagMomentsProfileGridInfiniteLoad = require(script.Flags.FFlagMomentsProfileGridInfiniteLoad)
 local t1 = {
 	useDeviceInsets = require(script.Hooks.useDeviceInsets),
 	useFormFactor = require(script.Hooks.useFormFactor),
 	useImageLoadingState = require(script.Hooks.useImageLoadingState),
-	useMomentsGating = function(...) -- line: 71
+	useMomentsGating = function(...) -- line: 74
 		return require(script.Hooks.useMomentsGating)(...)
 	end,
 	useScreenSize = require(script.Hooks.useScreenSize),
@@ -39,7 +42,8 @@ return {
 		GetFFlagMomentsAnalyticsProducerPrereqs = GetFFlagMomentsAnalyticsProducerPrereqs,
 		GetFFlagMomentsStickerButton = GetFFlagMomentsStickerButton,
 		GetFFlagMomentsAnalyticsSchemaIdentity = GetFFlagMomentsAnalyticsSchemaIdentity,
-		FFlagMomentsFeedHealthAnalytics = FFlagMomentsFeedHealthAnalytics
+		FFlagMomentsFeedHealthAnalytics = FFlagMomentsFeedHealthAnalytics,
+		FFlagMomentsProfileGridInfiniteLoad = FFlagMomentsProfileGridInfiniteLoad
 	},
 	Components = {
 		GradientBackdrop = GradientBackdrop,
@@ -47,7 +51,9 @@ return {
 		Reaction = Reaction,
 		OverlayDisplay = OverlayDisplay,
 		TextOverlay = TextOverlay,
-		TextOverlayDisplay = TextOverlayDisplay
+		TextOverlayDisplay = TextOverlayDisplay,
+		StickerOverlay = StickerOverlay,
+		ReactionAssets = ReactionAssets
 	},
 	Enums = {
 		FormFactor = FormFactor,

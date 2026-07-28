@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local _Index = script.Parent.Parent.Parent._Index
 
-return (require(_Workspace.FriendsNetworking.FriendsNetworking))
+return (require(_Index.FriendsNetworking.FriendsNetworking))

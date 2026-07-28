@@ -763,9 +763,17 @@ return {
 					}
 				}}
 			},
-			trailingAccessories = {{
-				type = "voiceSpeakingIndicator"
-			}},
+			trailingAccessories = {
+				{
+					type = "recentlyLeftIndicator",
+					text = {
+						["$translate"] = "Label.RecentlyLeft"
+					}
+				},
+				{
+					type = "voiceSpeakingIndicator"
+				}
+			},
 			nextButtonText = {
 				["$translate"] = "Action.Continue"
 			},
@@ -780,7 +788,7 @@ return {
 			}
 		},
 		generalUserSelection = {
-			type = "list",
+			type = "inExpUserSelection",
 			variant = "chevron",
 			storeAs = "selectedPlayer",
 			required = true,
@@ -806,6 +814,12 @@ return {
 					}
 				}}
 			},
+			trailingAccessories = {{
+				type = "recentlyLeftIndicator",
+				text = {
+					["$translate"] = "Label.RecentlyLeft"
+				}
+			}},
 			nextButtonText = {
 				["$translate"] = "Action.Continue"
 			},

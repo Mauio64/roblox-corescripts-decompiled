@@ -31,55 +31,54 @@ local PostSendUserSignal = UserSignals.PostSendUserSignal
 local UserSignalTypes = UserSignals.UserSignalTypes
 local NotInterestedUserSignalTelemetryEventConfigs = require(GameTile.NotInterestedUserSignalTelemetryEventConfigs)
 local FFlagLuaAppEnableSponsoredReportAd = SharedFlags.FFlagLuaAppEnableSponsoredReportAd
-local FFlagLuaAppSupportSponsoredExplicitFeedback = SharedFlags.FFlagLuaAppSupportSponsoredExplicitFeedback
 
-local function HiddenTileContent(t1: {[any]: any}) -- line: 50
-	-- upvalues: useDispatch (copy), React (copy), useTokens (copy), useFocusGuiObject (copy), useRoactService (copy), RoactNetworking (copy), useLocalization (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), SetNetworkingErrorToast (copy), GuiService (copy), PostSendUserSignal (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), UserSignalTypes (copy), mutedError (copy), View (copy), FFlagLuaAppEnableSponsoredReportAd (copy), FoundationText (copy), Button (copy), InputSize (copy), ButtonVariant (copy)
-	local v37 = useDispatch()
-	local v38 = React.useRef(nil)
-	local v39 = useTokens()
-	local v40 = useFocusGuiObject()
-	local v41 = useRoactService(RoactNetworking)
-	local v42 = useLocalization({
+local function HiddenTileContent(t1: {[any]: any}) -- line: 49
+	-- upvalues: useDispatch (copy), React (copy), useTokens (copy), useFocusGuiObject (copy), useRoactService (copy), RoactNetworking (copy), useLocalization (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), SetNetworkingErrorToast (copy), GuiService (copy), PostSendUserSignal (copy), UserSignalTypes (copy), mutedError (copy), View (copy), FFlagLuaAppEnableSponsoredReportAd (copy), FoundationText (copy), Button (copy), InputSize (copy), ButtonVariant (copy)
+	local v36 = useDispatch()
+	local v37 = React.useRef(nil)
+	local v38 = useTokens()
+	local v39 = useFocusGuiObject()
+	local v40 = useRoactService(RoactNetworking)
+	local v41 = useLocalization({
 		undoLabel = "Feature.GameDetails.Action.Undo",
 		hiddenTileMessage = "Feature.GameDetails.Message.SuggestLessOften"
 	})
-	local v43 = React.useCallback(function() -- line: 62
-		-- upvalues: t1 (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), v37 (copy), SetNetworkingErrorToast (copy), GuiService (copy), v38 (copy), v40 (copy), PostSendUserSignal (copy), v41 (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), UserSignalTypes (copy), mutedError (copy)
+	local v42 = React.useCallback(function() -- line: 61
+		-- upvalues: t1 (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), v36 (copy), SetNetworkingErrorToast (copy), GuiService (copy), v37 (copy), v39 (copy), PostSendUserSignal (copy), v40 (copy), UserSignalTypes (copy), mutedError (copy)
 		if not t1.appPage then
 			default:logRobloxTelemetryCounter(NotInterestedUserSignalTelemetryEventConfigs.NotInterestedMissingAppPage, 1)
-			v37(SetNetworkingErrorToast())
+			v36(SetNetworkingErrorToast())
 
 			return
 		end
 
 		t1.setGameHidden(t1.universeId, false)
 
-		if GuiService.SelectedCoreObject == v38.current then
-			task.delay(0, function() -- line: 75
-				-- upvalues: t1 (copy), v40 (copy)
+		if GuiService.SelectedCoreObject == v37.current then
+			task.delay(0, function() -- line: 74
+				-- upvalues: t1 (copy), v39 (copy)
 				if t1.parentRef then
-					v40(t1.parentRef.current)
+					v39(t1.parentRef.current)
 				end
 			end)
 		end
 
-		local ok, result = pcall(function() -- line: 82
-			-- upvalues: PostSendUserSignal (copy), v41 (copy), t1 (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), UserSignalTypes (copy), v37 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
-			PostSendUserSignal(v41, {
+		local ok, result = pcall(function() -- line: 81
+			-- upvalues: PostSendUserSignal (copy), v40 (copy), t1 (copy), UserSignalTypes (copy), v36 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
+			PostSendUserSignal(v40, {
 				boolValue = false
 			}, {
 				id = t1.universeId,
-				assetType = if not FFlagLuaAppSupportSponsoredExplicitFeedback or not t1.isSponsored then UserSignalTypes.AssetType.Game else UserSignalTypes.AssetType.SponsoredGame,
+				assetType = if not t1.isSponsored then UserSignalTypes.AssetType.Game else UserSignalTypes.AssetType.SponsoredGame,
 				signalOrigin = {
 					productSurface = t1.appPage,
 					topicId = t1.collectionId or "",
 					subIds = { t1.collectionId or "" }
 				}
-			}, UserSignalTypes.SignalValueType.Bool, UserSignalTypes.SignalType.NotInterested):catch(function(p1) -- line: 96
-				-- upvalues: t1 (copy), v37 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
+			}, UserSignalTypes.SignalValueType.Bool, UserSignalTypes.SignalType.NotInterested):catch(function(p1) -- line: 95
+				-- upvalues: t1 (copy), v36 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
 				t1.setGameHidden(t1.universeId, true)
-				v37(SetNetworkingErrorToast(p1))
+				v36(SetNetworkingErrorToast(p1))
 				default:logRobloxTelemetryCounter(NotInterestedUserSignalTelemetryEventConfigs.NotInterestedUserSignalFailed, 1)
 			end)
 		end)
@@ -89,15 +88,15 @@ local function HiddenTileContent(t1: {[any]: any}) -- line: 50
 			mutedError(result)
 		end
 	end, {
-		v41,
 		v40,
+		v39,
 		t1.setGameHidden,
 		t1.universeId,
 		t1.collectionId,
 		t1.appPage,
 		t1.parentRef,
-		v37,
-		if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else t1.isSponsored
+		v36,
+		t1.isSponsored
 	})
 
 	return React.createElement(View, {
@@ -107,18 +106,18 @@ local function HiddenTileContent(t1: {[any]: any}) -- line: 50
 			LayoutOrder = 1,
 			TextWrapped = true,
 			AutomaticSize = Enum.AutomaticSize.Y,
-			fontStyle = v39.Typography.BodySmall,
+			fontStyle = v38.Typography.BodySmall,
 			Size = UDim2.fromScale(1, 0),
-			Text = v42.hiddenTileMessage,
-			textStyle = v39.Color.Content.Default
+			Text = v41.hiddenTileMessage,
+			textStyle = v38.Color.Content.Default
 		}),
 		UndoButton = React.createElement(Button, {
 			LayoutOrder = 2,
-			onActivated = v43,
+			onActivated = v42,
 			size = InputSize.XSmall,
-			text = v42.undoLabel,
+			text = v41.undoLabel,
 			variant = ButtonVariant.Standard,
-			ref = v38
+			ref = v37
 		})
 	})
 end

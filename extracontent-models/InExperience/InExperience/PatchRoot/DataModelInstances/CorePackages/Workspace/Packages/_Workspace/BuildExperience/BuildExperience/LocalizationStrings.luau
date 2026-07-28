@@ -1,98 +1,235 @@
+local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local FFlagEnableShareSheet = require(Parent.SharedFlags).FFlagEnableShareSheet
+local t1 = {
+	ask_for_logs = {
+		completed = "Requested logs",
+		failed = "Couldn't request logs",
+		running = "Requesting logs"
+	},
+	ask_user = {
+		completed = "Asked a question",
+		failed = "Couldn't ask a question",
+		running = "Asking a question"
+	},
+	execute_luau = {
+		completed = "Executed Luau",
+		failed = "Couldn't execute Luau",
+		running = "Executing Luau"
+	},
+	generate_image = {
+		completed = "Generated image",
+		failed = "Couldn't generate image",
+		running = "Generating image"
+	},
+	generate_model = {
+		completed = "Generated 3D model",
+		failed = "Couldn't generate 3D model",
+		running = "Generating 3D model"
+	},
+	generate_primitive = {
+		completed = "Generated primitive shape",
+		failed = "Couldn't generate primitive shape",
+		running = "Generating primitive shape"
+	},
+	insert_asset = {
+		completed = "Inserted asset",
+		failed = "Couldn't insert asset",
+		running = "Inserting asset"
+	},
+	invoke_script = {
+		completed = "Ran script",
+		failed = "Couldn't run script",
+		running = "Running script"
+	},
+	list_skills = {
+		completed = "Listed available skills",
+		failed = "Couldn't list available skills",
+		running = "Listing available skills"
+	},
+	load_skill = {
+		completed = "Loaded skill",
+		failed = "Couldn't load skill",
+		running = "Loading skill"
+	},
+	manage_plan = {
+		completed = "Updated plan",
+		failed = "Couldn't update plan",
+		running = "Updating plan"
+	},
+	manage_requirements = {
+		completed = "Updated requirements",
+		failed = "Couldn't update requirements",
+		running = "Updating requirements"
+	},
+	manage_tasks = {
+		completed = "Tasks planned",
+		failed = "Couldn't plan tasks",
+		running = "Planning your tasks"
+	},
+	present_plan = {
+		completed = "Presented plan",
+		failed = "Couldn't present plan",
+		running = "Presenting plan"
+	},
+	save_and_publish = {
+		completed = "Saved game",
+		failed = "Couldn't save game",
+		running = "Saving game"
+	},
+	search_assets = {
+		completed = "Searched asset library",
+		failed = "Couldn't search asset library",
+		running = "Searching asset library"
+	},
+	set_game_thumbnail = {
+		completed = "Set game thumbnail",
+		failed = "Couldn't set game thumbnail",
+		running = "Setting game thumbnail"
+	},
+	update_game_info = {
+		completed = "Updated game info",
+		failed = "Couldn't update game info",
+		running = "Updating game info"
+	}
+}
+
 return {
 	AGENT_PLAN_BUILD = "Build",
 	AGENT_PLAN_OVERVIEW = "Overview",
 	AGENT_PLAN_VIEW = "View",
-	ANSWER_STACK_CUSTOM_ANSWER = "Custom Answer",
+	ANSWER_STACK_CUSTOM_ANSWER = "Custom answer",
 	ANSWER_STACK_NEXT = "Next",
 	ANSWER_STACK_SELECT_AN_OPTION = "Select an option",
 	ANSWER_STACK_SUBMIT = "Submit",
 	ARCHIVE_GAME_ARCHIVE = "Archive",
 	ARCHIVE_GAME_CANCEL = "Cancel",
-	ARCHIVE_GAME_DESCRIPTION = "Archiving your game will remove it from Build. You can access and restore your archived games from Creator Hub or Roblox Studio.",
-	ARCHIVE_GAME_TITLE = "Archive Game",
-	BUILD_ASSISTANT_FALLBACK_NAME = "Build Assistant",
+	ARCHIVE_GAME_DESCRIPTION = "If you archive this game, it will be removed from Build. You can still access and restore it from Creator Hub or Roblox Studio.",
+	ARCHIVE_GAME_TITLE = "Archive this game?",
+	BUILD_ASSISTANT_FALLBACK_NAME = "Build",
+	BUILD_ELIGIBILITY_DIALOG_ACTION = "OK",
+	BUILD_ELIGIBILITY_ERROR_DESCRIPTION = "Try again.",
+	BUILD_ELIGIBILITY_ERROR_TITLE = "Something went wrong",
+	BUILD_ELIGIBILITY_INELIGIBLE_DESCRIPTION = "Your account doesn't meet the requirements to use Build.",
+	BUILD_ELIGIBILITY_INELIGIBLE_TITLE = "Build isn't available",
 	BUILD_GREETING = "Hi",
 	BUILD_HEADER_TITLE = "Build",
 	BUILD_SEARCH_PLACEHOLDER = "Search games",
-	BUILD_SUBLINE = "What do you want to build today?",
-	BUILD_MENU_AGENTS = "Agents",
-	BUILD_MENU_ARCHIVE_GAME = "Archive game",
+	BUILD_SUBLINE = "What do you want to create today?",
+	BUILD_MENU_AGENTS = "Tasks",
 	BUILD_MENU_AUDIENCE = "Audience",
 	BUILD_MENU_BACK_TO_BUILD = "Back to Build",
+	BUILD_MENU_INVITE_TO_PLAYTEST = "Add to playtest",
 	BUILD_MENU_LOADING = "Loading...",
 	BUILD_MENU_PLAYTEST = "Playtest",
 	BUILD_MENU_PUBLISH = "Publish",
 	BUILD_MENU_PUBLISH_LATEST = "Publish latest",
+	CREATOR_CREDIT_BUY = "Buy",
+	CREATOR_CREDIT_DAILY_CAPTION = "AI Credits reset daily",
+	CREATOR_CREDIT_DAILY_LABEL = "Daily AI Credits",
+	CREATOR_CREDIT_EXTRA_DESCRIPTION = "Additional AI usage starts after your free daily credits run out.",
+	CREATOR_CREDIT_EXTRA_LABEL = "Extra AI Credits",
+	CREATOR_CREDIT_INSUFFICIENT_FUNDS = "You need more AI Credits to continue.",
+	CREATOR_CREDIT_LOADING = "Loading AI usage…",
+	CREATOR_CREDIT_MENU_ITEM = "Usage",
+	CREATOR_CREDIT_PAGE_TITLE = "AI usage",
+	CREATOR_CREDIT_FREE_USAGE_LABEL = "Free AI usage",
+	CREATOR_CREDIT_FREE_USAGE_CAPTION = "Resets daily",
+	CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL = "Get more AI usage",
+	CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL = "Additional AI usage",
+	CREATOR_CREDIT_AVAILABLE_SUFFIX = "available",
+	CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION = "Use your Robux to automatically buy additional AI usage as you create. You can set a daily spend limit anytime.",
+	CREATOR_CREDIT_SET_DAILY_LIMIT = "Set a daily limit",
+	CREATOR_CREDIT_MANAGE_LIMIT = "Manage limit",
+	CREATOR_CREDIT_SETTINGS_SAVE_ERROR = "Couldn't save changes. Try again.",
+	CREATOR_CREDIT_LIMIT_SHEET_TITLE = "Set a daily limit",
+	CREATOR_CREDIT_LIMIT_SHEET_CONFIRM = "Set limit",
+	CREATOR_CREDIT_LIMIT_SHEET_NO_LIMIT = "No limit",
+	CREATOR_CREDIT_BUY_ROBUX_BUTTON = "Buy Robux",
+	CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = "No Robux left for AI usage",
+	CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = "Buy more Robux to keep creating, or wait for your free AI usage to reset tomorrow.",
+	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE = "Free AI usage limit reached",
+	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION = "Buy more AI usage with Robux, or wait for your daily limit to reset.",
+	CREATOR_CREDIT_DAILY_LIMIT_REACHED_TITLE = "Daily Robux limit reached",
+	CREATOR_CREDIT_DAILY_LIMIT_REACHED_DESCRIPTION = "Increase your daily Robux limit to keep creating, or wait for it to reset tomorrow.",
+	CREATOR_CREDIT_ADJUST_LIMIT_BUTTON = "Manage limit",
+	CREATOR_CREDIT_VIEW_USAGE_BUTTON = "View usage",
+	CREATOR_CREDIT_NOT_NOW_BUTTON = "Not now",
+	CREATOR_CREDIT_BUY_ROBUX_SHEET_TITLE = "Buy Robux",
+	CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM = "Buy",
 	BUILD_MENU_SETTINGS = "Settings",
 	BUILD_MENU_SHARE = "Share",
-	BUILD_MENU_VERSION_HISTORY = "Version History",
-	CHAT_ASSIGNING_TASKS = "Assigning tasks to agents",
-	CHAT_ASSISTANT_DISABLED = "Assistant disabled",
+	BUILD_MENU_VERSION_HISTORY = "Version history",
+	CHAT_ASSIGNING_TASKS = "Working on your tasks",
+	CHAT_ASSISTANT_DISABLED = "Build unavailable.",
 	CHAT_ASSISTANT_LOADING = "Thinking",
-	CHAT_ASSISTANT_RESPONSE_FAILED = "Assistant response failed.",
-	CHAT_ASSISTANT_STILL_WORKING = "Working on it... Feel free to play Roblox",
-	CHAT_ASSISTANT_STOPPED = "You stopped the agent.",
+	CHAT_ASSISTANT_RESPONSE_FAILED = "Build couldn't respond. Try again.",
+	CHAT_ASSISTANT_STILL_WORKING = "Working on it. You can leave the app, play Roblox, or start another project while you wait.",
+	CHAT_ASSISTANT_STOPPED = "You stopped Build.",
 	CHAT_BUILD_CHAT_PAGE_TITLE = "New Game",
 	CHAT_COMPLETED_GAME_CREATION_DESCRIPTION = "I've completed creating and publishing your game. You can open it to playtest.",
 	CHAT_COMPLETED_GAME_CREATION_TITLE = "Completed game creation",
 	CHAT_COMPOSER_PLACEHOLDER = "Describe an idea",
-	CHAT_CREATE_UNIVERSE_ERROR = "The assistant couldn't create an experience. Please try again.",
-	CHAT_DEFAULT_FAILURE = "The assistant couldn't connect. Please try again.",
-	CHAT_ERROR_CONFLICT = "The assistant is busy with another request. Please wait a moment and try again.",
-	CHAT_ERROR_FORBIDDEN = "The assistant isn't available for your account right now.",
-	CHAT_ERROR_GONE = "This chat is no longer available. Please start a new one.",
-	CHAT_ERROR_INTERNAL = "The assistant ran into a problem. Please try again.",
-	CHAT_ERROR_INVALID_PARAMS = "Something went wrong with your message. Please edit it and try again.",
-	CHAT_ERROR_NOT_FOUND = "We couldn't find this chat. Please start a new one.",
-	CHAT_ERROR_UNAUTHORIZED = "You're signed out. Please sign in and try again.",
-	CHAT_ERROR_UPSTREAM_UNAVAILABLE = "The assistant is temporarily unavailable. Please try again in a moment.",
-	CHAT_MISSING_PROJECT = "An experience is required to chat with the assistant.",
-	CHAT_NOTIFICATION_DISABLED_DESCRIPTION = "Notifications are turned off. Enable them in your device settings to know when you receive a new chat message.",
-	CHAT_NOTIFICATION_PROMPT_DESCRIPTION = "Do you want to know when you receive a new chat message?",
+	CHAT_CREATE_UNIVERSE_ERROR = "Your game wasn't created. Try again.",
+	CHAT_DEFAULT_FAILURE = "Build couldn't connect. Try again.",
+	CHAT_ERROR_CONFLICT = "Build is busy. Wait a minute and try again.",
+	CHAT_ERROR_FORBIDDEN = "Build isn't available for your account right now.",
+	CHAT_ERROR_GONE = "This conversation is no longer available. Start a new one.",
+	CHAT_ERROR_INTERNAL = "Build ran into a problem. Try again.",
+	CHAT_ERROR_INVALID_PARAMS = "Something went wrong with your message. Edit it and try again.",
+	CHAT_ERROR_NOT_FOUND = "This conversation couldn't be found. Start a new one.",
+	CHAT_ERROR_OUT_OF_CREDITS = "You're out of AI usage. View your options to continue.",
+	CHAT_ERROR_UNAUTHORIZED = "You're signed out. Sign in and try again.",
+	CHAT_ERROR_UPSTREAM_UNAVAILABLE = "Build is temporarily unavailable. Try again in a minute.",
+	CHAT_MISSING_PROJECT = "Create a new game to start using Build.",
+	CHAT_NOTIFICATION_DISABLED_DESCRIPTION = "Turn on notifications in your device settings to get updates from Build.",
+	CHAT_NOTIFICATION_PROMPT_DESCRIPTION = "Get notified when Build has a reply for you.",
 	CHAT_NOTIFICATION_PROMPT_TITLE = "Push notifications",
 	CHAT_NOT_NOW = "Not now",
 	CHAT_NOTIFY_ME = "Notify me",
 	CHAT_OPEN_SETTINGS = "Open settings",
 	CHAT_PLAYTEST = "Playtest",
-	CHAT_POLICY_REJECTION = "Your message violates Roblox safety policy. Edit it and try again.",
-	CHAT_PORTRAIT_REQUIRED = "Return device to portrait to chat with assistant",
-	CHAT_QUESTION_COMPOSER_ANSWER = "Answer the agent's question in the composer below",
-	CHAT_QUESTION_MULTIPLE = "Agent has some questions",
-	CHAT_QUESTION_SINGLE = "Agent has a question",
-	CHAT_REVERT_FAILURE = "Couldn't revert agent publish. Try again.",
-	CHAT_REVERT_SUCCESS = "Reverted agent publish.",
+	CHAT_POLICY_REJECTION = "This message goes against our safety policy. Edit it and try again.",
+	CHAT_PORTRAIT_REQUIRED = "Turn your device to portrait mode to continue working on your game.",
+	CHAT_QUESTION_COMPOSER_ANSWER = "Answer Build's question below.",
+	CHAT_QUESTION_MULTIPLE = "Build has some questions",
+	CHAT_QUESTION_SINGLE = "Build has a question",
+	CHAT_REVERT_CONFIRMATION_DESCRIPTION = "This version will become your latest published version.",
+	CHAT_REVERT_FAILURE = "Your publish wasn't reverted. Try again.",
+	CHAT_REVERT_SUCCESS = "Reverted publish.",
 	CHAT_TOOL = "tool",
 	CHAT_TURN_ACTIVITY = "Turn activity",
 	CHAT_UPDATE_WITH_CHANGES = "Update with changes",
 	GAME_CONFIGURATION_ACCESS = "Access",
+	GAME_CONFIGURATION_ACCESS_AND_SHARING = "Access & sharing",
 	GAME_CONFIGURATION_ACCESS_BODY = "Choose who can play after you publish this experience.",
 	GAME_CONFIGURATION_ARCHIVE_GAME = "Archive game",
-	GAME_CONFIGURATION_BUILD_MATURITY_BANNER = "A default content maturity rating of \"Moderate\" is generated for games created in Build. By selecting \"Publish\", you confirm that this rating is accurate.",
+	GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER = "This game was edited outside of Build. Complete the content questionnaire to publish.",
 	GAME_CONFIGURATION_AUDIENCE = "Audience",
 	GAME_CONFIGURATION_AUDIENCE_BANNER = "Expand your audience eligibility on Creator Hub",
 	GAME_CONFIGURATION_AUDIENCE_BODY = "Choose who can play after you publish this experience.",
 	GAME_CONFIGURATION_AUDIENCE_FRIENDS = "Friends",
 	GAME_CONFIGURATION_AUDIENCE_FRIENDS_ONLY = "Friends only",
 	GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE = "Not eligible for this audience",
-	GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION = "Expand your audience eligibility on Creator Hub.",
-	GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE = "Experience Audience",
+	GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION = "Expand your audience eligibility on Creator Hub",
+	GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE = "Experience audience",
 	GAME_CONFIGURATION_AUDIENCE_PRIVATE = "Private",
 	GAME_CONFIGURATION_AUDIENCE_PUBLIC = "Public",
 	GAME_CONFIGURATION_AUDIENCE_UNKNOWN = "Unknown",
 	GAME_CONFIGURATION_CONTENT_RATING = "Content rating",
 	GAME_CONFIGURATION_CREATOR_HUB = "Creator Hub",
 	GAME_CONFIGURATION_CREATOR_HUB_DESCRIPTION = "Manage all settings on Creator Hub",
-	GAME_CONFIGURATION_GAME_DETAILS = "Game Details",
+	GAME_CONFIGURATION_GAME_DETAILS = "Game details",
 	GAME_CONFIGURATION_GAME_DETAILS_BODY = "Manage how your game appears to others.",
-	GAME_CONFIGURATION_ICON_AND_THUMBNAILS = "Icon & Thumbnails",
-	GAME_CONFIGURATION_LINK_COPIED = "Link copied to clipboard.",
+	GAME_CONFIGURATION_ICON_AND_THUMBNAILS = "Icon & thumbnails",
+	GAME_CONFIGURATION_LINK_COPIED = if FFlagEnableShareSheet then nil else "Link copied to clipboard.",
 	GAME_CONFIGURATION_LOADING = "Loading...",
 	GAME_CONFIGURATION_PREVIEW = "Preview",
 	GAME_CONFIGURATION_PUBLISH = "Publish",
-	GAME_CONFIGURATION_PUBLISH_ERROR = "Couldn't publish game. Please try again.",
-	GAME_CONFIGURATION_PUBLISH_SUCCESS = "Eligible players can now play this game in Roblox.",
+	GAME_CONFIGURATION_PUBLISH_ERROR = "Your game couldn't be published. Try again.",
+	GAME_CONFIGURATION_PUBLISH_SUCCESS = "Your game is ready to play on Roblox!",
 	GAME_CONFIGURATION_SHARE = "Share",
-	GAME_CONFIGURATION_TITLE_AND_DESCRIPTION = "Title & Description",
+	GAME_CONFIGURATION_UPDATE_RATING = "Update rating",
+	GAME_CONFIGURATION_TITLE_AND_DESCRIPTION = "Title & description",
 	GENRE_ACTION_NAME = "Action",
 	GENRE_ACTION_DESCRIPTION = "Combat, shooting, brawling, and action-oriented gameplay.",
 	GENRE_BATTLE_ROYALE_NAME = "Battle Royale",
@@ -201,9 +338,9 @@ return {
 	GENRE_NONE_DESCRIPTION = "No genre selected.",
 	MEDIA_SELECTION_CAPTURE_LIBRARY = "Capture library",
 	MEDIA_SELECTION_DELETE = "Delete",
-	MEDIA_SELECTION_TITLE = "Icon & Thumbnails",
+	MEDIA_SELECTION_TITLE = "Icon & thumbnails",
 	MEDIA_SELECTION_VIDEO = "Video",
-	MY_CREATIONS_BUILD_WITH_AI = "Build a game with AI",
+	MY_CREATIONS_BUILD_WITH_AI = "Turn your ideas into a game",
 	MY_CREATIONS_BUILDING = "Building...",
 	MY_CREATIONS_INPUT_NEEDED = "Input needed",
 	MY_CREATIONS_LOAD_ERROR = "Couldn't load experiences",
@@ -212,21 +349,45 @@ return {
 	MY_CREATIONS_PUBLIC = "Public",
 	MY_CREATIONS_READY = "Ready",
 	MY_CREATIONS_RESTRICTED = "Limited",
-	PLAYTEST_DISABLED_TOOLTIP = "Once you have your first build ready, tap here to begin playtesting",
+	PLAYTEST_DISABLED_TOOLTIP = "You can start playtesting after you create your first game.",
 	PLAYTEST_TITLE = "Playtest",
-	PUBLISH_CONTENT_BODY = "To change your content rating, go to Creator Hub",
+	PRIVATE_INVITES_ADD_PLAYTESTER = "Add playtester",
+	PRIVATE_INVITES_ADD_PLAYTESTERS = "Add playtesters",
+	PRIVATE_INVITES_ALL_FRIENDS_ADDED = "You've added all your friends as playtesters.",
+	PRIVATE_INVITES_FRIENDS_LOAD_ERROR = "Couldn't load friends. Try again.",
+	PRIVATE_INVITES_INVITE_BUTTON = "Add friends",
+	PRIVATE_INVITES_NO_FRIENDS = "You don't have any friends to add yet. Find people to connect with on Roblox first.",
+	PRIVATE_INVITES_PAGE_TITLE = "Playtesters",
+	PRIVATE_INVITES_ROW_DESCRIPTION = "Choose friends to help you playtest.",
+	PRIVATE_INVITES_ROW_LOAD_ERROR = "Couldn't load invites",
+	PRIVATE_INVITES_ROW_TITLE = "Playtesters",
+	PRIVATE_INVITES_ROW_TITLE_EMPTY = "Add to playtest",
+	PRIVATE_INVITES_SEARCH_PLACEHOLDER = "Search",
+	PRIVATE_INVITES_SEND = "Send invites separately",
+	PRIVATE_INVITES_SHARE_LINK = "Share link",
+	PRIVATE_INVITES_SHARE_LINK_ERROR = "Couldn't create the share link. Try again.",
+	PRIVATE_INVITES_SHARE_WITH_FRIENDS = "Share with friends you added",
+	PRIVATE_INVITES_SHARE_WITH_FRIENDS_BUTTON = "Share",
+	PRIVATE_INVITES_TITLE = "Add friends to help you playtest",
+	PRIVATE_INVITES_UNKNOWN_USER = "Unknown",
+	PUBLISH_CONTENT_BODY = "By publishing, you agree that this content rating is accurate.",
 	PUBLISH_CONTENT_MATURITY = "Content maturity",
 	PUBLISH_CONTENT_TITLE = "Content",
-	PUBLISH_GAME_SHEET_CAPTION = "Your experience reach depends on verification criteria.",
+	PUBLISH_GAME_SHEET_CAPTION = "Who can play your game depends on our account verification criteria.",
 	PUBLISH_GAME_SHEET_PUBLISH = "Publish",
 	PUBLISH_GAME_SHEET_TITLE = "Configure game",
+	PUBLISH_VERSION_INFORMATION_BODY = "Tell players what's changed in this version.",
+	PUBLISH_VERSION_INFORMATION_TITLE = "Version Information",
+	PUBLISH_VERSION_TITLE_DESCRIPTION = "Version title & description",
 	SHARE_AUDIENCE_CANCEL = "Cancel",
 	SHARE_AUDIENCE_FRIENDS_ONLY_DESCRIPTION = "Only your friends can access this link. Change your game's Audience setting if you want more people to play.",
 	SHARE_AUDIENCE_FRIENDS_ONLY_TITLE = "Only friends can play",
+	SHARE_AUDIENCE_PLAYTESTERS_ONLY_DESCRIPTION = "Add friends as playtesters or change your game's Audience setting to let more people play.",
+	SHARE_AUDIENCE_PLAYTESTERS_ONLY_TITLE = "Only playtesters can play",
 	SHARE_AUDIENCE_PRIVATE_DESCRIPTION = "Change your game's Audience setting to share it.",
 	SHARE_AUDIENCE_PRIVATE_TITLE = "This game is private",
 	SHARE_AUDIENCE_SHARE = "Share",
-	SUBAGENT_STATUS_AGENTS = "Agents",
+	SUBAGENT_STATUS_AGENTS = "Tasks",
 	SUBAGENT_STATUS_ALL = "All",
 	SUBAGENT_STATUS_BUILDING = "Building...",
 	SUBAGENT_STATUS_DELETED = "Deleted",
@@ -239,7 +400,8 @@ return {
 	SUBAGENT_STATUS_VERSION = "Version",
 	TITLE_DESCRIPTION_DESCRIPTION_LABEL = "Description",
 	TITLE_DESCRIPTION_TITLE_LABEL = "Title",
-	TITLE_DESCRIPTION_TITLE = "Title & Description",
+	TITLE_DESCRIPTION_TITLE = "Title & description",
+	USER_PICKER_NO_RESULTS = "No results",
 	VERSION_HISTORY_AUTOSAVED = "Autosaved",
 	VERSION_HISTORY_CANCEL = "Cancel",
 	VERSION_HISTORY_EMPTY = "No version history yet.",
@@ -247,76 +409,148 @@ return {
 	VERSION_HISTORY_HIDE_AUTOSAVED = "Hide autosaved",
 	VERSION_HISTORY_LOAD_FAILED = "Version history couldn't load.",
 	VERSION_HISTORY_LOADING = "Loading version history...",
-	VERSION_HISTORY_PREVIOUSLY_PUBLISHED = "Previously Published",
+	VERSION_HISTORY_PREVIOUSLY_PUBLISHED = "Previously published",
 	VERSION_HISTORY_PUBLISHED = "Published",
 	VERSION_HISTORY_RESTORE = "Restore",
 	VERSION_HISTORY_RESTORE_FAILED = "Couldn't restore this version. Try again.",
-	VERSION_HISTORY_TITLE = "Version History",
-	formatBuildGreeting = function(s1: string) -- line: 5
+	VERSION_HISTORY_TITLE = "Version history",
+	formatBuildGreeting = function(s1: string) -- line: 109
 		if s1 ~= "" then
 			return `Hi, { s1 }`
 		end
 
 		return "Hi"
 	end,
-	formatChatActionCount = function(n1: number) -- line: 21
-		if n1 == 1 then
-			return "1 Action completed"
+	formatGameSharedWithTarget = function(s2: string) -- line: 117
+		if s2 == "" then
+			return "Game shared"
 		end
 
-		return `{ n1 } Actions completed`
+		return `Game shared with { s2 }`
 	end,
-	formatChatFailedTool = function(s2: string) -- line: 44
-		return `Failed { s2 }`
+	formatShareExperience = function(s3: string) -- line: 113
+		return `Share { s3 }`
 	end,
-	formatChatFinishedTool = function(s3: string) -- line: 40
-		return `Finished { s3 }`
+	formatChatFailedTool = function(s4: string) -- line: 159
+		return `Failed { s4 }`
 	end,
-	formatChatRunningTool = function(s4: string) -- line: 48
-		return `Running { s4 }`
+	formatChatFinishedTool = function(s5: string) -- line: 155
+		return `Finished { s5 }`
 	end,
-	formatChatThinkingDuration = function(n2: number) -- line: 35
+	formatChatRunningTool = function(s6: string) -- line: 163
+		return `Running { s6 }`
+	end,
+	formatChatTaskCount = function(n1: number) -- line: 136
+		if n1 == 1 then
+			return "1 task completed"
+		end
+
+		return `{ n1 } tasks completed`
+	end,
+	formatChatThinkingDuration = function(n2: number) -- line: 150
 		return `Thinking for { math.max(0, (math.floor(n2))) }s`
 	end,
-	formatChatTurnFailureMessage = function(s5: string, n3: number?) -- line: 17
+	formatChatTurnFailureMessage = function(s7: string, n3: number?) -- line: 132
 		if n3 ~= nil then
-			return `({ n3 }) { s5 }`
+			return `({ n3 }) { s7 }`
 		end
 
-		return s5
+		return s7
 	end,
-	formatChatWorkedDuration = function(n4: number) -- line: 25
-		local v8 = math.max(0, (math.floor(n4 + 0.5)))
+	formatChatWorkedDuration = function(n4: number) -- line: 140
+		local v13 = math.max(0, (math.floor(n4 + 0.5)))
 
-		if v8 < 60 then
-			return `Worked for { v8 }s`
+		if v13 < 60 then
+			return `Worked for { v13 }s`
 		end
 
-		return `Worked for { math.floor(v8 / 60) }m{ v8 % 60 }s`
+		return `Worked for { math.floor(v13 / 60) }m{ v13 % 60 }s`
 	end,
-	formatMyCreationsUniverseName = function(n5: number) -- line: 9
+	getChatToolActivityLabel = function(s8: string, s9: string?) -- line: 167
+		-- upvalues: t1 (copy)
+		local v20 = t1[s8]
+
+		if v20 == nil then
+			return nil
+		end
+
+		if s9 == "completed" then
+			return v20.completed
+		end
+
+		if s9 == "failed" then
+			return v20.failed
+		end
+
+		return v20.running
+	end,
+	formatMyCreationsUniverseName = function(n5: number) -- line: 124
 		return `Universe { n5 }`
 	end,
-	formatSubagentStatusCompletedTasks = function(n6: number) -- line: 13
-		return `{ n6 } completed tasks`
+	formatPrivateInvitesCount = function(n6: number, n7: number) -- line: 212
+		return `{ n6 }/{ n7 }`
 	end,
-	formatVersionHistoryCreatedDate = function(s6: string, n7: number, s7: string) -- line: 63
-		return `{ s6 } { n7 }, { s7 }`
+	formatPrivateInvitesSent = function(n8: number, n9: number) -- line: 208
+		return `{ n8 } of { n9 } playtesters added`
 	end,
-	formatVersionHistoryRestoredBadge = function(n8: number) -- line: 59
-		return `Restored { (if not (n8 < 10) then `v{ n8 }` else `v0{ n8 }`) }`
+	formatPrivateInvitesSubtitle = function(n10: number) -- line: 204
+		return `Choose up to { n10 } friends, then share the link to the game.`
 	end,
-	formatVersionHistoryVersionLabel = function(n9: number, s8: string) -- line: 71
-		return `{ (if not (n9 < 10) then `v{ n9 }` else `v0{ n9 }`) } · { s8 }`
+	formatSubagentStatusCompletedTasks = function(n11: number) -- line: 128
+		return `{ n11 } completed tasks`
 	end,
-	formatVersionHistoryVersionNumber = function(n10: number) -- line: 52
-		if n10 < 10 then
-			return `v0{ n10 }`
+	formatUserPickerUsername = function(s10: string) -- line: 216
+		return `@{ s10 }`
+	end,
+	formatVersionHistoryCreatedDate = function(s11: string, n12: number, s12: string) -- line: 192
+		return `{ s11 } { n12 }, { s12 }`
+	end,
+	formatVersionHistoryRestoredBadge = function(n13: number) -- line: 188
+		return `Restored { (if not (n13 < 10) then `v{ n13 }` else `v0{ n13 }`) }`
+	end,
+	formatVersionHistoryVersionLabel = function(n14: number, s13: string) -- line: 200
+		return `{ (if not (n14 < 10) then `v{ n14 }` else `v0{ n14 }`) } · { s13 }`
+	end,
+	formatVersionHistoryVersionNumber = function(n15: number) -- line: 181
+		if n15 < 10 then
+			return `v0{ n15 }`
 		end
 
-		return `v{ n10 }`
+		return `v{ n15 }`
 	end,
-	formatVersionHistoryVersionTitle = function(n11: number) -- line: 67
-		return `Version { n11 }`
+	formatVersionHistoryVersionTitle = function(n16: number) -- line: 196
+		return `Version { n16 }`
+	end,
+	formatCreatorCreditAdditionalUsed = function(s14: string, s15: string) -- line: 242
+		return `{ s14 } of { s15 } used`
+	end,
+	formatCreatorCreditAdditionalUsedNoLimit = function(s16: string) -- line: 246
+		return `{ s16 } used • No limit`
+	end,
+	formatCreatorCreditLimitBelowSpend = function(s17: string) -- line: 250
+		return `Limit can't be below the { s17 } Robux already spent today.`
+	end,
+	formatCreatorCreditPercentUsed = function(n17: number) -- line: 224
+		local v38 = math.floor(n17 + 0.5)
+
+		if v38 < 0 then
+			v38 = 0
+		end
+
+		if v38 > 100 then
+			v38 = 100
+		end
+
+		return `{ v38 }% used`
+	end,
+	formatCreatorCreditResetHours = function(n18: number) -- line: 235
+		if n18 == 1 then
+			return "Resets in 1 hour"
+		end
+
+		return `Resets in { n18 } hours`
+	end,
+	formatCreatorCreditUsageTrailing = function(s18: string, s19: string) -- line: 220
+		return `{ s18 } of { s19 }`
 	end
 }

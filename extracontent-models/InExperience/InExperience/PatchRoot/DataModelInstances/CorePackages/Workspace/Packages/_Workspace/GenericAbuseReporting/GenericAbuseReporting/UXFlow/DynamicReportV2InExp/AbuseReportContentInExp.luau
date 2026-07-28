@@ -17,11 +17,11 @@ local inlineSlots = LayoutSlots.inlineSlots
 local LayoutSlotsProvider = LayoutSlots.LayoutSlotsProvider
 local OverlaidControlsProvider = LayoutSlots.OverlaidControlsProvider
 local LoaderProvider = LoaderContext.LoaderProvider
-local FFlagAbuseReportVoiceSpeakingIcon = SharedFlags.FFlagAbuseReportVoiceSpeakingIcon
+local FFlagAbuseReportInExpPlayerListV3 = SharedFlags.FFlagAbuseReportInExpPlayerListV3
 local FFlagAbuseReportVoiceMute = SharedFlags.FFlagAbuseReportVoiceMute
 
 local function AbuseReportContentInExp(t1: {[any]: any}) -- line: 58
-	-- upvalues: useAbuseSheetFlow (copy), React (copy), ArTranslationProvider (copy), AbuseReportAnalyticsProvider (copy), LayoutSlotsProvider (copy), inlineSlots (copy), OverlaidControlsProvider (copy), LoaderProvider (copy), AbuseReportInline (copy), FFlagAbuseReportVoiceSpeakingIcon (copy), FFlagAbuseReportVoiceMute (copy), voiceSpeakingSignals (copy)
+	-- upvalues: useAbuseSheetFlow (copy), React (copy), ArTranslationProvider (copy), AbuseReportAnalyticsProvider (copy), LayoutSlotsProvider (copy), inlineSlots (copy), OverlaidControlsProvider (copy), LoaderProvider (copy), AbuseReportInline (copy), FFlagAbuseReportInExpPlayerListV3 (copy), FFlagAbuseReportVoiceMute (copy), voiceSpeakingSignals (copy)
 	local v20 = useAbuseSheetFlow(t1.rawConfig, {
 		abuseVector = t1.abuseVector,
 		targetId = t1.targetId,
@@ -63,7 +63,7 @@ local function AbuseReportContentInExp(t1: {[any]: any}) -- line: 58
 		shouldUseOverlaidControls = t1.shouldUseOverlaidControls
 	}))))))
 
-	if FFlagAbuseReportVoiceSpeakingIcon or FFlagAbuseReportVoiceMute then
+	if FFlagAbuseReportInExpPlayerListV3 or FFlagAbuseReportVoiceMute then
 		return React.createElement(voiceSpeakingSignals.VoiceChatServiceManagerContext.Provider, {
 			value = t1.voiceChatServiceManager
 		}, v21)

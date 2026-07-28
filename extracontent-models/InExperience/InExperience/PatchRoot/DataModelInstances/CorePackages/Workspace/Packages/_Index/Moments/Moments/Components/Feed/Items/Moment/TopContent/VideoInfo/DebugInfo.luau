@@ -22,7 +22,7 @@ local function DebugInfo(t1: {[any]: any}) -- line: 32
 		return nil
 	end
 
-	local v18 = v17.store.getData(false).feedItemId or v17.momentId
+	local v18 = v17.store.getData(false).feedItemId or ""
 
 	return React.createElement(View, {
 		tag = "col align-x-left gap-small size-full-0 auto-y",
@@ -36,8 +36,8 @@ local function DebugInfo(t1: {[any]: any}) -- line: 32
 			text = v17.momentId,
 			width = UDim.new(1, 0)
 		}),
-		DebugItemId = React.createElement(TextInput, {
-			label = "itemId",
+		DebugFeedItemId = React.createElement(TextInput, {
+			label = "feedItemId",
 			LayoutOrder = 2,
 			onChanged = noop,
 			size = InputSize.Medium,

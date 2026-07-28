@@ -7,6 +7,8 @@ return {
 	SquadGameJoinOrigin = require(script.SquadGameJoinOrigin),
 	SquadLocation = require(script.SquadLocation),
 	SquadLocationEnum = require(script.SquadLocationEnum),
+	SquadLuckyRecommendationError = require(script.SquadLuckyRecommendationError),
+	SquadLuckyRecommendationPhase = require(script.SquadLuckyRecommendationPhase),
 	SquadPromptResponse = require(script.SquadPromptResponse),
 	SquadPromptType = require(script.SquadPromptType),
 	SquadRootViewType = SquadRootViewType,

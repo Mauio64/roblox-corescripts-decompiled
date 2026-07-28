@@ -44,6 +44,7 @@ local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableS
 local SharedFlags = require(GameJoinCardParent.SharedFlags)
 local FFlagEnableConsoleGameJoinCard = SharedFlags.FFlagEnableConsoleGameJoinCard
 local FFlagJoinCardAgeCheckUpsell = SharedFlags.FFlagJoinCardAgeCheckUpsell
+local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
 local getPlatformFriendsService = require(GameJoinCard.Utils.getPlatformFriendsService)
 local AnalyticsConstants = require(script.Parent.Parent.Parent.Analytics.AnalyticsConstants)
 local GameJoinCardButtonAction = AnalyticsConstants.GameJoinCardButtonAction
@@ -54,58 +55,58 @@ local useAgeCheckUpsellAnalytics = require(script.Parent.Parent.Parent.Analytics
 local useAgeCheckCompletionLogger = useAgeCheckUpsellAnalytics.useAgeCheckCompletionLogger
 local useAgeCheckPressLogger = useAgeCheckUpsellAnalytics.useAgeCheckPressLogger
 
-local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
-	-- upvalues: useDispatch (copy), useNavigation (copy), useNavigationFocus (copy), React (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), ContentProvider (copy), FFlagJoinCardAgeCheckUpsell (copy), useAgeCheckCompletionLogger (copy), useJoinUserInExperience (copy), useAgeCheckPressLogger (copy), useGameJoinCardAnalytics (copy), dependencyArray (copy), usePreferredInput (copy), Responsive (copy), FFlagEnableConsoleGameJoinCard (copy), getPlatformFriendsService (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), useRoactService (copy), AppEventIngestService (copy), AppSessionService (copy), AppGuiService (copy), useAppPolicy (copy), gamePlayIntent (copy), PeopleListInHomePage (copy), HttpService (copy), SetGamePlaySession (copy), SessionType (copy), gameDetailReferral (copy), OpenGameDetails (copy), viewEDPsourceValues (copy), GameJoinCardButtonAction (copy), viewProfileSourceValues (copy), AppPage (copy), NotificationType (copy), DesktopGameJoinCard (copy), GamepadJoinFocusBehavior (copy)
-	local v55 = useDispatch()
-	local v56 = useNavigation()
-	local v57 = useNavigationFocus() ~= false
+local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 91
+	-- upvalues: useDispatch (copy), useNavigation (copy), useNavigationFocus (copy), React (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), ContentProvider (copy), FFlagJoinCardAgeCheckUpsell (copy), useAgeCheckCompletionLogger (copy), useJoinUserInExperience (copy), useAgeCheckPressLogger (copy), useGameJoinCardAnalytics (copy), dependencyArray (copy), usePreferredInput (copy), Responsive (copy), FFlagEnableConsoleGameJoinCard (copy), getPlatformFriendsService (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), useRoactService (copy), AppEventIngestService (copy), AppSessionService (copy), AppGuiService (copy), useAppPolicy (copy), gamePlayIntent (copy), PeopleListInHomePage (copy), HttpService (copy), SetGamePlaySession (copy), SessionType (copy), gameDetailReferral (copy), OpenGameDetails (copy), viewEDPsourceValues (copy), GameJoinCardButtonAction (copy), viewProfileSourceValues (copy), FFlagEnableSplitPane (copy), AppPage (copy), NotificationType (copy), DesktopGameJoinCard (copy), GamepadJoinFocusBehavior (copy)
+	local v56 = useDispatch()
+	local v57 = useNavigation()
+	local v58 = useNavigationFocus() ~= false
 	local layoutOrder = t1.layoutOrder
 	local playerName = t1.playerName
 	local platformName = t1.platformName
 	local presence = t1.presence
 	local str = tostring(presence.universeId)
 	local lastLocation = presence.lastLocation
-	local v64 = React.useMemo(function() -- line: 100
+	local v65 = React.useMemo(function() -- line: 101
 		-- upvalues: getRbxThumb (copy), ThumbnailType (copy), str (copy), ThumbnailSize (copy)
 		return getRbxThumb(ThumbnailType.GameIcon, str, ThumbnailSize.Small)
 	end, { str })
-	local v65, v66 = React.useState(Enum.AssetFetchStatus.None)
+	local v66, v67 = React.useState(Enum.AssetFetchStatus.None)
 
-	React.useEffect(function() -- line: 104
-		-- upvalues: v66 (copy), ContentProvider (copy), v64 (copy)
-		v66(ContentProvider:GetAssetFetchStatus(v64))
-	end, { v64 })
-	React.useEffect(function() -- line: 107
-		-- upvalues: ContentProvider (copy), v64 (copy), v66 (copy)
-		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(v64):Connect(v66)
+	React.useEffect(function() -- line: 105
+		-- upvalues: v67 (copy), ContentProvider (copy), v65 (copy)
+		v67(ContentProvider:GetAssetFetchStatus(v65))
+	end, { v65 })
+	React.useEffect(function() -- line: 108
+		-- upvalues: ContentProvider (copy), v65 (copy), v67 (copy)
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(v65):Connect(v67)
 
-		return function() -- line: 110
+		return function() -- line: 111
 			-- upvalues: connection (copy)
 			connection:Disconnect()
 		end
-	end, { v64 })
+	end, { v65 })
 
-	local v67 = if not FFlagJoinCardAgeCheckUpsell then nil else useAgeCheckCompletionLogger(str)
-	local v68 = useJoinUserInExperience(t1.userId, {
+	local v68 = if not FFlagJoinCardAgeCheckUpsell then nil else useAgeCheckCompletionLogger(str)
+	local v69 = useJoinUserInExperience(t1.userId, {
 		isHomePageCarousel = true,
 		homepageCarouselAbsolutePosition = t1.homepageCarouselAbsolutePosition,
 		presence = t1.presence,
-		onAgeCheckCompletion = v67
+		onAgeCheckCompletion = v68
 	})
-	local v69 = if not FFlagJoinCardAgeCheckUpsell then nil else useAgeCheckPressLogger({
+	local v70 = if not FFlagJoinCardAgeCheckUpsell then nil else useAgeCheckPressLogger({
 		userId = t1.userId,
 		universeId = str,
 		absolutePosition = t1.homepageCarouselAbsolutePosition,
-		joinAgeCheckUpsellFlow = v68.joinAgeCheckUpsellFlow
+		joinAgeCheckUpsellFlow = v69.joinAgeCheckUpsellFlow
 	})
-	local v70 = FFlagJoinCardAgeCheckUpsell and v68.ageCheckRequired == true
-	local v71 = React.useRef(false)
+	local v71 = FFlagJoinCardAgeCheckUpsell and v69.ageCheckRequired == true
+	local v72 = React.useRef(false)
 
-	React.useEffect(function() -- line: 137
-		-- upvalues: t1 (copy), v57 (copy), v71 (copy), useGameJoinCardAnalytics (copy)
-		local v91 = t1.isOpen == true and v57
+	React.useEffect(function() -- line: 138
+		-- upvalues: t1 (copy), v58 (copy), v72 (copy), useGameJoinCardAnalytics (copy)
+		local v92 = t1.isOpen == true and v58
 
-		if v91 and not v71.current then
+		if v92 and not v72.current then
 			local universeId = t1.presence.universeId
 
 			useGameJoinCardAnalytics.logGameJoinCardPageLoaded({
@@ -115,33 +116,33 @@ local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
 			})
 		end
 
-		v71.current = v91
-	end, dependencyArray(t1.isOpen, v57, t1.userId, t1.presence, t1.homepageCarouselAbsolutePosition))
-	React.useEffect(function() -- line: 161
-		-- upvalues: t1 (copy), v57 (copy)
-		if t1.isOpen and not v57 then
+		v72.current = v92
+	end, dependencyArray(t1.isOpen, v58, t1.userId, t1.presence, t1.homepageCarouselAbsolutePosition))
+	React.useEffect(function() -- line: 162
+		-- upvalues: t1 (copy), v58 (copy)
+		if t1.isOpen and not v58 then
 			t1.onClose()
 		end
-	end, dependencyArray(v57, t1))
-	React.useEffect(function() -- line: 168
-		-- upvalues: t1 (copy), v57 (copy), v70 (copy), useGameJoinCardAnalytics (copy), str (copy)
-		if not t1.isOpen or not v57 or not v70 then
+	end, dependencyArray(v58, t1))
+	React.useEffect(function() -- line: 169
+		-- upvalues: t1 (copy), v58 (copy), v71 (copy), useGameJoinCardAnalytics (copy), str (copy)
+		if not t1.isOpen or not v58 or not v71 then
 			return
 		end
 
 		useGameJoinCardAnalytics.logJoinCardAgeCheckUpsellImpression({
 			universeId = if str == "" then nil else str
 		})
-	end, dependencyArray(t1.isOpen, v57, v70, str))
+	end, dependencyArray(t1.isOpen, v58, v71, str))
 
-	local v72 = str == "" or (lastLocation == nil or (lastLocation == "" or v65 == Enum.AssetFetchStatus.Loading))
-	local v73 = usePreferredInput() == Responsive.Input.Directional
-	local v74 = nil
+	local v73 = str == "" or (lastLocation == nil or (lastLocation == "" or v66 == Enum.AssetFetchStatus.Loading))
+	local v74 = usePreferredInput() == Responsive.Input.Directional
+	local v75 = nil
 
 	if FFlagEnableConsoleGameJoinCard then
 		local platformProfileId = t1.platformProfileId
 
-		v74 = React.useCallback(function() -- line: 189
+		v75 = React.useCallback(function() -- line: 190
 			-- upvalues: getPlatformFriendsService (copy), platformProfileId (copy)
 			if getPlatformFriendsService == nil or (platformProfileId == nil or platformProfileId == "") then
 				return
@@ -151,88 +152,88 @@ local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
 		end, { platformProfileId })
 	end
 
-	local v76 = if not FFlagEnableConsoleGameJoinCard then nil else useAppFocusRoot({
+	local v77 = if not FFlagEnableConsoleGameJoinCard then nil else useAppFocusRoot({
 		isAutoFocusRoot = false,
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
-		isFocusable = t1.isFocused == true and v57
+		isFocusable = t1.isFocused == true and v58
 	})
-	local v77 = React.useRef(nil)
-	local v78 = React.useCallback(function(p1) -- line: 207
-		-- upvalues: FFlagEnableConsoleGameJoinCard (copy), v77 (copy), v76 (copy), t1 (copy)
+	local v78 = React.useRef(nil)
+	local v79 = React.useCallback(function(p1) -- line: 208
+		-- upvalues: FFlagEnableConsoleGameJoinCard (copy), v78 (copy), v77 (copy), t1 (copy)
 		if not FFlagEnableConsoleGameJoinCard then
 			return
 		end
 
-		v77.current = p1
+		v78.current = p1
 
-		if v76 then
-			v76(p1)
+		if v77 then
+			v77(p1)
 		end
 
 		if t1.onCardGuiObjectChanged then
 			t1.onCardGuiObjectChanged(p1)
 		end
 	end, {
-		v76,
+		v77,
 		t1.onCardGuiObjectChanged
 	})
-	local v79 = useRoactService(AppEventIngestService)
-	local v80 = useRoactService(AppSessionService)
-	local v81 = useRoactService(AppGuiService)
-	local v82 = useAppPolicy(function(p2) -- line: 224
+	local v80 = useRoactService(AppEventIngestService)
+	local v81 = useRoactService(AppSessionService)
+	local v82 = useRoactService(AppGuiService)
+	local v83 = useAppPolicy(function(p2) -- line: 225
 		return p2.getCanUsePlatformChat()
 	end)
-	local v83 = React.useCallback(function() -- line: 228
-		-- upvalues: t1 (copy), presence (copy), gamePlayIntent (copy), v79 (copy), PeopleListInHomePage (copy), HttpService (copy)
+	local v84 = React.useCallback(function() -- line: 229
+		-- upvalues: t1 (copy), presence (copy), gamePlayIntent (copy), v80 (copy), PeopleListInHomePage (copy), HttpService (copy)
 		local userId = t1.userId
 
 		if userId == "" then
 			return
 		end
 
-		local v96 = (presence.placeId == nil or tostring(presence.placeId) == "") and "" or tostring(presence.placeId)
+		local v97 = (presence.placeId == nil or tostring(presence.placeId) == "") and "" or tostring(presence.placeId)
 		local num = tonumber(presence.rootPlaceId)
 
-		if v96 == "" or num == nil then
+		if v97 == "" or num == nil then
 			return
 		end
 
-		gamePlayIntent(v79, PeopleListInHomePage, {
-			placeId = v96,
+		gamePlayIntent(v80, PeopleListInHomePage, {
+			placeId = v97,
 			rootPlaceId = num,
 			friendId = userId,
 			joinAttemptId = HttpService:GenerateGUID(false)
 		})
 	end, dependencyArray(t1.userId, presence))
-	local v84 = React.useCallback(function() -- line: 249
-		-- upvalues: str (copy), presence (copy), t1 (copy), v80 (copy), SetGamePlaySession (copy), SessionType (copy), gameDetailReferral (copy), v79 (copy), v55 (copy), OpenGameDetails (copy), v56 (copy)
+	local v85 = React.useCallback(function() -- line: 250
+		-- upvalues: str (copy), presence (copy), t1 (copy), v81 (copy), SetGamePlaySession (copy), SessionType (copy), gameDetailReferral (copy), v80 (copy), v56 (copy), OpenGameDetails (copy), v57 (copy)
 		if str == "" then
 			return
 		end
 
 		local rootPlaceId = presence.rootPlaceId
-		local v99 = if rootPlaceId == nil or tostring(rootPlaceId) == "" then str else tostring(rootPlaceId)
-		local v100 = t1.homepageCarouselAbsolutePosition or 0
+		local v100 = if rootPlaceId == nil or tostring(rootPlaceId) == "" then str else tostring(rootPlaceId)
+		local v101 = t1.homepageCarouselAbsolutePosition or 0
 
-		if v80 then
-			SetGamePlaySession(v80, SessionType.StructuralIdentifier.GameDetailSource, false)
+		if v81 then
+			SetGamePlaySession(v81, SessionType.StructuralIdentifier.GameDetailSource, false)
 		end
 
-		gameDetailReferral(v79, "home", {
+		gameDetailReferral(v80, "home", {
 			ad = "no",
 			pg = "home",
 			rowOnPage = 1,
 			tis = 1,
 			friendId = t1.userId,
-			pid = v99,
-			pos = v100,
+			pid = v100,
+			pos = v101,
 			sortPos = t1.layoutOrder,
 			universeId = str
 		})
-		v55(OpenGameDetails(str, v56))
-	end, dependencyArray(v55, v56, str, presence, t1.homepageCarouselAbsolutePosition, t1.layoutOrder, t1.userId))
-	local v85 = React.useCallback(function(p3) -- line: 285
-		-- upvalues: str (copy), t1 (copy), viewEDPsourceValues (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), v84 (copy)
+		v56(OpenGameDetails(str, v57))
+	end, dependencyArray(v56, v57, str, presence, t1.homepageCarouselAbsolutePosition, t1.layoutOrder, t1.userId))
+	local v86 = React.useCallback(function(p3) -- line: 286
+		-- upvalues: str (copy), t1 (copy), viewEDPsourceValues (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), v85 (copy)
 		if str == "" then
 			return
 		end
@@ -251,10 +252,10 @@ local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
 			end
 		end
 
-		v84()
-	end, dependencyArray(v84, str, t1.userId, t1.homepageCarouselAbsolutePosition))
-	local v86 = React.useCallback(function() -- line: 311
-		-- upvalues: t1 (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), str (copy), v83 (copy), v68 (copy)
+		v85()
+	end, dependencyArray(v85, str, t1.userId, t1.homepageCarouselAbsolutePosition))
+	local v87 = React.useCallback(function() -- line: 312
+		-- upvalues: t1 (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), str (copy), v84 (copy), v69 (copy)
 		if t1.userId ~= "" then
 			useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.JoinGame, {
 				friendId = t1.userId,
@@ -263,12 +264,12 @@ local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
 			})
 		end
 
-		v83()
-		v68.joinExperience()
+		v84()
+		v69.joinExperience()
 		t1.onClose()
-	end, dependencyArray(v83, v68.joinExperience, t1.userId, str, t1.homepageCarouselAbsolutePosition, t1.onClose))
-	local v87 = React.useCallback(function(p4) -- line: 333
-		-- upvalues: t1 (copy), str (copy), viewProfileSourceValues (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), v56 (copy), AppPage (copy)
+	end, dependencyArray(v84, v69.joinExperience, t1.userId, str, t1.homepageCarouselAbsolutePosition, t1.onClose))
+	local v88 = React.useCallback(function(p4) -- line: 334
+		-- upvalues: t1 (copy), str (copy), viewProfileSourceValues (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), FFlagEnableSplitPane (copy), v57 (copy), AppPage (copy)
 		if t1.userId ~= "" then
 			local t3 = {
 				friendId = t1.userId,
@@ -281,15 +282,15 @@ local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
 			elseif p4 == viewProfileSourceValues.ViewProfileButton then
 				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.OpenProfileFromViewProfile, t3)
 			end
-		end
+		end;
 
-		v56.navigate(AppPage.ProfilePlatform, {
+		((if not FFlagEnableSplitPane then v57.navigate else v57.push))(AppPage.ProfilePlatform, {
 			detail = t1.userId
 		})
 		t1.onClose()
-	end, dependencyArray(v56, t1.userId, str, t1.homepageCarouselAbsolutePosition, t1.onClose))
-	local v88 = React.useCallback(function() -- line: 358
-		-- upvalues: t1 (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), str (copy), v81 (copy), NotificationType (copy)
+	end, dependencyArray(v57, t1.userId, str, t1.homepageCarouselAbsolutePosition, t1.onClose))
+	local v89 = React.useCallback(function() -- line: 360
+		-- upvalues: t1 (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), str (copy), v82 (copy), NotificationType (copy)
 		if t1.userId == "" then
 			return
 		end
@@ -299,42 +300,42 @@ local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 90
 			universeId = if str == "" then nil else str,
 			absolutePosition = t1.homepageCarouselAbsolutePosition
 		})
-		v81:BroadcastNotification(t1.userId, NotificationType.LAUNCH_CONVERSATION)
+		v82:BroadcastNotification(t1.userId, NotificationType.LAUNCH_CONVERSATION)
 		t1.onClose()
-	end, dependencyArray(t1.userId, str, t1.homepageCarouselAbsolutePosition, v81, t1.onClose))
-	local v89 = React.createElement(DesktopGameJoinCard, {
+	end, dependencyArray(t1.userId, str, t1.homepageCarouselAbsolutePosition, v82, t1.onClose))
+	local v90 = React.createElement(DesktopGameJoinCard, {
 		layoutOrder = layoutOrder,
 		playerName = playerName,
 		experienceName = lastLocation,
-		gameIconUrl = v64,
-		isLoading = v72,
-		onJoin = v86,
-		onViewExperienceDetails = v85,
+		gameIconUrl = v65,
+		isLoading = v73,
+		onJoin = v87,
+		onViewExperienceDetails = v86,
 		anchorRef = t1.anchorRef,
-		isOpen = t1.isOpen and v57,
+		isOpen = t1.isOpen and v58,
 		onClose = t1.onClose,
-		isConsole = v73,
+		isConsole = v74,
 		consolePlatformLabel = platformName,
-		focusRootRef = if not FFlagEnableConsoleGameJoinCard then nil else v78,
-		ageCheckRequired = if not FFlagJoinCardAgeCheckUpsell then nil else v68.ageCheckRequired,
-		onAgeCheckPressed = v69,
-		onPlatformProfilePressed = if not FFlagEnableConsoleGameJoinCard or not v73 then nil else v74,
-		onChat = if v73 or not v82 then nil else v88,
-		onViewProfile = if v73 then nil else v87
+		focusRootRef = if not FFlagEnableConsoleGameJoinCard then nil else v79,
+		ageCheckRequired = if not FFlagJoinCardAgeCheckUpsell then nil else v69.ageCheckRequired,
+		onAgeCheckPressed = v70,
+		onPlatformProfilePressed = if not FFlagEnableConsoleGameJoinCard or not v74 then nil else v75,
+		onChat = if v74 or not v83 then nil else v89,
+		onViewProfile = if v74 then nil else v88
 	})
 
 	if t1.showGamepadJoinFocus then
 		return React.createElement(React.Fragment, nil, {
 			GamepadJoinFocus = React.createElement(GamepadJoinFocusBehavior, {
 				tileRef = t1.anchorRef,
-				cardRef = if not FFlagEnableConsoleGameJoinCard then nil else v77,
-				joinExperience = v86
+				cardRef = if not FFlagEnableConsoleGameJoinCard then nil else v78,
+				joinExperience = v87
 			}),
-			Card = v89
+			Card = v90
 		})
 	end
 
-	return v89
+	return v90
 end
 
 return DesktopGameJoinCardContainer

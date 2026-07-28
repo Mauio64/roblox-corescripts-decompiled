@@ -37,7 +37,7 @@ local function rpcDecoder() -- line: 20
 		if typeof(v11) == "table" and v11.error then
 			local error = v11.error
 
-			return nil, ("CAS error %d: %s"):format(error.code or 0, (tostring(error.message or "JSON-RPC error"))), error.code
+			return nil, tostring(error.message or "JSON-RPC error"), error.code
 		end
 
 		if p2.statusCode >= 200 and p2.statusCode < 300 then

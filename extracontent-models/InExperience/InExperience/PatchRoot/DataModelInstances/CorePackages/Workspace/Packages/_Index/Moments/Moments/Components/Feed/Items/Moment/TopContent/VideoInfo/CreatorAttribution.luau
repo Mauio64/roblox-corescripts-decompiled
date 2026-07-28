@@ -63,7 +63,7 @@ local function CreatorAttribution(t2: {[any]: any}) -- line: 60
 		-- upvalues: openProfile (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), makeFeedActionFields (copy), v34 (copy), fireAnalyticsEvent (copy), EventNames (copy)
 		if openProfile ~= nil then
 			if GetFFlagMomentsAnalyticsSchemaIdentity() then
-				local v47 = makeFeedActionFields(v34.momentId, v34.feedItemIdRaw, v34.feedSessionId)
+				local v47 = makeFeedActionFields(v34.momentId, v34.feedItemId, v34.feedSessionId)
 
 				if v47 ~= nil then
 					fireAnalyticsEvent(EventNames.ProfileCreatorInfoTapped, v47)
@@ -83,7 +83,7 @@ local function CreatorAttribution(t2: {[any]: any}) -- line: 60
 		openProfile,
 		v34.creatorId,
 		v34.momentId,
-		v34.feedItemIdRaw,
+		v34.feedItemId,
 		v34.feedSessionId
 	})
 	local Size_800 = v32.Size.Size_800

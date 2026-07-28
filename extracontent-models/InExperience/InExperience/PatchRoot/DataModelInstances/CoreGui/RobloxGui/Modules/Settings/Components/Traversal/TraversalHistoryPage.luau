@@ -7,6 +7,7 @@ local React = require(CorePackages.Packages.React)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local CoreScriptsRoactCommon = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon)
 local Responsive = require(CorePackages.Workspace.Packages.Responsive)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local ParentParent = script.Parent.Parent.Parent
 local ReactPageSignal = require(ParentParent.ReactPageSignal)
 local TraversalLeaveConfirmation = require(script.Parent.TraversalLeaveConfirmation)
@@ -24,51 +25,52 @@ local useHistoryItems = Traversal.useHistoryItems
 local FIntMaximumTraversalHistoryItemsFetch = Traversal.Flags.FIntMaximumTraversalHistoryItemsFetch
 local FFlagTraversalExpPagePaddingFixes = Traversal.Flags.FFlagTraversalExpPagePaddingFixes
 local FFlagFixTraversalHistoryMenuFixesV3 = Traversal.Flags.FFlagFixTraversalHistoryMenuFixesV3
+local FFlagIntegrateTraversalHistoryInSideSheet = SharedFlags.FFlagIntegrateTraversalHistoryInSideSheet
 
-local function TraversalHistoryPage(_: {[any]: any}, p1) -- line: 35
-	-- upvalues: React (copy), FIntMaximumTraversalHistoryItemsFetch (copy), useHistoryItems (copy), Constants (copy), SignalsReact (copy), ReactPageSignal (copy), FFlagFixTraversalHistoryMenuFixesV3 (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), GuiService (copy), Cryo (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), default (copy), View (copy), FFlagTraversalExpPagePaddingFixes (copy), HistoryPage (copy), TraversalLeaveConfirmation (copy)
-	local v30 = React.useRef(nil)
+local function TraversalHistoryPage(_: {[any]: any}, p1) -- line: 37
+	-- upvalues: React (copy), FIntMaximumTraversalHistoryItemsFetch (copy), useHistoryItems (copy), Constants (copy), SignalsReact (copy), ReactPageSignal (copy), FFlagFixTraversalHistoryMenuFixesV3 (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), GuiService (copy), Cryo (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), default (copy), View (copy), FFlagIntegrateTraversalHistoryInSideSheet (copy), FFlagTraversalExpPagePaddingFixes (copy), HistoryPage (copy), TraversalLeaveConfirmation (copy)
+	local v32 = React.useRef(nil)
 
-	React.useImperativeHandle(p1, function() -- line: 37
-		-- upvalues: v30 (copy)
-		return v30.current
+	React.useImperativeHandle(p1, function() -- line: 39
+		-- upvalues: v32 (copy)
+		return v32.current
 	end, {})
 
-	local v31, v32 = React.useState(FIntMaximumTraversalHistoryItemsFetch)
-	local v33 = useHistoryItems(v31)
-	local v34, v35 = React.useState(Constants.NO_UNIVERSE_ID)
-	local v36 = SignalsReact.useSignalState(ReactPageSignal)
+	local v33, v34 = React.useState(FIntMaximumTraversalHistoryItemsFetch)
+	local v35 = useHistoryItems(v33)
+	local v36, v37 = React.useState(Constants.NO_UNIVERSE_ID)
+	local v38 = SignalsReact.useSignalState(ReactPageSignal)
 
 	if FFlagFixTraversalHistoryMenuFixesV3 then
-		React.useEffect(function() -- line: 46
-			-- upvalues: UserInputService (copy), GetInputModeStore (copy), Input (copy), v30 (copy), GuiService (copy)
+		React.useEffect(function() -- line: 48
+			-- upvalues: UserInputService (copy), GetInputModeStore (copy), Input (copy), v32 (copy), GuiService (copy)
 			local LastInputType = UserInputService:GetLastInputType()
-			local v42 = GetInputModeStore().getLastInputType()
+			local v44 = GetInputModeStore().getLastInputType()
 
-			if (v42 == Input.Directional or v42 == Input.Pointer and LastInputType == Enum.UserInputType.Keyboard) and v30.current then
-				GuiService.SelectedCoreObject = v30.current
+			if (v44 == Input.Directional or v44 == Input.Pointer and LastInputType == Enum.UserInputType.Keyboard) and v32.current then
+				GuiService.SelectedCoreObject = v32.current
 			end
 		end, {})
 	end
 
-	local v37 = React.useCallback(function(n1: number) -- line: 56
-		-- upvalues: v35 (copy)
-		v35(n1)
-	end, { v35 })
-	local v38 = React.useCallback(function() -- line: 60
-		-- upvalues: v35 (copy), Constants (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), v30 (copy), GuiService (copy)
-		v35(Constants.NO_UNIVERSE_ID)
+	local v39 = React.useCallback(function(n1: number) -- line: 58
+		-- upvalues: v37 (copy)
+		v37(n1)
+	end, { v37 })
+	local v40 = React.useCallback(function() -- line: 62
+		-- upvalues: v37 (copy), Constants (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), v32 (copy), GuiService (copy)
+		v37(Constants.NO_UNIVERSE_ID)
 
 		local LastInputType = UserInputService:GetLastInputType()
-		local v45 = GetInputModeStore().getLastInputType()
+		local v47 = GetInputModeStore().getLastInputType()
 
-		if (v45 == Input.Directional or v45 == Input.Pointer and LastInputType == Enum.UserInputType.Keyboard) and v30.current then
-			GuiService.SelectedCoreObject = v30.current
+		if (v47 == Input.Directional or v47 == Input.Pointer and LastInputType == Enum.UserInputType.Keyboard) and v32.current then
+			GuiService.SelectedCoreObject = v32.current
 		end
 	end, {})
-	local v39 = React.useMemo(function() -- line: 70
-		-- upvalues: Cryo (copy), v33 (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy)
-		return (Cryo.List.map(v33, function(p2) -- line: 71
+	local v41 = React.useMemo(function() -- line: 72
+		-- upvalues: Cryo (copy), v35 (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy)
+		return (Cryo.List.map(v35, function(p2) -- line: 73
 			-- upvalues: getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy)
 			return {
 				placeId = p2.placeId,
@@ -78,36 +80,36 @@ local function TraversalHistoryPage(_: {[any]: any}, p1) -- line: 35
 				rating = p2.rating
 			}
 		end))
-	end, { v33 })
-	local v40 = React.useCallback(function(n2: number) -- line: 83
-		-- upvalues: v31 (copy), default (copy), v32 (copy)
-		if v31 >= #default:getUniverseHistory() then
+	end, { v35 })
+	local v42 = React.useCallback(function(n2: number) -- line: 85
+		-- upvalues: v33 (copy), default (copy), v34 (copy)
+		if v33 >= #default:getUniverseHistory() then
 			return
 		end
 
-		v32(v31 + n2)
-	end, { v31 })
+		v34(v33 + n2)
+	end, { v33 })
 
-	return next(v39) ~= nil and React.createElement(View, {
-		tag = "size-full " .. (not FFlagTraversalExpPagePaddingFixes and "padding-large" or "padding-top-medium")
+	return next(v41) ~= nil and React.createElement(View, {
+		tag = "size-full " .. if not FFlagIntegrateTraversalHistoryInSideSheet then not FFlagTraversalExpPagePaddingFixes and "padding-large" or "padding-top-medium" else ""
 	}, {
 		HistoryPage = React.createElement(HistoryPage, {
-			historyItems = v39,
-			onHistoryClose = function() -- line: 95
-				-- upvalues: v36 (copy)
-				v36.setCurrentReactPage(nil)
+			historyItems = v41,
+			onHistoryClose = function() -- line: 97
+				-- upvalues: v38 (copy)
+				v38.setCurrentReactPage(nil)
 			end,
-			onCardItemActivated = v37,
-			onLoadMoreHistory = v40,
-			ref = v30
+			onCardItemActivated = v39,
+			onLoadMoreHistory = v42,
+			ref = v32
 		})
 	}, {
 		Dialog = React.createElement(TraversalLeaveConfirmation, {
 			source = "history_landing_page",
-			isDialogOpen = v34 > Constants.NO_UNIVERSE_ID,
-			onCancel = v38,
-			onClose = v38,
-			universeId = v34
+			isDialogOpen = v36 > Constants.NO_UNIVERSE_ID,
+			onCancel = v40,
+			onClose = v40,
+			universeId = v36
 		})
 	})
 end

@@ -16,29 +16,30 @@ require(ParentParent.Common.computeStatColumns)
 
 local GameTextTranslatorContext = require(ParentParent.Common.GameTextTranslatorContext)
 local FFlagPlayerListLocalizeGameText = require(ParentParent.Flags.FFlagPlayerListLocalizeGameText)
+local FFlagPlayerListReskinOptimization = require(ParentParent.Flags.FFlagPlayerListReskinOptimization)
 local ROW_FLEX_TAG = Constants.ROW_FLEX_TAG
 local TEAM_LAYOUT_MULTIPLIER = Constants.TEAM_LAYOUT_MULTIPLIER
 
-local function TeamEntryView(t1: {[any]: any}) -- line: 24
-	-- upvalues: FFlagPlayerListLocalizeGameText (copy), React (copy), GameTextTranslatorContext (copy), SignalsReact (copy), Signals (copy), TEAM_LAYOUT_MULTIPLIER (copy), View (copy), FoundationText (copy), StatCell (copy), ROW_FLEX_TAG (copy)
-	local v17 = if not FFlagPlayerListLocalizeGameText then nil else React.useContext(GameTextTranslatorContext)
-	local v18 = SignalsReact.useSignalBinding(t1.name)
-	local v19 = if not FFlagPlayerListLocalizeGameText then v18 else React.useMemo(function() -- line: 41
-		-- upvalues: v17 (copy), v18 (copy)
-		if v17 then
-			return (v18:map(v17))
+local function TeamEntryView(t1: {[any]: any}) -- line: 25
+	-- upvalues: FFlagPlayerListLocalizeGameText (copy), React (copy), GameTextTranslatorContext (copy), SignalsReact (copy), Signals (copy), TEAM_LAYOUT_MULTIPLIER (copy), View (copy), FoundationText (copy), StatCell (copy), FFlagPlayerListReskinOptimization (copy), ROW_FLEX_TAG (copy)
+	local v18 = if not FFlagPlayerListLocalizeGameText then nil else React.useContext(GameTextTranslatorContext)
+	local v19 = SignalsReact.useSignalBinding(t1.name)
+	local v20 = if not FFlagPlayerListLocalizeGameText then v19 else React.useMemo(function() -- line: 42
+		-- upvalues: v18 (copy), v19 (copy)
+		if v18 then
+			return (v19:map(v18))
 		end
 
-		return v18
+		return v19
 	end, {
-		v17,
-		v18
+		v18,
+		v19
 	})
-	local v20 = SignalsReact.useSignalBinding(t1.color)
+	local v21 = SignalsReact.useSignalBinding(t1.color)
 	local rowHeight = t1.rowHeight
-	local v22 = React.useMemo(function() -- line: 48
+	local v23 = React.useMemo(function() -- line: 49
 		-- upvalues: Signals (copy), t1 (copy), TEAM_LAYOUT_MULTIPLIER (copy)
-		return Signals.createComputed(function(p1) -- line: 49
+		return Signals.createComputed(function(p1) -- line: 50
 			-- upvalues: t1 (copy), TEAM_LAYOUT_MULTIPLIER (copy)
 			if t1.order then
 				return t1.order(p1) * TEAM_LAYOUT_MULTIPLIER
@@ -50,7 +51,7 @@ local function TeamEntryView(t1: {[any]: any}) -- line: 24
 		t1.order,
 		t1.layoutOrder
 	})
-	local v23 = SignalsReact.useSignalBinding(v22)
+	local v24 = SignalsReact.useSignalBinding(v23)
 	local t2 = {
 		NameLabel = React.createElement(View, {
 			LayoutOrder = 1,
@@ -58,19 +59,19 @@ local function TeamEntryView(t1: {[any]: any}) -- line: 24
 		}, {
 			Label = React.createElement(FoundationText, {
 				tag = "size-full text-label-small text-align-x-left content-emphasis",
-				Text = v19
+				Text = v20
 			})
 		})
 	}
 
 	if t1.statColumns then
 		for i, v in ipairs(t1.statColumns) do
-			local v27 = if not t1.teamStats then nil else t1.teamStats.getData(v.name, false)
+			local v28 = if not t1.teamStats then nil else t1.teamStats.getData(v.name, false)
 
 			t2[`TeamStat_{ v.name }`] = React.createElement(StatCell, {
 				textTag = "text-label-small content-emphasis",
 				statName = v.name,
-				playerStat = v27,
+				playerStat = v28,
 				statWidth = t1.statWidth,
 				rowHeight = rowHeight,
 				layoutOrder = i + 1
@@ -78,15 +79,25 @@ local function TeamEntryView(t1: {[any]: any}) -- line: 24
 		end
 	end
 
-	return React.createElement(View, {
-		Size = UDim2.new(1, 0, 0, rowHeight),
-		backgroundStyle = v20:map(function(color3: Color3) -- line: 87
+	local v29 = if not FFlagPlayerListReskinOptimization then v21:map(function(color3: Color3) -- line: 93
+		return {
+			Transparency = 0.5,
+			Color3 = color3
+		}
+	end) else React.useMemo(function() -- line: 87
+		-- upvalues: v21 (copy)
+		return v21:map(function(color3: Color3) -- line: 88
 			return {
 				Transparency = 0.5,
 				Color3 = color3
 			}
-		end),
-		LayoutOrder = v23
+		end)
+	end, { v21 })
+
+	return React.createElement(View, {
+		Size = UDim2.new(1, 0, 0, rowHeight),
+		backgroundStyle = v29,
+		LayoutOrder = v24
 	}, {
 		RowContent = React.createElement(View, {
 			tag = `size-full { ROW_FLEX_TAG }`

@@ -37,7 +37,7 @@ local function PushNotificationsUpsellCard(t1: {[any]: any}) -- line: 27
 				LayoutOrder = 1,
 				text = if not v14 then LocalizationStrings.CHAT_NOTIFY_ME else LocalizationStrings.CHAT_OPEN_SETTINGS,
 				size = InputSize.Small,
-				variant = ButtonVariant.SoftEmphasis,
+				variant = ButtonVariant.Emphasis,
 				fillBehavior = FillBehavior.Fill,
 				isLoading = t1.isRequestPending == true,
 				onActivated = if not v14 then t1.onNotifyMe else t1.onOpenSettings,

@@ -16,18 +16,18 @@ local Divider = Foundation.Divider
 local v16 = Images["icons/navigation/close"]
 local v17 = Constants.USER_PROFILE_HEADER_HEIGHT + Constants.CTA_BUTTON_HEIGHT + Constants.PAGE_PADDING
 
-return function(t1: {[any]: any}) -- line: 34
+return function(t1: {[any]: any}) -- line: 35
 	-- upvalues: useLastInputMode (copy), useStyle (copy), useProfileScrollContext (copy), React (copy), FFlagProfilePlatformNewProfileHeader (copy), v17 (copy), View (copy), ImageSetLabel (copy), v16 (copy), Divider (copy)
 	local v19 = useLastInputMode() == "Focus"
 	local v20 = useStyle()
 	local v21 = useProfileScrollContext()
 	local v22 = not v21 and 0 or v21.scrollY
-	local v23 = React.useCallback(function() -- line: 42
+	local v23 = React.useCallback(function() -- line: 43
 		-- upvalues: t1 (copy)
 		t1.navigateBack()
 	end, { t1.navigateBack })
 	local v24 = not FFlagProfilePlatformNewProfileHeader and 10 or nil
-	local v25 = React.useMemo(function() -- line: 48
+	local v25 = React.useMemo(function() -- line: 49
 		-- upvalues: t1 (copy), v17 (copy), v22 (copy)
 		if t1.backgroundTransparency ~= nil then
 			return t1.backgroundTransparency
@@ -56,7 +56,7 @@ return function(t1: {[any]: any}) -- line: 34
 			Transparency = v25
 		}
 	}, {
-		LeftNavigationButton = if v19 then nil else React.createElement(View, {
+		LeftNavigationButton = if v19 or t1.hideNavigationButton then nil else React.createElement(View, {
 			tag = "bg-over-media-0 radius-circle",
 			AnchorPoint = if not FFlagProfilePlatformNewProfileHeader then nil else Vector2.new(0, 0.5),
 			Position = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(0, 10, 0, v24) else UDim2.new(0, 10, 0.5, 0),

@@ -9,6 +9,7 @@ local Music = CreationFlowState.Music
 local TextOverlay = CreationFlowState.TextOverlay
 local Trimming = CreationFlowState.Trimming
 local Description = CreationFlowState.Description
+local StickerOverlay = CreationFlowState.StickerOverlay
 local t1 = {
 	[Gallery] = {
 		[Preview] = true
@@ -18,7 +19,8 @@ local t1 = {
 		[Trimming] = true,
 		[Music] = true,
 		[TextOverlay] = true,
-		[Description] = true
+		[Description] = true,
+		[StickerOverlay] = true
 	},
 	[Trimming] = {
 		[Preview] = true
@@ -31,51 +33,54 @@ local t1 = {
 	},
 	[Description] = {
 		[Preview] = true
+	},
+	[StickerOverlay] = {
+		[Preview] = true
 	}
 }
 
-local function createNavigationMachine(p1) -- line: 55
+local function createNavigationMachine(p1) -- line: 58
 	-- upvalues: createSignal (copy), Gallery (copy), t1 (copy)
-	local v15, v16 = createSignal(p1 or Gallery)
+	local v16, v17 = createSignal(p1 or Gallery)
 
 	return {
-		getStep = v15,
-		canNavigate = function(p2) -- line: 58
-			-- upvalues: v15 (copy), t1 (copy)
-			local v18 = v15(false)
+		getStep = v16,
+		canNavigate = function(p2) -- line: 61
+			-- upvalues: v16 (copy), t1 (copy)
+			local v19 = v16(false)
 
-			if v18 == p2 then
+			if v19 == p2 then
 				return true
 			end
 
-			local v19 = t1[v18]
+			local v20 = t1[v19]
 
-			return v19 ~= nil and v19[p2] == true
+			return v20 ~= nil and v20[p2] == true
 		end,
-		navigate = function(p3) -- line: 67
-			-- upvalues: v15 (copy), t1 (copy), v16 (copy)
-			local v21 = v15(false)
-			local v22
+		navigate = function(p3) -- line: 70
+			-- upvalues: v16 (copy), t1 (copy), v17 (copy)
+			local v22 = v16(false)
+			local v23
 
-			if v21 == p3 then
-				v22 = true
+			if v22 == p3 then
+				v23 = true
 			else
-				local v23 = t1[v21]
+				local v24 = t1[v22]
 
-				v22 = v23 ~= nil and v23[p3] == true
+				v23 = v24 ~= nil and v24[p3] == true
 			end
 
-			if not v22 then
+			if not v23 then
 				return false
 			end
 
-			v16(p3)
+			v17(p3)
 
 			return true
 		end,
-		reset = function(p4) -- line: 77
-			-- upvalues: v16 (copy)
-			v16(p4)
+		reset = function(p4) -- line: 80
+			-- upvalues: v17 (copy)
+			v17(p4)
 		end
 	}
 end

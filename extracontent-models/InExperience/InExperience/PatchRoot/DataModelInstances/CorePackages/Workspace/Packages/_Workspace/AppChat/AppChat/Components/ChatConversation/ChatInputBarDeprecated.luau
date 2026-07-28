@@ -72,7 +72,7 @@ function v29.init(p1) -- line: 73
 	p1.inputBoxRef = p1.props.inputBoxRef or Roact.createRef()
 	p1.messageListRef = p1.props.messageListRef
 	p1.inputBoxFocusLossKeyCodeRef = Roact.createRef()
-	p1.inputBoxFocusLossKeyCodeRef.current = Enum.KeyCode.Unknown
+	p1.inputBoxFocusLossKeyCodeRef.current = Enum.KeyCode.None
 	p1.inputBarRef = p1.props.inputBarRef or Roact.createRef()
 	p1.sendButtonRef = Roact.createRef()
 	p1.eventHandlerRegistration = nil
@@ -239,7 +239,7 @@ function v29.init(p1) -- line: 73
 		-- upvalues: p1 (copy)
 		if p20.eventData and p1.inputBoxFocusLossKeyCodeRef.current == p20.eventData.KeyCode then
 			p20:cancel()
-			p1.inputBoxFocusLossKeyCodeRef.current = Enum.KeyCode.Unknown
+			p1.inputBoxFocusLossKeyCodeRef.current = Enum.KeyCode.None
 		end
 	end
 end
@@ -411,7 +411,7 @@ function v29.didMount(p31) -- line: 460
 		p31.inputBoxRef.current.Selectable = false
 		p31.focusLostConnection = p31.inputBoxRef.current.FocusLost:Connect(function(_: boolean, p32) -- line: 465
 			-- upvalues: p31 (copy)
-			p31.inputBoxFocusLossKeyCodeRef.current = if not p32 then Enum.KeyCode.Unknown else p32.KeyCode
+			p31.inputBoxFocusLossKeyCodeRef.current = if not p32 then Enum.KeyCode.None else p32.KeyCode
 		end)
 	end
 

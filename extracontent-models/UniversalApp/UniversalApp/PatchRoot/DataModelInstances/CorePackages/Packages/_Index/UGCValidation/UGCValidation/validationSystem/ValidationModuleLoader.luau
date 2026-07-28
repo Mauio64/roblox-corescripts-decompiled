@@ -3,7 +3,6 @@ local ParentParent = script.Parent.Parent
 require(ParentParent.util.Types)
 
 local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
 local validationFolders = ParentParent.validationFolders
 local assetQualityFolders = ParentParent.assetQualityFolders
 local t1 = {}
@@ -16,69 +15,67 @@ local t2 = {
 }
 local t3 = {}
 
-for _, v10 in ValidationEnums.ValidationModule do
-	t3[v10] = validationFolders
+for _, v9 in ValidationEnums.ValidationModule do
+	t3[v9] = validationFolders
 end
 
-if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
-	for _, v12 in ValidationEnums.AssetQualityCheck do
-		t3[v12] = assetQualityFolders
-	end
+for _, v11 in ValidationEnums.AssetQualityCheck do
+	t3[v11] = assetQualityFolders
 end
 
 local t4 = {}
 
-for v14, v15 in ValidationEnums do
-	t4[v14] = {}
+for v13, v14 in ValidationEnums do
+	t4[v13] = {}
 
-	if typeof(v15) == "table" then
-		for v16, _ in v15 do
-			t4[v14][v16] = true
+	if typeof(v14) == "table" then
+		for v15, _ in v14 do
+			t4[v13][v15] = true
 		end
 	end
 end
 
-local function tableOnlyHasExistingEnums(s1: string, t5: {[any]: any}, s2: string) -- line: 54
+local function tableOnlyHasExistingEnums(s1: string, t5: {[any]: any}, s2: string) -- line: 50
 	-- upvalues: t4 (copy)
 	if typeof(t5) ~= "table" then
 		error(`Invalid config option { s2 } inside of { s1 } - expected to be table`)
 	end
 
-	for _, v37 in t5 do
-		if not t4[s2][v37] then
-			error(`Invalid config option { v37 } in { s2 } inside of { s1 }`)
+	for _, v34 in t5 do
+		if not t4[s2][v34] then
+			error(`Invalid config option { v34 } in { s2 } inside of { s1 }`)
 		end
 	end
 end
-local function defaultFlagCheck() -- line: 66
+local function defaultFlagCheck() -- line: 62
 	return true
 end
-local function defaultShadowCheck() -- line: 70
+local function defaultShadowCheck() -- line: 66
 	return false
 end
 
 local t6 = {}
 
-for v22, v23 in t3 do
-	local v24 = v23:FindFirstChild(v22)
+for v21, v22 in t3 do
+	local v23 = v22:FindFirstChild(v21)
 
-	if v24 == nil then
-		error(`{ v22 } validation folder is missing from { v23.Name }`)
+	if v23 == nil then
+		error(`{ v21 } validation folder is missing from { v22.Name }`)
 	end
 
-	local v25 = v24:FindFirstChild(v22)
+	local v24 = v23:FindFirstChild(v21)
 
-	if v25 == nil or not v25:IsA("ModuleScript") then
-		error(`{ v22 }.lua validation file is missing from { v23.Name }/{ v22 }`)
+	if v24 == nil or not v24:IsA("ModuleScript") then
+		error(`{ v21 }.lua validation file is missing from { v22.Name }/{ v21 }`)
 	end
 
-	local lib = require(v25)
+	local lib = require(v24)
 
-	for v27, _ in lib do
-		if typeof(v27) ~= "string" then
-			error(`{ v22 }.lua contains non-string key { tostring(v27) }`)
-		elseif not t4.ValidationConfig[v27] then
-			error(`{ v22 }.lua contains unexpected member { v27 }. Check for typos or add an extra ValidationEnums.ValidationConfig`)
+	for v26, _ in lib do
+		if typeof(v26) ~= "string" then
+			error(`{ v21 }.lua contains non-string key { tostring(v26) }`)
+		elseif not t4.ValidationConfig[v26] then
+			error(`{ v21 }.lua contains unexpected member { v26 }. Check for typos or add an extra ValidationEnums.ValidationConfig`)
 		end
 	end
 
@@ -89,55 +86,46 @@ for v22, v23 in t3 do
 	lib.conditionalData = lib.conditionalData or {}
 	lib.prereqTests = lib.prereqTests or {}
 	lib.expectedFailures = lib.expectedFailures or {}
-	lib.expectedAqsData = lib.expectedAqsData or {}
 	lib.knownAqsUserErrors = lib.knownAqsUserErrors or {}
-	lib.isAssetQualityModule = v23 == assetQualityFolders
+	lib.isAssetQualityModule = v22 == assetQualityFolders
 
-	if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
-		if lib.isAssetQualityModule then
-			for _, v30 in t2 do
-				if not table.find(lib.requiredData, v30) then
-					table.insert(lib.requiredData, v30)
-				end
-			end
-		end
-	elseif next(lib.expectedAqsData) ~= nil then
-		for _, v32 in t2 do
-			if not table.find(lib.requiredData, v32) then
-				table.insert(lib.requiredData, v32)
+	if lib.isAssetQualityModule then
+		for _, v29 in t2 do
+			if not table.find(lib.requiredData, v29) then
+				table.insert(lib.requiredData, v29)
 			end
 		end
 	end
 
 	if lib.run == nil or typeof(lib.run) ~= "function" then
-		error(`Missing module run function in { v22 }`)
+		error(`Missing module run function in { v21 }`)
 	end
 
 	setmetatable(lib, {
-		__index = function(_, p2) -- line: 136
-			-- upvalues: v22 (copy)
-			error(`Invalid ValidationConfig { p2 } used on the module { v22 }`)
+		__index = function(_, p2) -- line: 123
+			-- upvalues: v21 (copy)
+			error(`Invalid ValidationConfig { p2 } used on the module { v21 }`)
 		end
 	})
 
 	if typeof(lib.fflag) ~= "function" or typeof(lib.fflag()) ~= "boolean" then
-		error(`Invalid FFlag config in { v22 }`)
+		error(`Invalid FFlag config in { v21 }`)
 	end
 
 	if typeof(lib.shadowFlag) ~= "function" or typeof(lib.shadowFlag()) ~= "boolean" then
-		error(`Invalid shadowFlag config in { v22 }`)
+		error(`Invalid shadowFlag config in { v21 }`)
 	end
 
-	tableOnlyHasExistingEnums(v22, lib.categories, "UploadCategory")
-	tableOnlyHasExistingEnums(v22, lib.requiredData, "SharedDataMember")
-	tableOnlyHasExistingEnums(v22, lib.conditionalData, "SharedDataMember")
-	tableOnlyHasExistingEnums(v22, lib.prereqTests, "ValidationModule")
-	t6[v22] = lib
+	tableOnlyHasExistingEnums(v21, lib.categories, "UploadCategory")
+	tableOnlyHasExistingEnums(v21, lib.requiredData, "SharedDataMember")
+	tableOnlyHasExistingEnums(v21, lib.conditionalData, "SharedDataMember")
+	tableOnlyHasExistingEnums(v21, lib.prereqTests, "ValidationModule")
+	t6[v21] = lib
 end
 
 t1.allModules = t6
 
-function t1.getValidationModule(s3: string) -- line: 159
+function t1.getValidationModule(s3: string) -- line: 146
 	-- upvalues: t6 (copy)
 	if t6[s3] == nil then
 		error(`{ s3 } does not exist in the preload table.`)

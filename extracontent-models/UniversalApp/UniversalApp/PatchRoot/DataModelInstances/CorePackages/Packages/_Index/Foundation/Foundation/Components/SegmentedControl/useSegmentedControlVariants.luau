@@ -33,10 +33,7 @@ local function variantsFactory(p1) -- line: 29
 	local t2 = {
 		[InputSize.XSmall] = {
 			container = {
-				tag = {
-					["size-600"] = true,
-					["padding-xsmall"] = not Flags.FoundationSegmentedControlSizePaddingUpdate
-				}
+				tag = "size-600"
 			},
 			segment = {
 				tag = "padding-small"
@@ -53,10 +50,7 @@ local function variantsFactory(p1) -- line: 29
 		},
 		[InputSize.Small] = {
 			container = {
-				tag = {
-					["size-800"] = true,
-					["padding-xsmall"] = not Flags.FoundationSegmentedControlSizePaddingUpdate
-				}
+				tag = "size-800"
 			},
 			segment = {
 				tag = "padding-small"
@@ -109,16 +103,10 @@ local function variantsFactory(p1) -- line: 29
 	local t3 = {
 		[InputSize.XSmall] = {
 			container = {
-				tag = {
-					["radius-medium"] = Flags.FoundationSegmentedControlSizePaddingUpdate,
-					["radius-small"] = not Flags.FoundationSegmentedControlSizePaddingUpdate
-				}
+				tag = "radius-medium"
 			},
 			segment = {
-				tag = {
-					["radius-medium"] = Flags.FoundationSegmentedControlSizePaddingUpdate,
-					["radius-small"] = not Flags.FoundationSegmentedControlSizePaddingUpdate
-				}
+				tag = "radius-medium"
 			}
 		},
 		[InputSize.Small] = {
@@ -126,10 +114,7 @@ local function variantsFactory(p1) -- line: 29
 				tag = "radius-medium"
 			},
 			segment = {
-				tag = {
-					["radius-medium"] = Flags.FoundationSegmentedControlSizePaddingUpdate,
-					["radius-small"] = not Flags.FoundationSegmentedControlSizePaddingUpdate
-				}
+				tag = "radius-medium"
 			}
 		},
 		[InputSize.Medium] = {
@@ -166,7 +151,7 @@ local function variantsFactory(p1) -- line: 29
 	}
 end
 
-return function(p2, p3, b1: boolean?) -- line: 136
+return function(p2, p3, b1: boolean?) -- line: 112
 	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
 	local v16 = VariantsContext.useVariants("SegmentedControl", variantsFactory, p2)
 

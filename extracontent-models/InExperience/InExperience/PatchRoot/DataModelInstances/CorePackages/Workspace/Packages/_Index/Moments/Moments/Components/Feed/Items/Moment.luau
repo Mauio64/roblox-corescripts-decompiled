@@ -19,7 +19,7 @@ local makeRecommendationAttribution = require(Moments.Analytics.makeRecommendati
 local toMediaItem = require(Moments.Components.Feed.Media.toMediaItem)
 local MomentMediaView = MomentsCommon.Media.MomentMediaView
 
-local function momentAttribution(p1) -- line: 49
+local function momentAttribution(p1) -- line: 47
 	-- upvalues: makeRecommendationAttribution (copy)
 	if p1 == nil then
 		return nil
@@ -31,12 +31,12 @@ end
 return {
 	{
 		kind = "moment",
-		getKey = function(p2) -- line: 61
+		getKey = function(p2) -- line: 59
 			local moment = p2.moment
 			local recommendationMetadata = moment.recommendationMetadata
 
-			if recommendationMetadata and (recommendationMetadata.itemId and recommendationMetadata.itemId ~= "") then
-				return recommendationMetadata.itemId
+			if recommendationMetadata and (recommendationMetadata.feedItemId and recommendationMetadata.feedItemId ~= "") then
+				return recommendationMetadata.feedItemId
 			end
 
 			return moment.momentId
@@ -73,16 +73,14 @@ return {
 				creatorIsVerified = nil,
 				commentCount = nil,
 				momentId = moment.momentId,
-				itemId = moment.recommendationMetadata and moment.recommendationMetadata.itemId,
 				creatorId = moment.creatorId,
 				placeId = moment.metadata.placeId or 0,
 				universeId = moment.metadata.universeId or 0,
 				isSponsored = v24,
 				description = moment.metadata.description,
 				isModerated = moment.isModerated == true,
-				feedItemId = if recommendationMetadata == nil then nil else recommendationMetadata.itemId,
-				feedSessionId = if recommendationMetadata == nil then nil else recommendationMetadata.tracingId,
-				feedItemIdRaw = if recommendationMetadata == nil then nil else recommendationMetadata.feedItemId
+				feedItemId = if recommendationMetadata == nil then nil else recommendationMetadata.feedItemId,
+				feedSessionId = if recommendationMetadata == nil then nil else recommendationMetadata.tracingId
 			}
 
 			return React.createElement(MomentItem, {
@@ -94,13 +92,13 @@ return {
 	},
 	{
 		kind = "skeleton",
-		getKey = function(_) -- line: 153
+		getKey = function(_) -- line: 149
 			return "__feed_skeleton__"
 		end,
-		getAttribution = function(_) -- line: 158
+		getAttribution = function(_) -- line: 154
 			return nil
 		end,
-		render = function(_, _: number) -- line: 162
+		render = function(_, _: number) -- line: 158
 			-- upvalues: React (copy), MomentItemSkeleton (copy)
 			return React.createElement(MomentItemSkeleton)
 		end

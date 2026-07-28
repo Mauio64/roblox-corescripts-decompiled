@@ -1,6 +1,6 @@
 local _select = select
 
-local function v255(tbl, idx, ...)
+local function v257(tbl, idx, ...)
 	local va = { ... }
 
 	for i = 1, _select("#", ...) do
@@ -30,7 +30,11 @@ local GetUniverseId = require(ExperienceLoadingScript.Thunks.GetUniverseId)
 local PlaceLauncherState = require(ExperienceLoadingScript.Enums.PlaceLauncherState)
 local VerifiedBadges = require(ExperienceLoadingScriptParent.VerifiedBadges)
 local LoggingProtocol = require(ExperienceLoadingScriptParent.LoggingProtocol)
-local withStyle = require(ExperienceLoadingScriptParent.UIBlox).Style.withStyle
+local UIBlox = require(ExperienceLoadingScriptParent.UIBlox)
+local FFlagIncreaseLoadingScreenOrder = require(ExperienceLoadingScriptParent.SharedFlags).FFlagIncreaseLoadingScreenOrder
+local FFlagAddAutoTranslateToLoadingScreen = require(ExperienceLoadingScriptParent.SharedFlags).FFlagAddAutoTranslateToLoadingScreen
+local FFlagAutoTranslateSkipZeroUniverseId = require(ExperienceLoadingScriptParent.SharedFlags).FFlagAutoTranslateSkipZeroUniverseId
+local withStyle = UIBlox.Style.withStyle
 local Responsive = require(ExperienceLoadingScriptParent.Responsive)
 local Foundation = require(ExperienceLoadingScriptParent.Foundation)
 local IconSize = Foundation.Enums.IconSize
@@ -39,22 +43,18 @@ local FoundationProvider = Foundation.FoundationProvider
 local Localization = require(ExperienceLoadingScriptParent.InExperienceLocales).Localization
 local LocalizationProvider = require(ExperienceLoadingScriptParent.Localization).LocalizationProvider
 local AutoTranslateBadge = require(ExperienceLoadingScript.Components.AutoTranslateBadge)
-local LoadingScreenTelemetry = require(ExperienceLoadingScript.LoadingScreenTelemetry)
+local LoadingScreenTelemetry = require(ExperienceLoadingScriptParent.ProgressLoading.LoadingScreenTelemetry)
 local PolicyContainer = require(ExperienceLoadingScript.Components.PolicyContainer)
 local ServerStatus = require(ExperienceLoadingScript.Components.ServerStatus)
 local ServerStatusWithCountdown = require(ExperienceLoadingScript.Components.ServerStatusWithCountdown)
-local v36 = Localization.new(LocalizationService.RobloxLocaleId)
+local v40 = Localization.new(LocalizationService.RobloxLocaleId)
 local requestInternalWrapper = require(ExperienceLoadingScriptParent.Http).NetworkLayers.requestInternalWrapper
 local QueueExperimentation = require(ExperienceLoadingScriptParent.SocialExperiments).QueueExperimentation
 local GetFFlagReportFirstExperienceCancelled = require(ExperienceLoadingScript.Flags.GetFFlagReportFirstExperienceCancelled)
-local FFlagAddAutoTranslateToLoadingScreen = require(ExperienceLoadingScript.Flags.FFlagAddAutoTranslateToLoadingScreen)
-local FFlagAutoTranslateSkipZeroUniverseId = require(ExperienceLoadingScript.Flags.FFlagAutoTranslateSkipZeroUniverseId)
-local v42 = if not FFlagAddAutoTranslateToLoadingScreen then requestInternalWrapper(HttpService) else require(ExperienceLoadingScript.createNetworking)
+local v44 = if not FFlagAddAutoTranslateToLoadingScreen then requestInternalWrapper(HttpService) else require(ExperienceLoadingScript.createNetworking)
 local n1 = 7
 
-game:DefineFastFlag("IncreaseLoadingScreenOrder", false)
-
-if game:GetFastFlag("IncreaseLoadingScreenOrder") then
+if FFlagIncreaseLoadingScreenOrder then
 	n1 = 8
 end
 
@@ -86,24 +86,24 @@ local t1 = {
 		RIGHT = 64
 	}
 }
-local v47 = GuiService:IsTenFootInterface()
+local v49 = GuiService:IsTenFootInterface()
 local Platform = UserInputService:GetPlatform()
-local v49 = Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android
+local v51 = Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android
 local t2 = {
 	150,
 	256
 }
-local u51 = nil
+local u53 = nil
 local n2 = 0
 local n3 = 1e999
 
 local function getPadding(p1) -- line: 101
-	-- upvalues: v49 (copy), t1 (copy), v47 (copy)
-	if v49 then
+	-- upvalues: v51 (copy), t1 (copy), v49 (copy)
+	if v51 then
 		return p1 and t1.MOBILE_PORTRAIT or t1.MOBILE_LANDSCAPE
 	end
 
-	if v47 then
+	if v49 then
 		return t1.CONSOLE
 	end
 
@@ -111,9 +111,9 @@ local function getPadding(p1) -- line: 101
 end
 local function lerp(p2, p3) -- line: 111
 	if type(p2) == "table" and #p2 >= 2 then
-		local v63 = math.clamp(p3, 0, 1)
+		local v65 = math.clamp(p3, 0, 1)
 
-		return p2[1] * (1 - v63) + p2[2] * v63
+		return p2[1] * (1 - v65) + p2[2] * v65
 	end
 
 	return 0
@@ -135,110 +135,110 @@ local t9 = {
 		}
 
 		if p4 <= 0.6 then
-			local v71 = p4 / 0.6
+			local v73 = p4 / 0.6
 			local iconTransparency = p6.iconTransparency
-			local v74
+			local v76
 
 			if type(t4) == "table" and #t4 >= 2 then
-				local v73 = math.clamp(v71, 0, 1)
+				local v75 = math.clamp(v73, 0, 1)
 
-				v74 = t4[1] * (1 - v73) + t4[2] * v73
+				v76 = t4[1] * (1 - v75) + t4[2] * v75
 			else
-				v74 = 0
+				v76 = 0
 			end
 
-			iconTransparency(v74)
+			iconTransparency(v76)
 
 			local iconSize = p6.iconSize
-			local v77
+			local v79
 
 			if type(t3) == "table" and #t3 >= 2 then
-				local v76 = math.clamp(v71, 0, 1)
+				local v78 = math.clamp(v73, 0, 1)
 
-				v77 = t3[1] * (1 - v76) + t3[2] * v76
+				v79 = t3[1] * (1 - v78) + t3[2] * v78
 			else
-				v77 = 0
+				v79 = 0
 			end
 
-			iconSize(v77)
+			iconSize(v79)
 
 			local infoFrameTransparency = p6.infoFrameTransparency
-			local v80
+			local v82
 
 			if type(t5) == "table" and #t5 >= 2 then
-				local v79 = math.clamp(v71, 0, 1)
+				local v81 = math.clamp(v73, 0, 1)
 
-				v80 = t5[1] * (1 - v79) + t5[2] * v79
+				v82 = t5[1] * (1 - v81) + t5[2] * v81
 			else
-				v80 = 0
+				v82 = 0
 			end
 
-			infoFrameTransparency(v80)
+			infoFrameTransparency(v82)
 
 			local thumbnailTransparency = p6.thumbnailTransparency
-			local v83
+			local v85
 
 			if type(t4) == "table" and #t4 >= 2 then
-				local v82 = math.clamp(v71, 0, 1)
+				local v84 = math.clamp(v73, 0, 1)
 
-				v83 = t4[1] * (1 - v82) + t4[2] * v82
+				v85 = t4[1] * (1 - v84) + t4[2] * v84
 			else
-				v83 = 0
+				v85 = 0
 			end
 
-			thumbnailTransparency(v83)
+			thumbnailTransparency(v85)
 
 			local placeTextTransparency = p6.placeTextTransparency
-			local v86
+			local v88
 
 			if type(t4) == "table" and #t4 >= 2 then
-				local v85 = math.clamp(v71, 0, 1)
+				local v87 = math.clamp(v73, 0, 1)
 
-				v86 = t4[1] * (1 - v85) + t4[2] * v85
+				v88 = t4[1] * (1 - v87) + t4[2] * v87
 			else
-				v86 = 0
+				v88 = 0
 			end
 
-			placeTextTransparency(v86)
+			placeTextTransparency(v88)
 
 			local placeTextSize = p6.placeTextSize
-			local v89
+			local v91
 
 			if type(t3) == "table" and #t3 >= 2 then
-				local v88 = math.clamp(v71, 0, 1)
+				local v90 = math.clamp(v73, 0, 1)
 
-				v89 = t3[1] * (1 - v88) + t3[2] * v88
+				v91 = t3[1] * (1 - v90) + t3[2] * v90
 			else
-				v89 = 0
+				v91 = 0
 			end
 
-			placeTextSize(v89)
+			placeTextSize(v91)
 
 			local creatorTextTransparency = p6.creatorTextTransparency
-			local v92
+			local v94
 
 			if type(t4) == "table" and #t4 >= 2 then
-				local v91 = math.clamp(v71, 0, 1)
+				local v93 = math.clamp(v73, 0, 1)
 
-				v92 = t4[1] * (1 - v91) + t4[2] * v91
+				v94 = t4[1] * (1 - v93) + t4[2] * v93
 			else
-				v92 = 0
+				v94 = 0
 			end
 
-			creatorTextTransparency(v92)
+			creatorTextTransparency(v94)
 
 			local creatorTextSize = p6.creatorTextSize
-			local v95
+			local v97
 
 			if type(t3) == "table" and #t3 >= 2 then
-				local v94 = math.clamp(v71, 0, 1)
+				local v96 = math.clamp(v73, 0, 1)
 
-				v95 = t3[1] * (1 - v94) + t3[2] * v94
+				v97 = t3[1] * (1 - v96) + t3[2] * v96
 			else
-				v95 = 0
+				v97 = 0
 			end
 
-			creatorTextSize(v95)
+			creatorTextSize(v97)
 
 			return
 		end
@@ -269,110 +269,110 @@ local t9 = {
 		}
 
 		if p8 <= 0.6 then
-			local v103 = p8 / 0.6
+			local v105 = p8 / 0.6
 			local iconTransparency = p10.iconTransparency
-			local v106
+			local v108
 
 			if type(t7) == "table" and #t7 >= 2 then
-				local v105 = math.clamp(v103, 0, 1)
+				local v107 = math.clamp(v105, 0, 1)
 
-				v106 = t7[1] * (1 - v105) + t7[2] * v105
+				v108 = t7[1] * (1 - v107) + t7[2] * v107
 			else
-				v106 = 0
+				v108 = 0
 			end
 
-			iconTransparency(v106)
+			iconTransparency(v108)
 
 			local iconSize = p10.iconSize
-			local v109
+			local v111
 
 			if type(t6) == "table" and #t6 >= 2 then
-				local v108 = math.clamp(v103, 0, 1)
+				local v110 = math.clamp(v105, 0, 1)
 
-				v109 = t6[1] * (1 - v108) + t6[2] * v108
+				v111 = t6[1] * (1 - v110) + t6[2] * v110
 			else
-				v109 = 0
+				v111 = 0
 			end
 
-			iconSize(v109)
+			iconSize(v111)
 
 			local infoFrameTransparency = p10.infoFrameTransparency
-			local v112
+			local v114
 
 			if type(t8) == "table" and #t8 >= 2 then
-				local v111 = math.clamp(v103, 0, 1)
+				local v113 = math.clamp(v105, 0, 1)
 
-				v112 = t8[1] * (1 - v111) + t8[2] * v111
+				v114 = t8[1] * (1 - v113) + t8[2] * v113
 			else
-				v112 = 0
+				v114 = 0
 			end
 
-			infoFrameTransparency(v112)
+			infoFrameTransparency(v114)
 
 			local thumbnailTransparency = p10.thumbnailTransparency
-			local v115
+			local v117
 
 			if type(t7) == "table" and #t7 >= 2 then
-				local v114 = math.clamp(v103, 0, 1)
+				local v116 = math.clamp(v105, 0, 1)
 
-				v115 = t7[1] * (1 - v114) + t7[2] * v114
+				v117 = t7[1] * (1 - v116) + t7[2] * v116
 			else
-				v115 = 0
+				v117 = 0
 			end
 
-			thumbnailTransparency(v115)
+			thumbnailTransparency(v117)
 
 			local placeTextTransparency = p10.placeTextTransparency
-			local v118
+			local v120
 
 			if type(t7) == "table" and #t7 >= 2 then
-				local v117 = math.clamp(v103, 0, 1)
+				local v119 = math.clamp(v105, 0, 1)
 
-				v118 = t7[1] * (1 - v117) + t7[2] * v117
+				v120 = t7[1] * (1 - v119) + t7[2] * v119
 			else
-				v118 = 0
+				v120 = 0
 			end
 
-			placeTextTransparency(v118)
+			placeTextTransparency(v120)
 
 			local placeTextSize = p10.placeTextSize
-			local v121
+			local v123
 
 			if type(t6) == "table" and #t6 >= 2 then
-				local v120 = math.clamp(v103, 0, 1)
+				local v122 = math.clamp(v105, 0, 1)
 
-				v121 = t6[1] * (1 - v120) + t6[2] * v120
+				v123 = t6[1] * (1 - v122) + t6[2] * v122
 			else
-				v121 = 0
+				v123 = 0
 			end
 
-			placeTextSize(v121)
+			placeTextSize(v123)
 
 			local creatorTextTransparency = p10.creatorTextTransparency
-			local v124
+			local v126
 
 			if type(t7) == "table" and #t7 >= 2 then
-				local v123 = math.clamp(v103, 0, 1)
+				local v125 = math.clamp(v105, 0, 1)
 
-				v124 = t7[1] * (1 - v123) + t7[2] * v123
+				v126 = t7[1] * (1 - v125) + t7[2] * v125
 			else
-				v124 = 0
+				v126 = 0
 			end
 
-			creatorTextTransparency(v124)
+			creatorTextTransparency(v126)
 
 			local creatorTextSize = p10.creatorTextSize
-			local v127
+			local v129
 
 			if type(t6) == "table" and #t6 >= 2 then
-				local v126 = math.clamp(v103, 0, 1)
+				local v128 = math.clamp(v105, 0, 1)
 
-				v127 = t6[1] * (1 - v126) + t6[2] * v126
+				v129 = t6[1] * (1 - v128) + t6[2] * v128
 			else
-				v127 = 0
+				v129 = 0
 			end
 
-			creatorTextSize(v127)
+			creatorTextSize(v129)
 
 			return
 		end
@@ -391,17 +391,17 @@ local t9 = {
 }
 
 local function disconnectAndCloseHealthStat() -- line: 182
-	-- upvalues: u51 (ref), GuiService (copy)
-	if u51 then
-		u51:disconnect()
-		u51 = nil
+	-- upvalues: u53 (ref), GuiService (copy)
+	if u53 then
+		u53:disconnect()
+		u53 = nil
 		GuiService:CloseStatsBasedOnInputString("ConnectionHealth")
 	end
 end
 
-local v58 = Roact.Component:extend("LoadingScreen")
+local v60 = Roact.Component:extend("LoadingScreen")
 
-function v58.playAnimation(p12, p13, p14, p15) -- line: 193
+function v60.playAnimation(p12, p13, p14, p15) -- line: 193
 	-- upvalues: RunService (copy)
 	p12.animationStartTime = tick()
 	p12.animationFunction = p13
@@ -420,13 +420,13 @@ function v58.playAnimation(p12, p13, p14, p15) -- line: 193
 		end)
 	end
 end
-function v58.stopAnimation(p16) -- line: 209
+function v60.stopAnimation(p16) -- line: 209
 	if p16.renderSteppedConnection then
 		p16.renderSteppedConnection:Disconnect()
 		p16.renderSteppedConnection = nil
 	end
 end
-function v58.renderBackground(p17, p18) -- line: 216
+function v60.renderBackground(p17, p18) -- line: 216
 	-- upvalues: Roact (copy), n1 (ref), ExternalEventConnection (copy), RunService (copy)
 	local thumbnailScaledWidth = p17.state.thumbnailScaledWidth
 	local thumbnailScaledHeight = p17.state.thumbnailScaledHeight
@@ -468,8 +468,8 @@ function v58.renderBackground(p17, p18) -- line: 216
 		})
 	}) })
 end
-function v58.showConnnectionHealthDebugMenu(_, _) -- line: 258
-	-- upvalues: n2 (ref), n3 (ref), v49 (copy), GuiService (copy)
+function v60.showConnnectionHealthDebugMenu(_, _) -- line: 258
+	-- upvalues: n2 (ref), n3 (ref), v51 (copy), GuiService (copy)
 	if n2 == 0 then
 		n2 = 1
 		n3 = tick()
@@ -477,17 +477,17 @@ function v58.showConnnectionHealthDebugMenu(_, _) -- line: 258
 		return
 	end
 
-	if v49 and tick() - n3 <= 0.5 then
+	if v51 and tick() - n3 <= 0.5 then
 		GuiService:ShowStatsBasedOnInputString("ConnectionHealth")
 	end
 
 	n2 = 0
 	n3 = 1e999
 end
-function v58.renderPlaceIcon(p21, p22) -- line: 275
+function v60.renderPlaceIcon(p21, p22) -- line: 275
 	-- upvalues: Roact (copy), color3 (copy), ExternalEventConnection (copy), RunService (copy)
 	local shimPos = p21.state.shimPos
-	local v145 = p21.bindings.iconTransparency:getValue()
+	local v147 = p21.bindings.iconTransparency:getValue()
 	local s2 = ""
 
 	if p21.props.universeId and p21.props.universeId > 0 then
@@ -507,9 +507,9 @@ function v58.renderPlaceIcon(p21, p22) -- line: 275
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	}
 	local t11 = {}
-	local v151 = not ReducedMotion
+	local v153 = not ReducedMotion
 
-	if v151 then
+	if v153 then
 		local createElement2 = Roact.createElement
 		local t12 = {
 			BackgroundTransparency = 0,
@@ -538,51 +538,51 @@ function v58.renderPlaceIcon(p21, p22) -- line: 275
 			0.7,
 			1
 		}
-		local v162
+		local v164
 
 		if type(t16) == "table" and #t16 >= 2 then
-			local v161 = math.clamp(v145, 0, 1)
+			local v163 = math.clamp(v147, 0, 1)
 
-			v162 = t16[1] * (1 - v161) + t16[2] * v161
+			v164 = t16[1] * (1 - v163) + t16[2] * v163
 		else
-			v162 = 0
+			v164 = 0
 		end
 
-		local v163 = new2(0, v162)
+		local v165 = new2(0, v164)
 		local new3 = NumberSequenceKeypoint.new
 		local t17 = {
 			0.3,
 			1
 		}
-		local v167
+		local v169
 
 		if type(t17) == "table" and #t17 >= 2 then
-			local v166 = math.clamp(v145, 0, 1)
+			local v168 = math.clamp(v147, 0, 1)
 
-			v167 = t17[1] * (1 - v166) + t17[2] * v166
+			v169 = t17[1] * (1 - v168) + t17[2] * v168
 		else
-			v167 = 0
+			v169 = 0
 		end
 
-		local v168 = new3(0.5, v167)
+		local v170 = new3(0.5, v169)
 		local new4 = NumberSequenceKeypoint.new
 		local t18 = {
 			0.7,
 			1
 		}
-		local v172
+		local v174
 
 		if type(t18) == "table" and #t18 >= 2 then
-			local v171 = math.clamp(v145, 0, 1)
+			local v173 = math.clamp(v147, 0, 1)
 
-			v172 = t18[1] * (1 - v171) + t18[2] * v171
+			v174 = t18[1] * (1 - v173) + t18[2] * v173
 		else
-			v172 = 0
+			v174 = 0
 		end
 
-		t15[1] = v163
-		t15[2] = v168
-		v255(t15, 3, new4(1, v172))
+		t15[1] = v165
+		t15[2] = v170
+		v257(t15, 3, new4(1, v174))
 		t14.Transparency = new(t15)
 		t14.Offset = Vector2.new(shimPos, 0)
 		t13.Gradient = createElement3("UIGradient", t14)
@@ -590,10 +590,10 @@ function v58.renderPlaceIcon(p21, p22) -- line: 275
 			event = RunService.renderStepped,
 			callback = p21.renderShimmerCallback
 		})
-		v151 = createElement2("Frame", t12, t13)
+		v153 = createElement2("Frame", t12, t13)
 	end
 
-	t11.LoadingOverlay = v151
+	t11.LoadingOverlay = v153
 	t11.GameIconImage = Roact.createElement("ImageLabel", {
 		BackgroundTransparency = 1,
 		Image = s2,
@@ -608,17 +608,17 @@ function v58.renderPlaceIcon(p21, p22) -- line: 275
 
 	return createElement("Frame", t10, t11)
 end
-function v58.renderInfoFrame(p23, p24) -- line: 336
-	-- upvalues: VerifiedBadges (copy), t2 (copy), Roact (copy), FFlagAddAutoTranslateToLoadingScreen (copy), v49 (copy)
+function v60.renderInfoFrame(p23, p24) -- line: 336
+	-- upvalues: VerifiedBadges (copy), t2 (copy), Roact (copy), FFlagAddAutoTranslateToLoadingScreen (copy), v51 (copy)
 	local productInfo = p23.props.productInfo
-	local v176 = productInfo and productInfo.Name or ""
-	local v177 = productInfo and productInfo.Creator.Name or ""
+	local v178 = productInfo and productInfo.Name or ""
+	local v179 = productInfo and productInfo.Creator.Name or ""
 
 	if productInfo and productInfo.Creator.HasVerifiedBadge then
-		v177 = VerifiedBadges.appendVerifiedBadge(v177)
+		v179 = VerifiedBadges.appendVerifiedBadge(v179)
 	end
 
-	local v178 = math.clamp(math.max(p23.state.absoluteSize.X, p23.state.absoluteSize.Y) / 1024 * t2[1], t2[1], t2[2])
+	local v180 = math.clamp(math.max(p23.state.absoluteSize.X, p23.state.absoluteSize.Y) / 1024 * t2[1], t2[1], t2[2])
 
 	return Roact.createElement("Frame", {
 		Name = "InfoFrame",
@@ -644,7 +644,7 @@ function v58.renderInfoFrame(p23, p24) -- line: 336
 			BackgroundColor3 = p24.Theme.BackgroundMuted.Color,
 			AnchorPoint = Vector2.new(0.5, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Position = UDim2.new(0.5, 0, 0, v178 / 2),
+			Position = UDim2.new(0.5, 0, 0, v180 / 2),
 			Size = UDim2.fromScale(1, 0)
 		}, {
 			PlaceLabel = Roact.createElement("TextLabel", {
@@ -663,7 +663,7 @@ function v58.renderInfoFrame(p23, p24) -- line: 336
 				Font = p24.Font.Title.Font,
 				TextSize = p23.bindings.placeTextSize,
 				TextColor3 = p24.Theme.TextEmphasis.Color,
-				Text = v176,
+				Text = v178,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
 				TextTruncate = Enum.TextTruncate.AtEnd
@@ -684,7 +684,7 @@ function v58.renderInfoFrame(p23, p24) -- line: 336
 				Font = p24.Font.CaptionBody.Font,
 				TextSize = p23.bindings.creatorTextSize,
 				TextColor3 = p24.Theme.TextDefault.Color,
-				Text = v177,
+				Text = v179,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
 				TextTruncate = Enum.TextTruncate.AtEnd
@@ -693,20 +693,20 @@ function v58.renderInfoFrame(p23, p24) -- line: 336
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Padding = UDim.new(0, not v49 and 36 or 12)
+				Padding = UDim.new(0, not v51 and 36 or 12)
 			}),
 			Padding = Roact.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, not v49 and 36 or 12),
-				PaddingBottom = UDim.new(0, not v49 and 36 or 12)
+				PaddingTop = UDim.new(0, not v51 and 36 or 12),
+				PaddingBottom = UDim.new(0, not v51 and 36 or 12)
 			})
 		}),
 		Corner = Roact.createElement("UICorner")
 	})
 end
-function v58.renderMain(p26, p27) -- line: 434
-	-- upvalues: v49 (copy), t1 (copy), v47 (copy), Roact (copy), n1 (ref), Loading (copy), IconSize (copy), FFlagAddAutoTranslateToLoadingScreen (copy)
+function v60.renderMain(p26, p27) -- line: 434
+	-- upvalues: v51 (copy), t1 (copy), v49 (copy), Roact (copy), n1 (ref), Loading (copy), IconSize (copy), FFlagAddAutoTranslateToLoadingScreen (copy)
 	local isPortrait = p26.isPortrait
-	local v182 = if not v49 then if not v47 then t1.DESKTOP else t1.CONSOLE else isPortrait and t1.MOBILE_PORTRAIT or t1.MOBILE_LANDSCAPE
+	local v184 = if not v51 then if not v49 then t1.DESKTOP else t1.CONSOLE else isPortrait and t1.MOBILE_PORTRAIT or t1.MOBILE_LANDSCAPE
 	local ReducedMotion = p27.Settings.ReducedMotion
 
 	return Roact.createElement("ScreenGui", {
@@ -753,15 +753,15 @@ function v58.renderMain(p26, p27) -- line: 434
 			closeBtn = p26:renderCloseBtn(p27),
 			gamepadCancelBtn = p26:renderGamepadCancelBtn(p27),
 			Padding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v182.LEFT),
-				PaddingRight = UDim.new(0, v182.RIGHT),
-				PaddingTop = UDim.new(0, v182.TOP),
-				PaddingBottom = UDim.new(0, v182.BOTTOM)
+				PaddingLeft = UDim.new(0, v184.LEFT),
+				PaddingRight = UDim.new(0, v184.RIGHT),
+				PaddingTop = UDim.new(0, v184.TOP),
+				PaddingBottom = UDim.new(0, v184.BOTTOM)
 			})
 		})
 	})
 end
-function v58.renderCloseBtn(p28, _) -- line: 493
+function v60.renderCloseBtn(p28, _) -- line: 493
 	-- upvalues: Responsive (copy), Roact (copy), GetFFlagReportFirstExperienceCancelled (copy), LoggingProtocol (copy)
 	if p28.props.preferredInputRef.current ~= Responsive.Input.Directional and (not p28.state.showCloseBtn and tick() - p28.startTime > 5) then
 		p28:setState({
@@ -788,12 +788,12 @@ function v58.renderCloseBtn(p28, _) -- line: 493
 		end
 	})
 end
-function v58.renderServerFrame(p30, p31) -- line: 525
-	-- upvalues: v47 (copy), Roact (copy), v36 (copy), CoreGui (copy)
+function v60.renderServerFrame(p30, p31) -- line: 525
+	-- upvalues: v49 (copy), Roact (copy), v40 (copy), CoreGui (copy)
 	local serverStatusText = p30.state.serverStatusText
 	local isSubjectToChinaPolicies = p30.props.isSubjectToChinaPolicies
-	local v190 = not v47 and 12 or 16
-	local v191 = not v47 and 12 or 16
+	local v192 = not v49 and 12 or 16
+	local v193 = not v49 and 12 or 16
 
 	return Roact.createElement("Frame", {
 		Name = "ServerFrame",
@@ -811,22 +811,22 @@ function v58.renderServerFrame(p30, p31) -- line: 525
 			TextScaled = false,
 			TextStrokeTransparency = 1,
 			ZIndex = 2,
-			Size = UDim2.new(1, 0, 0, 2 * v191),
-			Position = UDim2.new(0, 0, 1, -4 * v190 - 2 * v191),
+			Size = UDim2.new(1, 0, 0, 2 * v193),
+			Position = UDim2.new(0, 0, 1, -4 * v192 - 2 * v193),
 			Font = p31.Font.Footer.Font,
-			TextSize = v191,
+			TextSize = v193,
 			TextColor3 = p31.Theme.TextDefault.Color,
-			Text = v36:Format("Authentication.Login.WeChat.AntiAddictionText"),
+			Text = v40:Format("Authentication.Login.WeChat.AntiAddictionText"),
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Center
 		}),
 		JoinServerLabel = Roact.createElement("TextLabel", {
 			Name = "JoinText",
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 4 * v190),
-			Position = UDim2.new(0, 0, 1, -2 * v190),
+			Size = UDim2.new(1, 0, 0, 4 * v192),
+			Position = UDim2.new(0, 0, 1, -2 * v192),
 			Font = p31.Font.Footer.Font,
-			TextSize = v190,
+			TextSize = v192,
 			TextWrapped = true,
 			TextScaled = false,
 			TextColor3 = p31.Theme.TextDefault.Color,
@@ -840,8 +840,8 @@ function v58.renderServerFrame(p30, p31) -- line: 525
 		})
 	})
 end
-function v58.renderGamepadCancelBtn(p32, p33) -- line: 578
-	-- upvalues: Responsive (copy), Roact (copy), v36 (copy)
+function v60.renderGamepadCancelBtn(p32, p33) -- line: 578
+	-- upvalues: Responsive (copy), Roact (copy), v40 (copy)
 	return p32.props.preferredInputRef.current == Responsive.Input.Directional and (not p32.state.gamepadCancelPressed and Roact.createElement("Frame", {
 		Name = "GamepadCancelFrame",
 		BackgroundTransparency = 1,
@@ -871,7 +871,7 @@ function v58.renderGamepadCancelBtn(p32, p33) -- line: 578
 			Size = UDim2.fromScale(1, 1),
 			Font = p33.Font.SubHeader1.Font,
 			TextColor3 = p33.Theme.TextEmphasis.Color,
-			Text = v36:Format("CoreScripts.TopBar.Back"),
+			Text = v40:Format("CoreScripts.TopBar.Back"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center
 		}),
@@ -884,8 +884,8 @@ function v58.renderGamepadCancelBtn(p32, p33) -- line: 578
 		})
 	}))
 end
-function v58.init(p34) -- line: 624
-	-- upvalues: vector2 (copy), v47 (copy), QueueExperimentation (copy), ContextActionService (copy), t9 (copy), Roact (copy), FFlagAddAutoTranslateToLoadingScreen (copy), t2 (copy), v49 (copy), GuiService (copy)
+function v60.init(p34) -- line: 624
+	-- upvalues: vector2 (copy), v49 (copy), QueueExperimentation (copy), ContextActionService (copy), t9 (copy), Roact (copy), FFlagAddAutoTranslateToLoadingScreen (copy), t2 (copy), v51 (copy), GuiService (copy)
 	p34.thumbnailMoveSpd = 0.05
 	p34.fadeinComplete = false
 	p34.isPortrait = false
@@ -902,7 +902,7 @@ function v58.init(p34) -- line: 624
 		absoluteSize = Vector2.new(0, 0),
 		thumbnailScaledWidth = vector2.x,
 		thumbnailScaledHeight = vector2.y,
-		showTenFootCancelBtn = v47
+		showTenFootCancelBtn = v49
 	})
 	p34.isQueueTreatmentEnabled = (QueueExperimentation.getIsJoinNewServerButtonEnabled() or QueueExperimentation.getIsAutoJoinNewServerEnabled()) and p34.props.placeId > 0
 
@@ -916,8 +916,8 @@ function v58.init(p34) -- line: 624
 	end
 
 	game.Loaded:Connect(function() -- line: 662
-		-- upvalues: v47 (copy), ContextActionService (copy), p34 (copy), t9 (copy)
-		if v47 then
+		-- upvalues: v49 (copy), ContextActionService (copy), p34 (copy), t9 (copy)
+		if v49 then
 			ContextActionService:UnbindCoreAction("CancelGameLoad")
 		end
 
@@ -934,91 +934,91 @@ function v58.init(p34) -- line: 624
 		end)
 	end)
 
-	local v195, v196 = Roact.createBinding(1)
 	local v197, v198 = Roact.createBinding(1)
-	local v199, v200 = Roact.createBinding(0)
-	local v201, v202 = Roact.createBinding(1)
-	local v203, v204 = Roact.createBinding(0)
-	local v205, v206 = Roact.createBinding(1)
-	local v207, v208 = Roact.createBinding(0)
-	local v209, v210 = Roact.createBinding(1)
-	local v211 = nil
-	local v212 = nil
+	local v199, v200 = Roact.createBinding(1)
+	local v201, v202 = Roact.createBinding(0)
+	local v203, v204 = Roact.createBinding(1)
+	local v205, v206 = Roact.createBinding(0)
+	local v207, v208 = Roact.createBinding(1)
+	local v209, v210 = Roact.createBinding(0)
+	local v211, v212 = Roact.createBinding(1)
+	local v213 = nil
+	local v214 = nil
 
 	if FFlagAddAutoTranslateToLoadingScreen then
-		v211, v212 = Roact.createBinding(Vector2.new(0, 0))
+		v213, v214 = Roact.createBinding(Vector2.new(0, 0))
 	end
 
 	p34.bindings = {
-		thumbnailTransparency = v195,
-		iconTransparency = v197,
-		iconSize = v199:map(function(p36) -- line: 694
+		thumbnailTransparency = v197,
+		iconTransparency = v199,
+		iconSize = v201:map(function(p36) -- line: 694
 			-- upvalues: p34 (copy), t2 (copy)
-			local v233 = math.clamp(math.max(p34.state.absoluteSize.X, p34.state.absoluteSize.Y) / 1024 * t2[1], t2[1], t2[2])
+			local v235 = math.clamp(math.max(p34.state.absoluteSize.X, p34.state.absoluteSize.Y) / 1024 * t2[1], t2[1], t2[2])
 
-			return UDim2.fromOffset(v233 * p36, v233 * p36)
+			return UDim2.fromOffset(v235 * p36, v235 * p36)
 		end),
-		placeTextTransparency = v201,
-		placeTextSize = v203:map(function(p37) -- line: 700
-			-- upvalues: v49 (copy)
-			return (not v49 and 36 or 20) * p37
+		placeTextTransparency = v203,
+		placeTextSize = v205:map(function(p37) -- line: 700
+			-- upvalues: v51 (copy)
+			return (not v51 and 36 or 20) * p37
 		end),
-		creatorTextTransparency = v205,
-		creatorTextSize = v207:map(function(p38) -- line: 704
+		creatorTextTransparency = v207,
+		creatorTextSize = v209:map(function(p38) -- line: 704
 			return 20 * p38
 		end),
-		infoFrameTransparency = v209,
-		infoFrameAbsoluteSize = if not FFlagAddAutoTranslateToLoadingScreen then nil else v211
+		infoFrameTransparency = v211,
+		infoFrameAbsoluteSize = if not FFlagAddAutoTranslateToLoadingScreen then nil else v213
 	}
 	p34.updateBindings = {
-		thumbnailTransparency = v196,
-		iconTransparency = v198,
-		iconSize = v200,
-		placeTextTransparency = v202,
-		placeTextSize = v204,
-		creatorTextTransparency = v206,
-		creatorTextSize = v208,
-		infoFrameTransparency = v210,
-		updateInfoFrameAbsoluteSize = if not FFlagAddAutoTranslateToLoadingScreen then nil else v212
+		thumbnailTransparency = v198,
+		iconTransparency = v200,
+		iconSize = v202,
+		placeTextTransparency = v204,
+		placeTextSize = v206,
+		creatorTextTransparency = v208,
+		creatorTextSize = v210,
+		infoFrameTransparency = v212,
+		updateInfoFrameAbsoluteSize = if not FFlagAddAutoTranslateToLoadingScreen then nil else v214
 	}
 
 	function p34.renderBackgroundSteppedCallback(p39) -- line: 724
 		-- upvalues: p34 (copy), vector2 (copy)
 		local absoluteSize = p34.state.absoluteSize
-		local v238 = absoluteSize.x * 1.5
-		local v239 = v238 / vector2.x * vector2.y
+		local v240 = absoluteSize.x * 1.5
+		local v241 = v240 / vector2.x * vector2.y
 
-		if v239 < absoluteSize.y then
-			v238 = absoluteSize.y / vector2.y * vector2.x
-			v239 = absoluteSize.y
+		if v241 < absoluteSize.y then
+			v240 = absoluteSize.y / vector2.y * vector2.x
+			v241 = absoluteSize.y
 		end
 
-		local v240 = v238 / absoluteSize.x / 2
-		local v241 = math.max(v240, 1 - v240)
-		local v242 = math.min(v240, 1 - v240)
-		local v243 = p34.state.thumbnailPositionX + p34.thumbnailMoveSpd * p39
+		local v242 = v240 / absoluteSize.x / 2
+		local v243 = math.max(v242, 1 - v242)
+		local v244 = math.min(v242, 1 - v242)
+		local v245 = p34.state.thumbnailPositionX + p34.thumbnailMoveSpd * p39
 
-		if v241 <= v243 or v243 <= v242 then
+		if v243 <= v245 or v245 <= v244 then
 			p34.thumbnailMoveSpd = -p34.thumbnailMoveSpd
-			v243 = math.clamp(v243, v242, v241)
+			v245 = math.clamp(v245, v244, v243)
 		end
 
 		p34:setState({
-			thumbnailPositionX = v243,
-			thumbnailScaledHeight = v239,
-			thumbnailScaledWidth = v238
+			thumbnailPositionX = v245,
+			thumbnailScaledHeight = v241,
+			thumbnailScaledWidth = v240
 		})
 	end
 	function p34.renderShimmerCallback(p40) -- line: 751
 		-- upvalues: p34 (copy)
-		local v245 = p34.state.shimPos + p40 * 1
+		local v247 = p34.state.shimPos + p40 * 1
 
-		if v245 > 1 then
-			v245 = -1
+		if v247 > 1 then
+			v247 = -1
 		end
 
 		p34:setState({
-			shimPos = v245
+			shimPos = v247
 		})
 	end
 
@@ -1037,17 +1037,17 @@ function v58.init(p34) -- line: 624
 		end
 	end)
 
-	local u213 = false
+	local u215 = false
 
 	ContextActionService:BindCoreAction("CancelGameLoad", function(_, p44, _) -- line: 776
-		-- upvalues: u213 (ref), p34 (copy), ContextActionService (copy)
+		-- upvalues: u215 (ref), p34 (copy), ContextActionService (copy)
 		if p44 == Enum.UserInputState.Begin then
-			u213 = true
+			u215 = true
 
 			return
 		end
 
-		if p44 == Enum.UserInputState.End and u213 then
+		if p44 == Enum.UserInputState.End and u215 then
 			p34:setState({
 				showTenFootCancelBtn = false
 			})
@@ -1062,7 +1062,7 @@ function v58.init(p34) -- line: 624
 		end
 	end, false, Enum.KeyCode.ButtonB)
 end
-function v58.renderAutoTranslate(p46) -- line: 796
+function v60.renderAutoTranslate(p46) -- line: 796
 	-- upvalues: FFlagAutoTranslateSkipZeroUniverseId (copy), LoadingScreenTelemetry (copy), Roact (copy), AutoTranslateBadge (copy)
 	if FFlagAutoTranslateSkipZeroUniverseId and p46.props.universeId <= 0 then
 		LoadingScreenTelemetry.countAutoTranslateZeroUniverseId()
@@ -1076,7 +1076,7 @@ function v58.renderAutoTranslate(p46) -- line: 796
 		transparencyBinding = p46.bindings.infoFrameTransparency
 	})
 end
-function v58.renderPolicyContainer(p47) -- line: 808
+function v60.renderPolicyContainer(p47) -- line: 808
 	-- upvalues: React (copy), PolicyContainer (copy)
 	if not p47.props.isSubjectToChinaPolicies then
 		return nil
@@ -1086,7 +1086,7 @@ function v58.renderPolicyContainer(p47) -- line: 808
 		position = UDim2.new(0, 0, 0, 32)
 	})
 end
-function v58.renderServerStatus(p48) -- line: 817
+function v60.renderServerStatus(p48) -- line: 817
 	-- upvalues: QueueExperimentation (copy), Roact (copy), ServerStatusWithCountdown (copy), ServerStatus (copy)
 	if QueueExperimentation.getIsAutoJoinNewServerEnabled() then
 		return Roact.createElement(ServerStatusWithCountdown, {
@@ -1112,15 +1112,15 @@ function v58.renderServerStatus(p48) -- line: 817
 
 	return nil
 end
-function v58.renderMainWithProviders(p49, p50) -- line: 841
-	-- upvalues: Roact (copy), FoundationProvider (copy), Foundation (copy), LocalizationProvider (copy), v36 (copy)
+function v60.renderMainWithProviders(p49, p50) -- line: 841
+	-- upvalues: Roact (copy), FoundationProvider (copy), Foundation (copy), LocalizationProvider (copy), v40 (copy)
 	return Roact.createElement(FoundationProvider, {
 		theme = Foundation.Enums.Theme.Dark
 	}, { Roact.createElement(LocalizationProvider, {
-		localization = v36
+		localization = v40
 	}, p49:renderMain(p50)) })
 end
-function v58.render(p51) -- line: 851
+function v60.render(p51) -- line: 851
 	-- upvalues: withStyle (copy), Roact (copy), FFlagAddAutoTranslateToLoadingScreen (copy)
 	return withStyle(function(p52) -- line: 854
 		-- upvalues: p51 (copy), Roact (copy), FFlagAddAutoTranslateToLoadingScreen (copy)
@@ -1130,9 +1130,9 @@ function v58.render(p51) -- line: 851
 		})
 	end)
 end
-function v58.willUpdate(_, _, _) -- line: 865
+function v60.willUpdate(_, _, _) -- line: 865
 end
-function v58.didMount(p56) -- line: 867
+function v60.didMount(p56) -- line: 867
 	-- upvalues: RunService (copy), t9 (copy), QueueExperimentation (copy), ExperienceService (copy), PlaceLauncherState (copy)
 	RunService:SetRobloxGuiFocused(true)
 	p56.props.fetchUniverseId(p56.props.placeId)
@@ -1158,17 +1158,17 @@ function v58.didMount(p56) -- line: 867
 		end)
 	end
 end
-function v58.willUnmount(p58) -- line: 893
-	-- upvalues: ContextActionService (copy), RunService (copy), u51 (ref), UserInputService (copy), GuiService (copy), QueueExperimentation (copy)
+function v60.willUnmount(p58) -- line: 893
+	-- upvalues: ContextActionService (copy), RunService (copy), u53 (ref), UserInputService (copy), GuiService (copy), QueueExperimentation (copy)
 	ContextActionService:UnbindCoreAction("CancelGameLoad")
 	RunService:SetRobloxGuiFocused(false)
 
-	if not u51 then
-		u51 = UserInputService.InputBegan:Connect(function() -- line: 897
-			-- upvalues: u51 (ref), GuiService (copy)
-			if u51 then
-				u51:disconnect()
-				u51 = nil
+	if not u53 then
+		u53 = UserInputService.InputBegan:Connect(function() -- line: 897
+			-- upvalues: u53 (ref), GuiService (copy)
+			if u53 then
+				u53:disconnect()
+				u53 = nil
 				GuiService:CloseStatsBasedOnInputString("ConnectionHealth")
 			end
 		end)
@@ -1180,7 +1180,7 @@ function v58.willUnmount(p58) -- line: 893
 	end
 end
 
-local u59 = RoactRodux.connect(function(p59, p60) -- line: 908
+local u61 = RoactRodux.connect(function(p59, p60) -- line: 908
 	return {
 		productInfo = p59.productInfo,
 		isSubjectToChinaPolicies = p59.isSubjectToChinaPolicies,
@@ -1189,7 +1189,7 @@ local u59 = RoactRodux.connect(function(p59, p60) -- line: 908
 		settings = p59.settings
 	}
 end, function(p61) -- line: 916
-	-- upvalues: GetGameProductInfo (copy), GetIsSubjectToChinaPolicies (copy), GetUniverseId (copy), v42 (copy)
+	-- upvalues: GetGameProductInfo (copy), GetIsSubjectToChinaPolicies (copy), GetUniverseId (copy), v44 (copy)
 	return {
 		fetchGameProductInfo = function(p62) -- line: 918
 			-- upvalues: p61 (copy), GetGameProductInfo (copy)
@@ -1200,19 +1200,19 @@ end, function(p61) -- line: 916
 			p61(GetIsSubjectToChinaPolicies())
 		end,
 		fetchUniverseId = function(p63) -- line: 924
-			-- upvalues: p61 (copy), GetUniverseId (copy), v42 (copy)
-			p61(GetUniverseId(v42, p63))
+			-- upvalues: p61 (copy), GetUniverseId (copy), v44 (copy)
+			p61(GetUniverseId(v44, p63))
 		end
 	}
-end)(v58)
+end)(v60)
 
 return function(p64) -- line: 929
-	-- upvalues: React (copy), Responsive (copy), u59 (ref), Cryo (copy)
-	local v229 = React.useRef(nil)
+	-- upvalues: React (copy), Responsive (copy), u61 (ref), Cryo (copy)
+	local v231 = React.useRef(nil)
 
-	v229.current = Responsive.usePreferredInput()
+	v231.current = Responsive.usePreferredInput()
 
-	return React.createElement(u59, Cryo.Dictionary.join(p64, {
-		preferredInputRef = v229
+	return React.createElement(u61, Cryo.Dictionary.join(p64, {
+		preferredInputRef = v231
 	}))
 end

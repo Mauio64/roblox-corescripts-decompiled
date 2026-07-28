@@ -24,8 +24,11 @@ return {
 		end
 
 		return {
-			ignoreClientTools = false,
-			specVersion = u2
+			specVersion = u2,
+			clientToolConfig = {
+				mode = "exclude",
+				tools = {}
+			}
 		}
 	end
 }

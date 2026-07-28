@@ -19,34 +19,33 @@ local useDeviceType = require(Parent.RobloxAppHooks).useDeviceType
 local DeviceType = require(Parent.RobloxAppEnums).DeviceType
 local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
 local SharedFlags = require(Parent.SharedFlags)
-local FFlagRenameDeprecatedUIBloxTokens = SharedFlags.FFlagRenameDeprecatedUIBloxTokens
 local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local v25 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local v24 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
 
-local function ExperienceDetailsConnectionsPlayedTextRow(t1: {[any]: any}) -- line: 54
-	-- upvalues: useTokens (copy), useDispatch (copy), useDeviceType (copy), DeviceType (copy), Game (copy), SignalsReact (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), React (copy), Players (copy), gameConnectionsPlayedChipClicked (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v25 (copy), NavigateDown (copy), FFlagRenameDeprecatedUIBloxTokens (copy), AvatarGroupType (copy), InputSize (copy), SduiTextAccessoryRow (copy)
+local function ExperienceDetailsConnectionsPlayedTextRow(t1: {[any]: any}) -- line: 53
+	-- upvalues: useTokens (copy), useDispatch (copy), useDeviceType (copy), DeviceType (copy), Game (copy), SignalsReact (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), React (copy), Players (copy), gameConnectionsPlayedChipClicked (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v24 (copy), NavigateDown (copy), AvatarGroupType (copy), InputSize (copy), SduiTextAccessoryRow (copy)
 	local layoutOrder = t1.layoutOrder
 	local universeId = t1.universeId
 	local name = t1.name
-	local v31 = useTokens()
-	local v32 = useDispatch()
-	local v33 = useDeviceType() == DeviceType.Phone
-	local v34 = Game.getConnectionsPlayedStore(false)
-	local v35 = SignalsReact.useSignalState(v34.getConnectionsPlayed(universeId).data)
-	local v36 = SignalsReact.useSignalState(Game.getGameInfoStore(false).getAndFetchGameInfo(universeId).data)
-	local v37 = if not v35 then {} else v35.userIds
-	local v38 = if not v35 then #v37 else v35.totalCount
-	local v39 = useLocalization({
+	local v30 = useTokens()
+	local v31 = useDispatch()
+	local v32 = useDeviceType() == DeviceType.Phone
+	local v33 = Game.getConnectionsPlayedStore(false)
+	local v34 = SignalsReact.useSignalState(v33.getConnectionsPlayed(universeId).data)
+	local v35 = SignalsReact.useSignalState(Game.getGameInfoStore(false).getAndFetchGameInfo(universeId).data)
+	local v36 = if not v34 then {} else v34.userIds
+	local v37 = if not v34 then #v36 else v34.totalCount
+	local v38 = useLocalization({
 		connectionsRecentlyPlayed = {
 			not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.ConnectionsRecentlyPlayed" or "Feature.Friends.Label.FriendsRecentlyPlayed",
-			numberOfConnections = v38
+			numberOfConnections = v37
 		},
 		connectionRecentlyPlayed = { not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.ConnectionRecentlyPlayed" or "Feature.Friends.Label.FriendRecentlyPlayed" },
 		playedByUserAndOthersPlural = {
 			not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.PlayedByUserAndOthers" or "Feature.Friends.Label.PlayedByUserAndOthers.FriendsRename",
 			name = name or "",
-			numOfOthers = v38 - 1
+			numOfOthers = v37 - 1
 		},
 		playedByUserAndOneOther = {
 			not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.PlayedByUserAndOneOther" or "Feature.Friends.Label.PlayedByUserAndOneOther.FriendsRename",
@@ -57,82 +56,82 @@ local function ExperienceDetailsConnectionsPlayedTextRow(t1: {[any]: any}) -- li
 			name = name or ""
 		}
 	})
-	local v40 = if not name or name == "" then if v38 ~= 1 then v39.connectionsRecentlyPlayed else v39.connectionRecentlyPlayed else if v38 ~= 1 then if v38 ~= 2 then v39.playedByUserAndOthersPlural else v39.playedByUserAndOneOther else v39.playedByUser
-	local v41 = v36 and v36.rootPlaceId
-	local v42 = React.useCallback(function() -- line: 128
-		-- upvalues: v41 (copy), Players (copy), gameConnectionsPlayedChipClicked (copy), universeId (copy), v38 (copy), AppPage (copy), v37 (copy), v39 (copy), FFlagSignalsNavP3Dispatch (copy), v25 (copy), v32 (copy), NavigateDown (copy)
-		if v41 then
-			local v47 = Players.LocalPlayer and Players.LocalPlayer.UserId
+	local v39 = if not name or name == "" then if v37 ~= 1 then v38.connectionsRecentlyPlayed else v38.connectionRecentlyPlayed else if v37 ~= 1 then if v37 ~= 2 then v38.playedByUserAndOthersPlural else v38.playedByUserAndOneOther else v38.playedByUser
+	local v40 = v35 and v35.rootPlaceId
+	local v41 = React.useCallback(function() -- line: 127
+		-- upvalues: v40 (copy), Players (copy), gameConnectionsPlayedChipClicked (copy), universeId (copy), v37 (copy), AppPage (copy), v36 (copy), v38 (copy), FFlagSignalsNavP3Dispatch (copy), v24 (copy), v31 (copy), NavigateDown (copy)
+		if v40 then
+			local v46 = Players.LocalPlayer and Players.LocalPlayer.UserId
 
 			gameConnectionsPlayedChipClicked({
-				uid = tostring(v47),
+				uid = tostring(v46),
 				universeId = universeId,
-				placeId = tostring(v41),
-				totalConnections = v38
+				placeId = tostring(v40),
+				totalConnections = v37
 			}, "ExperienceDetailsConnectionsPlayedChip")
 		end
 
 		local t2 = {
 			name = AppPage.SocialProofVerticalUserListSheet,
 			extraProps = {
-				userIds = v37,
-				title = if v38 ~= 1 then v39.connectionsRecentlyPlayed else v39.connectionRecentlyPlayed
+				userIds = v36,
+				title = if v37 ~= 1 then v38.connectionsRecentlyPlayed else v38.connectionRecentlyPlayed
 			}
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v25.down(v25.fromLegacyPage(t2))
+			v24.down(v24.fromLegacyPage(t2))
 
 			return
 		end
 
-		v32(NavigateDown(t2))
+		v31(NavigateDown(t2))
 	end, {
-		v32,
+		v31,
 		universeId,
-		v41,
+		v40,
+		v36,
 		v37,
 		v38,
-		v39,
 		Players.LocalPlayer
 	})
-	local v43 = React.useMemo(function() -- line: 157
-		-- upvalues: v37 (copy)
-		return { table.unpack(v37, 1, (math.min(2, #v37))) }
-	end, { v37 })
-	local v44 = if not v33 then if not FFlagRenameDeprecatedUIBloxTokens then v31.Semantic.Color.Background.Default else v31.Color.Surface.Surface_0 else if not FFlagRenameDeprecatedUIBloxTokens then v31.Semantic.Color.Background.Contrast else v31.Color.Surface.Surface_100
-	local v45 = React.useMemo(function() -- line: 169
-		-- upvalues: v43 (copy), AvatarGroupType (copy), InputSize (copy), v44 (copy)
+	local v42 = React.useMemo(function() -- line: 156
+		-- upvalues: v36 (copy)
+		return { table.unpack(v36, 1, (math.min(2, #v36))) }
+	end, { v36 })
+	local v43 = if not v32 then v30.Color.Surface.Surface_0 else v30.Color.Surface.Surface_100
+	local v44 = React.useMemo(function() -- line: 162
+		-- upvalues: v42 (copy), AvatarGroupType (copy), InputSize (copy), v43 (copy)
 		return {
 			type = "AvatarGroup",
 			max = 2,
-			avatars = v43,
+			avatars = v42,
 			groupType = AvatarGroupType.Stacked,
 			size = InputSize.XSmall,
-			backplateStyle = v44
+			backplateStyle = v43
 		}
 	end, {
-		v43,
-		v44
+		v42,
+		v43
 	})
-	local v46 = React.useMemo(function() -- line: 180
-		-- upvalues: v31 (copy)
+	local v45 = React.useMemo(function() -- line: 173
+		-- upvalues: v30 (copy)
 		return {
-			FontSize = v31.FontSize.FontSize_300
+			FontSize = v30.FontSize.FontSize_300
 		}
-	end, { v31 })
+	end, { v30 })
 
-	if v38 == 0 then
+	if v37 == 0 then
 		return nil
 	end
 
 	return React.createElement(SduiTextAccessoryRow, {
 		testId = "--experience-details-connections-played-text-row",
-		text = v40,
-		leading = v45,
-		gap = v31.Gap.Small,
-		fontStyle = v46,
-		onActivated = v42,
+		text = v39,
+		leading = v44,
+		gap = v30.Gap.Small,
+		fontStyle = v45,
+		onActivated = v41,
 		layoutOrder = layoutOrder
 	})
 end

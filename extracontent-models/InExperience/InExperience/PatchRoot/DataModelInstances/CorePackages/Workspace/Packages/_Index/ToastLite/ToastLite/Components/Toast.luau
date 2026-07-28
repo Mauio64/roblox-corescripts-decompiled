@@ -4,7 +4,6 @@ local React = require(Parent.React)
 local RoactUtils = require(Parent.RoactUtils)
 local ToastRodux = require(Parent.ToastRodux)
 local UIBlox = require(Parent.UIBlox)
-local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
 local Toast = UIBlox.App.Dialog.Toast
 local Images = UIBlox.App.ImageSet.Images
 local ToastType = ToastRodux.Enums.ToastType
@@ -29,56 +28,56 @@ local t3 = {
 	}
 }
 
-local function selectCurrentMessage(p1) -- line: 51
+local function selectCurrentMessage(p1) -- line: 49
 	return p1.currentToastMessages[1]
 end
-local function Toast2(t4: {[any]: any}) -- line: 55
-	-- upvalues: Cryo (copy), t3 (copy), useDispatch (copy), useSelector (copy), selectCurrentMessage (copy), useStyle (copy), React (copy), ToastRodux (copy), ToastType (copy), t2 (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Toast (copy)
-	local v21 = Cryo.Dictionary.join(t3, t4)
-	local v22 = useDispatch()
-	local v23 = useSelector(selectCurrentMessage)
+local function Toast2(t4: {[any]: any}) -- line: 53
+	-- upvalues: Cryo (copy), t3 (copy), useDispatch (copy), useSelector (copy), selectCurrentMessage (copy), useStyle (copy), React (copy), ToastRodux (copy), ToastType (copy), t2 (copy), Toast (copy)
+	local v20 = Cryo.Dictionary.join(t3, t4)
+	local v21 = useDispatch()
+	local v22 = useSelector(selectCurrentMessage)
 	local Tokens = useStyle().Tokens
-	local v25 = React.useCallback(function() -- line: 63
-		-- upvalues: v22 (copy), ToastRodux (copy)
-		v22(ToastRodux.Actions.RemoveCurrentToastMessage())
-	end, { v22 })
+	local v24 = React.useCallback(function() -- line: 61
+		-- upvalues: v21 (copy), ToastRodux (copy)
+		v21(ToastRodux.Actions.RemoveCurrentToastMessage())
+	end, { v21 })
 
-	React.useEffect(function() -- line: 75
-		-- upvalues: v23 (copy), v25 (copy)
-		if v23 and (not next(v23) or not v23.toastTitle) then
-			v25()
+	React.useEffect(function() -- line: 73
+		-- upvalues: v22 (copy), v24 (copy)
+		if v22 and (not next(v22) or not v22.toastTitle) then
+			v24()
 		end
 	end, {
-		v23,
-		v25
+		v22,
+		v24
 	})
 
-	if v23 == nil then
+	if v22 == nil then
 		return nil
 	end
 
-	local toastType = v23.toastType
-	local v27 = if toastType ~= ToastType.QuickLaunchError then nil else function() -- line: 68
-		-- upvalues: v23 (copy), v25 (copy)
-		if v23 then
-			v25()
+	local toastType = v22.toastType
+	local v26 = if toastType ~= ToastType.QuickLaunchError then nil else function() -- line: 66
+		-- upvalues: v22 (copy), v24 (copy)
+		if v22 then
+			v24()
 		end
 	end
-	local v28 = if toastType == nil then nil else t2[toastType]
-	local uDim2 = UDim2.new(0.5, 0, 0, if not FFlagRenameDeprecatedUIBloxTokens then Tokens.Global.Space_250 else Tokens.Size.Size_500)
+	local v27 = if toastType == nil then nil else t2[toastType]
+	local uDim2 = UDim2.new(0.5, 0, 0, Tokens.Size.Size_500)
 
 	return React.createElement(Toast, {
 		show = true,
-		duration = v21.duration,
+		duration = v20.duration,
 		position = uDim2,
-		springOptions = v21.springOptions,
+		springOptions = v20.springOptions,
 		toastContent = {
-			iconImage = v28,
-			onActivated = v27,
-			onDismissed = v25,
-			sequenceNumber = v23.sequenceNumber,
-			toastSubtitle = v23.toastSubtitle,
-			toastTitle = v23.toastTitle
+			iconImage = v27,
+			onActivated = v26,
+			onDismissed = v24,
+			sequenceNumber = v22.sequenceNumber,
+			toastSubtitle = v22.toastSubtitle,
+			toastTitle = v22.toastTitle
 		}
 	})
 end

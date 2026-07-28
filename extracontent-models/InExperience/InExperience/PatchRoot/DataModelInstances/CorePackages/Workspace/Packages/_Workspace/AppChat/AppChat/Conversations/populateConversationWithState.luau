@@ -9,29 +9,30 @@ local populateUserIdsWithState = require(script.Parent.populateUserIdsWithState)
 local getThumbnailsForUserIds = require(AppChat.Users.getThumbnailsForUserIds)
 local getLastMessageContent = require(script.Parent.getLastMessageContent)
 local RoduxPresence = require(AppChat.Http.RoduxPresence)
+local FFlagAppChatPresenceStoreMigration = require(AppChat.Flags.FFlagAppChatPresenceStoreMigration)
 local userPresenceUtils = require(AppChat.Users.userPresenceUtils)
 local getConversationTimestamp = require(AppChat.Utils.getConversationTimestamp)
 
-return function(p1, p2) -- line: 39
-	-- upvalues: Cryo (copy), getOtherParticipant (copy), RoduxPresence (copy), userPresenceUtils (copy), getConversationTimestamp (copy), getConversationTitle (copy), populateUserIdsWithState (copy), getLastMessageContent (copy), getThumbnailsForUserIds (copy), getConversationGameId (copy)
-	local v16 = p2.participants or {}
-	local v17 = Cryo.List.filter(v16, function(p3) -- line: 41
+return function(p1, p2) -- line: 40
+	-- upvalues: Cryo (copy), FFlagAppChatPresenceStoreMigration (copy), getOtherParticipant (copy), RoduxPresence (copy), userPresenceUtils (copy), getConversationTimestamp (copy), getConversationTitle (copy), populateUserIdsWithState (copy), getLastMessageContent (copy), getThumbnailsForUserIds (copy), getConversationGameId (copy)
+	local v17 = p2.participants or {}
+	local v18 = Cryo.List.filter(v17, function(p3) -- line: 42
 		-- upvalues: p1 (copy)
 		return p3 ~= p1.LocalUserId
 	end)
-	local v18 = nil
+	local v19 = nil
 
-	if p2.conversationType == "OneToOneConversation" then
-		local v19 = getOtherParticipant(p1, p2.participants)
-		local v20 = RoduxPresence.Selectors.getUserPresenceByUserId(p1, v19)
+	if not FFlagAppChatPresenceStoreMigration and p2.conversationType == "OneToOneConversation" then
+		local v20 = getOtherParticipant(p1, p2.participants)
+		local v21 = RoduxPresence.Selectors.getUserPresenceByUserId(p1, v20)
 
-		v18 = userPresenceUtils.getUserDisplayPresence(v20)
+		v19 = userPresenceUtils.getUserDisplayPresence(v21)
 	end
 
 	local t1 = {}
 	local Users = p1.Users
 
-	for _, v in pairs(v16) do
+	for _, v in pairs(v17) do
 		t1[v] = Users[v]
 	end
 
@@ -44,15 +45,15 @@ return function(p1, p2) -- line: 39
 	return Cryo.Dictionary.join({
 		id = p2.id,
 		title = getConversationTitle(p2),
-		participants = populateUserIdsWithState(p1, v16),
-		otherParticipants = v17,
+		participants = populateUserIdsWithState(p1, v17),
+		otherParticipants = v18,
 		isDefaultTitle = p2.isDefaultTitle,
 		hasGroupUp = p2.hasGroupUp,
 		lastMessageContent = getLastMessageContent(p2) or "",
 		hasUnreadMessages = p2.hasUnreadMessages or false,
-		thumbnails = getThumbnailsForUserIds(v17),
-		presenceText = v18 and v18.text,
-		presenceImage = v18 and v18.image,
+		thumbnails = getThumbnailsForUserIds(v18),
+		presenceText = if not FFlagAppChatPresenceStoreMigration then v19 and v19.text else nil,
+		presenceImage = if not FFlagAppChatPresenceStoreMigration then v19 and v19.image else nil,
 		gameId = getConversationGameId(p2, p1.LocalUserId, t1),
 		serverState = p2.serverState,
 		moderationType = p2.moderationType,

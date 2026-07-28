@@ -19,7 +19,7 @@ local LocalizationProvider = Localization.LocalizationProvider
 local Localization2 = RobloxAppLocales.Localization
 local v17 = game:DefineFastInt("FIntInGameBuildChatSheetSnapPoint", 50)
 
-local function ConnectedChatSheet() -- line: 27
+local function ConnectedChatSheet() -- line: 31
 	-- upvalues: GetPlayButtonStore (copy), React (copy), ChatSheet (copy), v17 (copy)
 	local v21 = GetPlayButtonStore()
 	local v22 = v21.useIsActive()
@@ -29,7 +29,7 @@ local function ConnectedChatSheet() -- line: 27
 		placeId = game.PlaceId
 	}
 	local v24 = v21.useResumeTarget()
-	local v25 = React.useCallback(function() -- line: 37
+	local v25 = React.useCallback(function() -- line: 41
 		-- upvalues: v21 (copy)
 		v21.setIsActive(false)
 	end, { v21 })
@@ -46,12 +46,12 @@ local function ConnectedChatSheet() -- line: 27
 	})
 end
 
-local v19 = RoactUtils.Components.createLazyComponent(function() -- line: 53
+local v19 = RoactUtils.Components.createLazyComponent(function() -- line: 57
 	-- upvalues: ConnectedChatSheet (copy)
 	return ConnectedChatSheet
 end)
 
-local function mountChatSheet() -- line: 57
+local function mountChatSheet() -- line: 61
 	-- upvalues: clientLogsCollector (copy), CoreGui (copy), ReactRoblox (copy), Localization2 (copy), LocalizationService (copy), React (copy), LocalizationProvider (copy), Foundation (copy), BuildExperienceCompositionStyleSheet (copy), v19 (copy)
 	clientLogsCollector.startServerLogCollection()
 
@@ -62,6 +62,7 @@ local function mountChatSheet() -- line: 57
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.Parent = CoreGui
+	ScreenGui.DisplayOrder = 9
 
 	local v27 = ReactRoblox.createRoot(ScreenGui)
 	local v28 = Localization2.new(LocalizationService.RobloxLocaleId)
@@ -70,7 +71,10 @@ local function mountChatSheet() -- line: 57
 		localization = v28
 	}, {
 		FoundationProvider = React.createElement(Foundation.FoundationProvider, {
-			theme = Foundation.Enums.Theme.Dark
+			theme = Foundation.Enums.Theme.Dark,
+			overlayGui = {
+				DisplayOrder = 9
+			}
 		}, {
 			CompositionStyleSheet = React.createElement(BuildExperienceCompositionStyleSheet),
 			Sheet = React.createElement(v19)

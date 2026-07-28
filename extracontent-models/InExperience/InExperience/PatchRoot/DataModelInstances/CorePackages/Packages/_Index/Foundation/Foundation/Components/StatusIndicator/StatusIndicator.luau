@@ -59,7 +59,7 @@ local function StatusIndicator(p1, p2) -- line: 65
 		Text = if not v25 or not v26.content.style then nil else React.createElement(Text, {
 			Text = if not ReactIs.isBinding(v22.value) then v27(v22.value) else v22.value:map(v27),
 			textStyle = v26.content.style,
-			fontStyle = if not Flags.FoundationStatusIndicatorBeta then nil else {
+			fontStyle = {
 				Font = v26.content.font,
 				FontSize = v24.Typography.LabelSmall.FontSize,
 				LineHeight = v24.Typography.LabelSmall.LineHeight

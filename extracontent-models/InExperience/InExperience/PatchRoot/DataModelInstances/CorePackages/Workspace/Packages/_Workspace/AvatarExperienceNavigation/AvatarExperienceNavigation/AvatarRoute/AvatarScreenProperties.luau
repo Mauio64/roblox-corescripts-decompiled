@@ -261,6 +261,10 @@ if FFlagAXOutfitPageRevamp then
 		isTransparent = false,
 		VRPanelPlacement = "Left"
 	}
+	t2[AvatarScreen.RenameOutfitDialog] = {
+		isTransparent = false,
+		VRPanelPlacement = "Right"
+	}
 	t2[AvatarScreen.ManageOutfitsPage] = {
 		isTransparent = false,
 		VRPanelPlacement = "Left",

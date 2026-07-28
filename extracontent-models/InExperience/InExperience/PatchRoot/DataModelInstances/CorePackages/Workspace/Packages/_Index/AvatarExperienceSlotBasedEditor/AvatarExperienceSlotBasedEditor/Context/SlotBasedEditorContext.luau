@@ -6,6 +6,7 @@ require(script.Parent.Parent.Enums.ItemView)
 require(script.Parent.Parent.Stores.createCategoryInventoryStore)
 require(script.Parent.Parent.Stores.createSortAndFiltersStore)
 require(script.Parent.Parent.Stores.createSlotBasedEditorStore)
+require(script.Parent.Parent.Stores.createThumbnailLatencyStore)
 
 local React = require(Parent.React)
 

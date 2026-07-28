@@ -9,9 +9,13 @@ return {
 	getStreamPresented = v3,
 	getActiveBellId = v5,
 	setActiveBellId = v6,
-	isBellActive = function(b1: boolean, s1: string?, s2: string?, b2: boolean?) -- line: 26
-		if not b1 then
+	isBellActive = function(b1: boolean, s1: string?, s2: string?, b2: boolean?, b3: boolean?) -- line: 26
+		if not b1 or b3 == false then
 			return false
+		end
+
+		if s1 == "StreamNotificationPrimaryBell" then
+			return b2 == true
 		end
 
 		if s1 == s2 then

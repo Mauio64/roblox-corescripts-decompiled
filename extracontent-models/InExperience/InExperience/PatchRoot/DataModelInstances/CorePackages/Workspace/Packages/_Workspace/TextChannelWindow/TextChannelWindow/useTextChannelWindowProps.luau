@@ -27,15 +27,17 @@ local function useTextChannelWindowProps(p2) -- line: 27
 		-- upvalues: p2 (copy)
 		return p2.BackgroundColor3
 	end)
+	local v13 = React.useRef(v9)
 
-	useEventConnection(p2:GetPropertyChangedSignal("Target"), function() -- line: 36
-		-- upvalues: v10 (copy), p2 (copy)
-		local v14 = v10
+	useEventConnection(p2:GetPropertyChangedSignal("Target"), function() -- line: 38
+		-- upvalues: p2 (copy), v13 (copy), v10 (copy)
 		local p2Target = p2.Target
+		local v16 = if not p2Target or not p2Target:IsA("TextChannel") then nil else p2Target
 
-		v14(if not p2Target or not p2Target:IsA("TextChannel") then nil else p2Target)
+		v13.current = v16
+		v10(v16)
 	end, { p2 })
-	useEventConnection(p2:GetPropertyChangedSignal("BackgroundColor3"), function() -- line: 40
+	useEventConnection(p2:GetPropertyChangedSignal("BackgroundColor3"), function() -- line: 45
 		-- upvalues: v12 (copy), p2 (copy)
 		v12(p2.BackgroundColor3)
 	end, { p2 })

@@ -109,6 +109,7 @@ return {
 		ItemDetailsPage = "ItemDetailsPage",
 		MutualConnectionsList = "MutualConnectionsList",
 		JoinGameCard = "JoinGameCard",
+		SchoolMemberList = "SchoolMemberList",
 		InExperienceProfile = not FFlagAddIEMProfilePage and "" or "InExperienceProfile",
 		MomentsFeed = not FFlagProfilePlatformEnableMoments and "" or "MomentsFeed"
 	},

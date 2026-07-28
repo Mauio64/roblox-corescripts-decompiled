@@ -5,5 +5,6 @@ return {
 	FFlagAppChatUseAbuseReportingApi = require(script.FFlagAppChatUseAbuseReportingApi),
 	FFlagAppChatConversationStore = require(script.FFlagAppChatConversationStore),
 	FFlagAppChatSignalsMessageStore = require(script.FFlagAppChatSignalsMessageStore),
-	FFlagAppChatSignalsReplyStore = require(script.FFlagAppChatSignalsReplyStore)
+	FFlagAppChatSignalsReplyStore = require(script.FFlagAppChatSignalsReplyStore),
+	FFlagAppChatPresenceStoreMigration = require(script.FFlagAppChatPresenceStoreMigration)
 }

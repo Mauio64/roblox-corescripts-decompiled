@@ -48,6 +48,7 @@ return {
 	EditAppearanceMenuSwitchAvatar = "EditAppearanceMenuSwitchAvatar",
 	EditAppearanceMenuEditBackground = "EditAppearanceMenuEditBackground",
 	FriendsButton = "ProfileFriendsButton",
+	SchoolButton = "ProfileSchoolButton",
 	FollowersButton = "ProfileFollowersButton",
 	FollowingsButton = "ProfileFollowingsButton",
 	MutualFriendsButton = "ProfileMutualFriendsButton",

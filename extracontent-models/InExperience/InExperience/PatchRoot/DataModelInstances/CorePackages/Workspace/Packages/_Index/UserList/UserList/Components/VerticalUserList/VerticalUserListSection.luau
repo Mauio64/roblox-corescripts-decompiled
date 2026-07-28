@@ -11,22 +11,24 @@ require(UserList.Common.Types)
 local UserListHeader = require(UserList.Components.UserListHeader)
 local UserListFooter = require(UserList.Components.UserListFooter)
 local VerticalUserList = require(script.Parent.VerticalUserList)
+local v8 = game:DefineFastFlag("UserListTightHeaderSpacing", false)
 
-local function VerticalUserListSection(t1: {[any]: any}) -- line: 37
-	-- upvalues: React (copy), View (copy), UserListHeader (copy), UserListFooter (copy), VerticalUserList (copy)
-	local v10 = if not t1.header then nil else React.createElement(View, {
+local function VerticalUserListSection(t1: {[any]: any}) -- line: 39
+	-- upvalues: React (copy), View (copy), v8 (copy), UserListHeader (copy), UserListFooter (copy), VerticalUserList (copy)
+	local v11 = if not t1.header then nil else React.createElement(View, {
 		tag = {
 			["size-full-0 auto-y"] = true,
-			["padding-bottom-large"] = t1.isScrollEnabled
+			["padding-bottom-small"] = v8,
+			["padding-bottom-large"] = not v8 and t1.isScrollEnabled
 		},
 		LayoutOrder = if t1.isScrollEnabled then nil else 1
 	}, {
 		HeaderContent = React.createElement(UserListHeader, t1.header)
 	})
-	local v11 = if not t1.hasMore or not t1.onLoadMore then nil else React.createElement(View, {
+	local v12 = if not t1.hasMore or not t1.onLoadMore then nil else React.createElement(View, {
 		tag = {
 			["size-full-0 auto-y"] = true,
-			["padding-top-large"] = t1.isScrollEnabled
+			["padding-top-large"] = v8 or t1.isScrollEnabled
 		},
 		LayoutOrder = if t1.isScrollEnabled then nil else 3
 	}, {
@@ -46,8 +48,8 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 37
 			entities = t1.entities,
 			initialRowCount = t1.initialRowCount,
 			onRowSelected = t1.onRowSelectedOverride,
-			ListHeaderComponent = v10,
-			ListFooterComponent = v11,
+			ListHeaderComponent = v11,
+			ListFooterComponent = v12,
 			renderRow = t1.renderRow,
 			layoutOrder = t1.layoutOrder,
 			configs = t1.configs
@@ -55,10 +57,13 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 37
 	end
 
 	return React.createElement(View, {
-		tag = "size-full-0 auto-y col gap-large",
+		tag = {
+			["col size-full-0 auto-y"] = v8,
+			["col gap-large size-full-0 auto-y"] = not v8
+		},
 		LayoutOrder = t1.layoutOrder
 	}, {
-		Header = v10,
+		Header = v11,
 		List = React.createElement(VerticalUserList, {
 			layoutOrder = 2,
 			isScrollEnabled = false,
@@ -68,7 +73,7 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 37
 			renderRow = t1.renderRow,
 			configs = t1.configs
 		}),
-		Footer = v11
+		Footer = v12
 	})
 end
 
