@@ -33,7 +33,7 @@ local function legacyVariants(p1) -- line: 42
 			tag = "align-x-center align-y-center"
 		},
 		submenuContent = {
-			tag = "col auto-xy stroke-standard stroke-default radius-medium"
+			tag = "stroke-standard stroke-default radius-medium"
 		}
 	}
 	local t2 = {
@@ -151,6 +151,18 @@ local function legacyVariants(p1) -- line: 42
 		}
 	}
 	local t4 = {
+		[false] = {
+			submenuContent = {
+				tag = "col auto-xy"
+			}
+		},
+		[true] = {
+			submenuContent = {
+				tag = ""
+			}
+		}
+	}
+	local t5 = {
 		container = {
 			tag = "auto-x"
 		}
@@ -160,12 +172,13 @@ local function legacyVariants(p1) -- line: 42
 		common = t1,
 		sizes = t2,
 		isChecked = t3,
-		defaultSize = t4
+		isScrollable = t4,
+		defaultSize = t5
 	}
 end
-local function refreshVariants(p2) -- line: 119
+local function refreshVariants(p2) -- line: 125
 	-- upvalues: InputSize (copy), IconSize (copy)
-	local t5 = {
+	local t6 = {
 		container = {
 			tag = ""
 		},
@@ -187,10 +200,10 @@ local function refreshVariants(p2) -- line: 119
 			tag = "align-x-center align-y-center"
 		},
 		submenuContent = {
-			tag = "col auto-xy stroke-standard stroke-default radius-medium"
+			tag = "stroke-standard stroke-default radius-medium"
 		}
 	}
-	local t6 = {
+	local t7 = {
 		[InputSize.XSmall] = {
 			container = {
 				tag = "size-full-600 radius-small",
@@ -320,7 +333,7 @@ local function refreshVariants(p2) -- line: 119
 			}
 		}
 	}
-	local t7 = {
+	local t8 = {
 		[false] = {
 			container = {
 				tag = ""
@@ -332,20 +345,33 @@ local function refreshVariants(p2) -- line: 119
 			}
 		}
 	}
-	local t8 = {
+	local t9 = {
+		[false] = {
+			submenuContent = {
+				tag = "col auto-xy"
+			}
+		},
+		[true] = {
+			submenuContent = {
+				tag = ""
+			}
+		}
+	}
+	local t10 = {
 		container = {
 			tag = "auto-x"
 		}
 	}
 
 	return {
-		common = t5,
-		sizes = t6,
-		isChecked = t7,
-		defaultSize = t8
+		common = t6,
+		sizes = t7,
+		isChecked = t8,
+		isScrollable = t9,
+		defaultSize = t10
 	}
 end
-local function variantsMap(p3) -- line: 221
+local function variantsMap(p3) -- line: 233
 	-- upvalues: Flags (copy), refreshVariants (copy), legacyVariants (copy)
 	if Flags.FoundationBaseMenuBeta then
 		return (refreshVariants(p3))
@@ -354,13 +380,13 @@ local function variantsMap(p3) -- line: 221
 	return (legacyVariants(p3))
 end
 
-return function(p4, p5, b1: boolean) -- line: 231
+return function(p4, p5, b1: boolean, b2: boolean) -- line: 243
 	-- upvalues: VariantsContext (copy), variantsMap (copy), Flags (copy), composeStyleVariant (copy)
-	local v24 = VariantsContext.useVariants("BaseMenuItem", variantsMap, p4)
+	local v27 = VariantsContext.useVariants("BaseMenuItem", variantsMap, p4)
 
 	if not Flags.FoundationBaseMenuBeta then
-		return composeStyleVariant(v24.common, v24.sizes[p5], v24.isChecked[b1])
+		return composeStyleVariant(v27.common, v27.sizes[p5], v27.isChecked[b1], v27.isScrollable[b2])
 	end
 
-	return composeStyleVariant(v24.common, v24.sizes[p5], v24.defaultSize)
+	return composeStyleVariant(v27.common, v27.sizes[p5], v27.defaultSize, v27.isScrollable[b2])
 end

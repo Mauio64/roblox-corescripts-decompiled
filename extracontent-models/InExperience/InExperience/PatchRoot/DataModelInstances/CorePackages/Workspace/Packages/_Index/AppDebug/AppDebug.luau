@@ -14,7 +14,7 @@ return {
 	LogTree = require(script.LogTree),
 	register = function() -- line: 33
 		-- upvalues: DevOnly (copy), v1 (copy), u3 (ref), u4 (ref)
-		if DevOnly == nil then
+		if _G.IS_PRODUCTION or DevOnly == nil then
 			return v1
 		end
 
@@ -26,7 +26,7 @@ return {
 
 		local t1 = { (require(DevOnly.TagAnnotation.TagAnnotationSection)) }
 
-		function u4() -- line: 47
+		function u4() -- line: 48
 			-- upvalues: t1 (copy), u3 (ref), u4 (ref)
 			for _, v7 in t1 do
 				v7()

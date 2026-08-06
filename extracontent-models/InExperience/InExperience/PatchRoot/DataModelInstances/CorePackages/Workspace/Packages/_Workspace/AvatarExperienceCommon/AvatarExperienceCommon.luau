@@ -16,7 +16,6 @@ local AXPartialPageModal = require(script.Components.AXPartialPageModal.AXPartia
 local BackgroundHighlightContainer = require(script.Components.BackgroundHighlight.BackgroundHighlightContainer)
 local ContextualActionButton = require(script.Components.ContextualActionButton.ContextualActionButton)
 local selectColorAdjustmentButtonColor = require(script.State.Selectors.selectColorAdjustmentButtonColor)
-local selectAdjustableLastTryOnItem = require(script.State.Selectors.selectAdjustableLastTryOnItem)
 local selectTryOnBodyIds = require(script.State.Selectors.selectTryOnBodyIds)
 local selectHasBodyTryOn = require(script.State.Selectors.selectHasBodyTryOn)
 local selectShowColorQuickButton = require(script.State.Selectors.selectShowColorQuickButton)
@@ -44,6 +43,7 @@ local CatalogCategoryKey = require(script.Enums.CatalogCategoryKey)
 local CatalogSubcategoryKey = require(script.Enums.CatalogSubcategoryKey)
 local NoPriceStatus = require(script.Enums.NoPriceStatus)
 local ItemPurchaseActionTypeEnum = require(script.Enums.ItemPurchaseActionTypeEnum)
+local InventoryOutfitType = require(script.Enums.InventoryOutfitType)
 local FullView = require(script.Enums.FullView)
 local WearTimeFilter = require(script.Enums.WearTimeFilter)
 local CharacterHistoryStateChangeButtonActivated = require(script.State.CharacterHistoryStateChangeButtonActivated)
@@ -71,7 +71,11 @@ require(script.Types.AvatarColorTypes)
 require(script.Types.WidgetAnalyticsInfo)
 require(script.Types.WidgetInfoContextTypes)
 require(script.Types.ItemTypes)
+require(script.Types.PurchaseItemsTypes)
+require(script.Types.TryOnItemComparisonData)
 require(script.Backgrounds.types)
+
+local getIsInsufficientRobuxError = require(script.Utils.getIsInsufficientRobuxError)
 
 return {
 	Components = {
@@ -113,6 +117,7 @@ return {
 	},
 	Enums = {
 		OutfitTypes = require(script.Enums.OutfitTypes),
+		InventoryOutfitType = InventoryOutfitType,
 		ItemTypeEnum = ItemTypeEnum,
 		ItemRestrictions = ItemRestrictions,
 		ItemStatus = ItemStatus,
@@ -146,7 +151,8 @@ return {
 		useAdaptiveScrolling = require(script.Hooks.useAdaptiveScrolling),
 		AdaptiveScrollingContext = AdaptiveScrollingContext,
 		withAdaptiveScrolling = withAdaptiveScrolling,
-		useUnifiedImpressionExposer = require(script.Hooks.useUnifiedImpressionExposer)
+		useUnifiedImpressionExposer = require(script.Hooks.useUnifiedImpressionExposer),
+		useIsDirectional = require(script.Hooks.useIsDirectional)
 	},
 	Lib = {
 		SafeAppStorageService = require(script.Lib.SafeAppStorageService)
@@ -158,7 +164,6 @@ return {
 	State = {
 		Selectors = {
 			selectColorAdjustmentButtonColor = selectColorAdjustmentButtonColor,
-			selectAdjustableLastTryOnItem = selectAdjustableLastTryOnItem,
 			selectTryOnBodyIds = selectTryOnBodyIds,
 			selectHasBodyTryOn = selectHasBodyTryOn,
 			selectShowColorQuickButton = selectShowColorQuickButton,
@@ -212,6 +217,10 @@ return {
 		getUseSelectorDeepEquals = require(script.Utils.getUseSelectorDeepEquals),
 		findItemInTryOnItems = require(script.Utils.findItemInTryOnItems),
 		getTryOnItemReducerKey = require(script.Utils.getTryOnItemReducerKey),
+		getFilteredTryOnItems = require(script.Utils.TryOns.getFilteredTryOnItems),
+		getTryOnItemComparisonData = require(script.Utils.TryOns.getTryOnItemComparisonData),
+		getShouldReplaceTryOn = require(script.Utils.TryOns.getShouldReplaceTryOn),
+		removeMakeupAssetsFromTryOnsIfOverLimit = require(script.Utils.TryOns.removeMakeupAssetsFromTryOnsIfOverLimit),
 		getItemPurchaseActionType = require(script.Utils.getItemPurchaseActionType),
 		RoactGamepadMigration = {
 			useTableWrappedCallbackRef = require(script.Utils.RoactGamepadMigration.useTableWrappedCallbackRef),
@@ -225,7 +234,12 @@ return {
 		isLayeredClothingAssetType = require(script.Utils.isLayeredClothingAssetType),
 		isDurableItemExpired = require(script.Utils.isDurableItemExpired),
 		formatTimeoutEndTime = require(script.Utils.formatTimeoutEndTime),
-		isOutfitNameValid = require(script.Utils.isOutfitNameValid)
+		isOutfitNameValid = require(script.Utils.isOutfitNameValid),
+		isValidAssetTypeForOutfitType = require(script.Utils.isValidAssetTypeForOutfitType),
+		getHumanoidDescriptionFromStateForOutfitType = require(script.Utils.Humanoid.getHumanoidDescriptionFromStateForOutfitType),
+		getIsInsufficientRobuxError = getIsInsufficientRobuxError,
+		getInventoryOutfitType = require(script.Utils.getInventoryOutfitType),
+		getGrantedOutfitIds = require(script.Utils.getGrantedOutfitIds)
 	},
 	Backgrounds = {
 		loadBackgroundAsset = require(script.Backgrounds.loadBackgroundAsset),

@@ -9,6 +9,7 @@ return {
 	SquadLocationEnum = require(script.SquadLocationEnum),
 	SquadLuckyRecommendationError = require(script.SquadLuckyRecommendationError),
 	SquadLuckyRecommendationPhase = require(script.SquadLuckyRecommendationPhase),
+	SquadLuckyRecommendationRevealType = require(script.SquadLuckyRecommendationRevealType),
 	SquadPromptResponse = require(script.SquadPromptResponse),
 	SquadPromptType = require(script.SquadPromptType),
 	SquadRootViewType = SquadRootViewType,

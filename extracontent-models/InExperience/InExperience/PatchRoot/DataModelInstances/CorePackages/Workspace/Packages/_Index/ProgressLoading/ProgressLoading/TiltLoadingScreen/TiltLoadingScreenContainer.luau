@@ -8,6 +8,7 @@ local TiltLoadingScreenView = require(script.Parent.TiltLoadingScreenView)
 local useTiltLoadingScreenViewModel = require(script.Parent.Hooks.useTiltLoadingScreenViewModel)
 local useLoadingScreenAnimation = require(script.Parent.Hooks.useLoadingScreenAnimation)
 local Constants = require(script.Parent.Constants)
+local shouldHoldForExit = require(script.Parent.shouldHoldForExit)
 local FFlagEnableTiltLoadingScreen = require(Parent.SharedFlags).FFlagEnableTiltLoadingScreen
 local FFlagIncreaseLoadingScreenOrder = require(Parent.SharedFlags).FFlagIncreaseLoadingScreenOrder
 local ContextActionService = game:GetService("ContextActionService")
@@ -16,14 +17,14 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local ANIMATION = Constants.ANIMATION
-local v19 = Motion.createState({
+local v20 = Motion.createState({
 	reveal = 1
 }, {
 	default = Motion.transition({
 		duration = ANIMATION.chromeFadeIn
 	})
 })
-local v20 = Motion.createState({
+local v21 = Motion.createState({
 	reveal = 0
 }, {
 	default = Motion.transition({
@@ -33,88 +34,110 @@ local v20 = Motion.createState({
 
 require(script.Parent.Types)
 
-local function TiltLoadingScreenContainer(p1) -- line: 40
-	-- upvalues: FFlagEnableTiltLoadingScreen (copy), React (copy), ReplicatedFirst (copy), UserGameSettings (copy), Motion (copy), v19 (copy), useTiltLoadingScreenViewModel (copy), useLoadingScreenAnimation (copy), InExperienceLocales (copy), LocalizationService (copy), v20 (copy), ANIMATION (copy), Players (copy), ContextActionService (copy), FFlagIncreaseLoadingScreenOrder (copy), Constants (copy), Foundation (copy), Localization (copy), TiltLoadingScreenView (copy)
+local function TiltLoadingScreenContainer(p1) -- line: 41
+	-- upvalues: FFlagEnableTiltLoadingScreen (copy), React (copy), ReplicatedFirst (copy), UserGameSettings (copy), Motion (copy), v20 (copy), useTiltLoadingScreenViewModel (copy), useLoadingScreenAnimation (copy), InExperienceLocales (copy), LocalizationService (copy), shouldHoldForExit (copy), ANIMATION (copy), v21 (copy), Players (copy), ContextActionService (copy), FFlagIncreaseLoadingScreenOrder (copy), Constants (copy), Foundation (copy), Localization (copy), TiltLoadingScreenView (copy)
 	if not FFlagEnableTiltLoadingScreen then
 		return nil
 	end
 
-	local v23, v24 = React.useState(function() -- line: 45
+	local v24, v25 = React.useState(function() -- line: 46
 		-- upvalues: ReplicatedFirst (copy)
 		return not ReplicatedFirst:IsDefaultLoadingGuiRemoved()
 	end)
-	local v25, v26 = React.useState(false)
+	local v26, v27 = React.useState(false)
 	local ReducedMotion = UserGameSettings.ReducedMotion
-	local v28, v29 = Motion.useMotion(v19)
-	local v30 = React.useRef(v29)
+	local v29, v30 = Motion.useMotion(v20)
+	local v31 = React.useRef(v30)
 
-	v30.current = v29
+	v31.current = v30
 
-	local v31 = React.useRef(p1.onDismissComplete)
+	local v32 = React.useRef(p1.onDismissComplete)
 
-	v31.current = p1.onDismissComplete
+	v32.current = p1.onDismissComplete
 
-	local v32 = React.useRef(p1.onCancel)
+	local v33 = React.useRef(p1.onCancel)
 
-	v32.current = p1.onCancel
+	v33.current = p1.onCancel
 
-	local v33 = useTiltLoadingScreenViewModel(p1.placeId)
-	local v34 = useLoadingScreenAnimation({
+	local v34 = useTiltLoadingScreenViewModel(p1.placeId)
+	local v35 = useLoadingScreenAnimation({
 		reducedMotion = ReducedMotion,
-		contentReady = v33.gameData ~= nil,
-		isDismissing = v25
+		contentReady = v34.gameData ~= nil,
+		isDismissing = v26
 	})
-	local v35 = React.useMemo(function() -- line: 63
+	local v36 = React.useMemo(function() -- line: 64
 		-- upvalues: InExperienceLocales (copy), LocalizationService (copy)
 		return InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
 	end, {})
 
-	React.useEffect(function() -- line: 67
-		-- upvalues: v26 (copy), v30 (copy), v20 (copy), ANIMATION (copy), ReplicatedFirst (copy), v24 (copy), v31 (copy), UserGameSettings (copy), Players (copy)
+	React.useEffect(function() -- line: 68
+		-- upvalues: shouldHoldForExit (copy), UserGameSettings (copy), ANIMATION (copy), v27 (copy), v31 (copy), v21 (copy), ReplicatedFirst (copy), v25 (copy), v32 (copy), Players (copy)
 		local t1 = {}
-		local u40 = false
 		local u41 = false
-		local u42 = nil
+		local u42 = false
 		local u43 = nil
 		local u44 = nil
+		local u45 = nil
+		local u46 = nil
+		local u47 = false
 
-		local function dismiss() -- line: 75
-			-- upvalues: u40 (ref), v26 (copy), u42 (ref), u41 (ref), v30 (copy), v20 (copy), u43 (ref), ANIMATION (copy), ReplicatedFirst (copy), v24 (copy), v31 (copy), UserGameSettings (copy)
-			if u40 then
+		local function dismiss() -- line: 78
+			-- upvalues: u41 (ref), u47 (ref), u46 (ref), shouldHoldForExit (copy), UserGameSettings (copy), ANIMATION (copy), u42 (ref), dismiss (copy), v27 (copy), u43 (ref), v31 (copy), v21 (copy), u44 (ref), ReplicatedFirst (copy), v25 (copy), v32 (copy)
+			if u41 then
 				return
 			end
 
-			u40 = true
-			v26(true)
+			if u47 and u46 ~= nil then
+				return
+			end
 
-			local function fadeChrome() -- line: 82
-				-- upvalues: u42 (ref), u41 (ref), v30 (copy), v20 (copy), u43 (ref), ANIMATION (copy), ReplicatedFirst (copy), v24 (copy), v31 (copy)
-				u42 = nil
+			if shouldHoldForExit(UserGameSettings.ReducedMotion, u47) then
+				u47 = true
+				u46 = task.delay(ANIMATION.enterExitHold, function() -- line: 89
+					-- upvalues: u46 (ref), u42 (ref), dismiss (copy)
+					u46 = nil
 
-				if u41 then
+					if u42 then
+						return
+					end
+
+					dismiss()
+				end)
+
+				return
+			end
+
+			u41 = true
+			v27(true)
+
+			local function fadeChrome() -- line: 102
+				-- upvalues: u43 (ref), u42 (ref), v31 (copy), v21 (copy), u44 (ref), ANIMATION (copy), ReplicatedFirst (copy), v25 (copy), v32 (copy)
+				u43 = nil
+
+				if u42 then
 					return
 				end
 
-				v30.current(v20, {
-					onAnimationComplete = function(p2) -- line: 88
-						-- upvalues: u41 (ref), u43 (ref), ANIMATION (copy), ReplicatedFirst (copy), v24 (copy), v31 (copy)
-						if p2 ~= true or u41 then
+				v31.current(v21, {
+					onAnimationComplete = function(p2) -- line: 108
+						-- upvalues: u42 (ref), u44 (ref), ANIMATION (copy), ReplicatedFirst (copy), v25 (copy), v32 (copy)
+						if p2 ~= true or u42 then
 							return
 						end
 
-						u43 = task.delay(ANIMATION.endPause, function() -- line: 92
-							-- upvalues: u43 (ref), u41 (ref), ReplicatedFirst (copy), v24 (copy), v31 (copy)
-							u43 = nil
+						u44 = task.delay(ANIMATION.endPause, function() -- line: 112
+							-- upvalues: u44 (ref), u42 (ref), ReplicatedFirst (copy), v25 (copy), v32 (copy)
+							u44 = nil
 
-							if u41 then
+							if u42 then
 								return
 							end
 
 							ReplicatedFirst:SetDefaultLoadingGuiRemoved()
-							v24(false)
+							v25(false)
 
-							if v31.current then
-								v31.current()
+							if v32.current then
+								v32.current()
 							end
 						end)
 					end
@@ -127,16 +150,16 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 				return
 			end
 
-			u42 = task.delay(ANIMATION.closeDur, fadeChrome)
+			u43 = task.delay(ANIMATION.closeDur, fadeChrome)
 		end
-		local function waitForCharacterAndDismiss() -- line: 114
-			-- upvalues: u44 (ref), Players (copy), u41 (ref), dismiss (copy)
-			if u44 then
+		local function waitForCharacterAndDismiss() -- line: 134
+			-- upvalues: u45 (ref), Players (copy), u42 (ref), dismiss (copy)
+			if u45 then
 				return
 			end
 
-			u44 = task.spawn(function() -- line: 118
-				-- upvalues: Players (copy), u44 (ref), u41 (ref), dismiss (copy)
+			u45 = task.spawn(function() -- line: 138
+				-- upvalues: Players (copy), u45 (ref), u42 (ref), dismiss (copy)
 				if Players.CharacterAutoLoads then
 					local LocalPlayer = Players.LocalPlayer
 
@@ -150,24 +173,24 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 					end
 				end
 
-				u44 = nil
+				u45 = nil
 
-				if u41 then
+				if u42 then
 					return
 				end
 
 				dismiss()
 			end)
 		end
-		local function handleFinishedReplicating() -- line: 137
-			-- upvalues: u44 (ref), Players (copy), u41 (ref), dismiss (copy), t1 (copy)
+		local function handleFinishedReplicating() -- line: 157
+			-- upvalues: u45 (ref), Players (copy), u42 (ref), dismiss (copy), t1 (copy)
 			if game:IsLoaded() then
-				if u44 then
+				if u45 then
 					return
 				end
 
-				u44 = task.spawn(function() -- line: 118
-					-- upvalues: Players (copy), u44 (ref), u41 (ref), dismiss (copy)
+				u45 = task.spawn(function() -- line: 138
+					-- upvalues: Players (copy), u45 (ref), u42 (ref), dismiss (copy)
 					if Players.CharacterAutoLoads then
 						local LocalPlayer = Players.LocalPlayer
 
@@ -181,9 +204,9 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 						end
 					end
 
-					u44 = nil
+					u45 = nil
 
-					if u41 then
+					if u42 then
 						return
 					end
 
@@ -195,16 +218,16 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 
 			local connection = nil
 
-			connection = game.Loaded:Connect(function() -- line: 142
-				-- upvalues: connection (ref), u44 (ref), Players (copy), u41 (ref), dismiss (copy)
+			connection = game.Loaded:Connect(function() -- line: 162
+				-- upvalues: connection (ref), u45 (ref), Players (copy), u42 (ref), dismiss (copy)
 				connection:Disconnect()
 
-				if u44 then
+				if u45 then
 					return
 				end
 
-				u44 = task.spawn(function() -- line: 118
-					-- upvalues: Players (copy), u44 (ref), u41 (ref), dismiss (copy)
+				u45 = task.spawn(function() -- line: 138
+					-- upvalues: Players (copy), u45 (ref), u42 (ref), dismiss (copy)
 					if Players.CharacterAutoLoads then
 						local LocalPlayer = Players.LocalPlayer
 
@@ -218,9 +241,9 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 						end
 					end
 
-					u44 = nil
+					u45 = nil
 
-					if u41 then
+					if u42 then
 						return
 					end
 
@@ -231,7 +254,7 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 		end
 
 		table.insert(t1, ReplicatedFirst.FinishedReplicating:Connect(handleFinishedReplicating))
-		table.insert(t1, ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function() -- line: 153
+		table.insert(t1, ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function() -- line: 173
 			-- upvalues: dismiss (copy)
 			dismiss()
 		end))
@@ -244,93 +267,98 @@ local function TiltLoadingScreenContainer(p1) -- line: 40
 			dismiss()
 		end
 
-		return function() -- line: 166
-			-- upvalues: u41 (ref), u42 (ref), u43 (ref), u44 (ref), t1 (copy)
-			u41 = true
+		return function() -- line: 186
+			-- upvalues: u42 (ref), u46 (ref), u43 (ref), u44 (ref), u45 (ref), t1 (copy)
+			u42 = true
 
-			if u42 then
-				task.cancel(u42)
+			if u46 then
+				task.cancel(u46)
 			end
 
 			if u43 then
 				task.cancel(u43)
 			end
 
-			if u44 and coroutine.status(u44) ~= "dead" then
+			if u44 then
 				task.cancel(u44)
 			end
 
-			for _, v52 in t1 do
-				v52:Disconnect()
+			if u45 and coroutine.status(u45) ~= "dead" then
+				task.cancel(u45)
+			end
+
+			for _, v55 in t1 do
+				v55:Disconnect()
 			end
 		end
 	end, {})
-	React.useEffect(function() -- line: 182
-		-- upvalues: ContextActionService (copy), v32 (copy)
-		local u48 = false
+	React.useEffect(function() -- line: 205
+		-- upvalues: ContextActionService (copy), v33 (copy)
+		local u51 = false
 
-		ContextActionService:BindCoreAction("CancelGameLoad", function(_, p4) -- line: 184
-			-- upvalues: u48 (ref), v32 (copy)
+		ContextActionService:BindCoreAction("CancelGameLoad", function(_, p4) -- line: 207
+			-- upvalues: u51 (ref), v33 (copy)
 			if p4 == Enum.UserInputState.Begin then
-				u48 = true
+				u51 = true
 
 				return
 			end
 
-			if p4 == Enum.UserInputState.End and u48 then
-				u48 = false
+			if p4 == Enum.UserInputState.End and u51 then
+				u51 = false
 
-				if v32.current then
-					v32.current(false)
+				if v33.current then
+					v33.current(false)
 				end
 			end
 		end, false, Enum.KeyCode.ButtonB)
 
-		return function() -- line: 195
+		return function() -- line: 218
 			-- upvalues: ContextActionService (copy)
 			ContextActionService:UnbindCoreAction("CancelGameLoad")
 		end
 	end, {})
 
-	local v36 = React.useMemo(function() -- line: 199
+	local v37 = React.useMemo(function() -- line: 222
 		-- upvalues: ReducedMotion (copy)
 		return {
 			reducedMotion = ReducedMotion
 		}
 	end, { ReducedMotion })
-	local v37 = React.useCallback(function() -- line: 202
-		-- upvalues: v32 (copy)
-		if v32.current then
-			v32.current(true)
+	local v38 = React.useCallback(function() -- line: 225
+		-- upvalues: v33 (copy)
+		if v33.current then
+			v33.current(true)
 		end
 	end, {})
 
-	if not v23 then
+	if not v24 then
 		return nil
 	end
 
-	local v38 = if not FFlagIncreaseLoadingScreenOrder then Constants.DISPLAY_ORDER else Constants.DISPLAY_ORDER + 1
+	local v39 = if not FFlagIncreaseLoadingScreenOrder then Constants.DISPLAY_ORDER else Constants.DISPLAY_ORDER + 1
 
 	return React.createElement("ScreenGui", {
 		IgnoreGuiInset = true,
-		DisplayOrder = v38,
+		DisplayOrder = v39,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	}, {
 		Foundation = React.createElement(Foundation.FoundationProvider, {
 			theme = Foundation.Enums.Theme.Dark,
-			preferences = v36
+			preferences = v37
 		}, {
 			Localization = React.createElement(Localization.LocalizationProvider, {
-				localization = v35
+				localization = v36
 			}, {
 				View = React.createElement(TiltLoadingScreenView, {
-					isMobile = v33.isMobile,
-					chromeReveal = v28.reveal,
-					animation = v34,
-					gameData = v33.gameData,
-					thumbnailUrl = v33.thumbnailUrl,
-					isAutoTranslated = v33.isAutoTranslated,
-					onCancel = v37
+					isMobile = v34.isMobile,
+					chromeReveal = v29.reveal,
+					animation = v35,
+					gameData = v34.gameData,
+					thumbnailUrl = v34.thumbnailUrl,
+					isAutoTranslated = v34.isAutoTranslated,
+					statusPanel = v34.statusPanel,
+					onCancel = v38
 				})
 			})
 		})

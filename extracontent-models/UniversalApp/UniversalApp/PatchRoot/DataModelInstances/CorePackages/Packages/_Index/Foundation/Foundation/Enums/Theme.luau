@@ -1,4 +1,1 @@
-return {
-	Dark = "Dark",
-	Light = "Light"
-}
+return (require(script.Parent.ColorMode))

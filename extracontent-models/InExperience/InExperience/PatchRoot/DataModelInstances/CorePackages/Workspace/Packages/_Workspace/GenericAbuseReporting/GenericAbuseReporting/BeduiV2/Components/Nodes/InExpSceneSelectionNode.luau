@@ -10,45 +10,47 @@ local TextWithTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translat
 
 require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
 
+local SubmitSource = analyticsService.SubmitSource
 local TelemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useLayoutSlots = LayoutSlots.useLayoutSlots
+local FFlagAbuseReportSceneSelectionSubmitTracking = require(GenericAbuseReporting.Flags.FFlagAbuseReportSceneSelectionSubmitTracking)
 
-local function InExpSceneSelectionNode(t1: {[any]: any}) -- line: 31
-	-- upvalues: React (copy), useAbuseReportAnalytics (copy), useLayoutSlots (copy), getIsInExpSceneSelectionAvailable (copy), TelemetryEventType (copy), inExpSceneSelectionAdapter (copy), TextWithTranslation (copy)
-	local v15, v16 = React.useState(t1.loadingText)
+local function InExpSceneSelectionNode(t1: {[any]: any}) -- line: 38
+	-- upvalues: React (copy), useAbuseReportAnalytics (copy), useLayoutSlots (copy), getIsInExpSceneSelectionAvailable (copy), TelemetryEventType (copy), inExpSceneSelectionAdapter (copy), FFlagAbuseReportSceneSelectionSubmitTracking (copy), SubmitSource (copy), TextWithTranslation (copy)
+	local v17, v18 = React.useState(t1.loadingText)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
-	local v18 = useLayoutSlots()
-	local Layout = v18.Layout
-	local Title = v18.Title
-	local v21 = React.useRef(t1)
+	local v20 = useLayoutSlots()
+	local Layout = v20.Layout
+	local Title = v20.Title
+	local v23 = React.useRef(t1)
 
-	v21.current = t1
+	v23.current = t1
 
-	local v22 = React.useRef(sendEvent)
+	local v24 = React.useRef(sendEvent)
 
-	v22.current = sendEvent
-	React.useEffect(function() -- line: 46
-		-- upvalues: getIsInExpSceneSelectionAvailable (copy), v22 (copy), TelemetryEventType (copy), v16 (copy), v21 (copy), inExpSceneSelectionAdapter (copy)
+	v24.current = sendEvent
+	React.useEffect(function() -- line: 53
+		-- upvalues: getIsInExpSceneSelectionAvailable (copy), v24 (copy), TelemetryEventType (copy), v18 (copy), v23 (copy), inExpSceneSelectionAdapter (copy), FFlagAbuseReportSceneSelectionSubmitTracking (copy), SubmitSource (copy)
 		if not getIsInExpSceneSelectionAvailable() then
-			v22.current({
+			v24.current({
 				sub_event_type = TelemetryEventType.SceneCaptureResult,
 				scene_capture_detail = {
 					exit_reason = "unavailable",
 					success = false
 				}
 			})
-			v16(v21.current.errorText)
+			v18(v23.current.errorText)
 
 			return
 		end
 
-		local u23 = nil
+		local u25 = nil
 
-		u23 = inExpSceneSelectionAdapter.subscribeOnceToExitReason(function(p1) -- line: 64
-			-- upvalues: u23 (ref), v22 (copy), TelemetryEventType (copy), v21 (copy)
-			u23 = nil
-			v22.current({
+		u25 = inExpSceneSelectionAdapter.subscribeOnceToExitReason(function(p1) -- line: 71
+			-- upvalues: u25 (ref), v24 (copy), TelemetryEventType (copy), v23 (copy), FFlagAbuseReportSceneSelectionSubmitTracking (copy), SubmitSource (copy)
+			u25 = nil
+			v24.current({
 				sub_event_type = TelemetryEventType.SceneCaptureResult,
 				scene_capture_detail = {
 					exit_reason = p1.reason,
@@ -56,9 +58,13 @@ local function InExpSceneSelectionNode(t1: {[any]: any}) -- line: 31
 				}
 			})
 
-			local current = v21.current
+			local current = v23.current
 
 			if p1.reason == "submit" then
+				if FFlagAbuseReportSceneSelectionSubmitTracking and current.onExternalSubmit then
+					current.onExternalSubmit(SubmitSource.SceneSelection)
+				end
+
 				if current.onNext then
 					current.onNext()
 
@@ -70,26 +76,26 @@ local function InExpSceneSelectionNode(t1: {[any]: any}) -- line: 31
 		end)
 
 		if not pcall(inExpSceneSelectionAdapter.start) then
-			v22.current({
+			v24.current({
 				sub_event_type = TelemetryEventType.SceneCaptureResult,
 				scene_capture_detail = {
 					exit_reason = "start_failed",
 					success = false
 				}
 			})
-			v16(v21.current.errorText)
+			v18(v23.current.errorText)
 
-			if u23 then
-				u23:Disconnect()
-				u23 = nil
+			if u25 then
+				u25:Disconnect()
+				u25 = nil
 			end
 		end
 
-		return function() -- line: 101
-			-- upvalues: u23 (ref)
-			if u23 then
-				u23:Disconnect()
-				u23 = nil
+		return function() -- line: 111
+			-- upvalues: u25 (ref)
+			if u25 then
+				u25:Disconnect()
+				u25 = nil
 			end
 		end
 	end, {})
@@ -100,10 +106,10 @@ local function InExpSceneSelectionNode(t1: {[any]: any}) -- line: 31
 				layoutOrder = 1,
 				input = t1.title
 			}),
-			Message = if not v15 then nil else React.createElement(TextWithTranslation, {
+			Message = if not v17 then nil else React.createElement(TextWithTranslation, {
 				tag = "size-full-0 auto-y text-body-small",
 				layoutOrder = 2,
-				input = v15
+				input = v17
 			})
 		})
 	})

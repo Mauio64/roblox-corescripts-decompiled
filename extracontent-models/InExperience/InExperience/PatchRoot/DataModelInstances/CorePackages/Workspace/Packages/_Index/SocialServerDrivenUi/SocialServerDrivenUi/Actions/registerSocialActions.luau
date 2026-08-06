@@ -9,25 +9,25 @@ local function registerSocialActions() -- line: 12
 	-- upvalues: SduiActionType (copy), FFlagLuaAppSduiVerificationUpsellActions (copy), SocialServerDrivenUi (copy), getSduiActionHandlerRegistry (copy)
 	local t1 = {
 		[SduiActionType.OpenFacialAgeEstimation] = if FFlagLuaAppSduiVerificationUpsellActions then nil else {
-			lazyHandler = function() -- line: 20
+			lazyHandler = function() -- line: 19
 				-- upvalues: SocialServerDrivenUi (copy)
 				return require(SocialServerDrivenUi.Actions.SduiOpenFacialAgeEstimationAction)
 			end
 		},
 		[SduiActionType.OpenAddConnectionsPage] = {
-			lazyHandler = function() -- line: 26
+			lazyHandler = function() -- line: 25
 				-- upvalues: SocialServerDrivenUi (copy)
 				return require(SocialServerDrivenUi.Actions.SduiOpenAddConnectionsPageAction)
 			end
 		},
 		[SduiActionType.OpenMarketplace] = {
-			lazyHandler = function() -- line: 31
+			lazyHandler = function() -- line: 30
 				-- upvalues: SocialServerDrivenUi (copy)
 				return require(SocialServerDrivenUi.Actions.SduiOpenMarketplaceAction)
 			end
 		},
 		[SduiActionType.HideProfileCompletion] = {
-			lazyHandler = function() -- line: 36
+			lazyHandler = function() -- line: 35
 				-- upvalues: SocialServerDrivenUi (copy)
 				return require(SocialServerDrivenUi.Actions.SduiHideProfileCompletionAction)
 			end

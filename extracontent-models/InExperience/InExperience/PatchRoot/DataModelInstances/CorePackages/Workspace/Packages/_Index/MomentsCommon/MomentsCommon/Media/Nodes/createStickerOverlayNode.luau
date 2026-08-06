@@ -15,63 +15,68 @@ require(MomentsCommon.Media.mediaNodeRegistry)
 
 local overlayScale = require(MomentsCommon.Media.overlayScale)
 local GetFFlagMomentsStickerOverlayMediaRect = require(MomentsCommon.Flags.GetFFlagMomentsStickerOverlayMediaRect)
-local v11 = Signals.createSignal(Enum.ScaleType.Crop)
+local FFlagMomentsOverlayContainerScaleFallback = require(MomentsCommon.Flags.FFlagMomentsOverlayContainerScaleFallback)
+local v12 = Signals.createSignal(Enum.ScaleType.Crop)
 
-local function StickerOverlayLayer(t1: {[any]: any}) -- line: 85
-	-- upvalues: React (copy), Signals (copy), useSignalState (copy), v11 (copy), OverlayDisplay (copy), StickerOverlay (copy)
+local function StickerOverlayLayer(t1: {[any]: any}) -- line: 86
+	-- upvalues: React (copy), Signals (copy), useSignalState (copy), v12 (copy), FFlagMomentsOverlayContainerScaleFallback (copy), OverlayDisplay (copy), StickerOverlay (copy)
 	local getResolution = t1.getResolution
-	local v17 = React.useMemo(function() -- line: 97
+	local v18 = React.useMemo(function() -- line: 98
 		-- upvalues: Signals (copy), getResolution (copy)
-		return Signals.createComputed(function(p1) -- line: 98
+		return Signals.createComputed(function(p1) -- line: 99
 			-- upvalues: getResolution (copy)
 			return getResolution(p1)
 		end)
 	end, { getResolution })
-	local v18 = useSignalState(t1.getItemSize)
-	local v19 = useSignalState(v17)
-	local v20 = useSignalState(t1.getScaleType or v11)
+	local v19 = useSignalState(t1.getItemSize)
+	local v20 = useSignalState(v18)
+	local v21 = useSignalState(t1.getScaleType or v12)
+
+	if FFlagMomentsOverlayContainerScaleFallback and v20 == nil then
+		v20 = v19
+	end
 
 	return React.createElement(OverlayDisplay, {
 		draggable = false,
 		editable = false,
 		overlayComponent = StickerOverlay,
-		itemResolution = v19,
-		itemSize = v18,
-		scaleType = v20,
+		itemResolution = v20,
+		itemSize = v19,
+		scaleType = v21,
 		overlayEdits = { t1.overlay }
 	})
 end
-local function LegacyStickerOverlayLayer(t2: {[any]: any}) -- line: 128
+local function LegacyStickerOverlayLayer(t2: {[any]: any}) -- line: 139
 	-- upvalues: useSignalState (copy), overlayScale (copy), React (copy), StickerOverlay (copy)
-	local v22 = useSignalState(t2.getItemSize)
-	local v23 = overlayScale(1, v22.X)
+	local v23 = useSignalState(t2.getItemSize)
+	local v24 = overlayScale(1, v23.X)
 
 	return React.createElement(StickerOverlay, {
 		draggable = false,
 		editable = false,
-		additionalScale = v23,
+		additionalScale = v24,
 		overlayEdit = t2.overlay
 	})
 end
-local function createStickerOverlayNode(p2, _) -- line: 141
+local function createStickerOverlayNode(p2, _) -- line: 152
 	-- upvalues: GetFFlagMomentsStickerOverlayMediaRect (copy), React (copy), LegacyStickerOverlayLayer (copy), StickerOverlayLayer (copy)
 	local overlay = p2.overlay
 
 	assert(overlay ~= nil, "createStickerOverlayNode: spec.overlay (a StickerOverlayEdit) is required")
 
-	local v27 = p2.zIndex or overlay.zIndex
+	local v28 = p2.zIndex or overlay.zIndex
 
 	return {
 		kind = "sticker",
 		usesDecoder = false,
 		id = p2.id,
-		assets = function() -- line: 153
+		assets = function() -- line: 164
 			return {}
 		end,
-		download = function() -- line: 179
+		download = function() -- line: 190
 		end,
-		zIndex = v27,
-		render = function(p4) -- line: 157
+		zIndex = v28,
+		render = function(p4) -- line: 168
 			-- upvalues: GetFFlagMomentsStickerOverlayMediaRect (copy), React (copy), LegacyStickerOverlayLayer (copy), overlay (copy), StickerOverlayLayer (copy)
 			if not GetFFlagMomentsStickerOverlayMediaRect() then
 				return React.createElement(LegacyStickerOverlayLayer, {
@@ -87,7 +92,7 @@ local function createStickerOverlayNode(p2, _) -- line: 141
 				getScaleType = p4.getScaleType
 			})
 		end,
-		dispose = function() -- line: 183
+		dispose = function() -- line: 194
 		end
 	}
 end

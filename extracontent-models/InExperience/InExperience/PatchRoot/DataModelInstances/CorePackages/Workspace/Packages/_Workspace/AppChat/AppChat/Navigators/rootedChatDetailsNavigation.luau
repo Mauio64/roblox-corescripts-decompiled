@@ -43,8 +43,14 @@ local function normalizeStoreConversationForRodux(p3) -- line: 24
 	})
 end
 
-function t1.navigateToRootedChatDetails(s1: string) -- line: 55
+function t1.navigateToRootedChatDetails(s1: string, n1: number?) -- line: 55
 	-- upvalues: RoactNavigation (copy), EnumScreens (copy)
+	local t2 = {
+		isRooted = true,
+		conversationId = s1,
+		rootedNavigationRequestId = n1
+	}
+
 	return RoactNavigation.Actions.navigate({
 		routeName = EnumScreens.ChatLandingStack,
 		params = {
@@ -54,33 +60,30 @@ function t1.navigateToRootedChatDetails(s1: string) -- line: 55
 			index = 1,
 			actions = { RoactNavigation.Actions.navigate({
 				routeName = EnumScreens.ChatDetails,
-				params = {
-					isRooted = true,
-					conversationId = s1
-				}
+				params = t2
 			}) }
 		})
 	})
 end
-function t1.tryNavigateToRootedChatDetails(t2: {[any]: any}, p4) -- line: 76
+function t1.tryNavigateToRootedChatDetails(t3: {[any]: any}, p4) -- line: 82
 	-- upvalues: getFFlagAppChatEnableRootedNavigation (copy), GetConversationStore (copy), ReceivedConversation (copy), normalizeStoreConversationForRodux (copy), ConversationChannels (copy), t1 (copy)
-	local v27 = p4 and p4.conversationId
+	local v29 = p4 and p4.conversationId
 
-	if not v27 or (p4.rooted ~= true or not getFFlagAppChatEnableRootedNavigation()) then
+	if not v29 or (p4.rooted ~= true or not getFFlagAppChatEnableRootedNavigation()) then
 		return false
 	end
 
-	local v28 = GetConversationStore(false).getConversation(v27, false)
+	local v30 = GetConversationStore(false).getConversation(v29, false)
 
-	if v28 then
-		t2.dispatch(ReceivedConversation(normalizeStoreConversationForRodux(v28)))
+	if v30 then
+		t3.dispatch(ReceivedConversation(normalizeStoreConversationForRodux(v30)))
 	end
 
-	if v28 == nil and (type(v27) ~= "string" or string.sub(v27, 1, 8) ~= "friends:") or v28 ~= nil and v28.source ~= ConversationChannels.Source.Friends then
-		t2.fetchLatestConversationDetails(v27)
+	if v30 == nil and (type(v29) ~= "string" or string.sub(v29, 1, 8) ~= "friends:") or v30 ~= nil and v30.source ~= ConversationChannels.Source.Friends then
+		t3.fetchLatestConversationDetails(v29)
 	end
 
-	t2.callback(t1.navigateToRootedChatDetails(v27))
+	t3.callback(t1.navigateToRootedChatDetails(v29, p4.rootedNavigationRequestId))
 
 	return true
 end

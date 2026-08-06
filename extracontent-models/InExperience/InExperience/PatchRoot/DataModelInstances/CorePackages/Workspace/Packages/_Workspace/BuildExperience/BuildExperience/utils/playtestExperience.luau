@@ -7,25 +7,25 @@ local launchExperience = require(script.Parent.launchExperience)
 local teleportToPlace = require(script.Parent.teleportToPlace)
 local debug = CreatorAgentChat.debug
 
-local function isAlreadyInPlace(n1: number, n2: number) -- line: 26
+local function isAlreadyInPlace(n1: number, n2: number) -- line: 24
 	return n2 ~= 0 and n2 == n1
 end
-local function listenForTeleportFailure(p1: ((...any) -> ...any)) -- line: 30
+local function listenForTeleportFailure(p1: ((...any) -> ...any)) -- line: 28
 	-- upvalues: Players (copy), TeleportService (copy)
 	local LocalPlayer = Players.LocalPlayer
-	local connection = TeleportService.TeleportInitFailed:Connect(function(p2) -- line: 34
+	local connection = TeleportService.TeleportInitFailed:Connect(function(p2) -- line: 32
 		-- upvalues: LocalPlayer (copy), p1 (copy)
 		if p2 == LocalPlayer then
 			p1()
 		end
 	end)
 
-	return function() -- line: 40
+	return function() -- line: 38
 		-- upvalues: connection (copy)
 		connection:Disconnect()
 	end
 end
-local function playtestExperience(n3: number, s1: string, t1: {[any]: any}?) -- line: 45
+local function playtestExperience(n3: number, s1: string, t1: {[any]: any}?) -- line: 43
 	-- upvalues: debug (copy), Players (copy), TeleportService (copy), BuildModeLaunch (copy), teleportToPlace (copy), launchExperience (copy)
 	local v20 = if not t1 or t1.currentPlaceId == nil then game.PlaceId else t1.currentPlaceId
 	local v21 = if not t1 then nil else t1.isTeamTest
@@ -43,7 +43,7 @@ local function playtestExperience(n3: number, s1: string, t1: {[any]: any}?) -- 
 		if t1 and t1.onTeleportFailed then
 			local onTeleportFailed = t1.onTeleportFailed
 
-			local function v24() -- line: 60
+			local function v24() -- line: 58
 				-- upvalues: u22 (ref), onTeleportFailed (copy)
 				if u22 then
 					u22()
@@ -54,14 +54,14 @@ local function playtestExperience(n3: number, s1: string, t1: {[any]: any}?) -- 
 			end
 
 			local LocalPlayer = Players.LocalPlayer
-			local connection = TeleportService.TeleportInitFailed:Connect(function(p3) -- line: 34
+			local connection = TeleportService.TeleportInitFailed:Connect(function(p3) -- line: 32
 				-- upvalues: LocalPlayer (copy), v24 (copy)
 				if p3 == LocalPlayer then
 					v24()
 				end
 			end)
 
-			function u22() -- line: 40
+			function u22() -- line: 38
 				-- upvalues: connection (copy)
 				connection:Disconnect()
 			end

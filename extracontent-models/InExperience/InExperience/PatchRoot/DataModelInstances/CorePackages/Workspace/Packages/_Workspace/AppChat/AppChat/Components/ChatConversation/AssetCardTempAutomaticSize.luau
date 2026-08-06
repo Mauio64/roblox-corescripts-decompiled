@@ -5,9 +5,9 @@ local Cryo = require(AppChatParent.Cryo)
 local ChatBubbleContainerAutomaticSize = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize)
 local Constants = require(AppChat.Constants)
 local useScaledValue = require(AppChatParent.Foundation).Hooks.useScaledValue
-local PlaceIdContainer = require(AppChat.Components.ChatConversation.GameCardComponents.PlaceIdContainer)
-local GameCardContainer = require(AppChat.Components.ChatConversation.GameCardComponents.GameCardContainer)
-local ShareLinkContainer = require(AppChat.Components.ChatConversation.GameCardComponents.ShareLinkContainer)
+local PlaceIdContainer = require(AppChat.Components.ChatConversation.ShareLinkComponents.GameCardComponents.PlaceIdContainer)
+local GameCardContainer = require(AppChat.Components.ChatConversation.ShareLinkComponents.GameCardComponents.GameCardContainer)
+local ShareLinkContainer = require(AppChat.Components.ChatConversation.ShareLinkComponents.ShareLinkContainer)
 local t1 = {
 	hasTail = false,
 	innerPadding = 0,
@@ -23,14 +23,14 @@ local t1 = {
 		placeId = nil,
 		universeId = nil,
 		senderUserId = nil,
-		onDetailsOpened = function() -- line: 24
+		onDetailsOpened = function() -- line: 26
 		end,
-		openGameDetailsPage = function() -- line: 25
+		openGameDetailsPage = function() -- line: 27
 		end
 	}
 }
 
-local function AssetCardTemp(p1) -- line: 38
+local function AssetCardTemp(p1) -- line: 40
 	-- upvalues: Cryo (copy), t1 (copy), ShareLinkContainer (copy), PlaceIdContainer (copy), GameCardContainer (copy), useScaledValue (copy), Constants (copy), Roact (copy), ChatBubbleContainerAutomaticSize (copy)
 	local v14 = Cryo.Dictionary.union(t1, p1)
 	local v15 = Cryo.Dictionary.union(t1.additionalProps, v14.additionalProps)

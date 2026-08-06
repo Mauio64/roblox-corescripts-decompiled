@@ -18,33 +18,33 @@ return React.createContext({
 	profilePlatformId = if not FFlagEnablePlatformProfileContextualMenuOption then nil else "TEST_PLATFORM_ID",
 	profileType = Enums.ProfileTypes.User,
 	navigateTo = {
-		qRCodePage = function() -- line: 122
+		qRCodePage = function() -- line: 123
 		end,
-		previousView = function() -- line: 123
+		previousView = function() -- line: 124
 		end,
-		itemDetails = function() -- line: 124
+		itemDetails = function() -- line: 125
 		end,
-		itemOrBundleDetails = if not FFlagProfilePlatformEnableStore then nil else function() -- line: 125
+		itemOrBundleDetails = if not FFlagProfilePlatformEnableStore then nil else function() -- line: 126
 		end,
-		catalogSearch = if not FFlagProfilePlatformEnableStore then nil else function() -- line: 126
+		catalogSearch = if not FFlagProfilePlatformEnableStore then nil else function() -- line: 127
 		end,
-		inspectAvatar = if not FFlagAddIEMProfilePage then nil else function() -- line: 127
+		inspectAvatar = if not FFlagAddIEMProfilePage then nil else function() -- line: 128
 		end,
-		editEmotes = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else function() -- line: 128
+		editEmotes = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else function() -- line: 129
 		end,
-		switchAvatar = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else function() -- line: 129
+		switchAvatar = if not FFlagProfilePlatformEnableEditAppearanceMenu then nil else function() -- line: 130
 		end,
-		editBackground = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEditBackgroundMenuItem then nil else function() -- line: 132
+		editBackground = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEditBackgroundMenuItem then nil else function() -- line: 133
 		end,
-		editAvatar = function() -- line: 134
+		editAvatar = function() -- line: 135
 		end,
-		editUsername = function() -- line: 135
+		editUsername = function() -- line: 136
 		end,
-		openLeaveRobloxAlertUIBlox = if not FFlagAddSocialLinksToCommunityProfile then nil else function() -- line: 136
+		openLeaveRobloxAlertUIBlox = if not FFlagAddSocialLinksToCommunityProfile then nil else function() -- line: 137
 		end,
-		closeLeaveRobloxAlert = if not FFlagAddSocialLinksToCommunityProfile then nil else function() -- line: 137
+		closeLeaveRobloxAlert = if not FFlagAddSocialLinksToCommunityProfile then nil else function() -- line: 138
 		end,
-		navigateToTransfer = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else function() -- line: 138
+		navigateToTransfer = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else function() -- line: 139
 		end
 	},
 	externalAnalytics = {

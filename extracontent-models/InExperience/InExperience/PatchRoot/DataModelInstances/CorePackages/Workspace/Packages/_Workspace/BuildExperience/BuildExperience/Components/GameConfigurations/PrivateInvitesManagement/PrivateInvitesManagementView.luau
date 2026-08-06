@@ -11,7 +11,7 @@ local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 
-local function PrivateInvitesManagementView(t1: {[any]: any}) -- line: 43
+local function PrivateInvitesManagementView(t1: {[any]: any}) -- line: 42
 	-- upvalues: React (copy), List (copy), View (copy), FoundationText (copy), Badge (copy), Button (copy), ButtonVariant (copy), InputSize (copy), PickedUserList (copy)
 	local v15 = t1.testId or "private-invites-management"
 	local isInviteDisabled = t1.isInviteDisabled

@@ -34,8 +34,10 @@ return {
 	getAvatarEventCounterNameWithPlatform = require(script.getAvatarEventCounterNameWithPlatform),
 	reportAvatarEventCounterNoAnalyticsArgument = require(script.reportAvatarEventCounterNoAnalyticsArgument),
 	reportAvatarEventCounterV1 = require(script.reportAvatarEventCounterV1),
+	Flags = {
+		FFlagAllowCustomUnifiedEventFilter = require(script.FFlagAllowCustomUnifiedEventFilter)
+	},
 	reportBackgroundUserActionCounter = require(script.reportBackgroundUserActionCounter),
-	Flags = {},
 	Enums = {
 		ImpressionEnums = require(script.Enums.ImpressionEnums)
 	},

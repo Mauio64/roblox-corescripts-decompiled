@@ -11,6 +11,7 @@ local Signals = require(BuildExperienceParent.Signals)
 local SignalsReact = require(BuildExperienceParent.SignalsReact)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
+local UniverseActivation = require(BuildExperienceParent.DataHydration.UniverseActivation)
 local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
 local Badge = Foundation.Badge
 local PrivacyType = UniverseConfiguration.PrivacyType
@@ -26,6 +27,7 @@ local InputSize = Foundation.Enums.InputSize
 local EnumsRadius = Foundation.Enums.Radius
 local useTokens = Foundation.Hooks.useTokens
 local BuildEmptyState = require(script.Parent.Parent.BuildEmptyState.BuildEmptyState)
+local ContentMaturityUtils = require(script.Parent.Parent.Parent.utils.ContentMaturityUtils)
 local matchesSearchQuery = require(script.Parent.Parent.Parent.utils.matchesSearchQuery)
 local chatConstants = require(script.Parent.Parent.Parent.Chat.chatConstants)
 
@@ -37,19 +39,31 @@ local GetSearchQueryStore = require(script.Parent.Parent.Parent.Stores.GetSearch
 require(script.Parent.Parent.Parent.Stores.GetSearchQueryStore.createSearchQueryStore)
 
 local FFlagEnableBuildExperienceScrollPerformanceTracking = require(script.Parent.Parent.Parent.Flags.FFlagEnableBuildExperienceScrollPerformanceTracking)
-local v34 = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil else require(script.Parent.Parent.Parent.Telemetry.useScrollPerformanceTracker)
+local FFlagBuildRehydrateOnPublish = require(BuildExperience.Flags.FFlagBuildRehydrateOnPublish)
+local v37 = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil else require(script.Parent.Parent.Parent.Telemetry.useScrollPerformanceTracker)
 local useSignalState = SignalsReact.useSignalState
-local t1 = {
+local t1 = {}
+local t2 = {
 	waiting_on_client = LocalizationStrings.MY_CREATIONS_INPUT_NEEDED,
 	idle = LocalizationStrings.MY_CREATIONS_READY,
 	working = LocalizationStrings.MY_CREATIONS_BUILDING
 }
 
-local function thumbForUniverseId(n1: number) -- line: 97
+local function thumbForUniverseId(n1: number) -- line: 101
 	return string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", n1)
 end
-local function privacyLabelForSummary(p1) -- line: 101
-	-- upvalues: PrivacyType (copy), LocalizationStrings (copy)
+local function privacyLabelForSummary(p1, b1: boolean?) -- line: 105
+	-- upvalues: FFlagBuildRehydrateOnPublish (copy), PrivacyType (copy), LocalizationStrings (copy)
+	if FFlagBuildRehydrateOnPublish and (p1.isActive == true and p1.privacyType == PrivacyType.Public) then
+		if b1 == nil then
+			return nil
+		end
+
+		if b1 then
+			return LocalizationStrings.MY_CREATIONS_PUBLICLY_UNAVAILABLE
+		end
+	end
+
 	if p1.privacyType == PrivacyType.Public then
 		return LocalizationStrings.MY_CREATIONS_PUBLIC
 	end
@@ -60,47 +74,47 @@ local function privacyLabelForSummary(p1) -- line: 101
 
 	return LocalizationStrings.MY_CREATIONS_PRIVATE
 end
-local function descriptionForSessionStatus(p2) -- line: 110
-	-- upvalues: t1 (copy)
-	local v49 = p2._meta and p2._meta._roblox
-	local v50 = if not v49 then nil else v49.sessionStatus
+local function descriptionForSessionStatus(p2) -- line: 124
+	-- upvalues: t2 (copy)
+	local v54 = p2._meta and p2._meta._roblox
+	local v55 = if not v54 then nil else v54.sessionStatus
 
-	if v50 == nil then
+	if v55 == nil then
 		return nil
 	end
 
-	return t1[v50]
+	return t2[v55]
 end
-local function requestHandleToPromise(p3) -- line: 119
+local function requestHandleToPromise(p3) -- line: 133
 	-- upvalues: Promise (copy)
-	return Promise.new(function(resolve, reject) -- line: 120
+	return Promise.new(function(resolve, reject) -- line: 134
 		-- upvalues: p3 (copy)
-		task.spawn(function() -- line: 121
+		task.spawn(function() -- line: 135
 			-- upvalues: p3 (copy), resolve (copy), reject (copy)
 			while p3.state(false).status == "pending" do
 				task.wait()
 			end
 
-			local v142 = p3.state(false)
+			local v154 = p3.state(false)
 
-			if v142.status == "succeeded" then
-				resolve(v142.result)
+			if v154.status == "succeeded" then
+				resolve(v154.result)
 
 				return
 			end
 
-			reject(v142.error)
+			reject(v154.error)
 		end)
 	end)
 end
-local function getSessionUniverseId(p4) -- line: 136
-	local v53 = p4._meta and p4._meta._roblox
+local function getSessionUniverseId(p4) -- line: 150
+	local v58 = p4._meta and p4._meta._roblox
 
-	if v53 == nil then
+	if v58 == nil then
 		return nil
 	end
 
-	local universeId = v53.universeId
+	local universeId = v58.universeId
 
 	if typeof(universeId) ~= "number" or universeId == 0 then
 		return nil
@@ -108,71 +122,73 @@ local function getSessionUniverseId(p4) -- line: 136
 
 	return universeId
 end
-local function buildExperienceMetadataByUniverseId(t2: {[any]: any}) -- line: 148
-	-- upvalues: PrivacyType (copy), LocalizationStrings (copy)
-	local t3 = {}
+local function buildExperienceMetadataByUniverseId(t3: {[any]: any}, t4: {[any]: any}) -- line: 162
+	-- upvalues: FFlagBuildRehydrateOnPublish (copy), PrivacyType (copy), LocalizationStrings (copy)
+	local t5 = {}
 
-	for v57, v58 in t2 do
-		local name = v58.name
+	for v63, v64 in t3 do
+		local name = v64.name
 
-		if typeof(name) == "string" and name ~= "" and not v58.isArchived then
-			local creatorName = v58.creatorName
-
-			t3[v57] = {
-				placeId = v58.rootPlaceId,
+		if typeof(name) == "string" and name ~= "" and not v64.isArchived then
+			local creatorName = v64.creatorName
+			local t6 = {
+				placeId = v64.rootPlaceId,
 				experienceName = name,
-				creatorName = if typeof(creatorName) ~= "string" or creatorName == "" then nil else creatorName,
-				visibilityLabel = if v58.privacyType ~= PrivacyType.Public then if v58.privacyType ~= PrivacyType.FriendsOnly then LocalizationStrings.MY_CREATIONS_PRIVATE else LocalizationStrings.MY_CREATIONS_RESTRICTED else LocalizationStrings.MY_CREATIONS_PUBLIC,
-				gameIcon = string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v57)
+				creatorName = if typeof(creatorName) ~= "string" or creatorName == "" then nil else creatorName
 			}
+			local v68 = t4[v63]
+
+			t6.visibilityLabel = if not FFlagBuildRehydrateOnPublish or (v64.isActive ~= true or v64.privacyType ~= PrivacyType.Public) then if v64.privacyType ~= PrivacyType.Public then if v64.privacyType ~= PrivacyType.FriendsOnly then LocalizationStrings.MY_CREATIONS_PRIVATE else LocalizationStrings.MY_CREATIONS_RESTRICTED else LocalizationStrings.MY_CREATIONS_PUBLIC else if v68 ~= nil then if not v68 then if v64.privacyType ~= PrivacyType.Public then if v64.privacyType ~= PrivacyType.FriendsOnly then LocalizationStrings.MY_CREATIONS_PRIVATE else LocalizationStrings.MY_CREATIONS_RESTRICTED else LocalizationStrings.MY_CREATIONS_PUBLIC else LocalizationStrings.MY_CREATIONS_PUBLICLY_UNAVAILABLE else nil
+			t6.gameIcon = string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v63)
+			t5[v63] = t6
 		end
 	end
 
-	return t3
+	return t5
 end
-local function buildSessionItems(t4: {[any]: any}, t5: {[any]: any}?) -- line: 169
-	-- upvalues: LocalizationStrings (copy), t1 (copy)
-	local t6 = {}
-	local t7 = {}
+local function buildSessionItems(t7: {[any]: any}, t8: {[any]: any}?) -- line: 184
+	-- upvalues: LocalizationStrings (copy), t2 (copy)
+	local t9 = {}
+	local t10 = {}
 
-	for _, v66 in t4 do
-		local sessionId = v66.sessionId
-		local v68 = v66._meta and v66._meta._roblox
-		local v69
+	for _, v74 in t7 do
+		local sessionId = v74.sessionId
+		local v76 = v74._meta and v74._meta._roblox
+		local v77
 
-		if v68 == nil then
-			v69 = nil
+		if v76 == nil then
+			v77 = nil
 		else
-			local universeId = v68.universeId
+			local universeId = v76.universeId
 
-			v69 = if typeof(universeId) == "number" and universeId ~= 0 then universeId else nil
+			v77 = if typeof(universeId) == "number" and universeId ~= 0 then universeId else nil
 		end
 
-		if typeof(sessionId) == "string" and sessionId ~= "" and v69 ~= nil and not t6[v69] then
-			t6[v69] = true
+		if typeof(sessionId) == "string" and sessionId ~= "" and v77 ~= nil and not t9[v77] then
+			t9[v77] = true
 
-			local v71 = if not t5 then nil else t5[v69]
-			local v72 = if not v71 then v66.title or LocalizationStrings.formatMyCreationsUniverseName(v69) else v71.experienceName
-			local t8 = {
+			local v79 = if not t8 then nil else t8[v77]
+			local v80 = if not v79 then v74.title or LocalizationStrings.formatMyCreationsUniverseName(v77) else v79.experienceName
+			local t11 = {
 				sessionId = sessionId,
-				universeId = v69,
-				placeId = if not v71 then nil else v71.placeId,
-				experienceName = v72,
-				creatorName = if not v71 then nil else v71.creatorName
+				universeId = v77,
+				placeId = if not v79 then nil else v79.placeId,
+				experienceName = v80,
+				creatorName = if not v79 then nil else v79.creatorName
 			}
-			local v74 = v66._meta and v66._meta._roblox
-			local v75 = if not v74 then nil else v74.sessionStatus
+			local v82 = v74._meta and v74._meta._roblox
+			local v83 = if not v82 then nil else v82.sessionStatus
 
-			t8.description = if v75 ~= nil then t1[v75] else nil
-			t8.visibilityLabel = if not v71 then LocalizationStrings.MY_CREATIONS_PRIVATE else v71.visibilityLabel
-			t8.gameIcon = if not v71 then string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v69) else v71.gameIcon
-			table.insert(t7, t8)
+			t11.description = if v83 ~= nil then t2[v83] else nil
+			t11.visibilityLabel = if not v79 then LocalizationStrings.MY_CREATIONS_PRIVATE else v79.visibilityLabel
+			t11.gameIcon = if not v79 then string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v77) else v79.gameIcon
+			table.insert(t10, t11)
 		end
 	end
 
-	return t7
+	return t10
 end
-local function renderLoadingExperienceSkeleton(n2: number, n3: number, p5) -- line: 208
+local function renderLoadingExperienceSkeleton(n2: number, n3: number, p5) -- line: 223
 	-- upvalues: React (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
 	return React.createElement(View, {
 		tag = "row align-y-center gap-medium",
@@ -206,304 +222,333 @@ local function renderLoadingExperienceSkeleton(n2: number, n3: number, p5) -- li
 		})
 	})
 end
-local function MyCreationsTab(t9: {[any]: any}) -- line: 246
-	-- upvalues: CreatorAgentChat (copy), UniverseConfiguration (copy), GetSearchQueryStore (copy), GetBuildExperienceRefreshStore (copy), AppLifecycleObserverService (copy), useTokens (copy), React (copy), FFlagEnableBuildExperienceScrollPerformanceTracking (copy), v34 (copy), useSignalState (copy), requestHandleToPromise (copy), Signals (copy), v5 (copy), buildExperienceMetadataByUniverseId (copy), buildSessionItems (copy), chatConstants (copy), Players (copy), Promise (copy), renderLoadingExperienceSkeleton (copy), matchesSearchQuery (copy), View (copy), List (copy), InputSize (copy), IconName (copy), LocalizationStrings (copy), BuildEmptyState (copy), Badge (copy), BadgeShape (copy), BadgeSize (copy), BadgeVariant (copy), RefreshScrollingFrame (copy)
-	local v80 = t9.creatorAgentChatStore or CreatorAgentChat.getCreatorAgentChatStore()
-	local v81 = t9.configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
-	local v82 = t9.searchQueryStore or GetSearchQueryStore()
-	local v83 = GetBuildExperienceRefreshStore()
-	local v84 = t9.appLifecycleObserverService or AppLifecycleObserverService
-	local v85 = t9.isFocused ~= false
-	local v86 = useTokens()
-	local v87 = React.useRef(nil)
-	local v88 = React.useRef(false)
-	local v89, v90 = React.useState(false)
+local function MyCreationsTab(t12: {[any]: any}) -- line: 261
+	-- upvalues: CreatorAgentChat (copy), FFlagBuildRehydrateOnPublish (copy), UniverseActivation (copy), UniverseConfiguration (copy), GetSearchQueryStore (copy), GetBuildExperienceRefreshStore (copy), AppLifecycleObserverService (copy), useTokens (copy), React (copy), FFlagEnableBuildExperienceScrollPerformanceTracking (copy), v37 (copy), useSignalState (copy), requestHandleToPromise (copy), Signals (copy), v5 (copy), PrivacyType (copy), ContentMaturityUtils (copy), t1 (copy), buildExperienceMetadataByUniverseId (copy), buildSessionItems (copy), chatConstants (copy), Players (copy), Promise (copy), renderLoadingExperienceSkeleton (copy), matchesSearchQuery (copy), View (copy), List (copy), InputSize (copy), IconName (copy), LocalizationStrings (copy), BuildEmptyState (copy), Badge (copy), BadgeShape (copy), BadgeSize (copy), BadgeVariant (copy), RefreshScrollingFrame (copy)
+	local v88 = t12.creatorAgentChatStore or CreatorAgentChat.getCreatorAgentChatStore()
+	local v89 = if not FFlagBuildRehydrateOnPublish then nil else UniverseActivation.getUniverseActivationStore()
+	local v90 = t12.configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
+	local v91 = t12.searchQueryStore or GetSearchQueryStore()
+	local v92 = GetBuildExperienceRefreshStore()
+	local v93 = t12.appLifecycleObserverService or AppLifecycleObserverService
+	local v94 = t12.isFocused ~= false
+	local v95 = useTokens()
+	local v96 = React.useRef(nil)
+	local v97 = React.useRef(false)
+	local v98, v99 = React.useState(false)
 
 	if FFlagEnableBuildExperienceScrollPerformanceTracking then
-		v34("LuaApp_Build_Home_Scroll", v87)
+		v37("LuaApp_Build_Home_Scroll", v96)
 	end
 
-	local v91 = v82.useDebouncedQuery()
-	local v92 = useSignalState(v83.getRefreshTick)
-	local v93 = v80.getSessionListStore()
-	local v94 = useSignalState(v93.getSessions)
-	local v95 = useSignalState(v93.getNextPageToken)
-	local v96 = useSignalState(v93.getStatus)
-	local v97 = useSignalState(v93.getLoadMoreStatus)
-	local v98 = if v96 ~= "pending" then v96 ~= "succeeded" and "Failed" or "Ready" else "NotReady"
-	local v99 = React.useCallback(function() -- line: 275
-		-- upvalues: requestHandleToPromise (copy), v93 (copy)
-		return requestHandleToPromise(v93.refresh())
-	end, { v93 })
+	local v100 = v91.useDebouncedQuery()
+	local v101 = useSignalState(v92.getRefreshTick)
+	local v102 = v88.getSessionListStore()
+	local v103 = useSignalState(v102.getSessions)
+	local v104 = useSignalState(v102.getNextPageToken)
+	local v105 = useSignalState(v102.getStatus)
+	local v106 = useSignalState(v102.getLoadMoreStatus)
+	local v107 = if v105 ~= "pending" then v105 ~= "succeeded" and "Failed" or "Ready" else "NotReady"
+	local v108 = React.useCallback(function() -- line: 293
+		-- upvalues: requestHandleToPromise (copy), v102 (copy)
+		return requestHandleToPromise(v102.refresh())
+	end, { v102 })
 
-	React.useEffect(function() -- line: 279
-		-- upvalues: v84 (copy), v85 (copy), v93 (copy)
-		local connection = v84.OnUnhide:Connect(function() -- line: 280
-			-- upvalues: v85 (copy), v93 (copy)
-			if v85 then
-				v93.refresh()
+	React.useEffect(function() -- line: 297
+		-- upvalues: v93 (copy), v94 (copy), v102 (copy)
+		local connection = v93.OnUnhide:Connect(function() -- line: 298
+			-- upvalues: v94 (copy), v102 (copy)
+			if v94 then
+				v102.refresh()
 			end
 		end)
 
-		return function() -- line: 286
+		return function() -- line: 304
 			-- upvalues: connection (copy)
 			connection:Disconnect()
 		end
 	end, {
-		v84,
-		v85,
-		v93
+		v93,
+		v94,
+		v102
 	})
-	React.useEffect(function() -- line: 291
-		-- upvalues: v85 (copy), v90 (copy), v93 (copy), Signals (copy)
-		if not v85 then
-			v90(false)
+	React.useEffect(function() -- line: 309
+		-- upvalues: v94 (copy), v99 (copy), v102 (copy), Signals (copy)
+		if not v94 then
+			v99(false)
 
 			return
 		end
 
-		v90(false)
+		v99(false)
 
-		local v123 = v93.refresh()
+		local v135 = v102.refresh()
 
-		return Signals.createEffect(function(p6) -- line: 299
-			-- upvalues: v123 (copy), v90 (copy)
-			if v123.state(p6).status == "succeeded" then
-				v90(true)
+		return Signals.createEffect(function(p6) -- line: 317
+			-- upvalues: v135 (copy), v99 (copy)
+			if v135.state(p6).status == "succeeded" then
+				v99(true)
 			end
 		end)
 	end, {
-		v85,
-		v92,
-		v93
+		v94,
+		v101,
+		v102
 	})
 
-	local v100 = math.max(0, t9.pollingIntervalSeconds or v5)
+	local v109 = math.max(0, t12.pollingIntervalSeconds or v5)
 
-	React.useEffect(function() -- line: 308
-		-- upvalues: v85 (copy), v100 (copy), v93 (copy)
-		if not v85 or v100 == 0 then
+	React.useEffect(function() -- line: 326
+		-- upvalues: v94 (copy), v109 (copy), v102 (copy)
+		if not v94 or v109 == 0 then
 			return
 		end
 
-		local u124 = false
+		local u136 = false
 
-		local function scheduleNextPoll() -- line: 314
-			-- upvalues: v100 (copy), u124 (ref), v93 (copy), scheduleNextPoll (copy)
-			task.delay(v100, function() -- line: 315
-				-- upvalues: u124 (ref), v93 (copy), scheduleNextPoll (copy)
-				if u124 then
+		local function scheduleNextPoll() -- line: 332
+			-- upvalues: v109 (copy), u136 (ref), v102 (copy), scheduleNextPoll (copy)
+			task.delay(v109, function() -- line: 333
+				-- upvalues: u136 (ref), v102 (copy), scheduleNextPoll (copy)
+				if u136 then
 					return
 				end
 
-				v93.refresh()
+				v102.refresh()
 				scheduleNextPoll()
 			end)
 		end
 
-		task.delay(v100, function() -- line: 315
-			-- upvalues: u124 (ref), v93 (copy), scheduleNextPoll (copy)
-			if u124 then
+		task.delay(v109, function() -- line: 333
+			-- upvalues: u136 (ref), v102 (copy), scheduleNextPoll (copy)
+			if u136 then
 				return
 			end
 
-			v93.refresh()
+			v102.refresh()
 			scheduleNextPoll()
 		end)
 
-		return function() -- line: 325
-			-- upvalues: u124 (ref)
-			u124 = true
+		return function() -- line: 343
+			-- upvalues: u136 (ref)
+			u136 = true
 		end
 	end, {
-		v85,
-		v100,
-		v93
+		v94,
+		v109,
+		v102
 	})
 
-	local v101 = React.useMemo(function() -- line: 330
-		-- upvalues: Signals (copy), v94 (copy), v81 (copy)
-		return Signals.createComputed(function(p7) -- line: 331
-			-- upvalues: v94 (copy), v81 (copy)
-			local t10 = {}
-			local t11 = {}
+	local v110 = React.useMemo(function() -- line: 348
+		-- upvalues: Signals (copy), v103 (copy), v90 (copy)
+		return Signals.createComputed(function(p7) -- line: 349
+			-- upvalues: v103 (copy), v90 (copy)
+			local t13 = {}
+			local t14 = {}
 
-			for _, v148 in v94 do
-				local v149 = v148._meta and v148._meta._roblox
-				local v150
+			for _, v160 in v103 do
+				local v161 = v160._meta and v160._meta._roblox
+				local v162
 
-				if v149 == nil then
-					v150 = nil
+				if v161 == nil then
+					v162 = nil
 				else
-					local universeId = v149.universeId
+					local universeId = v161.universeId
 
-					v150 = if typeof(universeId) == "number" and universeId ~= 0 then universeId else nil
+					v162 = if typeof(universeId) == "number" and universeId ~= 0 then universeId else nil
 				end
 
-				if v150 ~= nil and not t11[v150] then
-					t11[v150] = true
+				if v162 ~= nil and not t14[v162] then
+					t14[v162] = true
 
-					local v152 = v81.getAndFetchSummary(v150).data(p7)
+					local v164 = v90.getAndFetchSummary(v162).data(p7)
 
-					if v152 ~= nil then
-						t10[v150] = v152
+					if v164 ~= nil then
+						t13[v162] = v164
 					end
 				end
 			end
 
-			return t10
+			return t13
 		end)
 	end, {
-		v81,
-		v94
+		v90,
+		v103
 	})
-	local v102 = useSignalState(v101)
-	local v103 = React.useMemo(function() -- line: 348
-		-- upvalues: buildExperienceMetadataByUniverseId (copy), v102 (copy)
-		return (buildExperienceMetadataByUniverseId(v102))
-	end, { v102 })
-	local v104 = React.useMemo(function() -- line: 351
-		-- upvalues: buildSessionItems (copy), v94 (copy), v103 (copy), v102 (copy)
-		local t12 = {}
+	local v111 = useSignalState(v110)
+	local v112 = React.useMemo(function() -- line: 368
+		-- upvalues: Signals (copy), FFlagBuildRehydrateOnPublish (copy), v89 (copy), v111 (copy), PrivacyType (copy), ContentMaturityUtils (copy), t1 (copy)
+		return Signals.createComputed(function(p8) -- line: 369
+			-- upvalues: FFlagBuildRehydrateOnPublish (copy), v89 (copy), v111 (copy), PrivacyType (copy), ContentMaturityUtils (copy), t1 (copy)
+			local t15 = {}
 
-		for _, v128 in (buildSessionItems(v94, v103)) do
-			local v129 = v102[v128.universeId]
+			if FFlagBuildRehydrateOnPublish and v89 ~= nil then
+				for v167, v168 in v111 do
+					if v168.isActive == true and v168.privacyType == PrivacyType.Public and v89.getAndFetchEligibility(v167).data(p8) ~= nil then
+						t15[v167] = ContentMaturityUtils.isSealBroken(v167) and ContentMaturityUtils.isContentUnrated(v167)
+					end
+				end
+			end
 
-			if v129 ~= nil and not v129.isArchived then
-				table.insert(t12, v128)
+			if next(t15) == nil then
+				return t1
+			end
+
+			return t15
+		end)
+	end, {
+		v89,
+		v111
+	})
+	local v113 = useSignalState(v112)
+	local v114 = React.useMemo(function() -- line: 391
+		-- upvalues: buildExperienceMetadataByUniverseId (copy), v111 (copy), v113 (copy)
+		return (buildExperienceMetadataByUniverseId(v111, v113))
+	end, {
+		v113,
+		v111
+	})
+	local v115 = React.useMemo(function() -- line: 394
+		-- upvalues: buildSessionItems (copy), v103 (copy), v114 (copy), v111 (copy)
+		local t16 = {}
+
+		for _, v140 in (buildSessionItems(v103, v114)) do
+			local v141 = v111[v140.universeId]
+
+			if v141 ~= nil and not v141.isArchived then
+				table.insert(t16, v140)
 			end
 		end
 
-		return t12
+		return t16
 	end, {
-		v94,
 		v103,
-		v102
+		v114,
+		v111
 	})
-	local v105 = React.useMemo(function() -- line: 362
-		-- upvalues: v94 (copy), v102 (copy)
-		local t13 = {}
+	local v116 = React.useMemo(function() -- line: 405
+		-- upvalues: v103 (copy), v111 (copy)
+		local t17 = {}
 
-		for _, v132 in v94 do
-			local v133 = v132._meta and v132._meta._roblox
-			local v134
+		for _, v144 in v103 do
+			local v145 = v144._meta and v144._meta._roblox
+			local v146
 
-			if v133 == nil then
-				v134 = nil
+			if v145 == nil then
+				v146 = nil
 			else
-				local universeId = v133.universeId
+				local universeId = v145.universeId
 
-				v134 = if typeof(universeId) == "number" and universeId ~= 0 then universeId else nil
+				v146 = if typeof(universeId) == "number" and universeId ~= 0 then universeId else nil
 			end
 
-			if v134 == nil or t13[v134] then
+			if v146 == nil or t17[v146] then
 				continue
 			end
 
-			t13[v134] = true
+			t17[v146] = true
 
-			if v102[v134] == nil then
+			if v111[v146] == nil then
 				return true
 			end
 		end
 
 		return false
 	end, {
-		v94,
-		v102
+		v103,
+		v111
 	})
-	local v106 = v98 == "Ready" or #v94 > 0
-	local v107 = v97 == "pending"
-	local v108 = React.useCallback(function() -- line: 378
-		-- upvalues: v88 (copy), t9 (copy), chatConstants (copy), Players (copy)
-		v88.current = true
-		t9.onOpenChat({
+	local v117 = v107 == "Ready" or #v103 > 0
+	local v118 = v106 == "pending"
+	local v119 = React.useCallback(function() -- line: 421
+		-- upvalues: v97 (copy), t12 (copy), chatConstants (copy), Players (copy)
+		v97.current = true
+		t12.onOpenChat({
 			isNewGameTarget = true,
 			experienceName = chatConstants.BUILD_CHAT_PAGE_TITLE,
 			creatorName = if not Players.LocalPlayer then nil else Players.LocalPlayer.Name
 		})
-	end, { t9.onOpenChat })
+	end, { t12.onOpenChat })
 
-	React.useEffect(function() -- line: 388
-		-- upvalues: t9 (copy), v85 (copy), v89 (copy), v98 (copy), v94 (copy), v88 (copy), v108 (copy)
-		if t9.autoOpenNewGame ~= false and (v85 and v89 and v98 == "Ready" and #v94 == 0 and not v88.current) then
-			v108()
+	React.useEffect(function() -- line: 431
+		-- upvalues: t12 (copy), v94 (copy), v98 (copy), v107 (copy), v103 (copy), v97 (copy), v119 (copy)
+		if t12.autoOpenNewGame ~= false and (v94 and v98 and v107 == "Ready" and #v103 == 0 and not v97.current) then
+			v119()
 		end
 	end, {
-		v108,
-		v89,
-		v85,
-		t9.autoOpenNewGame,
+		v119,
+		v98,
 		v94,
-		v98
+		t12.autoOpenNewGame,
+		v103,
+		v107
 	})
 
-	local v109 = React.useCallback(function() -- line: 410
-		-- upvalues: v93 (copy), Promise (copy), requestHandleToPromise (copy)
-		local v136 = v93.loadMore()
+	local v120 = React.useCallback(function() -- line: 453
+		-- upvalues: v102 (copy), Promise (copy), requestHandleToPromise (copy)
+		local v148 = v102.loadMore()
 
-		if v136 == nil then
+		if v148 == nil then
 			return Promise.resolve()
 		end
 
-		return requestHandleToPromise(v136)
+		return requestHandleToPromise(v148)
 	end, {
+		v118,
+		v104,
 		v107,
-		v95,
-		v98,
-		v93
+		v102
 	})
-	local v110 = React.useCallback(function(p8) -- line: 418
-		-- upvalues: v95 (copy), v107 (copy), v98 (copy), v109 (copy)
-		local AbsoluteCanvasSizeY = p8.AbsoluteCanvasSize.Y
+	local v121 = React.useCallback(function(p9) -- line: 461
+		-- upvalues: v104 (copy), v118 (copy), v107 (copy), v120 (copy)
+		local AbsoluteCanvasSizeY = p9.AbsoluteCanvasSize.Y
 
-		if v95 == nil or (v107 or v98 ~= "Ready" or p8.CanvasPosition.Y <= 0 or AbsoluteCanvasSizeY <= 0 or p8.AbsoluteWindowSize.Y <= 0) then
+		if v104 == nil or (v118 or v107 ~= "Ready" or p9.CanvasPosition.Y <= 0 or AbsoluteCanvasSizeY <= 0 or p9.AbsoluteWindowSize.Y <= 0) then
 			return
 		end
 
-		if math.max(0, AbsoluteCanvasSizeY - p8.AbsoluteWindowSize.Y - 250) < p8.CanvasPosition.Y then
-			v109()
+		if math.max(0, AbsoluteCanvasSizeY - p9.AbsoluteWindowSize.Y - 250) < p9.CanvasPosition.Y then
+			v120()
 		end
 	end, {
-		v107,
-		v109,
-		v95,
-		v98
+		v118,
+		v120,
+		v104,
+		v107
 	})
-	local v111 = React.useCallback(function() -- line: 437
-		-- upvalues: v107 (copy), renderLoadingExperienceSkeleton (copy), v86 (copy)
-		if not v107 then
+	local v122 = React.useCallback(function() -- line: 480
+		-- upvalues: v118 (copy), renderLoadingExperienceSkeleton (copy), v95 (copy)
+		if not v118 then
 			return nil
 		end
 
-		return renderLoadingExperienceSkeleton(1, 1, v86)
+		return renderLoadingExperienceSkeleton(1, 1, v95)
 	end, {
-		v107,
-		v86
+		v118,
+		v95
 	})
-	local v112 = React.useMemo(function() -- line: 445
-		-- upvalues: v91 (copy), v104 (copy), matchesSearchQuery (copy)
-		if v91 == "" then
-			return v104
+	local v123 = React.useMemo(function() -- line: 488
+		-- upvalues: v100 (copy), v115 (copy), matchesSearchQuery (copy)
+		if v100 == "" then
+			return v115
 		end
 
-		local t14 = {}
+		local t18 = {}
 
-		for _, v141 in v104 do
-			if matchesSearchQuery(v141.experienceName, v91) then
-				table.insert(t14, v141)
+		for _, v153 in v115 do
+			if matchesSearchQuery(v153.experienceName, v100) then
+				table.insert(t18, v153)
 			end
 		end
 
-		return t14
+		return t18
 	end, {
-		v104,
-		v91
+		v115,
+		v100
 	})
-	local t15
+	local t19
 
-	if v106 and not v105 and #v104 == 0 then
-		t15 = {
+	if v117 and not v116 and #v115 == 0 then
+		t19 = {
 			EmptyContent = React.createElement(View, {
 				tag = "col size-full"
 			}, {
@@ -521,7 +566,7 @@ local function MyCreationsTab(t9: {[any]: any}) -- line: 246
 						leading = IconName.PlusLarge,
 						title = LocalizationStrings.MY_CREATIONS_NEW_GAME,
 						description = LocalizationStrings.MY_CREATIONS_BUILD_WITH_AI,
-						onActivated = v108
+						onActivated = v119
 					})
 				}),
 				EmptyState = React.createElement(View, {
@@ -534,65 +579,66 @@ local function MyCreationsTab(t9: {[any]: any}) -- line: 246
 			})
 		}
 	else
-		local t16 = {
+		local t20 = {
 			CreateRow = React.createElement(List.Item, {
 				LayoutOrder = 1,
 				leading = IconName.PlusLarge,
 				title = LocalizationStrings.MY_CREATIONS_NEW_GAME,
 				description = LocalizationStrings.MY_CREATIONS_BUILD_WITH_AI,
-				onActivated = v108
+				onActivated = v119
 			})
 		}
 
-		if v106 and #v104 > 0 then
-			for v115, v116 in v112 do
-				local experienceName = v116.experienceName
-				local gameIcon = v116.gameIcon
-				local placeId = v116.placeId
+		if v117 and #v115 > 0 then
+			for v126, v127 in v123 do
+				local experienceName = v127.experienceName
+				local gameIcon = v127.gameIcon
+				local placeId = v127.placeId
+				local visibilityLabel = v127.visibilityLabel
 
-				t16["S" .. v116.sessionId] = React.createElement(List.Item, {
-					LayoutOrder = v115 + 1,
+				t20["S" .. v127.sessionId] = React.createElement(List.Item, {
+					LayoutOrder = v126 + 1,
 					leading = {
 						iconName = gameIcon
 					},
 					title = experienceName,
-					description = v116.description,
-					testId = `MyCreationsTab.ExperienceRow.{ v116.universeId }`,
-					onActivated = function() -- line: 514
-						-- upvalues: t9 (copy), v116 (copy), placeId (copy), experienceName (copy), gameIcon (copy)
-						t9.onOpenChat({
-							universeId = v116.universeId,
+					description = v127.description,
+					testId = `MyCreationsTab.ExperienceRow.{ v127.universeId }`,
+					onActivated = function() -- line: 558
+						-- upvalues: t12 (copy), v127 (copy), placeId (copy), experienceName (copy), gameIcon (copy)
+						t12.onOpenChat({
+							universeId = v127.universeId,
 							placeId = placeId,
-							sessionId = v116.sessionId,
+							sessionId = v127.sessionId,
 							experienceName = experienceName,
-							creatorName = v116.creatorName,
+							creatorName = v127.creatorName,
 							gameIcon = gameIcon
 						})
 					end,
-					trailing = React.createElement(View, {
+					trailing = if visibilityLabel == nil then nil else React.createElement(View, {
 						tag = "row align-y-center auto-xy"
 					}, {
 						VisibilityBadge = React.createElement(Badge, {
-							text = v116.visibilityLabel,
+							text = visibilityLabel,
 							shape = BadgeShape.Box,
 							size = BadgeSize.Small,
 							variant = BadgeVariant.Neutral,
-							testId = `MyCreationsTab.VisibilityBadge.{ v116.universeId }`
+							testId = `MyCreationsTab.VisibilityBadge.{ v127.universeId }`
 						})
 					})
 				})
 			end
-		elseif v98 == "NotReady" or v105 then
-			t16[`Loading{ 1 }`] = renderLoadingExperienceSkeleton(1, 2, v86)
-			t16[`Loading{ 2 }`] = renderLoadingExperienceSkeleton(2, 3, v86)
-		elseif v98 == "Failed" then
-			t16.Error = React.createElement(List.Item, {
+		elseif v107 == "NotReady" or v116 then
+			t20[`Loading{ 1 }`] = renderLoadingExperienceSkeleton(1, 2, v95)
+			t20[`Loading{ 2 }`] = renderLoadingExperienceSkeleton(2, 3, v95)
+		elseif v107 == "Failed" then
+			t20.Error = React.createElement(List.Item, {
 				LayoutOrder = 2,
 				title = LocalizationStrings.MY_CREATIONS_LOAD_ERROR
 			})
 		end
 
-		t15 = {
+		t19 = {
 			ExperienceList = React.createElement(List.Root, {
 				hasDivider = false,
 				isContained = {
@@ -600,19 +646,19 @@ local function MyCreationsTab(t9: {[any]: any}) -- line: 246
 					hasMargin = false
 				},
 				size = InputSize.Large
-			}, t16)
+			}, t20)
 		}
 	end
 
 	return React.createElement(RefreshScrollingFrame, {
 		usesBuilderIcon = true,
-		refresh = v99,
-		ref = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil else v87,
-		onCanvasPositionChangedCallback = v110,
-		onCanvasSizeChangedCallback = v110,
-		createFooter = v111,
+		refresh = v108,
+		ref = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil else v96,
+		onCanvasPositionChangedCallback = v121,
+		onCanvasSizeChangedCallback = v121,
+		createFooter = v122,
 		scrollingElementProps = {
-			LayoutOrder = t9.LayoutOrder,
+			LayoutOrder = t12.LayoutOrder,
 			ZIndex = 1,
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
@@ -626,7 +672,7 @@ local function MyCreationsTab(t9: {[any]: any}) -- line: 246
 		ContentBody = React.createElement(View, {
 			tag = "composition-content-body col size-full-0 auto-y",
 			testId = "MyCreationsTab.ContentBody"
-		}, t15)
+		}, t19)
 	})
 end
 

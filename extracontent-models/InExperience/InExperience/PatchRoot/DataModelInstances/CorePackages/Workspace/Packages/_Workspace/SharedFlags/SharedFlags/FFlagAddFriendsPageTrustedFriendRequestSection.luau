@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAddFriendsUserListEnabled) and game:DefineFastFlag("AddFriendsPageTrustedFriendRequestSection_v7", false)
+return require(script.Parent.FFlagAddFriendsUserListEnabled) and game:DefineFastFlag("AddFriendsPageTrustedFriendRequestSection_v10", false)

@@ -4,7 +4,7 @@ local React = require(Parent.React)
 local FoundationText = Foundation.Text
 local View = Foundation.View
 
-local function AgentCard(t1: {[any]: any}) -- line: 20
+local function AgentCard(t1: {[any]: any}) -- line: 18
 	-- upvalues: React (copy), View (copy), FoundationText (copy)
 	local v8 = t1.testId or "agent-card"
 

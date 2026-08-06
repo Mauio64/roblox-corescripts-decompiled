@@ -50,25 +50,24 @@ local sendNotInterestedFeedbackFormAnalytics = require(GameTile.sendNotIntereste
 local useGameTileOverflowMenuFocusNavigation = require(GameTile.useGameTileOverflowMenuFocusNavigation)
 local TileOverflowMenuItems = require(GameTile.GameTileConstants).TileOverflowMenuItems
 local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
-local FFlagSignalsNavP3hMisc = SharedFlags.FFlagSignalsNavP3hMisc
+local FFlagSignalsNavP3fGameDetails = SharedFlags.FFlagSignalsNavP3fGameDetails
 local useSignalState = require(GameTileParent.SignalsReact).useSignalState
-local v55 = if not FFlagSignalsNavP3hMisc then nil else require(GameTileParent.NavigationRodux).GetLegacyNavigationStore
-local FFlagLuaAppGameTileOverflowMenuTelemetry = SharedFlags.FFlagLuaAppGameTileOverflowMenuTelemetry
+local v55 = if not FFlagSignalsNavP3fGameDetails then nil else require(GameTileParent.NavigationRodux).GetLegacyNavigationStore
 local FFlagLuaAppMakeDisclaimerOptInForFeedbackForm = SharedFlags.FFlagLuaAppMakeDisclaimerOptInForFeedbackForm
 local FFlagLuaAppNotInterestedFeedbackFormTelemetry = SharedFlags.FFlagLuaAppNotInterestedFeedbackFormTelemetry
 local FFlagLuaAppFixExplicitFeedbackTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackTelemetry
 local FFlagLuaAppEnableSponsoredReportAd = SharedFlags.FFlagLuaAppEnableSponsoredReportAd
-local v61 = game:DefineFastFlag("LuaAppAdjustOverflowMenuVisual", false)
+local v60 = game:DefineFastFlag("LuaAppAdjustOverflowMenuVisual", false)
 local FFlagLuaAppUseSnackbarForProvideFeedbackToast = SharedFlags.FFlagLuaAppUseSnackbarForProvideFeedbackToast
 local FFlagLuaAppFixExplicitFeedbackConsoleTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackConsoleTelemetry
 
-local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
-	-- upvalues: useDispatch (copy), useTokens (copy), useLastInput (copy), useRoactService (copy), RoactNetworking (copy), useLocalization (copy), FFlagLuaAppEnableSponsoredReportAd (copy), v61 (copy), getOverflowMenuSignalStore (copy), FFlagLuaAppFixExplicitFeedbackConsoleTelemetry (copy), useGameTileOverflowMenuFocusNavigation (copy), React (copy), UserSignalTypes (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), SetNetworkingErrorToast (copy), PostSendUserSignal (copy), HttpService (copy), mutedError (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), FFlagLuaAppMakeDisclaimerOptInForFeedbackForm (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), gameTileOverflowMenuAction (copy), SetCentralOverlay (copy), CentralOverlayType (copy), FFlagLuaAppUseSnackbarForProvideFeedbackToast (copy), Enums (copy), Images (copy), TileOverflowMenuItems (copy), flaggedMutedError (copy), IconName (copy), FFlagSignalsNavP3hMisc (copy), v55 (copy), useSignalState (copy), useSelector (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), UserInputService (copy), OverflowMenu (copy), Responsive (copy), IconSize (copy)
-	local v66 = useDispatch()
-	local v67 = useTokens()
-	local v68 = useLastInput()
-	local v69 = useRoactService(RoactNetworking)
-	local v70 = useLocalization({
+local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 93
+	-- upvalues: useDispatch (copy), useTokens (copy), useLastInput (copy), useRoactService (copy), RoactNetworking (copy), useLocalization (copy), FFlagLuaAppEnableSponsoredReportAd (copy), v60 (copy), getOverflowMenuSignalStore (copy), FFlagLuaAppFixExplicitFeedbackConsoleTelemetry (copy), useGameTileOverflowMenuFocusNavigation (copy), React (copy), UserSignalTypes (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), SetNetworkingErrorToast (copy), PostSendUserSignal (copy), HttpService (copy), mutedError (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), FFlagLuaAppMakeDisclaimerOptInForFeedbackForm (copy), gameTileOverflowMenuAction (copy), SetCentralOverlay (copy), CentralOverlayType (copy), FFlagLuaAppUseSnackbarForProvideFeedbackToast (copy), Enums (copy), Images (copy), TileOverflowMenuItems (copy), flaggedMutedError (copy), IconName (copy), FFlagSignalsNavP3fGameDetails (copy), useSignalState (copy), v55 (copy), useSelector (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), UserInputService (copy), OverflowMenu (copy), Responsive (copy), IconSize (copy)
+	local v65 = useDispatch()
+	local v66 = useTokens()
+	local v67 = useLastInput()
+	local v68 = useRoactService(RoactNetworking)
+	local v69 = useLocalization({
 		notInterested = "Feature.GameDetails.Action.NotInterested",
 		whyThisAd = "Feature.GameDetails.Action.WhyThisAd",
 		dialogTitle = "Feature.GameDetails.Label.ProvideFeedbackTitle",
@@ -81,80 +80,80 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 		somethingElse = "Feature.GameDetails.Label.SomethingElse",
 		reportAd = if not FFlagLuaAppEnableSponsoredReportAd then nil else "Feature.GameDetails.Action.ReportAd"
 	})
-	local v71 = t1.collectionId or ""
+	local v70 = t1.collectionId or ""
 	local menuKey = t1.menuKey
 	local vector2 = Vector2.new(1, 0)
-	local uDim2 = UDim2.new(1, if not v61 then -v67.Padding.Small else -v67.Padding.Medium, 0, if not v61 then v67.Padding.Small else v67.Padding.Medium)
-	local v75 = getOverflowMenuSignalStore()
-	local v76 = nil
+	local uDim2 = UDim2.new(1, if not v60 then -v66.Padding.Small else -v66.Padding.Medium, 0, if not v60 then v66.Padding.Small else v66.Padding.Medium)
+	local v74 = getOverflowMenuSignalStore()
+	local v75 = nil
 
 	if not FFlagLuaAppFixExplicitFeedbackConsoleTelemetry then
-		v76 = useGameTileOverflowMenuFocusNavigation(menuKey, t1.isSelected, t1.parentRef)
+		v75 = useGameTileOverflowMenuFocusNavigation(menuKey, t1.isSelected, t1.parentRef)
 	end
 
-	local v77 = React.useMemo(function() -- line: 129
-		-- upvalues: UserSignalTypes (copy), v70 (copy)
+	local v76 = React.useMemo(function() -- line: 128
+		-- upvalues: UserSignalTypes (copy), v69 (copy)
 		return {
 			{
 				id = UserSignalTypes.NotInterestedFeedbackItem.TooRepetitive,
-				text = v70.tooRepetitive
+				text = v69.tooRepetitive
 			},
 			{
 				id = UserSignalTypes.NotInterestedFeedbackItem.DontLikeGame,
-				text = v70.dontLikeGame
+				text = v69.dontLikeGame
 			},
 			{
 				id = UserSignalTypes.NotInterestedFeedbackItem.DontLikeImage,
-				text = v70.dontLikeImage
+				text = v69.dontLikeImage
 			},
 			{
 				id = UserSignalTypes.NotInterestedFeedbackItem.InappropriateContent,
-				text = v70.inappropriateContent
+				text = v69.inappropriateContent
 			},
 			{
 				triggersOtherTextbox = true,
 				id = UserSignalTypes.NotInterestedFeedbackItem.SomethingElse,
-				text = v70.somethingElse
+				text = v69.somethingElse
 			}
 		}
-	end, { v70 })
-	local v78 = React.useCallback(function(t2: {[any]: any}, s1: string) -- line: 156
-		-- upvalues: v77 (copy), UserSignalTypes (copy), v66 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), t1 (copy), CloseCentralOverlay (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), SetNetworkingErrorToast (copy), PostSendUserSignal (copy), v69 (copy), HttpService (copy), v71 (copy), mutedError (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy)
-		local v97 = false
+	end, { v69 })
+	local v77 = React.useCallback(function(t2: {[any]: any}, s1: string) -- line: 155
+		-- upvalues: v76 (copy), UserSignalTypes (copy), v65 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), t1 (copy), CloseCentralOverlay (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), SetNetworkingErrorToast (copy), PostSendUserSignal (copy), v68 (copy), HttpService (copy), v70 (copy), mutedError (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy)
+		local v95 = false
 		local t3 = {}
 
-		for _, v100 in v77 do
+		for _, v98 in v76 do
 			table.insert(t3, {
-				id = v100.id,
-				selected = t2[v100.id] or false
+				id = v98.id,
+				selected = t2[v98.id] or false
 			})
 
-			if v100.id == UserSignalTypes.NotInterestedFeedbackItem.InappropriateContent and t2[v100.id] then
-				v97 = true
+			if v98.id == UserSignalTypes.NotInterestedFeedbackItem.InappropriateContent and t2[v98.id] then
+				v95 = true
 			end
 		end
 
-		if v97 then
-			v66(OpenDynamicAbuseReport({
+		if v95 then
+			v65(OpenDynamicAbuseReport({
 				abuseVector = AbuseVector.Place,
 				targetId = t1.universeId,
-				onClose = function() -- line: 175
-					-- upvalues: v66 (copy), CloseCentralOverlay (copy)
-					v66(CloseCentralOverlay())
+				onClose = function() -- line: 174
+					-- upvalues: v65 (copy), CloseCentralOverlay (copy)
+					v65(CloseCentralOverlay())
 				end
 			}))
 		end
 
 		if not t1.appPage then
 			default:logRobloxTelemetryCounter(NotInterestedUserSignalTelemetryEventConfigs.NotInterestedMissingAppPage, 1)
-			v66(SetNetworkingErrorToast())
+			v65(SetNetworkingErrorToast())
 
 			return
 		end
 
-		local ok, result = pcall(function() -- line: 190
-			-- upvalues: PostSendUserSignal (copy), v69 (copy), HttpService (copy), UserSignalTypes (copy), s1 (copy), t3 (copy), t1 (copy), v71 (copy), v66 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
-			PostSendUserSignal(v69, {
+		local ok, result = pcall(function() -- line: 189
+			-- upvalues: PostSendUserSignal (copy), v68 (copy), HttpService (copy), UserSignalTypes (copy), s1 (copy), t3 (copy), t1 (copy), v70 (copy), v65 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
+			PostSendUserSignal(v68, {
 				stringValue = HttpService:JSONEncode({
 					formId = UserSignalTypes.NotInterestedFeedbackFormId.NotInterestedFeedback1,
 					titleId = UserSignalTypes.NotInterestedFeedbackFormTitleId.WhyHideExperience,
@@ -166,12 +165,12 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 				assetType = if not t1.isSponsored then UserSignalTypes.AssetType.Game else UserSignalTypes.AssetType.SponsoredGame,
 				signalOrigin = {
 					productSurface = t1.appPage,
-					topicId = v71,
-					subIds = { v71 }
+					topicId = v70,
+					subIds = { v70 }
 				}
-			}, UserSignalTypes.SignalValueType.String, UserSignalTypes.SignalType.NotInterestedFeedback):catch(function(p1) -- line: 209
-				-- upvalues: v66 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
-				v66(SetNetworkingErrorToast(p1))
+			}, UserSignalTypes.SignalValueType.String, UserSignalTypes.SignalType.NotInterestedFeedback):catch(function(p1) -- line: 208
+				-- upvalues: v65 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
+				v65(SetNetworkingErrorToast(p1))
 				default:logRobloxTelemetryCounter(NotInterestedUserSignalTelemetryEventConfigs.NotInterestedUserSignalFailed, 1)
 			end)
 		end)
@@ -185,25 +184,25 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 				actionType = "NotInterestedFeedbackFormSubmitted",
 				ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t1.appPage else nil,
 				universeId = t1.universeId,
-				sortId = v71
+				sortId = v70
 			}, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else t1.appPage)
 		end
 	end, {
+		v68,
+		v76,
 		v69,
-		v77,
-		v70,
 		t1.universeId,
 		t1.appPage,
-		v71,
-		v66,
+		v70,
+		v65,
 		t1.isSponsored
 	})
+	local u78 = nil
 	local u79 = nil
-	local u80 = nil
 
 	if FFlagLuaAppNotInterestedFeedbackFormTelemetry then
-		u79 = React.useCallback(function(b1: boolean?) -- line: 246
-			-- upvalues: sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t1 (copy), v71 (copy)
+		u78 = React.useCallback(function(b1: boolean?) -- line: 245
+			-- upvalues: sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t1 (copy), v70 (copy)
 			if b1 then
 				return
 			end
@@ -212,121 +211,115 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 				actionType = "NotInterestedFeedbackFormClosedWithoutSubmit",
 				ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t1.appPage else nil,
 				universeId = t1.universeId,
-				sortId = v71
+				sortId = v70
 			}, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else t1.appPage)
 		end, {
 			t1.appPage,
 			t1.universeId,
-			v71
+			v70
 		})
-		u80 = React.useCallback(function() -- line: 260
-			-- upvalues: sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t1 (copy), v71 (copy)
+		u79 = React.useCallback(function() -- line: 259
+			-- upvalues: sendNotInterestedFeedbackFormAnalytics (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t1 (copy), v70 (copy)
 			sendNotInterestedFeedbackFormAnalytics({
 				actionType = "NotInterestedFeedbackFormOpened",
 				ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t1.appPage else nil,
 				universeId = t1.universeId,
-				sortId = v71
+				sortId = v70
 			}, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else t1.appPage)
 		end, {
 			t1.appPage,
 			t1.universeId,
-			v71
+			v70
 		})
 	end
 
-	local v81 = React.useMemo(function() -- line: 270
-		-- upvalues: v70 (copy), v77 (copy), v78 (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), u79 (ref), FFlagLuaAppMakeDisclaimerOptInForFeedbackForm (copy)
+	local v80 = React.useMemo(function() -- line: 269
+		-- upvalues: v69 (copy), v76 (copy), v77 (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), u78 (ref), FFlagLuaAppMakeDisclaimerOptInForFeedbackForm (copy)
 		return {
-			dialogTitle = v70.dialogTitle,
-			dialogText = v70.dialogText,
-			checkboxListTitle = v70.checkboxListTitle,
-			checkboxItems = v77,
-			onSubmit = v78,
-			onClose = if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then nil else u79,
+			dialogTitle = v69.dialogTitle,
+			dialogText = v69.dialogText,
+			checkboxListTitle = v69.checkboxListTitle,
+			checkboxItems = v76,
+			onSubmit = v77,
+			onClose = if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then nil else u78,
 			showTermsOfUseDisclaimer = not FFlagLuaAppMakeDisclaimerOptInForFeedbackForm and nil
 		}
 	end, {
-		v70,
-		v77,
-		v78
+		v69,
+		v76,
+		v77
 	})
-	local v82 = nil
-	local u83 = nil
+	local t4 = {}
 
-	if FFlagLuaAppGameTileOverflowMenuTelemetry then
-		local t4 = {}
-
-		for v85, _ in t1.availableMenuItems do
-			table.insert(t4, v85)
-		end
-
-		local v87 = table.concat(t4, ",")
-
-		v82 = React.useCallback(function(b2: boolean) -- line: 290
-			-- upvalues: t1 (copy), v87 (copy)
-			if t1.onMenuOpenChanged then
-				t1.onMenuOpenChanged(b2, v87)
-			end
-		end, {
-			t1.onMenuOpenChanged,
-			v87
-		})
-		u83 = React.useCallback(function(s2: string) -- line: 296
-			-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t1 (copy), v71 (copy), v87 (copy), gameTileOverflowMenuAction (copy)
-			local t5 = {
-				actionType = "GameTileOverflowMenuItemActivated",
-				ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t1.appPage else nil,
-				universeId = t1.universeId,
-				sortId = v71,
-				menuItem = s2,
-				availableMenuItems = v87
-			}
-
-			gameTileOverflowMenuAction(t5, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else t1.appPage)
-		end, {
-			t1.appPage,
-			t1.universeId,
-			v71,
-			v87
-		})
-
-		if FFlagLuaAppFixExplicitFeedbackConsoleTelemetry then
-			v76 = useGameTileOverflowMenuFocusNavigation(menuKey, t1.isSelected, t1.parentRef, v82)
-		end
+	for v82, _ in t1.availableMenuItems do
+		table.insert(t4, v82)
 	end
 
-	local v88 = React.useCallback(function() -- line: 319
-		-- upvalues: t1 (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), v66 (copy), SetNetworkingErrorToast (copy), SetCentralOverlay (copy), CentralOverlayType (copy), v81 (copy), FFlagLuaAppUseSnackbarForProvideFeedbackToast (copy), Enums (copy), Images (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), u80 (ref), PostSendUserSignal (copy), v69 (copy), UserSignalTypes (copy), v71 (copy), mutedError (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), u83 (ref), TileOverflowMenuItems (copy)
+	local v84 = table.concat(t4, ",")
+	local v85 = React.useCallback(function(b2: boolean) -- line: 287
+		-- upvalues: t1 (copy), v84 (copy)
+		if t1.onMenuOpenChanged then
+			t1.onMenuOpenChanged(b2, v84)
+		end
+	end, {
+		t1.onMenuOpenChanged,
+		v84
+	})
+	local v86 = React.useCallback(function(s2: string) -- line: 293
+		-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), t1 (copy), v70 (copy), v84 (copy), gameTileOverflowMenuAction (copy)
+		local t5 = {
+			actionType = "GameTileOverflowMenuItemActivated",
+			ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t1.appPage else nil,
+			universeId = t1.universeId,
+			sortId = v70,
+			menuItem = s2,
+			availableMenuItems = v84
+		}
+
+		gameTileOverflowMenuAction(t5, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else t1.appPage)
+	end, {
+		t1.appPage,
+		t1.universeId,
+		v70,
+		v84
+	})
+
+	if FFlagLuaAppFixExplicitFeedbackConsoleTelemetry then
+		v75 = useGameTileOverflowMenuFocusNavigation(menuKey, t1.isSelected, t1.parentRef, v85)
+	end
+
+	local v87 = React.useCallback(function() -- line: 315
+		-- upvalues: t1 (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy), v65 (copy), SetNetworkingErrorToast (copy), SetCentralOverlay (copy), CentralOverlayType (copy), v80 (copy), FFlagLuaAppUseSnackbarForProvideFeedbackToast (copy), Enums (copy), Images (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), u79 (ref), PostSendUserSignal (copy), v68 (copy), UserSignalTypes (copy), v70 (copy), mutedError (copy), v86 (copy), TileOverflowMenuItems (copy)
 		if not t1.appPage then
 			default:logRobloxTelemetryCounter(NotInterestedUserSignalTelemetryEventConfigs.NotInterestedMissingAppPage, 1)
-			v66(SetNetworkingErrorToast())
+			v65(SetNetworkingErrorToast())
 
 			return
 		end
 
 		t1.setGameHidden(t1.universeId, true)
-		v66(SetCentralOverlay(CentralOverlayType.ProvideFeedbackToast, {
-			feedbackFormProps = v81,
+		v65(SetCentralOverlay(CentralOverlayType.ProvideFeedbackToast, {
+			feedbackFormProps = v80,
 			toastIcon = if not FFlagLuaAppUseSnackbarForProvideFeedbackToast then Images["icons/actions/edit/remove"] else Enums.IconName.CircleMinus,
-			onToastActivated = if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then nil else u80
+			onToastActivated = if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then nil else u79
 		}))
 
-		local ok, result = pcall(function() -- line: 338
-			-- upvalues: PostSendUserSignal (copy), v69 (copy), t1 (copy), UserSignalTypes (copy), v71 (copy), v66 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
-			PostSendUserSignal(v69, {
+		local ok, result = pcall(function() -- line: 334
+			-- upvalues: PostSendUserSignal (copy), v68 (copy), t1 (copy), UserSignalTypes (copy), v70 (copy), v65 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
+			PostSendUserSignal(v68, {
 				boolValue = true
 			}, {
 				id = t1.universeId,
 				assetType = if not t1.isSponsored then UserSignalTypes.AssetType.Game else UserSignalTypes.AssetType.SponsoredGame,
 				signalOrigin = {
 					productSurface = t1.appPage,
-					topicId = v71,
-					subIds = { v71 }
+					topicId = v70,
+					subIds = { v70 }
 				}
-			}, UserSignalTypes.SignalValueType.Bool, UserSignalTypes.SignalType.NotInterested):catch(function(p2) -- line: 352
-				-- upvalues: t1 (copy), v66 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
+			}, UserSignalTypes.SignalValueType.Bool, UserSignalTypes.SignalType.NotInterested):catch(function(p2) -- line: 348
+				-- upvalues: t1 (copy), v65 (copy), SetNetworkingErrorToast (copy), default (copy), NotInterestedUserSignalTelemetryEventConfigs (copy)
 				t1.setGameHidden(t1.universeId, false)
-				v66(SetNetworkingErrorToast(p2))
+				v65(SetNetworkingErrorToast(p2))
 				default:logRobloxTelemetryCounter(NotInterestedUserSignalTelemetryEventConfigs.NotInterestedUserSignalFailed, 1)
 			end)
 		end)
@@ -336,73 +329,65 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 			mutedError(result)
 		end
 
-		if FFlagLuaAppGameTileOverflowMenuTelemetry then
-			u83(TileOverflowMenuItems.NotInterested)
-		end
+		v86(TileOverflowMenuItems.NotInterested)
 	end, {
-		v69,
+		v68,
 		t1.setGameHidden,
-		v66,
-		v81,
+		v65,
+		v80,
 		t1.universeId,
-		v71,
+		v70,
 		t1.appPage,
-		if not FFlagLuaAppGameTileOverflowMenuTelemetry then nil else u83,
+		v86,
 		t1.isSponsored
 	})
-	local v89 = React.useCallback(function() -- line: 386
-		-- upvalues: v66 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), t1 (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), u83 (ref), TileOverflowMenuItems (copy)
-		v66(SetCentralOverlay(CentralOverlayType.WhyThisAdModal, {
+	local v88 = React.useCallback(function() -- line: 380
+		-- upvalues: v65 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), t1 (copy), v86 (copy), TileOverflowMenuItems (copy)
+		v65(SetCentralOverlay(CentralOverlayType.WhyThisAdModal, {
 			universeId = t1.universeId,
 			payerName = t1.payerName,
 			sponsoredUserCohort = t1.sponsoredUserCohort
 		}))
-
-		if FFlagLuaAppGameTileOverflowMenuTelemetry then
-			u83(TileOverflowMenuItems.WhyThisAd)
-		end
+		v86(TileOverflowMenuItems.WhyThisAd)
 	end, {
-		v66,
+		v65,
 		t1.universeId,
 		t1.payerName,
 		t1.sponsoredUserCohort,
-		if not FFlagLuaAppGameTileOverflowMenuTelemetry then nil else u83
+		v86
 	})
-	local v90 = if not FFlagLuaAppEnableSponsoredReportAd then nil else React.useCallback(function() -- line: 408
-		-- upvalues: t1 (copy), flaggedMutedError (copy), v66 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), FFlagLuaAppGameTileOverflowMenuTelemetry (copy), u83 (ref), TileOverflowMenuItems (copy)
+	local v89 = if not FFlagLuaAppEnableSponsoredReportAd then nil else React.useCallback(function() -- line: 400
+		-- upvalues: t1 (copy), flaggedMutedError (copy), v65 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), v86 (copy), TileOverflowMenuItems (copy)
 		if not t1.adId then
 			flaggedMutedError("ReportSponsoredAdError", "Report ad clicked without valid target ad id")
 
 			return
 		end
 
-		v66(OpenDynamicAbuseReport({
+		v65(OpenDynamicAbuseReport({
 			abuseVector = AbuseVector.AdV2,
 			targetId = t1.adId,
-			onClose = function() -- line: 417
-				-- upvalues: v66 (copy), CloseCentralOverlay (copy)
-				v66(CloseCentralOverlay())
+			onClose = function() -- line: 409
+				-- upvalues: v65 (copy), CloseCentralOverlay (copy)
+				v65(CloseCentralOverlay())
 			end
 		}))
-
-		if FFlagLuaAppGameTileOverflowMenuTelemetry then
-			u83(TileOverflowMenuItems.ReportAd)
-		end
+		v86(TileOverflowMenuItems.ReportAd)
 	end, {
-		v66,
+		v65,
 		t1.adId,
-		if not FFlagLuaAppGameTileOverflowMenuTelemetry then nil else u83
+		v86
 	})
-	local v91 = React.useMemo(function() -- line: 435
-		-- upvalues: t1 (copy), TileOverflowMenuItems (copy), v70 (copy), v88 (copy), v89 (copy), FFlagLuaAppEnableSponsoredReportAd (copy), IconName (copy), v90 (copy)
+	local v90 = React.useMemo(function() -- line: 425
+		-- upvalues: t1 (copy), TileOverflowMenuItems (copy), v69 (copy), v87 (copy), v88 (copy), FFlagLuaAppEnableSponsoredReportAd (copy), IconName (copy), v89 (copy)
 		local t6 = {}
 
 		if t1.availableMenuItems[TileOverflowMenuItems.NotInterested] then
 			table.insert(t6, {
 				icon = "icons/actions/block",
 				id = TileOverflowMenuItems.NotInterested,
-				text = v70.notInterested,
-				onActivated = v88
+				text = v69.notInterested,
+				onActivated = v87
 			})
 		end
 
@@ -410,8 +395,8 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 			table.insert(t6, {
 				icon = "icons/actions/info",
 				id = TileOverflowMenuItems.WhyThisAd,
-				text = v70.whyThisAd,
-				onActivated = v89
+				text = v69.whyThisAd,
+				onActivated = v88
 			})
 		end
 
@@ -419,61 +404,52 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 			table.insert(t6, {
 				icon = IconName.Flag,
 				id = TileOverflowMenuItems.ReportAd,
-				text = v70.reportAd,
-				onActivated = v90
+				text = v69.reportAd,
+				onActivated = v89
 			})
 		end
 
 		return t6
 	end, {
+		v87,
+		v69,
 		v88,
-		v70,
-		v89,
 		t1.isSponsored,
 		t1.availableMenuItems
 	})
-	local u93
+	local u91 = if not FFlagSignalsNavP3fGameDetails then useSelector(function(p3) -- line: 470
+		-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy)
+		if FFlagUseNavigationSelectors then
+			return Selectors.selectCurrentRoactNavigationRoute(p3).key or ""
+		end
 
-	if FFlagSignalsNavP3hMisc then
-		local v92 = v55(false)
+		return p3.Navigation.currentRoute.key or ""
+	end) else useSignalState(v55(false).getCurrentRouteKey)
+	local v92 = React.useRef(u91)
 
-		u93 = useSignalState(v92.getCurrentRoute).key or ""
-	else
-		u93 = useSelector(function(p3) -- line: 482
-			-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy)
-			if FFlagUseNavigationSelectors then
-				return Selectors.selectCurrentRoactNavigationRoute(p3).key or ""
-			end
-
-			return p3.Navigation.currentRoute.key or ""
-		end)
-	end
-
-	local v94 = React.useRef(u93)
-
-	React.useEffect(function() -- line: 491
-		-- upvalues: u93 (ref), v94 (copy), v75 (copy), menuKey (copy)
-		if u93 ~= v94.current then
-			v75.closeMenu(menuKey)
+	React.useEffect(function() -- line: 479
+		-- upvalues: u91 (ref), v92 (copy), v74 (copy), menuKey (copy)
+		if u91 ~= v92.current then
+			v74.closeMenu(menuKey)
 		end
 	end, {
-		u93,
+		u91,
 		menuKey
 	})
-	React.useEffect(function() -- line: 497
-		-- upvalues: t1 (copy), UserInputService (copy), v75 (copy), menuKey (copy)
+	React.useEffect(function() -- line: 485
+		-- upvalues: t1 (copy), UserInputService (copy), v74 (copy), menuKey (copy)
 		local connection = nil
 
 		if t1.menuOpen then
-			connection = UserInputService.InputBegan:Connect(function(input, _: boolean) -- line: 500
-				-- upvalues: t1 (copy), v75 (copy), menuKey (copy)
+			connection = UserInputService.InputBegan:Connect(function(input, _: boolean) -- line: 488
+				-- upvalues: t1 (copy), v74 (copy), menuKey (copy)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 and not t1.isHovered then
-					v75.closeMenu(menuKey)
+					v74.closeMenu(menuKey)
 				end
 			end)
 		end
 
-		return function() -- line: 508
+		return function() -- line: 496
 			-- upvalues: connection (ref)
 			if connection then
 				connection:Disconnect()
@@ -488,14 +464,14 @@ local function GameTileOverflowMenu(t1: {[any]: any}) -- line: 94
 	return React.createElement(OverflowMenu, {
 		anchorPoint = vector2,
 		anchorPosition = uDim2,
-		menuItems = v91,
-		hasOverflowButton = v68 == Responsive.Input.Pointer,
+		menuItems = v90,
+		hasOverflowButton = v67 == Responsive.Input.Pointer,
 		shouldShowAnchor = t1.isHovered,
-		buttonIconBackgroundStyle = v67.Color.OverMedia.OverMedia_0,
+		buttonIconBackgroundStyle = v66.Color.OverMedia.OverMedia_0,
 		menuKey = menuKey,
-		setFocusRef = v76,
-		onMenuOpenChanged = if not FFlagLuaAppGameTileOverflowMenuTelemetry then nil else v82,
-		buttonIconSize = if not v61 then nil else IconSize.Small
+		setFocusRef = v75,
+		onMenuOpenChanged = v85,
+		buttonIconSize = if not v60 then nil else IconSize.Small
 	})
 end
 

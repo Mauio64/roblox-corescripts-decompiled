@@ -13,10 +13,10 @@ local fetchAssetUserAuth = require(script.Parent.fetchAssetUserAuth)
 
 require(script.Parent.AssetUserAuthStoreTypes)
 
-local function ALWAYS_REFRESH() -- line: 28
+local function ALWAYS_REFRESH() -- line: 27
 	return true
 end
-local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
+local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 33
 	-- upvalues: createDataCache (copy), createDataResolver (copy), fetchAssetUserAuth (copy), Promise (copy), ALWAYS_REFRESH (copy)
 	local v10 = t1 or {}
 	local t2 = {
@@ -27,13 +27,13 @@ local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
 	local v13 = createDataResolver({
 		supportsMultiGet = false,
 		cache = v12,
-		fetchFn = function(s1: string, _) -- line: 42
+		fetchFn = function(s1: string, _) -- line: 41
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy)
 			return fetchAssetUserAuth.fetchOperation(s1, t2)
 		end
 	})
 
-	local function seedAndReturn(p2) -- line: 65
+	local function seedAndReturn(p2) -- line: 64
 		-- upvalues: v12 (copy)
 		local path = p2.path
 
@@ -47,9 +47,9 @@ local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
 	end
 
 	return {
-		patchAssetIcon = function(s2: string, p3) -- line: 47
+		patchAssetIcon = function(s2: string, p3) -- line: 46
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy), v12 (copy)
-			return fetchAssetUserAuth.patchAssetIcon(s2, p3, t2):andThen(function(p4) -- line: 48
+			return fetchAssetUserAuth.patchAssetIcon(s2, p3, t2):andThen(function(p4) -- line: 47
 				-- upvalues: v12 (copy)
 				local path = p4.path
 
@@ -62,23 +62,23 @@ local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
 				return p4
 			end)
 		end,
-		updateIcon = function(s3: string, s4: string) -- line: 74
+		updateIcon = function(s3: string, s4: string) -- line: 73
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy), seedAndReturn (copy)
 			return fetchAssetUserAuth.updateIcon(s3, s4, t2):andThen(seedAndReturn)
 		end,
-		getPreviews = function(s5: string) -- line: 78
+		getPreviews = function(s5: string) -- line: 77
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy)
 			return fetchAssetUserAuth.getPreviews(s5, t2)
 		end,
-		updatePreviews = function(s6: string, t3: {[any]: any}) -- line: 82
+		updatePreviews = function(s6: string, t3: {[any]: any}) -- line: 81
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy), seedAndReturn (copy)
 			return fetchAssetUserAuth.updatePreviews(s6, t3, t2):andThen(seedAndReturn)
 		end,
-		createImageAsset = function(s7: string, s8: string, p5) -- line: 86
+		createImageAsset = function(s7: string, s8: string, p5) -- line: 85
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy), seedAndReturn (copy)
 			return fetchAssetUserAuth.createImageAsset(s7, s8, p5, t2):andThen(seedAndReturn)
 		end,
-		pollUntilDone = function(p6) -- line: 94
+		pollUntilDone = function(p6) -- line: 93
 			-- upvalues: Promise (copy), fetchAssetUserAuth (copy), t2 (copy), v12 (copy)
 			local u32
 
@@ -90,23 +90,23 @@ local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
 				u32 = string.match(v33, "operations/(.+)$") or (p6.operationId or v33)
 			end
 
-			return Promise.new(function(resolve, reject) -- line: 102
+			return Promise.new(function(resolve, reject) -- line: 101
 				-- upvalues: u32 (ref), fetchAssetUserAuth (copy), t2 (copy), v12 (copy)
 				local n1 = 0
 				local n2 = 0
 
-				local function poll() -- line: 106
+				local function poll() -- line: 105
 					-- upvalues: n1 (ref), u32 (ref), fetchAssetUserAuth (copy), t2 (copy), v12 (copy), n2 (ref), reject (copy), resolve (copy), poll (copy)
 					n1 += 1
 
 					local v44 = u32
 
-					fetchAssetUserAuth.fetchOperation(v44, t2):andThen(function(p7) -- line: 59
+					fetchAssetUserAuth.fetchOperation(v44, t2):andThen(function(p7) -- line: 58
 						-- upvalues: v12 (copy), v44 (copy)
 						v12.updateItem(v44, p7)
 
 						return p7
-					end):andThen(function(p8) -- line: 109
+					end):andThen(function(p8) -- line: 108
 						-- upvalues: n2 (ref), reject (copy), resolve (copy), n1 (ref), u32 (ref), poll (copy)
 						n2 = 0
 
@@ -135,7 +135,7 @@ local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
 						end
 
 						task.delay(2, poll)
-					end):catch(function(p9) -- line: 123
+					end):catch(function(p9) -- line: 122
 						-- upvalues: n2 (ref), poll (copy), reject (copy)
 						n2 += 1
 
@@ -156,13 +156,13 @@ local function createAssetUserAuthStore(t1: {[any]: any}?) -- line: 34
 		end,
 		getOperation = v13.getCachedItem,
 		fetchOperation = v13.fetchItem,
-		getAndFetchOperation = function(s9: string) -- line: 148
+		getAndFetchOperation = function(s9: string) -- line: 147
 			-- upvalues: v13 (copy), ALWAYS_REFRESH (copy)
 			return v13.getAndFetchItem(s9, ALWAYS_REFRESH)
 		end,
-		refreshOperation = function(s10: string) -- line: 58
+		refreshOperation = function(s10: string) -- line: 57
 			-- upvalues: fetchAssetUserAuth (copy), t2 (copy), v12 (copy)
-			return fetchAssetUserAuth.fetchOperation(s10, t2):andThen(function(p10) -- line: 59
+			return fetchAssetUserAuth.fetchOperation(s10, t2):andThen(function(p10) -- line: 58
 				-- upvalues: v12 (copy), s10 (copy)
 				v12.updateItem(s10, p10)
 

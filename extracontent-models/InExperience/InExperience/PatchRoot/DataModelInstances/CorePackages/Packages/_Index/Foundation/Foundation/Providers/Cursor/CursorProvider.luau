@@ -14,7 +14,7 @@ require(Foundation.Enums.CursorType)
 
 local KeyUtilities = require(script.Parent.KeyUtilities)
 
-require(Foundation.Enums.ColorMode)
+require(Foundation.Enums.ColorNamespace)
 require(Foundation.Components.Types)
 
 local useTokens = require(Foundation.Providers.Style.useTokens)
@@ -127,7 +127,7 @@ local function CursorProvider(t1: {[any]: any}) -- line: 28
 						ref = v21[v25],
 						isVisible = v27,
 						cursorType = v29,
-						colorMode = v30
+						colorNamespace = v30
 					})
 				else
 					local v31, v32, v33, v34 = KeyUtilities.decodeKey(parts)
@@ -138,7 +138,7 @@ local function CursorProvider(t1: {[any]: any}) -- line: 28
 						cornerRadius = v31,
 						offset = v32,
 						borderWidth = v33,
-						colorMode = v34
+						colorNamespace = v34
 					})
 				end
 			end

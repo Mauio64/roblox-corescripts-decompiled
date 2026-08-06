@@ -18,19 +18,20 @@ local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalyt
 local FFlagSupportSubmissionOnAllReportNodes = require(GenericAbuseReportingParent.SharedFlags).FFlagSupportSubmissionOnAllReportNodes
 local FFlagAbuseReportMenuV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportMenuV2
 local FFlagAbuseReportInExpPlayerListV3 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3
+local FFlagAbuseReportSceneSelectionSubmitTracking = require(GenericAbuseReporting.Flags.FFlagAbuseReportSceneSelectionSubmitTracking)
 
-local function ContentNode(t1: {[any]: any}) -- line: 40
-	-- upvalues: useAbuseReportAnalytics (copy), React (copy), FFlagAbuseReportMenuV2 (copy), ListNodeV2 (copy), ListNode (copy), Dash (copy), CommentNode (copy), ConfirmationNode (copy), FFlagSupportSubmissionOnAllReportNodes (copy), ParagraphNode (copy), ReviewNode (copy), GenericAbuseReporting (copy), FFlagAbuseReportInExpPlayerListV3 (copy), TelemetryEventType (copy)
+local function ContentNode(t1: {[any]: any}) -- line: 45
+	-- upvalues: useAbuseReportAnalytics (copy), React (copy), FFlagAbuseReportMenuV2 (copy), ListNodeV2 (copy), ListNode (copy), Dash (copy), CommentNode (copy), ConfirmationNode (copy), FFlagSupportSubmissionOnAllReportNodes (copy), ParagraphNode (copy), ReviewNode (copy), GenericAbuseReporting (copy), FFlagAbuseReportSceneSelectionSubmitTracking (copy), FFlagAbuseReportInExpPlayerListV3 (copy), TelemetryEventType (copy)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
 
 	if t1.node.type == "list" then
-		local v21 = if not t1.store then nil else t1.store[t1.node.storeAs]
-		local v22 = if type(v21) ~= "table" then nil else v21.id
+		local v22 = if not t1.store then nil else t1.store[t1.node.storeAs]
+		local v23 = if type(v22) ~= "table" then nil else v22.id
 
 		return React.createElement(if not FFlagAbuseReportMenuV2 then ListNode else ListNodeV2, Dash.join(t1.node, {
-			initialValue = v22,
+			initialValue = v23,
 			isSubmitting = t1.isSubmitting,
-			onNext = function(_: string, p1) -- line: 51
+			onNext = function(_: string, p1) -- line: 56
 				-- upvalues: t1 (copy)
 				if t1.onNext then
 					t1.onNext({
@@ -44,12 +45,12 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 	end
 
 	if t1.node.type == "comment" then
-		local v23 = if not t1.store then nil else t1.store[t1.node.storeAs]
+		local v24 = if not t1.store then nil else t1.store[t1.node.storeAs]
 
 		return React.createElement(CommentNode, Dash.join(t1.node, {
-			initialValue = v23,
+			initialValue = v24,
 			isSubmitting = t1.isSubmitting,
-			onNext = function(s2: string) -- line: 69
+			onNext = function(s2: string) -- line: 74
 				-- upvalues: t1 (copy)
 				if t1.onNext then
 					t1.onNext({
@@ -65,7 +66,7 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 	if t1.node.type == "confirmation" then
 		return React.createElement(ConfirmationNode, Dash.join(t1.node, {
 			isSubmitting = if not FFlagSupportSubmissionOnAllReportNodes then nil else t1.isSubmitting,
-			onNext = t1.onNext and function() -- line: 83
+			onNext = t1.onNext and function() -- line: 88
 				-- upvalues: t1 (copy)
 				t1.onNext({})
 			end or nil
@@ -75,7 +76,7 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 	if t1.node.type == "paragraph" then
 		return React.createElement(ParagraphNode, Dash.join(t1.node, {
 			isSubmitting = if not FFlagSupportSubmissionOnAllReportNodes then nil else t1.isSubmitting,
-			onNext = t1.onNext and function() -- line: 93
+			onNext = t1.onNext and function() -- line: 98
 				-- upvalues: t1 (copy)
 				t1.onNext({})
 			end or nil
@@ -85,7 +86,7 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 	if FFlagAbuseReportMenuV2 and t1.node.type == "review" then
 		return React.createElement(ReviewNode, Dash.join(t1.node, {
 			isSubmitting = if not FFlagSupportSubmissionOnAllReportNodes then nil else t1.isSubmitting,
-			onNext = t1.onNext and function() -- line: 103
+			onNext = t1.onNext and function() -- line: 108
 				-- upvalues: t1 (copy)
 				t1.onNext({})
 			end or nil
@@ -94,14 +95,14 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 
 	if FFlagAbuseReportMenuV2 and t1.node.type == "inExpChatSelection" then
 		local InExpChatSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpChatSelectionNode)
-		local v25 = if not t1.store then nil else t1.store[t1.node.storeAs]
-		local v26 = if type(v25) ~= "table" then nil else v25.id
+		local v26 = if not t1.store then nil else t1.store[t1.node.storeAs]
+		local v27 = if type(v26) ~= "table" then nil else v26.id
 
 		return React.createElement(InExpChatSelectionNode, Dash.join(t1.node, {
-			initialValue = v26,
+			initialValue = v27,
 			isSubmitting = t1.isSubmitting,
 			goBack = t1.goBack,
-			onNext = function(_: string?, p2) -- line: 118
+			onNext = function(_: string?, p2) -- line: 123
 				-- upvalues: t1 (copy)
 				if t1.onNext then
 					t1.onNext({
@@ -119,7 +120,7 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 
 		return React.createElement(InExpConfirmationNode, Dash.join(t1.node, {
 			isSubmitting = t1.isSubmitting,
-			onNext = t1.onNext and function(t2: {[any]: any}) -- line: 135
+			onNext = t1.onNext and function(t2: {[any]: any}) -- line: 140
 				-- upvalues: t1 (copy)
 				t1.onNext({
 					store = if not t1.node.storeAs then {} else {
@@ -135,23 +136,24 @@ local function ContentNode(t1: {[any]: any}) -- line: 40
 		local InExpSceneSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpSceneSelectionNode)
 
 		return React.createElement(InExpSceneSelectionNode, Dash.join(t1.node, {
-			onNext = if not t1.onNext then nil else function() -- line: 153
+			onNext = if not t1.onNext then nil else function() -- line: 158
 				-- upvalues: t1 (copy)
 				t1.onNext({})
 			end,
-			goBack = t1.goBack
+			goBack = t1.goBack,
+			onExternalSubmit = if not FFlagAbuseReportSceneSelectionSubmitTracking then nil else t1.onExternalSubmit
 		}))
 	end
 
 	if FFlagAbuseReportInExpPlayerListV3 and t1.node.type == "inExpUserSelection" then
 		local InExpUserSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpUserSelectionNode)
-		local v30 = if not t1.store then nil else t1.store[t1.node.storeAs]
-		local v31 = if type(v30) ~= "table" then nil else v30.id
+		local v31 = if not t1.store then nil else t1.store[t1.node.storeAs]
+		local v32 = if type(v31) ~= "table" then nil else v31.id
 
 		return React.createElement(InExpUserSelectionNode, Dash.join(t1.node, {
-			initialValue = v31,
+			initialValue = v32,
 			isSubmitting = t1.isSubmitting,
-			onNext = if not t1.onNext then nil else function(_: string?, p3) -- line: 170
+			onNext = if not t1.onNext then nil else function(_: string?, p3) -- line: 176
 				-- upvalues: t1 (copy)
 				if t1.onNext then
 					t1.onNext({

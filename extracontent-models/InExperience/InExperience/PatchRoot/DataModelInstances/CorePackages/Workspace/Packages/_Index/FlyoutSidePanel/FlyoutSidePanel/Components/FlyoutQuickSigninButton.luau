@@ -14,13 +14,14 @@ local FlyoutAnalytics = require(script.Parent.Parent.Analytics.FlyoutAnalytics)
 local useRoactService = require(Parent.RobloxAppHooks).useRoactService
 local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
 local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
+local FFlagCTAChangeMorePageFlyoutButtonText = require(Parent.SharedFlags).FFlagCTAChangeMorePageFlyoutButtonText
 
-local function FlyoutQuickSigninButton(p1) -- line: 26
-	-- upvalues: useDispatch (copy), useRoactService (copy), AppEventIngestService (copy), React (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), NavigateDown (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), useLocalization (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
-	local v19 = useDispatch()
-	local v20 = useRoactService(AppEventIngestService)
-	local v21 = React.useCallback(function() -- line: 30
-		-- upvalues: p1 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), v19 (copy), NavigateDown (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), v20 (copy)
+local function FlyoutQuickSigninButton(p1) -- line: 29
+	-- upvalues: useDispatch (copy), useRoactService (copy), AppEventIngestService (copy), React (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), NavigateDown (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), useLocalization (copy), FFlagCTAChangeMorePageFlyoutButtonText (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
+	local v20 = useDispatch()
+	local v21 = useRoactService(AppEventIngestService)
+	local v22 = React.useCallback(function() -- line: 33
+		-- upvalues: p1 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), v20 (copy), NavigateDown (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), v21 (copy)
 		p1.closeDrawer()
 
 		local t1 = {
@@ -30,26 +31,26 @@ local function FlyoutQuickSigninButton(p1) -- line: 26
 		if FFlagSignalsNavP3Dispatch then
 			v8.down(v8.fromLegacyPage(t1))
 		else
-			v19(NavigateDown(t1))
+			v20(NavigateDown(t1))
 		end
 
 		local QuickSignin = FlyoutContentSettings.ItemType.QuickSignin
 
-		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v20, QuickSignin)
+		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v21, QuickSignin)
 	end, {
-		v20,
+		v21,
 		p1.closeDrawer
 	})
-	local v22 = useLocalization({
-		title = "Authentication.CrossDevice.Heading.QuickLogin"
+	local v23 = useLocalization({
+		title = not FFlagCTAChangeMorePageFlyoutButtonText and "Authentication.CrossDevice.Heading.QuickLogin" or "Authentication.Login.Action.QuickSignIn"
 	})
 
 	return React.createElement(Button, {
 		isDisabled = false,
-		text = v22.title,
+		text = v23.title,
 		variant = ButtonVariant.Standard,
 		LayoutOrder = p1.layoutOrder,
-		onActivated = v21,
+		onActivated = v22,
 		size = ButtonSize.Large,
 		width = UDim.new(1, 0)
 	})

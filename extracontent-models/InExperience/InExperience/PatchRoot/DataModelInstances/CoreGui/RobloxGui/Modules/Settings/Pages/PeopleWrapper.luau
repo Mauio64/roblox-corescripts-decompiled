@@ -40,60 +40,63 @@ local GetFFlagAddPeoplePageCardLayout = v33.GetFFlagAddPeoplePageCardLayout
 local GetFFlagPeoplePageLazyRenderCards = v33.GetFFlagPeoplePageLazyRenderCards
 local FFlagEnablePeopleListLazyRender = v33.FFlagEnablePeopleListLazyRender
 local FFlagPeopleCardsEnableVirtualizedGrid = v33.FFlagPeopleCardsEnableVirtualizedGrid
-local u38 = nil
-local v39, v40 = Signals.createSignal(false)
+local FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView = v33.FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView
+local FFlagPeoplePageFlipVolumePopoverToFitViewport = v33.FFlagPeoplePageFlipVolumePopoverToFitViewport
+local FFlagPeoplePageDismissCardMenuOnScrollOutOfView = v33.FFlagPeoplePageDismissCardMenuOnScrollOutOfView
+local u41 = nil
+local v42, v43 = Signals.createSignal(false)
 
-local function PeopleFocusRoot(p1) -- line: 65
+local function PeopleFocusRoot(p1) -- line: 71
 	-- upvalues: useRegistryEntry (copy), FocusNavigableSurfaceIdentifierEnum (copy), React (copy), FocusRoot (copy), FFlagIEMFocusNavPeoplePageToButtons (copy)
-	local v44 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.CentralOverlay) == nil
+	local v47 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.CentralOverlay) == nil
 
 	return React.createElement(FocusRoot, {
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.RouterView,
-		isAutoFocusRoot = not FFlagIEMFocusNavPeoplePageToButtons and v44
+		isAutoFocusRoot = not FFlagIEMFocusNavPeoplePageToButtons and v47
 	}, p1.children)
 end
-local function createPeoplePage() -- line: 77
-	-- upvalues: CorePackages (copy), SettingsPageFactory (copy), Constants (ref), uiblox (copy), BuilderIcons (copy), v22 (copy), FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), u38 (ref), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), SignalsReact (copy), v39 (copy), React (copy), CoreScriptsRootProvider (copy), LocalizationProvider (copy), PeopleFocusRoot (copy), BlockingModalScreen (copy), v14 (copy), GetFFlagAddPeoplePageCardLayout (copy), v15 (copy), ReactRoblox (copy), v9 (copy), v40 (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), SettingsShowSignal (copy)
+local function createPeoplePage() -- line: 83
+	-- upvalues: CorePackages (copy), SettingsPageFactory (copy), Constants (ref), uiblox (copy), BuilderIcons (copy), v22 (copy), FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), u41 (ref), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView (copy), FFlagPeoplePageFlipVolumePopoverToFitViewport (copy), FFlagPeoplePageDismissCardMenuOnScrollOutOfView (copy), SignalsReact (copy), v42 (copy), React (copy), CoreScriptsRootProvider (copy), LocalizationProvider (copy), PeopleFocusRoot (copy), BlockingModalScreen (copy), v14 (copy), GetFFlagAddPeoplePageCardLayout (copy), v15 (copy), ReactRoblox (copy), v9 (copy), v43 (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), SettingsShowSignal (copy)
 	local PeopleReactView = require(CorePackages.Workspace.Packages.PeopleReactView).PeopleReactView
 	local PeopleService2 = require(CorePackages.Workspace.Packages.PeopleService)
-	local v47 = SettingsPageFactory:CreateNewPage()
+	local v50 = SettingsPageFactory:CreateNewPage()
 
-	v47.TabHeader.Name = Constants.PEOPLEPAGE.TAB_HEADER.NAME
-	v47.Page.Name = Constants.PEOPLEPAGE.PAGE_ID
+	v50.TabHeader.Name = Constants.PEOPLEPAGE.TAB_HEADER.NAME
+	v50.Page.Name = Constants.PEOPLEPAGE.PAGE_ID
 
-	local v48 = uiblox[Constants.PEOPLEPAGE.TAB_HEADER.ICON]
+	local v51 = uiblox[Constants.PEOPLEPAGE.TAB_HEADER.ICON]
 
-	v47.TabHeader.TabLabel.Icon.Text = v48.name
-	v47.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v48.variant]
-	v47.TabHeader.TabLabel.Title.Text = v22:Format(Constants.PEOPLEPAGE.TAB_HEADER.TEXT)
+	v50.TabHeader.TabLabel.Icon.Text = v51.name
+	v50.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v51.variant]
+	v50.TabHeader.TabLabel.Title.Text = v22:Format(Constants.PEOPLEPAGE.TAB_HEADER.TEXT)
 
-	local v49 = PeopleService2.getService("SettingsHubService")
+	local v52 = PeopleService2.getService("SettingsHubService")
 
-	v49.register(v47)
+	v52.register(v50)
 
-	function v47.CreateMenuButtonsContainer(_) -- line: 94
-		-- upvalues: v49 (copy)
-		v49.setShowMenuButtonsContainer(true)
+	function v50.CreateMenuButtonsContainer(_) -- line: 100
+		-- upvalues: v52 (copy)
+		v52.setShowMenuButtonsContainer(true)
 	end
 
 	if FFlagRelocateMobileMenuButtons and FIntRelocateMobileMenuButtonsVariant == 2 then
-		function v47.UnmountMenuButtonsContainer(_) -- line: 99
-			-- upvalues: v49 (copy)
-			v49.setShowMenuButtonsContainer(false)
+		function v50.UnmountMenuButtonsContainer(_) -- line: 105
+			-- upvalues: v52 (copy)
+			v52.setShowMenuButtonsContainer(false)
 		end
 	end
 
-	local function createReactTree() -- line: 105
-		-- upvalues: u38 (ref), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), v47 (copy), SignalsReact (copy), v39 (copy), React (copy), CoreScriptsRootProvider (copy), LocalizationProvider (copy), v22 (copy), PeopleFocusRoot (copy), PeopleReactView (copy), BlockingModalScreen (copy), v14 (copy), GetFFlagAddPeoplePageCardLayout (copy), v15 (copy), ReactRoblox (copy)
-		if u38 then
+	local function createReactTree() -- line: 111
+		-- upvalues: u41 (ref), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView (copy), FFlagPeoplePageFlipVolumePopoverToFitViewport (copy), FFlagPeoplePageDismissCardMenuOnScrollOutOfView (copy), v50 (copy), SignalsReact (copy), v42 (copy), React (copy), CoreScriptsRootProvider (copy), LocalizationProvider (copy), v22 (copy), PeopleFocusRoot (copy), PeopleReactView (copy), BlockingModalScreen (copy), v14 (copy), GetFFlagAddPeoplePageCardLayout (copy), v15 (copy), ReactRoblox (copy)
+		if u41 then
 			return
 		end
 
-		local v53 = if not GetFFlagPeoplePageLazyRenderCards() and (not FFlagEnablePeopleListLazyRender and not FFlagPeopleCardsEnableVirtualizedGrid) then nil else v47.Page:FindFirstAncestorWhichIsA("ScrollingFrame")
+		local v56 = if not GetFFlagPeoplePageLazyRenderCards() and (not FFlagEnablePeopleListLazyRender and (not FFlagPeopleCardsEnableVirtualizedGrid and (not FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView and (not FFlagPeoplePageFlipVolumePopoverToFitViewport and not FFlagPeoplePageDismissCardMenuOnScrollOutOfView)))) then nil else v50.Page:FindFirstAncestorWhichIsA("ScrollingFrame")
 
-		local function PeopleConditionalView() -- line: 116
-			-- upvalues: SignalsReact (copy), v39 (copy), React (copy), CoreScriptsRootProvider (copy), LocalizationProvider (copy), v22 (copy), PeopleFocusRoot (copy), PeopleReactView (copy), BlockingModalScreen (copy), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), v53 (copy), v14 (copy), GetFFlagAddPeoplePageCardLayout (copy), v15 (copy)
-			if SignalsReact.useSignalState(v39) then
+		local function PeopleConditionalView() -- line: 125
+			-- upvalues: SignalsReact (copy), v42 (copy), React (copy), CoreScriptsRootProvider (copy), LocalizationProvider (copy), v22 (copy), PeopleFocusRoot (copy), PeopleReactView (copy), BlockingModalScreen (copy), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView (copy), FFlagPeoplePageFlipVolumePopoverToFitViewport (copy), FFlagPeoplePageDismissCardMenuOnScrollOutOfView (copy), v56 (copy), v14 (copy), GetFFlagAddPeoplePageCardLayout (copy), v15 (copy)
+			if SignalsReact.useSignalState(v42) then
 				return (React.createElement(CoreScriptsRootProvider, {}, {
 					LocalizationProvider = React.createElement(LocalizationProvider, {
 						localization = v22
@@ -102,7 +105,7 @@ local function createPeoplePage() -- line: 77
 							PeopleReactView = React.createElement(PeopleReactView, {
 								blockingModalScreen = BlockingModalScreen,
 								blockingFlags = {},
-								scrollingFrame = if not GetFFlagPeoplePageLazyRenderCards() and (not FFlagEnablePeopleListLazyRender and not FFlagPeopleCardsEnableVirtualizedGrid) then nil else v53,
+								scrollingFrame = if not GetFFlagPeoplePageLazyRenderCards() and (not FFlagEnablePeopleListLazyRender and (not FFlagPeopleCardsEnableVirtualizedGrid and (not FFlagPeoplePageDismissVolumePopoverOnScrollOutOfView and (not FFlagPeoplePageFlipVolumePopoverToFitViewport and not FFlagPeoplePageDismissCardMenuOnScrollOutOfView)))) then nil else v56,
 								chromeEnabled = v14,
 								getUniversesExposedTo = if not GetFFlagAddPeoplePageCardLayout() or not v15 then nil else v15.getUniversesExposedTo,
 								addUniverseToExposureList = if not GetFFlagAddPeoplePageCardLayout() or not v15 then nil else v15.addUniverseToExposureList
@@ -115,22 +118,22 @@ local function createPeoplePage() -- line: 77
 			return nil
 		end
 
-		u38 = ReactRoblox.createRoot(v47.Page)
+		u41 = ReactRoblox.createRoot(v50.Page)
 
-		if u38 then
-			u38:render(React.createElement(PeopleConditionalView))
+		if u41 then
+			u41:render(React.createElement(PeopleConditionalView))
 		end
 	end
 
-	v47.Displayed.Event:Connect(function() -- line: 156
-		-- upvalues: v9 (copy), v39 (copy), createReactTree (copy), v40 (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), v47 (copy)
-		if not v9 or not v39(false) then
+	v50.Displayed.Event:Connect(function() -- line: 168
+		-- upvalues: v9 (copy), v42 (copy), createReactTree (copy), v43 (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), v50 (copy)
+		if not v9 or not v42(false) then
 			createReactTree()
-			v40(true)
+			v43(true)
 		end
 
 		if FFlagIEMFocusNavPeoplePageToButtons then
-			local MenuContainer = v47.Page:FindFirstAncestor("MenuContainer")
+			local MenuContainer = v50.Page:FindFirstAncestor("MenuContainer")
 
 			if MenuContainer then
 				local BottomButtonFrame = MenuContainer:FindFirstChild("BottomButtonFrame", true)
@@ -143,23 +146,23 @@ local function createPeoplePage() -- line: 77
 	end)
 
 	if v9 then
-		SettingsShowSignal:connect(function(p4) -- line: 174
-			-- upvalues: v40 (copy)
+		SettingsShowSignal:connect(function(p4) -- line: 186
+			-- upvalues: v43 (copy)
 			if not p4 then
-				v40(false)
+				v43(false)
 			end
 		end)
 	else
-		v47.Hidden.Event:Connect(function() -- line: 180
-			-- upvalues: v40 (copy)
-			v40(false)
+		v50.Hidden.Event:Connect(function() -- line: 192
+			-- upvalues: v43 (copy)
+			v43(false)
 		end)
 	end
 
-	v47.Page.Size = UDim2.new(1, 0, 0, 0)
-	v47.Page.AutomaticSize = Enum.AutomaticSize.Y
+	v50.Page.Size = UDim2.new(1, 0, 0, 0)
+	v50.Page.AutomaticSize = Enum.AutomaticSize.Y
 
-	return v47
+	return v50
 end
 
 if FFlagRefactorPeoplePage() then

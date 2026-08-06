@@ -75,7 +75,7 @@ return (React.forwardRef(function(t1: {[any]: any}, _) -- line: 28
 				}
 			})
 		}),
-		OriginalPriceTag = if not FFlagAXDurables2Option or not t1.option.discountInformation then nil else React.createElement(Foundation.View, {
+		OriginalPriceTag = if not FFlagAXDurables2Option or not t1.option.discountInformation and (not t1.option.priceInRobuxDiscountedByOffers or (not t1.option.selected or not (t1.option.priceInRobuxDiscountedByOffers < t1.option.price))) then nil else React.createElement(Foundation.View, {
 			tag = "auto-xy",
 			LayoutOrder = 3
 		}, {
@@ -92,7 +92,7 @@ return (React.forwardRef(function(t1: {[any]: any}, _) -- line: 28
 				PriceLabel = React.createElement(FoundationText, {
 					tag = "auto-xy text-body-small content-muted",
 					LayoutOrder = 2,
-					Text = tostring(t1.option.discountInformation.originalPrice),
+					Text = if not t1.option.discountInformation then tostring(t1.option.price) else tostring(t1.option.discountInformation.originalPrice),
 					selection = {
 						Selectable = false
 					}

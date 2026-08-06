@@ -1,4 +1,4 @@
-local function insertNewlineAtCursor(s1: string, n1: number) -- line: 3
+local function insertNewlineAtCursor(s1: string, n1: number) -- line: 1
 	if n1 < 1 then
 		local v4 = utf8.len(s1)
 		local v5 = s1 .. "\n"

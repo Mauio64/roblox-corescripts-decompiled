@@ -17,19 +17,19 @@ local useTokens = Foundation.Hooks.useTokens
 
 require(script.Parent.types)
 
-local function MediaPreview(t1: {[any]: any}) -- line: 37
+local function MediaPreview(t1: {[any]: any}) -- line: 36
 	-- upvalues: useTokens (copy), React (copy), RunService (copy), View (copy), Skeleton (copy), Foundation (copy), Icon (copy), IconName (copy), IconSize (copy), IconButton (copy), InputSize (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), FoundationImage (copy)
 	local v19 = useTokens()
 	local v20, v21 = React.useState(true)
 	local v22 = React.useRef(nil)
 	local v23, v24 = React.useBinding(0)
 	local v25 = not t1.isIcon and 1.7777777777777777 or 1
-	local v26 = React.useCallback(function() -- line: 45
+	local v26 = React.useCallback(function() -- line: 44
 		-- upvalues: v21 (copy), v20 (copy)
 		v21(not v20)
 	end, { v20 })
 
-	React.useEffect(function() -- line: 49
+	React.useEffect(function() -- line: 48
 		-- upvalues: t1 (copy), v22 (copy), RunService (copy), v24 (copy)
 		if t1.mediaType ~= "video" then
 			return nil
@@ -39,7 +39,7 @@ local function MediaPreview(t1: {[any]: any}) -- line: 37
 			return nil
 		end
 
-		local connection = RunService.RenderStepped:Connect(function() -- line: 59
+		local connection = RunService.RenderStepped:Connect(function() -- line: 58
 			-- upvalues: v22 (copy), v24 (copy)
 			local current = v22.current
 
@@ -48,7 +48,7 @@ local function MediaPreview(t1: {[any]: any}) -- line: 37
 			end
 		end)
 
-		return function() -- line: 66
+		return function() -- line: 65
 			-- upvalues: connection (copy)
 			connection:Disconnect()
 		end

@@ -13,10 +13,10 @@ local MediaSelector = require(script.Parent.MediaSelector)
 
 require(script.Parent.types)
 
-local function IconThumbnailsSheet(t1: {[any]: any}) -- line: 27
+local function IconThumbnailsSheet(t1: {[any]: any}) -- line: 26
 	-- upvalues: React (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), FoundationText (copy), LocalizationStrings (copy), MediaSelector (copy)
 	local v15 = React.useRef(nil)
-	local v16 = React.useCallback(function() -- line: 30
+	local v16 = React.useCallback(function() -- line: 29
 		-- upvalues: v15 (copy), t1 (copy)
 		if v15.current then
 			v15.current()

@@ -11,10 +11,11 @@ local LayoutMode = UserTile.LayoutMode
 local FFlagConnectionsToFriendsRename = require(Parent.SharedFlags).FFlagConnectionsToFriendsRename
 local v12 = game:DefineFastFlag("PromptFriendRequestModalRevampFriendsRename", false)
 local v13 = FFlagConnectionsToFriendsRename and v12
+local v14 = game:DefineFastInt("PromptFriendRequestModalInputDelayMs", 1000)
 
-local function PromptFriendRequestModal(t1: {[any]: any}) -- line: 33
-	-- upvalues: useLocalization (copy), v13 (copy), React (copy), Dialog (copy), DialogSize (copy), Foundation (copy), UserTile2 (copy), LayoutMode (copy), ButtonVariant (copy)
-	local v16 = useLocalization({
+local function PromptFriendRequestModal(t1: {[any]: any}) -- line: 34
+	-- upvalues: useLocalization (copy), v13 (copy), React (copy), Dialog (copy), DialogSize (copy), Foundation (copy), UserTile2 (copy), LayoutMode (copy), ButtonVariant (copy), v14 (copy)
+	local v17 = useLocalization({
 		sendText = "InGame.FriendPlayerPrompt.Action.Send",
 		titleText = not v13 and "InGame.FriendPlayerPrompt.Title.SendFriendRequest" or "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename"
 	})
@@ -24,7 +25,7 @@ local function PromptFriendRequestModal(t1: {[any]: any}) -- line: 33
 		onClose = t1.onClose
 	}, {
 		DialogTitle = React.createElement(Dialog.Title, {
-			text = v16.titleText
+			text = v17.titleText
 		}),
 		Avatar = React.createElement(Foundation.View, {
 			tag = "row align-x-center size-full-3000",
@@ -44,10 +45,10 @@ local function PromptFriendRequestModal(t1: {[any]: any}) -- line: 33
 		DialogActions = React.createElement(Dialog.Actions, {
 			LayoutOrder = 4,
 			actions = {{
-				text = v16.sendText,
+				text = v17.sendText,
 				variant = ButtonVariant.Emphasis,
 				onActivated = t1.onSendClicked,
-				inputDelay = if t1.inputDelay ~= nil then t1.inputDelay else 3
+				inputDelay = if t1.inputDelay ~= nil then t1.inputDelay else v14 / 1000
 			}}
 		})
 	})

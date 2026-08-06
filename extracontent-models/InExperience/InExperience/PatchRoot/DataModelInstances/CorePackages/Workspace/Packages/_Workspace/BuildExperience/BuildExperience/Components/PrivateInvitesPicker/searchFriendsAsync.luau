@@ -7,7 +7,7 @@ local UrlBase = require(Parent.UrlBuilder).UrlBase
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function searchFriendsAsync(s1: string, s2: string?, n1: number?, n2: number?) -- line: 40
+local function searchFriendsAsync(s1: string, s2: string?, n1: number?, n2: number?) -- line: 39
 	-- upvalues: Players (copy), Promise (copy), UrlBase (copy), HttpService (copy), fetch (copy), asPromise (copy)
 	if n2 == nil then
 		local LocalPlayer = Players.LocalPlayer
@@ -29,12 +29,12 @@ local function searchFriendsAsync(s1: string, s2: string?, n1: number?, n2: numb
 		method = "GET",
 		analyticsKey = "build-experience.friends-search",
 		url = v15,
-		decode = function(p1) -- line: 65
+		decode = function(p1) -- line: 64
 			return p1
 		end
 	})
 
-	return asPromise(v16):andThen(function(t1: {[any]: any}?) -- line: 70
+	return asPromise(v16):andThen(function(t1: {[any]: any}?) -- line: 69
 		local t2 = {}
 
 		for _, v21 in t1 and t1.PageItems or {} do

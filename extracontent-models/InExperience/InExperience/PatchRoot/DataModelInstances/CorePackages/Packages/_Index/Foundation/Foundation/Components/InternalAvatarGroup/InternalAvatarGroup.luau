@@ -2,7 +2,7 @@ local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local React = require(FoundationParent.React)
 local ReactIs = require(FoundationParent.ReactIs)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local Icon = require(Foundation.Components.Icon)
 local IconSize = require(Foundation.Enums.IconSize)
 local Text = require(Foundation.Components.Text)
@@ -28,12 +28,12 @@ local t1 = {
 }
 
 local function AvatarOverflow(p1) -- line: 58
-	-- upvalues: useTokens (copy), usePresentationContext (copy), useCumulativeBackground (copy), ColorMode (copy), React (copy), View (copy), withCommonProps (copy), Icon (copy), IconSize (copy), Text (copy)
+	-- upvalues: useTokens (copy), usePresentationContext (copy), useCumulativeBackground (copy), ColorNamespace (copy), React (copy), View (copy), withCommonProps (copy), Icon (copy), IconSize (copy), Text (copy)
 	local v21 = useTokens()
 	local v22 = usePresentationContext()
 	local v23 = useCumulativeBackground(p1.backplateStyle, p1.backgroundStyle)
 	local v24 = not p1.isEllipsed and "text-caption-medium" or "text-caption-small"
-	local Emphasis = v21[v22.colorMode or ColorMode.Color].Content.Emphasis
+	local Emphasis = v21[v22.colorNamespace or ColorNamespace.Color].Content.Emphasis
 
 	return React.createElement(View, withCommonProps(p1, {
 		tag = "row align-x-center align-y-center radius-circle",
@@ -52,10 +52,10 @@ local function AvatarOverflow(p1) -- line: 58
 	}))
 end
 local function InternalAvatarGroup(p2, p3) -- line: 93
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), ColorMode (copy), ReactIs (copy), getBindableValue (copy), React (copy), AvatarOverflow (copy), View (copy), withCommonProps (copy)
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), ColorNamespace (copy), ReactIs (copy), getBindableValue (copy), React (copy), AvatarOverflow (copy), View (copy), withCommonProps (copy)
 	local v28 = withDefaults(p2, t1)
 	local v29 = useTokens()
-	local Shift_300 = v29[usePresentationContext().colorMode or ColorMode.Color].Shift.Shift_300
+	local Shift_300 = v29[usePresentationContext().colorNamespace or ColorNamespace.Color].Shift.Shift_300
 	local v31 = v28.backplateStyle or v29.Color.Surface.Surface_0
 	local resolvedSize = v28.resolvedSize
 	local v33 = resolvedSize + v28.gap

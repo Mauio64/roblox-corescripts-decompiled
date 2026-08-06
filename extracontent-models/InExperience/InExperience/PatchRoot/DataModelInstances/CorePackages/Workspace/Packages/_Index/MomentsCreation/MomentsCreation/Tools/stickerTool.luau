@@ -18,7 +18,7 @@ return {
 	zIndex = 3,
 	step = CreationFlowState.StickerOverlay,
 	cta = {
-		localizationKey = "Feature.Moments.Action.AddText",
+		localizationKey = "Feature.Moments.Action.AddSticker",
 		order = 4,
 		icon = BuilderIcons.Icon.SquareFaceEmoji,
 		analyticsEvent = EventNames.EditingFlowStickerOverlayButtonPressed,

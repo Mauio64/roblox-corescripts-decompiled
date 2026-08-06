@@ -3,7 +3,7 @@ local Signals = require(Parent.Signals)
 local SignalsReact = require(Parent.SignalsReact)
 local v4 = game:DefineFastInt("MyStatsExperienceSearchDebounceMs", 200)
 
-local function createSearchQueryStore(t1: {[any]: any}?) -- line: 48
+local function createSearchQueryStore(t1: {[any]: any}?) -- line: 47
 	-- upvalues: v4 (copy), Signals (copy), SignalsReact (copy)
 	local v7 = t1 or {}
 	local v8 = v7.debounceMs or v4
@@ -13,7 +13,7 @@ local function createSearchQueryStore(t1: {[any]: any}?) -- line: 48
 	local v13, v14 = Signals.createSignal("")
 	local u15 = nil
 
-	local function cancelPending() -- line: 59
+	local function cancelPending() -- line: 58
 		-- upvalues: u15 (ref), v10 (copy)
 		if u15 ~= nil then
 			pcall(v10, u15)
@@ -23,16 +23,16 @@ local function createSearchQueryStore(t1: {[any]: any}?) -- line: 48
 
 	return {
 		getDraftQuery = v11,
-		useDraftQuery = function() -- line: 95
+		useDraftQuery = function() -- line: 94
 			-- upvalues: SignalsReact (copy), v11 (copy)
 			return SignalsReact.useSignalState(v11)
 		end,
 		getDebouncedQuery = v13,
-		useDebouncedQuery = function() -- line: 99
+		useDebouncedQuery = function() -- line: 98
 			-- upvalues: SignalsReact (copy), v13 (copy)
 			return SignalsReact.useSignalState(v13)
 		end,
-		setQuery = function(s1: string) -- line: 69
+		setQuery = function(s1: string) -- line: 68
 			-- upvalues: v12 (copy), u15 (ref), v10 (copy), v13 (copy), v8 (copy), v9 (copy), v14 (copy)
 			v12(s1)
 
@@ -47,13 +47,13 @@ local function createSearchQueryStore(t1: {[any]: any}?) -- line: 48
 
 			local v18 = v8 / 1000
 
-			u15 = v9(v18, function() -- line: 79
+			u15 = v9(v18, function() -- line: 78
 				-- upvalues: u15 (ref), v14 (copy), s1 (copy)
 				u15 = nil
 				v14(s1)
 			end)
 		end,
-		clear = function() -- line: 85
+		clear = function() -- line: 84
 			-- upvalues: u15 (ref), v10 (copy), v12 (copy), v14 (copy)
 			if u15 ~= nil then
 				pcall(v10, u15)
@@ -63,7 +63,7 @@ local function createSearchQueryStore(t1: {[any]: any}?) -- line: 48
 			v12("")
 			v14("")
 		end,
-		destroy = function() -- line: 91
+		destroy = function() -- line: 90
 			-- upvalues: u15 (ref), v10 (copy)
 			if u15 ~= nil then
 				pcall(v10, u15)

@@ -52,7 +52,7 @@ local t1 = {
 	}
 }
 
-local function getStatusFilterText(p1) -- line: 75
+local function getStatusFilterText(p1) -- line: 73
 	-- upvalues: t1 (copy)
 	for _, v30 in t1 do
 		if p1 == v30.status then
@@ -62,18 +62,18 @@ local function getStatusFilterText(p1) -- line: 75
 
 	return p1 or "All"
 end
-local function taskMatchesSearch(p2, s1: string) -- line: 84
+local function taskMatchesSearch(p2, s1: string) -- line: 82
 	-- upvalues: matchesSearchQuery (copy)
 	return matchesSearchQuery(p2.text, s1) or matchesSearchQuery(p2.description, s1)
 end
-local function taskMatchesStatus(p3, p4) -- line: 88
+local function taskMatchesStatus(p3, p4) -- line: 86
 	if p4 == nil then
 		return true
 	end
 
 	return p4 == p3.status
 end
-local function shouldIncludeTask(p5, t2: {[any]: any}) -- line: 95
+local function shouldIncludeTask(p5, t2: {[any]: any}) -- line: 93
 	-- upvalues: matchesSearchQuery (copy)
 	local searchQuery = t2.searchQuery
 	local v38 = matchesSearchQuery(p5.text, searchQuery) or matchesSearchQuery(p5.description, searchQuery)
@@ -90,7 +90,7 @@ local function shouldIncludeTask(p5, t2: {[any]: any}) -- line: 95
 
 	return v38
 end
-local function AgentDetailsList(t3: {[any]: any}) -- line: 99
+local function AgentDetailsList(t3: {[any]: any}) -- line: 97
 	-- upvalues: React (copy), useScaledValue (copy), v21 (copy), matchesSearchQuery (copy), t1 (copy), View (copy), SearchInput (copy), LocalizationStrings (copy), Menu (copy), PopoverAlign (copy), PopoverSide (copy), InputSize (copy), Chip (copy), IconName (copy), ChipVariant (copy), ChipSize (copy), TodoList (copy)
 	local v41, v42 = React.useState("")
 	local v43, v44 = React.useState(nil)
@@ -124,7 +124,7 @@ local function AgentDetailsList(t3: {[any]: any}) -- line: 99
 		end
 	end
 
-	local v55 = React.useMemo(function() -- line: 122
+	local v55 = React.useMemo(function() -- line: 120
 		-- upvalues: t1 (copy), v43 (copy)
 		local t6 = {}
 
@@ -139,17 +139,17 @@ local function AgentDetailsList(t3: {[any]: any}) -- line: 99
 
 		return t6
 	end, { v43 })
-	local v56 = React.useCallback(function() -- line: 135
+	local v56 = React.useCallback(function() -- line: 133
 		-- upvalues: v46 (copy)
-		v46(function(p6) -- line: 136
+		v46(function(p6) -- line: 134
 			return not p6
 		end)
 	end, {})
-	local v57 = React.useCallback(function() -- line: 141
+	local v57 = React.useCallback(function() -- line: 139
 		-- upvalues: v46 (copy)
 		v46(false)
 	end, {})
-	local v58 = React.useCallback(function(p7) -- line: 145
+	local v58 = React.useCallback(function(p7) -- line: 143
 		-- upvalues: v44 (copy), v46 (copy)
 		v44(if p7 ~= "All" then p7 else nil)
 		v46(false)

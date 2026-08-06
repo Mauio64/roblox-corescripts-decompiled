@@ -15,16 +15,17 @@ local t1 = {
 	buy = "Feature.Catalog.Action.Buy"
 }
 
-local function ShopItemFooter(t2: {[any]: any}) -- line: 30
+local function ShopItemFooter(t2: {[any]: any}) -- line: 31
 	-- upvalues: useLocalization (copy), t1 (copy), React (copy), initiateShopItemPurchase (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
 	local v13 = useLocalization(t1)
 	local v14 = t2.isOwned or false
-	local v15 = React.useCallback(function() -- line: 34
+	local v15 = React.useCallback(function() -- line: 35
 		-- upvalues: initiateShopItemPurchase (copy), t2 (copy)
-		initiateShopItemPurchase(t2.itemId, t2.itemType)
+		initiateShopItemPurchase(t2.itemId, t2.itemType, t2.shopPageType)
 	end, {
 		t2.itemId,
-		t2.itemType
+		t2.itemType,
+		t2.shopPageType
 	})
 
 	if v14 then
@@ -35,7 +36,7 @@ local function ShopItemFooter(t2: {[any]: any}) -- line: 30
 			size = InputSize.Small,
 			width = UDim.new(1, 0),
 			LayoutOrder = t2.LayoutOrder,
-			onActivated = function() -- line: 46
+			onActivated = function() -- line: 47
 			end
 		})
 	end

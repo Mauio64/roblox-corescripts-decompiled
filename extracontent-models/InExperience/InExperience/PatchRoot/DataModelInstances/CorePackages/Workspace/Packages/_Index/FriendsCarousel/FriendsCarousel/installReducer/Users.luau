@@ -1,4 +1,10 @@
 local FriendsCarousel = script:FindFirstAncestor("FriendsCarousel")
+local FriendsCarouselParent = FriendsCarousel.Parent
+
+if require(FriendsCarouselParent.SharedFlags).FFlagFriendsCarouselDeprecateUnusedReducers then
+	return nil
+end
+
 local dependencies = require(FriendsCarousel.dependencies)
 local RoduxUsers = dependencies.RoduxUsers
 local convertActions = dependencies.convertActions

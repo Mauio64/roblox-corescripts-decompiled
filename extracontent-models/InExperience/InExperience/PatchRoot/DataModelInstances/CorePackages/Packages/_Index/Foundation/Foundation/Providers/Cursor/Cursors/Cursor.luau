@@ -6,7 +6,7 @@ local Images = FoundationImages.Images
 local CursorComponent = require(script.Parent.Parent.CursorComponent)
 local CursorType = require(Foundation.Enums.CursorType)
 
-require(Foundation.Enums.ColorMode)
+require(Foundation.Enums.ColorNamespace)
 
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local Components = script.Parent.Parent.Parent.Parent.Components
@@ -106,7 +106,7 @@ local t1 = {
 return (React.forwardRef(function(t2: {[any]: any}, p1) -- line: 140
 	-- upvalues: useTokens (copy), CursorType (copy), React (copy), t1 (copy), Images (copy), getScaledSlice (copy), CursorComponent (copy)
 	local v14 = useTokens()
-	local colorMode = t2.colorMode
+	local colorNamespace = t2.colorNamespace
 
 	if t2.cursorType == CursorType.NavHighlight then
 		return React.createElement("Frame", {
@@ -115,8 +115,8 @@ return (React.forwardRef(function(t2: {[any]: any}, p1) -- line: 140
 			AnchorPoint = Vector2.new(0, 1),
 			Position = UDim2.new(0, 0, 1, -3),
 			Size = UDim2.new(1, 0, 0, 3),
-			BackgroundColor3 = v14[colorMode].Selection.Start.Color3,
-			BorderColor3 = v14[colorMode].Selection.Start.Color3,
+			BackgroundColor3 = v14[colorNamespace].Selection.Start.Color3,
+			BorderColor3 = v14[colorNamespace].Selection.Start.Color3,
 			ref = p1
 		})
 	end
@@ -142,8 +142,8 @@ return (React.forwardRef(function(t2: {[any]: any}, p1) -- line: 140
 			ImageRectSize = Images[v16.Image].ImageRectSize,
 			Size = uDim2,
 			Position = uDim2_2,
-			ImageColor3 = v14[colorMode].Selection.Start.Color3,
-			ImageTransparency = v14[colorMode].Selection.Start.Transparency,
+			ImageColor3 = v14[colorNamespace].Selection.Start.Color3,
+			ImageTransparency = v14[colorNamespace].Selection.Start.Transparency,
 			ref = p1
 		})
 	end
@@ -169,8 +169,8 @@ return (React.forwardRef(function(t2: {[any]: any}, p1) -- line: 140
 			ScaleType = Enum.ScaleType.Slice,
 			Size = uDim2,
 			Position = UDim2.fromOffset(-InsetAdjustment.X, -InsetAdjustment.Y),
-			ImageColor3 = v14[colorMode].Selection.Start.Color3,
-			ImageTransparency = v14[colorMode].Selection.Start.Transparency,
+			ImageColor3 = v14[colorNamespace].Selection.Start.Color3,
+			ImageTransparency = v14[colorNamespace].Selection.Start.Transparency,
 			ref = p1
 		}, {
 			Padding = v22
@@ -183,7 +183,7 @@ return (React.forwardRef(function(t2: {[any]: any}, p1) -- line: 140
 			cornerRadius = v16.CornerRadius,
 			offset = v16.Offset - v16.BorderWidth,
 			borderWidth = v16.BorderWidth,
-			colorMode = t2.colorMode,
+			colorNamespace = t2.colorNamespace,
 			ref = p1
 		})
 	end

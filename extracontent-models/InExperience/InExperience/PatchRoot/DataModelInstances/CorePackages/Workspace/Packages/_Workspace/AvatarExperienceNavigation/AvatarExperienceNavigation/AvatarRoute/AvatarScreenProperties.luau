@@ -17,7 +17,6 @@ local v13 = game:DefineFastFlag("AXKeepTryOnsInAvatarEditor", false)
 local FFlagAXFixAvatarScreenVR = AvatarExperienceFlags.FFlagAXFixAvatarScreenVR
 local FFlagAXMakeupReleaseFTUX = AvatarExperienceFlags.FFlagAXMakeupReleaseFTUX
 local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
-local FFlagAXFixTryOnItemVR = AvatarExperienceFlags.FFlagAXFixTryOnItemVR
 local FFlagAXEnableProfileTab = require(AvatarExperienceNavigationParent.SharedFlags).FFlagAXEnableProfileTab
 local t1 = {
 	isTransparent = false,
@@ -161,8 +160,8 @@ local t2 = {
 	},
 	[AvatarScreen.TryOnItem] = {
 		isTransparent = false,
-		VRPanelPlacement = if not FFlagAXFixTryOnItemVR then nil else "Right",
-		VRPanelRoundedCorners = not not FFlagAXFixTryOnItemVR or nil,
+		VRPanelPlacement = "Right",
+		VRPanelRoundedCorners = true,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.ITEM_DETAILS
 		}
@@ -265,6 +264,14 @@ if FFlagAXOutfitPageRevamp then
 		isTransparent = false,
 		VRPanelPlacement = "Right"
 	}
+	t2[AvatarScreen.DeleteOutfitDialog] = {
+		isTransparent = false,
+		VRPanelPlacement = "Right"
+	}
+	t2[AvatarScreen.BulkDeleteOutfitDialog] = {
+		isTransparent = false,
+		VRPanelPlacement = "Left"
+	}
 	t2[AvatarScreen.ManageOutfitsPage] = {
 		isTransparent = false,
 		VRPanelPlacement = "Left",
@@ -340,8 +347,8 @@ end
 
 local t3 = {}
 
-for _, v23 in AvatarScreen do
-	t3[v23] = Cryo.Dictionary.join(t1, t2[v23] or {})
+for _, v22 in AvatarScreen do
+	t3[v22] = Cryo.Dictionary.join(t1, t2[v22] or {})
 end
 
 return t3

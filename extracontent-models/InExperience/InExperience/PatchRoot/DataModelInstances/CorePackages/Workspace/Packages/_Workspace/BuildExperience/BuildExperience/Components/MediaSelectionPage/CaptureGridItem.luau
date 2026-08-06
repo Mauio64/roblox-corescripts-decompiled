@@ -5,10 +5,10 @@ local Checkbox = Foundation.Checkbox
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 
-local function CaptureGridItem(t1: {[any]: any}) -- line: 19
+local function CaptureGridItem(t1: {[any]: any}) -- line: 18
 	-- upvalues: useTokens (copy), React (copy), View (copy), Foundation (copy), Checkbox (copy)
 	local v9 = useTokens()
-	local v10 = React.useCallback(function() -- line: 22
+	local v10 = React.useCallback(function() -- line: 21
 		-- upvalues: t1 (copy)
 		t1.onActivated(t1.capture)
 	end, {
@@ -44,7 +44,7 @@ local function CaptureGridItem(t1: {[any]: any}) -- line: 19
 				isChecked = true,
 				label = "",
 				AnchorPoint = Vector2.new(1, 0),
-				onActivated = function() -- line: 58
+				onActivated = function() -- line: 57
 					-- upvalues: v10 (copy)
 					v10()
 				end,

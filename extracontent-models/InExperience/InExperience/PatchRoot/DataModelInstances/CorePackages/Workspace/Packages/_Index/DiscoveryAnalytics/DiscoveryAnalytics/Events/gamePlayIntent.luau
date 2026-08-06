@@ -10,15 +10,14 @@ local DiscoveryEventErrorLogger = require(DiscoveryAnalyticsParent.DiscoveryUtil
 local FFlagLuaAppGamePlayIntentEventMobileAdsId = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppGamePlayIntentEventMobileAdsId
 local FFlagTraversalHistoryDiscoveryTelemetry = require(DiscoveryAnalyticsParent.SharedFlags).FFlagTraversalHistoryDiscoveryTelemetry
 local FFlagLuaAppAddSubIdToHomeEvents = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppAddSubIdToHomeEvents
-local FFlagLuaAppFixCustomTileBugs = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppFixCustomTileBugs
-local v14 = game:DefineFastFlag("LuaAppRemoveNumericalSortIndexSearch", false) and FFlagLuaAppFixCustomTileBugs
+local v13 = game:DefineFastFlag("LuaAppRemoveNumericalSortIndexSearch", false)
 local FFlagSduiExperienceDetailsSupport = require(DiscoveryAnalyticsParent.SharedFlags).FFlagSduiExperienceDetailsSupport
 local FFlagLuaAppMigrateGameEventsTelemetryService = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppMigrateGameEventsTelemetryService
 local FFlagLuaAppGameEventsTelemetryServiceShadowTraffic = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppGameEventsTelemetryServiceShadowTraffic
 local FFlagLuaAppGameItemTelemetryServiceTarget = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppGameItemTelemetryServiceTarget
 local FFlagLuaAppDemoModePlayButtonTelemetry = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppDemoModePlayButtonTelemetry
-local v20 = game:DefineFastInt("LuaAppGamePlayIntentEventThrottlingHundredthsPercent", 10000)
-local v21 = game:DefineFastInt("LuaAppGamePlayIntentShadowThrottlingHundredthsPercent", 10000)
+local v19 = game:DefineFastInt("LuaAppGamePlayIntentEventThrottlingHundredthsPercent", 10000)
+local v20 = game:DefineFastInt("LuaAppGamePlayIntentShadowThrottlingHundredthsPercent", 10000)
 local Constants = require(DiscoveryAnalytics.Constants)
 local t1 = nil
 
@@ -27,7 +26,7 @@ if FFlagLuaAppMigrateGameEventsTelemetryService then
 		eventName = "gamePlayIntent",
 		description = "Fires when the user clicks on a Play Button",
 		backends = { "EventIngest" },
-		throttlingPercentage = v20,
+		throttlingPercentage = v19,
 		lastUpdated = {
 			26,
 			2,
@@ -43,7 +42,7 @@ if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
 		eventName = "gamePlayIntentShadow",
 		description = "Shadow traffic for gamePlayIntent event recovery percentage",
 		backends = { "EventIngest" },
-		throttlingPercentage = v21,
+		throttlingPercentage = v20,
 		lastUpdated = {
 			26,
 			3,
@@ -52,7 +51,7 @@ if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
 	}
 end
 
-local v25 = t.strictInterface({
+local v24 = t.strictInterface({
 	placeId = t.union(t.string, t.number),
 	rootPlaceId = t.union(t.number, t.string),
 	referralSource = t.optional(t.string),
@@ -69,7 +68,7 @@ local v25 = t.strictInterface({
 	launchData = t.optional(t.string),
 	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
 })
-local v26 = t.strictInterface({
+local v25 = t.strictInterface({
 	placeId = t.union(t.string, t.number),
 	rootPlaceId = t.union(t.number, t.string),
 	referralSource = t.optional(t.string),
@@ -80,7 +79,7 @@ local v26 = t.strictInterface({
 	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string),
 	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
 })
-local v27 = t.strictInterface({
+local v26 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	universeId = t.string,
@@ -104,23 +103,30 @@ local v27 = t.strictInterface({
 	analyticsData = t.optional(t.table),
 	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
 })
-local v28 = t.strictInterface({
+local v27 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	universeId = t.string,
 	sortEntryIndex = t.string,
 	gameSetTypeId = t.string,
-	sortIndex = if not v14 then if not FFlagLuaAppFixCustomTileBugs then t.number else t.union(t.string, t.number) else t.string,
+	sortIndex = if not v13 then t.union(t.string, t.number) else t.string,
 	rowOnPage = t.optional(t.number),
 	topicDataPosition = t.optional(t.number),
 	nativeAdData = t.optional(t.string),
 	pageName = t.optional(t.string),
 	launchData = t.optional(t.string),
 	tileType = t.string,
-	positionInRow = if not FFlagLuaAppFixCustomTileBugs then nil else t.optional(t.number),
-	rowNumber = if not FFlagLuaAppFixCustomTileBugs then nil else t.optional(t.number),
-	feedRowNumber = if not FFlagLuaAppFixCustomTileBugs then nil else t.optional(t.number),
+	positionInRow = t.optional(t.number),
+	rowNumber = t.optional(t.number),
+	feedRowNumber = t.optional(t.number),
 	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
+})
+local v28 = t.strictInterface({
+	placeId = t.string,
+	rootPlaceId = t.number,
+	joinAttemptId = t.optional(t.string),
+	friendId = t.string,
+	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
 })
 local v29 = t.strictInterface({
 	placeId = t.string,
@@ -133,17 +139,10 @@ local v30 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	joinAttemptId = t.optional(t.string),
-	friendId = t.string,
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
-})
-local v31 = t.strictInterface({
-	placeId = t.string,
-	rootPlaceId = t.number,
-	joinAttemptId = t.optional(t.string),
 	conversationId = t.optional(t.string),
 	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
 })
-local v32 = t.strictInterface({
+local v31 = t.strictInterface({
 	placeId = t.union(t.string, t.number),
 	rootPlaceId = t.union(t.number, t.string),
 	linkId = t.string,
@@ -152,14 +151,14 @@ local v32 = t.strictInterface({
 	joinAttemptId = t.optional(t.string),
 	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
 })
-local v33 = t.strictInterface({
+local v32 = t.strictInterface({
 	friendId = t.string,
 	pageName = t.string,
 	placeId = t.optional(t.string),
 	rootPlaceId = t.optional(t.string),
 	joinAttemptId = t.string
 })
-local v34 = t.strictInterface({
+local v33 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	universeId = t.string,
@@ -174,27 +173,27 @@ local v34 = t.strictInterface({
 	tileType = t.string,
 	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
 })
-local v35 = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else t.strictInterface({
+local v34 = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else t.strictInterface({
 	placeId = t.string,
 	universeId = t.string,
 	sortEntryIndex = t.string,
 	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
 })
 local t3 = {
-	PlayButton = v26,
-	[Constants.Context.ExperienceTile] = v27,
-	[Constants.Context.SearchExperienceTile] = v28,
-	[Constants.Context.PeopleListInHomePage] = v29,
-	[Constants.Context.GamePlayIntentInPlacesList] = v30,
-	shareLinks = v32,
-	PlayGameFromPlayTogether = v25,
-	PlayGameFromLinkCard = v31,
-	[Constants.Context.PlayerContextualMenu] = v33,
-	[Constants.Context.HoldToPlayLauncher] = v34,
-	[Constants.Context.InExpHistoryTile] = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else v35
+	PlayButton = v25,
+	[Constants.Context.ExperienceTile] = v26,
+	[Constants.Context.SearchExperienceTile] = v27,
+	[Constants.Context.PeopleListInHomePage] = v28,
+	[Constants.Context.GamePlayIntentInPlacesList] = v29,
+	shareLinks = v31,
+	PlayGameFromPlayTogether = v24,
+	PlayGameFromLinkCard = v30,
+	[Constants.Context.PlayerContextualMenu] = v32,
+	[Constants.Context.HoldToPlayLauncher] = v33,
+	[Constants.Context.InExpHistoryTile] = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else v34
 }
 
-local function addMobileAdvertisingIdToEventParams(p1) -- line: 217
+local function addMobileAdvertisingIdToEventParams(p1) -- line: 213
 	-- upvalues: AppStorageService (copy)
 	local Item = AppStorageService:GetItem("MobileAdvertisingId")
 
@@ -203,13 +202,13 @@ local function addMobileAdvertisingIdToEventParams(p1) -- line: 217
 	end
 end
 
-return function(p2, s1: string, p3) -- line: 224
+return function(p2, s1: string, p3) -- line: 220
 	-- upvalues: t3 (copy), DiscoveryEventErrorLogger (copy), HttpService (copy), FFlagLuaAppGamePlayIntentEventMobileAdsId (copy), AppStorageService (copy), FFlagLuaAppMigrateGameEventsTelemetryService (copy), FFlagLuaAppAddSubIdToHomeEvents (copy), Cryo (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppGameEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
 	if t3[s1] ~= nil then
-		local v43, v44 = t3[s1](p3)
+		local v42, v43 = t3[s1](p3)
 
-		if not v43 then
-			DiscoveryEventErrorLogger.reportError("GamePlayIntentInvalidInterface", v44)
+		if not v42 then
+			DiscoveryEventErrorLogger.reportError("GamePlayIntentInvalidInterface", v43)
 		end
 	else
 		DiscoveryEventErrorLogger.reportError("GamePlayIntentMissingInterface", `Missing interface for eventContext { s1 } to type check gamePlayIntent event parameters`, {

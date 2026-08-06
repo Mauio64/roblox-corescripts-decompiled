@@ -44,14 +44,15 @@ local FFlagExpChatMessagesStoreBatch = require(ExpChat.Flags.FFlagExpChatMessage
 local FFlagExpChatMessagesStoreUseProxy = require(ExpChat.Flags.FFlagExpChatMessagesStoreUseProxy)
 local FFlagExpChatMessagesStoreMemoryCleanup = require(ExpChat.Flags.FFlagExpChatMessagesStoreMemoryCleanup)
 local FFlagExpChatEvictFloodcheckedFromWindowOrder = require(ExpChat.Flags.FFlagExpChatEvictFloodcheckedFromWindowOrder)
+local FFlagExpChatFixLocalUserVerifiedBadge = require(ExpChat.Flags.FFlagExpChatFixLocalUserVerifiedBadge)
 
-function getChatTranslationEnabled() -- line: 54
+function getChatTranslationEnabled() -- line: 55
 	-- upvalues: TextChatService (copy)
 	return TextChatService.ChatTranslationEnabled
 end
 
-local function createMessagesStore(p1) -- line: 176
-	-- upvalues: createSignal (copy), FFlagExpChatMessagesStoreUseProxy (copy), createProxy (copy), createComputed (copy), Dictionary (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), List (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), HttpService (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), FFlagExpChatEnableV2ChatWindow (copy), Set (copy), sanitizeForRichText (copy), GetFFlagExpChatSyntheticSystemMessageRichText (copy), generateRichSystemMessageTextFormat (copy), FFlagExpChatDictation (copy), computeNameColor (copy), Players (copy), FFlagEnableInExpChatRewrite (copy), getTextAndTranslation (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), isWhiteSpaceOnly (copy), FFlagExpChatPresetChatEnabled (copy), FFlagExpChatUseChatConfigStore (copy), GetChatConfigurationStore (copy), ExpChatShared (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatDisableUniverseBubbleChat (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagChatLineReportingGlobalMuteEnabled (copy), FIntExpChatRandomCharChangeLowerBound (copy), FIntExpChatRandomCharChangeUpperBound (copy), Config (copy), FFlagExpChatClearHiddenMessagesPostAgeCheck (copy)
+local function createMessagesStore(p1) -- line: 177
+	-- upvalues: createSignal (copy), FFlagExpChatMessagesStoreUseProxy (copy), createProxy (copy), createComputed (copy), Dictionary (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), List (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), HttpService (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), FFlagExpChatEnableV2ChatWindow (copy), Set (copy), sanitizeForRichText (copy), GetFFlagExpChatSyntheticSystemMessageRichText (copy), generateRichSystemMessageTextFormat (copy), FFlagExpChatDictation (copy), computeNameColor (copy), Players (copy), FFlagEnableInExpChatRewrite (copy), getTextAndTranslation (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), isWhiteSpaceOnly (copy), FFlagExpChatFixLocalUserVerifiedBadge (copy), FFlagExpChatPresetChatEnabled (copy), FFlagExpChatUseChatConfigStore (copy), GetChatConfigurationStore (copy), ExpChatShared (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatDisableUniverseBubbleChat (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagChatLineReportingGlobalMuteEnabled (copy), FIntExpChatRandomCharChangeLowerBound (copy), FIntExpChatRandomCharChangeUpperBound (copy), Config (copy), FFlagExpChatClearHiddenMessagesPostAgeCheck (copy)
 	local t1 = {
 		canLocalUserChat = false,
 		isBubbleChatEnabled = false,
@@ -66,65 +67,65 @@ local function createMessagesStore(p1) -- line: 176
 		messagesBySenderId = {},
 		messageComponentRingBuffer = {}
 	}
-	local v47, v48 = createSignal(t1.byMessageId)
-	local v49 = if not FFlagExpChatMessagesStoreUseProxy then nil else createProxy({})
-	local v50, v51 = createSignal(t1.messagesBySenderId)
-	local v52 = if not FFlagExpChatMessagesStoreUseProxy then nil else createProxy({})
-	local v53, v54 = createSignal(t1.windowMessagesInOrder)
-	local v55, v56 = createSignal(t1.windowMessagesInOrderByTabId)
-	local v57, v58 = createSignal(t1.mutedUserIds)
-	local v59 = if p1 == nil then v57 else createComputed(function(p2) -- line: 209
-		-- upvalues: v57 (copy), p1 (copy)
-		local v100 = v57(p2)
-		local v101 = p1(p2)
-		local v102 = table.clone(v100)
+	local v48, v49 = createSignal(t1.byMessageId)
+	local v50 = if not FFlagExpChatMessagesStoreUseProxy then nil else createProxy({})
+	local v51, v52 = createSignal(t1.messagesBySenderId)
+	local v53 = if not FFlagExpChatMessagesStoreUseProxy then nil else createProxy({})
+	local v54, v55 = createSignal(t1.windowMessagesInOrder)
+	local v56, v57 = createSignal(t1.windowMessagesInOrderByTabId)
+	local v58, v59 = createSignal(t1.mutedUserIds)
+	local v60 = if p1 == nil then v58 else createComputed(function(p2) -- line: 210
+		-- upvalues: v58 (copy), p1 (copy)
+		local v101 = v58(p2)
+		local v102 = p1(p2)
+		local v103 = table.clone(v101)
 
-		for v103 in v101 do
-			v102[v103] = true
+		for v104 in v102 do
+			v103[v104] = true
 		end
 
-		return v102
+		return v103
 	end)
-	local v60, v61 = createSignal(t1.canLocalUserChat)
-	local v62, _ = createSignal(t1.isBubbleChatEnabled)
-	local v64, v65 = createSignal(t1.mockUserIdToPartOrModel)
-	local v66, v67 = createSignal(t1.partOrModelToMockUserId)
-	local v68, v69 = createSignal(false)
-	local v70, v71 = createSignal(t1.messageComponentRingBuffer)
-	local v72, v73 = createSignal(t1.nextMessageComponentPointer)
+	local v61, v62 = createSignal(t1.canLocalUserChat)
+	local v63, _ = createSignal(t1.isBubbleChatEnabled)
+	local v65, v66 = createSignal(t1.mockUserIdToPartOrModel)
+	local v67, v68 = createSignal(t1.partOrModelToMockUserId)
+	local v69, v70 = createSignal(false)
+	local v71, v72 = createSignal(t1.messageComponentRingBuffer)
+	local v73, v74 = createSignal(t1.nextMessageComponentPointer)
 	local t2 = {}
 	local n1 = 0
 	local t3 = {}
-	local v77, v78 = createSignal(nil)
+	local v78, v79 = createSignal(nil)
 	local updateNextMessageComponent = nil
 	local t4 = {}
 
-	local function readByMessageId() -- line: 251
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy)
+	local function readByMessageId() -- line: 252
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			return v49
+			return v50
 		end
 
-		return v47(false)
+		return v48(false)
 	end
-	local function readByMessageIdReactive(p3) -- line: 258
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy)
+	local function readByMessageIdReactive(p3) -- line: 259
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			return v49(p3)
+			return v50(p3)
 		end
 
-		return v47(p3)
+		return v48(p3)
 	end
-	local function writeByMessageId(s1: string, t5: {[any]: any}?) -- line: 265
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v48 (copy), Dictionary (copy)
+	local function writeByMessageId(s1: string, t5: {[any]: any}?) -- line: 266
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v49 (copy), Dictionary (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			v49[s1] = t5
+			v50[s1] = t5
 
 			return
 		end
 
 		if t5 ~= nil then
-			v48(function(p4) -- line: 269
+			v49(function(p4) -- line: 270
 				-- upvalues: Dictionary (copy), s1 (copy), t5 (copy)
 				return Dictionary.join(p4, {
 					[s1] = t5
@@ -134,37 +135,37 @@ local function createMessagesStore(p1) -- line: 176
 			return
 		end
 
-		v48(function(p5) -- line: 273
+		v49(function(p5) -- line: 274
 			-- upvalues: Dictionary (copy), s1 (copy)
 			return Dictionary.removeKey(p5, s1)
 		end)
 	end
-	local function updateByMessageId(s2: string, p6: ((...any) -> ...any)) -- line: 280
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v48 (copy), Dictionary (copy)
+	local function updateByMessageId(s2: string, p6: ((...any) -> ...any)) -- line: 281
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v49 (copy), Dictionary (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			local v109 = v49[s2]
+			local v110 = v50[s2]
 
-			if v109 then
-				local v110 = p6(v109)
+			if v110 then
+				local v111 = p6(v110)
 
-				if v110 then
-					v49[s2] = v110
+				if v111 then
+					v50[s2] = v111
 
 					return
 				end
 			end
 		else
-			v48(function(p7) -- line: 290
+			v49(function(p7) -- line: 291
 				-- upvalues: s2 (copy), p6 (copy), Dictionary (copy)
 				if not p7 or not p7[s2] then
 					return p7 or {}
 				end
 
-				local v232 = p6(p7[s2])
+				local v233 = p6(p7[s2])
 
-				if v232 then
+				if v233 then
 					return Dictionary.join(p7, {
-						[s2] = v232
+						[s2] = v233
 					})
 				end
 
@@ -172,17 +173,17 @@ local function createMessagesStore(p1) -- line: 176
 			end)
 		end
 	end
-	local function forEachByMessageId(p8: ((...any) -> ...any)) -- line: 303
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v48 (copy)
+	local function forEachByMessageId(p8: ((...any) -> ...any)) -- line: 304
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v49 (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			for v112 in v49 do
-				local v113 = v49[v112]
+			for v113 in v50 do
+				local v114 = v50[v113]
 
-				if v113 then
-					local v114 = p8(v112, v113)
+				if v114 then
+					local v115 = p8(v113, v114)
 
-					if v114 then
-						v49[v112] = v114
+					if v115 then
+						v50[v113] = v115
 					end
 				end
 			end
@@ -190,7 +191,7 @@ local function createMessagesStore(p1) -- line: 176
 			return
 		end
 
-		v48(function(p9) -- line: 315
+		v49(function(p9) -- line: 316
 			-- upvalues: p8 (copy)
 			if not p9 then
 				return {}
@@ -198,31 +199,31 @@ local function createMessagesStore(p1) -- line: 176
 
 			local t6 = {}
 
-			for v235, v236 in p9 do
-				t6[v235] = p8(v235, v236) or v236
+			for v236, v237 in p9 do
+				t6[v236] = p8(v236, v237) or v237
 			end
 
 			return t6
 		end)
 	end
-	local function readMessagesBySenderIdReactive(p10) -- line: 331
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v50 (copy)
+	local function readMessagesBySenderIdReactive(p10) -- line: 332
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v51 (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			return v52(p10)
+			return v53(p10)
 		end
 
-		return v50(p10)
+		return v51(p10)
 	end
-	local function writeMessagesBySenderId(s3: string, p11) -- line: 338
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v51 (copy), Dictionary (copy)
+	local function writeMessagesBySenderId(s3: string, p11) -- line: 339
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v52 (copy), Dictionary (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			v52[s3] = p11
+			v53[s3] = p11
 
 			return
 		end
 
 		if p11 ~= nil then
-			v51(function(p12) -- line: 342
+			v52(function(p12) -- line: 343
 				-- upvalues: Dictionary (copy), s3 (copy), p11 (copy)
 				return Dictionary.join(p12, {
 					[s3] = p11
@@ -232,41 +233,41 @@ local function createMessagesStore(p1) -- line: 176
 			return
 		end
 
-		v51(function(p13) -- line: 346
+		v52(function(p13) -- line: 347
 			-- upvalues: Dictionary (copy), s3 (copy)
 			return Dictionary.removeKey(p13, s3)
 		end)
 	end
-	local function updateMessagesBySenderId(s4: string, p14: ((...any) -> ...any)) -- line: 352
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v51 (copy), Dictionary (copy)
+	local function updateMessagesBySenderId(s4: string, p14: ((...any) -> ...any)) -- line: 353
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v52 (copy), Dictionary (copy)
 		if FFlagExpChatMessagesStoreUseProxy then
-			v52[s4] = p14(v52[s4])
+			v53[s4] = p14(v53[s4])
 
 			return
 		end
 
-		v51(function(p15) -- line: 357
+		v52(function(p15) -- line: 358
 			-- upvalues: p14 (copy), s4 (copy), Dictionary (copy)
-			local v240 = p14(p15[s4])
+			local v241 = p14(p15[s4])
 
-			if v240 == nil then
+			if v241 == nil then
 				return Dictionary.removeKey(p15, s4)
 			end
 
 			return Dictionary.join(p15, {
-				[s4] = v240
+				[s4] = v241
 			})
 		end)
 	end
-	local function resolveChannelNameForMapOrder(t7: {[any]: any}, s5: string?) -- line: 367
-		-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy)
+	local function resolveChannelNameForMapOrder(t7: {[any]: any}, s5: string?) -- line: 368
+		-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy)
 		if GetFFlagTextChatEnableUniverseChatTabs() then
 			if s5 then
 				return s5
 			end
 
 			if t7.textChannel then
-				if t7.textChannel.Name == "RBXSystem" or not v68(false) then
+				if t7.textChannel.Name == "RBXSystem" or not v69(false) then
 					return "RBXGeneral"
 				end
 
@@ -286,7 +287,7 @@ local function createMessagesStore(p1) -- line: 176
 
 		return nil
 	end
-	local function maybeBatch(p16: ((...any) -> ...any)) -- line: 387
+	local function maybeBatch(p16: ((...any) -> ...any)) -- line: 388
 		-- upvalues: FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
 		if FFlagExpChatMessagesStoreBatch then
 			SignalsExperimental.batch(p16)
@@ -296,40 +297,40 @@ local function createMessagesStore(p1) -- line: 176
 
 		p16()
 	end
-	local function addMessage(t8: {[any]: any}) -- line: 395
-		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-		local function v124() -- line: 396
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t8 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref)
-			local v241 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
+	local function addMessage(t8: {[any]: any}) -- line: 396
+		-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+		local function v125() -- line: 397
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t8 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref)
+			local v242 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
 
-			if v241 and v241[t8.messageId] then
+			if v242 and v242[t8.messageId] then
 				if FFlagExpChatEvictFloodcheckedFromWindowOrder and (t8.status == Enum.TextChatMessageStatus.Floodchecked or t8.status == Enum.TextChatMessageStatus.MessageTooLong) then
-					v54(function(p17) -- line: 407
+					v55(function(p17) -- line: 408
 						-- upvalues: List (copy), t8 (copy)
-						return List.filter(p17, function(p18) -- line: 408
+						return List.filter(p17, function(p18) -- line: 409
 							-- upvalues: t8 (copy)
 							return p18 ~= t8.messageId
 						end)
 					end)
 
-					local v242 = resolveChannelNameForMapOrder(t8, t8.channelNameOverride)
+					local v243 = resolveChannelNameForMapOrder(t8, t8.channelNameOverride)
 
-					if v242 then
-						v56(function(p19) -- line: 415
-							-- upvalues: v242 (copy), List (copy), t8 (copy), Dictionary (copy)
-							local v432 = p19[v242]
+					if v243 then
+						v57(function(p19) -- line: 416
+							-- upvalues: v243 (copy), List (copy), t8 (copy), Dictionary (copy)
+							local v433 = p19[v243]
 
-							if not v432 then
+							if not v433 then
 								return p19
 							end
 
-							local v433 = List.filter(v432, function(p20) -- line: 420
+							local v434 = List.filter(v433, function(p20) -- line: 421
 								-- upvalues: t8 (copy)
 								return p20 ~= t8.messageId
 							end)
 
 							return Dictionary.join(p19, {
-								[v242] = v433
+								[v243] = v434
 							})
 						end)
 					end
@@ -337,9 +338,9 @@ local function createMessagesStore(p1) -- line: 176
 					local messageId = t8.messageId
 
 					if FFlagExpChatMessagesStoreUseProxy then
-						v49[messageId] = nil
+						v50[messageId] = nil
 					else
-						v48(function(p21) -- line: 273
+						v49(function(p21) -- line: 274
 							-- upvalues: Dictionary (copy), messageId (copy)
 							return Dictionary.removeKey(p21, messageId)
 						end)
@@ -348,43 +349,43 @@ local function createMessagesStore(p1) -- line: 176
 					if t8.userId then
 						local userId = t8.userId
 
-						local function v245(p22) -- line: 432
+						local function v246(p22) -- line: 433
 							-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), t8 (copy)
 							if not p22 then
 								return nil
 							end
 
-							local v436 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p22, function(p23) -- line: 442
+							local v437 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p22, function(p23) -- line: 443
 								-- upvalues: t8 (copy)
 								return p23.messageId ~= t8.messageId
-							end) else List.filter(p22, function(p24) -- line: 438
+							end) else List.filter(p22, function(p24) -- line: 439
 								-- upvalues: t8 (copy)
 								return p24 ~= t8.messageId
 							end)
 
-							if #v436 == 0 then
+							if #v437 == 0 then
 								return nil
 							end
 
-							return v436
+							return v437
 						end
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v52[userId] = v245(v52[userId])
+							v53[userId] = v246(v53[userId])
 
 							return
 						end
 
-						v51(function(p25) -- line: 357
-							-- upvalues: v245 (copy), userId (copy), Dictionary (copy)
-							local v438 = v245(p25[userId])
+						v52(function(p25) -- line: 358
+							-- upvalues: v246 (copy), userId (copy), Dictionary (copy)
+							local v439 = v246(p25[userId])
 
-							if v438 == nil then
+							if v439 == nil then
 								return Dictionary.removeKey(p25, userId)
 							end
 
 							return Dictionary.join(p25, {
-								[userId] = v438
+								[userId] = v439
 							})
 						end)
 					end
@@ -397,45 +398,45 @@ local function createMessagesStore(p1) -- line: 176
 				if not FFlagExpChatMessagesStoreMemoryCleanup and t8.userId then
 					local userId = t8.userId
 
-					local function v247(p26) -- line: 461
+					local function v248(p26) -- line: 462
 						-- upvalues: t8 (copy), List (copy)
 						if not p26 then
 							return nil
 						end
 
-						local v440 = nil
+						local v441 = nil
 
 						for i, v in ipairs(p26) do
 							if v.messageId == t8.messageId then
-								v440 = i
+								v441 = i
 
 								break
 							end
 						end
 
-						if v440 then
-							return List.set(p26, v440, t8)
+						if v441 then
+							return List.set(p26, v441, t8)
 						end
 
 						return p26
 					end
 
 					if FFlagExpChatMessagesStoreUseProxy then
-						v52[userId] = v247(v52[userId])
+						v53[userId] = v248(v53[userId])
 
 						return
 					end
 
-					v51(function(p27) -- line: 357
-						-- upvalues: v247 (copy), userId (copy), Dictionary (copy)
-						local v444 = v247(p27[userId])
+					v52(function(p27) -- line: 358
+						-- upvalues: v248 (copy), userId (copy), Dictionary (copy)
+						local v445 = v248(p27[userId])
 
-						if v444 == nil then
+						if v445 == nil then
 							return Dictionary.removeKey(p27, userId)
 						end
 
 						return Dictionary.join(p27, {
-							[userId] = v444
+							[userId] = v445
 						})
 					end)
 				end
@@ -447,17 +448,17 @@ local function createMessagesStore(p1) -- line: 176
 			local partOrModel = t8.partOrModel
 
 			if not userId and partOrModel then
-				userId = v66(false)[partOrModel]
+				userId = v67(false)[partOrModel]
 
 				if not userId then
 					userId = HttpService:GenerateGUID(false)
-					v65(function(p28) -- line: 496
+					v66(function(p28) -- line: 497
 						-- upvalues: Dictionary (copy), userId (ref), partOrModel (copy)
 						return Dictionary.join(p28, {
 							[userId] = partOrModel
 						})
 					end)
-					v67(function(p29) -- line: 503
+					v68(function(p29) -- line: 504
 						-- upvalues: Dictionary (copy), partOrModel (copy), userId (ref)
 						return Dictionary.join(p29, {
 							[partOrModel] = userId
@@ -466,261 +467,261 @@ local function createMessagesStore(p1) -- line: 176
 				end
 			end
 
-			local v250 = if userId == t8.userId then t8 else Dictionary.join(t8, {
+			local v251 = if userId == t8.userId then t8 else Dictionary.join(t8, {
 				userId = userId
 			})
 			local channelNameOverride = nil
 
-			if GetFFlagTextChatEnableUniverseChatTabs() and v250.channelNameOverride then
-				channelNameOverride = v250.channelNameOverride
-			elseif v250.textChannel then
-				channelNameOverride = if v250.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v68(false)) then v250.textChannel.Name else "RBXGeneral"
+			if GetFFlagTextChatEnableUniverseChatTabs() and v251.channelNameOverride then
+				channelNameOverride = v251.channelNameOverride
+			elseif v251.textChannel then
+				channelNameOverride = if v251.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v69(false)) then v251.textChannel.Name else "RBXGeneral"
 			end
 
-			if v250.isVisibleInChatWindow then
-				local v252 = v53(false)
-				local v253 = if not channelNameOverride then {} else v55(false)[channelNameOverride] or {}
+			if v251.isVisibleInChatWindow then
+				local v253 = v54(false)
+				local v254 = if not channelNameOverride then {} else v56(false)[channelNameOverride] or {}
 
-				if #v252 >= t1.messageLimit then
-					local v254 = v252[1]
-					local v255 = v241 and v241[v254]
+				if #v253 >= t1.messageLimit then
+					local v255 = v253[1]
+					local v256 = v242 and v242[v255]
 
-					if v255 then
+					if v256 then
 						if not FFlagExpChatMessagesStoreKeepInByMessageId then
 							if FFlagExpChatMessagesStoreUseProxy then
-								v49[v254] = nil
+								v50[v255] = nil
 							else
-								v48(function(p30) -- line: 273
-									-- upvalues: Dictionary (copy), v254 (copy)
-									return Dictionary.removeKey(p30, v254)
+								v49(function(p30) -- line: 274
+									-- upvalues: Dictionary (copy), v255 (copy)
+									return Dictionary.removeKey(p30, v255)
 								end)
 							end
 						end
 
-						if v255.userId then
-							local userId2 = v255.userId
+						if v256.userId then
+							local userId2 = v256.userId
 
-							local function v257(p31) -- line: 550
-								-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v254 (copy), v64 (copy), v255 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+							local function v258(p31) -- line: 551
+								-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v255 (copy), v65 (copy), v256 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 								if not p31 then
 									return nil
 								end
 
-								local v449 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p31, function(p32) -- line: 560
-									-- upvalues: v254 (copy)
-									return p32.messageId ~= v254
-								end) else List.filter(p31, function(p33) -- line: 556
-									-- upvalues: v254 (copy)
-									return p33 ~= v254
+								local v450 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p31, function(p32) -- line: 561
+									-- upvalues: v255 (copy)
+									return p32.messageId ~= v255
+								end) else List.filter(p31, function(p33) -- line: 557
+									-- upvalues: v255 (copy)
+									return p33 ~= v255
 								end)
 
-								if #v449 == 0 then
-									local v450 = v64(false)
+								if #v450 == 0 then
+									local v451 = v65(false)
 
-									if v450[v255.userId] then
-										local v451 = v450[v255.userId]
+									if v451[v256.userId] then
+										local v452 = v451[v256.userId]
 
-										v67(function(p34) -- line: 571
-											-- upvalues: Dictionary (copy), v451 (copy)
-											return Dictionary.removeKey(p34, v451)
+										v68(function(p34) -- line: 572
+											-- upvalues: Dictionary (copy), v452 (copy)
+											return Dictionary.removeKey(p34, v452)
 										end)
-										v65(function(p35) -- line: 575
-											-- upvalues: Dictionary (copy), v255 (copy)
-											return Dictionary.removeKey(p35, v255.userId)
+										v66(function(p35) -- line: 576
+											-- upvalues: Dictionary (copy), v256 (copy)
+											return Dictionary.removeKey(p35, v256.userId)
 										end)
 									end
 
 									return nil
 								end
 
-								return v449
+								return v450
 							end
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v52[userId2] = v257(v52[userId2])
+								v53[userId2] = v258(v53[userId2])
 							else
-								v51(function(p36) -- line: 357
-									-- upvalues: v257 (copy), userId2 (copy), Dictionary (copy)
-									local v453 = v257(p36[userId2])
+								v52(function(p36) -- line: 358
+									-- upvalues: v258 (copy), userId2 (copy), Dictionary (copy)
+									local v454 = v258(p36[userId2])
 
-									if v453 == nil then
+									if v454 == nil then
 										return Dictionary.removeKey(p36, userId2)
 									end
 
 									return Dictionary.join(p36, {
-										[userId2] = v453
+										[userId2] = v454
 									})
 								end)
 							end
 						end
 
-						v54(function(p37) -- line: 587
+						v55(function(p37) -- line: 588
 							-- upvalues: List (copy)
 							return List.removeIndex(p37, 1)
 						end)
 
 						if FFlagExpChatMessagesStoreMemoryCleanup then
-							t4[v254] = nil
+							t4[v255] = nil
 						end
 					end
 				end
 
-				if channelNameOverride and #v253 >= t1.messageLimit then
-					local v258 = v253[1]
+				if channelNameOverride and #v254 >= t1.messageLimit then
+					local v259 = v254[1]
 
-					if v258 then
-						v56(function(p38) -- line: 601
+					if v259 then
+						v57(function(p38) -- line: 602
 							-- upvalues: channelNameOverride (ref), List (copy), Dictionary (copy)
-							local v456 = p38[channelNameOverride] or {}
-							local v457 = List.removeIndex(v456, 1)
+							local v457 = p38[channelNameOverride] or {}
+							local v458 = List.removeIndex(v457, 1)
 
 							return Dictionary.join(p38, {
-								[channelNameOverride] = v457
+								[channelNameOverride] = v458
 							})
 						end)
 
-						if v241 and v241[v258] then
+						if v242 and v242[v259] then
 							if FFlagExpChatMessagesStoreUseProxy then
-								v49[v258] = nil
+								v50[v259] = nil
 							else
-								v48(function(p39) -- line: 273
-									-- upvalues: Dictionary (copy), v258 (copy)
-									return Dictionary.removeKey(p39, v258)
+								v49(function(p39) -- line: 274
+									-- upvalues: Dictionary (copy), v259 (copy)
+									return Dictionary.removeKey(p39, v259)
 								end)
 							end
 						end
 
 						if FFlagExpChatMessagesStoreMemoryCleanup then
-							t4[v258] = nil
+							t4[v259] = nil
 						end
 					end
 				end
 			end
 
-			writeByMessageId(v250.messageId, v250)
+			writeByMessageId(v251.messageId, v251)
 
-			if v250.userId then
-				local userId3 = v250.userId
+			if v251.userId then
+				local userId3 = v251.userId
 
-				local function v260(p40) -- line: 623
-					-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v250 (copy), List (copy)
-					local v460 = p40 or {}
-					local v461 = false
+				local function v261(p40) -- line: 624
+					-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v251 (copy), List (copy)
+					local v461 = p40 or {}
+					local v462 = false
 
 					if FFlagExpChatMessagesStoreMemoryCleanup then
-						for _, v in ipairs(v460) do
-							if v == v250.messageId then
-								v461 = true
+						for _, v in ipairs(v461) do
+							if v == v251.messageId then
+								v462 = true
 
 								break
 							end
 						end
 					else
-						for _, v in ipairs(v460) do
-							if v.messageId == v250.messageId then
-								v461 = true
+						for _, v in ipairs(v461) do
+							if v.messageId == v251.messageId then
+								v462 = true
 
 								break
 							end
 						end
 					end
 
-					if not v461 then
-						local v466 = if not FFlagExpChatMessagesStoreMemoryCleanup then v250 else v250.messageId
+					if not v462 then
+						local v467 = if not FFlagExpChatMessagesStoreMemoryCleanup then v251 else v251.messageId
 
-						return List.append(v460, v466)
+						return List.append(v461, v467)
 					end
 
-					return v460
+					return v461
 				end
 
 				if FFlagExpChatMessagesStoreUseProxy then
-					v52[userId3] = v260(v52[userId3])
+					v53[userId3] = v261(v53[userId3])
 				else
-					v51(function(p41) -- line: 357
-						-- upvalues: v260 (copy), userId3 (copy), Dictionary (copy)
-						local v468 = v260(p41[userId3])
+					v52(function(p41) -- line: 358
+						-- upvalues: v261 (copy), userId3 (copy), Dictionary (copy)
+						local v469 = v261(p41[userId3])
 
-						if v468 == nil then
+						if v469 == nil then
 							return Dictionary.removeKey(p41, userId3)
 						end
 
 						return Dictionary.join(p41, {
-							[userId3] = v468
+							[userId3] = v469
 						})
 					end)
 				end
 			end
 
-			if v250.isVisibleInChatWindow then
-				v54(function(p42) -- line: 656
-					-- upvalues: List (copy), v250 (copy)
-					return List.append(p42, v250.messageId)
+			if v251.isVisibleInChatWindow then
+				v55(function(p42) -- line: 657
+					-- upvalues: List (copy), v251 (copy)
+					return List.append(p42, v251.messageId)
 				end)
 
 				if channelNameOverride then
-					v56(function(p43) -- line: 662
-						-- upvalues: channelNameOverride (ref), List (copy), v250 (copy), Dictionary (copy)
-						local v471 = p43[channelNameOverride] or {}
-						local v472 = List.append(v471, v250.messageId)
+					v57(function(p43) -- line: 663
+						-- upvalues: channelNameOverride (ref), List (copy), v251 (copy), Dictionary (copy)
+						local v472 = p43[channelNameOverride] or {}
+						local v473 = List.append(v472, v251.messageId)
 
 						return Dictionary.join(p43, {
-							[channelNameOverride] = v472
+							[channelNameOverride] = v473
 						})
 					end)
 				end
 
 				if FFlagExpChatEnableV2ChatWindow then
-					local v261 = v77(false)
+					local v262 = v78(false)
 
-					if v261 == nil or v261 == channelNameOverride then
-						updateNextMessageComponent(v250.messageId)
+					if v262 == nil or v262 == channelNameOverride then
+						updateNextMessageComponent(v251.messageId)
 					end
 				end
 			end
 		end
 
 		if FFlagExpChatMessagesStoreBatch then
-			SignalsExperimental.batch(v124)
+			SignalsExperimental.batch(v125)
 
 			return
 		end
 
-		v124()
+		v125()
 	end
 
 	local t9 = {}
 
-	local function getUserMessageCache(s6: string) -- line: 713
-		-- upvalues: t9 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), createComputed (copy), FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v50 (copy), v49 (copy), v47 (copy), v59 (copy), Set (copy)
+	local function getUserMessageCache(s6: string) -- line: 714
+		-- upvalues: t9 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), createComputed (copy), FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v51 (copy), v50 (copy), v48 (copy), v60 (copy), Set (copy)
 		local str = tostring(s6)
 
 		if not t9[str] then
 			t9[str] = {}
 
 			if not FFlagExpChatMessagesStoreMemoryCleanup then
-				t9[str].messages = createComputed(function(p44) -- line: 719
-					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v50 (copy), str (copy)
-					return ((if not FFlagExpChatMessagesStoreUseProxy then v50(p44) else v52(p44)))[str] or {}
+				t9[str].messages = createComputed(function(p44) -- line: 720
+					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v51 (copy), str (copy)
+					return ((if not FFlagExpChatMessagesStoreUseProxy then v51(p44) else v53(p44)))[str] or {}
 				end)
 			end
 
 			if FFlagExpChatMessagesStoreMemoryCleanup then
-				t9[str].bubbleMessages = createComputed(function(p45) -- line: 726
-					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v50 (copy), str (copy), v49 (copy), v47 (copy), v59 (copy), Set (copy)
-					local v267 = ((if not FFlagExpChatMessagesStoreUseProxy then v50(p45) else v52(p45)))[str] or {}
-					local v268 = if not FFlagExpChatMessagesStoreUseProxy then v47(p45) else v49(p45)
-					local v269 = v59(p45)
+				t9[str].bubbleMessages = createComputed(function(p45) -- line: 727
+					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v51 (copy), str (copy), v50 (copy), v48 (copy), v60 (copy), Set (copy)
+					local v268 = ((if not FFlagExpChatMessagesStoreUseProxy then v51(p45) else v53(p45)))[str] or {}
+					local v269 = if not FFlagExpChatMessagesStoreUseProxy then v48(p45) else v50(p45)
+					local v270 = v60(p45)
 					local t10 = {}
 
-					for _, v in ipairs(v267) do
-						local v273 = v268[v]
+					for _, v in ipairs(v268) do
+						local v274 = v269[v]
 
-						if v273 then
-							local v274 = not not v273.userId and (Set.has(v269, v273.userId) or false)
+						if v274 then
+							local v275 = not not v274.userId and (Set.has(v270, v274.userId) or false)
 
-							if v273.isVisibleInBubbleChat and not v274 then
-								table.insert(t10, v273)
+							if v274.isVisibleInBubbleChat and not v275 then
+								table.insert(t10, v274)
 							end
 						end
 					end
@@ -728,16 +729,16 @@ local function createMessagesStore(p1) -- line: 176
 					return t10
 				end)
 			else
-				t9[str].bubbleMessages = createComputed(function(p46) -- line: 744
-					-- upvalues: t9 (copy), str (copy), v59 (copy), Set (copy)
-					local v276 = t9[str].messages(p46)
-					local v277 = v59(p46)
+				t9[str].bubbleMessages = createComputed(function(p46) -- line: 745
+					-- upvalues: t9 (copy), str (copy), v60 (copy), Set (copy)
+					local v277 = t9[str].messages(p46)
+					local v278 = v60(p46)
 					local t11 = {}
 
-					for _, v in ipairs(v276) do
-						local v281 = not not v.userId and (Set.has(v277, v.userId) or false)
+					for _, v in ipairs(v277) do
+						local v282 = not not v.userId and (Set.has(v278, v.userId) or false)
 
-						if v.isVisibleInBubbleChat and not v281 then
+						if v.isVisibleInBubbleChat and not v282 then
 							table.insert(t11, v)
 						end
 					end
@@ -747,12 +748,12 @@ local function createMessagesStore(p1) -- line: 176
 			end
 
 			if not FFlagExpChatMessagesStoreMemoryCleanup then
-				t9[str].lastMessage = createComputed(function(p47) -- line: 759
+				t9[str].lastMessage = createComputed(function(p47) -- line: 760
 					-- upvalues: t9 (copy), str (copy)
-					local v283 = t9[str].messages(p47)
+					local v284 = t9[str].messages(p47)
 
-					if #v283 > 0 then
-						return v283[#v283]
+					if #v284 > 0 then
+						return v284[#v284]
 					end
 
 					return nil
@@ -762,34 +763,34 @@ local function createMessagesStore(p1) -- line: 176
 
 		return t9[str]
 	end
-	local function getUserMessages(s7: string) -- line: 771
+	local function getUserMessages(s7: string) -- line: 772
 		-- upvalues: getUserMessageCache (copy)
 		return getUserMessageCache(s7).messages
 	end
-	local function getUserLastMessage(s8: string) -- line: 781
+	local function getUserLastMessage(s8: string) -- line: 782
 		-- upvalues: getUserMessageCache (copy)
 		return getUserMessageCache(s8).lastMessage
 	end
-	local function createMessagesArraySignal() -- line: 786
-		-- upvalues: createComputed (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy)
-		return createComputed(function(p48) -- line: 787
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy)
-			local v285 = if not FFlagExpChatMessagesStoreUseProxy then v47(p48) else v49(p48)
+	local function createMessagesArraySignal() -- line: 787
+		-- upvalues: createComputed (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy)
+		return createComputed(function(p48) -- line: 788
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy)
+			local v286 = if not FFlagExpChatMessagesStoreUseProxy then v48(p48) else v50(p48)
 
-			if not v285 then
+			if not v286 then
 				return {}
 			end
 
 			local t12 = {}
 
-			for _, v288 in v285 do
-				table.insert(t12, v288)
+			for _, v289 in v286 do
+				table.insert(t12, v289)
 			end
 
 			return t12
 		end)
 	end
-	local function formatPrefixForUniverseChatTabs(s9: string, s10: string?, p49) -- line: 839
+	local function formatPrefixForUniverseChatTabs(s9: string, s10: string?, p49) -- line: 840
 		-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), computeNameColor (copy), Players (copy)
 		if not GetFFlagTextChatEnableUniverseChatTabs() or (not s10 or #s9 == 0) then
 			return s9
@@ -797,7 +798,7 @@ local function createMessagesStore(p1) -- line: 176
 
 		return `<font color="#{ ((if not p49.TextSource then computeNameColor(not Players.LocalPlayer and "" or Players.LocalPlayer.Name) else computeNameColor(p49.TextSource.Username))):ToHex() }">{ s9 }</font>`
 	end
-	local function rebuildMessageWithTranslation(t13: {[any]: any}, b1: boolean) -- line: 1197
+	local function rebuildMessageWithTranslation(t13: {[any]: any}, b1: boolean) -- line: 1205
 		-- upvalues: getFFlagExpChatTelemetryEventTrigger (copy), FFlagEnableInExpChatRewrite (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatPresetChatEnabled (copy)
 		return {
 			prefixText = t13.prefixText,
@@ -824,117 +825,117 @@ local function createMessagesStore(p1) -- line: 176
 		}
 	end
 
-	function updateNextMessageComponent(s11: string) -- line: 1375
-		-- upvalues: v70 (copy), v72 (copy), v73 (copy), t2 (copy), FFlagEnableInExpChatRewrite (copy), n1 (ref), t3 (copy)
-		local v216 = v70(false)
+	function updateNextMessageComponent(s11: string) -- line: 1383
+		-- upvalues: v71 (copy), v73 (copy), v74 (copy), t2 (copy), FFlagEnableInExpChatRewrite (copy), n1 (ref), t3 (copy)
+		local v217 = v71(false)
 
-		if #v216 == 0 then
+		if #v217 == 0 then
 			return
 		end
 
-		local v217 = v72(false)
-		local v218 = v216[v217]
+		local v218 = v73(false)
+		local v219 = v217[v218]
 
-		if not v218 then
-			v73(1)
+		if not v219 then
+			v74(1)
 
 			return
 		end
 
-		local v219 = t2[v218]
+		local v220 = t2[v219]
 
-		if v219 then
-			v219.setter(s11)
+		if v220 then
+			v220.setter(s11)
 		end
 
-		local v220 = not FFlagEnableInExpChatRewrite and 1 or 10
+		local v221 = not FFlagEnableInExpChatRewrite and 1 or 10
 
-		n1 += v220
+		n1 += v221
 
-		local v221 = t3[v218]
+		local v222 = t3[v219]
 
-		if v221 then
-			v221.setter(n1)
+		if v222 then
+			v222.setter(n1)
 		end
 
-		local v222 = v217 % #v216 + 1
+		local v223 = v218 % #v217 + 1
 
-		v73(v222)
+		v74(v223)
 	end
 
 	return {
-		getByMessageId = if not FFlagExpChatMessagesStoreUseProxy then v47 else v49,
-		getMessages = if not FFlagExpChatMessagesStoreMemoryCleanup then createComputed(function(p50) -- line: 787
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy)
-			local v225 = if not FFlagExpChatMessagesStoreUseProxy then v47(p50) else v49(p50)
+		getByMessageId = if not FFlagExpChatMessagesStoreUseProxy then v48 else v50,
+		getMessages = if not FFlagExpChatMessagesStoreMemoryCleanup then createComputed(function(p50) -- line: 788
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy)
+			local v226 = if not FFlagExpChatMessagesStoreUseProxy then v48(p50) else v50(p50)
 
-			if not v225 then
+			if not v226 then
 				return {}
 			end
 
 			local t14 = {}
 
-			for _, v228 in v225 do
-				table.insert(t14, v228)
+			for _, v229 in v226 do
+				table.insert(t14, v229)
 			end
 
 			return t14
 		end) else nil,
-		getMessagesBySenderId = if not FFlagExpChatMessagesStoreUseProxy then v50 else v52,
-		getWindowMessagesInOrder = v53,
-		getWindowMessagesInOrderByTabId = v55,
-		getMutedUserIds = v59,
-		getCanLocalUserChat = v60,
-		getIsBubbleChatEnabled = v62,
-		getMockUserIdToPartOrModel = v64,
-		getPartOrModelToMockUserId = v66,
-		getMessage = function(s12: string) -- line: 694
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t4 (copy), createComputed (copy)
+		getMessagesBySenderId = if not FFlagExpChatMessagesStoreUseProxy then v51 else v53,
+		getWindowMessagesInOrder = v54,
+		getWindowMessagesInOrderByTabId = v56,
+		getMutedUserIds = v60,
+		getCanLocalUserChat = v61,
+		getIsBubbleChatEnabled = v63,
+		getMockUserIdToPartOrModel = v65,
+		getPartOrModelToMockUserId = v67,
+		getMessage = function(s12: string) -- line: 695
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t4 (copy), createComputed (copy)
 			if FFlagExpChatMessagesStoreUseProxy then
-				return function(p51) -- line: 696
-					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), s12 (copy)
-					return ((if not FFlagExpChatMessagesStoreUseProxy then v47(p51) else v49(p51)))[s12]
+				return function(p51) -- line: 697
+					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), s12 (copy)
+					return ((if not FFlagExpChatMessagesStoreUseProxy then v48(p51) else v50(p51)))[s12]
 				end
 			end
 
 			if not t4[s12] then
-				t4[s12] = createComputed(function(p52) -- line: 702
-					-- upvalues: v47 (copy), s12 (copy)
-					local v264 = v47(p52)
+				t4[s12] = createComputed(function(p52) -- line: 703
+					-- upvalues: v48 (copy), s12 (copy)
+					local v265 = v48(p52)
 
-					if not v264 or not v264[s12] then
+					if not v265 or not v265[s12] then
 						return nil
 					end
 
-					return v264[s12]
+					return v265[s12]
 				end)
 			end
 
 			return t4[s12]
 		end,
 		getUserMessages = if not FFlagExpChatMessagesStoreMemoryCleanup then getUserMessages else nil,
-		getUserBubbleMessages = function(s13: string) -- line: 776
+		getUserBubbleMessages = function(s13: string) -- line: 777
 			-- upvalues: getUserMessageCache (copy)
 			return getUserMessageCache(s13).bubbleMessages
 		end,
 		getUserLastMessage = if not FFlagExpChatMessagesStoreMemoryCleanup then getUserLastMessage else nil,
-		registerMessageComponent = function(s14: string) -- line: 1288
-			-- upvalues: t2 (copy), createSignal (copy), t3 (copy), v71 (copy), List (copy)
+		registerMessageComponent = function(s14: string) -- line: 1296
+			-- upvalues: t2 (copy), createSignal (copy), t3 (copy), v72 (copy), List (copy)
 			if not t2[s14] then
-				local v201, v202 = createSignal(nil)
+				local v202, v203 = createSignal(nil)
 
 				t2[s14] = {
-					getter = v201,
-					setter = v202
+					getter = v202,
+					setter = v203
 				}
 
-				local v203, v204 = createSignal(0)
+				local v204, v205 = createSignal(0)
 
 				t3[s14] = {
-					getter = v203,
-					setter = v204
+					getter = v204,
+					setter = v205
 				}
-				v71(function(p53) -- line: 1303
+				v72(function(p53) -- line: 1311
 					-- upvalues: List (copy), s14 (copy)
 					return List.append(p53, s14)
 				end)
@@ -942,14 +943,14 @@ local function createMessagesStore(p1) -- line: 176
 
 			return t2[s14].getter
 		end,
-		unregisterMessageComponent = function(s15: string) -- line: 1312
-			-- upvalues: v70 (copy), t2 (copy), t3 (copy), v71 (copy), List (copy), v72 (copy), v73 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local v206 = v70(false)
-			local u207 = nil
+		unregisterMessageComponent = function(s15: string) -- line: 1320
+			-- upvalues: v71 (copy), t2 (copy), t3 (copy), v72 (copy), List (copy), v73 (copy), v74 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+			local v207 = v71(false)
+			local u208 = nil
 
-			for i, v in ipairs(v206) do
+			for i, v in ipairs(v207) do
 				if v == s15 then
-					u207 = i
+					u208 = i
 
 					break
 				end
@@ -963,34 +964,34 @@ local function createMessagesStore(p1) -- line: 176
 				t3[s15] = nil
 			end
 
-			if u207 then
-				local function doUnregister() -- line: 1335
-					-- upvalues: v71 (copy), List (copy), s15 (copy), v70 (copy), v72 (copy), v73 (copy), u207 (ref)
-					v71(function(p54) -- line: 1336
+			if u208 then
+				local function doUnregister() -- line: 1343
+					-- upvalues: v72 (copy), List (copy), s15 (copy), v71 (copy), v73 (copy), v74 (copy), u208 (ref)
+					v72(function(p54) -- line: 1344
 						-- upvalues: List (copy), s15 (copy)
-						return List.filter(p54, function(p55) -- line: 1337
+						return List.filter(p54, function(p55) -- line: 1345
 							-- upvalues: s15 (copy)
 							return p55 ~= s15
 						end)
 					end)
 
-					local v421 = v70(false)
-					local v422 = v72(false)
+					local v422 = v71(false)
+					local v423 = v73(false)
 
-					if #v421 == 0 then
-						v73(1)
-
-						return
-					end
-
-					if v422 > u207 then
-						v73(v422 - 1)
+					if #v422 == 0 then
+						v74(1)
 
 						return
 					end
 
-					if v422 > #v421 then
-						v73(1)
+					if v423 > u208 then
+						v74(v423 - 1)
+
+						return
+					end
+
+					if v423 > #v422 then
+						v74(1)
 					end
 				end
 
@@ -1001,28 +1002,28 @@ local function createMessagesStore(p1) -- line: 176
 				end
 			end
 		end,
-		repopulateMessageComponents = function() -- line: 1412
-			-- upvalues: v77 (copy), v55 (copy), v53 (copy), v73 (copy), n1 (ref), updateNextMessageComponent (ref), v70 (copy), v72 (copy), t2 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local function doRepopulate() -- line: 1413
-				-- upvalues: v77 (copy), v55 (copy), v53 (copy), v73 (copy), n1 (ref), updateNextMessageComponent (ref), v70 (copy), v72 (copy), t2 (copy)
-				local v423 = v77(false)
-				local v424 = if not v423 then v53(false) else v55(false)[v423] or {}
+		repopulateMessageComponents = function() -- line: 1420
+			-- upvalues: v78 (copy), v56 (copy), v54 (copy), v74 (copy), n1 (ref), updateNextMessageComponent (ref), v71 (copy), v73 (copy), t2 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+			local function doRepopulate() -- line: 1421
+				-- upvalues: v78 (copy), v56 (copy), v54 (copy), v74 (copy), n1 (ref), updateNextMessageComponent (ref), v71 (copy), v73 (copy), t2 (copy)
+				local v424 = v78(false)
+				local v425 = if not v424 then v54(false) else v56(false)[v424] or {}
 
-				v73(1)
+				v74(1)
 				n1 = 0
 
-				for _, v in ipairs(v424) do
+				for _, v in ipairs(v425) do
 					updateNextMessageComponent(v)
 				end
 
-				local v427 = v70(false)
+				local v428 = v71(false)
 
-				if #v424 < #v427 then
-					for i = v72(false), #v427 do
-						local v429 = t2[v427[i]]
+				if #v425 < #v428 then
+					for i = v73(false), #v428 do
+						local v430 = t2[v428[i]]
 
-						if v429 then
-							v429.setter(nil)
+						if v430 then
+							v430.setter(nil)
 						end
 					end
 				end
@@ -1036,35 +1037,35 @@ local function createMessagesStore(p1) -- line: 176
 
 			doRepopulate()
 		end,
-		getMessageComponentSignal = function(s16: string) -- line: 1363
+		getMessageComponentSignal = function(s16: string) -- line: 1371
 			-- upvalues: t2 (copy)
-			local v212 = t2[s16]
+			local v213 = t2[s16]
 
-			if v212 then
-				return v212.getter
+			if v213 then
+				return v213.getter
 			end
 
 			return nil
 		end,
-		getLayoutOrderSignal = function(s17: string) -- line: 1369
+		getLayoutOrderSignal = function(s17: string) -- line: 1377
 			-- upvalues: t3 (copy)
-			local v214 = t3[s17]
+			local v215 = t3[s17]
 
-			if v214 then
-				return v214.getter
+			if v215 then
+				return v215.getter
 			end
 
 			return nil
 		end,
 		updateNextMessageComponent = updateNextMessageComponent,
-		getMessageComponentRingBuffer = v70,
-		getNextMessageComponentPointer = v72,
-		setActiveChannelFilter = v78,
-		getActiveChannelFilter = v77,
-		setCanLocalUserChat = v61,
-		muteUser = function(s18: string) -- line: 1110
-			-- upvalues: v58 (copy), Set (copy)
-			v58(function(p56) -- line: 1111
+		getMessageComponentRingBuffer = v71,
+		getNextMessageComponentPointer = v73,
+		setActiveChannelFilter = v79,
+		getActiveChannelFilter = v78,
+		setCanLocalUserChat = v62,
+		muteUser = function(s18: string) -- line: 1118
+			-- upvalues: v59 (copy), Set (copy)
+			v59(function(p56) -- line: 1119
 				-- upvalues: Set (copy), s18 (copy)
 				if not p56 then
 					return {}
@@ -1073,9 +1074,9 @@ local function createMessagesStore(p1) -- line: 176
 				return (Set.add(p56, s18))
 			end)
 		end,
-		unmuteUser = function(s19: string) -- line: 1120
-			-- upvalues: v58 (copy), Set (copy)
-			v58(function(p57) -- line: 1121
+		unmuteUser = function(s19: string) -- line: 1128
+			-- upvalues: v59 (copy), Set (copy)
+			v59(function(p57) -- line: 1129
 				-- upvalues: Set (copy), s19 (copy)
 				if not p57 then
 					return {}
@@ -1084,20 +1085,20 @@ local function createMessagesStore(p1) -- line: 176
 				return (Set.subtract(p57, s19))
 			end)
 		end,
-		handlePlayerRemoved = function(s20: string) -- line: 1065
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v51 (copy), Dictionary (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), t9 (copy), v58 (copy), Set (copy), v50 (copy), v64 (copy), v67 (copy), v65 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+		handlePlayerRemoved = function(s20: string) -- line: 1073
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v52 (copy), Dictionary (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), t9 (copy), v59 (copy), Set (copy), v51 (copy), v65 (copy), v68 (copy), v66 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
 			local str = tostring(s20)
 
-			local function doHandlePlayerRemoved() -- line: 1068
-				-- upvalues: str (copy), FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v51 (copy), Dictionary (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), t9 (copy), v58 (copy), Set (copy), v50 (copy), v64 (copy), v67 (copy), v65 (copy)
-				local v373 = str
+			local function doHandlePlayerRemoved() -- line: 1076
+				-- upvalues: str (copy), FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v52 (copy), Dictionary (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), t9 (copy), v59 (copy), Set (copy), v51 (copy), v65 (copy), v68 (copy), v66 (copy)
+				local v374 = str
 
 				if FFlagExpChatMessagesStoreUseProxy then
-					v52[v373] = nil
+					v53[v374] = nil
 				else
-					v51(function(p58) -- line: 346
-						-- upvalues: Dictionary (copy), v373 (copy)
-						return Dictionary.removeKey(p58, v373)
+					v52(function(p58) -- line: 347
+						-- upvalues: Dictionary (copy), v374 (copy)
+						return Dictionary.removeKey(p58, v374)
 					end)
 				end
 
@@ -1105,28 +1106,28 @@ local function createMessagesStore(p1) -- line: 176
 					t9[str] = nil
 				end
 
-				v58(function(p59) -- line: 1076
-					-- upvalues: Set (copy), str (copy), FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v50 (copy), v64 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+				v59(function(p59) -- line: 1084
+					-- upvalues: Set (copy), str (copy), FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v51 (copy), v65 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 					if not p59 then
 						return {}
 					end
 
-					local v647 = Set.has(p59, str)
+					local v648 = Set.has(p59, str)
 
-					if #(((if not FFlagExpChatMessagesStoreUseProxy then v50(false) else v52))[str] or {}) == 0 and not v647 then
+					if #(((if not FFlagExpChatMessagesStoreUseProxy then v51(false) else v53))[str] or {}) == 0 and not v648 then
 						return p59
 					end
 
-					local v648 = v64(false)
+					local v649 = v65(false)
 
-					if v648[str] then
-						local v649 = v648[str]
+					if v649[str] then
+						local v650 = v649[str]
 
-						v67(function(p60) -- line: 1094
-							-- upvalues: Dictionary (copy), v649 (copy)
-							return Dictionary.removeKey(p60, v649)
+						v68(function(p60) -- line: 1102
+							-- upvalues: Dictionary (copy), v650 (copy)
+							return Dictionary.removeKey(p60, v650)
 						end)
-						v65(function(p61) -- line: 1098
+						v66(function(p61) -- line: 1106
 							-- upvalues: Dictionary (copy), str (copy)
 							return Dictionary.removeKey(p61, str)
 						end)
@@ -1143,9 +1144,9 @@ local function createMessagesStore(p1) -- line: 176
 			end
 
 			if FFlagExpChatMessagesStoreUseProxy then
-				v52[str] = nil
+				v53[str] = nil
 			else
-				v51(function(p62) -- line: 346
+				v52(function(p62) -- line: 347
 					-- upvalues: Dictionary (copy), str (copy)
 					return Dictionary.removeKey(p62, str)
 				end)
@@ -1155,28 +1156,28 @@ local function createMessagesStore(p1) -- line: 176
 				t9[str] = nil
 			end
 
-			v58(function(p63) -- line: 1076
-				-- upvalues: Set (copy), str (copy), FFlagExpChatMessagesStoreUseProxy (copy), v52 (copy), v50 (copy), v64 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+			v59(function(p63) -- line: 1084
+				-- upvalues: Set (copy), str (copy), FFlagExpChatMessagesStoreUseProxy (copy), v53 (copy), v51 (copy), v65 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 				if not p63 then
 					return {}
 				end
 
-				local v376 = Set.has(p63, str)
+				local v377 = Set.has(p63, str)
 
-				if #(((if not FFlagExpChatMessagesStoreUseProxy then v50(false) else v52))[str] or {}) == 0 and not v376 then
+				if #(((if not FFlagExpChatMessagesStoreUseProxy then v51(false) else v53))[str] or {}) == 0 and not v377 then
 					return p63
 				end
 
-				local v377 = v64(false)
+				local v378 = v65(false)
 
-				if v377[str] then
-					local v378 = v377[str]
+				if v378[str] then
+					local v379 = v378[str]
 
-					v67(function(p64) -- line: 1094
-						-- upvalues: Dictionary (copy), v378 (copy)
-						return Dictionary.removeKey(p64, v378)
+					v68(function(p64) -- line: 1102
+						-- upvalues: Dictionary (copy), v379 (copy)
+						return Dictionary.removeKey(p64, v379)
 					end)
-					v65(function(p65) -- line: 1098
+					v66(function(p65) -- line: 1106
 						-- upvalues: Dictionary (copy), str (copy)
 						return Dictionary.removeKey(p65, str)
 					end)
@@ -1185,34 +1186,34 @@ local function createMessagesStore(p1) -- line: 176
 				return Set.subtract(p63, str)
 			end)
 		end,
-		clearWindowMessages = function() -- line: 1130
-			-- upvalues: forEachByMessageId (copy), Dictionary (copy), v54 (copy), v56 (copy), FFlagExpChatEnableV2ChatWindow (copy), v73 (copy), n1 (ref), v70 (copy), t2 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local function doClearWindowMessages() -- line: 1131
-				-- upvalues: forEachByMessageId (copy), Dictionary (copy), v54 (copy), v56 (copy), FFlagExpChatEnableV2ChatWindow (copy), v73 (copy), n1 (ref), v70 (copy), t2 (copy)
-				forEachByMessageId(function(_, p67) -- line: 1132
+		clearWindowMessages = function() -- line: 1138
+			-- upvalues: forEachByMessageId (copy), Dictionary (copy), v55 (copy), v57 (copy), FFlagExpChatEnableV2ChatWindow (copy), v74 (copy), n1 (ref), v71 (copy), t2 (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+			local function doClearWindowMessages() -- line: 1139
+				-- upvalues: forEachByMessageId (copy), Dictionary (copy), v55 (copy), v57 (copy), FFlagExpChatEnableV2ChatWindow (copy), v74 (copy), n1 (ref), v71 (copy), t2 (copy)
+				forEachByMessageId(function(_, p67) -- line: 1140
 					-- upvalues: Dictionary (copy)
 					return Dictionary.join(p67, {
 						isVisibleInChatWindow = false
 					})
 				end)
-				v54(function(_) -- line: 1137
+				v55(function(_) -- line: 1145
 					return {}
 				end)
-				v56(function(_) -- line: 1142
+				v57(function(_) -- line: 1150
 					return {}
 				end)
 
 				if FFlagExpChatEnableV2ChatWindow then
-					v73(1)
+					v74(1)
 					n1 = 0
 
-					local v381 = v70(false)
+					local v382 = v71(false)
 
-					for _, v in ipairs(v381) do
-						local v384 = t2[v]
+					for _, v in ipairs(v382) do
+						local v385 = t2[v]
 
-						if v384 then
-							v384.setter(nil)
+						if v385 then
+							v385.setter(nil)
 						end
 					end
 				end
@@ -1226,11 +1227,11 @@ local function createMessagesStore(p1) -- line: 176
 
 			doClearWindowMessages()
 		end,
-		toggleGlobalTranslation = function(b2: boolean) -- line: 1227
+		toggleGlobalTranslation = function(b2: boolean) -- line: 1235
 			-- upvalues: forEachByMessageId (copy), rebuildMessageWithTranslation (copy), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local function doToggleGlobalTranslation() -- line: 1228
+			local function doToggleGlobalTranslation() -- line: 1236
 				-- upvalues: forEachByMessageId (copy), rebuildMessageWithTranslation (copy), b2 (copy)
-				forEachByMessageId(function(_, p71) -- line: 1229
+				forEachByMessageId(function(_, p71) -- line: 1237
 					-- upvalues: rebuildMessageWithTranslation (copy), b2 (copy)
 					return (rebuildMessageWithTranslation(p71, b2))
 				end)
@@ -1242,42 +1243,42 @@ local function createMessagesStore(p1) -- line: 176
 				return
 			end
 
-			forEachByMessageId(function(_, p73) -- line: 1229
+			forEachByMessageId(function(_, p73) -- line: 1237
 				-- upvalues: rebuildMessageWithTranslation (copy), b2 (copy)
 				return (rebuildMessageWithTranslation(p73, b2))
 			end)
 		end,
-		toggleMessageTranslation = function(b3: boolean, s21: string) -- line: 1237
-			-- upvalues: rebuildMessageWithTranslation (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v48 (copy), Dictionary (copy)
-			local function v187(p74) -- line: 1238
+		toggleMessageTranslation = function(b3: boolean, s21: string) -- line: 1245
+			-- upvalues: rebuildMessageWithTranslation (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v49 (copy), Dictionary (copy)
+			local function v188(p74) -- line: 1246
 				-- upvalues: rebuildMessageWithTranslation (copy), b3 (copy)
 				return (rebuildMessageWithTranslation(p74, b3))
 			end
 
 			if FFlagExpChatMessagesStoreUseProxy then
-				local v188 = v49[s21]
+				local v189 = v50[s21]
 
-				if v188 then
-					local v189 = rebuildMessageWithTranslation(v188, b3)
+				if v189 then
+					local v190 = rebuildMessageWithTranslation(v189, b3)
 
-					if v189 then
-						v49[s21] = v189
+					if v190 then
+						v50[s21] = v190
 
 						return
 					end
 				end
 			else
-				v48(function(p75) -- line: 290
-					-- upvalues: s21 (copy), v187 (copy), Dictionary (copy)
+				v49(function(p75) -- line: 291
+					-- upvalues: s21 (copy), v188 (copy), Dictionary (copy)
 					if not p75 or not p75[s21] then
 						return p75 or {}
 					end
 
-					local v395 = v187(p75[s21])
+					local v396 = v188(p75[s21])
 
-					if v395 then
+					if v396 then
 						return Dictionary.join(p75, {
-							[s21] = v395
+							[s21] = v396
 						})
 					end
 
@@ -1285,68 +1286,68 @@ local function createMessagesStore(p1) -- line: 176
 				end)
 			end
 		end,
-		handleIncomingOrOutgoingMessage = function(p76, _: boolean, s22: string?, b5: boolean?) -- line: 862
-			-- upvalues: FFlagEnableInExpChatRewrite (copy), getTextAndTranslation (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), isWhiteSpaceOnly (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), v60 (copy), FFlagExpChatPresetChatEnabled (copy), v59 (copy), Set (copy), FFlagExpChatUseChatConfigStore (copy), GetChatConfigurationStore (copy), ExpChatShared (copy), v62 (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatDisableUniverseBubbleChat (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), formatPrefixForUniverseChatTabs (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagChatLineReportingGlobalMuteEnabled (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local v148, v149
+		handleIncomingOrOutgoingMessage = function(p76, b4: boolean, s22: string?, b5: boolean?) -- line: 863
+			-- upvalues: FFlagEnableInExpChatRewrite (copy), getTextAndTranslation (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), isWhiteSpaceOnly (copy), FFlagExpChatFixLocalUserVerifiedBadge (copy), Players (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), v61 (copy), FFlagExpChatPresetChatEnabled (copy), v60 (copy), Set (copy), FFlagExpChatUseChatConfigStore (copy), GetChatConfigurationStore (copy), ExpChatShared (copy), v63 (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatDisableUniverseBubbleChat (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), formatPrefixForUniverseChatTabs (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagChatLineReportingGlobalMuteEnabled (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+			local v149, v150
 
 			if FFlagEnableInExpChatRewrite then
-				v148, v149 = getTextAndTranslation(p76)
+				v149, v150 = getTextAndTranslation(p76)
 			else
-				v148 = if not getFFlagExpChatProtectedChatInternalAPIs() then p76.Text else p76.TextInternal
-				v149 = if not getFFlagExpChatProtectedChatInternalAPIs() then p76.Translation else p76.TranslationInternal
+				v149 = if not getFFlagExpChatProtectedChatInternalAPIs() then p76.Text else p76.TextInternal
+				v150 = if not getFFlagExpChatProtectedChatInternalAPIs() then p76.Translation else p76.TranslationInternal
 			end
 
-			if isWhiteSpaceOnly(v148) and p76.Status ~= Enum.TextChatMessageStatus.Floodchecked and p76.Status ~= Enum.TextChatMessageStatus.MessageTooLong then
+			if isWhiteSpaceOnly(v149) and p76.Status ~= Enum.TextChatMessageStatus.Floodchecked and p76.Status ~= Enum.TextChatMessageStatus.MessageTooLong then
 				return
 			end
 
-			local v150 = if not p76.TextSource then nil else tostring(p76.TextSource.UserId)
+			local v151 = if not p76.TextSource then if not FFlagExpChatFixLocalUserVerifiedBadge or (not b4 or not Players.LocalPlayer) then nil else tostring(Players.LocalPlayer.UserId) else tostring(p76.TextSource.UserId)
 
-			if not if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49 then
+			if not if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50 then
 				return
 			end
 
-			local v151 = v60(false)
-			local v152 = v150 == nil or (v151 or not not FFlagExpChatPresetChatEnabled and (p76.PresetId or "") ~= "") and (p76.Status == Enum.TextChatMessageStatus.Success or p76.Status == Enum.TextChatMessageStatus.Sending)
-			local v153 = not not v150 and (not not v59(false) and Set.has(v59(false), v150))
-			local v154 = v152 and not v153
-			local v155 = false
-			local v156
+			local v152 = v61(false)
+			local v153 = v151 == nil or (v152 or not not FFlagExpChatPresetChatEnabled and (p76.PresetId or "") ~= "") and (p76.Status == Enum.TextChatMessageStatus.Success or p76.Status == Enum.TextChatMessageStatus.Sending)
+			local v154 = not not v151 and (not not v60(false) and Set.has(v60(false), v151))
+			local v155 = v153 and not v154
+			local v156 = false
+			local v157
 
 			if FFlagExpChatUseChatConfigStore then
-				v156 = GetChatConfigurationStore(false).getIsBubbleChatEnabled(false)
+				v157 = GetChatConfigurationStore(false).getIsBubbleChatEnabled(false)
 			else
-				local v157 = ExpChatShared.context and ExpChatShared.context.store
+				local v158 = ExpChatShared.context and ExpChatShared.context.store
 
-				v156 = if not v157 then v62(false) else v157:getState().Messages.isBubbleChatEnabled
+				v157 = if not v158 then v63(false) else v158:getState().Messages.isBubbleChatEnabled
 			end
 
-			if v156 and v154 and (not FFlagEnableInExpChatSummaryOnLua or v150 ~= nil) and (p76.Status == Enum.TextChatMessageStatus.Success or p76.Status == Enum.TextChatMessageStatus.Sending) then
-				v155 = true
+			if v157 and v155 and (not FFlagEnableInExpChatSummaryOnLua or v151 ~= nil) and (p76.Status == Enum.TextChatMessageStatus.Success or p76.Status == Enum.TextChatMessageStatus.Sending) then
+				v156 = true
 			end
 
 			if FFlagExpChatDisableUniverseBubbleChat and GetFFlagTextChatEnableUniverseChatTabs() and b5 == true then
-				v155 = false
+				v156 = false
 			end
 
 			if p76.Status ~= Enum.TextChatMessageStatus.Success and p76.Status ~= Enum.TextChatMessageStatus.Sending then
-				v154 = false
 				v155 = false
+				v156 = false
 			end
 
-			local v158 = formatPrefixForUniverseChatTabs(if not getFFlagExpChatProtectedChatInternalAPIs() then p76.PrefixText else p76.PrefixTextInternal, s22, p76)
+			local v159 = formatPrefixForUniverseChatTabs(if not getFFlagExpChatProtectedChatInternalAPIs() then p76.PrefixText else p76.PrefixTextInternal, s22, p76)
 			local t15 = {
 				shouldOverrideBubbleChatSettings = false,
-				userId = v150,
-				prefixText = v158,
-				text = v148,
-				translation = v149,
-				useTranslation = getChatTranslationEnabled() and v149 ~= nil,
+				userId = v151,
+				prefixText = v159,
+				text = v149,
+				translation = v150,
+				useTranslation = getChatTranslationEnabled() and v150 ~= nil,
 				messageId = p76.MessageId,
 				status = p76.Status,
 				timestamp = p76.Timestamp,
-				isVisibleInBubbleChat = v155,
-				isVisibleInChatWindow = v154,
+				isVisibleInBubbleChat = v156,
+				isVisibleInChatWindow = v155,
 				textChannel = p76.TextChannel,
 				bubbleChatMessageProperties = p76.BubbleChatMessageProperties,
 				chatWindowMessageProperties = p76.ChatWindowMessageProperties,
@@ -1360,42 +1361,42 @@ local function createMessagesStore(p1) -- line: 176
 				presetId = if not FFlagExpChatPresetChatEnabled then nil else p76.PresetId,
 				presetChatVersion = if not FFlagExpChatPresetChatEnabled then nil else p76.PresetChatVersion
 			}
-			local v160 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
-			local v161 = v160 and v160[t15.messageId] ~= nil
+			local v161 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
+			local v162 = v161 and v161[t15.messageId] ~= nil
 
-			if t15.isVisibleInChatWindow or t15.isVisibleInBubbleChat or v161 then
-				local function v162() -- line: 396
-					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t15 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref)
-					local v310 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
+			if t15.isVisibleInChatWindow or t15.isVisibleInBubbleChat or v162 then
+				local function v163() -- line: 397
+					-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t15 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref)
+					local v311 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
 
-					if v310 and v310[t15.messageId] then
+					if v311 and v311[t15.messageId] then
 						if FFlagExpChatEvictFloodcheckedFromWindowOrder and (t15.status == Enum.TextChatMessageStatus.Floodchecked or t15.status == Enum.TextChatMessageStatus.MessageTooLong) then
-							v54(function(p77) -- line: 407
+							v55(function(p77) -- line: 408
 								-- upvalues: List (copy), t15 (copy)
-								return List.filter(p77, function(p78) -- line: 408
+								return List.filter(p77, function(p78) -- line: 409
 									-- upvalues: t15 (copy)
 									return p78 ~= t15.messageId
 								end)
 							end)
 
-							local v311 = resolveChannelNameForMapOrder(t15, t15.channelNameOverride)
+							local v312 = resolveChannelNameForMapOrder(t15, t15.channelNameOverride)
 
-							if v311 then
-								v56(function(p79) -- line: 415
-									-- upvalues: v311 (copy), List (copy), t15 (copy), Dictionary (copy)
-									local v518 = p79[v311]
+							if v312 then
+								v57(function(p79) -- line: 416
+									-- upvalues: v312 (copy), List (copy), t15 (copy), Dictionary (copy)
+									local v519 = p79[v312]
 
-									if not v518 then
+									if not v519 then
 										return p79
 									end
 
-									local v519 = List.filter(v518, function(p80) -- line: 420
+									local v520 = List.filter(v519, function(p80) -- line: 421
 										-- upvalues: t15 (copy)
 										return p80 ~= t15.messageId
 									end)
 
 									return Dictionary.join(p79, {
-										[v311] = v519
+										[v312] = v520
 									})
 								end)
 							end
@@ -1403,9 +1404,9 @@ local function createMessagesStore(p1) -- line: 176
 							local messageId = t15.messageId
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v49[messageId] = nil
+								v50[messageId] = nil
 							else
-								v48(function(p81) -- line: 273
+								v49(function(p81) -- line: 274
 									-- upvalues: Dictionary (copy), messageId (copy)
 									return Dictionary.removeKey(p81, messageId)
 								end)
@@ -1414,43 +1415,43 @@ local function createMessagesStore(p1) -- line: 176
 							if t15.userId then
 								local userId = t15.userId
 
-								local function v314(p82) -- line: 432
+								local function v315(p82) -- line: 433
 									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), t15 (copy)
 									if not p82 then
 										return nil
 									end
 
-									local v522 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p82, function(p83) -- line: 442
+									local v523 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p82, function(p83) -- line: 443
 										-- upvalues: t15 (copy)
 										return p83.messageId ~= t15.messageId
-									end) else List.filter(p82, function(p84) -- line: 438
+									end) else List.filter(p82, function(p84) -- line: 439
 										-- upvalues: t15 (copy)
 										return p84 ~= t15.messageId
 									end)
 
-									if #v522 == 0 then
+									if #v523 == 0 then
 										return nil
 									end
 
-									return v522
+									return v523
 								end
 
 								if FFlagExpChatMessagesStoreUseProxy then
-									v52[userId] = v314(v52[userId])
+									v53[userId] = v315(v53[userId])
 
 									return
 								end
 
-								v51(function(p85) -- line: 357
-									-- upvalues: v314 (copy), userId (copy), Dictionary (copy)
-									local v524 = v314(p85[userId])
+								v52(function(p85) -- line: 358
+									-- upvalues: v315 (copy), userId (copy), Dictionary (copy)
+									local v525 = v315(p85[userId])
 
-									if v524 == nil then
+									if v525 == nil then
 										return Dictionary.removeKey(p85, userId)
 									end
 
 									return Dictionary.join(p85, {
-										[userId] = v524
+										[userId] = v525
 									})
 								end)
 							end
@@ -1463,45 +1464,45 @@ local function createMessagesStore(p1) -- line: 176
 						if not FFlagExpChatMessagesStoreMemoryCleanup and t15.userId then
 							local userId = t15.userId
 
-							local function v316(p86) -- line: 461
+							local function v317(p86) -- line: 462
 								-- upvalues: t15 (copy), List (copy)
 								if not p86 then
 									return nil
 								end
 
-								local v526 = nil
+								local v527 = nil
 
 								for i, v in ipairs(p86) do
 									if v.messageId == t15.messageId then
-										v526 = i
+										v527 = i
 
 										break
 									end
 								end
 
-								if v526 then
-									return List.set(p86, v526, t15)
+								if v527 then
+									return List.set(p86, v527, t15)
 								end
 
 								return p86
 							end
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v52[userId] = v316(v52[userId])
+								v53[userId] = v317(v53[userId])
 
 								return
 							end
 
-							v51(function(p87) -- line: 357
-								-- upvalues: v316 (copy), userId (copy), Dictionary (copy)
-								local v530 = v316(p87[userId])
+							v52(function(p87) -- line: 358
+								-- upvalues: v317 (copy), userId (copy), Dictionary (copy)
+								local v531 = v317(p87[userId])
 
-								if v530 == nil then
+								if v531 == nil then
 									return Dictionary.removeKey(p87, userId)
 								end
 
 								return Dictionary.join(p87, {
-									[userId] = v530
+									[userId] = v531
 								})
 							end)
 						end
@@ -1513,17 +1514,17 @@ local function createMessagesStore(p1) -- line: 176
 					local partOrModel = t15.partOrModel
 
 					if not userId and partOrModel then
-						userId = v66(false)[partOrModel]
+						userId = v67(false)[partOrModel]
 
 						if not userId then
 							userId = HttpService:GenerateGUID(false)
-							v65(function(p88) -- line: 496
+							v66(function(p88) -- line: 497
 								-- upvalues: Dictionary (copy), userId (ref), partOrModel (copy)
 								return Dictionary.join(p88, {
 									[userId] = partOrModel
 								})
 							end)
-							v67(function(p89) -- line: 503
+							v68(function(p89) -- line: 504
 								-- upvalues: Dictionary (copy), partOrModel (copy), userId (ref)
 								return Dictionary.join(p89, {
 									[partOrModel] = userId
@@ -1532,231 +1533,231 @@ local function createMessagesStore(p1) -- line: 176
 						end
 					end
 
-					local v319 = if userId == t15.userId then t15 else Dictionary.join(t15, {
+					local v320 = if userId == t15.userId then t15 else Dictionary.join(t15, {
 						userId = userId
 					})
 					local channelNameOverride = nil
 
-					if GetFFlagTextChatEnableUniverseChatTabs() and v319.channelNameOverride then
-						channelNameOverride = v319.channelNameOverride
-					elseif v319.textChannel then
-						channelNameOverride = if v319.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v68(false)) then v319.textChannel.Name else "RBXGeneral"
+					if GetFFlagTextChatEnableUniverseChatTabs() and v320.channelNameOverride then
+						channelNameOverride = v320.channelNameOverride
+					elseif v320.textChannel then
+						channelNameOverride = if v320.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v69(false)) then v320.textChannel.Name else "RBXGeneral"
 					end
 
-					if v319.isVisibleInChatWindow then
-						local v321 = v53(false)
-						local v322 = if not channelNameOverride then {} else v55(false)[channelNameOverride] or {}
+					if v320.isVisibleInChatWindow then
+						local v322 = v54(false)
+						local v323 = if not channelNameOverride then {} else v56(false)[channelNameOverride] or {}
 
-						if #v321 >= t1.messageLimit then
-							local v323 = v321[1]
-							local v324 = v310 and v310[v323]
+						if #v322 >= t1.messageLimit then
+							local v324 = v322[1]
+							local v325 = v311 and v311[v324]
 
-							if v324 then
+							if v325 then
 								if not FFlagExpChatMessagesStoreKeepInByMessageId then
 									if FFlagExpChatMessagesStoreUseProxy then
-										v49[v323] = nil
+										v50[v324] = nil
 									else
-										v48(function(p90) -- line: 273
-											-- upvalues: Dictionary (copy), v323 (copy)
-											return Dictionary.removeKey(p90, v323)
+										v49(function(p90) -- line: 274
+											-- upvalues: Dictionary (copy), v324 (copy)
+											return Dictionary.removeKey(p90, v324)
 										end)
 									end
 								end
 
-								if v324.userId then
-									local userId4 = v324.userId
+								if v325.userId then
+									local userId4 = v325.userId
 
-									local function v326(p91) -- line: 550
-										-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v323 (copy), v64 (copy), v324 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+									local function v327(p91) -- line: 551
+										-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v324 (copy), v65 (copy), v325 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 										if not p91 then
 											return nil
 										end
 
-										local v535 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p91, function(p92) -- line: 560
-											-- upvalues: v323 (copy)
-											return p92.messageId ~= v323
-										end) else List.filter(p91, function(p93) -- line: 556
-											-- upvalues: v323 (copy)
-											return p93 ~= v323
+										local v536 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p91, function(p92) -- line: 561
+											-- upvalues: v324 (copy)
+											return p92.messageId ~= v324
+										end) else List.filter(p91, function(p93) -- line: 557
+											-- upvalues: v324 (copy)
+											return p93 ~= v324
 										end)
 
-										if #v535 == 0 then
-											local v536 = v64(false)
+										if #v536 == 0 then
+											local v537 = v65(false)
 
-											if v536[v324.userId] then
-												local v537 = v536[v324.userId]
+											if v537[v325.userId] then
+												local v538 = v537[v325.userId]
 
-												v67(function(p94) -- line: 571
-													-- upvalues: Dictionary (copy), v537 (copy)
-													return Dictionary.removeKey(p94, v537)
+												v68(function(p94) -- line: 572
+													-- upvalues: Dictionary (copy), v538 (copy)
+													return Dictionary.removeKey(p94, v538)
 												end)
-												v65(function(p95) -- line: 575
-													-- upvalues: Dictionary (copy), v324 (copy)
-													return Dictionary.removeKey(p95, v324.userId)
+												v66(function(p95) -- line: 576
+													-- upvalues: Dictionary (copy), v325 (copy)
+													return Dictionary.removeKey(p95, v325.userId)
 												end)
 											end
 
 											return nil
 										end
 
-										return v535
+										return v536
 									end
 
 									if FFlagExpChatMessagesStoreUseProxy then
-										v52[userId4] = v326(v52[userId4])
+										v53[userId4] = v327(v53[userId4])
 									else
-										v51(function(p96) -- line: 357
-											-- upvalues: v326 (copy), userId4 (copy), Dictionary (copy)
-											local v539 = v326(p96[userId4])
+										v52(function(p96) -- line: 358
+											-- upvalues: v327 (copy), userId4 (copy), Dictionary (copy)
+											local v540 = v327(p96[userId4])
 
-											if v539 == nil then
+											if v540 == nil then
 												return Dictionary.removeKey(p96, userId4)
 											end
 
 											return Dictionary.join(p96, {
-												[userId4] = v539
+												[userId4] = v540
 											})
 										end)
 									end
 								end
 
-								v54(function(p97) -- line: 587
+								v55(function(p97) -- line: 588
 									-- upvalues: List (copy)
 									return List.removeIndex(p97, 1)
 								end)
 
 								if FFlagExpChatMessagesStoreMemoryCleanup then
-									t4[v323] = nil
+									t4[v324] = nil
 								end
 							end
 						end
 
-						if channelNameOverride and #v322 >= t1.messageLimit then
-							local v327 = v322[1]
+						if channelNameOverride and #v323 >= t1.messageLimit then
+							local v328 = v323[1]
 
-							if v327 then
-								v56(function(p98) -- line: 601
+							if v328 then
+								v57(function(p98) -- line: 602
 									-- upvalues: channelNameOverride (ref), List (copy), Dictionary (copy)
-									local v542 = p98[channelNameOverride] or {}
-									local v543 = List.removeIndex(v542, 1)
+									local v543 = p98[channelNameOverride] or {}
+									local v544 = List.removeIndex(v543, 1)
 
 									return Dictionary.join(p98, {
-										[channelNameOverride] = v543
+										[channelNameOverride] = v544
 									})
 								end)
 
-								if v310 and v310[v327] then
+								if v311 and v311[v328] then
 									if FFlagExpChatMessagesStoreUseProxy then
-										v49[v327] = nil
+										v50[v328] = nil
 									else
-										v48(function(p99) -- line: 273
-											-- upvalues: Dictionary (copy), v327 (copy)
-											return Dictionary.removeKey(p99, v327)
+										v49(function(p99) -- line: 274
+											-- upvalues: Dictionary (copy), v328 (copy)
+											return Dictionary.removeKey(p99, v328)
 										end)
 									end
 								end
 
 								if FFlagExpChatMessagesStoreMemoryCleanup then
-									t4[v327] = nil
+									t4[v328] = nil
 								end
 							end
 						end
 					end
 
-					writeByMessageId(v319.messageId, v319)
+					writeByMessageId(v320.messageId, v320)
 
-					if v319.userId then
-						local userId5 = v319.userId
+					if v320.userId then
+						local userId5 = v320.userId
 
-						local function v329(p100) -- line: 623
-							-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v319 (copy), List (copy)
-							local v546 = p100 or {}
-							local v547 = false
+						local function v330(p100) -- line: 624
+							-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v320 (copy), List (copy)
+							local v547 = p100 or {}
+							local v548 = false
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								for _, v in ipairs(v546) do
-									if v == v319.messageId then
-										v547 = true
+								for _, v in ipairs(v547) do
+									if v == v320.messageId then
+										v548 = true
 
 										break
 									end
 								end
 							else
-								for _, v in ipairs(v546) do
-									if v.messageId == v319.messageId then
-										v547 = true
+								for _, v in ipairs(v547) do
+									if v.messageId == v320.messageId then
+										v548 = true
 
 										break
 									end
 								end
 							end
 
-							if not v547 then
-								local v552 = if not FFlagExpChatMessagesStoreMemoryCleanup then v319 else v319.messageId
+							if not v548 then
+								local v553 = if not FFlagExpChatMessagesStoreMemoryCleanup then v320 else v320.messageId
 
-								return List.append(v546, v552)
+								return List.append(v547, v553)
 							end
 
-							return v546
+							return v547
 						end
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v52[userId5] = v329(v52[userId5])
+							v53[userId5] = v330(v53[userId5])
 						else
-							v51(function(p101) -- line: 357
-								-- upvalues: v329 (copy), userId5 (copy), Dictionary (copy)
-								local v554 = v329(p101[userId5])
+							v52(function(p101) -- line: 358
+								-- upvalues: v330 (copy), userId5 (copy), Dictionary (copy)
+								local v555 = v330(p101[userId5])
 
-								if v554 == nil then
+								if v555 == nil then
 									return Dictionary.removeKey(p101, userId5)
 								end
 
 								return Dictionary.join(p101, {
-									[userId5] = v554
+									[userId5] = v555
 								})
 							end)
 						end
 					end
 
-					if v319.isVisibleInChatWindow then
-						v54(function(p102) -- line: 656
-							-- upvalues: List (copy), v319 (copy)
-							return List.append(p102, v319.messageId)
+					if v320.isVisibleInChatWindow then
+						v55(function(p102) -- line: 657
+							-- upvalues: List (copy), v320 (copy)
+							return List.append(p102, v320.messageId)
 						end)
 
 						if channelNameOverride then
-							v56(function(p103) -- line: 662
-								-- upvalues: channelNameOverride (ref), List (copy), v319 (copy), Dictionary (copy)
-								local v557 = p103[channelNameOverride] or {}
-								local v558 = List.append(v557, v319.messageId)
+							v57(function(p103) -- line: 663
+								-- upvalues: channelNameOverride (ref), List (copy), v320 (copy), Dictionary (copy)
+								local v558 = p103[channelNameOverride] or {}
+								local v559 = List.append(v558, v320.messageId)
 
 								return Dictionary.join(p103, {
-									[channelNameOverride] = v558
+									[channelNameOverride] = v559
 								})
 							end)
 						end
 
 						if FFlagExpChatEnableV2ChatWindow then
-							local v330 = v77(false)
+							local v331 = v78(false)
 
-							if v330 == nil or v330 == channelNameOverride then
-								updateNextMessageComponent(v319.messageId)
+							if v331 == nil or v331 == channelNameOverride then
+								updateNextMessageComponent(v320.messageId)
 							end
 						end
 					end
 				end
 
 				if FFlagExpChatMessagesStoreBatch then
-					SignalsExperimental.batch(v162)
+					SignalsExperimental.batch(v163)
 
 					return
 				end
 
-				v162()
+				v163()
 			end
 		end,
-		handleIncomingBubbleChatMessage = function(t16: {[any]: any}) -- line: 1009
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+		handleIncomingBubbleChatMessage = function(t16: {[any]: any}) -- line: 1017
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
 			local t17 = {
 				prefixText = "",
 				textChannel = nil,
@@ -1775,38 +1776,38 @@ local function createMessagesStore(p1) -- line: 176
 				bubbleChatMessageProperties = t16.bubbleChatMessageProperties
 			}
 
-			local function v165() -- line: 396
-				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t17 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref)
-				local v331 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
+			local function v166() -- line: 397
+				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t17 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref)
+				local v332 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
 
-				if v331 and v331[t17.messageId] then
+				if v332 and v332[t17.messageId] then
 					if FFlagExpChatEvictFloodcheckedFromWindowOrder and (t17.status == Enum.TextChatMessageStatus.Floodchecked or t17.status == Enum.TextChatMessageStatus.MessageTooLong) then
-						v54(function(p104) -- line: 407
+						v55(function(p104) -- line: 408
 							-- upvalues: List (copy), t17 (copy)
-							return List.filter(p104, function(p105) -- line: 408
+							return List.filter(p104, function(p105) -- line: 409
 								-- upvalues: t17 (copy)
 								return p105 ~= t17.messageId
 							end)
 						end)
 
-						local v332 = resolveChannelNameForMapOrder(t17, t17.channelNameOverride)
+						local v333 = resolveChannelNameForMapOrder(t17, t17.channelNameOverride)
 
-						if v332 then
-							v56(function(p106) -- line: 415
-								-- upvalues: v332 (copy), List (copy), t17 (copy), Dictionary (copy)
-								local v561 = p106[v332]
+						if v333 then
+							v57(function(p106) -- line: 416
+								-- upvalues: v333 (copy), List (copy), t17 (copy), Dictionary (copy)
+								local v562 = p106[v333]
 
-								if not v561 then
+								if not v562 then
 									return p106
 								end
 
-								local v562 = List.filter(v561, function(p107) -- line: 420
+								local v563 = List.filter(v562, function(p107) -- line: 421
 									-- upvalues: t17 (copy)
 									return p107 ~= t17.messageId
 								end)
 
 								return Dictionary.join(p106, {
-									[v332] = v562
+									[v333] = v563
 								})
 							end)
 						end
@@ -1814,9 +1815,9 @@ local function createMessagesStore(p1) -- line: 176
 						local messageId = t17.messageId
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v49[messageId] = nil
+							v50[messageId] = nil
 						else
-							v48(function(p108) -- line: 273
+							v49(function(p108) -- line: 274
 								-- upvalues: Dictionary (copy), messageId (copy)
 								return Dictionary.removeKey(p108, messageId)
 							end)
@@ -1825,43 +1826,43 @@ local function createMessagesStore(p1) -- line: 176
 						if t17.userId then
 							local userId = t17.userId
 
-							local function v335(p109) -- line: 432
+							local function v336(p109) -- line: 433
 								-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), t17 (copy)
 								if not p109 then
 									return nil
 								end
 
-								local v565 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p109, function(p110) -- line: 442
+								local v566 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p109, function(p110) -- line: 443
 									-- upvalues: t17 (copy)
 									return p110.messageId ~= t17.messageId
-								end) else List.filter(p109, function(p111) -- line: 438
+								end) else List.filter(p109, function(p111) -- line: 439
 									-- upvalues: t17 (copy)
 									return p111 ~= t17.messageId
 								end)
 
-								if #v565 == 0 then
+								if #v566 == 0 then
 									return nil
 								end
 
-								return v565
+								return v566
 							end
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v52[userId] = v335(v52[userId])
+								v53[userId] = v336(v53[userId])
 
 								return
 							end
 
-							v51(function(p112) -- line: 357
-								-- upvalues: v335 (copy), userId (copy), Dictionary (copy)
-								local v567 = v335(p112[userId])
+							v52(function(p112) -- line: 358
+								-- upvalues: v336 (copy), userId (copy), Dictionary (copy)
+								local v568 = v336(p112[userId])
 
-								if v567 == nil then
+								if v568 == nil then
 									return Dictionary.removeKey(p112, userId)
 								end
 
 								return Dictionary.join(p112, {
-									[userId] = v567
+									[userId] = v568
 								})
 							end)
 						end
@@ -1874,45 +1875,45 @@ local function createMessagesStore(p1) -- line: 176
 					if not FFlagExpChatMessagesStoreMemoryCleanup and t17.userId then
 						local userId = t17.userId
 
-						local function v337(p113) -- line: 461
+						local function v338(p113) -- line: 462
 							-- upvalues: t17 (copy), List (copy)
 							if not p113 then
 								return nil
 							end
 
-							local v569 = nil
+							local v570 = nil
 
 							for i, v in ipairs(p113) do
 								if v.messageId == t17.messageId then
-									v569 = i
+									v570 = i
 
 									break
 								end
 							end
 
-							if v569 then
-								return List.set(p113, v569, t17)
+							if v570 then
+								return List.set(p113, v570, t17)
 							end
 
 							return p113
 						end
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v52[userId] = v337(v52[userId])
+							v53[userId] = v338(v53[userId])
 
 							return
 						end
 
-						v51(function(p114) -- line: 357
-							-- upvalues: v337 (copy), userId (copy), Dictionary (copy)
-							local v573 = v337(p114[userId])
+						v52(function(p114) -- line: 358
+							-- upvalues: v338 (copy), userId (copy), Dictionary (copy)
+							local v574 = v338(p114[userId])
 
-							if v573 == nil then
+							if v574 == nil then
 								return Dictionary.removeKey(p114, userId)
 							end
 
 							return Dictionary.join(p114, {
-								[userId] = v573
+								[userId] = v574
 							})
 						end)
 					end
@@ -1924,17 +1925,17 @@ local function createMessagesStore(p1) -- line: 176
 				local partOrModel = t17.partOrModel
 
 				if not userId and partOrModel then
-					userId = v66(false)[partOrModel]
+					userId = v67(false)[partOrModel]
 
 					if not userId then
 						userId = HttpService:GenerateGUID(false)
-						v65(function(p115) -- line: 496
+						v66(function(p115) -- line: 497
 							-- upvalues: Dictionary (copy), userId (ref), partOrModel (copy)
 							return Dictionary.join(p115, {
 								[userId] = partOrModel
 							})
 						end)
-						v67(function(p116) -- line: 503
+						v68(function(p116) -- line: 504
 							-- upvalues: Dictionary (copy), partOrModel (copy), userId (ref)
 							return Dictionary.join(p116, {
 								[partOrModel] = userId
@@ -1943,232 +1944,232 @@ local function createMessagesStore(p1) -- line: 176
 					end
 				end
 
-				local v340 = if userId == t17.userId then t17 else Dictionary.join(t17, {
+				local v341 = if userId == t17.userId then t17 else Dictionary.join(t17, {
 					userId = userId
 				})
 				local channelNameOverride = nil
 
-				if GetFFlagTextChatEnableUniverseChatTabs() and v340.channelNameOverride then
-					channelNameOverride = v340.channelNameOverride
-				elseif v340.textChannel then
-					channelNameOverride = if v340.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v68(false)) then v340.textChannel.Name else "RBXGeneral"
+				if GetFFlagTextChatEnableUniverseChatTabs() and v341.channelNameOverride then
+					channelNameOverride = v341.channelNameOverride
+				elseif v341.textChannel then
+					channelNameOverride = if v341.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v69(false)) then v341.textChannel.Name else "RBXGeneral"
 				end
 
-				if v340.isVisibleInChatWindow then
-					local v342 = v53(false)
-					local v343 = if not channelNameOverride then {} else v55(false)[channelNameOverride] or {}
+				if v341.isVisibleInChatWindow then
+					local v343 = v54(false)
+					local v344 = if not channelNameOverride then {} else v56(false)[channelNameOverride] or {}
 
-					if #v342 >= t1.messageLimit then
-						local v344 = v342[1]
-						local v345 = v331 and v331[v344]
+					if #v343 >= t1.messageLimit then
+						local v345 = v343[1]
+						local v346 = v332 and v332[v345]
 
-						if v345 then
+						if v346 then
 							if not FFlagExpChatMessagesStoreKeepInByMessageId then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v344] = nil
+									v50[v345] = nil
 								else
-									v48(function(p117) -- line: 273
-										-- upvalues: Dictionary (copy), v344 (copy)
-										return Dictionary.removeKey(p117, v344)
+									v49(function(p117) -- line: 274
+										-- upvalues: Dictionary (copy), v345 (copy)
+										return Dictionary.removeKey(p117, v345)
 									end)
 								end
 							end
 
-							if v345.userId then
-								local userId6 = v345.userId
+							if v346.userId then
+								local userId6 = v346.userId
 
-								local function v347(p118) -- line: 550
-									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v344 (copy), v64 (copy), v345 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+								local function v348(p118) -- line: 551
+									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v345 (copy), v65 (copy), v346 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 									if not p118 then
 										return nil
 									end
 
-									local v578 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p118, function(p119) -- line: 560
-										-- upvalues: v344 (copy)
-										return p119.messageId ~= v344
-									end) else List.filter(p118, function(p120) -- line: 556
-										-- upvalues: v344 (copy)
-										return p120 ~= v344
+									local v579 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p118, function(p119) -- line: 561
+										-- upvalues: v345 (copy)
+										return p119.messageId ~= v345
+									end) else List.filter(p118, function(p120) -- line: 557
+										-- upvalues: v345 (copy)
+										return p120 ~= v345
 									end)
 
-									if #v578 == 0 then
-										local v579 = v64(false)
+									if #v579 == 0 then
+										local v580 = v65(false)
 
-										if v579[v345.userId] then
-											local v580 = v579[v345.userId]
+										if v580[v346.userId] then
+											local v581 = v580[v346.userId]
 
-											v67(function(p121) -- line: 571
-												-- upvalues: Dictionary (copy), v580 (copy)
-												return Dictionary.removeKey(p121, v580)
+											v68(function(p121) -- line: 572
+												-- upvalues: Dictionary (copy), v581 (copy)
+												return Dictionary.removeKey(p121, v581)
 											end)
-											v65(function(p122) -- line: 575
-												-- upvalues: Dictionary (copy), v345 (copy)
-												return Dictionary.removeKey(p122, v345.userId)
+											v66(function(p122) -- line: 576
+												-- upvalues: Dictionary (copy), v346 (copy)
+												return Dictionary.removeKey(p122, v346.userId)
 											end)
 										end
 
 										return nil
 									end
 
-									return v578
+									return v579
 								end
 
 								if FFlagExpChatMessagesStoreUseProxy then
-									v52[userId6] = v347(v52[userId6])
+									v53[userId6] = v348(v53[userId6])
 								else
-									v51(function(p123) -- line: 357
-										-- upvalues: v347 (copy), userId6 (copy), Dictionary (copy)
-										local v582 = v347(p123[userId6])
+									v52(function(p123) -- line: 358
+										-- upvalues: v348 (copy), userId6 (copy), Dictionary (copy)
+										local v583 = v348(p123[userId6])
 
-										if v582 == nil then
+										if v583 == nil then
 											return Dictionary.removeKey(p123, userId6)
 										end
 
 										return Dictionary.join(p123, {
-											[userId6] = v582
+											[userId6] = v583
 										})
 									end)
 								end
 							end
 
-							v54(function(p124) -- line: 587
+							v55(function(p124) -- line: 588
 								-- upvalues: List (copy)
 								return List.removeIndex(p124, 1)
 							end)
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v344] = nil
+								t4[v345] = nil
 							end
 						end
 					end
 
-					if channelNameOverride and #v343 >= t1.messageLimit then
-						local v348 = v343[1]
+					if channelNameOverride and #v344 >= t1.messageLimit then
+						local v349 = v344[1]
 
-						if v348 then
-							v56(function(p125) -- line: 601
+						if v349 then
+							v57(function(p125) -- line: 602
 								-- upvalues: channelNameOverride (ref), List (copy), Dictionary (copy)
-								local v585 = p125[channelNameOverride] or {}
-								local v586 = List.removeIndex(v585, 1)
+								local v586 = p125[channelNameOverride] or {}
+								local v587 = List.removeIndex(v586, 1)
 
 								return Dictionary.join(p125, {
-									[channelNameOverride] = v586
+									[channelNameOverride] = v587
 								})
 							end)
 
-							if v331 and v331[v348] then
+							if v332 and v332[v349] then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v348] = nil
+									v50[v349] = nil
 								else
-									v48(function(p126) -- line: 273
-										-- upvalues: Dictionary (copy), v348 (copy)
-										return Dictionary.removeKey(p126, v348)
+									v49(function(p126) -- line: 274
+										-- upvalues: Dictionary (copy), v349 (copy)
+										return Dictionary.removeKey(p126, v349)
 									end)
 								end
 							end
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v348] = nil
+								t4[v349] = nil
 							end
 						end
 					end
 				end
 
-				writeByMessageId(v340.messageId, v340)
+				writeByMessageId(v341.messageId, v341)
 
-				if v340.userId then
-					local userId7 = v340.userId
+				if v341.userId then
+					local userId7 = v341.userId
 
-					local function v350(p127) -- line: 623
-						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v340 (copy), List (copy)
-						local v589 = p127 or {}
-						local v590 = false
+					local function v351(p127) -- line: 624
+						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v341 (copy), List (copy)
+						local v590 = p127 or {}
+						local v591 = false
 
 						if FFlagExpChatMessagesStoreMemoryCleanup then
-							for _, v in ipairs(v589) do
-								if v == v340.messageId then
-									v590 = true
+							for _, v in ipairs(v590) do
+								if v == v341.messageId then
+									v591 = true
 
 									break
 								end
 							end
 						else
-							for _, v in ipairs(v589) do
-								if v.messageId == v340.messageId then
-									v590 = true
+							for _, v in ipairs(v590) do
+								if v.messageId == v341.messageId then
+									v591 = true
 
 									break
 								end
 							end
 						end
 
-						if not v590 then
-							local v595 = if not FFlagExpChatMessagesStoreMemoryCleanup then v340 else v340.messageId
+						if not v591 then
+							local v596 = if not FFlagExpChatMessagesStoreMemoryCleanup then v341 else v341.messageId
 
-							return List.append(v589, v595)
+							return List.append(v590, v596)
 						end
 
-						return v589
+						return v590
 					end
 
 					if FFlagExpChatMessagesStoreUseProxy then
-						v52[userId7] = v350(v52[userId7])
+						v53[userId7] = v351(v53[userId7])
 					else
-						v51(function(p128) -- line: 357
-							-- upvalues: v350 (copy), userId7 (copy), Dictionary (copy)
-							local v597 = v350(p128[userId7])
+						v52(function(p128) -- line: 358
+							-- upvalues: v351 (copy), userId7 (copy), Dictionary (copy)
+							local v598 = v351(p128[userId7])
 
-							if v597 == nil then
+							if v598 == nil then
 								return Dictionary.removeKey(p128, userId7)
 							end
 
 							return Dictionary.join(p128, {
-								[userId7] = v597
+								[userId7] = v598
 							})
 						end)
 					end
 				end
 
-				if v340.isVisibleInChatWindow then
-					v54(function(p129) -- line: 656
-						-- upvalues: List (copy), v340 (copy)
-						return List.append(p129, v340.messageId)
+				if v341.isVisibleInChatWindow then
+					v55(function(p129) -- line: 657
+						-- upvalues: List (copy), v341 (copy)
+						return List.append(p129, v341.messageId)
 					end)
 
 					if channelNameOverride then
-						v56(function(p130) -- line: 662
-							-- upvalues: channelNameOverride (ref), List (copy), v340 (copy), Dictionary (copy)
-							local v600 = p130[channelNameOverride] or {}
-							local v601 = List.append(v600, v340.messageId)
+						v57(function(p130) -- line: 663
+							-- upvalues: channelNameOverride (ref), List (copy), v341 (copy), Dictionary (copy)
+							local v601 = p130[channelNameOverride] or {}
+							local v602 = List.append(v601, v341.messageId)
 
 							return Dictionary.join(p130, {
-								[channelNameOverride] = v601
+								[channelNameOverride] = v602
 							})
 						end)
 					end
 
 					if FFlagExpChatEnableV2ChatWindow then
-						local v351 = v77(false)
+						local v352 = v78(false)
 
-						if v351 == nil or v351 == channelNameOverride then
-							updateNextMessageComponent(v340.messageId)
+						if v352 == nil or v352 == channelNameOverride then
+							updateNextMessageComponent(v341.messageId)
 						end
 					end
 				end
 			end
 
 			if FFlagExpChatMessagesStoreBatch then
-				SignalsExperimental.batch(v165)
+				SignalsExperimental.batch(v166)
 
 				return
 			end
 
-			v165()
+			v166()
 		end,
-		handleLegacyBubbleCreated = function(t18: {[any]: any}) -- line: 1243
-			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+		handleLegacyBubbleCreated = function(t18: {[any]: any}) -- line: 1251
+			-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
 			local timestamp = t18.timestamp
-			local v192 = if not timestamp then DateTime.now() else DateTime.fromUnixTimestampMillis(timestamp)
+			local v193 = if not timestamp then DateTime.now() else DateTime.fromUnixTimestampMillis(timestamp)
 			local t19 = {
 				prefixText = "",
 				shouldOverrideBubbleChatSettings = true,
@@ -2183,42 +2184,42 @@ local function createMessagesStore(p1) -- line: 176
 				text = t18.text,
 				messageId = t18.id,
 				status = Enum.TextChatMessageStatus.Success,
-				timestamp = v192,
+				timestamp = v193,
 				partOrModel = t18.adornee
 			}
 
-			local function v194() -- line: 396
-				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t19 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref)
-				local v396 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
+			local function v195() -- line: 397
+				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t19 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref)
+				local v397 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
 
-				if v396 and v396[t19.messageId] then
+				if v397 and v397[t19.messageId] then
 					if FFlagExpChatEvictFloodcheckedFromWindowOrder and (t19.status == Enum.TextChatMessageStatus.Floodchecked or t19.status == Enum.TextChatMessageStatus.MessageTooLong) then
-						v54(function(p131) -- line: 407
+						v55(function(p131) -- line: 408
 							-- upvalues: List (copy), t19 (copy)
-							return List.filter(p131, function(p132) -- line: 408
+							return List.filter(p131, function(p132) -- line: 409
 								-- upvalues: t19 (copy)
 								return p132 ~= t19.messageId
 							end)
 						end)
 
-						local v397 = resolveChannelNameForMapOrder(t19, t19.channelNameOverride)
+						local v398 = resolveChannelNameForMapOrder(t19, t19.channelNameOverride)
 
-						if v397 then
-							v56(function(p133) -- line: 415
-								-- upvalues: v397 (copy), List (copy), t19 (copy), Dictionary (copy)
-								local v661 = p133[v397]
+						if v398 then
+							v57(function(p133) -- line: 416
+								-- upvalues: v398 (copy), List (copy), t19 (copy), Dictionary (copy)
+								local v662 = p133[v398]
 
-								if not v661 then
+								if not v662 then
 									return p133
 								end
 
-								local v662 = List.filter(v661, function(p134) -- line: 420
+								local v663 = List.filter(v662, function(p134) -- line: 421
 									-- upvalues: t19 (copy)
 									return p134 ~= t19.messageId
 								end)
 
 								return Dictionary.join(p133, {
-									[v397] = v662
+									[v398] = v663
 								})
 							end)
 						end
@@ -2226,9 +2227,9 @@ local function createMessagesStore(p1) -- line: 176
 						local messageId = t19.messageId
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v49[messageId] = nil
+							v50[messageId] = nil
 						else
-							v48(function(p135) -- line: 273
+							v49(function(p135) -- line: 274
 								-- upvalues: Dictionary (copy), messageId (copy)
 								return Dictionary.removeKey(p135, messageId)
 							end)
@@ -2237,43 +2238,43 @@ local function createMessagesStore(p1) -- line: 176
 						if t19.userId then
 							local userId = t19.userId
 
-							local function v400(p136) -- line: 432
+							local function v401(p136) -- line: 433
 								-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), t19 (copy)
 								if not p136 then
 									return nil
 								end
 
-								local v665 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p136, function(p137) -- line: 442
+								local v666 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p136, function(p137) -- line: 443
 									-- upvalues: t19 (copy)
 									return p137.messageId ~= t19.messageId
-								end) else List.filter(p136, function(p138) -- line: 438
+								end) else List.filter(p136, function(p138) -- line: 439
 									-- upvalues: t19 (copy)
 									return p138 ~= t19.messageId
 								end)
 
-								if #v665 == 0 then
+								if #v666 == 0 then
 									return nil
 								end
 
-								return v665
+								return v666
 							end
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v52[userId] = v400(v52[userId])
+								v53[userId] = v401(v53[userId])
 
 								return
 							end
 
-							v51(function(p139) -- line: 357
-								-- upvalues: v400 (copy), userId (copy), Dictionary (copy)
-								local v667 = v400(p139[userId])
+							v52(function(p139) -- line: 358
+								-- upvalues: v401 (copy), userId (copy), Dictionary (copy)
+								local v668 = v401(p139[userId])
 
-								if v667 == nil then
+								if v668 == nil then
 									return Dictionary.removeKey(p139, userId)
 								end
 
 								return Dictionary.join(p139, {
-									[userId] = v667
+									[userId] = v668
 								})
 							end)
 						end
@@ -2286,45 +2287,45 @@ local function createMessagesStore(p1) -- line: 176
 					if not FFlagExpChatMessagesStoreMemoryCleanup and t19.userId then
 						local userId = t19.userId
 
-						local function v402(p140) -- line: 461
+						local function v403(p140) -- line: 462
 							-- upvalues: t19 (copy), List (copy)
 							if not p140 then
 								return nil
 							end
 
-							local v669 = nil
+							local v670 = nil
 
 							for i, v in ipairs(p140) do
 								if v.messageId == t19.messageId then
-									v669 = i
+									v670 = i
 
 									break
 								end
 							end
 
-							if v669 then
-								return List.set(p140, v669, t19)
+							if v670 then
+								return List.set(p140, v670, t19)
 							end
 
 							return p140
 						end
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v52[userId] = v402(v52[userId])
+							v53[userId] = v403(v53[userId])
 
 							return
 						end
 
-						v51(function(p141) -- line: 357
-							-- upvalues: v402 (copy), userId (copy), Dictionary (copy)
-							local v673 = v402(p141[userId])
+						v52(function(p141) -- line: 358
+							-- upvalues: v403 (copy), userId (copy), Dictionary (copy)
+							local v674 = v403(p141[userId])
 
-							if v673 == nil then
+							if v674 == nil then
 								return Dictionary.removeKey(p141, userId)
 							end
 
 							return Dictionary.join(p141, {
-								[userId] = v673
+								[userId] = v674
 							})
 						end)
 					end
@@ -2336,17 +2337,17 @@ local function createMessagesStore(p1) -- line: 176
 				local partOrModel = t19.partOrModel
 
 				if not userId and partOrModel then
-					userId = v66(false)[partOrModel]
+					userId = v67(false)[partOrModel]
 
 					if not userId then
 						userId = HttpService:GenerateGUID(false)
-						v65(function(p142) -- line: 496
+						v66(function(p142) -- line: 497
 							-- upvalues: Dictionary (copy), userId (ref), partOrModel (copy)
 							return Dictionary.join(p142, {
 								[userId] = partOrModel
 							})
 						end)
-						v67(function(p143) -- line: 503
+						v68(function(p143) -- line: 504
 							-- upvalues: Dictionary (copy), partOrModel (copy), userId (ref)
 							return Dictionary.join(p143, {
 								[partOrModel] = userId
@@ -2355,231 +2356,231 @@ local function createMessagesStore(p1) -- line: 176
 					end
 				end
 
-				local v405 = if userId == t19.userId then t19 else Dictionary.join(t19, {
+				local v406 = if userId == t19.userId then t19 else Dictionary.join(t19, {
 					userId = userId
 				})
 				local channelNameOverride = nil
 
-				if GetFFlagTextChatEnableUniverseChatTabs() and v405.channelNameOverride then
-					channelNameOverride = v405.channelNameOverride
-				elseif v405.textChannel then
-					channelNameOverride = if v405.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v68(false)) then v405.textChannel.Name else "RBXGeneral"
+				if GetFFlagTextChatEnableUniverseChatTabs() and v406.channelNameOverride then
+					channelNameOverride = v406.channelNameOverride
+				elseif v406.textChannel then
+					channelNameOverride = if v406.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v69(false)) then v406.textChannel.Name else "RBXGeneral"
 				end
 
-				if v405.isVisibleInChatWindow then
-					local v407 = v53(false)
-					local v408 = if not channelNameOverride then {} else v55(false)[channelNameOverride] or {}
+				if v406.isVisibleInChatWindow then
+					local v408 = v54(false)
+					local v409 = if not channelNameOverride then {} else v56(false)[channelNameOverride] or {}
 
-					if #v407 >= t1.messageLimit then
-						local v409 = v407[1]
-						local v410 = v396 and v396[v409]
+					if #v408 >= t1.messageLimit then
+						local v410 = v408[1]
+						local v411 = v397 and v397[v410]
 
-						if v410 then
+						if v411 then
 							if not FFlagExpChatMessagesStoreKeepInByMessageId then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v409] = nil
+									v50[v410] = nil
 								else
-									v48(function(p144) -- line: 273
-										-- upvalues: Dictionary (copy), v409 (copy)
-										return Dictionary.removeKey(p144, v409)
+									v49(function(p144) -- line: 274
+										-- upvalues: Dictionary (copy), v410 (copy)
+										return Dictionary.removeKey(p144, v410)
 									end)
 								end
 							end
 
-							if v410.userId then
-								local userId8 = v410.userId
+							if v411.userId then
+								local userId8 = v411.userId
 
-								local function v412(p145) -- line: 550
-									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v409 (copy), v64 (copy), v410 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+								local function v413(p145) -- line: 551
+									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v410 (copy), v65 (copy), v411 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 									if not p145 then
 										return nil
 									end
 
-									local v678 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p145, function(p146) -- line: 560
-										-- upvalues: v409 (copy)
-										return p146.messageId ~= v409
-									end) else List.filter(p145, function(p147) -- line: 556
-										-- upvalues: v409 (copy)
-										return p147 ~= v409
+									local v679 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p145, function(p146) -- line: 561
+										-- upvalues: v410 (copy)
+										return p146.messageId ~= v410
+									end) else List.filter(p145, function(p147) -- line: 557
+										-- upvalues: v410 (copy)
+										return p147 ~= v410
 									end)
 
-									if #v678 == 0 then
-										local v679 = v64(false)
+									if #v679 == 0 then
+										local v680 = v65(false)
 
-										if v679[v410.userId] then
-											local v680 = v679[v410.userId]
+										if v680[v411.userId] then
+											local v681 = v680[v411.userId]
 
-											v67(function(p148) -- line: 571
-												-- upvalues: Dictionary (copy), v680 (copy)
-												return Dictionary.removeKey(p148, v680)
+											v68(function(p148) -- line: 572
+												-- upvalues: Dictionary (copy), v681 (copy)
+												return Dictionary.removeKey(p148, v681)
 											end)
-											v65(function(p149) -- line: 575
-												-- upvalues: Dictionary (copy), v410 (copy)
-												return Dictionary.removeKey(p149, v410.userId)
+											v66(function(p149) -- line: 576
+												-- upvalues: Dictionary (copy), v411 (copy)
+												return Dictionary.removeKey(p149, v411.userId)
 											end)
 										end
 
 										return nil
 									end
 
-									return v678
+									return v679
 								end
 
 								if FFlagExpChatMessagesStoreUseProxy then
-									v52[userId8] = v412(v52[userId8])
+									v53[userId8] = v413(v53[userId8])
 								else
-									v51(function(p150) -- line: 357
-										-- upvalues: v412 (copy), userId8 (copy), Dictionary (copy)
-										local v682 = v412(p150[userId8])
+									v52(function(p150) -- line: 358
+										-- upvalues: v413 (copy), userId8 (copy), Dictionary (copy)
+										local v683 = v413(p150[userId8])
 
-										if v682 == nil then
+										if v683 == nil then
 											return Dictionary.removeKey(p150, userId8)
 										end
 
 										return Dictionary.join(p150, {
-											[userId8] = v682
+											[userId8] = v683
 										})
 									end)
 								end
 							end
 
-							v54(function(p151) -- line: 587
+							v55(function(p151) -- line: 588
 								-- upvalues: List (copy)
 								return List.removeIndex(p151, 1)
 							end)
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v409] = nil
+								t4[v410] = nil
 							end
 						end
 					end
 
-					if channelNameOverride and #v408 >= t1.messageLimit then
-						local v413 = v408[1]
+					if channelNameOverride and #v409 >= t1.messageLimit then
+						local v414 = v409[1]
 
-						if v413 then
-							v56(function(p152) -- line: 601
+						if v414 then
+							v57(function(p152) -- line: 602
 								-- upvalues: channelNameOverride (ref), List (copy), Dictionary (copy)
-								local v685 = p152[channelNameOverride] or {}
-								local v686 = List.removeIndex(v685, 1)
+								local v686 = p152[channelNameOverride] or {}
+								local v687 = List.removeIndex(v686, 1)
 
 								return Dictionary.join(p152, {
-									[channelNameOverride] = v686
+									[channelNameOverride] = v687
 								})
 							end)
 
-							if v396 and v396[v413] then
+							if v397 and v397[v414] then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v413] = nil
+									v50[v414] = nil
 								else
-									v48(function(p153) -- line: 273
-										-- upvalues: Dictionary (copy), v413 (copy)
-										return Dictionary.removeKey(p153, v413)
+									v49(function(p153) -- line: 274
+										-- upvalues: Dictionary (copy), v414 (copy)
+										return Dictionary.removeKey(p153, v414)
 									end)
 								end
 							end
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v413] = nil
+								t4[v414] = nil
 							end
 						end
 					end
 				end
 
-				writeByMessageId(v405.messageId, v405)
+				writeByMessageId(v406.messageId, v406)
 
-				if v405.userId then
-					local userId9 = v405.userId
+				if v406.userId then
+					local userId9 = v406.userId
 
-					local function v415(p154) -- line: 623
-						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v405 (copy), List (copy)
-						local v689 = p154 or {}
-						local v690 = false
+					local function v416(p154) -- line: 624
+						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v406 (copy), List (copy)
+						local v690 = p154 or {}
+						local v691 = false
 
 						if FFlagExpChatMessagesStoreMemoryCleanup then
-							for _, v in ipairs(v689) do
-								if v == v405.messageId then
-									v690 = true
+							for _, v in ipairs(v690) do
+								if v == v406.messageId then
+									v691 = true
 
 									break
 								end
 							end
 						else
-							for _, v in ipairs(v689) do
-								if v.messageId == v405.messageId then
-									v690 = true
+							for _, v in ipairs(v690) do
+								if v.messageId == v406.messageId then
+									v691 = true
 
 									break
 								end
 							end
 						end
 
-						if not v690 then
-							local v695 = if not FFlagExpChatMessagesStoreMemoryCleanup then v405 else v405.messageId
+						if not v691 then
+							local v696 = if not FFlagExpChatMessagesStoreMemoryCleanup then v406 else v406.messageId
 
-							return List.append(v689, v695)
+							return List.append(v690, v696)
 						end
 
-						return v689
+						return v690
 					end
 
 					if FFlagExpChatMessagesStoreUseProxy then
-						v52[userId9] = v415(v52[userId9])
+						v53[userId9] = v416(v53[userId9])
 					else
-						v51(function(p155) -- line: 357
-							-- upvalues: v415 (copy), userId9 (copy), Dictionary (copy)
-							local v697 = v415(p155[userId9])
+						v52(function(p155) -- line: 358
+							-- upvalues: v416 (copy), userId9 (copy), Dictionary (copy)
+							local v698 = v416(p155[userId9])
 
-							if v697 == nil then
+							if v698 == nil then
 								return Dictionary.removeKey(p155, userId9)
 							end
 
 							return Dictionary.join(p155, {
-								[userId9] = v697
+								[userId9] = v698
 							})
 						end)
 					end
 				end
 
-				if v405.isVisibleInChatWindow then
-					v54(function(p156) -- line: 656
-						-- upvalues: List (copy), v405 (copy)
-						return List.append(p156, v405.messageId)
+				if v406.isVisibleInChatWindow then
+					v55(function(p156) -- line: 657
+						-- upvalues: List (copy), v406 (copy)
+						return List.append(p156, v406.messageId)
 					end)
 
 					if channelNameOverride then
-						v56(function(p157) -- line: 662
-							-- upvalues: channelNameOverride (ref), List (copy), v405 (copy), Dictionary (copy)
-							local v700 = p157[channelNameOverride] or {}
-							local v701 = List.append(v700, v405.messageId)
+						v57(function(p157) -- line: 663
+							-- upvalues: channelNameOverride (ref), List (copy), v406 (copy), Dictionary (copy)
+							local v701 = p157[channelNameOverride] or {}
+							local v702 = List.append(v701, v406.messageId)
 
 							return Dictionary.join(p157, {
-								[channelNameOverride] = v701
+								[channelNameOverride] = v702
 							})
 						end)
 					end
 
 					if FFlagExpChatEnableV2ChatWindow then
-						local v416 = v77(false)
+						local v417 = v78(false)
 
-						if v416 == nil or v416 == channelNameOverride then
-							updateNextMessageComponent(v405.messageId)
+						if v417 == nil or v417 == channelNameOverride then
+							updateNextMessageComponent(v406.messageId)
 						end
 					end
 				end
 			end
 
 			if FFlagExpChatMessagesStoreBatch then
-				SignalsExperimental.batch(v194)
+				SignalsExperimental.batch(v195)
 
 				return
 			end
 
-			v194()
+			v195()
 		end,
-		handleLegacyBubbleTextUpdated = function(s23: string, s24: string) -- line: 1280
-			-- upvalues: Dictionary (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v48 (copy)
-			local function v197(p158) -- line: 1281
+		handleLegacyBubbleTextUpdated = function(s23: string, s24: string) -- line: 1288
+			-- upvalues: Dictionary (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v49 (copy)
+			local function v198(p158) -- line: 1289
 				-- upvalues: Dictionary (copy), s24 (copy)
 				return Dictionary.join(p158, {
 					text = s24
@@ -2587,31 +2588,31 @@ local function createMessagesStore(p1) -- line: 176
 			end
 
 			if FFlagExpChatMessagesStoreUseProxy then
-				local v198 = v49[s23]
+				local v199 = v50[s23]
 
-				if v198 then
-					local v199 = Dictionary.join(v198, {
+				if v199 then
+					local v200 = Dictionary.join(v199, {
 						text = s24
 					})
 
-					if v199 then
-						v49[s23] = v199
+					if v200 then
+						v50[s23] = v200
 
 						return
 					end
 				end
 			else
-				v48(function(p159) -- line: 290
-					-- upvalues: s23 (copy), v197 (copy), Dictionary (copy)
+				v49(function(p159) -- line: 291
+					-- upvalues: s23 (copy), v198 (copy), Dictionary (copy)
 					if not p159 or not p159[s23] then
 						return p159 or {}
 					end
 
-					local v419 = v197(p159[s23])
+					local v420 = v198(p159[s23])
 
-					if v419 then
+					if v420 then
 						return Dictionary.join(p159, {
-							[s23] = v419
+							[s23] = v420
 						})
 					end
 
@@ -2619,20 +2620,20 @@ local function createMessagesStore(p1) -- line: 176
 				end)
 			end
 		end,
-		handleHiddenMessageReceived = function(p160) -- line: 1032
-			-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), FIntExpChatRandomCharChangeLowerBound (copy), FIntExpChatRandomCharChangeUpperBound (copy), Config (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local v167 = string.len(if not getFFlagExpChatProtectedChatInternalAPIs() then p160.Text else p160.TextInternal)
-			local v168 = math.max(FIntExpChatRandomCharChangeLowerBound, -(v167 - 1))
-			local v169 = FIntExpChatRandomCharChangeUpperBound
-			local v170 = math.random(v168, v169)
-			local v171 = string.rep(Config.DOT_TEXT, v167 + v170)
+		handleHiddenMessageReceived = function(p160) -- line: 1040
+			-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), FIntExpChatRandomCharChangeLowerBound (copy), FIntExpChatRandomCharChangeUpperBound (copy), Config (copy), getFFlagExpChatTelemetryEventTrigger (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+			local v168 = string.len(if not getFFlagExpChatProtectedChatInternalAPIs() then p160.Text else p160.TextInternal)
+			local v169 = math.max(FIntExpChatRandomCharChangeLowerBound, -(v168 - 1))
+			local v170 = FIntExpChatRandomCharChangeUpperBound
+			local v171 = math.random(v169, v170)
+			local v172 = string.rep(Config.DOT_TEXT, v168 + v171)
 			local t20 = {
 				userId = nil,
 				isVisibleInBubbleChat = false,
 				isVisibleInChatWindow = true,
 				isHiddenMessage = true,
 				prefixText = Config.LOCK_EMOJI .. " :",
-				text = v171,
+				text = v172,
 				textChannel = p160.TextChannel,
 				messageId = p160.MessageId,
 				status = p160.Status,
@@ -2640,38 +2641,38 @@ local function createMessagesStore(p1) -- line: 176
 				textChatMessageInstance = if not getFFlagExpChatTelemetryEventTrigger() then nil else p160
 			}
 
-			local function v173() -- line: 396
-				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t20 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref)
-				local v352 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
+			local function v174() -- line: 397
+				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t20 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref)
+				local v353 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
 
-				if v352 and v352[t20.messageId] then
+				if v353 and v353[t20.messageId] then
 					if FFlagExpChatEvictFloodcheckedFromWindowOrder and (t20.status == Enum.TextChatMessageStatus.Floodchecked or t20.status == Enum.TextChatMessageStatus.MessageTooLong) then
-						v54(function(p161) -- line: 407
+						v55(function(p161) -- line: 408
 							-- upvalues: List (copy), t20 (copy)
-							return List.filter(p161, function(p162) -- line: 408
+							return List.filter(p161, function(p162) -- line: 409
 								-- upvalues: t20 (copy)
 								return p162 ~= t20.messageId
 							end)
 						end)
 
-						local v353 = resolveChannelNameForMapOrder(t20, t20.channelNameOverride)
+						local v354 = resolveChannelNameForMapOrder(t20, t20.channelNameOverride)
 
-						if v353 then
-							v56(function(p163) -- line: 415
-								-- upvalues: v353 (copy), List (copy), t20 (copy), Dictionary (copy)
-								local v604 = p163[v353]
+						if v354 then
+							v57(function(p163) -- line: 416
+								-- upvalues: v354 (copy), List (copy), t20 (copy), Dictionary (copy)
+								local v605 = p163[v354]
 
-								if not v604 then
+								if not v605 then
 									return p163
 								end
 
-								local v605 = List.filter(v604, function(p164) -- line: 420
+								local v606 = List.filter(v605, function(p164) -- line: 421
 									-- upvalues: t20 (copy)
 									return p164 ~= t20.messageId
 								end)
 
 								return Dictionary.join(p163, {
-									[v353] = v605
+									[v354] = v606
 								})
 							end)
 						end
@@ -2679,9 +2680,9 @@ local function createMessagesStore(p1) -- line: 176
 						local messageId = t20.messageId
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v49[messageId] = nil
+							v50[messageId] = nil
 						else
-							v48(function(p165) -- line: 273
+							v49(function(p165) -- line: 274
 								-- upvalues: Dictionary (copy), messageId (copy)
 								return Dictionary.removeKey(p165, messageId)
 							end)
@@ -2690,43 +2691,43 @@ local function createMessagesStore(p1) -- line: 176
 						if t20.userId then
 							local userId = t20.userId
 
-							local function v356(p166) -- line: 432
+							local function v357(p166) -- line: 433
 								-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), t20 (copy)
 								if not p166 then
 									return nil
 								end
 
-								local v608 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p166, function(p167) -- line: 442
+								local v609 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p166, function(p167) -- line: 443
 									-- upvalues: t20 (copy)
 									return p167.messageId ~= t20.messageId
-								end) else List.filter(p166, function(p168) -- line: 438
+								end) else List.filter(p166, function(p168) -- line: 439
 									-- upvalues: t20 (copy)
 									return p168 ~= t20.messageId
 								end)
 
-								if #v608 == 0 then
+								if #v609 == 0 then
 									return nil
 								end
 
-								return v608
+								return v609
 							end
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v52[userId] = v356(v52[userId])
+								v53[userId] = v357(v53[userId])
 
 								return
 							end
 
-							v51(function(p169) -- line: 357
-								-- upvalues: v356 (copy), userId (copy), Dictionary (copy)
-								local v610 = v356(p169[userId])
+							v52(function(p169) -- line: 358
+								-- upvalues: v357 (copy), userId (copy), Dictionary (copy)
+								local v611 = v357(p169[userId])
 
-								if v610 == nil then
+								if v611 == nil then
 									return Dictionary.removeKey(p169, userId)
 								end
 
 								return Dictionary.join(p169, {
-									[userId] = v610
+									[userId] = v611
 								})
 							end)
 						end
@@ -2739,45 +2740,45 @@ local function createMessagesStore(p1) -- line: 176
 					if not FFlagExpChatMessagesStoreMemoryCleanup and t20.userId then
 						local userId = t20.userId
 
-						local function v358(p170) -- line: 461
+						local function v359(p170) -- line: 462
 							-- upvalues: t20 (copy), List (copy)
 							if not p170 then
 								return nil
 							end
 
-							local v612 = nil
+							local v613 = nil
 
 							for i, v in ipairs(p170) do
 								if v.messageId == t20.messageId then
-									v612 = i
+									v613 = i
 
 									break
 								end
 							end
 
-							if v612 then
-								return List.set(p170, v612, t20)
+							if v613 then
+								return List.set(p170, v613, t20)
 							end
 
 							return p170
 						end
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v52[userId] = v358(v52[userId])
+							v53[userId] = v359(v53[userId])
 
 							return
 						end
 
-						v51(function(p171) -- line: 357
-							-- upvalues: v358 (copy), userId (copy), Dictionary (copy)
-							local v616 = v358(p171[userId])
+						v52(function(p171) -- line: 358
+							-- upvalues: v359 (copy), userId (copy), Dictionary (copy)
+							local v617 = v359(p171[userId])
 
-							if v616 == nil then
+							if v617 == nil then
 								return Dictionary.removeKey(p171, userId)
 							end
 
 							return Dictionary.join(p171, {
-								[userId] = v616
+								[userId] = v617
 							})
 						end)
 					end
@@ -2789,17 +2790,17 @@ local function createMessagesStore(p1) -- line: 176
 				local partOrModel = t20.partOrModel
 
 				if not userId and partOrModel then
-					userId = v66(false)[partOrModel]
+					userId = v67(false)[partOrModel]
 
 					if not userId then
 						userId = HttpService:GenerateGUID(false)
-						v65(function(p172) -- line: 496
+						v66(function(p172) -- line: 497
 							-- upvalues: Dictionary (copy), userId (ref), partOrModel (copy)
 							return Dictionary.join(p172, {
 								[userId] = partOrModel
 							})
 						end)
-						v67(function(p173) -- line: 503
+						v68(function(p173) -- line: 504
 							-- upvalues: Dictionary (copy), partOrModel (copy), userId (ref)
 							return Dictionary.join(p173, {
 								[partOrModel] = userId
@@ -2808,235 +2809,235 @@ local function createMessagesStore(p1) -- line: 176
 					end
 				end
 
-				local v361 = if userId == t20.userId then t20 else Dictionary.join(t20, {
+				local v362 = if userId == t20.userId then t20 else Dictionary.join(t20, {
 					userId = userId
 				})
 				local channelNameOverride = nil
 
-				if GetFFlagTextChatEnableUniverseChatTabs() and v361.channelNameOverride then
-					channelNameOverride = v361.channelNameOverride
-				elseif v361.textChannel then
-					channelNameOverride = if v361.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v68(false)) then v361.textChannel.Name else "RBXGeneral"
+				if GetFFlagTextChatEnableUniverseChatTabs() and v362.channelNameOverride then
+					channelNameOverride = v362.channelNameOverride
+				elseif v362.textChannel then
+					channelNameOverride = if v362.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v69(false)) then v362.textChannel.Name else "RBXGeneral"
 				end
 
-				if v361.isVisibleInChatWindow then
-					local v363 = v53(false)
-					local v364 = if not channelNameOverride then {} else v55(false)[channelNameOverride] or {}
+				if v362.isVisibleInChatWindow then
+					local v364 = v54(false)
+					local v365 = if not channelNameOverride then {} else v56(false)[channelNameOverride] or {}
 
-					if #v363 >= t1.messageLimit then
-						local v365 = v363[1]
-						local v366 = v352 and v352[v365]
+					if #v364 >= t1.messageLimit then
+						local v366 = v364[1]
+						local v367 = v353 and v353[v366]
 
-						if v366 then
+						if v367 then
 							if not FFlagExpChatMessagesStoreKeepInByMessageId then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v365] = nil
+									v50[v366] = nil
 								else
-									v48(function(p174) -- line: 273
-										-- upvalues: Dictionary (copy), v365 (copy)
-										return Dictionary.removeKey(p174, v365)
+									v49(function(p174) -- line: 274
+										-- upvalues: Dictionary (copy), v366 (copy)
+										return Dictionary.removeKey(p174, v366)
 									end)
 								end
 							end
 
-							if v366.userId then
-								local userId10 = v366.userId
+							if v367.userId then
+								local userId10 = v367.userId
 
-								local function v368(p175) -- line: 550
-									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v365 (copy), v64 (copy), v366 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+								local function v369(p175) -- line: 551
+									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v366 (copy), v65 (copy), v367 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 									if not p175 then
 										return nil
 									end
 
-									local v621 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p175, function(p176) -- line: 560
-										-- upvalues: v365 (copy)
-										return p176.messageId ~= v365
-									end) else List.filter(p175, function(p177) -- line: 556
-										-- upvalues: v365 (copy)
-										return p177 ~= v365
+									local v622 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p175, function(p176) -- line: 561
+										-- upvalues: v366 (copy)
+										return p176.messageId ~= v366
+									end) else List.filter(p175, function(p177) -- line: 557
+										-- upvalues: v366 (copy)
+										return p177 ~= v366
 									end)
 
-									if #v621 == 0 then
-										local v622 = v64(false)
+									if #v622 == 0 then
+										local v623 = v65(false)
 
-										if v622[v366.userId] then
-											local v623 = v622[v366.userId]
+										if v623[v367.userId] then
+											local v624 = v623[v367.userId]
 
-											v67(function(p178) -- line: 571
-												-- upvalues: Dictionary (copy), v623 (copy)
-												return Dictionary.removeKey(p178, v623)
+											v68(function(p178) -- line: 572
+												-- upvalues: Dictionary (copy), v624 (copy)
+												return Dictionary.removeKey(p178, v624)
 											end)
-											v65(function(p179) -- line: 575
-												-- upvalues: Dictionary (copy), v366 (copy)
-												return Dictionary.removeKey(p179, v366.userId)
+											v66(function(p179) -- line: 576
+												-- upvalues: Dictionary (copy), v367 (copy)
+												return Dictionary.removeKey(p179, v367.userId)
 											end)
 										end
 
 										return nil
 									end
 
-									return v621
+									return v622
 								end
 
 								if FFlagExpChatMessagesStoreUseProxy then
-									v52[userId10] = v368(v52[userId10])
+									v53[userId10] = v369(v53[userId10])
 								else
-									v51(function(p180) -- line: 357
-										-- upvalues: v368 (copy), userId10 (copy), Dictionary (copy)
-										local v625 = v368(p180[userId10])
+									v52(function(p180) -- line: 358
+										-- upvalues: v369 (copy), userId10 (copy), Dictionary (copy)
+										local v626 = v369(p180[userId10])
 
-										if v625 == nil then
+										if v626 == nil then
 											return Dictionary.removeKey(p180, userId10)
 										end
 
 										return Dictionary.join(p180, {
-											[userId10] = v625
+											[userId10] = v626
 										})
 									end)
 								end
 							end
 
-							v54(function(p181) -- line: 587
+							v55(function(p181) -- line: 588
 								-- upvalues: List (copy)
 								return List.removeIndex(p181, 1)
 							end)
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v365] = nil
+								t4[v366] = nil
 							end
 						end
 					end
 
-					if channelNameOverride and #v364 >= t1.messageLimit then
-						local v369 = v364[1]
+					if channelNameOverride and #v365 >= t1.messageLimit then
+						local v370 = v365[1]
 
-						if v369 then
-							v56(function(p182) -- line: 601
+						if v370 then
+							v57(function(p182) -- line: 602
 								-- upvalues: channelNameOverride (ref), List (copy), Dictionary (copy)
-								local v628 = p182[channelNameOverride] or {}
-								local v629 = List.removeIndex(v628, 1)
+								local v629 = p182[channelNameOverride] or {}
+								local v630 = List.removeIndex(v629, 1)
 
 								return Dictionary.join(p182, {
-									[channelNameOverride] = v629
+									[channelNameOverride] = v630
 								})
 							end)
 
-							if v352 and v352[v369] then
+							if v353 and v353[v370] then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v369] = nil
+									v50[v370] = nil
 								else
-									v48(function(p183) -- line: 273
-										-- upvalues: Dictionary (copy), v369 (copy)
-										return Dictionary.removeKey(p183, v369)
+									v49(function(p183) -- line: 274
+										-- upvalues: Dictionary (copy), v370 (copy)
+										return Dictionary.removeKey(p183, v370)
 									end)
 								end
 							end
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v369] = nil
+								t4[v370] = nil
 							end
 						end
 					end
 				end
 
-				writeByMessageId(v361.messageId, v361)
+				writeByMessageId(v362.messageId, v362)
 
-				if v361.userId then
-					local userId11 = v361.userId
+				if v362.userId then
+					local userId11 = v362.userId
 
-					local function v371(p184) -- line: 623
-						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v361 (copy), List (copy)
-						local v632 = p184 or {}
-						local v633 = false
+					local function v372(p184) -- line: 624
+						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v362 (copy), List (copy)
+						local v633 = p184 or {}
+						local v634 = false
 
 						if FFlagExpChatMessagesStoreMemoryCleanup then
-							for _, v in ipairs(v632) do
-								if v == v361.messageId then
-									v633 = true
+							for _, v in ipairs(v633) do
+								if v == v362.messageId then
+									v634 = true
 
 									break
 								end
 							end
 						else
-							for _, v in ipairs(v632) do
-								if v.messageId == v361.messageId then
-									v633 = true
+							for _, v in ipairs(v633) do
+								if v.messageId == v362.messageId then
+									v634 = true
 
 									break
 								end
 							end
 						end
 
-						if not v633 then
-							local v638 = if not FFlagExpChatMessagesStoreMemoryCleanup then v361 else v361.messageId
+						if not v634 then
+							local v639 = if not FFlagExpChatMessagesStoreMemoryCleanup then v362 else v362.messageId
 
-							return List.append(v632, v638)
+							return List.append(v633, v639)
 						end
 
-						return v632
+						return v633
 					end
 
 					if FFlagExpChatMessagesStoreUseProxy then
-						v52[userId11] = v371(v52[userId11])
+						v53[userId11] = v372(v53[userId11])
 					else
-						v51(function(p185) -- line: 357
-							-- upvalues: v371 (copy), userId11 (copy), Dictionary (copy)
-							local v640 = v371(p185[userId11])
+						v52(function(p185) -- line: 358
+							-- upvalues: v372 (copy), userId11 (copy), Dictionary (copy)
+							local v641 = v372(p185[userId11])
 
-							if v640 == nil then
+							if v641 == nil then
 								return Dictionary.removeKey(p185, userId11)
 							end
 
 							return Dictionary.join(p185, {
-								[userId11] = v640
+								[userId11] = v641
 							})
 						end)
 					end
 				end
 
-				if v361.isVisibleInChatWindow then
-					v54(function(p186) -- line: 656
-						-- upvalues: List (copy), v361 (copy)
-						return List.append(p186, v361.messageId)
+				if v362.isVisibleInChatWindow then
+					v55(function(p186) -- line: 657
+						-- upvalues: List (copy), v362 (copy)
+						return List.append(p186, v362.messageId)
 					end)
 
 					if channelNameOverride then
-						v56(function(p187) -- line: 662
-							-- upvalues: channelNameOverride (ref), List (copy), v361 (copy), Dictionary (copy)
-							local v643 = p187[channelNameOverride] or {}
-							local v644 = List.append(v643, v361.messageId)
+						v57(function(p187) -- line: 663
+							-- upvalues: channelNameOverride (ref), List (copy), v362 (copy), Dictionary (copy)
+							local v644 = p187[channelNameOverride] or {}
+							local v645 = List.append(v644, v362.messageId)
 
 							return Dictionary.join(p187, {
-								[channelNameOverride] = v644
+								[channelNameOverride] = v645
 							})
 						end)
 					end
 
 					if FFlagExpChatEnableV2ChatWindow then
-						local v372 = v77(false)
+						local v373 = v78(false)
 
-						if v372 == nil or v372 == channelNameOverride then
-							updateNextMessageComponent(v361.messageId)
+						if v373 == nil or v373 == channelNameOverride then
+							updateNextMessageComponent(v362.messageId)
 						end
 					end
 				end
 			end
 
 			if FFlagExpChatMessagesStoreBatch then
-				SignalsExperimental.batch(v173)
+				SignalsExperimental.batch(v174)
 
 				return
 			end
 
-			v173()
+			v174()
 		end,
-		handleHiddenMessagesCleared = function() -- line: 1165
-			-- upvalues: FFlagExpChatClearHiddenMessagesPostAgeCheck (copy), forEachByMessageId (copy), Dictionary (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), v54 (copy), List (copy), v56 (copy)
+		handleHiddenMessagesCleared = function() -- line: 1173
+			-- upvalues: FFlagExpChatClearHiddenMessagesPostAgeCheck (copy), forEachByMessageId (copy), Dictionary (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), v55 (copy), List (copy), v57 (copy)
 			if not FFlagExpChatClearHiddenMessagesPostAgeCheck then
 				return
 			end
 
-			forEachByMessageId(function(_, p189) -- line: 1172
+			forEachByMessageId(function(_, p189) -- line: 1180
 				-- upvalues: Dictionary (copy)
 				if p189 and p189.isHiddenMessage then
 					return Dictionary.join(p189, {
@@ -3047,29 +3048,29 @@ local function createMessagesStore(p1) -- line: 176
 				return nil
 			end)
 
-			local function isNotHidden(s25: string) -- line: 1179
-				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy)
-				local v388 = ((if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49))[s25]
+			local function isNotHidden(s25: string) -- line: 1187
+				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy)
+				local v389 = ((if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50))[s25]
 
-				return v388 and not v388.isHiddenMessage
+				return v389 and not v389.isHiddenMessage
 			end
 
-			v54(function(p190) -- line: 1185
+			v55(function(p190) -- line: 1193
 				-- upvalues: List (copy), isNotHidden (copy)
 				return List.filter(p190, isNotHidden)
 			end)
-			v56(function(p191) -- line: 1190
+			v57(function(p191) -- line: 1198
 				-- upvalues: Dictionary (copy), List (copy), isNotHidden (copy)
-				return Dictionary.map(p191, function(p192) -- line: 1191
+				return Dictionary.map(p191, function(p192) -- line: 1199
 					-- upvalues: List (copy), isNotHidden (copy)
 					return List.filter(p192, isNotHidden)
 				end)
 			end)
 		end,
-		addSystemMessage = function(s26: string, s27: string, s28: string?, p193: ((...any) -> ...any)?, b6: boolean?) -- line: 800
-			-- upvalues: sanitizeForRichText (copy), GetFFlagExpChatSyntheticSystemMessageRichText (copy), generateRichSystemMessageTextFormat (copy), FFlagExpChatDictation (copy), HttpService (copy), FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
-			local v136 = sanitizeForRichText(s26)
-			local v137 = if not GetFFlagExpChatSyntheticSystemMessageRichText() then v136 else generateRichSystemMessageTextFormat(v136, if not FFlagExpChatDictation then nil else b6, p193)
+		addSystemMessage = function(s26: string, s27: string, s28: string?, p193: ((...any) -> ...any)?, b6: boolean?) -- line: 801
+			-- upvalues: sanitizeForRichText (copy), GetFFlagExpChatSyntheticSystemMessageRichText (copy), generateRichSystemMessageTextFormat (copy), FFlagExpChatDictation (copy), HttpService (copy), FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref), FFlagExpChatMessagesStoreBatch (copy), SignalsExperimental (copy)
+			local v137 = sanitizeForRichText(s26)
+			local v138 = if not GetFFlagExpChatSyntheticSystemMessageRichText() then v137 else generateRichSystemMessageTextFormat(v137, if not FFlagExpChatDictation then nil else b6, p193)
 			local guid = HttpService:GenerateGUID(false)
 			local t21 = {
 				userId = nil,
@@ -3084,7 +3085,7 @@ local function createMessagesStore(p1) -- line: 176
 				chatWindowMessageProperties = nil,
 				textChatMessageInstance = nil,
 				partOrModel = nil,
-				text = v137,
+				text = v138,
 				messageId = guid,
 				timestamp = DateTime.fromUnixTimestampMillis(workspace:GetServerTimeNow() * 1000),
 				status = Enum.TextChatMessageStatus.Success,
@@ -3092,38 +3093,38 @@ local function createMessagesStore(p1) -- line: 176
 				metadata = s28
 			}
 
-			local function v140() -- line: 396
-				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v49 (copy), v47 (copy), t21 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v54 (copy), List (copy), resolveChannelNameForMapOrder (copy), v56 (copy), Dictionary (copy), v48 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v52 (copy), v51 (copy), writeByMessageId (copy), v66 (copy), HttpService (copy), v65 (copy), v67 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v68 (copy), v53 (copy), v55 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v64 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v77 (copy), updateNextMessageComponent (ref)
-				local v289 = if not FFlagExpChatMessagesStoreUseProxy then v47(false) else v49
+			local function v141() -- line: 397
+				-- upvalues: FFlagExpChatMessagesStoreUseProxy (copy), v50 (copy), v48 (copy), t21 (copy), FFlagExpChatEvictFloodcheckedFromWindowOrder (copy), v55 (copy), List (copy), resolveChannelNameForMapOrder (copy), v57 (copy), Dictionary (copy), v49 (copy), FFlagExpChatMessagesStoreMemoryCleanup (copy), v53 (copy), v52 (copy), writeByMessageId (copy), v67 (copy), HttpService (copy), v66 (copy), v68 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v69 (copy), v54 (copy), v56 (copy), t1 (copy), FFlagExpChatMessagesStoreKeepInByMessageId (copy), v65 (copy), t4 (copy), FFlagExpChatEnableV2ChatWindow (copy), v78 (copy), updateNextMessageComponent (ref)
+				local v290 = if not FFlagExpChatMessagesStoreUseProxy then v48(false) else v50
 
-				if v289 and v289[t21.messageId] then
+				if v290 and v290[t21.messageId] then
 					if FFlagExpChatEvictFloodcheckedFromWindowOrder and (t21.status == Enum.TextChatMessageStatus.Floodchecked or t21.status == Enum.TextChatMessageStatus.MessageTooLong) then
-						v54(function(p194) -- line: 407
+						v55(function(p194) -- line: 408
 							-- upvalues: List (copy), t21 (copy)
-							return List.filter(p194, function(p195) -- line: 408
+							return List.filter(p194, function(p195) -- line: 409
 								-- upvalues: t21 (copy)
 								return p195 ~= t21.messageId
 							end)
 						end)
 
-						local v290 = resolveChannelNameForMapOrder(t21, t21.channelNameOverride)
+						local v291 = resolveChannelNameForMapOrder(t21, t21.channelNameOverride)
 
-						if v290 then
-							v56(function(p196) -- line: 415
-								-- upvalues: v290 (copy), List (copy), t21 (copy), Dictionary (copy)
-								local v475 = p196[v290]
+						if v291 then
+							v57(function(p196) -- line: 416
+								-- upvalues: v291 (copy), List (copy), t21 (copy), Dictionary (copy)
+								local v476 = p196[v291]
 
-								if not v475 then
+								if not v476 then
 									return p196
 								end
 
-								local v476 = List.filter(v475, function(p197) -- line: 420
+								local v477 = List.filter(v476, function(p197) -- line: 421
 									-- upvalues: t21 (copy)
 									return p197 ~= t21.messageId
 								end)
 
 								return Dictionary.join(p196, {
-									[v290] = v476
+									[v291] = v477
 								})
 							end)
 						end
@@ -3131,9 +3132,9 @@ local function createMessagesStore(p1) -- line: 176
 						local messageId = t21.messageId
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v49[messageId] = nil
+							v50[messageId] = nil
 						else
-							v48(function(p198) -- line: 273
+							v49(function(p198) -- line: 274
 								-- upvalues: Dictionary (copy), messageId (copy)
 								return Dictionary.removeKey(p198, messageId)
 							end)
@@ -3142,43 +3143,43 @@ local function createMessagesStore(p1) -- line: 176
 						if t21.userId then
 							local userId = t21.userId
 
-							local function v293(p199) -- line: 432
+							local function v294(p199) -- line: 433
 								-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), t21 (copy)
 								if not p199 then
 									return nil
 								end
 
-								local v479 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p199, function(p200) -- line: 442
+								local v480 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p199, function(p200) -- line: 443
 									-- upvalues: t21 (copy)
 									return p200.messageId ~= t21.messageId
-								end) else List.filter(p199, function(p201) -- line: 438
+								end) else List.filter(p199, function(p201) -- line: 439
 									-- upvalues: t21 (copy)
 									return p201 ~= t21.messageId
 								end)
 
-								if #v479 == 0 then
+								if #v480 == 0 then
 									return nil
 								end
 
-								return v479
+								return v480
 							end
 
 							if FFlagExpChatMessagesStoreUseProxy then
-								v52[userId] = v293(v52[userId])
+								v53[userId] = v294(v53[userId])
 
 								return
 							end
 
-							v51(function(p202) -- line: 357
-								-- upvalues: v293 (copy), userId (copy), Dictionary (copy)
-								local v481 = v293(p202[userId])
+							v52(function(p202) -- line: 358
+								-- upvalues: v294 (copy), userId (copy), Dictionary (copy)
+								local v482 = v294(p202[userId])
 
-								if v481 == nil then
+								if v482 == nil then
 									return Dictionary.removeKey(p202, userId)
 								end
 
 								return Dictionary.join(p202, {
-									[userId] = v481
+									[userId] = v482
 								})
 							end)
 						end
@@ -3191,45 +3192,45 @@ local function createMessagesStore(p1) -- line: 176
 					if not FFlagExpChatMessagesStoreMemoryCleanup and t21.userId then
 						local userId = t21.userId
 
-						local function v295(p203) -- line: 461
+						local function v296(p203) -- line: 462
 							-- upvalues: t21 (copy), List (copy)
 							if not p203 then
 								return nil
 							end
 
-							local v483 = nil
+							local v484 = nil
 
 							for i, v in ipairs(p203) do
 								if v.messageId == t21.messageId then
-									v483 = i
+									v484 = i
 
 									break
 								end
 							end
 
-							if v483 then
-								return List.set(p203, v483, t21)
+							if v484 then
+								return List.set(p203, v484, t21)
 							end
 
 							return p203
 						end
 
 						if FFlagExpChatMessagesStoreUseProxy then
-							v52[userId] = v295(v52[userId])
+							v53[userId] = v296(v53[userId])
 
 							return
 						end
 
-						v51(function(p204) -- line: 357
-							-- upvalues: v295 (copy), userId (copy), Dictionary (copy)
-							local v487 = v295(p204[userId])
+						v52(function(p204) -- line: 358
+							-- upvalues: v296 (copy), userId (copy), Dictionary (copy)
+							local v488 = v296(p204[userId])
 
-							if v487 == nil then
+							if v488 == nil then
 								return Dictionary.removeKey(p204, userId)
 							end
 
 							return Dictionary.join(p204, {
-								[userId] = v487
+								[userId] = v488
 							})
 						end)
 					end
@@ -3241,17 +3242,17 @@ local function createMessagesStore(p1) -- line: 176
 				local partOrModel = t21.partOrModel
 
 				if not userId and partOrModel then
-					userId = v66(false)[partOrModel]
+					userId = v67(false)[partOrModel]
 
 					if not userId then
 						userId = HttpService:GenerateGUID(false)
-						v65(function(p205) -- line: 496
+						v66(function(p205) -- line: 497
 							-- upvalues: Dictionary (copy), userId (ref), partOrModel (copy)
 							return Dictionary.join(p205, {
 								[userId] = partOrModel
 							})
 						end)
-						v67(function(p206) -- line: 503
+						v68(function(p206) -- line: 504
 							-- upvalues: Dictionary (copy), partOrModel (copy), userId (ref)
 							return Dictionary.join(p206, {
 								[partOrModel] = userId
@@ -3260,230 +3261,230 @@ local function createMessagesStore(p1) -- line: 176
 					end
 				end
 
-				local v298 = if userId == t21.userId then t21 else Dictionary.join(t21, {
+				local v299 = if userId == t21.userId then t21 else Dictionary.join(t21, {
 					userId = userId
 				})
 				local channelNameOverride = nil
 
-				if GetFFlagTextChatEnableUniverseChatTabs() and v298.channelNameOverride then
-					channelNameOverride = v298.channelNameOverride
-				elseif v298.textChannel then
-					channelNameOverride = if v298.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v68(false)) then v298.textChannel.Name else "RBXGeneral"
+				if GetFFlagTextChatEnableUniverseChatTabs() and v299.channelNameOverride then
+					channelNameOverride = v299.channelNameOverride
+				elseif v299.textChannel then
+					channelNameOverride = if v299.textChannel.Name ~= "RBXSystem" and (not GetFFlagTextChatEnableUniverseChatTabs() or v69(false)) then v299.textChannel.Name else "RBXGeneral"
 				end
 
-				if v298.isVisibleInChatWindow then
-					local v300 = v53(false)
-					local v301 = if not channelNameOverride then {} else v55(false)[channelNameOverride] or {}
+				if v299.isVisibleInChatWindow then
+					local v301 = v54(false)
+					local v302 = if not channelNameOverride then {} else v56(false)[channelNameOverride] or {}
 
-					if #v300 >= t1.messageLimit then
-						local v302 = v300[1]
-						local v303 = v289 and v289[v302]
+					if #v301 >= t1.messageLimit then
+						local v303 = v301[1]
+						local v304 = v290 and v290[v303]
 
-						if v303 then
+						if v304 then
 							if not FFlagExpChatMessagesStoreKeepInByMessageId then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v302] = nil
+									v50[v303] = nil
 								else
-									v48(function(p207) -- line: 273
-										-- upvalues: Dictionary (copy), v302 (copy)
-										return Dictionary.removeKey(p207, v302)
+									v49(function(p207) -- line: 274
+										-- upvalues: Dictionary (copy), v303 (copy)
+										return Dictionary.removeKey(p207, v303)
 									end)
 								end
 							end
 
-							if v303.userId then
-								local userId12 = v303.userId
+							if v304.userId then
+								local userId12 = v304.userId
 
-								local function v305(p208) -- line: 550
-									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v302 (copy), v64 (copy), v303 (copy), v67 (copy), Dictionary (copy), v65 (copy)
+								local function v306(p208) -- line: 551
+									-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), List (copy), v303 (copy), v65 (copy), v304 (copy), v68 (copy), Dictionary (copy), v66 (copy)
 									if not p208 then
 										return nil
 									end
 
-									local v492 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p208, function(p209) -- line: 560
-										-- upvalues: v302 (copy)
-										return p209.messageId ~= v302
-									end) else List.filter(p208, function(p210) -- line: 556
-										-- upvalues: v302 (copy)
-										return p210 ~= v302
+									local v493 = if not FFlagExpChatMessagesStoreMemoryCleanup then List.filter(p208, function(p209) -- line: 561
+										-- upvalues: v303 (copy)
+										return p209.messageId ~= v303
+									end) else List.filter(p208, function(p210) -- line: 557
+										-- upvalues: v303 (copy)
+										return p210 ~= v303
 									end)
 
-									if #v492 == 0 then
-										local v493 = v64(false)
+									if #v493 == 0 then
+										local v494 = v65(false)
 
-										if v493[v303.userId] then
-											local v494 = v493[v303.userId]
+										if v494[v304.userId] then
+											local v495 = v494[v304.userId]
 
-											v67(function(p211) -- line: 571
-												-- upvalues: Dictionary (copy), v494 (copy)
-												return Dictionary.removeKey(p211, v494)
+											v68(function(p211) -- line: 572
+												-- upvalues: Dictionary (copy), v495 (copy)
+												return Dictionary.removeKey(p211, v495)
 											end)
-											v65(function(p212) -- line: 575
-												-- upvalues: Dictionary (copy), v303 (copy)
-												return Dictionary.removeKey(p212, v303.userId)
+											v66(function(p212) -- line: 576
+												-- upvalues: Dictionary (copy), v304 (copy)
+												return Dictionary.removeKey(p212, v304.userId)
 											end)
 										end
 
 										return nil
 									end
 
-									return v492
+									return v493
 								end
 
 								if FFlagExpChatMessagesStoreUseProxy then
-									v52[userId12] = v305(v52[userId12])
+									v53[userId12] = v306(v53[userId12])
 								else
-									v51(function(p213) -- line: 357
-										-- upvalues: v305 (copy), userId12 (copy), Dictionary (copy)
-										local v496 = v305(p213[userId12])
+									v52(function(p213) -- line: 358
+										-- upvalues: v306 (copy), userId12 (copy), Dictionary (copy)
+										local v497 = v306(p213[userId12])
 
-										if v496 == nil then
+										if v497 == nil then
 											return Dictionary.removeKey(p213, userId12)
 										end
 
 										return Dictionary.join(p213, {
-											[userId12] = v496
+											[userId12] = v497
 										})
 									end)
 								end
 							end
 
-							v54(function(p214) -- line: 587
+							v55(function(p214) -- line: 588
 								-- upvalues: List (copy)
 								return List.removeIndex(p214, 1)
 							end)
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v302] = nil
+								t4[v303] = nil
 							end
 						end
 					end
 
-					if channelNameOverride and #v301 >= t1.messageLimit then
-						local v306 = v301[1]
+					if channelNameOverride and #v302 >= t1.messageLimit then
+						local v307 = v302[1]
 
-						if v306 then
-							v56(function(p215) -- line: 601
+						if v307 then
+							v57(function(p215) -- line: 602
 								-- upvalues: channelNameOverride (ref), List (copy), Dictionary (copy)
-								local v499 = p215[channelNameOverride] or {}
-								local v500 = List.removeIndex(v499, 1)
+								local v500 = p215[channelNameOverride] or {}
+								local v501 = List.removeIndex(v500, 1)
 
 								return Dictionary.join(p215, {
-									[channelNameOverride] = v500
+									[channelNameOverride] = v501
 								})
 							end)
 
-							if v289 and v289[v306] then
+							if v290 and v290[v307] then
 								if FFlagExpChatMessagesStoreUseProxy then
-									v49[v306] = nil
+									v50[v307] = nil
 								else
-									v48(function(p216) -- line: 273
-										-- upvalues: Dictionary (copy), v306 (copy)
-										return Dictionary.removeKey(p216, v306)
+									v49(function(p216) -- line: 274
+										-- upvalues: Dictionary (copy), v307 (copy)
+										return Dictionary.removeKey(p216, v307)
 									end)
 								end
 							end
 
 							if FFlagExpChatMessagesStoreMemoryCleanup then
-								t4[v306] = nil
+								t4[v307] = nil
 							end
 						end
 					end
 				end
 
-				writeByMessageId(v298.messageId, v298)
+				writeByMessageId(v299.messageId, v299)
 
-				if v298.userId then
-					local userId13 = v298.userId
+				if v299.userId then
+					local userId13 = v299.userId
 
-					local function v308(p217) -- line: 623
-						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v298 (copy), List (copy)
-						local v503 = p217 or {}
-						local v504 = false
+					local function v309(p217) -- line: 624
+						-- upvalues: FFlagExpChatMessagesStoreMemoryCleanup (copy), v299 (copy), List (copy)
+						local v504 = p217 or {}
+						local v505 = false
 
 						if FFlagExpChatMessagesStoreMemoryCleanup then
-							for _, v in ipairs(v503) do
-								if v == v298.messageId then
-									v504 = true
+							for _, v in ipairs(v504) do
+								if v == v299.messageId then
+									v505 = true
 
 									break
 								end
 							end
 						else
-							for _, v in ipairs(v503) do
-								if v.messageId == v298.messageId then
-									v504 = true
+							for _, v in ipairs(v504) do
+								if v.messageId == v299.messageId then
+									v505 = true
 
 									break
 								end
 							end
 						end
 
-						if not v504 then
-							local v509 = if not FFlagExpChatMessagesStoreMemoryCleanup then v298 else v298.messageId
+						if not v505 then
+							local v510 = if not FFlagExpChatMessagesStoreMemoryCleanup then v299 else v299.messageId
 
-							return List.append(v503, v509)
+							return List.append(v504, v510)
 						end
 
-						return v503
+						return v504
 					end
 
 					if FFlagExpChatMessagesStoreUseProxy then
-						v52[userId13] = v308(v52[userId13])
+						v53[userId13] = v309(v53[userId13])
 					else
-						v51(function(p218) -- line: 357
-							-- upvalues: v308 (copy), userId13 (copy), Dictionary (copy)
-							local v511 = v308(p218[userId13])
+						v52(function(p218) -- line: 358
+							-- upvalues: v309 (copy), userId13 (copy), Dictionary (copy)
+							local v512 = v309(p218[userId13])
 
-							if v511 == nil then
+							if v512 == nil then
 								return Dictionary.removeKey(p218, userId13)
 							end
 
 							return Dictionary.join(p218, {
-								[userId13] = v511
+								[userId13] = v512
 							})
 						end)
 					end
 				end
 
-				if v298.isVisibleInChatWindow then
-					v54(function(p219) -- line: 656
-						-- upvalues: List (copy), v298 (copy)
-						return List.append(p219, v298.messageId)
+				if v299.isVisibleInChatWindow then
+					v55(function(p219) -- line: 657
+						-- upvalues: List (copy), v299 (copy)
+						return List.append(p219, v299.messageId)
 					end)
 
 					if channelNameOverride then
-						v56(function(p220) -- line: 662
-							-- upvalues: channelNameOverride (ref), List (copy), v298 (copy), Dictionary (copy)
-							local v514 = p220[channelNameOverride] or {}
-							local v515 = List.append(v514, v298.messageId)
+						v57(function(p220) -- line: 663
+							-- upvalues: channelNameOverride (ref), List (copy), v299 (copy), Dictionary (copy)
+							local v515 = p220[channelNameOverride] or {}
+							local v516 = List.append(v515, v299.messageId)
 
 							return Dictionary.join(p220, {
-								[channelNameOverride] = v515
+								[channelNameOverride] = v516
 							})
 						end)
 					end
 
 					if FFlagExpChatEnableV2ChatWindow then
-						local v309 = v77(false)
+						local v310 = v78(false)
 
-						if v309 == nil or v309 == channelNameOverride then
-							updateNextMessageComponent(v298.messageId)
+						if v310 == nil or v310 == channelNameOverride then
+							updateNextMessageComponent(v299.messageId)
 						end
 					end
 				end
 			end
 
 			if FFlagExpChatMessagesStoreBatch then
-				SignalsExperimental.batch(v140)
+				SignalsExperimental.batch(v141)
 
 				return
 			end
 
-			v140()
+			v141()
 		end,
-		getChannelTabsConfigurationEnabled = v68,
-		setChannelTabsConfigurationEnabled = v69
+		getChannelTabsConfigurationEnabled = v69,
+		setChannelTabsConfigurationEnabled = v70
 	}
 end
 

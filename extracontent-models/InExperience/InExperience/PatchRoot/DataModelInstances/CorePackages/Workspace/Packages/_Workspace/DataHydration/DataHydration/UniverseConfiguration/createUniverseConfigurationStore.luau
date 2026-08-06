@@ -26,14 +26,14 @@ local function createUniverseConfigurationStore(t1: {[any]: any}?) -- line: 23
 
 		return fetchUniverseConfiguration.fetchSummary(n2, t2):andThen(function(p1) -- line: 32
 			-- upvalues: t3 (ref), n2 (copy), v17 (copy), Cryo (copy)
-			local v31 = t3[n2]
+			local v37 = t3[n2]
 
-			if v31 == nil then
+			if v37 == nil then
 				return p1
 			end
 
-			if v17 <= v31.generation then
-				return Cryo.Dictionary.join(p1, v31.patch)
+			if v17 <= v37.generation then
+				return Cryo.Dictionary.join(p1, v37.patch)
 			end
 
 			t3[n2] = nil
@@ -75,56 +75,93 @@ local function createUniverseConfigurationStore(t1: {[any]: any}?) -- line: 23
 	return {
 		getSummary = v12.get,
 		fetchSummary = v12.fetch,
+		refreshSummary = function(n5: number) -- line: 93
+			-- upvalues: fetchUniverseConfiguration (copy), t2 (copy), v12 (copy)
+			return fetchUniverseConfiguration.fetchSummary(n5, t2):andThen(function(p3) -- line: 94
+				-- upvalues: v12 (copy), n5 (copy)
+				v12.cache.replaceItem(tostring(n5), p3)
+
+				return p3
+			end)
+		end,
 		getAndFetchSummary = v12.getAndFetch,
-		updateSummary = v12.update,
+		updateSummary = function(n6: number, p4) -- line: 81
+			-- upvalues: v12 (copy), Cryo (copy)
+			local v28 = v12.get(n6).data(false)
+
+			if v28 == nil then
+				return
+			end
+
+			local v29 = Cryo.Dictionary.join(v28, p4)
+
+			v12.update(n6, v29)
+		end,
 		getConfiguration = v13.get,
 		fetchConfiguration = v13.fetch,
+		refreshConfiguration = function(n7: number) -- line: 100
+			-- upvalues: fetchUniverseConfiguration (copy), t2 (copy), v13 (copy)
+			return fetchUniverseConfiguration.fetchConfiguration(n7, t2):andThen(function(p5) -- line: 103
+				-- upvalues: v13 (copy), n7 (copy)
+				v13.cache.replaceItem(tostring(n7), p5)
+
+				return p5
+			end)
+		end,
 		getAndFetchConfiguration = v13.getAndFetch,
-		updateConfiguration = function(n5: number, p3) -- line: 71
+		updateConfiguration = function(n8: number, p6) -- line: 71
 			-- upvalues: v13 (copy), Cryo (copy)
-			local v24 = v13.get(n5).data(false)
+			local v24 = v13.get(n8).data(false)
 
 			if v24 == nil then
 				return
 			end
 
-			local v25 = Cryo.Dictionary.join(v24, p3)
+			local v25 = Cryo.Dictionary.join(v24, p6)
 
-			v13.update(n5, v25)
+			v13.update(n8, v25)
 		end,
-		patchConfiguration = function(n6: number, p4) -- line: 81
-			-- upvalues: fetchUniverseConfiguration (copy), t2 (copy), v13 (copy), getSummaryPatch (copy), v12 (copy), t3 (ref), n1 (ref)
-			return fetchUniverseConfiguration.patchConfiguration(n6, p4, t2):andThen(function(p5) -- line: 87
-				-- upvalues: v13 (copy), n6 (copy), p4 (copy), getSummaryPatch (copy), v12 (copy), t3 (ref), n1 (ref)
-				v13.update(n6, p5)
-				v13.update(n6, p4)
+		patchConfiguration = function(n9: number, p7) -- line: 109
+			-- upvalues: fetchUniverseConfiguration (copy), t2 (copy), v13 (copy), getSummaryPatch (copy), v12 (copy), t3 (ref), n1 (ref), Cryo (copy)
+			return fetchUniverseConfiguration.patchConfiguration(n9, p7, t2):andThen(function(p8) -- line: 115
+				-- upvalues: v13 (copy), n9 (copy), p7 (copy), getSummaryPatch (copy), v12 (copy), t3 (ref), n1 (ref), Cryo (copy)
+				v13.update(n9, p8)
+				v13.update(n9, p7)
 
-				local v33 = getSummaryPatch(p4)
+				local v41 = getSummaryPatch(p7)
 
-				if v33 ~= nil and v12.get(n6).data(false) ~= nil then
-					t3[n6] = {
+				if v41 ~= nil and v12.get(n9).data(false) ~= nil then
+					t3[n9] = {
 						generation = n1,
-						patch = v33
+						patch = v41
 					}
-					v12.update(n6, v33)
+
+					local v42 = n9
+					local v43 = v12.get(v42).data(false)
+
+					if v43 ~= nil then
+						local v44 = Cryo.Dictionary.join(v43, v41)
+
+						v12.update(v42, v44)
+					end
 				end
 
-				return (v13.get(n6).data(false))
+				return (v13.get(n9).data(false))
 			end)
 		end,
 		getTeamCreate = v14.get,
 		fetchTeamCreate = v14.fetch,
 		getAndFetchTeamCreate = v14.getAndFetch,
-		setTeamCreate = function(n7: number, b1: boolean) -- line: 104
+		setTeamCreate = function(n10: number, b1: boolean) -- line: 132
 			-- upvalues: fetchUniverseConfiguration (copy), t2 (copy), v14 (copy)
-			return fetchUniverseConfiguration.setTeamCreate(n7, b1, t2):andThen(function(p6) -- line: 105
-				-- upvalues: v14 (copy), n7 (copy)
-				v14.update(n7, p6)
+			return fetchUniverseConfiguration.setTeamCreate(n10, b1, t2):andThen(function(p9) -- line: 133
+				-- upvalues: v14 (copy), n10 (copy)
+				v14.update(n10, p9)
 
-				return p6
+				return p9
 			end)
 		end,
-		clear = function() -- line: 111
+		clear = function() -- line: 139
 			-- upvalues: n1 (ref), t3 (ref), v12 (copy), v13 (copy), v14 (copy)
 			n1 = 0
 			t3 = {}
@@ -132,7 +169,7 @@ local function createUniverseConfigurationStore(t1: {[any]: any}?) -- line: 23
 			v13.clear()
 			v14.clear()
 		end,
-		dispose = function() -- line: 119
+		dispose = function() -- line: 147
 			-- upvalues: v12 (copy), v13 (copy), v14 (copy)
 			v12.dispose()
 			v13.dispose()

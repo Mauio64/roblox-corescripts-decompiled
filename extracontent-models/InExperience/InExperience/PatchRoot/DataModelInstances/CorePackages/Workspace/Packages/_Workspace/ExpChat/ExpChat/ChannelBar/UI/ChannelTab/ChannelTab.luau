@@ -57,7 +57,8 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 	if FFlagExpChatChannelTabRefactor or GetFFlagEnableExpChatUniverseChatTabNames() then
 		local v35 = Localization.useLocalization({
 			yourServer = "CoreScripts.TextChat.ChannelTabs.Here",
-			moreServers = "CoreScripts.TextChat.ChannelTabs.Global2"
+			moreServers = "CoreScripts.TextChat.ChannelTabs.Global2",
+			friends = "CoreScripts.TextChat.ChannelTabs.Friends"
 		})
 
 		if FFlagExpChatChannelTabRefactor then
@@ -84,7 +85,7 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 					channelName = v35.moreServers
 				end
 			elseif FFlagExpChatEnableFriendsTab and tabType == "FriendsChat" then
-				channelName = "Friends"
+				channelName = v35.friends
 			else
 				unreachable(tabType)
 			end
@@ -109,12 +110,12 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 		local v47, v48 = React.useBinding(nil)
 		local v49, v50 = React.useBinding(nil)
 
-		function v44(p1) -- line: 145
+		function v44(p1) -- line: 146
 			-- upvalues: v50 (copy)
 			v50(p1.AbsoluteSize.X)
 		end
 
-		React.useEffect(function() -- line: 150
+		React.useEffect(function() -- line: 151
 			-- upvalues: v48 (copy), v33 (copy), v39 (copy), v17 (copy)
 			v48(nil)
 
@@ -124,7 +125,7 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 
 			local u56 = false
 
-			task.spawn(function() -- line: 157
+			task.spawn(function() -- line: 158
 				-- upvalues: v39 (copy), v33 (copy), v17 (copy), u56 (ref), v48 (copy)
 				local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
 
@@ -133,7 +134,7 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 				GetTextBoundsParams.Size = v33.channelTabsSettings.TextSize
 				GetTextBoundsParams.Width = 1e999
 
-				local ok, result = pcall(function() -- line: 164
+				local ok, result = pcall(function() -- line: 165
 					-- upvalues: v17 (copy), GetTextBoundsParams (copy)
 					return v17:GetTextBoundsAsync(GetTextBoundsParams)
 				end)
@@ -143,7 +144,7 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 				end
 			end)
 
-			return function() -- line: 172
+			return function() -- line: 173
 				-- upvalues: u56 (ref)
 				u56 = true
 			end
@@ -159,12 +160,12 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 			local v51 = React.joinBindings({
 				naturalTextWidth = v47,
 				tabWidth = v49
-			}):map(function(p2) -- line: 189
+			}):map(function(p2) -- line: 190
 				-- upvalues: getUnreadIndicatorLayout (copy), v33 (copy), v25 (copy)
 				return getUnreadIndicatorLayout(v33.hasUnreadMessages, v33.isTabCollapsed, p2.tabWidth, p2.naturalTextWidth, v25, 8, 8)
 			end)
 
-			v45 = v51:map(function(p3) -- line: 200
+			v45 = v51:map(function(p3) -- line: 201
 				-- upvalues: v25 (copy)
 				if p3 then
 					return (UDim2.new(0, p3.textWidth, 1, 0))
@@ -172,7 +173,7 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 
 				return (UDim2.new(1, -(v25 * 2 + 8 + 8), 1, 0))
 			end)
-			v46 = v51:map(function(p4) -- line: 205
+			v46 = v51:map(function(p4) -- line: 206
 				-- upvalues: v25 (copy)
 				if p4 then
 					return (UDim2.fromOffset(p4.textLeft, 0))
@@ -189,17 +190,17 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 		BackgroundColor3 = v33.isTabCollapsed and v40 or v33.channelTabsSettings.BackgroundColor3,
 		BorderSizePixel = 0,
 		SelectionImageObject = v42,
-		onStateChanged = function() -- line: 221
+		onStateChanged = function() -- line: 222
 		end,
 		[React.Change.AbsoluteSize] = v44,
 		[React.Event.Activated] = v33.onTabSelected,
-		[React.Event.MouseEnter] = function() -- line: 224
+		[React.Event.MouseEnter] = function() -- line: 225
 			-- upvalues: v33 (copy), v41 (copy)
 			if v33.isTabCollapsed then
 				v41(v33.channelTabsSettings.HoverBackgroundColor3)
 			end
 		end,
-		[React.Event.MouseLeave] = function() -- line: 229
+		[React.Event.MouseLeave] = function() -- line: 230
 			-- upvalues: v33 (copy), v41 (copy)
 			if v33.isTabCollapsed then
 				v41(v33.channelTabsSettings.BackgroundColor3)
@@ -247,7 +248,7 @@ local function ChannelTab(t2: {[any]: any}) -- line: 80
 	})
 end
 
-return GameLocalization.connect(function(p5) -- line: 286
+return GameLocalization.connect(function(p5) -- line: 287
 	-- upvalues: FFlagExpChatChannelTabRefactor (copy), GetFFlagEnableExpChatUniverseChatTabNames (copy), Players (copy), getOtherDisplayNameInWhisperChannel (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
 	local channelName = p5.channelName
 

@@ -29,7 +29,6 @@ local FFlagLuaAppUnlockUpsellSupport = require(SduiSharedContentParent.SharedFla
 local FFlagSduiDevStoreSeeAllSupport = require(SduiSharedContentParent.SharedFlags).FFlagSduiDevStoreSeeAllSupport
 local FFlagSduiPlayWithReward = require(SduiSharedContentParent.SharedFlags).FFlagSduiPlayWithReward
 local FFlagSduiDismissPromptAction = require(SduiSharedContentParent.SharedFlags).FFlagSduiDismissPromptAction
-local FFlagLuaAppSduiVerificationUpsellActions = require(SduiSharedContentParent.SharedFlags).FFlagLuaAppSduiVerificationUpsellActions
 local FFlagSduiShimmerTextComponentEnabled = require(SduiSharedContentParent.SharedFlags).FFlagSduiShimmerTextComponentEnabled
 local FFlagSduiTooltipComponentEnabled = require(SduiSharedContentParent.SharedFlags).FFlagSduiTooltipComponentEnabled
 local FFlagLuaAppSduiPlaceholderSupport = require(SduiSharedContentParent.SharedFlags).FFlagLuaAppSduiPlaceholderSupport
@@ -37,9 +36,10 @@ local FFlagSduiSkeletonComponentEnabled = require(SduiSharedContentParent.Shared
 local FFlagSduiRevealTextComponentEnabled = require(SduiSharedContentParent.SharedFlags).FFlagSduiRevealTextComponentEnabled
 local FFlagSduiAiOverviewEnabled = require(SduiSharedContentParent.SharedFlags).FFlagSduiAiOverviewEnabled
 local FFlagSduiCollectionCarouselPlaceholderItem = require(SduiSharedContentParent.SharedFlags).FFlagSduiCollectionCarouselPlaceholderItem
+local FFlagSduiShowToastAction = require(SduiSharedContentParent.SharedFlags).FFlagSduiShowToastAction
 
 local function registerSharedActions() -- line: 53
-	-- upvalues: SduiActionType (copy), FFlagSduiChartsSupport (copy), v23 (copy), SduiSharedContent (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiDismissPromptAction (copy), FFlagLuaAppSduiVerificationUpsellActions (copy), getSduiActionHandlerRegistry (copy)
+	-- upvalues: SduiActionType (copy), FFlagSduiChartsSupport (copy), v23 (copy), SduiSharedContent (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiDismissPromptAction (copy), FFlagSduiShowToastAction (copy), getSduiActionHandlerRegistry (copy)
 	local t1 = {
 		[SduiActionType.CustomAnalyticsEvent] = if not FFlagSduiChartsSupport and not v23 then nil else {
 			skipUnifiedLogging = true,
@@ -83,11 +83,11 @@ local function registerSharedActions() -- line: 53
 				return require(SduiSharedContent.Actions.SduiDismissPromptAction)
 			end
 		},
-		[SduiActionType.OpenFacialAgeEstimation] = if not FFlagLuaAppSduiVerificationUpsellActions then nil else {
+		[SduiActionType.ShowToast] = if not FFlagSduiShowToastAction then nil else {
 			skipUnifiedLogging = false,
 			lazyHandler = function() -- line: 105
 				-- upvalues: SduiSharedContent (copy)
-				return require(SduiSharedContent.Actions.SduiOpenFacialAgeEstimationAction)
+				return require(SduiSharedContent.Actions.SduiShowToastAction)
 			end
 		}
 	}

@@ -4,7 +4,7 @@ require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
 return {
 	DisplayLocation = ({
 		DisplayLocation = {
-			fromNumber = function(n1: number) -- line: 36
+			fromNumber = function(n1: number) -- line: 37
 				if n1 == 0 then
 					return "DISPLAY_LOCATION_INVALID"
 				end
@@ -73,9 +73,13 @@ return {
 					return "DISPLAY_LOCATION_MARKETPLACE_FAVORITES_SAVED"
 				end
 
+				if n1 == 17 then
+					return "DISPLAY_LOCATION_PRE_AUTH_LANDING"
+				end
+
 				return nil
 			end,
-			toNumber = function(p1) -- line: 76
+			toNumber = function(p1) -- line: 79
 				if p1 == "DISPLAY_LOCATION_INVALID" then
 					return 0
 				end
@@ -144,9 +148,13 @@ return {
 					return 16
 				end
 
+				if p1 == "DISPLAY_LOCATION_PRE_AUTH_LANDING" then
+					return 17
+				end
+
 				return p1
 			end,
-			fromName = function(s1: string) -- line: 116
+			fromName = function(s1: string) -- line: 121
 				if s1 == "DISPLAY_LOCATION_INVALID" then
 					return "DISPLAY_LOCATION_INVALID"
 				end
@@ -213,6 +221,10 @@ return {
 
 				if s1 == "DISPLAY_LOCATION_MARKETPLACE_FAVORITES_SAVED" then
 					return "DISPLAY_LOCATION_MARKETPLACE_FAVORITES_SAVED"
+				end
+
+				if s1 == "DISPLAY_LOCATION_PRE_AUTH_LANDING" then
+					return "DISPLAY_LOCATION_PRE_AUTH_LANDING"
 				end
 
 				return nil

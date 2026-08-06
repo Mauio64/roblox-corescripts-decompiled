@@ -1,7 +1,7 @@
 local GenreTaxonomy = require(script.Parent.GenreTaxonomy)
 
 return {
-	resolveGenreLevels = function(s1: string) -- line: 7
+	resolveGenreLevels = function(s1: string) -- line: 6
 		-- upvalues: GenreTaxonomy (copy)
 		for _, v4 in GenreTaxonomy.genres do
 			if s1 == v4.id then

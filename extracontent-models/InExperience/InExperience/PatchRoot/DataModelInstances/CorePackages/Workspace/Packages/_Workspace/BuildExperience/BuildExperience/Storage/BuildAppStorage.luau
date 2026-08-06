@@ -1,13 +1,13 @@
-local function getUtcDate(s1: string) -- line: 16
+local function getUtcDate(s1: string) -- line: 14
 	return string.match(s1, "^(%d%d%d%d%-%d%d%-%d%d)")
 end
-local function isSameUtcDate(s2: string?, s3: string) -- line: 20
+local function isSameUtcDate(s2: string?, s3: string) -- line: 18
 	return s2 ~= nil and string.match(s2, "^(%d%d%d%d%-%d%d%-%d%d)") == string.match(s3, "^(%d%d%d%d%-%d%d%-%d%d)")
 end
-local function createBuildAppStorage(p1, p2) -- line: 24
+local function createBuildAppStorage(p1, p2) -- line: 22
 	local u10 = nil
 
-	local function readData() -- line: 27
+	local function readData() -- line: 25
 		-- upvalues: p1 (copy), p2 (copy)
 		local ok, result = pcall(p1.GetItem, p1, "BuildAppStorageKey")
 
@@ -23,7 +23,7 @@ local function createBuildAppStorage(p1, p2) -- line: 24
 
 		return result2
 	end
-	local function writeData(t1: {[any]: any}) -- line: 41
+	local function writeData(t1: {[any]: any}) -- line: 39
 		-- upvalues: p2 (copy), p1 (copy)
 		local ok, result = pcall(p2.JSONEncode, p2, t1)
 
@@ -31,7 +31,7 @@ local function createBuildAppStorage(p1, p2) -- line: 24
 			return false
 		end
 
-		return (pcall(function() -- line: 47
+		return (pcall(function() -- line: 45
 			-- upvalues: p1 (copy), result (copy)
 			p1:SetItem("BuildAppStorageKey", result)
 			p1:Flush()
@@ -40,7 +40,7 @@ local function createBuildAppStorage(p1, p2) -- line: 24
 
 	return {
 		STORAGE_KEY = "BuildAppStorageKey",
-		wasPushNotificationsUpsellShownToday = function(p3) -- line: 54
+		wasPushNotificationsUpsellShownToday = function(p3) -- line: 52
 			-- upvalues: u10 (ref), readData (copy)
 			local v21 = (p3 or DateTime.now()):ToIsoDate()
 			local v22 = u10
@@ -60,7 +60,7 @@ local function createBuildAppStorage(p1, p2) -- line: 24
 
 			return v24
 		end,
-		markPushNotificationsUpsellShown = function(p4) -- line: 65
+		markPushNotificationsUpsellShown = function(p4) -- line: 63
 			-- upvalues: u10 (ref), readData (copy), p2 (copy), p1 (copy)
 			local v27 = (p4 or DateTime.now()):ToIsoDate()
 
@@ -79,13 +79,13 @@ local function createBuildAppStorage(p1, p2) -- line: 24
 				return false
 			end
 
-			return (pcall(function() -- line: 47
+			return (pcall(function() -- line: 45
 				-- upvalues: p1 (copy), result (copy)
 				p1:SetItem("BuildAppStorageKey", result)
 				p1:Flush()
 			end))
 		end,
-		clearSessionCacheForTests = function() -- line: 83
+		clearSessionCacheForTests = function() -- line: 81
 			-- upvalues: u10 (ref)
 			u10 = nil
 		end

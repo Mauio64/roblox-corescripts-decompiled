@@ -3,6 +3,7 @@ local AppChatParent = AppChat.Parent
 local React = require(AppChatParent.React)
 local Cryo = require(AppChatParent.Cryo)
 local OrderedMap = require(AppChatParent.AppCommonLib).OrderedMap
+local useCanAccessParty = require(AppChatParent.Squads.useCanAccessParty)
 local RoactRodux = require(AppChatParent.RoactUtils).Hooks.RoactRodux
 local useSelector = RoactRodux.useSelector
 local useStore = RoactRodux.useStore
@@ -13,199 +14,215 @@ require(AppChat.Components.EventReceivers.PlatformChatConversationTypes)
 local useRealtimePlatformChatConversation = require(AppChat.Components.EventReceivers.useRealtimePlatformChatConversation)
 local getDeepValue = require(AppChat.Utils.getDeepValue)
 local MessageModel = require(AppChat.Models.MessageModel)
-
-require(script.Parent.Types)
-
+local Types = require(script.Parent.Types)
 local SmartSuggestionActionHandler = require(script.Parent.SmartSuggestionActionHandler)
 local fetchSmartSuggestions = require(script.Parent.fetchSmartSuggestions)
+local useStartPartySuggestion = require(script.Parent.useStartPartySuggestion)
 local createSmartSuggestionActionHandler = SmartSuggestionActionHandler.createSmartSuggestionActionHandler
+local SuggestionType = Types.SuggestionType
 local t1 = {}
 
-local function getConversationMessages(p1, s1: string?) -- line: 47
+local function getConversationMessages(p1, s1: string?) -- line: 50
 	-- upvalues: getDeepValue (copy)
 	if s1 == nil then
 		return nil
 	end
 
-	local v23 = getDeepValue(p1, `ChatAppReducer.Conversations.{ s1 }`)
+	local v27 = getDeepValue(p1, `ChatAppReducer.Conversations.{ s1 }`)
 
-	if v23 == nil or v23.messages == nil then
+	if v27 == nil or v27.messages == nil then
 		return nil
 	end
 
-	return v23.messages
+	return v27.messages
 end
-local function getLatestUserMessageId(p2, s2: string?) -- line: 60
+local function getLatestUserMessageId(p2, s2: string?) -- line: 63
 	-- upvalues: getDeepValue (copy), OrderedMap (copy), MessageModel (copy)
-	local v26
+	local v30
 
 	if s2 == nil then
-		v26 = nil
+		v30 = nil
 	else
-		local v27 = getDeepValue(p2, `ChatAppReducer.Conversations.{ s2 }`)
+		local v31 = getDeepValue(p2, `ChatAppReducer.Conversations.{ s2 }`)
 
-		v26 = if v27 ~= nil and v27.messages ~= nil then v27.messages else nil
+		v30 = if v31 ~= nil and v31.messages ~= nil then v31.messages else nil
 	end
 
-	if v26 == nil or v26.keys == nil or v26.values == nil then
+	if v30 == nil or v30.keys == nil or v30.values == nil then
 		return nil
 	end
 
-	for i = OrderedMap.Length(v26), 1, -1 do
-		local v29 = OrderedMap.GetByIndex(v26, i)
+	for i = OrderedMap.Length(v30), 1, -1 do
+		local v33 = OrderedMap.GetByIndex(v30, i)
 
-		if v29 and v29.senderType == MessageModel.SenderTypes.User then
-			return v29.id
+		if v33 and v33.senderType == MessageModel.SenderTypes.User then
+			return v33.id
 		end
 	end
 
 	return nil
 end
-local function isMessageCommitted(p3, s3: string, s4: string) -- line: 76
+local function isMessageCommitted(p3, s3: string, s4: string) -- line: 79
 	-- upvalues: getDeepValue (copy), OrderedMap (copy)
-	local v33
+	local v37
 
 	if s3 == nil then
-		v33 = nil
+		v37 = nil
 	else
-		local v34 = getDeepValue(p3, `ChatAppReducer.Conversations.{ s3 }`)
+		local v38 = getDeepValue(p3, `ChatAppReducer.Conversations.{ s3 }`)
 
-		v33 = if v34 ~= nil and v34.messages ~= nil then v34.messages else nil
+		v37 = if v38 ~= nil and v38.messages ~= nil then v38.messages else nil
 	end
 
-	return v33 ~= nil and (v33.values ~= nil and OrderedMap.Get(v33, s4) ~= nil)
+	return v37 ~= nil and (v37.values ~= nil and OrderedMap.Get(v37, s4) ~= nil)
 end
-local function useSmartSuggestions(s5: string, p4: ((...any) -> ...any), p5: ((...any) -> ...any)) -- line: 81
-	-- upvalues: useStore (copy), React (copy), getLatestUserMessageId (copy), useSelector (copy), createSmartSuggestionActionHandler (copy), t1 (copy), fetchSmartSuggestions (copy), Constants (copy), getDeepValue (copy), OrderedMap (copy), useRealtimePlatformChatConversation (copy), Cryo (copy)
-	local v38 = useStore()
-	local v39 = React.useCallback(function(p6) -- line: 87
+local function useSmartSuggestions(s5: string, p4: ((...any) -> ...any), p5: ((...any) -> ...any)) -- line: 84
+	-- upvalues: useCanAccessParty (copy), useStartPartySuggestion (copy), useStore (copy), React (copy), getLatestUserMessageId (copy), useSelector (copy), createSmartSuggestionActionHandler (copy), t1 (copy), Cryo (copy), SuggestionType (copy), fetchSmartSuggestions (copy), Constants (copy), getDeepValue (copy), OrderedMap (copy), useRealtimePlatformChatConversation (copy)
+	local v42 = useCanAccessParty()
+	local v43 = useStartPartySuggestion(s5, v42)
+	local canStartParty = v43.canStartParty
+	local startParty = v43.startParty
+	local v46 = useStore()
+	local v47 = React.useCallback(function(p6) -- line: 94
 		-- upvalues: getLatestUserMessageId (copy), s5 (copy)
 		return (getLatestUserMessageId(p6, s5))
 	end, { s5 })
-	local v40 = useSelector(v39)
-	local v41 = React.useMemo(function() -- line: 91
-		-- upvalues: createSmartSuggestionActionHandler (copy), p4 (copy), p5 (copy)
+	local v48 = useSelector(v47)
+	local v49 = React.useMemo(function() -- line: 98
+		-- upvalues: createSmartSuggestionActionHandler (copy), p4 (copy), p5 (copy), startParty (copy)
 		return createSmartSuggestionActionHandler({
 			sendMessage = p4,
-			sendGameLinkChatMessage = p5
+			sendGameLinkChatMessage = p5,
+			startParty = startParty
 		})
 	end, {
 		p4,
-		p5
+		p5,
+		startParty
 	})
-	local v42, v43 = React.useState({})
-	local v44, v45 = React.useState(t1)
-	local v46 = React.useRef({
+	local v50, v51 = React.useState({})
+	local v52, v53 = React.useState(t1)
+	local v54 = React.useMemo(function() -- line: 108
+		-- upvalues: Cryo (copy), v50 (copy), SuggestionType (copy), canStartParty (copy)
+		return Cryo.List.filter(v50, function(p7) -- line: 109
+			-- upvalues: SuggestionType (copy), canStartParty (copy)
+			return p7.type ~= SuggestionType.StartParty or canStartParty
+		end)
+	end, {
+		v50,
+		canStartParty
+	})
+	local v55 = React.useRef({
 		requestId = 0,
 		pendingRealtimeNotification = nil,
-		previousNewestUserMessageId = v40,
+		previousNewestUserMessageId = v48,
 		newestMessageConversationId = s5
 	})
-	local v47 = React.useCallback(function() -- line: 111
-		-- upvalues: s5 (copy), v46 (copy), fetchSmartSuggestions (copy), v43 (copy), v45 (copy), t1 (copy)
+	local v56 = React.useCallback(function() -- line: 124
+		-- upvalues: s5 (copy), v55 (copy), fetchSmartSuggestions (copy), v51 (copy), v53 (copy), t1 (copy)
 		if s5 == nil then
 			return
 		end
 
-		local current = v46.current
+		local current = v55.current
 
 		current.requestId = current.requestId + 1
 
-		local requestId = v46.current.requestId
+		local requestId = v55.current.requestId
 
-		fetchSmartSuggestions(s5):andThen(function(t2: {[any]: any}) -- line: 118
-			-- upvalues: v46 (copy), requestId (copy), v43 (copy), v45 (copy), t1 (copy)
-			if v46.current.requestId ~= requestId then
+		fetchSmartSuggestions(s5):andThen(function(t2: {[any]: any}) -- line: 131
+			-- upvalues: v55 (copy), requestId (copy), v51 (copy), v53 (copy), t1 (copy)
+			if v55.current.requestId ~= requestId then
 				return
 			end
 
-			v43(t2)
-			v45(t1)
-		end):catch(function() -- line: 125
+			v51(t2)
+			v53(t1)
+		end):catch(function() -- line: 138
 		end)
 	end, { s5 })
 
-	React.useEffect(function() -- line: 132
-		-- upvalues: v43 (copy), v45 (copy), t1 (copy), v47 (copy), v46 (copy)
-		v43({})
-		v45(t1)
-		v47()
+	React.useEffect(function() -- line: 145
+		-- upvalues: v51 (copy), v53 (copy), t1 (copy), v56 (copy), v55 (copy)
+		v51({})
+		v53(t1)
+		v56()
 
-		return function() -- line: 136
-			-- upvalues: v46 (copy)
-			local current = v46.current
+		return function() -- line: 149
+			-- upvalues: v55 (copy)
+			local current = v55.current
 
 			current.requestId = current.requestId + 1
-			v46.current.pendingRealtimeNotification = nil
+			v55.current.pendingRealtimeNotification = nil
 		end
 	end, {
 		s5,
-		v47
+		v56
 	})
 
-	local v48 = React.useCallback(function(p7) -- line: 143
-		-- upvalues: Constants (copy), s5 (copy), v38 (copy), getLatestUserMessageId (copy), getDeepValue (copy), OrderedMap (copy), v46 (copy), v47 (copy)
-		if p7.Type ~= Constants.PlatformChatConversation.Types.ConversationSuggestionsGenerated then
+	local v57 = React.useCallback(function(p8) -- line: 156
+		-- upvalues: Constants (copy), s5 (copy), v46 (copy), getLatestUserMessageId (copy), getDeepValue (copy), OrderedMap (copy), v55 (copy), v56 (copy)
+		if p8.Type ~= Constants.PlatformChatConversation.Types.ConversationSuggestionsGenerated then
 			return
 		end
 
-		if s5 == nil or p7.ConversationId ~= s5 then
+		if s5 == nil or p8.ConversationId ~= s5 then
 			return
 		end
 
-		local v54 = v38:getState()
+		local v63 = v46:getState()
 
-		if getLatestUserMessageId(v54, s5) ~= p7.MessageId then
-			local v55 = s5
-			local MessageId = p7.MessageId
-			local v57
+		if getLatestUserMessageId(v63, s5) ~= p8.MessageId then
+			local v64 = s5
+			local MessageId = p8.MessageId
+			local v66
 
-			if v55 == nil then
-				v57 = nil
+			if v64 == nil then
+				v66 = nil
 			else
-				local v58 = getDeepValue(v54, `ChatAppReducer.Conversations.{ v55 }`)
+				local v67 = getDeepValue(v63, `ChatAppReducer.Conversations.{ v64 }`)
 
-				v57 = if v58 ~= nil and v58.messages ~= nil then v58.messages else nil
+				v66 = if v67 ~= nil and v67.messages ~= nil then v67.messages else nil
 			end
 
-			if v57 ~= nil and (v57.values ~= nil and OrderedMap.Get(v57, MessageId) ~= nil) then
+			if v66 ~= nil and (v66.values ~= nil and OrderedMap.Get(v66, MessageId) ~= nil) then
 				return
 			end
 
-			v46.current.pendingRealtimeNotification = {
+			v55.current.pendingRealtimeNotification = {
 				conversationId = s5,
-				messageId = p7.MessageId
+				messageId = p8.MessageId
 			}
 
 			return
 		end
 
-		if v46.current.newestMessageConversationId ~= s5 or v46.current.previousNewestUserMessageId ~= p7.MessageId then
-			v46.current.pendingRealtimeNotification = {
+		if v55.current.newestMessageConversationId ~= s5 or v55.current.previousNewestUserMessageId ~= p8.MessageId then
+			v55.current.pendingRealtimeNotification = {
 				conversationId = s5,
-				messageId = p7.MessageId
+				messageId = p8.MessageId
 			}
 
 			return
 		end
 
-		v47()
+		v56()
 	end, {
 		s5,
-		v38,
-		v47
+		v46,
+		v56
 	})
 
-	useRealtimePlatformChatConversation(v48, { v48 })
-	React.useEffect(function() -- line: 185
-		-- upvalues: v46 (copy), v40 (copy), s5 (copy), v43 (copy), v45 (copy), t1 (copy), v47 (copy), v38 (copy), getDeepValue (copy), OrderedMap (copy)
-		local previousNewestUserMessageId = v46.current.previousNewestUserMessageId
-		local newestMessageConversationId = v46.current.newestMessageConversationId
+	useRealtimePlatformChatConversation(v57, { v57 })
+	React.useEffect(function() -- line: 198
+		-- upvalues: v55 (copy), v48 (copy), s5 (copy), v51 (copy), v53 (copy), t1 (copy), v56 (copy), v46 (copy), getDeepValue (copy), OrderedMap (copy)
+		local previousNewestUserMessageId = v55.current.previousNewestUserMessageId
+		local newestMessageConversationId = v55.current.newestMessageConversationId
 
-		v46.current.previousNewestUserMessageId = v40
-		v46.current.newestMessageConversationId = s5
+		v55.current.previousNewestUserMessageId = v48
+		v55.current.newestMessageConversationId = s5
 
-		if previousNewestUserMessageId == v40 then
+		if previousNewestUserMessageId == v48 then
 			return
 		end
 
@@ -213,79 +230,79 @@ local function useSmartSuggestions(s5: string, p4: ((...any) -> ...any), p5: ((.
 			return
 		end
 
-		local current = v46.current
+		local current = v55.current
 
 		current.requestId = current.requestId + 1
-		v43({})
-		v45(t1)
+		v51({})
+		v53(t1)
 
-		local pendingRealtimeNotification = v46.current.pendingRealtimeNotification
+		local pendingRealtimeNotification = v55.current.pendingRealtimeNotification
 
 		if pendingRealtimeNotification == nil or pendingRealtimeNotification.conversationId ~= s5 then
 			return
 		end
 
-		if pendingRealtimeNotification.messageId == v40 then
-			v46.current.pendingRealtimeNotification = nil
-			v47()
+		if pendingRealtimeNotification.messageId == v48 then
+			v55.current.pendingRealtimeNotification = nil
+			v56()
 
 			return
 		end
 
-		local v63 = v38:getState()
-		local v64 = s5
+		local v72 = v46:getState()
+		local v73 = s5
 		local messageId = pendingRealtimeNotification.messageId
-		local v66
+		local v75
 
-		if v64 == nil then
-			v66 = nil
+		if v73 == nil then
+			v75 = nil
 		else
-			local v67 = getDeepValue(v63, `ChatAppReducer.Conversations.{ v64 }`)
+			local v76 = getDeepValue(v72, `ChatAppReducer.Conversations.{ v73 }`)
 
-			v66 = if v67 ~= nil and v67.messages ~= nil then v67.messages else nil
+			v75 = if v76 ~= nil and v76.messages ~= nil then v76.messages else nil
 		end
 
-		if v66 ~= nil and (v66.values ~= nil and OrderedMap.Get(v66, messageId) ~= nil) then
-			v46.current.pendingRealtimeNotification = nil
+		if v75 ~= nil and (v75.values ~= nil and OrderedMap.Get(v75, messageId) ~= nil) then
+			v55.current.pendingRealtimeNotification = nil
 		end
 	end, {
-		v40,
+		v48,
 		s5,
-		v38,
-		v47
+		v46,
+		v56
 	})
 
-	local v49 = React.useCallback(function(p8) -- line: 216
-		-- upvalues: v45 (copy), Cryo (copy), v41 (copy), s5 (copy)
-		v45(function(t3: {[any]: any}) -- line: 218
-			-- upvalues: Cryo (copy), p8 (copy)
+	local v58 = React.useCallback(function(p9) -- line: 229
+		-- upvalues: v53 (copy), Cryo (copy), v49 (copy), s5 (copy)
+		v53(function(t3: {[any]: any}) -- line: 231
+			-- upvalues: Cryo (copy), p9 (copy)
 			return Cryo.Dictionary.join(t3, {
-				[p8] = true
+				[p9] = true
 			})
 		end)
 
-		local v69 = v41(p8, s5)
+		local v78 = v49(p9, s5)
 
-		if typeof(v69) == "table" and typeof(v69.catch) == "function" then
-			v69:catch(function() -- line: 225
-				-- upvalues: v45 (copy), Cryo (copy), p8 (copy)
-				v45(function(t4: {[any]: any}) -- line: 226
-					-- upvalues: Cryo (copy), p8 (copy)
+		if typeof(v78) == "table" and typeof(v78.catch) == "function" then
+			v78:catch(function() -- line: 238
+				-- upvalues: v53 (copy), Cryo (copy), p9 (copy)
+				v53(function(t4: {[any]: any}) -- line: 239
+					-- upvalues: Cryo (copy), p9 (copy)
 					return Cryo.Dictionary.join(t4, {
-						[p8] = Cryo.None
+						[p9] = Cryo.None
 					})
 				end)
 			end)
 		end
 	end, {
-		v41,
+		v49,
 		s5
 	})
 
 	return {
-		suggestions = v42,
-		hiddenSuggestions = v44,
-		onActivated = v49
+		suggestions = v54,
+		hiddenSuggestions = v52,
+		onActivated = v58
 	}
 end
 

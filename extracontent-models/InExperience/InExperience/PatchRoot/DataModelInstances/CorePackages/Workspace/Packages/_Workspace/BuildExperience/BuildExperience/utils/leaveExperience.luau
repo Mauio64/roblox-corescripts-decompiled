@@ -1,7 +1,7 @@
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 
-local function leaveExperience(p1: ((...any) -> ...any)?) -- line: 11
+local function leaveExperience(p1: ((...any) -> ...any)?) -- line: 10
 	-- upvalues: GuiService (copy), RunService (copy)
 	GuiService.SelectedCoreObject = nil
 	RunService.RenderStepped:Wait()

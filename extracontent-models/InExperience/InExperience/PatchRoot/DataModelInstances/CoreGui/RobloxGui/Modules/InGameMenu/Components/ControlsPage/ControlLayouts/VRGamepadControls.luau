@@ -29,6 +29,9 @@ local function GamepadControls(_) -- line: 43
 	}, {
 		GamepadImage = Roact.createElement(if not FFlagCoreUiMigrateUIBloxToFoundation then ImageSetLabel else Image, {
 			BackgroundTransparency = not FFlagCoreUiMigrateUIBloxToFoundation and 1 or nil,
+			backgroundStyle = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else {
+				Transparency = 1
+			},
 			Image = Assets.Images.GamepadQuest,
 			Size = UDim2.new(1, 0, 0.6, 0),
 			Position = UDim2.new(0.5, 16.5, 0.5, 0),
@@ -36,11 +39,11 @@ local function GamepadControls(_) -- line: 43
 			SizeConstraint = Enum.SizeConstraint.RelativeXX,
 			testId = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else "VRGamepadInstructions",
 			[React.Tag] = not FFlagCoreUiMigrateUIBloxToFoundation and "data-testid=VRGamepadInstructions" or nil
-		}, { Array.map(Controls.questGamepadLabels, function(p2, p3) -- line: 57
+		}, { Array.map(Controls.questGamepadLabels, function(p2, p3) -- line: 58
 			-- upvalues: t1 (copy), withLocalization (copy), Roact (copy), ThemedTextLabel (copy)
 			local v21 = t1[p2.labelKey]
 
-			return withLocalization({ v21 })(function(p4) -- line: 60
+			return withLocalization({ v21 })(function(p4) -- line: 61
 				-- upvalues: Roact (copy), ThemedTextLabel (copy), p2 (copy), p3 (copy)
 				return Roact.createElement(ThemedTextLabel, {
 					fontKey = "Header2",

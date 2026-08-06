@@ -6,7 +6,7 @@ local React = require(FoundationParent.React)
 local IconVariant = BuilderIcons.IconVariant
 local CloseAffordance = require(Foundation.Components.CloseAffordance)
 local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local Icon = require(Foundation.Components.Icon)
 local InputSize = require(Foundation.Enums.InputSize)
 local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
@@ -24,7 +24,7 @@ local t1 = {
 	testId = "--foundation-snackbar"
 }
 local t2 = {
-	colorMode = ColorMode.Inverse
+	colorNamespace = ColorNamespace.Inverse
 }
 
 local function Snackbar(p1, p2) -- line: 56

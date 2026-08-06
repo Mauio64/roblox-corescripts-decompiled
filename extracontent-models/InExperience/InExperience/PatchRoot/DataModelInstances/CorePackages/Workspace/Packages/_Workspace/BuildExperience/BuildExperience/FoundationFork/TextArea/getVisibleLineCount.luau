@@ -1,4 +1,4 @@
-local function getVisibleLineCount(s1: string, n1: number) -- line: 3
+local function getVisibleLineCount(s1: string, n1: number) -- line: 1
 	local n2 = 1
 
 	if s1 ~= "" then

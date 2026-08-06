@@ -7,7 +7,7 @@ local Enums = require(UserList.Common.Enums)
 
 require(UserList.Common.Types)
 
-local function UserListLayoutAdaptor(t1: {[any]: any}) -- line: 36
+local function UserListLayoutAdaptor(t1: {[any]: any}) -- line: 38
 	-- upvalues: Enums (copy), VerticalUserListSection (copy), HorizontalUserList (copy), React (copy)
 	local v9 = if t1.layoutMode ~= Enums.LayoutMode.Vertical then HorizontalUserList else VerticalUserListSection
 	local v10 = table.clone(t1)

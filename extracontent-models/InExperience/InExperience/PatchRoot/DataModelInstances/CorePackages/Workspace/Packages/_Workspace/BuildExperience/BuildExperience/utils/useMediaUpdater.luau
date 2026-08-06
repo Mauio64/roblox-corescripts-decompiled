@@ -4,7 +4,7 @@ local Promise = require(Parent.Promise)
 local getAssetUserAuthStore = require(Parent.DataHydration.AssetUserAuth).getAssetUserAuthStore
 local debug = require(Parent.DataHydration.CreatorAgentChat).debug
 
-local function formatError(p1) -- line: 33
+local function formatError(p1) -- line: 32
 	if typeof(p1) == "string" then
 		return p1
 	end
@@ -15,21 +15,21 @@ local function formatError(p1) -- line: 33
 
 	return (tostring(p1))
 end
-local function useMediaUpdater(t1: {[any]: any}?) -- line: 42
+local function useMediaUpdater(t1: {[any]: any}?) -- line: 41
 	-- upvalues: React (copy), Promise (copy), debug (copy), getAssetUserAuthStore (copy)
 	local v10 = React.useRef(Promise.resolve())
 	local v11 = t1 and t1.onSuccess
 	local v12 = t1 and t1.onError
-	local v13 = React.useCallback(function(p2: ((...any) -> ...any), s1: string) -- line: 47
+	local v13 = React.useCallback(function(p2: ((...any) -> ...any), s1: string) -- line: 46
 		-- upvalues: debug (copy), v10 (copy), getAssetUserAuthStore (copy), Promise (copy), v11 (copy), v12 (copy)
 		debug.log("info", `media_updater { s1 } enqueued`)
 
-		local v20 = v10.current:catch(function() -- line: 50
+		local v20 = v10.current:catch(function() -- line: 49
 			return nil
-		end):andThen(p2):andThen(function(p3) -- line: 54
+		end):andThen(p2):andThen(function(p3) -- line: 53
 			-- upvalues: getAssetUserAuthStore (copy)
 			return getAssetUserAuthStore().pollUntilDone(p3)
-		end):andThen(function(p4) -- line: 57
+		end):andThen(function(p4) -- line: 56
 			-- upvalues: Promise (copy)
 			if typeof(p4) == "table" and p4.status == "timed_out" then
 				return Promise.reject("Operation did not complete in time")
@@ -42,11 +42,11 @@ local function useMediaUpdater(t1: {[any]: any}?) -- line: 42
 			return p4
 		end)
 
-		v10.current = v20:catch(function() -- line: 64
+		v10.current = v20:catch(function() -- line: 63
 			return nil
 		end)
 
-		return v20:andThen(function(p5) -- line: 69
+		return v20:andThen(function(p5) -- line: 68
 			-- upvalues: debug (copy), s1 (copy), v11 (copy)
 			debug.log("info", `media_updater { s1 } succeeded`)
 
@@ -55,7 +55,7 @@ local function useMediaUpdater(t1: {[any]: any}?) -- line: 42
 			end
 
 			return p5
-		end):catch(function(p6) -- line: 76
+		end):catch(function(p6) -- line: 75
 			-- upvalues: debug (copy), s1 (copy), v12 (copy), Promise (copy)
 			local v34 = if typeof(p6) ~= "string" then if typeof(p6) ~= "table" or not p6.errorMessage then tostring(p6) else `HTTP { tostring(p6.responseCode) }: { p6.errorMessage }` else p6
 
@@ -73,25 +73,25 @@ local function useMediaUpdater(t1: {[any]: any}?) -- line: 42
 		v11,
 		v12
 	})
-	local v14 = React.useCallback(function(s2: string, p7) -- line: 86
+	local v14 = React.useCallback(function(s2: string, p7) -- line: 85
 		-- upvalues: v13 (copy), Promise (copy), getAssetUserAuthStore (copy)
-		return v13(function() -- line: 87
+		return v13(function() -- line: 86
 			-- upvalues: Promise (copy), p7 (copy), getAssetUserAuthStore (copy), s2 (copy)
-			return Promise.resolve(p7):andThen(function(s3: string) -- line: 88
+			return Promise.resolve(p7):andThen(function(s3: string) -- line: 87
 				-- upvalues: getAssetUserAuthStore (copy), s2 (copy)
 				return getAssetUserAuthStore().updateIcon(s2, s3)
 			end)
 		end, "setIcon")
 	end, { v13 })
-	local v15 = React.useCallback(function(s4: string, p8) -- line: 95
+	local v15 = React.useCallback(function(s4: string, p8) -- line: 94
 		-- upvalues: v13 (copy), getAssetUserAuthStore (copy), Promise (copy)
-		return v13(function() -- line: 96
+		return v13(function() -- line: 95
 			-- upvalues: getAssetUserAuthStore (copy), Promise (copy), p8 (copy), s4 (copy)
 			local v35 = getAssetUserAuthStore()
 
-			return Promise.resolve(p8):andThen(function(s5: string) -- line: 98
+			return Promise.resolve(p8):andThen(function(s5: string) -- line: 97
 				-- upvalues: v35 (copy), s4 (copy)
-				return v35.getPreviews(s4):andThen(function(t2: {[any]: any}) -- line: 99
+				return v35.getPreviews(s4):andThen(function(t2: {[any]: any}) -- line: 98
 					-- upvalues: s5 (copy), v35 (copy), s4 (copy)
 					local v47 = table.clone(t2)
 
@@ -104,15 +104,15 @@ local function useMediaUpdater(t1: {[any]: any}?) -- line: 42
 			end)
 		end, "addPreview")
 	end, { v13 })
-	local v16 = React.useCallback(function(s6: string, p9, s7: string) -- line: 111
+	local v16 = React.useCallback(function(s6: string, p9, s7: string) -- line: 110
 		-- upvalues: v13 (copy), getAssetUserAuthStore (copy), Promise (copy)
-		return v13(function() -- line: 112
+		return v13(function() -- line: 111
 			-- upvalues: getAssetUserAuthStore (copy), Promise (copy), p9 (copy), s6 (copy), s7 (copy)
 			local v36 = getAssetUserAuthStore()
 
-			return Promise.resolve(p9):andThen(function(s8: string) -- line: 114
+			return Promise.resolve(p9):andThen(function(s8: string) -- line: 113
 				-- upvalues: v36 (copy), s6 (copy), s7 (copy), Promise (copy)
-				return v36.getPreviews(s6):andThen(function(t3: {[any]: any}) -- line: 115
+				return v36.getPreviews(s6):andThen(function(t3: {[any]: any}) -- line: 114
 					-- upvalues: s7 (copy), Promise (copy), s8 (copy), v36 (copy), s6 (copy)
 					local v49 = nil
 
@@ -139,13 +139,13 @@ local function useMediaUpdater(t1: {[any]: any}?) -- line: 42
 			end)
 		end, "replacePreview")
 	end, { v13 })
-	local v17 = React.useCallback(function(s9: string, s10: string) -- line: 138
+	local v17 = React.useCallback(function(s9: string, s10: string) -- line: 137
 		-- upvalues: v13 (copy), getAssetUserAuthStore (copy), Promise (copy)
-		return v13(function() -- line: 139
+		return v13(function() -- line: 138
 			-- upvalues: getAssetUserAuthStore (copy), s9 (copy), s10 (copy), Promise (copy)
 			local v37 = getAssetUserAuthStore()
 
-			return v37.getPreviews(s9):andThen(function(t4: {[any]: any}) -- line: 141
+			return v37.getPreviews(s9):andThen(function(t4: {[any]: any}) -- line: 140
 				-- upvalues: s10 (copy), Promise (copy), v37 (copy), s9 (copy)
 				local v42 = nil
 

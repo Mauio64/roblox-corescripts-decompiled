@@ -72,7 +72,7 @@ local function SduiGameImpressionsHandler(p2, t3: {[any]: any}, t4: {[any]: any}
 		local t6 = {
 			searchUuid = p3.searchUuid,
 			emphasisFlag = not FFlagSduiSearchResultsPageEnabled and 0 or (not p3.hasEmphasizedTile and 0 or 1),
-			seeAllFlag = not FFlagSduiSearchResultsPageEnabled and 0 or (p3.seeAllFlag or 0),
+			seeAllFlag = not FFlagSduiSearchResultsPageEnabled and 0 or (tonumber(p3.seeAllFlag) or 0),
 			sortPos = p3.collectionPosition,
 			gameSetTypeId = tostring(p3.collectionId)
 		}
@@ -96,7 +96,7 @@ local function SduiGameImpressionsHandler(p2, t3: {[any]: any}, t4: {[any]: any}
 		return
 	end
 
-	SendGameImpressions.sendFromTopicContents(p2.dependencies.eventIngest, p2.dependencies.appAnalytics, t3, t5, p2.appPage, tostring(p3.collectionId), p3.collectionPosition, n1, if not FFlagSduiChartsSupport then nil else p3.gameSetTargetId, nil, p3.itemsPerRow, p3.isWideTiles or false, v30, if not FFlagSduiChartsSupport then nil else p3.appliedFilters, nil, function(s1: string) -- line: 154
+	SendGameImpressions.sendFromTopicContents(p2.dependencies.eventIngest, p2.dependencies.appAnalytics, t3, t5, p2.appPage, tostring(p3.collectionId), p3.collectionPosition, n1, if not FFlagSduiChartsSupport then nil else p3.gameSetTargetId, nil, p3.itemsPerRow, p3.isWideTiles or false, v30, if not FFlagSduiChartsSupport then nil else p3.appliedFilters, nil, function(s1: string) -- line: 156
 		-- upvalues: SduiParseHelpers (copy), p3 (copy), p2 (copy), SduiErrors (copy), v30 (copy)
 		local v34 = SduiParseHelpers.stringifyValue(p3)
 

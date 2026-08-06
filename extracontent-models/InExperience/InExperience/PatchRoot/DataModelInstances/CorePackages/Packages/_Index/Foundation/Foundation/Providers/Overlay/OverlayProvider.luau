@@ -15,10 +15,10 @@ local ReactRoblox = require(FoundationParent.ReactRoblox)
 local t1 = {
 	DisplayOrder = Constants.MAX_LAYOUT_ORDER - 1
 }
-local v13 = getMainGui()
+local v13 = if not Flags.FoundationOverlayResilientMainGui then getMainGui() else nil
 
 local function OverlayProvider(p1) -- line: 30
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), Flags (copy), useKeyboardAwareSize (copy), useStyleSheet (copy), v13 (copy), OverlayContext (copy), ReactRoblox (copy)
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), Flags (copy), useKeyboardAwareSize (copy), useStyleSheet (copy), getMainGui (copy), v13 (copy), OverlayContext (copy), ReactRoblox (copy)
 	local v16 = withDefaults(p1, t1)
 	local v17, v18 = React.useState(v16.gui)
 	local v19, v20 = React.useState(false)
@@ -31,22 +31,23 @@ local function OverlayProvider(p1) -- line: 30
 			v20(true)
 		end
 	end, { v16.gui })
-	local v25 = v16.gui == nil and (v13 ~= nil and v19)
-	local v26 = if v16.gui == nil then v17 else v16.gui
-	local v27 = nil
+	local v25 = if not Flags.FoundationOverlayResilientMainGui then v13 else if v16.gui ~= nil or not v19 then nil else getMainGui()
+	local v26 = v16.gui == nil and (v25 ~= nil and v19)
+	local v27 = if v16.gui == nil then v17 else v16.gui
+	local v28 = nil
 
 	if Flags.FoundationOverlayKeyboardAwarenessHardened then
-		v27 = if v16.gui == nil then v21 else v16.gui
+		v28 = if v16.gui == nil then v21 else v16.gui
 	end
 
 	return React.createElement(OverlayContext.Provider, {
 		value = {
 			requestOverlay = v24,
-			instance = v26,
-			screen = v27
+			instance = v27,
+			screen = v28
 		}
 	}, {
-		FoundationOverlay = if not v25 then nil else ReactRoblox.createPortal(React.createElement("ScreenGui", {
+		FoundationOverlay = if not v26 then nil else ReactRoblox.createPortal(React.createElement("ScreenGui", {
 			Enabled = true,
 			ClipToDeviceSafeArea = false,
 			DisplayOrder = v16.DisplayOrder,
@@ -64,7 +65,7 @@ local function OverlayProvider(p1) -- line: 30
 			FoundationStyleLink = React.createElement("StyleLink", {
 				StyleSheet = v23
 			})
-		}), v13),
+		}), v25),
 		Children = React.createElement(React.Fragment, nil, v16.children)
 	})
 end

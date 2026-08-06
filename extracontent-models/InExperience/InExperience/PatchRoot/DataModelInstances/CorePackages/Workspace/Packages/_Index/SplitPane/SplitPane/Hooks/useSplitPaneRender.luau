@@ -8,7 +8,7 @@ local SplitPaneStore = require(script.Parent.Parent.Stores.SplitPaneStore)
 local SupportPaneMode = AppSplitView.Enums.SupportPaneMode
 local TempRnSwitchNavigatorName = Constants.TempRnSwitchNavigatorName
 
-local function useSplitPaneRender(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}, b1: boolean) -- line: 40
+local function useSplitPaneRender(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}, b1: boolean) -- line: 41
 	-- upvalues: SplitPaneStore (copy), SignalsReact (copy), React (copy), SplitPaneContext (copy), TempRnSwitchNavigatorName (copy), SupportPaneMode (copy)
 	local v15 = SplitPaneStore.getStore()
 	local v16 = SignalsReact.useSignalState(v15.getSupportPaneMode)
@@ -18,59 +18,90 @@ local function useSplitPaneRender(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]
 	local v20 = not b1 and 0 or #t3
 	local v21 = table.clone(t2)
 	local t4 = {}
+	local t5 = {}
 
 	if b1 then
-		for _, v24 in t3 do
-			local key = t1[v24].descriptor.key
-			local v26 = v21[key]
+		for _, v25 in t3 do
+			local key = t1[v25].descriptor.key
+			local v27 = v21[key]
 
-			if v26 ~= nil then
+			if v27 ~= nil then
 				v21[key] = nil
-				t4[key] = v26
+				t4[key] = v27
 			end
 		end
 	end
 
-	local v27 = t1[1] ~= nil and (t1[1].descriptor ~= nil and (t1[1].descriptor.state ~= nil and t1[1].descriptor.state.routeName == TempRnSwitchNavigatorName))
-	local v28 = React.useRef(0)
+	if v18 then
+		local n1 = 0
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: v28 (copy), v20 (copy), v27 (copy), v16 (copy), SupportPaneMode (copy), v15 (copy)
-		local current = v28.current
+		for v29, v30 in t1 do
+			local options = v30.descriptor.options
 
-		v28.current = v20
+			if options ~= nil and options.splitPaneEligibility ~= nil then
+				n1 = v29
+			end
+		end
 
-		if not v27 or v16 == SupportPaneMode.Normal then
+		for v32, v33 in t1 do
+			local options = v33.descriptor.options
+
+			if options ~= nil and options.transparent and not options.overlayEnabled and options.splitPaneEligibility == nil then
+				local key = v33.descriptor.key
+				local v36 = v21[key]
+
+				if v36 ~= nil then
+					v21[key] = nil
+
+					if n1 < v32 then
+						t5[key] = v36
+					end
+				end
+			end
+		end
+	end
+
+	local v37 = t1[1] ~= nil and (t1[1].descriptor ~= nil and (t1[1].descriptor.state ~= nil and t1[1].descriptor.state.routeName == TempRnSwitchNavigatorName))
+	local v38 = React.useRef(0)
+
+	React.useEffect(function() -- line: 107
+		-- upvalues: v38 (copy), v20 (copy), v37 (copy), v16 (copy), SupportPaneMode (copy), v15 (copy)
+		local current = v38.current
+
+		v38.current = v20
+
+		if not v37 or v16 == SupportPaneMode.Normal then
 			return
 		end
 
-		local v33 = current > 0 and v20 == 0
-		local v34 = current == 0 and v20 > 0
+		local v43 = current > 0 and v20 == 0
+		local v44 = current == 0 and v20 > 0
 
-		if v33 or v34 then
+		if v43 or v44 then
 			v15.setSupportPaneMode(SupportPaneMode.Normal)
 		end
 	end, {
-		v27,
+		v37,
 		v20,
 		v15,
 		v16
 	})
 
-	local v29 = if not (v20 > 0) then nil else t3[v20]
-	local v30 = if v29 == nil then {} else t1[v29].descriptor.options
-	local t5 = {
-		hostNavigation = if v29 == nil then nil else t1[v29].descriptor.navigation,
-		hasDetailOnTop = v29 ~= nil,
+	local v39 = if not (v20 > 0) then nil else t3[v20]
+	local v40 = if v39 == nil then {} else t1[v39].descriptor.options
+	local t6 = {
+		hostNavigation = if v39 == nil then nil else t1[v39].descriptor.navigation,
+		hasDetailOnTop = v39 ~= nil,
 		paneCount = v20,
-		splitPaneExpandable = v30.splitPaneExpandable,
-		splitPaneCollapsible = v30.splitPaneCollapsible
+		splitPaneExpandable = v40.splitPaneExpandable,
+		splitPaneCollapsible = v40.splitPaneCollapsible
 	}
 
 	return {
 		primarySlotChildren = v21,
 		supportSlotChildren = t4,
-		supportContentProps = t5,
+		overlaySlotChildren = t5,
+		supportContentProps = t6,
 		supportWidth = v17,
 		supportMinWidth = v15.getMinSupportWidth(),
 		supportMaxWidth = v15.getMaxSupportWidth(),

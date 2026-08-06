@@ -34,12 +34,12 @@ local t2 = {
 	onPlanAcceptedByToolCallId = {}
 }
 
-local function constantSource() -- line: 80
+local function constantSource() -- line: 78
 	return 0
 end
-local function useReactiveValue(p1) -- line: 84
+local function useReactiveValue(p1) -- line: 82
 	-- upvalues: React (copy), constantSource (copy), SignalsReact (copy)
-	local v40 = React.useCallback(function(p2) -- line: 85
+	local v40 = React.useCallback(function(p2) -- line: 83
 		-- upvalues: p1 (copy), constantSource (copy)
 		if typeof(p1) == "function" then
 			return (p1(p2))
@@ -54,7 +54,7 @@ local function useReactiveValue(p1) -- line: 84
 
 	return (SignalsReact.useSignalState(v40))
 end
-local function hasSelectedOptions(p3) -- line: 98
+local function hasSelectedOptions(p3) -- line: 96
 	if typeof(p3) == "string" then
 		return true
 	end
@@ -65,7 +65,7 @@ local function hasSelectedOptions(p3) -- line: 98
 
 	return #p3 > 0
 end
-local function AnswerStackSection(t3: {[any]: any}) -- line: 108
+local function AnswerStackSection(t3: {[any]: any}) -- line: 106
 	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), OptionSelector (copy), AnswerStack (copy)
 	local prompt = t3.prompt
 	local question = prompt.question
@@ -96,7 +96,7 @@ local function AnswerStackSection(t3: {[any]: any}) -- line: 108
 			title = LocalizationStrings.ANSWER_STACK_CUSTOM_ANSWER,
 			description = customResponseText,
 			testId = `AnswerStack.{ question.id }.CustomAnswer`,
-			onActivated = function() -- line: 135
+			onActivated = function() -- line: 133
 			end
 		})
 	elseif #question.options > 0 then
@@ -115,7 +115,7 @@ local function AnswerStackSection(t3: {[any]: any}) -- line: 108
 		t6.onConfirm = if not v47 or not v46 then nil else t3.onAnswerConfirmed
 		t6.testId = `AnswerStack.{ question.id }`
 
-		function t6.onOptionSelected(p4) -- line: 146
+		function t6.onOptionSelected(p4) -- line: 144
 			-- upvalues: t3 (copy), v47 (copy), v46 (copy), question (copy), prompt (copy)
 			if t3.onAnswerSelected == nil then
 				return
@@ -143,7 +143,7 @@ local function AnswerStackSection(t3: {[any]: any}) -- line: 108
 
 	return createElement(v50, t4, t5)
 end
-local function PlanProposalSection(t7: {[any]: any}) -- line: 165
+local function PlanProposalSection(t7: {[any]: any}) -- line: 163
 	-- upvalues: React (copy), AgentPlanCard (copy), View (copy), ChatUserMessage (copy)
 	local planProposal = t7.planProposal
 	local v60 = planProposal.isAccepted ~= true and planProposal.feedbackText == nil
@@ -153,7 +153,7 @@ local function PlanProposalSection(t7: {[any]: any}) -- line: 165
 		title = planProposal.title,
 		textContent = planProposal.textContent,
 		summary = planProposal.summary,
-		onBuild = t7.onPlanAccepted or function() -- line: 173
+		onBuild = t7.onPlanAccepted or function() -- line: 171
 		end,
 		isBuildDisabled = not v60
 	})
@@ -181,11 +181,11 @@ local function PlanProposalSection(t7: {[any]: any}) -- line: 165
 		})
 	})
 end
-local function AgentMessageSegment(t8: {[any]: any}) -- line: 202
+local function AgentMessageSegment(t8: {[any]: any}) -- line: 200
 	-- upvalues: useReactiveValue (copy), Foundation (copy), React (copy), getMarkdownRendererProps (copy), View (copy), Icon (copy), IconName (copy), IconVariant (copy), IconSize (copy), FoundationText (copy), MarkdownViewer (copy)
 	local v63 = useReactiveValue(t8.segment.text)
 	local v64 = Foundation.Hooks.useTokens()
-	local v65 = React.useMemo(function() -- line: 205
+	local v65 = React.useMemo(function() -- line: 203
 		-- upvalues: getMarkdownRendererProps (copy), v64 (copy), t8 (copy)
 		return getMarkdownRendererProps(v64, t8.markdownTextStyle)
 	end, {
@@ -228,7 +228,7 @@ local function AgentMessageSegment(t8: {[any]: any}) -- line: 202
 		MarkdownRendererProps = v65
 	})
 end
-local function renderClientToolSegment(p5, n1: number, p6) -- line: 247
+local function renderClientToolSegment(p5, n1: number, p6) -- line: 245
 	-- upvalues: React (copy), AnswerStackSection (copy), PlanProposalSection (copy)
 	if p5.answerStackPrompt ~= nil then
 		return React.createElement(AnswerStackSection, {
@@ -250,7 +250,7 @@ local function renderClientToolSegment(p5, n1: number, p6) -- line: 247
 
 	return nil
 end
-local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 277
+local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 275
 	-- upvalues: React (copy), AgentMessageSegment (copy), TurnActivitySummary (copy), renderClientToolSegment (copy)
 	if p7.kind == "agent_message" then
 		return React.createElement(AgentMessageSegment, {
@@ -274,7 +274,7 @@ local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 277
 
 	return nil
 end
-local function TurnWorkSegment(t9: {[any]: any}) -- line: 303
+local function TurnWorkSegment(t9: {[any]: any}) -- line: 301
 	-- upvalues: useReactiveValue (copy), React (copy), Foundation (copy), renderWorkSegment (copy), View (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy)
 	local v75 = useReactiveValue(t9.segment.label)
 	local v76 = useReactiveValue(t9.segment.segments)
@@ -282,9 +282,9 @@ local function TurnWorkSegment(t9: {[any]: any}) -- line: 303
 	local v79 = Foundation.Hooks.useTokens()
 	local isDone = t9.isDone
 	local v81 = not t9.isDone or v77
-	local v82 = React.useCallback(function() -- line: 311
+	local v82 = React.useCallback(function() -- line: 309
 		-- upvalues: v78 (copy)
-		v78(function(b1: boolean) -- line: 312
+		v78(function(b1: boolean) -- line: 310
 			return not b1
 		end)
 	end, {})
@@ -339,7 +339,7 @@ local function TurnWorkSegment(t9: {[any]: any}) -- line: 303
 		}, t10)
 	})
 end
-local function ChatTurnBlock(t11: {[any]: any}) -- line: 374
+local function ChatTurnBlock(t11: {[any]: any}) -- line: 372
 	-- upvalues: React (copy), turnProjection (copy), reportTurnActivityGap (copy), useReactiveValue (copy), t1 (copy), t2 (copy), Foundation (copy), sendBuildExperienceEvent (copy), renderWorkSegment (copy), TurnWorkSegment (copy), PlaytestCompletedCard (copy), View (copy), AgentTurnFeedback (copy)
 	local turn = t11.turn
 	local turnState = turn.turnState
@@ -351,7 +351,7 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 374
 	local universeId = turn.universeId
 	local sessionId = turn.sessionId
 	local isDone = turn.isDone
-	local v99 = React.useMemo(function() -- line: 388
+	local v99 = React.useMemo(function() -- line: 386
 		-- upvalues: turnState (copy), turnProjection (copy), turnKey (copy), universeId (copy), sessionId (copy), startSequenceId (copy), endSequenceId (copy), optimisticLocalTools (copy), setupErrorText (copy)
 		if turnState ~= nil then
 			return turnProjection.projectActiveTurnSegments(turnState, {
@@ -385,7 +385,7 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 374
 	})
 	local v100 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 417
+	React.useEffect(function() -- line: 415
 		-- upvalues: isDone (copy), v100 (copy), reportTurnActivityGap (copy), universeId (copy)
 		if isDone then
 			v100.current = nil
@@ -409,7 +409,7 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 374
 	local v102 = t11.localToolActions or t2
 	local Emphasis = Foundation.Hooks.useTokens().Color.Content.Emphasis
 	local onPlaytest = t11.onPlaytest
-	local v105 = React.useCallback(function() -- line: 436
+	local v105 = React.useCallback(function() -- line: 434
 		-- upvalues: sendBuildExperienceEvent (copy), v101 (copy), onPlaytest (copy)
 		sendBuildExperienceEvent("PLAYTEST_CLICK", {
 			universeId = v101.universeId,
@@ -427,7 +427,7 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 374
 	})
 	local v106 = React.useRef(false)
 
-	React.useEffect(function() -- line: 449
+	React.useEffect(function() -- line: 447
 		-- upvalues: v106 (copy), onPlaytest (copy), v99 (copy), sendBuildExperienceEvent (copy), v101 (copy)
 		if v106.current or onPlaytest == nil then
 			return

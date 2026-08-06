@@ -5,13 +5,8 @@ local UserInputService = game:GetService("UserInputService")
 local React = require(CorePackages.Packages.React)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
-local FFlagExpChatShowGlobalChatTooltip = SharedFlags.FFlagExpChatShowGlobalChatTooltip
 local FFlagEnableWhatsNew = SharedFlags.FFlagEnableWhatsNew
-local v10 = if not FFlagEnableWhatsNew then nil else require(CorePackages.Workspace.Packages.WhatsNew).WhatsNewAnchor
-local ExpChatShared = require(CorePackages.Workspace.Packages.ExpChatShared)
-local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
-local FFlagExpChatUseUnifiedTooltipStore = ExpChatShared.Flags.FFlagExpChatUseUnifiedTooltipStore
-local v14 = FFlagExpChatShowGlobalChatTooltip or FFlagExpChatPresetChatEnabled and FFlagExpChatUseUnifiedTooltipStore
+local v9 = if not FFlagEnableWhatsNew then nil else require(CorePackages.Workspace.Packages.WhatsNew).WhatsNewAnchor
 local Flags = require(script.Parent.Parent.Parent.Parent.Flags)
 local FFlagUnibarMenuOpenHamburger = Flags.FFlagUnibarMenuOpenHamburger
 local FFlagUnibarMenuOpenSubmenu = Flags.FFlagUnibarMenuOpenSubmenu
@@ -44,7 +39,7 @@ local PanelType = nil
 local TooltipOrientation = nil
 local TooltipCallout = nil
 local SPATIAL_TOOLTIP_SPACING = nil
-local u47 = nil
+local u42 = nil
 
 if isInExperienceUIVREnabled then
 	isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
@@ -59,33 +54,33 @@ if isInExperienceUIVREnabled then
 
 	local UIManager = VrSpatialUi.UIManager
 	local MappedSignal = require(ChromeShared.Service.ChromeUtils).MappedSignal
-	local v51 = UIManager.getInstance():getBottomBarVisibility()
+	local v46 = UIManager.getInstance():getBottomBarVisibility()
 
-	if v51 and isSpatial() then
-		u47 = MappedSignal.new(v51, function() -- line: 84
-			-- upvalues: v51 (copy)
-			return v51:get()
+	if v46 and isSpatial() then
+		u42 = MappedSignal.new(v46, function() -- line: 76
+			-- upvalues: v46 (copy)
+			return v46:get()
 		end)
 	end
 end
 
-local v52 = if not FFlagEnableConsoleExpControls then nil else require(ChromeShared.Parent.Parent.TopBar.Components.MenuIconContext)
-local v53 = game:DefineFastFlag("UseBindingForUnreadChat", false)
+local v47 = if not FFlagEnableConsoleExpControls then nil else require(ChromeShared.Parent.Parent.TopBar.Components.MenuIconContext)
+local v48 = game:DefineFastFlag("UseBindingForUnreadChat", false)
 local t1 = {}
 
-function areTooltipsDisplaying() -- line: 106
+function areTooltipsDisplaying() -- line: 98
 	-- upvalues: t1 (copy)
 	local timestamp = tick()
 
-	for _, v57 in t1 do
-		if v57.displaying or timestamp - v57.time < 0.15 then
+	for _, v52 in t1 do
+		if v52.displaying or timestamp - v52.time < 0.15 then
 			return true
 		end
 	end
 
 	return false
 end
-function logTooltipState(p1, b1: boolean) -- line: 118
+function logTooltipState(p1, b1: boolean) -- line: 110
 	-- upvalues: t1 (copy)
 	if not t1[p1] or b1 ~= t1[p1].displaying then
 		t1[p1] = {
@@ -94,111 +89,109 @@ function logTooltipState(p1, b1: boolean) -- line: 118
 		}
 	end
 end
-function NotificationBadge(t2: {[any]: any}) -- line: 137
-	-- upvalues: v53 (copy), React (copy), useNotificationCount (copy), useMappedObservableValue (copy), Service (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), v14 (copy), StatusIndicator (copy), Flags2 (copy), StatusIndicatorVariant (copy)
+function NotificationBadge(t2: {[any]: any}) -- line: 129
+	-- upvalues: v48 (copy), React (copy), useNotificationCount (copy), useMappedObservableValue (copy), Service (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), StatusIndicator (copy), Flags2 (copy), StatusIndicatorVariant (copy)
 	if not t2.integration then
 		return nil
 	end
 
-	local v61 = nil
-	local u62 = nil
-	local v63 = nil
-	local v64 = nil
-	local u65 = nil
-	local u66 = false
+	local v56 = nil
+	local u57 = nil
+	local v58 = nil
+	local v59 = nil
+	local u60 = nil
+	local u61 = false
 
-	if v53 then
-		local v67 = t2.integration.integration and t2.integration.integration.notification or nil
-		local v68
+	if v48 then
+		local v62 = t2.integration.integration and t2.integration.integration.notification or nil
+		local v63
 
-		v61, v68 = React.useBinding(v67 and v67:get().value or 0)
-		u62 = v68
+		v56, v63 = React.useBinding(v62 and v62:get().value or 0)
+		u57 = v63
 
-		local v69
+		local v64
 
-		v64, v69 = React.useState(false)
-		u65 = v69
-		React.useEffect(function() -- line: 151
-			-- upvalues: v67 (copy), u65 (ref), u62 (ref)
-			if not v67 then
+		v59, v64 = React.useState(false)
+		u60 = v64
+		React.useEffect(function() -- line: 143
+			-- upvalues: v62 (copy), u60 (ref), u57 (ref)
+			if not v62 then
 				return
 			end
 
-			local v124 = v67:connect(function() -- line: 156
-				-- upvalues: v67 (copy), u65 (ref), u62 (ref)
-				local v150 = v67:get().value or 0
+			local v119 = v62:connect(function() -- line: 148
+				-- upvalues: v62 (copy), u60 (ref), u57 (ref)
+				local v144 = v62:get().value or 0
 
-				u65(v150 > 0)
-				u62(v150)
+				u60(v144 > 0)
+				u57(v144)
 			end)
 
-			return function() -- line: 161
-				-- upvalues: v124 (copy)
-				v124:disconnect()
+			return function() -- line: 153
+				-- upvalues: v119 (copy)
+				v119:disconnect()
 			end
 		end, { t2.integration.integration.id })
 	else
-		v63 = useNotificationCount(t2.integration.integration)
+		v58 = useNotificationCount(t2.integration.integration)
 
-		if useMappedObservableValue(Service:currentSubMenu(), function(p2) -- line: 169
+		if useMappedObservableValue(Service:currentSubMenu(), function(p2) -- line: 161
 			-- upvalues: t2 (copy)
 			return p2 == t2.integration.id
 		end) then
-			v63 = 0
+			v58 = 0
 		end
 
 		if t2.integration and t2.integration.integration then
-			u66 = t2.integration.integration.hideNotificationCountWhileOpen or false
+			u61 = t2.integration.integration.hideNotificationCountWhileOpen or false
 		end
 	end
 
 	local ICON_BADGE_OFFSET_X, ICON_BADGE_OFFSET_Y
 
 	if FFlagTokenizeUnibarConstantsWithStyleProvider then
-		local v70 = UnibarStyle.use()
+		local v65 = UnibarStyle.use()
 
-		ICON_BADGE_OFFSET_X = v70.ICON_BADGE_OFFSET_X
-		ICON_BADGE_OFFSET_Y = v70.ICON_BADGE_OFFSET_Y
+		ICON_BADGE_OFFSET_X = v65.ICON_BADGE_OFFSET_X
+		ICON_BADGE_OFFSET_Y = v65.ICON_BADGE_OFFSET_Y
 	else
 		ICON_BADGE_OFFSET_X = Constants.ICON_BADGE_OFFSET_X
 		ICON_BADGE_OFFSET_Y = Constants.ICON_BADGE_OFFSET_Y
 	end
 
-	local v73 = t2.minBadgeCount or 0
-	local v74 = if not v14 then if not v53 then v63 > 0 else v64 else if not v53 then v63 > 0 or v73 > 0 else v64 or v73 > 0
-	local v75 = if not v14 then if not v53 then math.min(v63, 99) else v61:map(function(p3) -- line: 216
-		return (math.min(p3, 99))
-	end) else if not v53 then math.min(math.max(v63, v73), 99) else v61:map(function(p4) -- line: 210
-		-- upvalues: v73 (copy)
-		return (math.min(math.max(p4, v73), 99))
+	local v68 = t2.minBadgeCount or 0
+	local v69 = if not v48 then v58 > 0 or v68 > 0 else v59 or v68 > 0
+	local v70 = if not v48 then math.min(math.max(v58, v68), 99) else v56:map(function(p3) -- line: 196
+		-- upvalues: v68 (copy)
+		return (math.min(math.max(p3, v68), 99))
 	end)
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
 		ZIndex = 2,
 		Size = UDim2.fromScale(1, 1),
-		Visible = not t2.toggleTransition or (t2.toggleTransition:map(function(p5) -- line: 225
-			-- upvalues: u66 (ref)
-			if u66 then
-				return p5 < 0.5
+		Visible = not t2.toggleTransition or (t2.toggleTransition:map(function(p4) -- line: 204
+			-- upvalues: u61 (ref)
+			if u61 then
+				return p4 < 0.5
 			end
 
 			return true
 		end) or true)
 	}, {
-		Badge = if not v74 then nil else React.createElement(StatusIndicator, {
-			value = v75,
+		Badge = if not v69 then nil else React.createElement(StatusIndicator, {
+			value = v70,
 			variant = if not Flags2.FoundationStatusIndicatorVariantExperiment then StatusIndicatorVariant.Emphasis else StatusIndicatorVariant.Contrast_Experiment,
 			AnchorPoint = Vector2.new(0, 0),
 			Position = UDim2.new(0, ICON_BADGE_OFFSET_X, 0, ICON_BADGE_OFFSET_Y)
 		})
 	})
 end
-function NotificationIndicator(t3: {[any]: any}) -- line: 254
+function NotificationIndicator(t3: {[any]: any}) -- line: 233
 	-- upvalues: useObservableValue (copy), Service (copy), React (copy)
-	local v77 = useObservableValue(Service:notificationIndicator())
+	local v72 = useObservableValue(Service:notificationIndicator())
 
-	t3.setIconVisible(not v77)
+	t3.setIconVisible(not v72)
 
 	return (React.createElement("Frame", {
 		Name = "NotificationIndicatorFrame",
@@ -206,7 +199,7 @@ function NotificationIndicator(t3: {[any]: any}) -- line: 254
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0)
 	}, {
-		IntegrationIcon = v77 and v77.component(t3) or nil,
+		IntegrationIcon = v72 and v72.component(t3) or nil,
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -214,173 +207,173 @@ function NotificationIndicator(t3: {[any]: any}) -- line: 254
 		})
 	}))
 end
-function HighlightCircle(p6) -- line: 273
+function HighlightCircle(p5) -- line: 252
 	-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy)
-	local v79 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_HIGHLIGHT_SIZE else UnibarStyle.use().ICON_HIGHLIGHT_SIZE
+	local v74 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_HIGHLIGHT_SIZE else UnibarStyle.use().ICON_HIGHLIGHT_SIZE
 
 	return React.createElement("Frame", {
 		BorderSizePixel = 0,
-		Name = p6.name or "Highlighter",
-		Size = v79,
+		Name = p5.name or "Highlighter",
+		Size = v74,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-		BackgroundColor3 = p6.color.Color,
-		BackgroundTransparency = p6.color.Transparency,
-		Visible = p6.visible
+		BackgroundColor3 = p5.color.Color,
+		BackgroundTransparency = p5.color.Transparency,
+		Visible = p5.visible
 	}, {
 		corner = React.createElement("UICorner", {
 			CornerRadius = UDim.new(1, 0)
 		})
 	})
 end
-function TooltipButton(t4: {[any]: any}) -- line: 303
-	-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), useTimeHysteresis (copy), isInExperienceUIVREnabled (copy), isSpatial (ref), useObservableValue (copy), Service (copy), u47 (ref), ControlState (copy), ChromeAnalytics (copy), UserInputService (copy), shouldRejectMultiTouch (copy), FFlagEnableConsoleExpControls (copy), v52 (copy), Interactable (copy), FFlagUnibarMenuOpenHamburger (copy), FFlagUnibarMenuOpenSubmenu (copy), useCursor (copy), Foundation (copy), Panel3DInSpatialUI (ref), PanelType (ref), SPATIAL_TOOLTIP_SPACING (ref), TooltipCallout (ref), TooltipOrientation (ref), withTooltip (copy), CoreGui (copy)
-	local u81 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_HIGHLIGHT_SIZE else UnibarStyle.use().ICON_HIGHLIGHT_SIZE
-	local v82 = React.useRef(nil)
+function TooltipButton(t4: {[any]: any}) -- line: 282
+	-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), useTimeHysteresis (copy), isInExperienceUIVREnabled (copy), isSpatial (ref), useObservableValue (copy), Service (copy), u42 (ref), ControlState (copy), ChromeAnalytics (copy), UserInputService (copy), shouldRejectMultiTouch (copy), FFlagEnableConsoleExpControls (copy), v47 (copy), Interactable (copy), FFlagUnibarMenuOpenHamburger (copy), FFlagUnibarMenuOpenSubmenu (copy), useCursor (copy), Foundation (copy), Panel3DInSpatialUI (ref), PanelType (ref), SPATIAL_TOOLTIP_SPACING (ref), TooltipCallout (ref), TooltipOrientation (ref), withTooltip (copy), CoreGui (copy)
+	local u76 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_HIGHLIGHT_SIZE else UnibarStyle.use().ICON_HIGHLIGHT_SIZE
+	local v77 = React.useRef(nil)
 	local secondaryAction = t4.integration.integration.secondaryAction
-	local u84 = t4.integration.integration.draggable or false
-	local v85 = React.useRef(nil)
+	local u79 = t4.integration.integration.draggable or false
+	local v80 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 319
-		-- upvalues: v85 (copy)
-		return function() -- line: 320
-			-- upvalues: v85 (copy)
-			if v85.current then
-				v85.current:Disconnect()
-				v85.current = nil
+	React.useEffect(function() -- line: 298
+		-- upvalues: v80 (copy)
+		return function() -- line: 299
+			-- upvalues: v80 (copy)
+			if v80.current then
+				v80.current:Disconnect()
+				v80.current = nil
 			end
 		end
 	end, {})
 
-	local v86, u88
+	local v81, u83
 
 	if secondaryAction then
-		local v87
+		local v82
 
-		v86, v87 = useTimeHysteresis(0.05, 0.15, 0.35)
-		u88 = v87
+		v81, v82 = useTimeHysteresis(0.05, 0.15, 0.35)
+		u83 = v82
 	else
-		local v89
+		local v84
 
-		v86, v89 = useTimeHysteresis(0.6, 0.65, 0.7)
-		u88 = v89
+		v81, v84 = useTimeHysteresis(0.6, 0.65, 0.7)
+		u83 = v84
 	end
 
-	local v90, v91 = useTimeHysteresis(0, 0, 0.65)
-	local v92, v93 = React.useState(false)
-	local v94, v95 = useTimeHysteresis(0, 1)
-	local v96 = if not isInExperienceUIVREnabled then nil else isSpatial()
-	local v97 = if not isInExperienceUIVREnabled then nil else useObservableValue(Service:getTopBarVisibiity())
-	local v98 = if not isInExperienceUIVREnabled or not u47 then nil else useObservableValue(u47)
-	local u99 = false
+	local v85, v86 = useTimeHysteresis(0, 0, 0.65)
+	local v87, v88 = React.useState(false)
+	local v89, v90 = useTimeHysteresis(0, 1)
+	local v91 = if not isInExperienceUIVREnabled then nil else isSpatial()
+	local v92 = if not isInExperienceUIVREnabled then nil else useObservableValue(Service:getTopBarVisibiity())
+	local v93 = if not isInExperienceUIVREnabled or not u42 then nil else useObservableValue(u42)
+	local u94 = false
 
-	if isInExperienceUIVREnabled and v96 and not v97 and not v98 then
-		u99 = true
-		u84 = u84 and not u99
+	if isInExperienceUIVREnabled and v91 and not v92 and not v93 then
+		u94 = true
+		u79 = u79 and not u94
 	end
 
-	local v100 = React.useCallback(function(p7, p8) -- line: 358
-		-- upvalues: isInExperienceUIVREnabled (copy), u99 (ref), ControlState (copy), Service (copy), t4 (copy), u88 (ref), v90 (copy), v95 (copy)
-		if isInExperienceUIVREnabled and u99 then
+	local v95 = React.useCallback(function(p6, p7) -- line: 337
+		-- upvalues: isInExperienceUIVREnabled (copy), u94 (ref), ControlState (copy), Service (copy), t4 (copy), u83 (ref), v85 (copy), v90 (copy)
+		if isInExperienceUIVREnabled and u94 then
 			return
 		end
 
-		if p8 == ControlState.Selected and (p7 == ControlState.Default or p7 == ControlState.Hover) then
+		if p7 == ControlState.Selected and (p6 == ControlState.Default or p6 == ControlState.Hover) then
 			Service:setSelected(t4.integration.id)
-		elseif p8 == ControlState.Selected and p7 == ControlState.Default then
+		elseif p7 == ControlState.Selected and p6 == ControlState.Default then
 			Service:setSelected(t4.integration.id)
 		end
 
-		local v131 = p8 ~= ControlState.Default
+		local v125 = p7 ~= ControlState.Default
 
-		t4.setHovered(v131)
+		t4.setHovered(v125)
 
-		local v132 = p8 == ControlState.Hover
+		local v126 = p7 == ControlState.Hover
 
-		u88(v132, v132 and v90 or areTooltipsDisplaying())
+		u83(v126, v126 and v85 or areTooltipsDisplaying())
 
-		if v132 then
+		if v126 then
 			Service:onIntegrationHovered():fire(t4.integration.id)
 		end
 
-		if not v131 then
-			v95(false)
+		if not v125 then
+			v90(false)
 		end
 	end, if not isInExperienceUIVREnabled then {
 		t4.setHovered,
-		u88,
-		v95,
-		v90
+		u83,
+		v90,
+		v85
 	} else {
 		t4.setHovered,
-		u88,
-		v95,
+		u83,
 		v90,
-		v96,
-		u99
+		v85,
+		v91,
+		u94
 	})
-	local v101 = React.useCallback(function(_, p10) -- line: 394
-		-- upvalues: u84 (ref), v95 (copy), ChromeAnalytics (copy), t4 (copy), v85 (copy), UserInputService (copy), shouldRejectMultiTouch (copy), Service (copy), Constants (copy)
-		if not u84 then
+	local v96 = React.useCallback(function(_, p9) -- line: 373
+		-- upvalues: u79 (ref), v90 (copy), ChromeAnalytics (copy), t4 (copy), v80 (copy), UserInputService (copy), shouldRejectMultiTouch (copy), Service (copy), Constants (copy)
+		if not u79 then
 			return
 		end
 
-		if p10.UserInputType == Enum.UserInputType.MouseButton1 or p10.UserInputType == Enum.UserInputType.Touch then
-			local p10Position = p10.Position
+		if p9.UserInputType == Enum.UserInputType.MouseButton1 or p9.UserInputType == Enum.UserInputType.Touch then
+			local p9Position = p9.Position
 
-			v95(true, true)
+			v90(true, true)
 			ChromeAnalytics.default:onIconTouchBegan(t4.integration.id)
 
-			if not v85.current then
-				v85.current = UserInputService.InputChanged:Connect(function(input, _) -- line: 407
-					-- upvalues: shouldRejectMultiTouch (copy), p10 (copy), Service (copy), t4 (copy), v85 (copy), p10Position (copy), Constants (copy), ChromeAnalytics (copy)
-					if shouldRejectMultiTouch(p10, input) then
+			if not v80.current then
+				v80.current = UserInputService.InputChanged:Connect(function(input, _) -- line: 386
+					-- upvalues: shouldRejectMultiTouch (copy), p9 (copy), Service (copy), t4 (copy), v80 (copy), p9Position (copy), Constants (copy), ChromeAnalytics (copy)
+					if shouldRejectMultiTouch(p9, input) then
 						return
 					end
 
-					if Service:isWindowOpen(t4.integration.id) or not v85.current then
+					if Service:isWindowOpen(t4.integration.id) or not v80.current then
 						return
 					end
 
 					local inputPosition = input.Position
 
-					if math.abs((p10Position - inputPosition).Magnitude) > Constants.DRAG_MAGNITUDE_THRESHOLD then
+					if math.abs((p9Position - inputPosition).Magnitude) > Constants.DRAG_MAGNITUDE_THRESHOLD then
 						ChromeAnalytics.default:onIconDrag(t4.integration.id)
 						Service:storeChromeInteracted()
 						Service:toggleWindow(t4.integration.id)
-						Service:gesture(t4.integration.id, v85, p10)
+						Service:gesture(t4.integration.id, v80, p9)
 					end
 				end)
 			end
 		end
-	end, { u84 })
-	local v102 = React.useCallback(function(_, p13) -- line: 433
-		-- upvalues: u84 (ref), v95 (copy), v85 (copy), Service (copy), t4 (copy)
-		if not u84 then
+	end, { u79 })
+	local v97 = React.useCallback(function(_, p12) -- line: 412
+		-- upvalues: u79 (ref), v90 (copy), v80 (copy), Service (copy), t4 (copy)
+		if not u79 then
 			return
 		end
 
-		if p13.UserInputType == Enum.UserInputType.MouseButton1 or p13.UserInputType == Enum.UserInputType.Touch then
-			v95(false)
+		if p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch then
+			v90(false)
 
-			if v85.current then
-				v85.current:Disconnect()
-				v85.current = nil
+			if v80.current then
+				v80.current:Disconnect()
+				v80.current = nil
 				Service:gesture(t4.integration.id, nil)
 			end
 		end
-	end, { u84 })
-	local u103 = (v86 or (v90 or v92)) and not v94
+	end, { u79 })
+	local u98 = (v81 or (v85 or v87)) and not v89
 
-	if isInExperienceUIVREnabled and u103 and u99 then
-		u103 = false
+	if isInExperienceUIVREnabled and u98 and u94 then
+		u98 = false
 	end
 
-	logTooltipState(t4.integration.id, u103)
+	logTooltipState(t4.integration.id, u98)
 
-	local v104 = if not FFlagEnableConsoleExpControls then nil else React.useContext(v52)
-	local v105 = React.useCallback(function(p14) -- line: 461
-		-- upvalues: FFlagEnableConsoleExpControls (copy), Service (copy), React (copy), Interactable (copy), Constants (copy), t4 (copy), u81 (ref), v100 (copy), v82 (copy), FFlagUnibarMenuOpenHamburger (copy), FFlagUnibarMenuOpenSubmenu (copy), useCursor (copy), Foundation (copy), u103 (ref), secondaryAction (copy), v104 (copy), v101 (copy), v102 (copy), isInExperienceUIVREnabled (copy), v96 (copy), u99 (ref), v95 (copy), v85 (copy)
+	local v99 = if not FFlagEnableConsoleExpControls then nil else React.useContext(v47)
+	local v100 = React.useCallback(function(p13) -- line: 440
+		-- upvalues: FFlagEnableConsoleExpControls (copy), Service (copy), React (copy), Interactable (copy), Constants (copy), t4 (copy), u76 (ref), v95 (copy), v77 (copy), FFlagUnibarMenuOpenHamburger (copy), FFlagUnibarMenuOpenSubmenu (copy), useCursor (copy), Foundation (copy), u98 (ref), secondaryAction (copy), v99 (copy), v96 (copy), v97 (copy), isInExperienceUIVREnabled (copy), v91 (copy), u94 (ref), v90 (copy), v80 (copy)
 		local id = nil
 
 		if FFlagEnableConsoleExpControls then
@@ -389,49 +382,49 @@ function TooltipButton(t4: {[any]: any}) -- line: 303
 
 		return React.createElement(Interactable, {
 			Name = (not FFlagEnableConsoleExpControls and "IconHitArea_" or Constants.ICON_NAME_PREFIX) .. t4.integration.id,
-			Size = u81,
+			Size = u76,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			onStateChanged = v100,
-			ref = v82,
+			onStateChanged = v95,
+			ref = v77,
 			SelectionOrder = if not FFlagUnibarMenuOpenHamburger and not FFlagUnibarMenuOpenSubmenu then 100 - t4.integration.order else t4.integration.order,
-			Position = t4.isCurrentlyOpenSubMenu:map(function(b2: boolean?) -- line: 479
+			Position = t4.isCurrentlyOpenSubMenu:map(function(b2: boolean?) -- line: 458
 				-- upvalues: FFlagEnableConsoleExpControls (copy)
 				return UDim2.new(0.5, 0, 0.5, (FFlagEnableConsoleExpControls or not b2) and 0 or 1)
 			end),
 			SelectionImageObject = useCursor(Foundation.Enums.CursorType.SkinToneCircle),
 			SelectionGroup = true,
 			SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
-			SelectionBehaviorDown = t4.isCurrentlyOpenSubMenu:map(function(b3: boolean?) -- line: 485
-				-- upvalues: u103 (ref), secondaryAction (copy)
-				if u103 and secondaryAction or b3 then
+			SelectionBehaviorDown = t4.isCurrentlyOpenSubMenu:map(function(b3: boolean?) -- line: 464
+				-- upvalues: u98 (ref), secondaryAction (copy)
+				if u98 and secondaryAction or b3 then
 					return Enum.SelectionBehavior.Escape
 				end
 
 				return Enum.SelectionBehavior.Stop
 			end),
-			NextSelectionLeft = if not FFlagEnableConsoleExpControls or id ~= t4.integration.id then nil else v104.menuIconRef,
-			[React.Change.AbsolutePosition] = p14,
-			[React.Change.AbsoluteSize] = p14,
-			[React.Event.InputBegan] = v101,
-			[React.Event.InputEnded] = v102,
-			[React.Event.Activated] = function() -- line: 499
-				-- upvalues: isInExperienceUIVREnabled (copy), v96 (copy), u99 (ref), Service (copy), v95 (copy), t4 (copy), v85 (copy)
-				if isInExperienceUIVREnabled and v96 then
-					if u99 then
+			NextSelectionLeft = if not FFlagEnableConsoleExpControls or id ~= t4.integration.id then nil else v99.menuIconRef,
+			[React.Change.AbsolutePosition] = p13,
+			[React.Change.AbsoluteSize] = p13,
+			[React.Event.InputBegan] = v96,
+			[React.Event.InputEnded] = v97,
+			[React.Event.Activated] = function() -- line: 478
+				-- upvalues: isInExperienceUIVREnabled (copy), v91 (copy), u94 (ref), Service (copy), v90 (copy), t4 (copy), v80 (copy)
+				if isInExperienceUIVREnabled and v91 then
+					if u94 then
 						return
 					end
 
 					Service:onTriggerVRToggleButton():fire(true)
 				end
 
-				v95(true, true)
+				v90(true, true)
 				t4.integration.activated()
 
-				if v85.current then
-					v85.current:Disconnect()
-					v85.current = nil
+				if v80.current then
+					v80.current:Disconnect()
+					v80.current = nil
 					Service:gesture(t4.integration.id, nil)
 				end
 			end
@@ -441,101 +434,101 @@ function TooltipButton(t4: {[any]: any}) -- line: 303
 			})
 		})
 	end, {
-		v100,
-		u88,
 		v95,
-		v101,
-		v102,
+		u83,
+		v90,
+		v96,
+		v97,
 		t4.isCurrentlyOpenSubMenu,
-		u103,
+		u98,
 		secondaryAction,
-		if not isInExperienceUIVREnabled then nil else u99,
-		if not FFlagEnableConsoleExpControls then nil else v104.menuIconRef
+		if not isInExperienceUIVREnabled then nil else u94,
+		if not FFlagEnableConsoleExpControls then nil else v99.menuIconRef
 	})
-	local v106 = React.useRef(nil)
-	local v107 = React.useCallback(function(p15) -- line: 536
-		-- upvalues: v106 (copy), v91 (copy)
-		local u141 = nil
-		local u142 = nil
-		local u143 = nil
+	local v101 = React.useRef(nil)
+	local v102 = React.useCallback(function(p14) -- line: 515
+		-- upvalues: v101 (copy), v86 (copy)
+		local u135 = nil
+		local u136 = nil
+		local u137 = nil
 
-		if p15 ~= v106.current then
-			pcall(function() -- line: 543
-				-- upvalues: u141 (ref), u142 (ref), u143 (ref)
-				if u141 then
-					u141:disconnect()
-					u141 = nil
+		if p14 ~= v101.current then
+			pcall(function() -- line: 522
+				-- upvalues: u135 (ref), u136 (ref), u137 (ref)
+				if u135 then
+					u135:disconnect()
+					u135 = nil
 				end
 
-				if u142 then
-					u142:disconnect()
-					u142 = nil
+				if u136 then
+					u136:disconnect()
+					u136 = nil
 				end
 
-				if u143 then
-					u143:disconnect()
-					u143 = nil
+				if u137 then
+					u137:disconnect()
+					u137 = nil
 				end
 			end)
 
-			if p15 then
-				u141 = p15.MouseEnter:Connect(function() -- line: 561
-					-- upvalues: v91 (copy)
-					v91(true, true)
+			if p14 then
+				u135 = p14.MouseEnter:Connect(function() -- line: 540
+					-- upvalues: v86 (copy)
+					v86(true, true)
 				end)
-				u142 = p15.MouseLeave:Connect(function() -- line: 564
-					-- upvalues: v91 (copy)
-					v91(false)
+				u136 = p14.MouseLeave:Connect(function() -- line: 543
+					-- upvalues: v86 (copy)
+					v86(false)
 				end)
-				u143 = p15.Destroying:Connect(function() -- line: 567
-					-- upvalues: v91 (copy)
-					v91(false)
+				u137 = p14.Destroying:Connect(function() -- line: 546
+					-- upvalues: v86 (copy)
+					v86(false)
 				end)
 			end
 
-			v106.current = p15
+			v101.current = p14
 		end
-	end, { v91 })
-	local v108 = if not secondaryAction then nil else {
+	end, { v86 })
+	local v103 = if not secondaryAction then nil else {
 		text = secondaryAction.label,
-		onStateChanged = function(_, p17) -- line: 578
-			-- upvalues: ControlState (copy), v93 (copy)
-			if p17 == ControlState.Selected then
-				v93(true)
+		onStateChanged = function(_, p16) -- line: 557
+			-- upvalues: ControlState (copy), v88 (copy)
+			if p16 == ControlState.Selected then
+				v88(true)
 
 				return
 			end
 
-			v93(false)
+			v88(false)
 		end,
-		onActivated = function() -- line: 585
+		onActivated = function() -- line: 564
 			-- upvalues: secondaryAction (copy), t4 (copy)
 			secondaryAction.activated(t4.integration)
 		end,
-		NextSelectionUp = v82,
-		NextSelectionLeft = v82,
-		NextSelectionRight = v82,
-		NextSelectionDown = v82
+		NextSelectionUp = v77,
+		NextSelectionLeft = v77,
+		NextSelectionRight = v77,
+		NextSelectionDown = v77
 	}
 
-	if isInExperienceUIVREnabled and v96 then
-		local v109, v110 = React.useBinding(Vector2.zero)
-		local v111, v112 = React.useBinding(Vector2.zero)
-		local v113 = React.useCallback(function(p18) -- line: 599
-			-- upvalues: v110 (copy), v112 (copy)
-			v110(p18.AbsolutePosition)
-			v112(p18.AbsoluteSize)
+	if isInExperienceUIVREnabled and v91 then
+		local v104, v105 = React.useBinding(Vector2.zero)
+		local v106, v107 = React.useBinding(Vector2.zero)
+		local v108 = React.useCallback(function(p17) -- line: 578
+			-- upvalues: v105 (copy), v107 (copy)
+			v105(p17.AbsolutePosition)
+			v107(p17.AbsoluteSize)
 		end, {
-			v110,
-			v112
+			v105,
+			v107
 		})
 
 		return React.createElement(React.Fragment, nil, {
-			VRSpatialTooltip = if not u103 or not Panel3DInSpatialUI then nil else React.createElement(Panel3DInSpatialUI, {
+			VRSpatialTooltip = if not u98 or not Panel3DInSpatialUI then nil else React.createElement(Panel3DInSpatialUI, {
 				panelType = PanelType.ToolTipsContainer,
-				renderFunction = function(vector2: Vector2) -- line: 611
-					-- upvalues: v109 (copy), v111 (copy), SPATIAL_TOOLTIP_SPACING (ref), React (copy), TooltipCallout (ref), t4 (copy), TooltipOrientation (ref), v108 (copy), secondaryAction (copy), v107 (copy)
-					local vector2_2 = Vector2.new(v109:getValue().X + v111:getValue().X / 2, vector2.Y - SPATIAL_TOOLTIP_SPACING)
+				renderFunction = function(vector2: Vector2) -- line: 590
+					-- upvalues: v104 (copy), v106 (copy), SPATIAL_TOOLTIP_SPACING (ref), React (copy), TooltipCallout (ref), t4 (copy), TooltipOrientation (ref), v103 (copy), secondaryAction (copy), v102 (copy)
+					local vector2_2 = Vector2.new(v104:getValue().X + v106:getValue().X / 2, vector2.Y - SPATIAL_TOOLTIP_SPACING)
 
 					return React.createElement(TooltipCallout, {
 						distanceOffset = 0,
@@ -545,12 +538,12 @@ function TooltipButton(t4: {[any]: any}) -- line: 303
 						triggerPointCenter = vector2_2,
 						contentOffsetVector = Vector2.zero,
 						triggerPointRadius = Vector2.zero,
-						buttonProps = v108,
-						ref = if not secondaryAction then nil else v107
+						buttonProps = v103,
+						ref = if not secondaryAction then nil else v102
 					})
 				end
 			}),
-			v105(v113)
+			v100(v108)
 		})
 	end
 
@@ -558,27 +551,27 @@ function TooltipButton(t4: {[any]: any}) -- line: 303
 		headerText = t4.integration.integration.label,
 		hotkeyCodes = t4.integration.integration.hotkeyCodes,
 		textAlignment = Enum.TextXAlignment.Left,
-		buttonProps = v108,
-		ref = if not secondaryAction then nil else v107
+		buttonProps = v103,
+		ref = if not secondaryAction then nil else v102
 	}, {
 		DisplayOrder = 10,
-		active = u103,
+		active = u98,
 		guiTarget = CoreGui
-	}, v105)
+	}, v100)
 end
-function IconHost(t5: {[any]: any}) -- line: 650
-	-- upvalues: React (copy), useStyle (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), useMappedObservableValueBinding (copy), Service (copy), v14 (copy), ChatNotificationBadge (copy), FFlagEnableConsoleExpControls (copy), FFlagEnableWhatsNew (copy), v10 (copy)
+function IconHost(t5: {[any]: any}) -- line: 629
+	-- upvalues: React (copy), useStyle (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), useMappedObservableValueBinding (copy), Service (copy), ChatNotificationBadge (copy), FFlagEnableConsoleExpControls (copy), FFlagEnableWhatsNew (copy), v9 (copy)
 	if not t5.integration or not t5.integration.component then
 		warn("IconHost has no component to render")
 	end
 
-	local v115, v116 = React.useBinding(false)
-	local v117, v118 = React.useBinding(true)
+	local v110, v111 = React.useBinding(false)
+	local v112, v113 = React.useBinding(true)
 	local BackgroundOnHover = useStyle().Theme.BackgroundOnHover
-	local v120 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_CELL_WIDTH else UnibarStyle.use().ICON_CELL_WIDTH
-	local v121 = useMappedObservableValueBinding(Service:currentSubMenu(), function(p19) -- line: 673
+	local v115 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_CELL_WIDTH else UnibarStyle.use().ICON_CELL_WIDTH
+	local v116 = useMappedObservableValueBinding(Service:currentSubMenu(), function(p18) -- line: 652
 		-- upvalues: t5 (copy)
-		return p19 == t5.integration.id
+		return p18 == t5.integration.id
 	end)
 	local t6 = {
 		React.createElement("Frame", {
@@ -586,7 +579,7 @@ function IconHost(t5: {[any]: any}) -- line: 650
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
-			Visible = v117
+			Visible = v112
 		}, {
 			IntegrationIcon = t5.integration and (not not t5.integration.component and t5.integration.component(t5)) or nil,
 			UIListLayout = React.createElement("UIListLayout", {
@@ -597,32 +590,32 @@ function IconHost(t5: {[any]: any}) -- line: 650
 		}),
 		if not t5.integration.integration.flashNotificationSource then nil else React.createElement(NotificationIndicator, {
 			integration = t5.integration,
-			setIconVisible = v118
+			setIconVisible = v113
 		}),
 		React.createElement(HighlightCircle, {
 			name = "SelectedHighlighter",
 			color = BackgroundOnHover,
-			visible = v121
+			visible = v116
 		}),
 		React.createElement(HighlightCircle, {
 			name = "Highlighter",
 			color = BackgroundOnHover,
-			visible = v115
+			visible = v110
 		}),
-		if not v14 or t5.integration.id ~= "chat" then React.createElement(NotificationBadge, t5) else React.createElement(ChatNotificationBadge, {
+		if t5.integration.id ~= "chat" then React.createElement(NotificationBadge, t5) else React.createElement(ChatNotificationBadge, {
 			iconHostProps = t5,
 			NotificationBadge = NotificationBadge
 		}),
 		if not t5.disableButtonBehaviors then React.createElement(TooltipButton, {
 			integration = t5.integration,
-			setHovered = v116,
-			isCurrentlyOpenSubMenu = v121
+			setHovered = v111,
+			isCurrentlyOpenSubMenu = v116
 		}) else nil
 	}
 	local t7 = {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(0, v120, 0, v120),
+		Size = UDim2.new(0, v115, 0, v115),
 		LayoutOrder = t5.integration.order,
 		Position = t5.position,
 		Visible = t5.visible,
@@ -631,7 +624,7 @@ function IconHost(t5: {[any]: any}) -- line: 650
 
 	if FFlagEnableWhatsNew then
 		return React.createElement("Frame", t7, {
-			WhatsNewAnchor = React.createElement(v10, {
+			WhatsNewAnchor = React.createElement(v9, {
 				tag = "size-full",
 				anchorId = t5.integration.id
 			}, t6)

@@ -60,7 +60,7 @@ local function getCardsPerRowAndCardWidth(t1: {[any]: any}) -- line: 73
 	return v49, v50
 end
 local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
-	-- upvalues: useRoactService (copy), AppEventIngestService (copy), RoactAnalytics (copy), useTokens (copy), useLocalization (copy), FFlagTraversalExpPagePaddingFixes (copy), React (copy), v22 (copy), v23 (copy), GuiService (copy), CollectionItemSize (copy), CollectionLayoutCalculators (copy), CollectionViews (copy), getCardsPerRowAndCardWidth (copy), v19 (copy), Signal (copy), Cryo (copy), TraversalExperienceCard (copy), Constants (copy), TraversalTelemetry (copy), FFlagTraversalHistoryDiscoveryTelemetry (copy), gamePlayIntent (copy), DiscoveryAnalytics (copy), useViewportBounds (copy), SendGameImpressions (copy), View (copy), FFlagIntegrateTraversalHistoryInSideSheet (copy), IconButton (copy), IconName (copy), FoundationText (copy), ScrollView (copy), ImpressionsTrackerWithoutNavigation (copy)
+	-- upvalues: useRoactService (copy), AppEventIngestService (copy), RoactAnalytics (copy), useTokens (copy), useLocalization (copy), FFlagTraversalExpPagePaddingFixes (copy), React (copy), v22 (copy), v23 (copy), GuiService (copy), CollectionItemSize (copy), CollectionLayoutCalculators (copy), CollectionViews (copy), getCardsPerRowAndCardWidth (copy), v19 (copy), Signal (copy), Cryo (copy), TraversalExperienceCard (copy), Constants (copy), TraversalTelemetry (copy), FFlagTraversalHistoryDiscoveryTelemetry (copy), gamePlayIntent (copy), DiscoveryAnalytics (copy), useViewportBounds (copy), SendGameImpressions (copy), FFlagIntegrateTraversalHistoryInSideSheet (copy), View (copy), IconButton (copy), IconName (copy), FoundationText (copy), ScrollView (copy), ImpressionsTrackerWithoutNavigation (copy)
 	local v54 = useRoactService(AppEventIngestService)
 	local v55 = useRoactService(RoactAnalytics)
 	local v56 = useTokens()
@@ -154,14 +154,14 @@ local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
 			return
 		end
 
-		local v84 = v68.current * v67
+		local v85 = v68.current * v67
 
-		if v84 + v68.current <= v71.current.AbsoluteSize.Y then
+		if v85 + v68.current <= v71.current.AbsoluteSize.Y then
 			v74.current = true
 
-			local v85 = math.max(math.floor((v71.current.AbsoluteSize.Y - v84) / v68.current), 1) * u66
+			local v86 = math.max(math.floor((v71.current.AbsoluteSize.Y - v85) / v68.current), 1) * u66
 
-			t2.onLoadMoreHistory(v85)
+			t2.onLoadMoreHistory(v86)
 		end
 	end, {
 		t2.onLoadMoreHistory,
@@ -175,12 +175,12 @@ local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
 		if FFlagTraversalHistoryDiscoveryTelemetry then
 			local t3 = {}
 
-			for v88, v89 in t2.historyItems do
-				if v89 then
+			for v89, v90 in t2.historyItems do
+				if v90 then
 					table.insert(t3, {
-						placeId = tostring(v89.placeId),
-						universeId = tostring(v89.universeId),
-						uiIndex = v88
+						placeId = tostring(v90.placeId),
+						universeId = tostring(v90.universeId),
+						uiIndex = v89
 					})
 				end
 			end
@@ -204,9 +204,9 @@ local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
 	end, { t2.onHistoryClose })
 	local v78 = React.useCallback(function(p8) -- line: 246
 		-- upvalues: XLarge (copy), v61 (copy), v69 (copy), v68 (copy)
-		local v91 = p8.AbsoluteSize.X - 2 * XLarge
+		local v92 = p8.AbsoluteSize.X - 2 * XLarge
 
-		v61(v91)
+		v61(v92)
 
 		if v69.current[1] then
 			v68.current = v69.current[1].AbsoluteSize.Y
@@ -233,6 +233,18 @@ local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
 		u66,
 		v72
 	})
+	local v80 = if not FFlagTraversalExpPagePaddingFixes then UDim.new(0, XLarge) else {
+		left = UDim.new(0, XLarge),
+		right = UDim.new(0, XLarge)
+	}
+
+	if FFlagIntegrateTraversalHistoryInSideSheet then
+		v80 = {
+			left = UDim.new(0, XLarge),
+			right = UDim.new(0, XLarge),
+			top = UDim.new(0, v56.Padding.Small)
+		}
+	end
 
 	return React.createElement(View, {
 		tag = "col auto-xy size-full-0",
@@ -277,10 +289,7 @@ local function HistoryPage(t2: {[any]: any}, p1) -- line: 95
 			tag = "size-full shrink",
 			LayoutOrder = 2,
 			selectionGroup = false,
-			padding = if not FFlagTraversalExpPagePaddingFixes then UDim.new(0, XLarge) else {
-				left = UDim.new(0, XLarge),
-				right = UDim.new(0, XLarge)
-			},
+			padding = v80,
 			layout = {
 				Wraps = true,
 				FillDirection = Enum.FillDirection.Horizontal,

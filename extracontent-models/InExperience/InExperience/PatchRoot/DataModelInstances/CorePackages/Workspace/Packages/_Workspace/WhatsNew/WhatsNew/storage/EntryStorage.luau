@@ -217,7 +217,12 @@ return {
 		-- upvalues: v7 (copy)
 		v7._jsonDecodeCache = {}
 	end,
-	getEntries = function() -- line: 178
+	clearForTests = function() -- line: 178
+		-- upvalues: writeDeviceData (copy), emptyDeviceData (copy), v7 (copy)
+		writeDeviceData((emptyDeviceData()))
+		v7._jsonDecodeCache = {}
+	end,
+	getEntries = function() -- line: 182
 		-- upvalues: v7 (copy), emptyDeviceData (copy), deepClone (copy), t1 (copy), toSnapshot (copy)
 		local v55 = v7:getCachedJsonForKey("WhatsNewEntries")
 		local v56 = if type(v55) ~= "table" then nil else v55
@@ -242,7 +247,7 @@ return {
 
 		return (toSnapshot(v57.entries))
 	end,
-	getMeta = function() -- line: 183
+	getMeta = function() -- line: 187
 		-- upvalues: v7 (copy), emptyDeviceData (copy), deepClone (copy), t1 (copy), normalizeMeta (copy)
 		local v59 = v7:getCachedJsonForKey("WhatsNewEntries")
 		local v60 = if type(v59) ~= "table" then nil else v59
@@ -269,9 +274,9 @@ return {
 
 		return normalizeMeta(meta)
 	end,
-	setMeta = function(p4) -- line: 188
+	setMeta = function(p4) -- line: 192
 		-- upvalues: updateDeviceData (copy), t1 (copy)
-		updateDeviceData(function(p5) -- line: 189
+		updateDeviceData(function(p5) -- line: 193
 			-- upvalues: p4 (copy), t1 (copy)
 			local v74 = p4
 
@@ -280,9 +285,9 @@ return {
 			return p5
 		end)
 	end,
-	markSeen = function(s2: string, s3: string) -- line: 195
+	markSeen = function(s2: string, s3: string) -- line: 199
 		-- upvalues: updateDeviceData (copy)
-		updateDeviceData(function(p6) -- line: 196
+		updateDeviceData(function(p6) -- line: 200
 			-- upvalues: s2 (copy), s3 (copy)
 			local entries = p6.entries
 			local v77 = s2
@@ -298,7 +303,7 @@ return {
 			return p6
 		end)
 	end,
-	runMigration = function(t12: {[any]: any}?) -- line: 203
+	runMigration = function(t12: {[any]: any}?) -- line: 207
 		-- upvalues: v7 (copy), emptyDeviceData (copy), deepClone (copy), t1 (copy), hadUsageBeforeFeature (copy), updateDeviceData (copy)
 		local v68 = v7:getCachedJsonForKey("WhatsNewEntries")
 		local v69 = if type(v68) ~= "table" then nil else v68
@@ -328,7 +333,7 @@ return {
 		end
 
 		if hadUsageBeforeFeature() then
-			updateDeviceData(function(p7) -- line: 213
+			updateDeviceData(function(p7) -- line: 217
 				-- upvalues: meta (copy)
 				p7.meta = {
 					grandfathered = true,
@@ -344,7 +349,7 @@ return {
 				return
 			end
 		else
-			updateDeviceData(function(p8) -- line: 225
+			updateDeviceData(function(p8) -- line: 229
 				-- upvalues: meta (copy)
 				p8.meta = {
 					grandfathered = false,

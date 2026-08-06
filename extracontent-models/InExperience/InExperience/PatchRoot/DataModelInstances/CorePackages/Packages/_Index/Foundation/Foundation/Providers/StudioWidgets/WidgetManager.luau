@@ -20,162 +20,247 @@ function t1.new(t2: {[any]: any}) -- line: 54
 	self._pendingDeregisters = {}
 	self._registeredWidgets = {}
 	self._signals = {}
+	self._deferredAncestrySignals = {}
 	self._running = false
 
 	return self
 end
-function t1.nextId(_) -- line: 69
+function t1.nextId(_) -- line: 70
 	-- upvalues: HttpService (copy)
 	return HttpService:GenerateGUID(false)
 end
-function t1.flush(p2) -- line: 73
-	-- upvalues: filter (copy), values (copy), StudioUri (copy), Flags (copy)
-	local t3 = {}
+function t1.flush(p2) -- line: 74
+	-- upvalues: Flags (copy)
+	if Flags.FoundationWidgetManagerSnapshotFlush then
+		local _pendingDeregisters = p2._pendingDeregisters
+		local _pendingRegisters = p2._pendingRegisters
 
-	for v16, v17 in p2._pendingDeregisters do
-		table.insert(t3, v17)
-		p2._registeredWidgets[v16] = nil
+		p2._pendingDeregisters = {}
+		p2._pendingRegisters = {}
+		p2:_flushWith(_pendingDeregisters, _pendingRegisters)
+
+		return
 	end
 
-	if #t3 > 0 then
-		pcall(function() -- line: 80
-			-- upvalues: p2 (copy), t3 (copy)
-			p2._widgetsApi:DeregisterAsync(t3)
+	p2:_flushWith(p2._pendingDeregisters, p2._pendingRegisters)
+	p2._pendingDeregisters = {}
+	p2._pendingRegisters = {}
+end
+function t1._flushWith(p3, t3: {[any]: any}, t4: {[any]: any}) -- line: 89
+	-- upvalues: Flags (copy), filter (copy), values (copy), StudioUri (copy)
+	local t5 = {}
+
+	for v21, v22 in t3 do
+		table.insert(t5, v22)
+		p3._registeredWidgets[v21] = nil
+	end
+
+	if #t5 > 0 then
+		pcall(function() -- line: 100
+			-- upvalues: p3 (copy), t5 (copy)
+			p3._widgetsApi:DeregisterAsync(t5)
 		end)
 	end
 
-	p2._pendingDeregisters = {}
+	local v23 = if not Flags.FoundationWidgetManagerSnapshotFlush then nil else {}
+	local v24 = filter(values(t4), function(p4) -- line: 106
+		-- upvalues: Flags (copy), v23 (copy)
+		local v53 = p4.Widget:FindFirstAncestorWhichIsA("LayerCollector") ~= nil
 
-	local v18 = filter(values(p2._pendingRegisters), function(p3) -- line: 86
-		return p3.Widget:FindFirstAncestorWhichIsA("LayerCollector") ~= nil
+		if Flags.FoundationWidgetManagerSnapshotFlush and not v53 then
+			table.insert(v23, p4)
+		end
+
+		return v53
 	end)
-	local t4 = {}
 
-	for _, v21 in v18 do
-		v21.Position = v21.Widget.AbsolutePosition
-		v21.Size = v21.Widget.AbsoluteSize
-		v21.Visible = v21.Widget:GetStyled("Visible")
+	if Flags.FoundationWidgetManagerSnapshotFlush then
+		for _, v26 in v23 do
+			local v27 = StudioUri.toString(v26.Uri)
 
-		local v22 = StudioUri.toString(v21.Uri)
-		local DEPRECATED_PluginGui = v21.DEPRECATED_PluginGui
-		local v24 = p2._signals[v22]
+			if not p3._deferredAncestrySignals[v27] then
+				p3._deferredAncestrySignals[v27] = v26.Widget.AncestryChanged:Connect(function(_, parent) -- line: 118
+					-- upvalues: p3 (copy), v27 (copy), v26 (copy)
+					if parent == nil then
+						local v56 = p3._deferredAncestrySignals[v27]
 
-		if v24 then
-			if v24.Widget == v21.Widget then
-				if Flags.FoundationPopoverPluginOverlayMeasurement and DEPRECATED_PluginGui ~= v24.Host then
-					v24.Host = DEPRECATED_PluginGui
-					table.insert(t4, v21.Uri)
+						if v56 then
+							v56:Disconnect()
+							p3._deferredAncestrySignals[v27] = nil
+						end
+
+						return
+					end
+
+					if v26.Widget:FindFirstAncestorWhichIsA("LayerCollector") then
+						local v57 = p3._deferredAncestrySignals[v27]
+
+						if v57 then
+							v57:Disconnect()
+							p3._deferredAncestrySignals[v27] = nil
+						end
+
+						p3:register(v26.Uri, v26.Widget)
+					end
+				end)
+			end
+		end
+	end
+
+	local t6 = {}
+
+	for _, v30 in v24 do
+		v30.Position = v30.Widget.AbsolutePosition
+		v30.Size = v30.Widget.AbsoluteSize
+		v30.Visible = v30.Widget:GetStyled("Visible")
+
+		local v31 = StudioUri.toString(v30.Uri)
+		local DEPRECATED_PluginGui = v30.DEPRECATED_PluginGui
+		local v33 = p3._signals[v31]
+
+		if v33 then
+			if v33.Widget == v30.Widget then
+				if Flags.FoundationPopoverPluginOverlayMeasurement and DEPRECATED_PluginGui ~= v33.Host then
+					v33.Host = DEPRECATED_PluginGui
+					table.insert(t6, v30.Uri)
 				end
 
 				continue
 			end
 
-			v24.PositionChanged:Disconnect()
-			v24.SizeChanged:Disconnect()
-			v24.VisibleChanged:Disconnect()
-			v24.AncestryChanged:Disconnect()
+			v33.PositionChanged:Disconnect()
+			v33.SizeChanged:Disconnect()
+			v33.VisibleChanged:Disconnect()
+			v33.AncestryChanged:Disconnect()
 		end
 
-		p2._signals[v22] = {
-			Widget = v21.Widget,
+		p3._signals[v31] = {
+			Widget = v30.Widget,
 			Host = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else DEPRECATED_PluginGui,
-			PositionChanged = v21.Widget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 116
-				-- upvalues: p2 (copy), v21 (copy)
-				p2:register(v21.Uri, v21.Widget)
+			PositionChanged = v30.Widget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 167
+				-- upvalues: p3 (copy), v30 (copy)
+				p3:register(v30.Uri, v30.Widget)
 			end),
-			SizeChanged = v21.Widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 119
-				-- upvalues: p2 (copy), v21 (copy)
-				p2:register(v21.Uri, v21.Widget)
+			SizeChanged = v30.Widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 170
+				-- upvalues: p3 (copy), v30 (copy)
+				p3:register(v30.Uri, v30.Widget)
 			end),
-			VisibleChanged = v21.Widget:GetStyledPropertyChangedSignal("Visible"):Connect(function() -- line: 122
-				-- upvalues: p2 (copy), v21 (copy)
-				p2:register(v21.Uri, v21.Widget)
+			VisibleChanged = v30.Widget:GetStyledPropertyChangedSignal("Visible"):Connect(function() -- line: 173
+				-- upvalues: p3 (copy), v30 (copy)
+				p3:register(v30.Uri, v30.Widget)
 			end),
-			AncestryChanged = v21.Widget.AncestryChanged:Connect(function(_, parent) -- line: 125
-				-- upvalues: p2 (copy), v21 (copy)
+			AncestryChanged = v30.Widget.AncestryChanged:Connect(function(_, parent) -- line: 176
+				-- upvalues: p3 (copy), v30 (copy)
 				if not parent then
-					p2:deregister(v21.Uri)
+					p3:deregister(v30.Uri)
 				end
 			end)
 		}
 	end
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement and #t4 > 0 then
-		pcall(function() -- line: 134
-			-- upvalues: p2 (copy), t4 (copy)
-			p2._widgetsApi:DeregisterAsync(t4)
+	if Flags.FoundationPopoverPluginOverlayMeasurement and #t6 > 0 then
+		pcall(function() -- line: 185
+			-- upvalues: p3 (copy), t6 (copy)
+			p3._widgetsApi:DeregisterAsync(t6)
 		end)
 	end
 
-	if #v18 > 0 then
-		p2._widgetsApi:RegisterAsync(v18)
+	if #v24 > 0 then
+		p3._widgetsApi:RegisterAsync(v24)
 	end
-
-	p2._pendingRegisters = {}
 end
-function t1._run(p5) -- line: 145
-	if p5._running then
+function t1._run(p7) -- line: 195
+	if p7._running then
 		return
 	end
 
-	p5._running = true
-	task.defer(function() -- line: 150
-		-- upvalues: p5 (copy)
-		p5._running = false
-		p5:flush()
+	p7._running = true
+	task.defer(function() -- line: 200
+		-- upvalues: p7 (copy)
+		p7._running = false
+		p7:flush()
 	end)
 end
-function t1.register(p6, p7, p8) -- line: 160
-	-- upvalues: StudioUri (copy)
-	local v29 = p8:FindFirstAncestorWhichIsA("PluginGui") or p8:FindFirstAncestorWhichIsA("ScreenGui")
+function t1.register(p8, p9, p10) -- line: 210
+	-- upvalues: StudioUri (copy), Flags (copy)
+	local v38 = p10:FindFirstAncestorWhichIsA("PluginGui") or p10:FindFirstAncestorWhichIsA("ScreenGui")
 
-	if v29 then
-		local v30 = StudioUri.toString(p7)
+	if v38 then
+		local v39 = StudioUri.toString(p9)
 
-		p6._registeredWidgets[v30] = p8
-		p6._pendingRegisters[v30] = {
-			Uri = p7,
-			Widget = p8,
-			DEPRECATED_PluginGui = v29
+		if Flags.FoundationWidgetManagerSnapshotFlush then
+			local v40 = p8._deferredAncestrySignals[v39]
+
+			if v40 then
+				v40:Disconnect()
+				p8._deferredAncestrySignals[v39] = nil
+			end
+		end
+
+		p8._registeredWidgets[v39] = p10
+		p8._pendingRegisters[v39] = {
+			Uri = p9,
+			Widget = p10,
+			DEPRECATED_PluginGui = v38
 		}
-		p6._pendingDeregisters[v30] = nil
-		p6:_run()
+		p8._pendingDeregisters[v39] = nil
+		p8:_run()
 	end
 end
-function t1.deregister(p9, p10, p11) -- line: 174
-	-- upvalues: StudioUri (copy), Logger (copy)
-	local v34 = StudioUri.toString(p10)
+function t1.deregister(p11, p12, p13) -- line: 231
+	-- upvalues: StudioUri (copy), Flags (copy), Logger (copy)
+	local v44 = StudioUri.toString(p12)
 
-	p9._pendingDeregisters[v34] = p10
+	p11._pendingDeregisters[v44] = p12
 
-	local v35 = p9._signals[v34]
+	if Flags.FoundationWidgetManagerSnapshotFlush then
+		p11._pendingRegisters[v44] = nil
 
-	if v35 then
-		if p11 == nil or p11 == v35.Widget then
-			v35.PositionChanged:Disconnect()
-			v35.SizeChanged:Disconnect()
-			v35.VisibleChanged:Disconnect()
-			v35.AncestryChanged:Disconnect()
-			p9._signals[v34] = nil
-		else
-			Logger:warning(`WidgetManager:deregister called with mismatched widget for uri { v34 }`)
+		local v45 = p11._deferredAncestrySignals[v44]
+
+		if v45 then
+			v45:Disconnect()
+			p11._deferredAncestrySignals[v44] = nil
 		end
 	end
 
-	p9:_run()
-end
-function t1.destroy(p12) -- line: 192
-	for _, v38 in p12._signals do
-		v38.PositionChanged:Disconnect()
-		v38.SizeChanged:Disconnect()
-		v38.VisibleChanged:Disconnect()
-		v38.AncestryChanged:Disconnect()
+	local v46 = p11._signals[v44]
+
+	if v46 then
+		if p13 == nil or p13 == v46.Widget then
+			v46.PositionChanged:Disconnect()
+			v46.SizeChanged:Disconnect()
+			v46.VisibleChanged:Disconnect()
+			v46.AncestryChanged:Disconnect()
+			p11._signals[v44] = nil
+		else
+			Logger:warning(`WidgetManager:deregister called with mismatched widget for uri { v44 }`)
+		end
 	end
 
-	p12._signals = {}
-	p12._pendingRegisters = {}
-	p12._pendingDeregisters = {}
-	p12._registeredWidgets = {}
+	p11:_run()
+end
+function t1.destroy(p14) -- line: 257
+	-- upvalues: Flags (copy)
+	for _, v49 in p14._signals do
+		v49.PositionChanged:Disconnect()
+		v49.SizeChanged:Disconnect()
+		v49.VisibleChanged:Disconnect()
+		v49.AncestryChanged:Disconnect()
+	end
+
+	if Flags.FoundationWidgetManagerSnapshotFlush then
+		for _, v51 in p14._deferredAncestrySignals do
+			v51:Disconnect()
+		end
+
+		p14._deferredAncestrySignals = {}
+	end
+
+	p14._signals = {}
+	p14._pendingRegisters = {}
+	p14._pendingDeregisters = {}
+	p14._registeredWidgets = {}
 end
 
 return t1

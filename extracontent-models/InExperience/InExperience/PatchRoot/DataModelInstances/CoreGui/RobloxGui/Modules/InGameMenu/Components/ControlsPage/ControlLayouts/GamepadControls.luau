@@ -55,6 +55,9 @@ local function GamepadControls(p3) -- line: 76
 	}, {
 		GamepadImage = Roact.createElement(if not FFlagCoreUiMigrateUIBloxToFoundation then ImageSetLabel else Image, {
 			BackgroundTransparency = not FFlagCoreUiMigrateUIBloxToFoundation and 1 or nil,
+			backgroundStyle = if not FFlagCoreUiMigrateUIBloxToFoundation then nil else {
+				Transparency = 1
+			},
 			Image = v22 and Assets.Images.GamepadXbox or Assets.Images.Gamepad,
 			Size = UDim2.new(0, 473, 0, 465),
 			Position = UDim2.new(0.5, 16.5, 0.5, 0),

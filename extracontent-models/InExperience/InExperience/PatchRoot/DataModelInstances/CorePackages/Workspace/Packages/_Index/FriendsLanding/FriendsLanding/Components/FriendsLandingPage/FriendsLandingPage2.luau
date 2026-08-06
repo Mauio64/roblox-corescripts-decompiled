@@ -61,48 +61,49 @@ local FFlagCreateConnectionsHub = require(FriendsLandingParent.SharedFlags).FFla
 local FFlagFixCohubUiBugs = require(FriendsLandingParent.SharedFlags).FFlagFixCohubUiBugs
 local FFlagFriendsPageAlwaysOpenPPV = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageAlwaysOpenPPV
 local FFlagFriendsPageUserListEnabled = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageUserListEnabled
+local FFlagFriendsPageUnifiedOpenProfileLogic = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageUnifiedOpenProfileLogic
 local FFlagExtendScrollingFramesBySafeInsets = require(FriendsLandingParent.SharedFlags).FFlagExtendScrollingFramesBySafeInsets
 local FFlagEnableLeftNavOnConsole = require(FriendsLandingParent.SharedFlags).FFlagEnableLeftNavOnConsole
 local FStringIsUserInTcEligibleCountryAmpFeature = require(FriendsLandingParent.SharedFlags).FStringIsUserInTcEligibleCountryAmpFeature
 local FStringCanAccessTrustedContactsAmpNameSpace = require(FriendsLandingParent.SharedFlags).FStringCanAccessTrustedContactsAmpNameSpace
-local v62 = game:DefineFastFlag("FixSearchYNavigation", false)
-local v63 = game:DefineFastFlag("FixFriendsLandingRightMargin", false)
+local v63 = game:DefineFastFlag("FixSearchYNavigation", false)
+local v64 = game:DefineFastFlag("FixFriendsLandingRightMargin", false)
 local FFlagLuaAppsDefaultSelection = require(FriendsLandingParent.SharedFlags).FFlagLuaAppsDefaultSelection
 
-local function FriendsLandingPage(t1: {[any]: any}) -- line: 106
-	-- upvalues: useLocalization (copy), React (copy), FriendsLandingContext (copy), FriendsLandingAnalytics (copy), useNavigation (copy), useDesignTokens (copy), useUiModeInfo (copy), FFlagFixScalingOnFriendsLanding (copy), useTokens (copy), useFocusGuiObject (copy), FFlagFixCohubUiBugs (copy), getPageMargin (copy), useScreenSize (copy), UiMode (copy), FocusNavigationUtils (copy), InputHandlers (copy), v62 (copy), FFlagEnableLeftNavOnConsole (copy), AppPage (copy), RobloxAppEnums (copy), EnumScreens (copy), ReactFocusNavigation (copy), FocusNavigationEventNameEnum (copy), useTextSizeOffset (copy), FFlagConnectionManagementChips (copy), AmpApiProvider (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AccessResponseEnum (copy), FFlagFriendsPageAlwaysOpenPPV (copy), convertUserPresenceTypeToString (copy), ButtonClickEvents (copy), Constants (copy), FFlagFriendsPageUserListEnabled (copy), FriendTile (copy), dependencyArray (copy), v51 (copy), filterStates (copy), FFlagCreateConnectionsHub (copy), GridMetrics (copy), useAnimatedScrollToSelection (copy), FFlagExtendScrollingFramesBySafeInsets (copy), useSignalState (copy), Display (copy), isFromConnectionsHub (copy), FFlagLuaAppsDefaultSelection (copy), useFocusOnMount (copy), Roact (copy), HorizontalPageMargin (copy), v63 (copy), RefreshScrollingFrame (copy), FilterByButton (copy), EmptyResultsView (copy), NoFriendsView (copy), UserListLayoutAdaptor (copy), LayoutMode (copy), CollectionGrid (copy), Button (copy), ButtonType (copy)
-	local v67 = useLocalization({
+local function FriendsLandingPage(t1: {[any]: any}) -- line: 107
+	-- upvalues: useLocalization (copy), React (copy), FriendsLandingContext (copy), FriendsLandingAnalytics (copy), useNavigation (copy), useDesignTokens (copy), useUiModeInfo (copy), FFlagFixScalingOnFriendsLanding (copy), useTokens (copy), useFocusGuiObject (copy), FFlagFixCohubUiBugs (copy), getPageMargin (copy), useScreenSize (copy), UiMode (copy), FocusNavigationUtils (copy), InputHandlers (copy), v63 (copy), FFlagEnableLeftNavOnConsole (copy), AppPage (copy), RobloxAppEnums (copy), EnumScreens (copy), ReactFocusNavigation (copy), FocusNavigationEventNameEnum (copy), useTextSizeOffset (copy), FFlagConnectionManagementChips (copy), AmpApiProvider (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AccessResponseEnum (copy), FFlagFriendsPageAlwaysOpenPPV (copy), convertUserPresenceTypeToString (copy), ButtonClickEvents (copy), Constants (copy), FFlagFriendsPageUserListEnabled (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), FriendTile (copy), dependencyArray (copy), v51 (copy), filterStates (copy), FFlagCreateConnectionsHub (copy), GridMetrics (copy), useAnimatedScrollToSelection (copy), FFlagExtendScrollingFramesBySafeInsets (copy), useSignalState (copy), Display (copy), isFromConnectionsHub (copy), FFlagLuaAppsDefaultSelection (copy), useFocusOnMount (copy), Roact (copy), HorizontalPageMargin (copy), v64 (copy), RefreshScrollingFrame (copy), FilterByButton (copy), EmptyResultsView (copy), NoFriendsView (copy), UserListLayoutAdaptor (copy), LayoutMode (copy), CollectionGrid (copy), Button (copy), ButtonType (copy)
+	local v68 = useLocalization({
 		pageError = "CommonUI.Messages.Response.PageError",
 		successText = "Feature.Friends.Action.FriendRemoved",
 		errorText = "Feature.Toast.NetworkingError.SomethingIsWrong",
 		friends = "CommonUI.Features.Label.Friends",
 		showMore = "Feature.Avatar.Action.ShowMore"
 	})
-	local v68 = React.useContext(FriendsLandingContext.Context)
-	local v69 = React.useContext(FriendsLandingAnalytics.Context)
-	local v70 = useNavigation()
-	local navigateToLuaAppPages = v68.navigateToLuaAppPages
-	local v72 = useDesignTokens()
-	local v73 = useUiModeInfo()
-	local v74 = if not FFlagFixScalingOnFriendsLanding then nil else useTokens()
-	local v75 = useFocusGuiObject()
-	local v76 = if not FFlagFixCohubUiBugs then nil else getPageMargin(useScreenSize().X)
-	local v77 = v73.uiMode == UiMode.TenFoot
-	local v78 = FocusNavigationUtils.useLastInputMode() == "Cursor"
-	local v79 = InputHandlers.onRelease(function(p1) -- line: 131
-		-- upvalues: v62 (copy), v77 (copy), FFlagEnableLeftNavOnConsole (copy), v70 (copy), AppPage (copy), RobloxAppEnums (copy), navigateToLuaAppPages (copy), EnumScreens (copy)
+	local v69 = React.useContext(FriendsLandingContext.Context)
+	local v70 = React.useContext(FriendsLandingAnalytics.Context)
+	local v71 = useNavigation()
+	local navigateToLuaAppPages = v69.navigateToLuaAppPages
+	local v73 = useDesignTokens()
+	local v74 = useUiModeInfo()
+	local v75 = if not FFlagFixScalingOnFriendsLanding then nil else useTokens()
+	local v76 = useFocusGuiObject()
+	local v77 = if not FFlagFixCohubUiBugs then nil else getPageMargin(useScreenSize().X)
+	local v78 = v74.uiMode == UiMode.TenFoot
+	local v79 = FocusNavigationUtils.useLastInputMode() == "Cursor"
+	local v80 = InputHandlers.onRelease(function(p1) -- line: 132
+		-- upvalues: v63 (copy), v78 (copy), FFlagEnableLeftNavOnConsole (copy), v71 (copy), AppPage (copy), RobloxAppEnums (copy), navigateToLuaAppPages (copy), EnumScreens (copy)
 		p1:cancel()
 
-		if v62 then
-			if v77 and not FFlagEnableLeftNavOnConsole then
-				v70.navigate(AppPage.SearchPage, {
+		if v63 then
+			if v78 and not FFlagEnableLeftNavOnConsole then
+				v71.navigate(AppPage.SearchPage, {
 					defaultSearchType = RobloxAppEnums.SearchTypes.Players
 				})
 
 				return
 			end
 
-			v70.navigate(AppPage.UserSearch, {
+			v71.navigate(AppPage.UserSearch, {
 				shouldShowUserSearchLandingPage = true
 			})
 
@@ -111,34 +112,34 @@ local function FriendsLandingPage(t1: {[any]: any}) -- line: 106
 
 		navigateToLuaAppPages[EnumScreens.SearchPage]()
 	end)
-	local v80 = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.Search, v79)
-	local v81 = if not v77 then v72.Size.Size_2000 else v72.Size.Size_1600
-	local v82 = useTextSizeOffset()
-	local u83 = v81 + v82 * 3
-	local v84 = nil
-	local u85 = nil
+	local v81 = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.Search, v80)
+	local v82 = if not v78 then v73.Size.Size_2000 else v73.Size.Size_1600
+	local v83 = useTextSizeOffset()
+	local u84 = v82 + v83 * 3
+	local v85 = nil
+	local u86 = nil
 
 	if FFlagConnectionManagementChips then
-		local v86
+		local v87
 
-		v84, v86 = React.useState(false)
-		u85 = v86
+		v85, v87 = React.useState(false)
+		u86 = v87
 	end
 
-	React.useEffect(function() -- line: 163
-		-- upvalues: v69 (copy), FFlagConnectionManagementChips (copy), AmpApiProvider (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AccessResponseEnum (copy), u85 (ref)
-		v69:pageMountingTimeReport()
+	React.useEffect(function() -- line: 164
+		-- upvalues: v70 (copy), FFlagConnectionManagementChips (copy), AmpApiProvider (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AccessResponseEnum (copy), u86 (ref)
+		v70:pageMountingTimeReport()
 
 		if FFlagConnectionManagementChips and AmpApiProvider.upsellFeatureAccess(FStringIsUserInTcEligibleCountryAmpFeature, {}, FStringCanAccessTrustedContactsAmpNameSpace).access == AccessResponseEnum.Granted then
-			u85(true)
+			u86(true)
 		end
 	end, {})
 
-	local v87 = if not FFlagFriendsPageAlwaysOpenPPV then React.useCallback(function(p2) -- line: 175
-		-- upvalues: v68 (copy), convertUserPresenceTypeToString (copy)
-		return function() -- line: 176
-			-- upvalues: v68 (copy), p2 (copy), convertUserPresenceTypeToString (copy)
-			v68.openPlayerContextualMenu({
+	local v88 = if not FFlagFriendsPageAlwaysOpenPPV then React.useCallback(function(p2) -- line: 176
+		-- upvalues: v69 (copy), convertUserPresenceTypeToString (copy)
+		return function() -- line: 177
+			-- upvalues: v69 (copy), p2 (copy), convertUserPresenceTypeToString (copy)
+			v69.openPlayerContextualMenu({
 				friendshipOriginSourceType = nil,
 				subjectUserId = p2.id,
 				robloxFriendshipStatus = Enum.FriendStatus.Friend,
@@ -151,216 +152,226 @@ local function FriendsLandingPage(t1: {[any]: any}) -- line: 106
 				}
 			})
 		end
-	end, { v68.openPlayerContextualMenu }) else nil
-	local v88 = React.useCallback(function(p3, n1: number, _, _, _) -- line: 193
-		-- upvalues: v69 (copy), EnumScreens (copy), ButtonClickEvents (copy), v68 (copy), Constants (copy)
-		return function() -- line: 194
-			-- upvalues: v69 (copy), EnumScreens (copy), ButtonClickEvents (copy), p3 (copy), n1 (copy), v68 (copy), Constants (copy)
-			v69:navigate(EnumScreens.ViewUserProfile)
-			v69:buttonClick(ButtonClickEvents.PlayerTile, {
+	end, { v69.openPlayerContextualMenu }) else nil
+	local v89 = React.useCallback(function(p3, n1: number, _, _, _) -- line: 194
+		-- upvalues: v70 (copy), EnumScreens (copy), ButtonClickEvents (copy), v69 (copy), Constants (copy)
+		return function() -- line: 195
+			-- upvalues: v70 (copy), EnumScreens (copy), ButtonClickEvents (copy), p3 (copy), n1 (copy), v69 (copy), Constants (copy)
+			v70:navigate(EnumScreens.ViewUserProfile)
+			v70:buttonClick(ButtonClickEvents.PlayerTile, {
 				subpage = "peekView",
 				page = "playerProfile",
 				friendId = p3,
 				position = n1 - 1
 			})
-			v68.openProfilePeekView(p3, {
+			v69.openProfilePeekView(p3, {
 				source = Constants.FriendsLandingPageSourceName
 			})
 		end
 	end, {
-		v69,
-		v68.openProfilePeekView
+		v70,
+		v69.openProfilePeekView
 	})
-	local v89 = if not FFlagFriendsPageUserListEnabled then nil else React.useCallback(function(p7, n2: number) -- line: 210
-		-- upvalues: v69 (copy), EnumScreens (copy), ButtonClickEvents (copy), v68 (copy), Constants (copy)
-		v69:navigate(EnumScreens.ViewUserProfile)
-		v69:buttonClick(ButtonClickEvents.PlayerTile, {
+	local v90 = if not FFlagFriendsPageUserListEnabled and not FFlagFriendsPageUnifiedOpenProfileLogic then nil else React.useCallback(function(p7, n2: number, p8) -- line: 211
+		-- upvalues: FFlagFriendsPageAlwaysOpenPPV (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), v78 (copy), v88 (copy), v70 (copy), EnumScreens (copy), ButtonClickEvents (copy), v69 (copy), Constants (copy)
+		if not FFlagFriendsPageAlwaysOpenPPV and (FFlagFriendsPageUnifiedOpenProfileLogic and v78 and v88) then
+			return v88(p8)()
+		end
+
+		v70:navigate(EnumScreens.ViewUserProfile)
+		v70:buttonClick(ButtonClickEvents.PlayerTile, {
 			subpage = "peekView",
 			page = "playerProfile",
 			friendId = p7,
 			position = n2 - 1
 		})
-		v68.openProfilePeekView(p7, {
+		v69.openProfilePeekView(p7, {
 			source = Constants.FriendsLandingPageSourceName
 		})
-	end, { v69 })
+	end, {
+		v70,
+		if not FFlagFriendsPageUnifiedOpenProfileLogic then nil else v88,
+		if not FFlagFriendsPageUnifiedOpenProfileLogic then nil else v78
+	})
 
-	local function v90() -- line: 225
-		-- upvalues: v69 (copy)
-		v69:pageLoadingTimeReport()
+	local function v91() -- line: 238
+		-- upvalues: v70 (copy)
+		v70:pageLoadingTimeReport()
 	end
 
-	local v91 = React.useCallback(function() -- line: 229
-		-- upvalues: v70 (copy), EnumScreens (copy), v67 (copy)
-		return function() -- line: 230
-			-- upvalues: v70 (copy), EnumScreens (copy), v67 (copy)
-			v70.navigate(EnumScreens.GenericToast, {
+	local v92 = React.useCallback(function() -- line: 242
+		-- upvalues: v71 (copy), EnumScreens (copy), v68 (copy)
+		return function() -- line: 243
+			-- upvalues: v71 (copy), EnumScreens (copy), v68 (copy)
+			v71.navigate(EnumScreens.GenericToast, {
 				toastProps = {
 					toastContent = {
-						toastTitle = v67.errorText
+						toastTitle = v68.errorText
 					}
 				}
 			})
 		end
 	end, {
-		v70,
-		v67
+		v71,
+		v68
 	})
-	local v92 = React.useCallback(function(p8, p9) -- line: 239
-		-- upvalues: React (copy), FriendTile (copy), FFlagFriendsPageAlwaysOpenPPV (copy), v88 (copy), v77 (copy), v87 (copy), v91 (copy), v90 (copy), t1 (copy), v75 (copy)
+	local v93 = React.useCallback(function(p9, p10) -- line: 252
+		-- upvalues: React (copy), FriendTile (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), FFlagFriendsPageAlwaysOpenPPV (copy), v89 (copy), v78 (copy), v88 (copy), v92 (copy), v90 (copy), v91 (copy), t1 (copy), v76 (copy)
 		return React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
-			LayoutOrder = p9
+			LayoutOrder = p10
 		}, {
 			tile = React.createElement(FriendTile, {
-				user = p8,
-				index = p9,
-				openPlayerProfile = if not FFlagFriendsPageAlwaysOpenPPV then if not v77 then v88 else if v87 ~= nil then v87 else v91 else v88,
-				isPlayerContextualMenuEnabled = v77,
-				pageLoadingTimeReport = v90,
-				selected = p9 == t1.selectedItemIndex,
-				focusGuiObject = v75
+				user = p9,
+				index = p10,
+				openPlayerProfile = if not FFlagFriendsPageUnifiedOpenProfileLogic then if not FFlagFriendsPageAlwaysOpenPPV then if not v78 then v89 else if v88 ~= nil then v88 else v92 else v89 else nil,
+				openPlayerProfileHandle = if not FFlagFriendsPageUnifiedOpenProfileLogic then nil else v90,
+				isPlayerContextualMenuEnabled = if not FFlagFriendsPageUnifiedOpenProfileLogic then v78 else nil,
+				pageLoadingTimeReport = v91,
+				selected = p10 == t1.selectedItemIndex,
+				focusGuiObject = v76
 			})
 		}), "FriendTile"
 	end, {
 		t1.selectedItemIndex,
-		v77,
-		if not FFlagFriendsPageAlwaysOpenPPV then v87 else nil,
-		v88
+		v78,
+		if not FFlagFriendsPageAlwaysOpenPPV and not FFlagFriendsPageUnifiedOpenProfileLogic then v88 else nil,
+		v89,
+		if not FFlagFriendsPageUnifiedOpenProfileLogic then nil else v90
 	})
-	local v93 = React.useCallback(function(n3: number) -- line: 267
-		-- upvalues: u83 (ref)
-		return n3 + u83
-	end, dependencyArray(u83, v82))
-	local v94 = React.useCallback(function() -- line: 271
-		-- upvalues: v69 (copy), ButtonClickEvents (copy), v70 (copy), EnumScreens (copy), v51 (copy), t1 (copy)
-		v69:buttonClick(ButtonClickEvents.FriendFilterPill)
-		v70.navigate(EnumScreens.FilterByModal, {
+	local v94 = React.useCallback(function(n3: number) -- line: 291
+		-- upvalues: u84 (ref)
+		return n3 + u84
+	end, dependencyArray(u84, v83))
+	local v95 = React.useCallback(function() -- line: 295
+		-- upvalues: v70 (copy), ButtonClickEvents (copy), v71 (copy), EnumScreens (copy), v51 (copy), t1 (copy)
+		v70:buttonClick(ButtonClickEvents.FriendFilterPill)
+		v71.navigate(EnumScreens.FilterByModal, {
 			onFewestInteractionsSelection = v51,
 			friendCount = t1.totalFriendCount
 		})
-	end, dependencyArray(v70, v69))
-	local v95 = if not FFlagConnectionManagementChips then nil else React.useCallback(function(s1: string) -- line: 280
-		-- upvalues: v69 (copy), ButtonClickEvents (copy), v68 (copy)
-		v69:buttonClick(ButtonClickEvents.FriendFilterPill)
-		v68.setFilterKeys(s1)
-	end, dependencyArray(v69, v68.setFilterKeys))
-	local v96 = React.useCallback(function() -- line: 286
-		-- upvalues: v69 (copy), v68 (copy), filterStates (copy), v67 (copy)
-		v69:pageLoaded()
-		v68.setFilterKeys(filterStates.All)
+	end, dependencyArray(v71, v70))
+	local v96 = if not FFlagConnectionManagementChips then nil else React.useCallback(function(s1: string) -- line: 304
+		-- upvalues: v70 (copy), ButtonClickEvents (copy), v69 (copy)
+		v70:buttonClick(ButtonClickEvents.FriendFilterPill)
+		v69.setFilterKeys(s1)
+	end, dependencyArray(v70, v69.setFilterKeys))
+	local v97 = React.useCallback(function() -- line: 310
+		-- upvalues: v70 (copy), v69 (copy), filterStates (copy), v68 (copy)
+		v70:pageLoaded()
+		v69.setFilterKeys(filterStates.All)
 
-		return v68.refreshPage({
-			errorMessage = v67.pageError,
-			onResolve = function() -- line: 292
-				-- upvalues: v69 (copy)
-				v69:pageLoadedWithArgs()
+		return v69.refreshPage({
+			errorMessage = v68.pageError,
+			onResolve = function() -- line: 316
+				-- upvalues: v70 (copy)
+				v70:pageLoadedWithArgs()
 			end
 		})
-	end, dependencyArray(v68.refreshPage, v67, v69, v68.setFilterKeys))
-	local v97 = React.useCallback(function() -- line: 298
-		-- upvalues: v69 (copy), ButtonClickEvents (copy), EnumScreens (copy), FFlagCreateConnectionsHub (copy), v70 (copy), AppPage (copy)
-		v69:buttonClick(ButtonClickEvents.AddFriendsNoFriendsEmptyView)
-		v69:navigate(EnumScreens.AddFriends)
+	end, dependencyArray(v69.refreshPage, v68, v70, v69.setFilterKeys))
+	local v98 = React.useCallback(function() -- line: 322
+		-- upvalues: v70 (copy), ButtonClickEvents (copy), EnumScreens (copy), FFlagCreateConnectionsHub (copy), v71 (copy), AppPage (copy)
+		v70:buttonClick(ButtonClickEvents.AddFriendsNoFriendsEmptyView)
+		v70:navigate(EnumScreens.AddFriends)
 
 		if FFlagCreateConnectionsHub then
-			v70.navigate(AppPage.CoHubAddConnections)
+			v71.navigate(AppPage.CoHubAddConnections)
 
 			return
 		end
 
-		v70.navigate(AppPage.AddFriendsPage)
-	end, dependencyArray(v69, v70))
-	local v98 = t1.friends and #t1.friends or 0
-	local v99 = t1.totalFriendCount or 0
-	local v100 = v99 == 0
-	local v101 = v98 == 0 and v99 > 0
-	local v102 = t1.fetchMoreFriends and (not v100 and (not v101 and (not v68.filter or v68.filter == filterStates.All)))
-	local v103 = React.useCallback(function() -- line: 317
+		v71.navigate(AppPage.AddFriendsPage)
+	end, dependencyArray(v70, v71))
+	local v99 = t1.friends and #t1.friends or 0
+	local v100 = t1.totalFriendCount or 0
+	local v101 = v100 == 0
+	local v102 = v99 == 0 and v100 > 0
+	local v103 = t1.fetchMoreFriends and (not v101 and (not v102 and (not v69.filter or v69.filter == filterStates.All)))
+	local v104 = React.useCallback(function() -- line: 341
 		-- upvalues: t1 (copy)
 		if t1.fetchMoreFriends then
 			t1.fetchMoreFriends()
 		end
 	end, { t1.fetchMoreFriends })
-	local v104 = not v77 and 12 or 24
-	local v105, v106 = React.useState(100)
+	local v105 = not v78 and 12 or 24
+	local v106, v107 = React.useState(100)
 	local GridViewItemMetrics, GridHorizontalSpacing
 
-	if v77 then
-		GridViewItemMetrics = v72.LuaApps.FriendsLanding.FriendsLandingPage.GridViewItemMetrics
-		GridHorizontalSpacing = v72.LuaApps.FriendsLanding.FriendsLandingPage.GridHorizontalSpacing
+	if v78 then
+		GridViewItemMetrics = v73.LuaApps.FriendsLanding.FriendsLandingPage.GridViewItemMetrics
+		GridHorizontalSpacing = v73.LuaApps.FriendsLanding.FriendsLandingPage.GridHorizontalSpacing
 	else
 		GridViewItemMetrics = {
 			minimumItemsPerRow = 2,
-			minimumItemWidth = not FFlagFixScalingOnFriendsLanding and 176 or 176 * v74.Config.UI.Scale
+			minimumItemWidth = not FFlagFixScalingOnFriendsLanding and 176 or 176 * v75.Config.UI.Scale
 		}
 		GridHorizontalSpacing = 12
 	end
 
-	local v109 = React.useMemo(function() -- line: 340
+	local v110 = React.useMemo(function() -- line: 364
 		-- upvalues: GridMetrics (copy), GridViewItemMetrics (ref)
 		return GridMetrics.makeCustomMetricsGetter(GridViewItemMetrics)
 	end, { GridViewItemMetrics })
-	local v110 = React.useMemo(function() -- line: 344
-		-- upvalues: v109 (copy), v105 (copy), GridHorizontalSpacing (ref)
-		return v109(v105, GridHorizontalSpacing)
-	end, { v109 })
-	local v111 = React.useCallback(function(vector2: Vector2) -- line: 348
-		-- upvalues: v106 (copy)
-		v106(vector2.X)
+	local v111 = React.useMemo(function() -- line: 368
+		-- upvalues: v110 (copy), v106 (copy), GridHorizontalSpacing (ref)
+		return v110(v106, GridHorizontalSpacing)
+	end, { v110 })
+	local v112 = React.useCallback(function(vector2: Vector2) -- line: 372
+		-- upvalues: v107 (copy)
+		v107(vector2.X)
 	end, {})
-	local v112 = React.useRef({})
-	local ScrollAnimationConfig = v72.LuaApps.App.Page.ScrollAnimationConfig
-	local v114, v115 = useAnimatedScrollToSelection(Enum.ScrollingDirection.Y, 0, v72.Size.Size_2000, ScrollAnimationConfig)
-	local v116 = not v77 and 8 or (not v100 and (not v101 and not v78) and 1000 or 8)
-	local v117 = if not FFlagExtendScrollingFramesBySafeInsets then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
-	local v118 = v116 + (not FFlagExtendScrollingFramesBySafeInsets and 0 or v117.bottom)
-	local v119 = FFlagCreateConnectionsHub and isFromConnectionsHub(v70)
-	local v120 = if not FFlagLuaAppsDefaultSelection then nil else useFocusOnMount()
-	local v121 = if not FFlagFriendsPageUserListEnabled then nil else React.useCallback(function(p10, p11, p12) -- line: 375
-		-- upvalues: React (copy), FriendTile (copy), v89 (copy), v90 (copy)
+	local v113 = React.useRef({})
+	local ScrollAnimationConfig = v73.LuaApps.App.Page.ScrollAnimationConfig
+	local v115, v116 = useAnimatedScrollToSelection(Enum.ScrollingDirection.Y, 0, v73.Size.Size_2000, ScrollAnimationConfig)
+	local v117 = not v78 and 8 or (not v101 and (not v102 and not v79) and 1000 or 8)
+	local v118 = if not FFlagExtendScrollingFramesBySafeInsets then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	local v119 = v117 + (not FFlagExtendScrollingFramesBySafeInsets and 0 or v118.bottom)
+	local v120 = FFlagCreateConnectionsHub and isFromConnectionsHub(v71)
+	local v121 = if not FFlagLuaAppsDefaultSelection then nil else useFocusOnMount()
+	local v122 = if not FFlagFriendsPageUserListEnabled then nil else React.useCallback(function(p11, p12, p13) -- line: 399
+		-- upvalues: React (copy), FriendTile (copy), v90 (copy), v91 (copy)
 		return React.createElement(FriendTile, {
 			isPlayerContextualMenuEnabled = nil,
-			user = p11,
-			createRow = p10,
-			index = p12,
-			openPlayerProfileHandle = v89,
-			pageLoadingTimeReport = v90
+			user = p12,
+			createRow = p11,
+			index = p13,
+			openPlayerProfileHandle = v90,
+			pageLoadingTimeReport = v91
 		})
 	end, {
-		v90,
-		v89
+		v91,
+		v90
 	})
 
 	return React.createElement("Frame", {
-		[Roact.Ref] = v80,
+		[Roact.Ref] = v81,
 		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = if not v119 then v72.LuaApps.App.Page.BackgroundColor else nil,
-		BackgroundTransparency = if not v119 then v72.LuaApps.App.Page.BackgroundTransparency else 1
+		BackgroundColor3 = if not v120 then v73.LuaApps.App.Page.BackgroundColor else nil,
+		BackgroundTransparency = if not v120 then v73.LuaApps.App.Page.BackgroundTransparency else 1
 	}, {
 		HorizontalPageMargin = React.createElement(HorizontalPageMargin, {
 			backgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1)
 		}, {
 			Padding = if not FFlagFixCohubUiBugs then nil else React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v76),
-				PaddingRight = if not v63 then nil else UDim.new(0, v76)
+				PaddingLeft = UDim.new(0, v77),
+				PaddingRight = if not v64 then nil else UDim.new(0, v77)
 			}),
 			scrollView = React.createElement(RefreshScrollingFrame, {
 				scrollingElementProps = {
-					Size = UDim2.new(1, 0, 1, -Constants.TOP_BAR_HEIGHT + (FFlagExtendScrollingFramesBySafeInsets and v117.bottom or 0)),
+					Size = UDim2.new(1, 0, 1, -Constants.TOP_BAR_HEIGHT + (FFlagExtendScrollingFramesBySafeInsets and v118.bottom or 0)),
 					BackgroundTransparency = 1,
 					ScrollingDirection = Enum.ScrollingDirection.Y,
 					ScrollBarThickness = 0,
 					CanvasSize = UDim2.new(1, 0, 0, 0),
 					AutomaticCanvasSize = Enum.AutomaticSize.XY,
-					CanvasPosition = v114,
-					[Roact.Event.SelectionChanged] = v115,
+					CanvasPosition = v115,
+					[Roact.Event.SelectionChanged] = v116,
 					Selectable = not FFlagEnableLeftNavOnConsole and nil
 				},
-				[Roact.Ref] = v112,
-				refresh = v96,
+				[Roact.Ref] = v113,
+				refresh = v97,
 				usesBuilderIcon = true
 			}, {
 				UISizeConstraint = if not FFlagFriendsPageUserListEnabled then nil else React.createElement("UISizeConstraint", {
@@ -375,49 +386,49 @@ local function FriendsLandingPage(t1: {[any]: any}) -- line: 106
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 0, 1)
 				}) or nil,
-				filterByButton = if not v77 then React.createElement(FilterByButton, {
+				filterByButton = if not v78 then React.createElement(FilterByButton, {
 					layoutOrder = 2,
-					analytics = v69,
-					filter = v68.filter,
-					friendCount = if v68.filter ~= filterStates.All then v98 else v99,
-					isDisabled = v99 == 0,
-					onActivated = if not FFlagConnectionManagementChips then v94 else v95,
+					analytics = v70,
+					filter = v69.filter,
+					friendCount = if v69.filter ~= filterStates.All then v99 else v100,
+					isDisabled = v100 == 0,
+					onActivated = if not FFlagConnectionManagementChips then v95 else v96,
 					maxWidth = if not FFlagConnectionManagementChips then nil else 640,
-					canAccessTrustedContacts = if not FFlagConnectionManagementChips then nil else v84
+					canAccessTrustedContacts = if not FFlagConnectionManagementChips then nil else v85
 				}) else nil,
-				NoResultsView = if not v101 then nil else React.createElement(EmptyResultsView, {
+				NoResultsView = if not v102 then nil else React.createElement(EmptyResultsView, {
 					layoutOrder = 6
 				}),
-				NoFriendsView = if not v100 then nil else React.createElement(NoFriendsView, {
+				NoFriendsView = if not v101 then nil else React.createElement(NoFriendsView, {
 					layoutOrder = 6,
-					pageLoadingTimeReport = v90,
-					openAddFriendsPage = v97
+					pageLoadingTimeReport = v91,
+					openAddFriendsPage = v98
 				}),
-				UserListLayoutAdaptor = if not FFlagFriendsPageUserListEnabled then nil else if v101 or v100 then nil else React.createElement(UserListLayoutAdaptor, {
+				UserListLayoutAdaptor = if not FFlagFriendsPageUserListEnabled then nil else if v102 or v101 then nil else React.createElement(UserListLayoutAdaptor, {
 					layoutOrder = 6,
 					isScrollEnabled = false,
 					layoutMode = LayoutMode.Vertical,
 					header = {
-						title = v67.peopleYouMayKnow
+						title = v68.peopleYouMayKnow
 					},
 					entities = t1.friends,
-					renderRow = v121,
-					hasMore = v102,
-					onLoadMore = v103
+					renderRow = v122,
+					hasMore = v103,
+					onLoadMore = v104
 				}),
-				FriendsGridView = if not FFlagFriendsPageUserListEnabled then if v101 or v100 then nil else React.createElement(CollectionGrid, {
+				FriendsGridView = if not FFlagFriendsPageUserListEnabled then if v102 or v101 then nil else React.createElement(CollectionGrid, {
 					LayoutOrder = 6,
-					containerRef = if not FFlagLuaAppsDefaultSelection then nil else v120,
+					containerRef = if not FFlagLuaAppsDefaultSelection then nil else v121,
 					items = t1.friends,
-					verticalScrollingFrameRef = v112,
-					renderItem = v92,
-					getItemHeight = v93,
-					numColumns = v110.itemsPerRow,
+					verticalScrollingFrameRef = v113,
+					renderItem = v93,
+					getItemHeight = v94,
+					numColumns = v111.itemsPerRow,
 					columnGap = GridHorizontalSpacing,
-					verticalPadding = v104,
-					onContainerSizeChanged = v111
+					verticalPadding = v105,
+					onContainerSizeChanged = v112
 				}) else nil,
-				showMoreFrame = if not FFlagFriendsPageUserListEnabled then if not v102 then nil else React.createElement("Frame", {
+				showMoreFrame = if not FFlagFriendsPageUserListEnabled then if not v103 then nil else React.createElement("Frame", {
 					BackgroundTransparency = 1,
 					LayoutOrder = 7,
 					Size = UDim2.new(1, 0, 0, Constants.CTA_BUTTON_HEIGHT)
@@ -430,14 +441,14 @@ local function FriendsLandingPage(t1: {[any]: any}) -- line: 106
 					showMoreButton = React.createElement(Button, {
 						buttonType = ButtonType.Secondary,
 						size = UDim2.new(1, 0, 1, 0),
-						onActivated = v103,
-						text = v67.showMore
+						onActivated = v104,
+						text = v68.showMore
 					})
 				}) else nil,
 				additionalPadding = React.createElement("Frame", {
 					BackgroundTransparency = 1,
 					LayoutOrder = 8,
-					Size = UDim2.new(1, 0, 0, v118)
+					Size = UDim2.new(1, 0, 0, v119)
 				})
 			})
 		})

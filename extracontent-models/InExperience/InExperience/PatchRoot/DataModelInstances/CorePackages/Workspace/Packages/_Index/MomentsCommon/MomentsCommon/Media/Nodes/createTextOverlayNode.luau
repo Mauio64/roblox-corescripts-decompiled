@@ -15,62 +15,67 @@ require(MomentsCommon.Media.mediaNodeRegistry)
 
 local overlayScale = require(MomentsCommon.Media.overlayScale)
 local GetFFlagMomentsTextOverlayMediaRect = require(MomentsCommon.Flags.GetFFlagMomentsTextOverlayMediaRect)
-local v11 = Signals.createSignal(Enum.ScaleType.Crop)
+local FFlagMomentsOverlayContainerScaleFallback = require(MomentsCommon.Flags.FFlagMomentsOverlayContainerScaleFallback)
+local v12 = Signals.createSignal(Enum.ScaleType.Crop)
 
-local function TextOverlayLayer(t1: {[any]: any}) -- line: 85
-	-- upvalues: React (copy), Signals (copy), useSignalState (copy), v11 (copy), TextOverlayDisplay (copy)
+local function TextOverlayLayer(t1: {[any]: any}) -- line: 86
+	-- upvalues: React (copy), Signals (copy), useSignalState (copy), v12 (copy), FFlagMomentsOverlayContainerScaleFallback (copy), TextOverlayDisplay (copy)
 	local getResolution = t1.getResolution
-	local v17 = React.useMemo(function() -- line: 97
+	local v18 = React.useMemo(function() -- line: 98
 		-- upvalues: Signals (copy), getResolution (copy)
-		return Signals.createComputed(function(p1) -- line: 98
+		return Signals.createComputed(function(p1) -- line: 99
 			-- upvalues: getResolution (copy)
 			return getResolution(p1)
 		end)
 	end, { getResolution })
-	local v18 = useSignalState(t1.getItemSize)
-	local v19 = useSignalState(v17)
-	local v20 = useSignalState(t1.getScaleType or v11)
+	local v19 = useSignalState(t1.getItemSize)
+	local v20 = useSignalState(v18)
+	local v21 = useSignalState(t1.getScaleType or v12)
+
+	if FFlagMomentsOverlayContainerScaleFallback and v20 == nil then
+		v20 = v19
+	end
 
 	return React.createElement(TextOverlayDisplay, {
 		draggable = false,
 		editable = false,
-		itemResolution = v19,
-		itemSize = v18,
-		scaleType = v20,
+		itemResolution = v20,
+		itemSize = v19,
+		scaleType = v21,
 		textOverlayEdits = { t1.overlay }
 	})
 end
-local function LegacyTextOverlayLayer(t2: {[any]: any}) -- line: 127
+local function LegacyTextOverlayLayer(t2: {[any]: any}) -- line: 138
 	-- upvalues: useSignalState (copy), overlayScale (copy), React (copy), TextOverlay (copy)
-	local v22 = useSignalState(t2.getItemSize)
-	local v23 = overlayScale(1, v22.X)
+	local v23 = useSignalState(t2.getItemSize)
+	local v24 = overlayScale(1, v23.X)
 
 	return React.createElement(TextOverlay, {
 		draggable = false,
 		editable = false,
-		additionalScale = v23,
+		additionalScale = v24,
 		textOverlayEdit = t2.overlay
 	})
 end
-local function createTextOverlayNode(p2, _) -- line: 140
+local function createTextOverlayNode(p2, _) -- line: 151
 	-- upvalues: GetFFlagMomentsTextOverlayMediaRect (copy), React (copy), LegacyTextOverlayLayer (copy), TextOverlayLayer (copy)
 	local overlay = p2.overlay
 
 	assert(overlay ~= nil, "createTextOverlayNode: spec.overlay (a TextOverlayEdit) is required")
 
-	local v27 = p2.zIndex or overlay.zIndex
+	local v28 = p2.zIndex or overlay.zIndex
 
 	return {
 		kind = "text",
 		usesDecoder = false,
 		id = p2.id,
-		assets = function() -- line: 148
+		assets = function() -- line: 159
 			return {}
 		end,
-		download = function() -- line: 174
+		download = function() -- line: 185
 		end,
-		zIndex = v27,
-		render = function(p4) -- line: 152
+		zIndex = v28,
+		render = function(p4) -- line: 163
 			-- upvalues: GetFFlagMomentsTextOverlayMediaRect (copy), React (copy), LegacyTextOverlayLayer (copy), overlay (copy), TextOverlayLayer (copy)
 			if not GetFFlagMomentsTextOverlayMediaRect() then
 				return React.createElement(LegacyTextOverlayLayer, {
@@ -86,7 +91,7 @@ local function createTextOverlayNode(p2, _) -- line: 140
 				getScaleType = p4.getScaleType
 			})
 		end,
-		dispose = function() -- line: 178
+		dispose = function() -- line: 189
 		end
 	}
 end

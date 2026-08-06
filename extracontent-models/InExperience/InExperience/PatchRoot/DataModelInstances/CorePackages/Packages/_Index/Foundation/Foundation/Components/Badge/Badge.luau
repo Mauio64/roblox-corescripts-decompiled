@@ -35,16 +35,17 @@ local t1 = {
 }
 local t2 = {
 	[BadgeVariant.Primary] = BadgeVariant.Contrast,
-	[BadgeVariant.Secondary] = BadgeVariant.Neutral
+	[BadgeVariant.Secondary] = if not Flags.FoundationBadgeBetaUpdate then BadgeVariant.Neutral else BadgeVariant.Standard,
+	[BadgeVariant.Neutral] = if not Flags.FoundationBadgeBetaUpdate then nil else BadgeVariant.Standard
 }
 
-local function Badge(p1, p2) -- line: 71
+local function Badge(p1, p2) -- line: 72
 	-- upvalues: withDefaults (copy), t1 (copy), t2 (copy), useScaledValue (copy), useTokens (copy), React (copy), IconPosition (copy), useBadgeVariants (copy), Flags (copy), IconSize (copy), useIconSize (copy), isBuilderOrMigratedIcon (copy), Icon (copy), isMigrated (copy), uiblox (copy), IconVariant (copy), getIconScale (copy), View (copy), Image (copy), withCommonProps (copy), Text (copy)
 	local v32 = withDefaults(p1, t1)
 	local v33 = t2[v32.variant] or v32.variant
 	local v34 = useScaledValue(200)
 	local v35 = useTokens()
-	local v36 = React.useMemo(function() -- line: 78
+	local v36 = React.useMemo(function() -- line: 79
 		-- upvalues: v32 (copy), IconPosition (copy)
 		if typeof(v32.icon) == "string" then
 			return {

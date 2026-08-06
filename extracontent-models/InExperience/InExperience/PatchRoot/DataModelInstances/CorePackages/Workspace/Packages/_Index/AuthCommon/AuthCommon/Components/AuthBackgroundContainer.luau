@@ -4,7 +4,7 @@ local React = require(AuthCommonParent.React)
 local Foundation = require(AuthCommonParent.Foundation)
 local Background2026 = require(AuthCommon.Common.AuthBackgroundConstants).Background2026
 
-local function renderScrim(n1: number) -- line: 43
+local function renderScrim(n1: number) -- line: 37
 	-- upvalues: React (copy)
 	return React.createElement("ImageLabel", {
 		ZIndex = 2,
@@ -17,7 +17,7 @@ local function renderScrim(n1: number) -- line: 43
 		BackgroundTransparency = n1
 	})
 end
-local function renderImage(s1: string) -- line: 56
+local function renderImage(s1: string) -- line: 50
 	-- upvalues: React (copy), Foundation (copy)
 	return React.createElement(Foundation.Image, {
 		BorderSizePixel = 0,
@@ -28,7 +28,7 @@ local function renderImage(s1: string) -- line: 56
 		ScaleType = Enum.ScaleType.Crop
 	})
 end
-local function AuthBackgroundContainer(t1: {[any]: any}) -- line: 67
+local function AuthBackgroundContainer(t1: {[any]: any}) -- line: 61
 	-- upvalues: Background2026 (copy), React (copy), renderImage (copy), renderScrim (copy)
 	local v12 = Background2026.SCRIM_TRANSPARENCY < 1
 	local v13 = t1.showImage == nil or t1.showImage

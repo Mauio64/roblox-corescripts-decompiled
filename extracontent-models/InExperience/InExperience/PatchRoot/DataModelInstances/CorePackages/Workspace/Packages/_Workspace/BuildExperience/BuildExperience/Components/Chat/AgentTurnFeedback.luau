@@ -21,7 +21,7 @@ local t1 = {
 }
 local t2 = {}
 
-local function getRollbackInProgressSignal(n1: number?) -- line: 40
+local function getRollbackInProgressSignal(n1: number?) -- line: 38
 	-- upvalues: t1 (copy), t2 (copy), Signals (copy)
 	if n1 == nil then
 		return t1
@@ -41,7 +41,7 @@ local function getRollbackInProgressSignal(n1: number?) -- line: 40
 
 	return v21
 end
-local function AgentTurnFeedback(t3: {[any]: any}) -- line: 57
+local function AgentTurnFeedback(t3: {[any]: any}) -- line: 55
 	-- upvalues: React (copy), feedbackIcons (copy), t1 (copy), t2 (copy), Signals (copy), GetPlaytestLoadingStore (copy), SignalsReact (copy), LocalizationStrings (copy), FeedbackAction (copy), sendAgentTurnFeedback (copy), UserFeedback (copy), Snackbar (copy), RestoreVersionDialog (copy)
 	local turnFeedbackIds = t3.turnFeedbackIds
 	local v26, v27 = React.useState(false)
@@ -49,7 +49,7 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 57
 	local v30, v31 = React.useState("")
 	local v32 = if turnFeedbackIds == nil then nil else turnFeedbackIds.placeId
 	local v33 = if turnFeedbackIds == nil then nil else feedbackIcons.getRollbackTargetVersionNumber(turnFeedbackIds)
-	local v34 = React.useMemo(function() -- line: 67
+	local v34 = React.useMemo(function() -- line: 65
 		-- upvalues: v32 (copy), t1 (copy), t2 (copy), Signals (copy)
 		local v43 = v32
 
@@ -71,7 +71,7 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 57
 
 		return v44
 	end, { v32 })
-	local v35 = React.useCallback(function(p1) -- line: 70
+	local v35 = React.useCallback(function(p1) -- line: 68
 		-- upvalues: GetPlaytestLoadingStore (copy), v32 (copy)
 		local v48 = GetPlaytestLoadingStore(p1)
 
@@ -83,25 +83,25 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 57
 	end, { v32 })
 	local v36 = SignalsReact.useSignalState(v35)
 	local v37 = SignalsReact.useSignalState(v34.get)
-	local v38 = React.useCallback(function() -- line: 79
+	local v38 = React.useCallback(function() -- line: 77
 		-- upvalues: v31 (copy)
 		v31("")
 	end, {})
-	local v39 = React.useCallback(function() -- line: 83
+	local v39 = React.useCallback(function() -- line: 81
 		-- upvalues: v34 (copy)
 		v34.set(true)
 	end, { v34 })
-	local v40 = React.useCallback(function() -- line: 86
+	local v40 = React.useCallback(function() -- line: 84
 		-- upvalues: v34 (copy), v31 (copy), LocalizationStrings (copy)
 		v34.set(false)
 		v31(LocalizationStrings.CHAT_REVERT_SUCCESS)
 	end, { v34 })
-	local v41 = React.useCallback(function() -- line: 90
+	local v41 = React.useCallback(function() -- line: 88
 		-- upvalues: v34 (copy), v31 (copy), LocalizationStrings (copy)
 		v34.set(false)
 		v31(LocalizationStrings.CHAT_REVERT_FAILURE)
 	end, { v34 })
-	local v42 = React.useCallback(function(p2) -- line: 94
+	local v42 = React.useCallback(function(p2) -- line: 92
 		-- upvalues: turnFeedbackIds (copy), FeedbackAction (copy), v27 (copy), v29 (copy), sendAgentTurnFeedback (copy)
 		if turnFeedbackIds == nil then
 			return
@@ -142,7 +142,7 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 57
 			isOpen = true,
 			title = LocalizationStrings.formatVersionHistoryVersionNumber(v33),
 			description = LocalizationStrings.CHAT_REVERT_CONFIRMATION_DESCRIPTION,
-			onRestore = function() -- line: 136
+			onRestore = function() -- line: 134
 				-- upvalues: v27 (copy), v35 (copy), v34 (copy), v29 (copy), FeedbackAction (copy), sendAgentTurnFeedback (copy), turnFeedbackIds (copy), feedbackIcons (copy), v39 (copy), v40 (copy), v41 (copy)
 				v27(false)
 
@@ -158,7 +158,7 @@ local function AgentTurnFeedback(t3: {[any]: any}) -- line: 57
 					onRevertFailure = v41
 				})
 			end,
-			onCancel = function() -- line: 149
+			onCancel = function() -- line: 147
 				-- upvalues: v27 (copy)
 				v27(false)
 			end

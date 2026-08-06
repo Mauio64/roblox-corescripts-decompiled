@@ -9,13 +9,13 @@ local useReleaseFocusOnDownSwipe = require(script.Parent.useReleaseFocusOnDownSw
 local View = Foundation.View
 local InputSize = Foundation.Enums.InputSize
 
-local function trimMessage(s1: string) -- line: 36
+local function trimMessage(s1: string) -- line: 34
 	return string.gsub(s1, "^%s*(.-)%s*$", "%1")
 end
-local function ChatComposer(t1: {[any]: any}) -- line: 40
+local function ChatComposer(t1: {[any]: any}) -- line: 38
 	-- upvalues: React (copy), Signals (copy), useReleaseFocusOnDownSwipe (copy), TextArea (copy), InputSize (copy), View (copy), ChatActionsRow (copy)
 	local v15 = React.useRef(nil)
-	local v16 = React.useMemo(function() -- line: 42
+	local v16 = React.useMemo(function() -- line: 40
 		-- upvalues: Signals (copy)
 		local v21, v22 = Signals.createSignal(true)
 
@@ -26,7 +26,7 @@ local function ChatComposer(t1: {[any]: any}) -- line: 40
 	end, {})
 	local v17 = t1.isAssistantResponding and t1.canSendWhileResponding ~= true
 	local v18 = t1.composerErrorText ~= nil
-	local v19 = React.useCallback(function(s2: string) -- line: 53
+	local v19 = React.useCallback(function(s2: string) -- line: 51
 		-- upvalues: v16 (copy), t1 (copy)
 		v16.setIsComposerEmpty(string.gsub(s2, "^%s*(.-)%s*$", "%1") == "")
 		t1.onChanged(s2)
@@ -34,7 +34,7 @@ local function ChatComposer(t1: {[any]: any}) -- line: 40
 		t1.onChanged,
 		v16
 	})
-	local v20 = React.useCallback(function() -- line: 58
+	local v20 = React.useCallback(function() -- line: 56
 		-- upvalues: t1 (copy), v16 (copy)
 		if t1.onSend() then
 			v16.setIsComposerEmpty(true)

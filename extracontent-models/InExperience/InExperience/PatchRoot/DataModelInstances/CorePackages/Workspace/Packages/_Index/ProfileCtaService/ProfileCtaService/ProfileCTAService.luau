@@ -2,17 +2,17 @@ local Parent = script:FindFirstAncestor("ProfileCtaService").Parent
 local ProfileCTAStore = require(Parent.DataHydration).Profile.ProfileCTAStore
 local createProfileCTAEventListener = require(script.Parent.createProfileCTAEventListener)
 
-local function createProfileCTAService() -- line: 19
+local function createProfileCTAService() -- line: 20
 	-- upvalues: ProfileCTAStore (copy), createProfileCTAEventListener (copy)
 	local n1 = 0
 	local t1 = {}
 	local v7 = ProfileCTAStore.get()
 
-	local function refetchCTA(s1: string) -- line: 24
+	local function refetchCTA(s1: string) -- line: 25
 		-- upvalues: v7 (copy)
 		v7.getCTA(s1, true)
 	end
-	local function handleCTAUpdate(s2: string) -- line: 28
+	local function handleCTAUpdate(s2: string) -- line: 29
 		-- upvalues: n1 (ref), v7 (copy), t1 (copy)
 		if n1 > 0 then
 			v7.getCTA(s2, true)
@@ -25,11 +25,11 @@ local function createProfileCTAService() -- line: 19
 
 	createProfileCTAEventListener(handleCTAUpdate)
 
-	local function enableRealTimeUpdates() -- line: 38
+	local function enableRealTimeUpdates() -- line: 39
 		-- upvalues: n1 (ref)
 		n1 += 1
 	end
-	local function disableRealTimeUpdates() -- line: 42
+	local function disableRealTimeUpdates() -- line: 43
 		-- upvalues: n1 (ref)
 		n1 -= 1
 
@@ -39,14 +39,14 @@ local function createProfileCTAService() -- line: 19
 	end
 
 	return {
-		connectRealTimeUpdates = function() -- line: 53
+		connectRealTimeUpdates = function() -- line: 54
 			-- upvalues: n1 (ref)
 			n1 += 1
 
 			local u14 = false
 
 			return {
-				Disconnect = function() -- line: 59
+				Disconnect = function() -- line: 60
 					-- upvalues: u14 (ref), n1 (ref)
 					if u14 then
 						return
@@ -61,7 +61,18 @@ local function createProfileCTAService() -- line: 19
 				end
 			}
 		end,
-		getProfileCTAs = function(t2: {[any]: any}) -- line: 69
+		getProfileCTA = function(s3: string) -- line: 70
+			-- upvalues: t1 (copy), v7 (copy)
+			local v16 = false
+
+			if t1[s3] then
+				v16 = true
+				t1[s3] = nil
+			end
+
+			return v7.getCTA(s3, v16)
+		end,
+		getProfileCTAs = function(t2: {[any]: any}) -- line: 79
 			-- upvalues: t1 (copy), v7 (copy)
 			local t3 = {}
 

@@ -34,174 +34,175 @@ local useCallback = React.useCallback
 local GetFFlagIsSquadEnabled = require(VirtualEventsParent.SharedFlags).GetFFlagIsSquadEnabled
 local FFlagLuaAppSduiEventDetailsEnabled = require(VirtualEventsParent.SharedFlags).FFlagLuaAppSduiEventDetailsEnabled
 local FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable = require(VirtualEventsParent.SharedFlags).FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable
+local FFlagLuaAppGameViewTileBackgroundColorOverride = require(VirtualEventsParent.SharedFlags).FFlagLuaAppGameViewTileBackgroundColorOverride
 
-local function v34() -- line: 63
+local function v35() -- line: 67
 end
 
-return function(t1: {[any]: any}) -- line: 67
-	-- upvalues: useDesignTokens (copy), useTextSizeOffset (copy), getVirtualEventDates (copy), useMemo (copy), FooterCornerButtonStyle (copy), useRoactService (copy), RoactNetworking (copy), usePlayButtonState (copy), PlayButtonStates (copy), GetFFlagIsSquadEnabled (copy), useLocalization (copy), useCallback (copy), React (copy), useEffect (copy), FFlagLuaAppSduiEventDetailsEnabled (copy), formatDateLocalized (copy), NotificationModalsManager (copy), useState (copy), fetchEventThumbnail (copy), ImpressionsTagUtility (copy), FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable (copy), getEventCtaButtonState (copy), FocusNavigationEventNameEnum (copy), v34 (copy), GameTileView (copy), GridTileTextFooter (copy), GameTileThumbnailBadges (copy), EventWideFooterButton (copy), HoldDetector (copy)
-	local v36 = useDesignTokens()
-	local v37 = useTextSizeOffset()
+return function(t1: {[any]: any}) -- line: 71
+	-- upvalues: useDesignTokens (copy), useTextSizeOffset (copy), getVirtualEventDates (copy), useMemo (copy), FooterCornerButtonStyle (copy), useRoactService (copy), RoactNetworking (copy), usePlayButtonState (copy), PlayButtonStates (copy), GetFFlagIsSquadEnabled (copy), useLocalization (copy), useCallback (copy), React (copy), useEffect (copy), FFlagLuaAppSduiEventDetailsEnabled (copy), formatDateLocalized (copy), NotificationModalsManager (copy), useState (copy), fetchEventThumbnail (copy), ImpressionsTagUtility (copy), FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable (copy), getEventCtaButtonState (copy), FocusNavigationEventNameEnum (copy), v35 (copy), GameTileView (copy), FFlagLuaAppGameViewTileBackgroundColorOverride (copy), GridTileTextFooter (copy), GameTileThumbnailBadges (copy), EventWideFooterButton (copy), HoldDetector (copy)
+	local v37 = useDesignTokens()
+	local v38 = useTextSizeOffset()
 	local Event = t1.Event
-	local v39 = getVirtualEventDates(Event)
-	local v40 = DateTime.now().UnixTimestamp >= v39.startDate.UnixTimestamp
-	local v41 = Event.userRsvpStatus == "going"
-	local v42 = useMemo(function() -- line: 75
-		-- upvalues: v40 (copy), FooterCornerButtonStyle (copy), v41 (copy)
-		if v40 then
+	local v40 = getVirtualEventDates(Event)
+	local v41 = DateTime.now().UnixTimestamp >= v40.startDate.UnixTimestamp
+	local v42 = Event.userRsvpStatus == "going"
+	local v43 = useMemo(function() -- line: 79
+		-- upvalues: v41 (copy), FooterCornerButtonStyle (copy), v42 (copy)
+		if v41 then
 			return FooterCornerButtonStyle.Play
 		end
 
-		if v41 then
+		if v42 then
 			return FooterCornerButtonStyle.Following
 		end
 
 		return FooterCornerButtonStyle.Follow
 	end, {
-		v40,
-		v41
+		v41,
+		v42
 	})
-	local v43 = useRoactService(RoactNetworking)
-	local v44 = usePlayButtonState(v43, t1.Event.universeId or "")
-	local v45 = v44.playButtonState == PlayButtonStates.Playable or GetFFlagIsSquadEnabled() and v44.playButtonState == PlayButtonStates.PlayableWithParty
-	local v46 = useLocalization({
+	local v44 = useRoactService(RoactNetworking)
+	local v45 = usePlayButtonState(v44, t1.Event.universeId or "")
+	local v46 = v45.playButtonState == PlayButtonStates.Playable or GetFFlagIsSquadEnabled() and v45.playButtonState == PlayButtonStates.PlayableWithParty
+	local v47 = useLocalization({
 		HappeningNow = "Feature.Home.Label.HappeningNow",
 		DateAtTime = "Feature.VirtualEvents.Label.DateAtTime",
 		ToastText = "Feature.VirtualEvents.Label.ReminderSetForEventTime"
 	})
-	local v47 = useCallback(function() -- line: 96
-		-- upvalues: v45 (copy), v40 (copy), t1 (copy), Event (copy)
-		if not v45 then
+	local v48 = useCallback(function() -- line: 100
+		-- upvalues: v46 (copy), v41 (copy), t1 (copy), Event (copy)
+		if not v46 then
 			return
 		end
 
-		if v40 then
+		if v41 then
 			t1.onJoinEvent(Event)
 
 			return
 		end
 
-		local v62 = Event.userRsvpStatus == "going" and "notGoing" or "going"
+		local v63 = Event.userRsvpStatus == "going" and "notGoing" or "going"
 
 		if t1.onRsvpChanged then
-			t1.onRsvpChanged(Event, v62)
+			t1.onRsvpChanged(Event, v63)
 		end
 	end, {
-		v40,
+		v41,
 		t1.onJoinEvent,
 		t1.onRsvpChanged,
 		Event.userRsvpStatus,
 		Event,
-		v45
+		v46
 	})
-	local v48 = React.useRef(Event.userRsvpStatus)
+	local v49 = React.useRef(Event.userRsvpStatus)
 
-	useEffect(function() -- line: 118
-		-- upvalues: FFlagLuaAppSduiEventDetailsEnabled (copy), t1 (copy), v48 (copy), Event (copy), formatDateLocalized (copy), v46 (copy), v39 (copy), NotificationModalsManager (copy)
-		if (not FFlagLuaAppSduiEventDetailsEnabled or not t1.suppressRsvpReminderToastBecauseEventDetailsFocused) and (v48.current and v48.current ~= "going" and Event.userRsvpStatus == "going") then
-			local v63 = formatDateLocalized(v46.DateAtTime, v39.startDate)
-			local v64 = v46.ToastText:gsub("{(.-)}", {
+	useEffect(function() -- line: 122
+		-- upvalues: FFlagLuaAppSduiEventDetailsEnabled (copy), t1 (copy), v49 (copy), Event (copy), formatDateLocalized (copy), v47 (copy), v40 (copy), NotificationModalsManager (copy)
+		if (not FFlagLuaAppSduiEventDetailsEnabled or not t1.suppressRsvpReminderToastBecauseEventDetailsFocused) and (v49.current and v49.current ~= "going" and Event.userRsvpStatus == "going") then
+			local v64 = formatDateLocalized(v47.DateAtTime, v40.startDate)
+			local v65 = v47.ToastText:gsub("{(.-)}", {
 				eventName = Event.displayTitle,
-				eventTime = v63
+				eventTime = v64
 			})
 
 			NotificationModalsManager.SetUIBloxToast({
-				toastTitle = v64,
+				toastTitle = v65,
 				sequenceNumber = DateTime.now().UnixTimestamp
 			})
 		end
 
-		v48.current = Event.userRsvpStatus
+		v49.current = Event.userRsvpStatus
 	end, {
 		Event.userRsvpStatus,
 		Event.displayTitle,
-		v39.startDate,
-		v46.DateAtTime,
-		v46.ToastText,
+		v40.startDate,
+		v47.DateAtTime,
+		v47.ToastText,
 		if not FFlagLuaAppSduiEventDetailsEnabled then nil else t1.suppressRsvpReminderToastBecauseEventDetailsFocused
 	})
 
-	local v49, v50 = useState(nil)
+	local v50, v51 = useState(nil)
 
-	useEffect(function() -- line: 152
-		-- upvalues: fetchEventThumbnail (copy), v43 (copy), Event (copy), t1 (copy), v50 (copy)
-		local u65 = true
+	useEffect(function() -- line: 156
+		-- upvalues: fetchEventThumbnail (copy), v44 (copy), Event (copy), t1 (copy), v51 (copy)
+		local u66 = true
 
-		fetchEventThumbnail(v43, Event.id, t1.DefaultThumbnail):andThen(function(p1) -- line: 154
-			-- upvalues: u65 (ref), v50 (copy)
-			if u65 then
-				v50(p1)
+		fetchEventThumbnail(v44, Event.id, t1.DefaultThumbnail):andThen(function(p1) -- line: 158
+			-- upvalues: u66 (ref), v51 (copy)
+			if u66 then
+				v51(p1)
 			end
 		end)
 
-		return function() -- line: 159
-			-- upvalues: u65 (ref)
-			u65 = false
+		return function() -- line: 163
+			-- upvalues: u66 (ref)
+			u66 = false
 		end
 	end, {
 		Event.id,
 		t1.DefaultThumbnail
 	})
 
-	local v51 = React.useRef(nil)
+	local v52 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 165
-		-- upvalues: ImpressionsTagUtility (copy), v51 (copy), t1 (copy)
-		ImpressionsTagUtility.AddTag(v51, t1.impressionsTag, t1.layoutOrder)
+	React.useEffect(function() -- line: 169
+		-- upvalues: ImpressionsTagUtility (copy), v52 (copy), t1 (copy)
+		ImpressionsTagUtility.AddTag(v52, t1.impressionsTag, t1.layoutOrder)
 
-		return function() -- line: 167
-			-- upvalues: ImpressionsTagUtility (copy), v51 (copy), t1 (copy)
-			ImpressionsTagUtility.RemoveTag(v51, t1.impressionsTag, t1.layoutOrder)
+		return function() -- line: 171
+			-- upvalues: ImpressionsTagUtility (copy), v52 (copy), t1 (copy)
+			ImpressionsTagUtility.RemoveTag(v52, t1.impressionsTag, t1.layoutOrder)
 		end
 	end, {
-		v51,
+		v52,
 		t1.impressionsTag,
 		t1.layoutOrder
 	})
 
-	local v52 = React.useRef(nil)
-	local v53 = React.useRef(false)
-	local v54 = React.useCallback(function(b1: boolean) -- line: 176
-		-- upvalues: v53 (copy)
-		v53.current = b1
+	local v53 = React.useRef(nil)
+	local v54 = React.useRef(false)
+	local v55 = React.useCallback(function(b1: boolean) -- line: 180
+		-- upvalues: v54 (copy)
+		v54.current = b1
 	end, {})
 	local isRsvpDisabled = nil
 	local isJoinEventDisabled = nil
 
 	if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
-		local v57 = getEventCtaButtonState(v44)
+		local v58 = getEventCtaButtonState(v45)
 
-		isJoinEventDisabled = v57.isJoinEventDisabled
-		isRsvpDisabled = v57.isRsvpDisabled
+		isJoinEventDisabled = v58.isJoinEventDisabled
+		isRsvpDisabled = v58.isRsvpDisabled
 	end
 
-	local v58 = nil
+	local v59 = nil
 	local HoldToNotifyMe
 
-	if v42 == FooterCornerButtonStyle.Follow then
+	if v43 == FooterCornerButtonStyle.Follow then
 		HoldToNotifyMe = FocusNavigationEventNameEnum.HoldToNotifyMe
 
 		if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
-			v58 = isRsvpDisabled
+			v59 = isRsvpDisabled
 		end
-	elseif v42 == FooterCornerButtonStyle.Following then
+	elseif v43 == FooterCornerButtonStyle.Following then
 		HoldToNotifyMe = FocusNavigationEventNameEnum.HoldToUnfollowEvent
 
 		if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
-			v58 = isRsvpDisabled
+			v59 = isRsvpDisabled
 		end
 	else
 		HoldToNotifyMe = FocusNavigationEventNameEnum.HoldToJoinEvent
 
 		if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
-			v58 = isJoinEventDisabled
+			v59 = isJoinEventDisabled
 		end
 	end
 
-	local v60 = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable or not v58 then v47 else v34
-	local v61 = useCallback(function() -- line: 213
-		-- upvalues: v53 (copy), t1 (copy)
-		if v53.current then
+	local v61 = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable or not v59 then v48 else v35
+	local v62 = useCallback(function() -- line: 217
+		-- upvalues: v54 (copy), t1 (copy)
+		if v54.current then
 			return
 		end
 
@@ -215,18 +216,19 @@ return function(t1: {[any]: any}) -- line: 67
 		BackgroundTransparency = 1,
 		LayoutOrder = t1.layoutOrder,
 		Size = t1.size,
-		ref = v51
+		ref = v52
 	}, {
 		GameTile = React.createElement(GameTileView, {
 			imageAspectRatio = 1.7777777777777777,
 			isContained = true,
 			hidePlayButton = true,
 			isHovered = false,
-			forwardRef = v52,
-			image = v49,
+			forwardRef = v53,
+			image = v50,
+			backgroundStyle = if not FFlagLuaAppGameViewTileBackgroundColorOverride then nil else t1.backgroundStyle,
 			Size = UDim2.fromScale(1, 1),
 			title = Event.displayTitle or "",
-			onActivated = v61,
+			onActivated = v62,
 			footerMetadata = React.createElement(GridTileTextFooter, {
 				useLargerFont = true,
 				text = Event.displaySubtitle or (Event.displayDescription or "")
@@ -235,23 +237,23 @@ return function(t1: {[any]: any}) -- line: 67
 				tileBadgesByPosition = {
 					ImageTopLeft = {{
 						tileBadgeType = "Text",
-						text = if not v40 then formatDateLocalized(v46.DateAtTime, v39.startDate) else v46.HappeningNow
+						text = if not v41 then formatDateLocalized(v47.DateAtTime, v40.startDate) else v47.HappeningNow
 					}}
 				}
 			}),
-			extraFooterSpace = if t1.disableButtons then nil else v36.Size.Size_700 + v36.Size.Size_200,
+			extraFooterSpace = if t1.disableButtons then nil else v37.Size.Size_700 + v37.Size.Size_200,
 			extraFooterContent = if t1.disableButtons then nil else React.createElement(EventWideFooterButton, {
 				key = "WideFooterButton",
-				buttonStyle = v42,
-				disabled = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then not v45 else v58,
-				onActivated = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then v47 else v60
+				buttonStyle = v43,
+				disabled = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then not v46 else v59,
+				onActivated = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then v48 else v61
 			}),
-			textSizeOffset = v37
+			textSizeOffset = v38
 		}),
-		HoldDetector = if not v52 or not v52.current then nil else React.createElement(HoldDetector, {
-			guiObject = v52.current,
-			onHoldDetected = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then v47 else v60,
-			setDisabledForHold = v54,
+		HoldDetector = if not v53 or not v53.current then nil else React.createElement(HoldDetector, {
+			guiObject = v53.current,
+			onHoldDetected = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then v48 else v61,
+			setDisabledForHold = v55,
 			keyCode = Enum.KeyCode.ButtonA,
 			focusNavigationEventName = HoldToNotifyMe
 		})

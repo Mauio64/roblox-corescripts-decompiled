@@ -6,14 +6,14 @@ local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 local v7 = UrlBase.APIS .. "/sharelinks/v1/get-or-create-link"
 
-local function decodeShareLink(t1: {[any]: any}) -- line: 38
+local function decodeShareLink(t1: {[any]: any}) -- line: 37
 	if type(t1) == "table" and type(t1.shortUrl) == "string" then
 		return t1.shortUrl
 	end
 
 	return nil
 end
-local function createPrivateShareLink(n1: number) -- line: 45
+local function createPrivateShareLink(n1: number) -- line: 44
 	-- upvalues: fetch (copy), v7 (copy), HttpService (copy), decodeShareLink (copy), asPromise (copy)
 	local v12 = fetch({
 		method = "POST",

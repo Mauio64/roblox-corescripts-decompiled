@@ -36,7 +36,7 @@ local function CloseAffordance(p1, p2) -- line: 53
 	local v20 = withDefaults(p1, t1)
 	local v21 = useTokens()
 	local v22 = usePresentationContext()
-	local v23 = useCloseAffordanceVariants(v21, v20.size, v20.variant, v22.colorMode, v20.hasPadding, v20.isCircular)
+	local v23 = useCloseAffordanceVariants(v21, v20.size, v20.variant, v22.colorNamespace, v20.hasPadding, v20.isCircular)
 	local uDim = UDim.new(0, v23.container.radius)
 	local v25 = React.useMemo(function() -- line: 68
 		-- upvalues: uDim (copy), v21 (copy)

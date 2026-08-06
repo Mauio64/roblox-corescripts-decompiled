@@ -15,11 +15,10 @@ local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
 local SharedFlags = require(Parent.SharedFlags)
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
 local FFlagRobloxPlusUpsellRefreshOnComplete = SharedFlags.FFlagRobloxPlusUpsellRefreshOnComplete
-local FFlagDismissInlineBannerOnCtaClick = SharedFlags.FFlagDismissInlineBannerOnCtaClick
-local v19 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local v18 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
 local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
 local UrlBase = require(Parent.UrlBuilder).UrlBase
-local v22 = UrlBuilder.new({
+local v21 = UrlBuilder.new({
 	path = "plus",
 	base = UrlBase.WWW,
 	query = {
@@ -36,16 +35,15 @@ local v22 = UrlBuilder.new({
 	}
 })
 
-local function SduiOpenFaeTrialUpsellAction(p1, _, p3) -- line: 46
-	-- upvalues: FFlagRobloxPlusUpsellRefreshOnComplete (copy), AppPage (copy), SurfaceName (copy), SurfaceContext (copy), v22 (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), NavigateDown (copy), claimTrial (copy), SubscriptionGrantType (copy), getSduiApiStore (copy), FFlagDismissInlineBannerOnCtaClick (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy), startFacialAgeEstimation (copy)
+local function SduiOpenFaeTrialUpsellAction(p1, _, p3) -- line: 45
+	-- upvalues: FFlagRobloxPlusUpsellRefreshOnComplete (copy), AppPage (copy), SurfaceName (copy), SurfaceContext (copy), v21 (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), NavigateDown (copy), claimTrial (copy), SubscriptionGrantType (copy), getSduiApiStore (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy), startFacialAgeEstimation (copy)
 	local dispatch = p3.dependencies.dispatch
 	local localization = p3.dependencies.localization
-	local v29 = if not FFlagRobloxPlusUpsellRefreshOnComplete then nil else p1 and p1.actionParams or nil
-	local v30 = if not FFlagRobloxPlusUpsellRefreshOnComplete then nil else v29 and v29.promptType
-	local v31 = if not FFlagRobloxPlusUpsellRefreshOnComplete then nil else v29 and v29.configKey or "Home"
-	local v32 = localization:Format("Feature.RobloxSubscription.Title.AgeCheckTrial")
-	local v33 = localization:Format("Feature.RobloxSubscription.Description.AgeCheckTrial")
-	local v34 = localization:Format("Feature.FAE.Action.Continue")
+	local v28 = if not FFlagRobloxPlusUpsellRefreshOnComplete then nil else p1 and p1.actionParams or nil
+	local v29 = if not FFlagRobloxPlusUpsellRefreshOnComplete then nil else v28 and v28.promptType
+	local v30 = localization:Format("Feature.RobloxSubscription.Title.AgeCheckTrial")
+	local v31 = localization:Format("Feature.RobloxSubscription.Description.AgeCheckTrial")
+	local v32 = localization:Format("Feature.FAE.Action.Continue")
 	local t2 = {
 		name = AppPage.RobloxSubscriptionUpsell,
 		extraProps = {
@@ -53,19 +51,19 @@ local function SduiOpenFaeTrialUpsellAction(p1, _, p3) -- line: 46
 				skipGuacPolicy = true,
 				showLegalDisclosure = true,
 				noPurchaseMethodRequired = true,
-				title = v32,
-				description = v33,
-				ctaText = v34
+				title = v30,
+				description = v31,
+				ctaText = v32
 			},
 			surfaceName = SurfaceName.HomepageFaeTrialBanner,
 			surfaceContext = SurfaceContext.InApp,
-			onCtaOverride = function(p4, p5) -- line: 85
-				-- upvalues: AppPage (copy), v22 (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), dispatch (copy), NavigateDown (copy), claimTrial (copy), SubscriptionGrantType (copy), FFlagRobloxPlusUpsellRefreshOnComplete (copy), getSduiApiStore (copy), v30 (copy), FFlagDismissInlineBannerOnCtaClick (copy), v31 (copy), p3 (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy), startFacialAgeEstimation (copy)
-				local function openConfirmationWebview(p6) -- line: 86
-					-- upvalues: AppPage (copy), v22 (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), dispatch (copy), NavigateDown (copy)
+			onCtaOverride = function(p4, p5) -- line: 79
+				-- upvalues: AppPage (copy), v21 (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), dispatch (copy), NavigateDown (copy), claimTrial (copy), SubscriptionGrantType (copy), FFlagRobloxPlusUpsellRefreshOnComplete (copy), getSduiApiStore (copy), v29 (copy), p3 (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy), startFacialAgeEstimation (copy)
+				local function openConfirmationWebview(p6) -- line: 80
+					-- upvalues: AppPage (copy), v21 (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), dispatch (copy), NavigateDown (copy)
 					local t1 = {
 						name = AppPage.GenericWebPage,
-						detail = v22({
+						detail = v21({
 							t = tostring(os.time())
 						}),
 						extraProps = {
@@ -75,50 +73,37 @@ local function SduiOpenFaeTrialUpsellAction(p1, _, p3) -- line: 46
 					}
 
 					if FFlagSignalsNavP3Dispatch then
-						v19.down(v19.fromLegacyPage(t1))
+						v18.down(v18.fromLegacyPage(t1))
 
 						return
 					end
 
 					dispatch(NavigateDown(t1))
 				end
-				local function onFaeSuccess() -- line: 102
-					-- upvalues: claimTrial (copy), SubscriptionGrantType (copy), p4 (copy), FFlagRobloxPlusUpsellRefreshOnComplete (copy), getSduiApiStore (copy), v30 (copy), FFlagDismissInlineBannerOnCtaClick (copy), v31 (copy), openConfirmationWebview (copy), p3 (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy)
-					claimTrial(SubscriptionGrantType.FaeFreeTrial):andThen(function() -- line: 108
-						-- upvalues: p4 (copy), FFlagRobloxPlusUpsellRefreshOnComplete (copy), getSduiApiStore (copy), v30 (copy), FFlagDismissInlineBannerOnCtaClick (copy), v31 (copy), openConfirmationWebview (copy)
-						local u42 = p4
+				local function onFaeSuccess() -- line: 96
+					-- upvalues: claimTrial (copy), SubscriptionGrantType (copy), p4 (copy), FFlagRobloxPlusUpsellRefreshOnComplete (copy), getSduiApiStore (copy), v29 (copy), openConfirmationWebview (copy), p3 (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy)
+					claimTrial(SubscriptionGrantType.FaeFreeTrial):andThen(function() -- line: 102
+						-- upvalues: p4 (copy), FFlagRobloxPlusUpsellRefreshOnComplete (copy), getSduiApiStore (copy), v29 (copy), openConfirmationWebview (copy)
+						local u40 = p4
 
 						if FFlagRobloxPlusUpsellRefreshOnComplete then
-							function u42() -- line: 116
-								-- upvalues: getSduiApiStore (copy), v30 (copy), FFlagDismissInlineBannerOnCtaClick (copy), v31 (copy), p4 (copy)
-								local v44 = getSduiApiStore()
-								local dismissEntry = v44.dismissEntry
+							function u40() -- line: 110
+								-- upvalues: getSduiApiStore (copy), v29 (copy), p4 (copy)
+								local dismissEntry = getSduiApiStore().dismissEntry
 
-								if dismissEntry then
-									if typeof(v30) == "string" then
-										dismissEntry(v30)
-									elseif FFlagDismissInlineBannerOnCtaClick and typeof(v31) == "string" then
-										local v46 = v44.getData(v31).data(false)
-
-										if v46 then
-											for _, v48 in v46 do
-												if v48.category == "InlineBanner" and typeof(v48.title) == "string" then
-													dismissEntry(v48.title)
-												end
-											end
-										end
-									end
+								if dismissEntry and typeof(v29) == "string" then
+									dismissEntry(v29)
 								end
 
 								p4()
 							end
 						end
 
-						task.delay(1, function() -- line: 144
-							-- upvalues: openConfirmationWebview (copy), u42 (ref)
-							openConfirmationWebview(u42)
+						task.delay(1, function() -- line: 122
+							-- upvalues: openConfirmationWebview (copy), u40 (ref)
+							openConfirmationWebview(u40)
 						end)
-					end):catch(function(p7) -- line: 148
+					end):catch(function(p7) -- line: 126
 						-- upvalues: p3 (copy), SduiErrorType (copy), SduiActionType (copy), SduiParseHelpers (copy)
 						p3.dependencies.logger.reportError(SduiErrorType.ActionNetworkRequestFailed, {
 							name = SduiActionType.OpenFaeTrialUpsell,
@@ -133,7 +118,7 @@ local function SduiOpenFaeTrialUpsellAction(p1, _, p3) -- line: 46
 	}
 
 	if FFlagSignalsNavP3Dispatch then
-		v19.down(v19.fromLegacyPage(t2))
+		v18.down(v18.fromLegacyPage(t2))
 
 		return
 	end

@@ -60,5 +60,6 @@ return {
 	EnableEventNotifications = "EnableEventNotifications",
 	DismissEventNotificationsModal = "DismissEventNotificationsModal",
 	OpenFaeTrialUpsell = "OpenFaeTrialUpsell",
-	PinExperienceShortcut = "PinExperienceShortcut"
+	PinExperienceShortcut = "PinExperienceShortcut",
+	ShowToast = "ShowToast"
 }

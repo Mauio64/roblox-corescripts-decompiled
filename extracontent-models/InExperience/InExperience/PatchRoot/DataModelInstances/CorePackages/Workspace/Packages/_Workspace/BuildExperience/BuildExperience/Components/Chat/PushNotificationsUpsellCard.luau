@@ -10,7 +10,7 @@ local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
 
-local function PushNotificationsUpsellCard(t1: {[any]: any}) -- line: 27
+local function PushNotificationsUpsellCard(t1: {[any]: any}) -- line: 25
 	-- upvalues: React (copy), View (copy), FoundationText (copy), LocalizationStrings (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy)
 	local v14 = t1.shouldOpenSettings == true
 

@@ -70,14 +70,14 @@ local t5 = {
 }
 
 return {
-	sendLoadTimerEvent = function(t6: {[any]: any}) -- line: 64
+	sendLoadTimerEvent = function(t6: {[any]: any}) -- line: 66
 		-- upvalues: TelemetryService (copy), t1 (copy)
 		TelemetryService:LogEvent(t1, {
 			customFields = t6,
 			standardizedFields = { "addOSInfo" }
 		})
 	end,
-	sendPageStatusEvent = function(s1: string, n1: number?, p1) -- line: 87
+	sendPageStatusEvent = function(s1: string, n1: number?, p1) -- line: 89
 		-- upvalues: TelemetryService (copy), t3 (copy), t5 (copy)
 		TelemetryService:LogCounter(t3, {
 			customFields = {
@@ -87,7 +87,7 @@ return {
 			}
 		})
 	end,
-	sendPagePayloadSizeEvent = function(s2: string, p2) -- line: 97
+	sendPagePayloadSizeEvent = function(s2: string, p2) -- line: 99
 		-- upvalues: TelemetryService (copy), t4 (copy)
 		local v16
 
@@ -107,7 +107,7 @@ return {
 			}
 		}, v16)
 	end,
-	sendLoadMoreEvent = function(s3: string) -- line: 113
+	sendLoadMoreEvent = function(s3: string) -- line: 115
 		-- upvalues: TelemetryService (copy), t2 (copy)
 		TelemetryService:LogEvent(t2, {
 			customFields = {

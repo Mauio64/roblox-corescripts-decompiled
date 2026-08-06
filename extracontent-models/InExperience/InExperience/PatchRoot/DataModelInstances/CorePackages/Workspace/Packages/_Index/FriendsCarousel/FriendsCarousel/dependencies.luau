@@ -7,8 +7,9 @@ local v6 = require(scriptParentParent.Loggers).Logger:new("FriendsCarousel")
 local v7 = v6:new("FriendsCarousel Networking")
 local v8 = game:DefineFastInt("FriendsCarouselHttpRetryCount", 3)
 local getFFlagMigrateSocialNetworking = require(scriptParentParent.SharedFlags).getFFlagMigrateSocialNetworking
-local v10 = httpRequest.config({
-	requestFunction = function(p1, p2, p3) -- line: 18
+local FFlagFriendsCarouselDeprecateUnusedReducers = require(scriptParentParent.SharedFlags).FFlagFriendsCarouselDeprecateUnusedReducers
+local v11 = httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 20
 		-- upvalues: v7 (copy), getFFlagMigrateSocialNetworking (copy), httpRequest (copy)
 		v7:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
 
@@ -18,16 +19,16 @@ local v10 = httpRequest.config({
 
 		return httpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
 	end,
-	postRequestFunction = function(p4, p5) -- line: 26
+	postRequestFunction = function(p4, p5) -- line: 28
 		-- upvalues: v7 (copy)
 		v7:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s ]", p5.requestMethod, p5.url, p4.StatusCode))
 	end,
 	maxRetryCount = v8
 })
 local RODUX_KEY = require(scriptParent.Common.Constants).RODUX_KEY
-local v12 = LuaSocialLibrariesDeps.RoduxNetworking.config({
+local v13 = LuaSocialLibrariesDeps.RoduxNetworking.config({
 	keyPath = RODUX_KEY .. ".NetworkStatus",
-	networkImpl = v10
+	networkImpl = v11
 })
 local UIBlox = require(scriptParentParent.UIBlox)
 
@@ -47,25 +48,25 @@ return {
 	llama = LuaSocialLibrariesDeps.llama,
 	SocialLibraries = LuaSocialLibrariesDeps.SocialLibraries.config({}),
 	SocialCommon = require(scriptParentParent.SocialCommon),
-	RoduxNetworking = v12,
+	RoduxNetworking = v13,
 	NetworkingFriends = require(scriptParentParent.FriendsNetworking).config({
-		roduxNetworking = v12
+		roduxNetworking = v13
 	}),
 	NetworkingAliases = LuaSocialLibrariesDeps.NetworkingAliases.config({
-		roduxNetworking = v12
+		roduxNetworking = v13
 	}),
-	RoduxUsers = LuaSocialLibrariesDeps.RoduxUsers.config({
+	RoduxUsers = if not FFlagFriendsCarouselDeprecateUnusedReducers then LuaSocialLibrariesDeps.RoduxUsers.config({
 		keyPath = RODUX_KEY .. ".Users"
-	}),
+	}) else nil,
 	RoduxFriends = require(scriptParentParent.FriendsRodux).config({
 		keyPath = RODUX_KEY .. ".Friends"
 	}),
-	RoduxPresence = LuaSocialLibrariesDeps.RoduxPresence.config({
+	RoduxPresence = if not FFlagFriendsCarouselDeprecateUnusedReducers then LuaSocialLibrariesDeps.RoduxPresence.config({
 		keyPath = RODUX_KEY .. ".Presence"
-	}),
-	RoduxUserPermissions = LuaSocialLibrariesDeps.RoduxUserPermissions.config({
+	}) else nil,
+	RoduxUserPermissions = if not FFlagFriendsCarouselDeprecateUnusedReducers then LuaSocialLibrariesDeps.RoduxUserPermissions.config({
 		keyPath = RODUX_KEY .. ".UserPermissions"
-	}),
+	}) else nil,
 	RoduxAnalytics = SocialLuaAnalytics.Analytics.RoduxAnalytics.config({
 		keyPath = RODUX_KEY .. ".Analytics"
 	}),

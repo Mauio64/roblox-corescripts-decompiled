@@ -9,17 +9,19 @@ require(Moments.Stores.GetMomentsStore.createMomentsStore)
 local ExperienceDetailsSheet = require(Moments.ExperienceDetailsSheet).ExperienceDetailsSheet
 local ToastOverlay = require(Moments.Components.ToastOverlay)
 
-local function MomentsHostShell(t1: {[any]: any}) -- line: 45
+local function MomentsHostShell(t1: {[any]: any}) -- line: 48
 	-- upvalues: React (copy), MomentsSessionContext (copy), MomentsHostContext (copy), ExperienceDetailsSheet (copy), ToastOverlay (copy)
-	local v10 = React.useMemo(function() -- line: 46
+	local v10 = React.useMemo(function() -- line: 49
 		-- upvalues: t1 (copy)
 		return {
 			openProfile = t1.openProfile,
-			openOwnMoments = t1.openOwnMoments
+			openOwnMoments = t1.openOwnMoments,
+			openMomentsFeedReport = t1.openMomentsFeedReport
 		}
 	end, {
 		t1.openProfile,
-		t1.openOwnMoments
+		t1.openOwnMoments,
+		t1.openMomentsFeedReport
 	})
 
 	return React.createElement(MomentsSessionContext.MomentsSessionContext.Provider, {

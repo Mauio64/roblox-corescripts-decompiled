@@ -13,8 +13,9 @@ local FFlagLuaAppAddSubIdToHomeEvents = require(Parent.SharedFlags).FFlagLuaAppA
 local FFlagLuaAppMigrateGameEventsTelemetryService = require(Parent.SharedFlags).FFlagLuaAppMigrateGameEventsTelemetryService
 local FFlagLuaAppGameEventsTelemetryServiceShadowTraffic = require(Parent.SharedFlags).FFlagLuaAppGameEventsTelemetryServiceShadowTraffic
 local FFlagLuaAppGameItemTelemetryServiceTarget = require(Parent.SharedFlags).FFlagLuaAppGameItemTelemetryServiceTarget
-local v16 = game:DefineFastInt("LuaAppGameDetailReferralEventThrottlingHundredthsPercent", 10000)
-local v17 = game:DefineFastInt("LuaAppGameDetailReferralShadowThrottlingHundredthsPercent", 10000)
+local FFlagLuaAppAddSeeAllFlagToGameDetailReferral = require(Parent.SharedFlags).FFlagLuaAppAddSeeAllFlagToGameDetailReferral
+local v17 = game:DefineFastInt("LuaAppGameDetailReferralEventThrottlingHundredthsPercent", 10000)
+local v18 = game:DefineFastInt("LuaAppGameDetailReferralShadowThrottlingHundredthsPercent", 10000)
 local t1 = nil
 
 if FFlagLuaAppMigrateGameEventsTelemetryService then
@@ -22,7 +23,7 @@ if FFlagLuaAppMigrateGameEventsTelemetryService then
 		eventName = "gameDetailReferral",
 		description = "Fires when the user navigates to game details",
 		backends = { "EventIngest" },
-		throttlingPercentage = v16,
+		throttlingPercentage = v17,
 		lastUpdated = {
 			26,
 			2,
@@ -38,7 +39,7 @@ if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
 		eventName = "gameDetailReferralShadow",
 		description = "Shadow traffic for gameDetailReferral event recovery percentage",
 		backends = { "EventIngest" },
-		throttlingPercentage = v17,
+		throttlingPercentage = v18,
 		lastUpdated = {
 			26,
 			3,
@@ -47,7 +48,7 @@ if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
 	}
 end
 
-local v20 = t.strictInterface({
+local v21 = t.strictInterface({
 	pg = t.string,
 	universeId = t.union(t.string, t.number),
 	navigationUniverseId = t.optional(t.string),
@@ -84,10 +85,11 @@ local v20 = t.strictInterface({
 	loadSource = t.optional(t.string),
 	tileType = t.optional(t.string),
 	sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else t.optional(t.string),
-	analyticsData = t.optional(t.table)
+	analyticsData = t.optional(t.table),
+	seeAllFlag = if not FFlagLuaAppAddSeeAllFlagToGameDetailReferral then nil else t.optional(t.number)
 })
 
-local function addMobileAdvertisingIdToEventParams(p1) -- line: 92
+local function addMobileAdvertisingIdToEventParams(p1) -- line: 95
 	-- upvalues: AppStorageService (copy)
 	local Item = AppStorageService:GetItem("MobileAdvertisingId")
 
@@ -96,12 +98,12 @@ local function addMobileAdvertisingIdToEventParams(p1) -- line: 92
 	end
 end
 
-return function(p2, s1: string, p3) -- line: 99
-	-- upvalues: v20 (copy), DiscoveryEventErrorLogger (copy), HttpService (copy), FFlagLuaAppGameDetailEventMobileAdsId (copy), AppStorageService (copy), Cryo (copy), FFlagLuaAppMigrateGameEventsTelemetryService (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppGameEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
-	local v27, v28 = v20(p3)
+return function(p2, s1: string, p3) -- line: 102
+	-- upvalues: v21 (copy), DiscoveryEventErrorLogger (copy), HttpService (copy), FFlagLuaAppGameDetailEventMobileAdsId (copy), AppStorageService (copy), Cryo (copy), FFlagLuaAppMigrateGameEventsTelemetryService (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppGameEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
+	local v28, v29 = v21(p3)
 
-	if not v27 then
-		DiscoveryEventErrorLogger.reportError("GameDetailReferralInvalidInterface", v28)
+	if not v28 then
+		DiscoveryEventErrorLogger.reportError("GameDetailReferralInvalidInterface", v29)
 	end
 
 	if not p3.interactionUuid then
@@ -150,10 +152,10 @@ return function(p2, s1: string, p3) -- line: 99
 	end
 
 	if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
-		local v31 = table.clone(p3)
+		local v32 = table.clone(p3)
 
-		v31.isSdui = if v31.isSdui ~= true then if v31.isSdui ~= false then v31.isSdui else "false" else "true"
-		v31.isAd = if v31.isAd ~= true then if v31.isAd ~= false then v31.isAd else "false" else "true"
+		v32.isSdui = if v32.isSdui ~= true then if v32.isSdui ~= false then v32.isSdui else "false" else "true"
+		v32.isAd = if v32.isAd ~= true then if v32.isAd ~= false then v32.isAd else "false" else "true"
 		TelemetryService:LogEvent(t2, {
 			eventContext = s1,
 			standardizedFields = {
@@ -161,7 +163,7 @@ return function(p2, s1: string, p3) -- line: 99
 				"addSessionId",
 				"addOSInfo"
 			},
-			customFields = v31,
+			customFields = v32,
 			legacyOverrideTargetForEventIngest = if not FFlagLuaAppGameItemTelemetryServiceTarget then nil else getPlatformTarget()
 		})
 	end

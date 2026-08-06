@@ -33,116 +33,117 @@ local FFlagSduiMarketplaceCatalogCategorySupport = SharedFlags.FFlagSduiMarketpl
 local FFlagSduiMarketplaceCatalogSortSupport = SharedFlags.FFlagSduiMarketplaceCatalogSortSupport
 local FFlagSduiAddMarketplaceEntityDataHydration = SharedFlags.FFlagSduiAddMarketplaceEntityDataHydration
 local FFlagSduiHydrationFetchIfMissing = SharedFlags.FFlagSduiHydrationFetchIfMissing
+local FFlagSduiGameIconSupport = SharedFlags.FFlagSduiGameIconSupport
 local FFlagLuaAppVoteOptimisticUpdateRaceFix = SharedFlags.FFlagLuaAppVoteOptimisticUpdateRaceFix
 local FFlagSduiDevStoreSeeAllSupport = SharedFlags.FFlagSduiDevStoreSeeAllSupport
 local FFlagSduiClientPageScope = SharedFlags.FFlagSduiClientPageScope
 local FFlagSduiCapabilityBindings = SharedFlags.FFlagSduiCapabilityBindings
 local protobufTimestampToLocalTimeString = SduiDataBinderTransformUtils.protobufTimestampToLocalTimeString
 
-local function updateBadgesInfoStore(t1: {[any]: any}) -- line: 66
+local function updateBadgesInfoStore(t1: {[any]: any}) -- line: 67
 	-- upvalues: DataHydration (copy)
 	DataHydration.Badges.getBadgeInfoStore(false).updateBadges(t1)
 end
-local function updateCreatorInfoStore(t2: {[any]: any}) -- line: 70
+local function updateCreatorInfoStore(t2: {[any]: any}) -- line: 71
 	-- upvalues: DataHydration (copy)
 	DataHydration.Creator.getCreatorInfoStore(false).updateCreatorInfos(t2)
 end
-local function updateGameInfos(t3: {[any]: any}) -- line: 74
+local function updateGameInfos(t3: {[any]: any}) -- line: 75
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getGameInfoStore(false).updateGameInfos(t3)
 end
-local function updateAgeRecommendations(t4: {[any]: any}) -- line: 78
+local function updateAgeRecommendations(t4: {[any]: any}) -- line: 79
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getAgeRecommendationStore(false).updateAgeRecommendations(t4)
 end
-local function updateSocialLinkInfos(t5: {[any]: any}) -- line: 82
+local function updateSocialLinkInfos(t5: {[any]: any}) -- line: 83
 	-- upvalues: DataHydration (copy)
 	DataHydration.SocialLink.getSocialLinkInfoStore(false).updateSocialLinkInfos(t5)
 end
-local function updateMediaAssetStore(t6: {[any]: any}) -- line: 86
+local function updateMediaAssetStore(t6: {[any]: any}) -- line: 87
 	-- upvalues: DataHydration (copy)
 	DataHydration.MediaAsset.getMediaAssetStore(false).updateMediaAssets(t6)
 end
-local function updateExperienceEventInfoStore(t7: {[any]: any}) -- line: 90
+local function updateExperienceEventInfoStore(t7: {[any]: any}) -- line: 91
 	-- upvalues: DataHydration (copy)
 	DataHydration.ExperienceEvents.getExperienceEventInfoStore(false).updateExperienceEventInfos(t7)
 end
-local function updateMarketplaceCatalogCategoryStore(t8: {[any]: any}) -- line: 94
+local function updateMarketplaceCatalogCategoryStore(t8: {[any]: any}) -- line: 95
 	-- upvalues: DataHydration (copy)
 	DataHydration.MarketplaceCatalogCategory.getMarketplaceCatalogCategoryStore(false).updateMarketplaceCatalogCategories(t8)
 end
-local function updateMarketplaceCatalogSortStore(t9: {[any]: any}) -- line: 100
+local function updateMarketplaceCatalogSortStore(t9: {[any]: any}) -- line: 101
 	-- upvalues: DataHydration (copy)
 	DataHydration.MarketplaceCatalogSort.getMarketplaceCatalogSortStore(false).updateMarketplaceCatalogSorts(t9)
 end
-local function updateMarketplaceAssetInfoStore(t10: {[any]: any}) -- line: 104
+local function updateMarketplaceAssetInfoStore(t10: {[any]: any}) -- line: 105
 	-- upvalues: DataHydration (copy)
 	DataHydration.MarketplaceAsset.getMarketplaceAssetStore(false).updateMarketplaceAssetInfos(t10)
 end
-local function updateMarketplaceBundleInfoStore(t11: {[any]: any}) -- line: 108
+local function updateMarketplaceBundleInfoStore(t11: {[any]: any}) -- line: 109
 	-- upvalues: DataHydration (copy)
 	DataHydration.MarketplaceBundle.getMarketplaceBundleStore(false).updateMarketplaceBundleInfos(t11)
 end
-local function updateMarketplaceLookInfoStore(t12: {[any]: any}) -- line: 112
+local function updateMarketplaceLookInfoStore(t12: {[any]: any}) -- line: 113
 	-- upvalues: DataHydration (copy)
 	DataHydration.MarketplaceLook.getMarketplaceLookStore(false).updateMarketplaceLookInfos(t12)
 end
-local function updateGamePassStore(t13: {[any]: any}) -- line: 116
+local function updateGamePassStore(t13: {[any]: any}) -- line: 117
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getGamePassStore(false).updateGamePassInfos(t13)
 end
-local function updatePlayabilityStore(t14: {[any]: any}) -- line: 120
+local function updatePlayabilityStore(t14: {[any]: any}) -- line: 121
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getPlayabilityStore(false).updatePlayabilities(t14)
 end
-local function updateGameDeveloperProductStore(t15: {[any]: any}) -- line: 124
+local function updateGameDeveloperProductStore(t15: {[any]: any}) -- line: 125
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getGameDeveloperProductStore(false).updateGameDeveloperProductInfos(t15)
 end
-local function updateGameSubscriptionStore(t16: {[any]: any}) -- line: 128
+local function updateGameSubscriptionStore(t16: {[any]: any}) -- line: 129
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getGameSubscriptionStore(false).updateGameSubscriptionInfos(t16)
 end
-local function updateFavoritesStore(t17: {[any]: any}) -- line: 132
+local function updateFavoritesStore(t17: {[any]: any}) -- line: 133
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getFavoritesStore(false).updateItems(t17)
 end
-local function updateUserVoteStore(t18: {[any]: any}) -- line: 136
+local function updateUserVoteStore(t18: {[any]: any}) -- line: 137
 	-- upvalues: DataHydration (copy)
 	DataHydration.Game.getVotesStore(false).updateUserVoteItems(t18)
 end
-local function calculateBadgeDerivedField(s1: string, p1, _) -- line: 148
+local function calculateBadgeDerivedField(s1: string, p1, _) -- line: 149
 	-- upvalues: protobufTimestampToLocalTimeString (copy)
 	if s1 == "created_time_formatted" then
-		local v78 = p1 and (p1.created_time or p1.createdTime)
-
-		return v78 and protobufTimestampToLocalTimeString(v78)
-	end
-
-	if s1 == "updated_time_formatted" then
-		local v79 = p1 and (p1.updated_time or p1.updatedTime)
-
-		return v79 and protobufTimestampToLocalTimeString(v79)
-	end
-
-	if s1 == "awarded_time_formatted" then
-		local v80 = p1 and (p1.awarded_time or p1.awardedTime)
+		local v80 = p1 and (p1.created_time or p1.createdTime)
 
 		return v80 and protobufTimestampToLocalTimeString(v80)
 	end
 
+	if s1 == "updated_time_formatted" then
+		local v81 = p1 and (p1.updated_time or p1.updatedTime)
+
+		return v81 and protobufTimestampToLocalTimeString(v81)
+	end
+
+	if s1 == "awarded_time_formatted" then
+		local v82 = p1 and (p1.awarded_time or p1.awardedTime)
+
+		return v82 and protobufTimestampToLocalTimeString(v82)
+	end
+
 	return nil
 end
-local function calculateUniverseDerivedField(s2: string, p3, _) -- line: 171
+local function calculateUniverseDerivedField(s2: string, p3, _) -- line: 172
 	-- upvalues: DataHydration (copy), FFlagSduiExperienceDetailsSupport (copy), LocalizationService (copy), getZendeskUrl (copy)
 	if s2 == "rating_text_formatted_brief" then
-		local v84 = tonumber(p3.totalUpVotes) or 0
-		local v85 = tonumber(p3.totalDownVotes) or 0
-		local v86 = DataHydration.Game.VotesUtils.calculateRating(v84, v85)
+		local v86 = tonumber(p3.totalUpVotes) or 0
+		local v87 = tonumber(p3.totalDownVotes) or 0
+		local v88 = DataHydration.Game.VotesUtils.calculateRating(v86, v87)
 		local t19 = {
-			upVotes = v84,
-			downVotes = v85,
-			rating = v86
+			upVotes = v86,
+			downVotes = v87,
+			rating = v88
 		}
 
 		return DataHydration.Game.VotesUtils.getRatingDisplayText(t19)
@@ -156,22 +157,22 @@ local function calculateUniverseDerivedField(s2: string, p3, _) -- line: 171
 
 	return nil
 end
-local function calculateAgeRecommendationDerivedField(s3: string, p5, _) -- line: 201
+local function calculateAgeRecommendationDerivedField(s3: string, p5, _) -- line: 202
 	-- upvalues: DataHydration (copy)
 	if s3 == "content_rating_image" then
-		local v92 = p5 and p5.igrsRating
+		local v94 = p5 and p5.igrsRating
 
-		return v92 and DataHydration.Game.AgeRecommendationUtils.getIgrsImage(v92)
+		return v94 and DataHydration.Game.AgeRecommendationUtils.getIgrsImage(v94)
 	end
 
 	if s3 == "filtered_descriptors" then
 		local t20 = {}
 
 		if p5 and p5.descriptors then
-			for _, v95 in p5.descriptors do
-				if v95.contains == true and v95.displayName and v95.displayName ~= "" then
+			for _, v97 in p5.descriptors do
+				if v97.contains == true and v97.displayName and v97.displayName ~= "" then
 					table.insert(t20, {
-						displayName = v95.displayName
+						displayName = v97.displayName
 					})
 				end
 			end
@@ -182,8 +183,8 @@ local function calculateAgeRecommendationDerivedField(s3: string, p5, _) -- line
 
 	if s3 == "contains_strong_language" then
 		if p5 and p5.descriptors then
-			for _, v97 in p5.descriptors do
-				if v97.contains == true and v97.name == "strong-language" then
+			for _, v99 in p5.descriptors do
+				if v99.contains == true and v99.name == "strong-language" then
 					return true
 				end
 			end
@@ -194,7 +195,7 @@ local function calculateAgeRecommendationDerivedField(s3: string, p5, _) -- line
 
 	return nil
 end
-local function getDataObjectSignal(p7, _: {[any]: any}, s4: string, b1: boolean?) -- line: 237
+local function getDataObjectSignal(p7, _: {[any]: any}, s4: string, b1: boolean?) -- line: 238
 	-- upvalues: DataHydration (copy), FFlagSduiHydrationFetchIfMissing (copy), FFlagSduiExperienceDetailsSupport (copy), SduiDataBindingContentType (copy), FFlagLuaAppVoteOptimisticUpdateRaceFix (copy), FFlagSduiDevStoreSeeAllSupport (copy), FFlagSduiEventDetailsSupport (copy), FFlagSduiMarketplaceCatalogCategorySupport (copy), FFlagSduiMarketplaceCatalogSortSupport (copy), FFlagSduiAddMarketplaceEntityDataHydration (copy)
 	if p7 == "badge" then
 		return DataHydration.Badges.getBadgeInfoStore(false).getBadgeInfo((tostring(s4)))
@@ -324,7 +325,7 @@ local t22 = {
 	capability = not not FFlagSduiCapabilityBindings or nil
 }
 
-local function calculateDerivedFieldValue(p8, s5: string, p9, p10) -- line: 448
+local function calculateDerivedFieldValue(p8, s5: string, p9, p10) -- line: 449
 	-- upvalues: calculateBadgeDerivedField (copy), FFlagSduiExperienceDetailsSupport (copy), calculateUniverseDerivedField (copy), calculateAgeRecommendationDerivedField (copy), SduiDataBindingContentType (copy), DataHydration (copy), FFlagSduiEventDetailsSupport (copy), getSduiServiceDependenciesStore (copy)
 	if p8 == "badge" then
 		return (calculateBadgeDerivedField(s5, p9, p10))
@@ -345,48 +346,70 @@ local function calculateDerivedFieldValue(p8, s5: string, p9, p10) -- line: 448
 	end
 
 	if (FFlagSduiExperienceDetailsSupport or FFlagSduiEventDetailsSupport) and p8 == "event" then
-		local v131 = DataHydration.ExperienceEvents.getExperienceEventInfoStore(false)
+		local v133 = DataHydration.ExperienceEvents.getExperienceEventInfoStore(false)
 		local localization = getSduiServiceDependenciesStore().getDependencies("SduiDataBinder").localization
 
-		return v131.calculateDerivedField(s5, p9, p10, localization)
+		return v133.calculateDerivedField(s5, p9, p10, localization)
 	end
 
 	return nil
 end
-local function getDataHydrationField(p11, t23: {[any]: any}, s6: string, p12, b2: boolean?) -- line: 492
-	-- upvalues: getDataObjectSignal (copy), tryGetPathFromData (copy), calculateDerivedFieldValue (copy)
+local function getUniverseIcon(s6: string, p11, p12) -- line: 500
+	-- upvalues: DataHydration (copy)
+	local v138 = DataHydration.Game.getGameIconStore(false).getAndFetchGameIcon(tostring(s6), p12)
+	local v139 = v138.data(p11)
+	local v140 = v138.status(p11)
+
+	if v139 and v139.url then
+		return v139.url, v140
+	end
+
+	return nil, v140
+end
+local function getDataHydrationField(p13, t23: {[any]: any}, s7: string, p14, b2: boolean?) -- line: 515
+	-- upvalues: FFlagSduiGameIconSupport (copy), getUniverseIcon (copy), DataHydration (copy), getDataObjectSignal (copy), tryGetPathFromData (copy), calculateDerivedFieldValue (copy)
 	if #t23 < 2 then
 		return nil, nil
 	end
 
-	local v138 = getDataObjectSignal(p11, t23, s6, b2)
+	if FFlagSduiGameIconSupport and p13 == "universe" and #t23 == 2 then
+		if t23[2] == "icon" then
+			return getUniverseIcon(s7, p14)
+		end
 
-	if not v138 then
-		local v139 = table.concat(t23, ".")
-
-		error(`No available data object for { p11 } { v139 } for id: { s6 }`)
+		if t23[2] == "largeIcon" then
+			return getUniverseIcon(s7, p14, DataHydration.Game.GameIconSize.Large)
+		end
 	end
 
-	local v140 = v138.data(p12)
-	local v141 = v138.status(p12)
+	local v146 = getDataObjectSignal(p13, t23, s7, b2)
 
-	if not v140 then
-		return nil, v141
+	if not v146 then
+		local v147 = table.concat(t23, ".")
+
+		error(`No available data object for { p13 } { v147 } for id: { s7 }`)
 	end
 
-	local v142, v143 = tryGetPathFromData(v140, t23, 2)
+	local v148 = v146.data(p14)
+	local v149 = v146.status(p14)
 
-	if v142 then
-		return v143, v141
+	if not v148 then
+		return nil, v149
+	end
+
+	local v150, v151 = tryGetPathFromData(v148, t23, 2)
+
+	if v150 then
+		return v151, v149
 	end
 
 	if #t23 == 2 then
-		local v144 = t23[2]
+		local v152 = t23[2]
 
-		return calculateDerivedFieldValue(p11, v144, v140, p12), v141
+		return calculateDerivedFieldValue(p13, v152, v148, p14), v149
 	end
 
-	return nil, v141
+	return nil, v149
 end
 
 local t24 = {
@@ -415,7 +438,7 @@ local t24 = {
 }
 
 return {
-	updateDataStores = function(t25: {[any]: any}) -- line: 596
+	updateDataStores = function(t25: {[any]: any}) -- line: 627
 		-- upvalues: DataHydration (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiDevStoreSeeAllSupport (copy), FFlagSduiEventDetailsSupport (copy), FFlagSduiMarketplaceCatalogCategorySupport (copy), FFlagSduiMarketplaceCatalogSortSupport (copy), FFlagSduiAddMarketplaceEntityDataHydration (copy)
 		if t25.badge then
 			local badge = t25.badge
@@ -540,91 +563,91 @@ return {
 		end
 	end,
 	getDataObjectSignal = getDataObjectSignal,
-	getFieldValue = function(p13, t26: {[any]: any}, s7: string, p14, b3: boolean?) -- line: 573
+	getFieldValue = function(p15, t26: {[any]: any}, s8: string, p16, b3: boolean?) -- line: 604
 		-- upvalues: t24 (copy)
 		if #t26 < 2 then
 			return nil, nil
 		end
 
-		local v150 = t24[p13]
+		local v158 = t24[p15]
 
-		if v150 == nil then
+		if v158 == nil then
 			return nil, nil
 		end
 
-		return v150(p13, t26, s7, p14, b3)
+		return v158(p15, t26, s8, p16, b3)
 	end,
 	calculateBadgeDerivedField = calculateBadgeDerivedField,
 	calculateUniverseDerivedField = calculateUniverseDerivedField,
-	isClientContentType = function(p15) -- line: 349
+	isClientContentType = function(p17) -- line: 350
 		-- upvalues: t22 (copy)
-		return t22[p15] or false
+		return t22[p17] or false
 	end,
-	getFieldValueForClientContentType = function(p16, t27: {[any]: any}, p17, p18) -- line: 353
+	getFieldValueForClientContentType = function(p18, t27: {[any]: any}, p19, p20) -- line: 354
 		-- upvalues: FFlagSduiClientPageScope (copy), SduiDataBindingContentType (copy), getSduiClientPageScope (copy), SduiDataBindingResponsiveFieldName (copy), Display (copy), Responsive (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagLuaAppEdpKeepFullPageOnPortraitRotation (copy), FFlagSduiCapabilityBindings (copy), SduiCapabilities (copy), FFlagSduiAppPolicyBindings (copy), getSduiPolicyStore (copy), resolveSduiPolicyField (copy), tryGetPathFromData (copy)
-		if FFlagSduiClientPageScope and p16 == SduiDataBindingContentType.clientPageScope then
-			local v107 = if not p18 then nil else p18.configKey
+		if FFlagSduiClientPageScope and p18 == SduiDataBindingContentType.clientPageScope then
+			local v109 = if not p20 then nil else p20.configKey
 
-			if not v107 or #t27 < 2 then
+			if not v109 or #t27 < 2 then
 				return nil
 			end
 
-			local v108 = t27[2]
+			local v110 = t27[2]
 
-			return getSduiClientPageScope(v107).getSignal(v108)(p17), nil
+			return getSduiClientPageScope(v109).getSignal(v110)(p19), nil
 		end
 
-		if p16 == SduiDataBindingContentType.responsive then
+		if p18 == SduiDataBindingContentType.responsive then
 			if #t27 ~= 2 then
 				return nil
 			end
 
-			local v109 = t27[2]
+			local v111 = t27[2]
 
-			if v109 == SduiDataBindingResponsiveFieldName.screenWidth then
-				return Display.GetDisplayStore(p17).getViewportSize(p17).X
+			if v111 == SduiDataBindingResponsiveFieldName.screenWidth then
+				return Display.GetDisplayStore(p19).getViewportSize(p19).X
 			end
 
-			if v109 == SduiDataBindingResponsiveFieldName.screenHeight then
-				return Display.GetDisplayStore(p17).getViewportSize(p17).Y
+			if v111 == SduiDataBindingResponsiveFieldName.screenHeight then
+				return Display.GetDisplayStore(p19).getViewportSize(p19).Y
 			end
 
-			if v109 == SduiDataBindingResponsiveFieldName.isPortrait then
-				local v110 = Display.GetDisplayStore(p17).getViewportSize(p17)
+			if v111 == SduiDataBindingResponsiveFieldName.isPortrait then
+				local v112 = Display.GetDisplayStore(p19).getViewportSize(p19)
 
-				return v110.X < v110.Y
+				return v112.X < v112.Y
 			end
 
-			if v109 == SduiDataBindingResponsiveFieldName.isSpatial then
-				return Display.GetDisplayStore(p17).getIsSpatial(p17)
+			if v111 == SduiDataBindingResponsiveFieldName.isSpatial then
+				return Display.GetDisplayStore(p19).getIsSpatial(p19)
 			end
 
-			if v109 == SduiDataBindingResponsiveFieldName.lastInput then
-				return Responsive.GetInputModeStore(p17).getLastInputType(p17)
+			if v111 == SduiDataBindingResponsiveFieldName.lastInput then
+				return Responsive.GetInputModeStore(p19).getLastInputType(p19)
 			end
 
-			if v109 == SduiDataBindingResponsiveFieldName.preferredInput then
-				return Responsive.GetInputModeStore(p17).getPreferredInputType(p17)
+			if v111 == SduiDataBindingResponsiveFieldName.preferredInput then
+				return Responsive.GetInputModeStore(p19).getPreferredInputType(p19)
 			end
 
-			if FFlagSduiExperienceDetailsSupport and v109 == SduiDataBindingResponsiveFieldName.isCompactTouch then
+			if FFlagSduiExperienceDetailsSupport and v111 == SduiDataBindingResponsiveFieldName.isCompactTouch then
 				if FFlagLuaAppEdpKeepFullPageOnPortraitRotation then
-					local v111 = Display.GetDisplayStore(p17).getViewportSize(p17)
-					local v112 = Responsive.GetInputModeStore(p17).getPreferredInputType(p17)
+					local v113 = Display.GetDisplayStore(p19).getViewportSize(p19)
+					local v114 = Responsive.GetInputModeStore(p19).getPreferredInputType(p19)
 
-					return Responsive.getIsCompactTouch(v111, v112)
+					return Responsive.getIsCompactTouch(v113, v114)
 				end
 
-				local v113 = Display.GetDisplayStore(p17).getViewportSize(p17)
-				local v114 = Responsive.GetInputModeStore(p17).getPreferredInputType(p17)
+				local v115 = Display.GetDisplayStore(p19).getViewportSize(p19)
+				local v116 = Responsive.GetInputModeStore(p19).getPreferredInputType(p19)
 				local maxWidth = Responsive.BreakpointConfig.sizes[Responsive.Keys.Small].maxWidth
-				local v116 = v113.X < v113.Y
+				local v118 = v115.X < v115.Y
 
-				return maxWidth >= v113.X and (v116 and v114 == Responsive.Input.Touch)
+				return maxWidth >= v115.X and (v118 and v116 == Responsive.Input.Touch)
 			end
 		end
 
-		if FFlagSduiCapabilityBindings and p16 == SduiDataBindingContentType.capability then
+		if FFlagSduiCapabilityBindings and p18 == SduiDataBindingContentType.capability then
 			if #t27 < 2 then
 				return nil
 			end
@@ -632,42 +655,42 @@ return {
 			return SduiCapabilities.isEnabled(t27[2])
 		end
 
-		if FFlagSduiAppPolicyBindings and p16 == SduiDataBindingContentType.policy then
+		if FFlagSduiAppPolicyBindings and p18 == SduiDataBindingContentType.policy then
 			if #t27 < 2 then
 				return nil
 			end
 
-			local v117 = getSduiPolicyStore().getAppPolicy(p17)
+			local v119 = getSduiPolicyStore().getAppPolicy(p19)
 
-			if v117 == nil then
-				local v118 = table.concat(t27, ".")
+			if v119 == nil then
+				local v120 = table.concat(t27, ".")
 
-				error(`Failed to find policy table when binding value { v118 }`)
+				error(`Failed to find policy table when binding value { v120 }`)
 			end
 
-			local v119 = t27[2]
-			local v120, v121 = resolveSduiPolicyField(v117, v119)
-
-			if v120 then
-				return v121
-			end
-
-			local v122 = v117.getRawPolicy()
+			local v121 = t27[2]
+			local v122, v123 = resolveSduiPolicyField(v119, v121)
 
 			if v122 then
-				local v123, v124 = tryGetPathFromData(v122, t27, 2)
+				return v123
+			end
 
-				if v123 then
-					return v124
+			local v124 = v119.getRawPolicy()
+
+			if v124 then
+				local v125, v126 = tryGetPathFromData(v124, t27, 2)
+
+				if v125 then
+					return v126
 				end
 
-				local v125 = table.concat(t27, ".")
+				local v127 = table.concat(t27, ".")
 
-				error(`Failed to find policy value for '{ v125 }'`)
+				error(`Failed to find policy value for '{ v127 }'`)
 			else
-				local v126 = table.concat(t27, ".")
+				local v128 = table.concat(t27, ".")
 
-				error(`Failed to find rawPolicy table when binding value { v126 }`)
+				error(`Failed to find rawPolicy table when binding value { v128 }`)
 			end
 		end
 

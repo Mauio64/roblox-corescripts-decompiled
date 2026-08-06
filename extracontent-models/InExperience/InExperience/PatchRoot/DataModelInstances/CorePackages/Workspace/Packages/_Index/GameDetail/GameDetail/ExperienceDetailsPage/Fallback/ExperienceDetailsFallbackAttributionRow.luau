@@ -19,7 +19,7 @@ local FFlagLuaAppLaunchWhenLoadingEdp = SharedFlags.FFlagLuaAppLaunchWhenLoading
 local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp = SharedFlags.FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp
 local FFlagLuaAppDemoModePlayButton = SharedFlags.FFlagLuaAppDemoModePlayButton
 
-local function VerifiedBadgeIcon() -- line: 62
+local function VerifiedBadgeIcon() -- line: 63
 	-- upvalues: useTokens (copy), React (copy), View (copy), Icon (copy), Foundation (copy)
 	local v23 = useTokens()
 
@@ -42,7 +42,7 @@ local function VerifiedBadgeIcon() -- line: 62
 		})
 	})
 end
-local function FallbackAttributionRow(t1: {[any]: any}) -- line: 84
+local function FallbackAttributionRow(t1: {[any]: any}) -- line: 85
 	-- upvalues: useTokens (copy), useImageLoadFade (copy), React (copy), View (copy), FoundationImage (copy), Skeleton (copy), FoundationText (copy), EnumsRadius (copy), VerifiedBadgeIcon (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), v1 (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy), FFlagLuaAppDemoModePlayButton (copy)
 	local v25 = useTokens()
 	local isSmallScreen = t1.isSmallScreen
@@ -79,6 +79,7 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 84
 	if t1.gameName then
 		v34 = React.createElement(FoundationText, {
 			LayoutOrder = 1,
+			testId = "--edp-fallback-attribution-title",
 			tag = {
 				["auto-xy text-wrap text-align-x-left text-truncate-none"] = true,
 				["text-heading-small"] = isSmallScreen,
@@ -106,6 +107,7 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 84
 			CreatorName = React.createElement(FoundationText, {
 				tag = "auto-xy text-body-medium content-default",
 				LayoutOrder = 1,
+				testId = "--edp-fallback-attribution-creator",
 				Text = t1.creatorName,
 				TextTruncate = Enum.TextTruncate.None
 			}),
@@ -125,6 +127,7 @@ local function FallbackAttributionRow(t1: {[any]: any}) -- line: 84
 		v37 = React.createElement(FoundationText, {
 			tag = "auto-xy text-body-medium content-default",
 			LayoutOrder = 3,
+			testId = "--edp-fallback-attribution-age-rating",
 			Text = t1.ageRecDisplayName
 		})
 	elseif v27 then

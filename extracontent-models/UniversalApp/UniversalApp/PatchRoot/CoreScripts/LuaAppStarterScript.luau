@@ -3,18 +3,19 @@ _G.LUAUFORGE_SENTRY_DEBUG_IDS = _G.LUAUFORGE_SENTRY_DEBUG_IDS or {}
 local v1 = debug.info(1, "s")
 
 if v1 and type(v1) == "string" then
-	_G.LUAUFORGE_SENTRY_DEBUG_IDS[v1] = "86e3272c-20d8-5058-a38a-21dd97d689ba"
+	_G.LUAUFORGE_SENTRY_DEBUG_IDS[v1] = "88877336-86b9-58e9-9c2b-1044656acec3"
 end
 
 local __ = _G.LUAUFORGE_SENTRY_DEBUG_IDS
 
+_G.IS_PRODUCTION = true
 _ = "apps/UniversalApp/build/app/bootstrap.luau"
 
 local t1 = nil
 
 t1 = {
 	cache = {},
-	load = function(p1) -- line: 6
+	load = function(p1) -- line: 11
 		-- upvalues: t1 (ref)
 		if not t1.cache[p1] then
 			t1.cache[p1] = {
@@ -26,10 +27,10 @@ t1 = {
 	end
 }
 
-local function createModuleLoader(__) -- line: 16
+local function createModuleLoader(__) -- line: 21
 	local t2 = {}
 
-	local function loadModule(p3, p4) -- line: 18
+	local function loadModule(p3, p4) -- line: 23
 		-- upvalues: t2 (copy)
 		local v27 = t2[p3]
 
@@ -48,10 +49,10 @@ local function createModuleLoader(__) -- line: 16
 
 	return loadModule
 end
-local function createChunkLoader(p5) -- line: 30
+local function createChunkLoader(p5) -- line: 35
 	local t3 = {}
 
-	local function resolveChunk(p6) -- line: 32
+	local function resolveChunk(p6) -- line: 37
 		-- upvalues: t3 (copy), p5 (copy), resolveChunk (copy)
 		local v30 = t3[p6]
 
@@ -66,7 +67,7 @@ local function createChunkLoader(p5) -- line: 30
 		}
 		local t5 = {}
 
-		local function loadModule(p7, p8) -- line: 18
+		local function loadModule(p7, p8) -- line: 23
 			-- upvalues: t5 (copy)
 			local v43 = t5[p7]
 
@@ -94,13 +95,13 @@ local function createChunkLoader(p5) -- line: 30
 
 	return resolveChunk
 end
-local function requireChunk(p9) -- line: 48
+local function requireChunk(p9) -- line: 53
 	return require(`@game/CorePackages/LuauForgeChunks/{ p9 }`)
 end
 
 local t6 = {}
 
-local function resolveChunk(p10) -- line: 32
+local function resolveChunk(p10) -- line: 37
 	-- upvalues: t6 (copy), requireChunk (copy), resolveChunk (copy)
 	local v18 = t6[p10]
 
@@ -115,7 +116,7 @@ local function resolveChunk(p10) -- line: 32
 	}
 	local t8 = {}
 
-	local function loadModule(p11, p12) -- line: 18
+	local function loadModule(p11, p12) -- line: 23
 		-- upvalues: t8 (copy)
 		local v39 = t8[p11]
 

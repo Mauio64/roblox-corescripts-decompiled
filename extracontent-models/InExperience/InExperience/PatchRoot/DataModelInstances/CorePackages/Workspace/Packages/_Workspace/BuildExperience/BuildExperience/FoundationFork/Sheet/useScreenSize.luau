@@ -1,36 +1,34 @@
 local Foundation = game:GetService("CorePackages").Packages._Index.Foundation.Foundation
 local FoundationParent = Foundation.Parent
 local React = require(FoundationParent.React)
-local Flags = require(Foundation.Utility.Flags)
-local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
 local useScreen = require(Foundation.Providers.Overlay.useScreen)
 
-local function useScreenSize() -- line: 9
-	-- upvalues: Flags (copy), useScreen (copy), useOverlay (copy), React (copy)
-	local v8 = if not Flags.FoundationOverlayKeyboardAwarenessHardened then useOverlay() else useScreen()
-	local v9, v10 = React.useState(v8 and v8.AbsoluteSize or Vector2.new(0, 0))
+local function useScreenSize() -- line: 7
+	-- upvalues: useScreen (copy), React (copy)
+	local v6 = useScreen()
+	local v7, v8 = React.useState(v6 and v6.AbsoluteSize or Vector2.new(0, 0))
 
-	React.useLayoutEffect(function() -- line: 13
-		-- upvalues: v8 (copy), v10 (copy)
+	React.useLayoutEffect(function() -- line: 11
+		-- upvalues: v6 (copy), v8 (copy)
 		local connection = nil
 
-		if v8 then
-			v10(v8.AbsoluteSize)
-			connection = v8:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 18
-				-- upvalues: v10 (copy), v8 (copy)
-				v10(v8.AbsoluteSize)
+		if v6 then
+			v8(v6.AbsoluteSize)
+			connection = v6:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 16
+				-- upvalues: v8 (copy), v6 (copy)
+				v8(v6.AbsoluteSize)
 			end)
 		end
 
-		return function() -- line: 23
+		return function() -- line: 21
 			-- upvalues: connection (ref)
 			if connection then
 				connection:Disconnect()
 			end
 		end
-	end, { v8 })
+	end, { v6 })
 
-	return v9
+	return v7
 end
 
 return useScreenSize

@@ -30,11 +30,12 @@ local GetReactionsStore = require(Moments.Stores.GetReactionsStore)
 local GetShareCountsStore = require(Moments.Stores.GetShareCountsStore)
 local GetFFlagMomentsFilterUnavailableFeedItems = require(Moments.Flags.GetFFlagMomentsFilterUnavailableFeedItems)
 local GetFFlagMomentsFixUnavailableDeeplink = require(Moments.Flags.GetFFlagMomentsFixUnavailableDeeplink)
+local GetFFlagMomentsShareDeeplinkReliableOpen = require(Moments.Flags.GetFFlagMomentsShareDeeplinkReliableOpen)
 local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
 
-local function defaultFetchDeepLinkedMoments(s1: string, s2: string?) -- line: 57
+local function defaultFetchDeepLinkedMoments(s1: string, s2: string?) -- line: 58
 	-- upvalues: Promise (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), fetchMomentsByIds (copy)
-	return Promise.resolve():andThen(function() -- line: 58
+	return Promise.resolve():andThen(function() -- line: 59
 		-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), fetchMomentsByIds (copy), s1 (copy), s2 (copy)
 		if FFlagMomentsPassFeedItemIdToBackendApis then
 			return (fetchMomentsByIds({ s1 }, s2))
@@ -43,7 +44,7 @@ local function defaultFetchDeepLinkedMoments(s1: string, s2: string?) -- line: 5
 		return (fetchMomentsByIds({ s1 }))
 	end)
 end
-local function hasDeepLinkIdentity(p1, s3: string) -- line: 71
+local function hasDeepLinkIdentity(p1, s3: string) -- line: 72
 	if s3 == p1.momentId then
 		return true
 	end
@@ -52,21 +53,21 @@ local function hasDeepLinkIdentity(p1, s3: string) -- line: 71
 
 	return recommendationMetadata ~= nil and s3 == recommendationMetadata.feedItemId
 end
-local function loadDeepLinkedMoments(p2: ((...any) -> ...any), s4: string, s5: string?, n1: number) -- line: 81
+local function loadDeepLinkedMoments(p2: ((...any) -> ...any), s4: string, s5: string?, n1: number) -- line: 82
 	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), Promise (copy)
-	local v30 = ((if not FFlagMomentsPassFeedItemIdToBackendApis then p2(s4) else p2(s4, s5))):catch(function() -- line: 91
+	local v31 = ((if not FFlagMomentsPassFeedItemIdToBackendApis then p2(s4) else p2(s4, s5))):catch(function() -- line: 92
 		return nil
 	end)
-	local v31 = Promise.delay(n1):andThen(function() -- line: 94
+	local v32 = Promise.delay(n1):andThen(function() -- line: 95
 		return nil
 	end)
-	local v32, v33 = Promise.race({
-		v30,
-		v31
+	local v33, v34 = Promise.race({
+		v31,
+		v32
 	}):await()
 
-	if v32 and type(v33) == "table" then
-		return v33
+	if v33 and type(v34) == "table" then
+		return v34
 	end
 
 	return {
@@ -75,157 +76,258 @@ local function loadDeepLinkedMoments(p2: ((...any) -> ...any), s4: string, s5: s
 		moments = {}
 	}
 end
-local function loadDeepLinkedMomentsForUnavailableDialog(p3: ((...any) -> ...any), s6: string, s7: string?, n2: number) -- line: 107
+local function loadDeepLinkedMomentsForUnavailableDialog(p3: ((...any) -> ...any), s6: string, s7: string?, n2: number) -- line: 108
 	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), Promise (copy)
-	local v38 = ((if not FFlagMomentsPassFeedItemIdToBackendApis then p3(s6) else p3(s6, s7))):catch(function() -- line: 116
+	local v39 = ((if not FFlagMomentsPassFeedItemIdToBackendApis then p3(s6) else p3(s6, s7))):catch(function() -- line: 117
 		return nil
 	end)
-	local v39 = Promise.delay(n2):andThen(function() -- line: 119
+	local v40 = Promise.delay(n2):andThen(function() -- line: 120
 		return nil
 	end)
-	local v40, v41 = Promise.race({
-		v38,
-		v39
+	local v41, v42 = Promise.race({
+		v39,
+		v40
 	}):await()
 
-	if v40 and type(v41) == "table" then
-		return v41
+	if v41 and type(v42) == "table" then
+		return v42
 	end
 
 	return nil
 end
-local function createMomentsFeedSource(p4, t1: {[any]: any}?) -- line: 130
-	-- upvalues: MomentsGetMomentsTrendingStore (copy), GetDeepLinkStore (copy), defaultFetchDeepLinkedMoments (copy), GetFFlagMomentsFixUnavailableDeeplink (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), RecommendationSource (copy), GetReactionsStore (copy), GetShareCountsStore (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), shouldShowMomentInFeed (copy), loadDeepLinkedMomentsForUnavailableDialog (copy), loadDeepLinkedMoments (copy)
-	local v44 = t1 or {}
-	local v45 = if v44.trendingStore == nil then MomentsGetMomentsTrendingStore(false) else v44.trendingStore
-	local v46 = v44.deepLinkStore or GetDeepLinkStore()
-	local v47 = v44.fetchDeepLinkedMoments or defaultFetchDeepLinkedMoments
-	local v48 = v44.deepLinkFetchTimeoutSeconds or 20
-	local v49 = GetFFlagMomentsFixUnavailableDeeplink() and GetFFlagMomentsFilterUnavailableFeedItems()
-	local u50 = nil
+local function createMomentsFeedSource(p4, t1: {[any]: any}?) -- line: 131
+	-- upvalues: MomentsGetMomentsTrendingStore (copy), GetDeepLinkStore (copy), defaultFetchDeepLinkedMoments (copy), GetFFlagMomentsFixUnavailableDeeplink (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), RecommendationSource (copy), GetReactionsStore (copy), GetShareCountsStore (copy), GetFFlagMomentsShareDeeplinkReliableOpen (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), shouldShowMomentInFeed (copy), loadDeepLinkedMomentsForUnavailableDialog (copy), loadDeepLinkedMoments (copy)
+	local v45 = t1 or {}
+	local v46 = if v45.trendingStore == nil then MomentsGetMomentsTrendingStore(false) else v45.trendingStore
+	local v47 = v45.deepLinkStore or GetDeepLinkStore()
+	local v48 = v45.fetchDeepLinkedMoments or defaultFetchDeepLinkedMoments
+	local v49 = v45.deepLinkFetchTimeoutSeconds or 20
+	local v50 = GetFFlagMomentsFixUnavailableDeeplink() and GetFFlagMomentsFilterUnavailableFeedItems()
+	local u51 = nil
 
 	return {
 		id = "trending",
 		recommendationSource = RecommendationSource.Trending,
-		fetchAsync = function(p5) -- line: 150
-			-- upvalues: u50 (ref), v44 (copy), v45 (copy), p4 (copy), GetReactionsStore (copy), GetShareCountsStore (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), v46 (copy), v49 (copy), shouldShowMomentInFeed (copy), loadDeepLinkedMomentsForUnavailableDialog (copy), v47 (copy), v48 (copy), loadDeepLinkedMoments (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy)
-			local v52 = p5 or u50
-			local signalTracker = v44.signalTracker
-			local v54 = if not signalTracker then nil else signalTracker:getSignalsPayload()
-			local v55, v56 = v45.getTrending(p4(false), v52, v54):await()
+		fetchAsync = function(p5) -- line: 151
+			-- upvalues: u51 (ref), v45 (copy), v46 (copy), p4 (copy), GetReactionsStore (copy), GetShareCountsStore (copy), GetFFlagMomentsShareDeeplinkReliableOpen (copy), v47 (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), shouldShowMomentInFeed (copy), v50 (copy), loadDeepLinkedMomentsForUnavailableDialog (copy), v48 (copy), v49 (copy), loadDeepLinkedMoments (copy)
+			local v53 = p5 or u51
+			local signalTracker = v45.signalTracker
+			local v55 = if not signalTracker then nil else signalTracker:getSignalsPayload()
+			local v56, v57 = v46.getTrending(p4(false), v53, v55):await()
 
-			if not v55 then
-				error(v56)
+			if not v56 then
+				error(v57)
 			end
 
-			u50 = v56.nextCursor or u50
+			u51 = v57.nextCursor or u51
 
 			if p5 == nil then
 				GetReactionsStore(false).clear()
 				GetShareCountsStore(false).clear()
 			end
 
-			GetReactionsStore(false).setBatchReactionCounts(v56.reactionsByMomentId or {})
-			GetShareCountsStore(false).setBatchShareCounts(v56.shareInfoByMomentId or {})
+			GetReactionsStore(false).setBatchReactionCounts(v57.reactionsByMomentId or {})
+			GetShareCountsStore(false).setBatchShareCounts(v57.shareInfoByMomentId or {})
 
 			local t2 = {}
+			local v59 = nil
+			local momentId = nil
 
 			if p5 == nil then
-				local v58 = if not FFlagMomentsPassFeedItemIdToBackendApis then nil else v46.consumeDeepLinkedMoment()
+				if GetFFlagMomentsShareDeeplinkReliableOpen() then
+					local v61 = v47.getDeepLinkedMomentId(false)
+					local v62 = if not FFlagMomentsPassFeedItemIdToBackendApis then nil else v47.getDeepLinkedMomentTargetIdType(false)
 
-				if not FFlagMomentsPassFeedItemIdToBackendApis then
-					local v59 = v46.consumeDeepLinkedMomentId()
+					if v61 ~= nil then
+						local t3 = {}
+						local v64 = nil
 
-					if v59 ~= nil then
-						v58 = {
-							targetIdType = nil,
-							targetId = v59
-						}
-					end
-				end
+						for _, v66 in v57.moments do
+							t3[v66.momentId] = true
 
-				if v58 ~= nil then
-					local targetId = v58.targetId
-					local targetIdType = v58.targetIdType
-					local t3 = {}
-					local v63 = false
+							if v64 == nil then
+								local v67
 
-					for _, v65 in v56.moments do
-						t3[v65.momentId] = true
-
-						if v49 then
-							local v66
-
-							if targetId == v65.momentId then
-								v66 = true
-							else
-								local recommendationMetadata = v65.recommendationMetadata
-
-								v66 = recommendationMetadata ~= nil and targetId == recommendationMetadata.feedItemId
-							end
-
-							if v66 and shouldShowMomentInFeed(v65) then
-								v63 = true
-							end
-						end
-					end
-
-					local v68 = if not v49 then loadDeepLinkedMoments(v47, targetId, targetIdType, v48) else loadDeepLinkedMomentsForUnavailableDialog(v47, targetId, targetIdType, v48)
-
-					if v68 ~= nil then
-						if v68.reactionsByMomentId then
-							GetReactionsStore(false).setBatchReactionCounts(v68.reactionsByMomentId)
-						end
-
-						if v68.shareInfoByMomentId then
-							GetShareCountsStore(false).setBatchShareCounts(v68.shareInfoByMomentId)
-						end
-
-						for _, v70 in v68.moments do
-							local v71 = not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v70)
-							local v72 = not v49
-
-							if not v72 then
-								if targetId == v70.momentId then
-									v72 = true
+								if v61 == v66.momentId then
+									v67 = true
 								else
-									local recommendationMetadata = v70.recommendationMetadata
+									local recommendationMetadata = v66.recommendationMetadata
 
-									v72 = recommendationMetadata ~= nil and targetId == recommendationMetadata.feedItemId
+									v67 = recommendationMetadata ~= nil and v61 == recommendationMetadata.feedItemId
+								end
+
+								if v67 then
+									v64 = v66
+								end
+							end
+						end
+
+						local v69 = false
+						local v70 = false
+
+						if v64 ~= nil and (not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v64)) then
+							table.insert(t2, {
+								kind = "moment",
+								moment = v64
+							})
+							momentId = v64.momentId
+							v69 = true
+						elseif v64 == nil or v50 then
+							local v71 = if not v50 then loadDeepLinkedMoments(v48, v61, v62, v49) else loadDeepLinkedMomentsForUnavailableDialog(v48, v61, v62, v49)
+
+							if v71 ~= nil then
+								if v71.reactionsByMomentId then
+									GetReactionsStore(false).setBatchReactionCounts(v71.reactionsByMomentId)
+								end
+
+								if v71.shareInfoByMomentId then
+									GetShareCountsStore(false).setBatchShareCounts(v71.shareInfoByMomentId)
+								end
+
+								for _, v73 in v71.moments do
+									local v74
+
+									if v61 == v73.momentId then
+										v74 = true
+									else
+										local recommendationMetadata = v73.recommendationMetadata
+
+										v74 = recommendationMetadata ~= nil and v61 == recommendationMetadata.feedItemId
+									end
+
+									local v76 = not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v73)
+									local v77 = not v50 or v74
+									local v78 = v74 or not t3[v73.momentId]
+
+									if v76 and v77 and v78 then
+										table.insert(t2, {
+											kind = "moment",
+											moment = v73
+										})
+
+										if v74 then
+											v69 = true
+										end
+									end
+								end
+
+								v70 = v50 and not v69
+							end
+						end
+
+						if v69 or v70 then
+							local v79 = v70
+
+							function v59() -- line: 270
+								-- upvalues: v47 (copy), v61 (copy), v79 (copy), v45 (copy)
+								if v47.getDeepLinkedMomentId(false) == v61 then
+									v47.setDeepLinkedMomentId(nil)
+
+									if v79 and v45.onDeepLinkedMomentUnavailable ~= nil then
+										v45.onDeepLinkedMomentUnavailable()
+									end
+								end
+							end
+						end
+					end
+				else
+					local v80 = if not FFlagMomentsPassFeedItemIdToBackendApis then nil else v47.consumeDeepLinkedMoment()
+
+					if not FFlagMomentsPassFeedItemIdToBackendApis then
+						local v81 = v47.consumeDeepLinkedMomentId()
+
+						if v81 ~= nil then
+							v80 = {
+								targetIdType = nil,
+								targetId = v81
+							}
+						end
+					end
+
+					if v80 ~= nil then
+						local targetId = v80.targetId
+						local targetIdType = v80.targetIdType
+						local t4 = {}
+						local v85 = false
+
+						for _, v87 in v57.moments do
+							t4[v87.momentId] = true
+
+							if v50 then
+								local v88
+
+								if targetId == v87.momentId then
+									v88 = true
+								else
+									local recommendationMetadata = v87.recommendationMetadata
+
+									v88 = recommendationMetadata ~= nil and targetId == recommendationMetadata.feedItemId
+								end
+
+								if v88 and shouldShowMomentInFeed(v87) then
+									v85 = true
+								end
+							end
+						end
+
+						local v90 = if not v50 then loadDeepLinkedMoments(v48, targetId, targetIdType, v49) else loadDeepLinkedMomentsForUnavailableDialog(v48, targetId, targetIdType, v49)
+
+						if v90 ~= nil then
+							if v90.reactionsByMomentId then
+								GetReactionsStore(false).setBatchReactionCounts(v90.reactionsByMomentId)
+							end
+
+							if v90.shareInfoByMomentId then
+								GetShareCountsStore(false).setBatchShareCounts(v90.shareInfoByMomentId)
+							end
+
+							for _, v92 in v90.moments do
+								local v93 = not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v92)
+								local v94 = not v50
+
+								if not v94 then
+									if targetId == v92.momentId then
+										v94 = true
+									else
+										local recommendationMetadata = v92.recommendationMetadata
+
+										v94 = recommendationMetadata ~= nil and targetId == recommendationMetadata.feedItemId
+									end
+								end
+
+								if v50 and v94 and v93 then
+									v85 = true
+								end
+
+								if v93 and v94 and not t4[v92.momentId] then
+									table.insert(t2, {
+										kind = "moment",
+										moment = v92
+									})
 								end
 							end
 
-							if v49 and v72 and v71 then
-								v63 = true
+							if v50 and not v85 and v45.onDeepLinkedMomentUnavailable ~= nil then
+								v45.onDeepLinkedMomentUnavailable()
 							end
-
-							if v71 and v72 and not t3[v70.momentId] then
-								table.insert(t2, {
-									kind = "moment",
-									moment = v70
-								})
-							end
-						end
-
-						if v49 and not v63 and v44.onDeepLinkedMomentUnavailable ~= nil then
-							v44.onDeepLinkedMomentUnavailable()
 						end
 					end
 				end
 			end
 
-			for _, v75 in v56.moments do
-				if if not GetFFlagMomentsFilterUnavailableFeedItems() then not v75.isModerated else shouldShowMomentInFeed(v75) then
+			for _, v97 in v57.moments do
+				if (not GetFFlagMomentsShareDeeplinkReliableOpen() or (momentId == nil or momentId ~= v97.momentId)) and if not GetFFlagMomentsFilterUnavailableFeedItems() then not v97.isModerated else shouldShowMomentInFeed(v97) then
 					table.insert(t2, {
 						kind = "moment",
-						moment = v75
+						moment = v97
 					})
 				end
 			end
 
 			return {
 				items = t2,
-				nextCursor = v56.nextCursor
+				nextCursor = v57.nextCursor,
+				onAccepted = v59
 			}
 		end
 	}

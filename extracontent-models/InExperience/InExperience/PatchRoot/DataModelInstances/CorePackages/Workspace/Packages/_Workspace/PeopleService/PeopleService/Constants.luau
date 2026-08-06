@@ -27,6 +27,11 @@ local t3 = {
 		PEOPLE_LIST = "people_list",
 		PEOPLE_CARD = "people_card",
 		PLAYER_PROFILE = "player_profile"
+	},
+	UX_VARIANT = {
+		SYNC = "sync",
+		DISABLE_WHEN_MUTED = "disable_when_muted",
+		INDEPENDENT = "independent"
 	}
 }
 

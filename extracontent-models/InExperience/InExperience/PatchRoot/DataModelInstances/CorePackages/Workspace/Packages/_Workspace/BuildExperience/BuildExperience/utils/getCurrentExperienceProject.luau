@@ -1,4 +1,4 @@
-local function getCurrentExperienceProject() -- line: 10
+local function getCurrentExperienceProject() -- line: 9
 	local GameId = game.GameId
 	local PlaceId = game.PlaceId
 

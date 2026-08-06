@@ -37,81 +37,82 @@ local useFormData = require(GenericAbuseReporting.Bedui.Provider.useFormData)
 local validateBeduiData = require(GenericAbuseReporting.Bedui.Provider.validateBeduiData)
 local ValueToAbuseCategory = require(GenericAbuseReporting.Enums.ValueToAbuseCategory)
 local FFlagAddThumbnailSelectorReport = require(GenericAbuseReportingParent.SharedFlags).FFlagAddThumbnailSelectorReport
+local FFlagGenericAbuseReportingUnifyReportTags = require(GenericAbuseReporting.Flags.FFlagGenericAbuseReportingUnifyReportTags)
 
-local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
-	-- upvalues: useTokens (copy), React (copy), useBeduiData (copy), useFormData (copy), useRoactService (copy), RoactNetworking (copy), useAnalyticsContext (copy), useLayerCollector (copy), AbuseReportBeduiContextStatus (copy), validateBeduiData (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), InnerContentConfigType (copy), Cryo (copy), Players (copy), AbuseVector (copy), getReportBody (copy), submitReportV1 (copy), Dash (copy), FFlagAddThumbnailSelectorReport (copy), getReportTags (copy), submitReport (copy), createReport (copy), ValueToAbuseCategory (copy), AbuseCategory (copy), SingleStepContainer (copy), SingleStepInnerContentRenderer (copy), ArgCheck (copy), ButtonVariant (copy), FillBehavior (copy), Skeleton (copy), EnumsRadius (copy), Empty (copy), Stepper (copy)
-	local v42 = useTokens()
-	local v43, v44 = React.useState({})
-	local v45 = useBeduiData()
+local function ReportFlowHandler(t1: {[any]: any}) -- line: 62
+	-- upvalues: useTokens (copy), React (copy), useBeduiData (copy), useFormData (copy), useRoactService (copy), RoactNetworking (copy), useAnalyticsContext (copy), useLayerCollector (copy), AbuseReportBeduiContextStatus (copy), validateBeduiData (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), InnerContentConfigType (copy), Cryo (copy), Players (copy), AbuseVector (copy), getReportBody (copy), submitReportV1 (copy), Dash (copy), FFlagGenericAbuseReportingUnifyReportTags (copy), FFlagAddThumbnailSelectorReport (copy), getReportTags (copy), submitReport (copy), createReport (copy), ValueToAbuseCategory (copy), AbuseCategory (copy), SingleStepContainer (copy), SingleStepInnerContentRenderer (copy), ArgCheck (copy), ButtonVariant (copy), FillBehavior (copy), Skeleton (copy), EnumsRadius (copy), Empty (copy), Stepper (copy)
+	local v43 = useTokens()
+	local v44, v45 = React.useState({})
+	local v46 = useBeduiData()
 	local formData = useFormData().formData
 	local additionalReportTags = useFormData().additionalReportTags
-	local v48 = useRoactService(RoactNetworking)
-	local v49 = useAnalyticsContext()
-	local isReportSubmitted = v49.isReportSubmitted
-	local setIsReportSubmitted = v49.setIsReportSubmitted
-	local v52 = useLayerCollector().absoluteSize.X < 540
-	local v53 = React.useMemo(function() -- line: 77
-		-- upvalues: v45 (copy), AbuseReportBeduiContextStatus (copy)
-		return v45 == nil or v45.status == AbuseReportBeduiContextStatus.Loading
-	end, { v45 })
-	local v54 = React.useMemo(function() -- line: 81
-		-- upvalues: v53 (copy), v45 (copy), validateBeduiData (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy), AbuseReportBeduiContextStatus (copy)
-		if v53 or v45 == nil then
+	local v49 = useRoactService(RoactNetworking)
+	local v50 = useAnalyticsContext()
+	local isReportSubmitted = v50.isReportSubmitted
+	local setIsReportSubmitted = v50.setIsReportSubmitted
+	local v53 = useLayerCollector().absoluteSize.X < 540
+	local v54 = React.useMemo(function() -- line: 78
+		-- upvalues: v46 (copy), AbuseReportBeduiContextStatus (copy)
+		return v46 == nil or v46.status == AbuseReportBeduiContextStatus.Loading
+	end, { v46 })
+	local v55 = React.useMemo(function() -- line: 82
+		-- upvalues: v54 (copy), v46 (copy), validateBeduiData (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy), AbuseReportBeduiContextStatus (copy)
+		if v54 or v46 == nil then
 			return true
 		end
 
-		local v58, v59 = validateBeduiData(v45.beduiData)
+		local v59, v60 = validateBeduiData(v46.beduiData)
 
-		if not v58 then
+		if not v59 then
 			sendAnalyticsEvent({
 				eventType = TelemetryEventType.Error,
-				context = v49,
+				context = v50,
 				meta = {
-					error = `ReportFlowHandler - Invalid Bedui data: { tostring(v59) }`
+					error = `ReportFlowHandler - Invalid Bedui data: { tostring(v60) }`
 				}
 			})
 
 			return true
 		end
 
-		return v45.status == AbuseReportBeduiContextStatus.Error
+		return v46.status == AbuseReportBeduiContextStatus.Error
 	end, {
-		v45,
-		v53,
+		v46,
+		v54,
 		validateBeduiData,
 		sendAnalyticsEvent,
-		v49
+		v50
 	})
-	local v55 = React.useCallback(function(p1) -- line: 100
-		-- upvalues: InnerContentConfigType (copy), formData (copy), v44 (copy), Cryo (copy), v43 (copy)
+	local v56 = React.useCallback(function(p1) -- line: 101
+		-- upvalues: InnerContentConfigType (copy), formData (copy), v45 (copy), Cryo (copy), v44 (copy)
 		if p1 == nil then
 			return true
 		end
 
-		local v61 = false
+		local v62 = false
 
 		if p1.type == InnerContentConfigType.ConfigurableComponentList then
-			for _, v63 in p1.configurableComponentList.components do
-				if not v63.isOptional and formData[v63.formDataKey] == nil then
-					v61 = true
-					v44(Cryo.List.join(v43, { v63.formDataKey }))
+			for _, v64 in p1.configurableComponentList.components do
+				if not v64.isOptional and formData[v64.formDataKey] == nil then
+					v62 = true
+					v45(Cryo.List.join(v44, { v64.formDataKey }))
 				end
 			end
 		end
 
-		return not v61
+		return not v62
 	end, {
 		formData,
-		v43
+		v44
 	})
-	local v56 = React.useCallback(function() -- line: 119
-		-- upvalues: Players (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy), t1 (copy), AbuseVector (copy), getReportBody (copy), formData (copy), additionalReportTags (copy), submitReportV1 (copy), v48 (copy), Dash (copy), FFlagAddThumbnailSelectorReport (copy), getReportTags (copy), submitReport (copy), createReport (copy), ValueToAbuseCategory (copy), AbuseCategory (copy)
+	local v57 = React.useCallback(function() -- line: 120
+		-- upvalues: Players (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy), t1 (copy), AbuseVector (copy), getReportBody (copy), formData (copy), additionalReportTags (copy), submitReportV1 (copy), v49 (copy), Dash (copy), FFlagGenericAbuseReportingUnifyReportTags (copy), FFlagAddThumbnailSelectorReport (copy), getReportTags (copy), submitReport (copy), createReport (copy), ValueToAbuseCategory (copy), AbuseCategory (copy)
 		local LocalPlayer = Players.LocalPlayer
 
 		if LocalPlayer == nil then
 			sendAnalyticsEvent({
 				eventType = TelemetryEventType.Error,
-				context = v49,
+				context = v50,
 				meta = {
 					error = "ReportFlowHandler - LocalPlayer is nil"
 				}
@@ -121,7 +122,7 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 		end
 
 		if t1.abuseVector == AbuseVector.AdV2 then
-			local v65 = getReportBody({
+			local v66 = getReportBody({
 				abuseVector = t1.abuseVector,
 				formData = formData,
 				localPlayerUserId = LocalPlayer.UserId,
@@ -129,27 +130,27 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 				additionalReportTags = additionalReportTags
 			})
 
-			submitReportV1(v48, v65):andThen(function(_) -- line: 141
-				-- upvalues: sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy), t1 (copy)
+			submitReportV1(v49, v66):andThen(function(_) -- line: 142
+				-- upvalues: sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy), t1 (copy)
 				sendAnalyticsEvent({
 					eventType = TelemetryEventType.Submitted,
-					context = v49
+					context = v50
 				})
 
 				if t1.onSubmit then
 					t1.onSubmit()
 				end
-			end):catch(function(p3) -- line: 150
-				-- upvalues: Dash (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy)
-				local v76 = Dash.pretty(p3, {
+			end):catch(function(p3) -- line: 151
+				-- upvalues: Dash (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy)
+				local v77 = Dash.pretty(p3, {
 					depth = 10
 				})
 
 				sendAnalyticsEvent({
 					eventType = TelemetryEventType.Error,
-					context = v49,
+					context = v50,
 					meta = {
-						error = `ReportFlowHandler - Submitting v1 report: { v76 }`
+						error = `ReportFlowHandler - Submitting v1 report: { v77 }`
 					}
 				})
 			end)
@@ -157,8 +158,8 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 			return
 		end
 
-		if FFlagAddThumbnailSelectorReport then
-			local v66 = getReportTags({
+		if FFlagGenericAbuseReportingUnifyReportTags or FFlagAddThumbnailSelectorReport then
+			local v67 = getReportTags({
 				formData = formData,
 				localPlayerUserId = tostring(LocalPlayer.UserId),
 				abuseVector = t1.abuseVector,
@@ -167,27 +168,27 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 				additionalReportTags = additionalReportTags
 			})
 
-			submitReport(v48, v66):andThen(function(_) -- line: 171
-				-- upvalues: sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy), t1 (copy)
+			submitReport(v49, v67):andThen(function(_) -- line: 172
+				-- upvalues: sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy), t1 (copy)
 				sendAnalyticsEvent({
 					eventType = TelemetryEventType.Submitted,
-					context = v49
+					context = v50
 				})
 
 				if t1.onSubmit then
 					t1.onSubmit()
 				end
-			end):catch(function(p5) -- line: 180
-				-- upvalues: Dash (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy)
-				local v79 = Dash.pretty(p5, {
+			end):catch(function(p5) -- line: 181
+				-- upvalues: Dash (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy)
+				local v80 = Dash.pretty(p5, {
 					depth = 10
 				})
 
 				sendAnalyticsEvent({
 					eventType = TelemetryEventType.Error,
-					context = v49,
+					context = v50,
 					meta = {
-						error = `ReportFlowHandler - Submitting report: { v79 }`
+						error = `ReportFlowHandler - Submitting report: { v80 }`
 					}
 				})
 			end)
@@ -195,7 +196,7 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 			return
 		end
 
-		local v67 = createReport({
+		local v68 = createReport({
 			abuseCategory = ValueToAbuseCategory[formData.legacy_abuse_category] or (formData.abuse_category or AbuseCategory.ABUSE_CATEGORY_INVALID),
 			abuseVector = t1.abuseVector,
 			comment = formData.free_comment,
@@ -204,23 +205,23 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 			custom = t1.custom
 		})
 
-		submitReport(v48, v67):andThen(function(_) -- line: 202
-			-- upvalues: sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy)
+		submitReport(v49, v68):andThen(function(_) -- line: 203
+			-- upvalues: sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy)
 			sendAnalyticsEvent({
 				eventType = TelemetryEventType.Submitted,
-				context = v49
+				context = v50
 			})
-		end):catch(function(p7) -- line: 208
-			-- upvalues: Dash (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy)
-			local v82 = Dash.pretty(p7, {
+		end):catch(function(p7) -- line: 209
+			-- upvalues: Dash (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy)
+			local v83 = Dash.pretty(p7, {
 				depth = 10
 			})
 
 			sendAnalyticsEvent({
 				eventType = TelemetryEventType.Error,
-				context = v49,
+				context = v50,
 				meta = {
-					error = `ReportFlowHandler - Submitting report: { v82 }`
+					error = `ReportFlowHandler - Submitting report: { v83 }`
 				}
 			})
 		end)
@@ -230,18 +231,18 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 		t1.abuseVector,
 		t1.targetId,
 		sendAnalyticsEvent,
-		v49
+		v50
 	})
-	local v57 = React.useMemo(function() -- line: 231
-		-- upvalues: v53 (copy), v54 (copy), v45 (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy), Dash (copy), v52 (copy), Cryo (copy), React (copy), SingleStepContainer (copy), v43 (copy), SingleStepInnerContentRenderer (copy), ArgCheck (copy), isReportSubmitted (copy), v56 (copy), setIsReportSubmitted (copy), v55 (copy), ButtonVariant (copy), FillBehavior (copy)
-		if v53 then
+	local v58 = React.useMemo(function() -- line: 232
+		-- upvalues: v54 (copy), v55 (copy), v46 (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy), Dash (copy), v53 (copy), Cryo (copy), React (copy), SingleStepContainer (copy), v44 (copy), SingleStepInnerContentRenderer (copy), ArgCheck (copy), isReportSubmitted (copy), v57 (copy), setIsReportSubmitted (copy), v56 (copy), ButtonVariant (copy), FillBehavior (copy)
+		if v54 then
 			return {}
 		end
 
-		if v54 or not v45.beduiData or not v45.beduiData.nodes then
+		if v55 or not v46.beduiData or not v46.beduiData.nodes then
 			sendAnalyticsEvent({
 				eventType = TelemetryEventType.Error,
-				context = v49,
+				context = v50,
 				meta = {
 					error = "ReportFlowHandler - Invalid Bedui data or no nodes found"
 				}
@@ -252,76 +253,76 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 
 		local t2 = {}
 
-		for _, v70 in v45.beduiData.nodes do
-			local v71 = Dash.joinDeep({}, v70)
-			local innerContentConfig = v71.innerContentConfig
-			local v73 = v52 and v70.footerContentConfig
+		for _, v71 in v46.beduiData.nodes do
+			local v72 = Dash.joinDeep({}, v71)
+			local innerContentConfig = v72.innerContentConfig
+			local v74 = v53 and v71.footerContentConfig
 
-			if v73 then
+			if v74 then
 				innerContentConfig = {
 					type = innerContentConfig.type,
 					configurableComponentList = {
-						components = Cryo.List.join(innerContentConfig.configurableComponentList.components, v71.footerContentConfig.configurableComponentList.components)
+						components = Cryo.List.join(innerContentConfig.configurableComponentList.components, v72.footerContentConfig.configurableComponentList.components)
 					}
 				}
 			end
 
-			if t2[v71.stepId] ~= nil then
+			if t2[v72.stepId] ~= nil then
 				sendAnalyticsEvent({
 					eventType = TelemetryEventType.Error,
-					context = v49,
+					context = v50,
 					meta = {
-						error = `ReportFlowHandler - Duplicate stepId found: { tostring(v71.stepId) }`
+						error = `ReportFlowHandler - Duplicate stepId found: { tostring(v72.stepId) }`
 					}
 				})
 
 				return {}
 			end
 
-			t2[v71.stepId] = {
+			t2[v72.stepId] = {
 				onStepCancel = nil,
-				stepId = v71.stepId,
-				predefinedNextStepId = v71.actionInfo.predefinedNextStepId,
+				stepId = v72.stepId,
+				predefinedNextStepId = v72.actionInfo.predefinedNextStepId,
 				content = React.createElement(SingleStepContainer, {
-					node = v71,
+					node = v72,
 					contentConfig = innerContentConfig,
-					formDataKeysWithError = v43
+					formDataKeysWithError = v44
 				}),
-				footer = if not v71.footerContentConfig or v73 then nil else React.createElement(SingleStepInnerContentRenderer, {
-					contentConfig = v71.footerContentConfig,
-					formDataKeysWithError = v43
+				footer = if not v72.footerContentConfig or v74 then nil else React.createElement(SingleStepInnerContentRenderer, {
+					contentConfig = v72.footerContentConfig,
+					formDataKeysWithError = v44
 				}),
 				labels = {
-					continueButton = v71.actionInfo.actionLabel
+					continueButton = v72.actionInfo.actionLabel
 				},
-				onStepContinue = function() -- line: 294
-					-- upvalues: ArgCheck (copy), isReportSubmitted (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v49 (copy), v71 (copy), v56 (copy), setIsReportSubmitted (copy)
+				onStepContinue = function() -- line: 295
+					-- upvalues: ArgCheck (copy), isReportSubmitted (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v50 (copy), v72 (copy), v57 (copy), setIsReportSubmitted (copy)
 					ArgCheck.assert(isReportSubmitted == false, "Report should only be able to be submitted once")
 
 					if isReportSubmitted then
 						sendAnalyticsEvent({
 							eventType = TelemetryEventType.Error,
-							context = v49,
+							context = v50,
 							meta = {
-								error = `ReportFlowHandler - Report already submitted for stepId: { tostring(v71.stepId) }`
+								error = `ReportFlowHandler - Report already submitted for stepId: { tostring(v72.stepId) }`
 							}
 						})
 					end
 
-					if v71.actionInfo.shouldSubmit and not isReportSubmitted then
-						v56()
+					if v72.actionInfo.shouldSubmit and not isReportSubmitted then
+						v57()
 						setIsReportSubmitted(true)
 					end
 				end,
-				validateState = function() -- line: 312
-					-- upvalues: v55 (copy), innerContentConfig (ref)
-					return v55(innerContentConfig)
+				validateState = function() -- line: 313
+					-- upvalues: v56 (copy), innerContentConfig (ref)
+					return v56(innerContentConfig)
 				end,
 				stepStyle = {
 					buttonXAlignment = "align-x-right",
 					continueButton = {
-						variant = if not v71.actionInfo.shouldSubmit then ButtonVariant.Standard else ButtonVariant.Emphasis,
-						fillBehavior = if not v52 then FillBehavior.Fit else FillBehavior.Fill
+						variant = if not v72.actionInfo.shouldSubmit then ButtonVariant.Standard else ButtonVariant.Emphasis,
+						fillBehavior = if not v53 then FillBehavior.Fit else FillBehavior.Fill
 					}
 				}
 			}
@@ -329,33 +330,33 @@ local function ReportFlowHandler(t1: {[any]: any}) -- line: 61
 
 		return t2
 	end, {
-		v53,
 		v54,
-		v45,
-		v43,
-		v52,
-		v56,
 		v55,
+		v46,
+		v44,
+		v53,
+		v57,
+		v56,
 		isReportSubmitted,
 		sendAnalyticsEvent,
-		v49
+		v50
 	})
 
-	if v53 then
+	if v54 then
 		return (React.createElement(Skeleton, {
 			radius = EnumsRadius.Medium,
-			Size = UDim2.new(1, 0, 0, v42.Size.Size_2500)
+			Size = UDim2.new(1, 0, 0, v43.Size.Size_2500)
 		}))
 	end
 
-	if v54 or not next(v57) then
+	if v55 or not next(v58) then
 		return (React.createElement(Empty, {}))
 	end
 
-	if next(v57) and v45.beduiData then
+	if next(v58) and v46.beduiData then
 		return (React.createElement(Stepper, {
-			currentStep = v45.beduiData.rootStepId,
-			steps = v57
+			currentStep = v46.beduiData.rootStepId,
+			steps = v58
 		}))
 	end
 

@@ -80,17 +80,28 @@ function variantsFactory(p1) -- line: 35
 				style = p1.Inverse.Content.Emphasis
 			}
 		},
-		[BadgeVariant.Neutral] = {
+		[BadgeVariant.Standard] = {
 			container = {
-				backgroundStyle = if not Flags.FoundationBadgeBetaUpdate then p1.Color.Shift.Shift_300 else p1.Color.ActionStandard.Background
+				backgroundStyle = p1.Color.ActionStandard.Background
 			},
 			content = {
-				style = if not Flags.FoundationBadgeBetaUpdate then p1.Color.Content.Emphasis else p1.Color.ActionStandard.Foreground
+				style = p1.Color.ActionStandard.Foreground
 			},
 			icon = {
 				style = p1.Color.ActionStandard.Foreground
 			}
 		},
+		[BadgeVariant.Neutral] = if not Flags.FoundationBadgeBetaUpdate then {
+			container = {
+				backgroundStyle = p1.Color.Shift.Shift_300
+			},
+			content = {
+				style = p1.Color.Content.Emphasis
+			},
+			icon = {
+				style = p1.Color.ActionStandard.Foreground
+			}
+		} else nil,
 		[BadgeVariant.OverMedia] = {
 			container = {
 				backgroundStyle = if not Flags.FoundationBadgeBetaUpdate then p1.LightMode.Surface.Surface_100 else p1.Color.OverMedia.OverMedia_0,
@@ -205,7 +216,7 @@ function variantsFactory(p1) -- line: 35
 	}
 end
 
-return function(p2, p3, p4, p5, p6, b1: boolean) -- line: 211
+return function(p2, p3, p4, p5, p6, b1: boolean) -- line: 218
 	-- upvalues: VariantsContext (copy), composeStyleVariant (copy), Flags (copy), Dash (copy)
 	local v25 = VariantsContext.useVariants("Badge", variantsFactory, p2)
 

@@ -9,13 +9,13 @@ require(script.Parent.PlaceVersionHistoryStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function debugRestore(s1: string) -- line: 22
+local function debugRestore(s1: string) -- line: 21
 	print(`[PlaceVersionHistoryRestoreDebug] { s1 }`)
 end
-local function debugNote(s2: string) -- line: 26
+local function debugNote(s2: string) -- line: 25
 	print(`[PlaceVersionHistoryNoteDebug] { s2 }`)
 end
-local function bodyPreview(p1) -- line: 30
+local function bodyPreview(p1) -- line: 29
 	if p1 == nil then
 		return "nil"
 	end
@@ -29,7 +29,7 @@ local function bodyPreview(p1) -- line: 30
 
 	return v24
 end
-local function appendQuery(s3: string, t1: {[any]: any}) -- line: 44
+local function appendQuery(s3: string, t1: {[any]: any}) -- line: 43
 	local v27 = false
 	local t2 = {}
 
@@ -46,7 +46,7 @@ local function appendQuery(s3: string, t1: {[any]: any}) -- line: 44
 
 	return s3 .. (string.find(s3, "?", 1, true) == nil and "?" or "&") .. table.concat(t2, "&")
 end
-local function historyUrl(s4: string, n1: number, p2) -- line: 61
+local function historyUrl(s4: string, n1: number, p2) -- line: 60
 	-- upvalues: appendQuery (copy)
 	local v34 = ("%s/place-version-history-api/v1/%d/history"):format(s4, n1)
 
@@ -61,30 +61,30 @@ local function historyUrl(s4: string, n1: number, p2) -- line: 61
 		pageSize = p2.pageSize or p2.limit
 	}))
 end
-local function notesUrl(s5: string, n2: number, s6: string) -- line: 69
+local function notesUrl(s5: string, n2: number, s6: string) -- line: 68
 	return ("%s/place-version-history-api/v1/%d/version/%s/notes"):format(s5, n2, s6)
 end
-local function revertUrl(s7: string, n3: number, n4: number) -- line: 73
+local function revertUrl(s7: string, n3: number, n4: number) -- line: 72
 	return ("%s/v1/assets/%d/revert-version?assetVersionNumber=%d"):format(s7, n3, n4)
 end
-local function rollbackUrl(s8: string, n5: number) -- line: 77
+local function rollbackUrl(s8: string, n5: number) -- line: 76
 	return ("%s/universes/v1/places/%d/rollback"):format(s8, n5)
 end
-local function resolveBase(t3: {[any]: any}?) -- line: 81
+local function resolveBase(t3: {[any]: any}?) -- line: 80
 	-- upvalues: UrlBase (copy)
 	local v44 = t3 or {}
 
 	return v44.network, v44.baseUrl or UrlBase.APIS
 end
-local function resolveDevelopBase(t4: {[any]: any}?) -- line: 86
+local function resolveDevelopBase(t4: {[any]: any}?) -- line: 85
 	-- upvalues: UrlBase (copy)
 	return (t4 or {}).developBaseUrl or UrlBase.new("develop")
 end
-local function resolveMutatingNetwork(t5: {[any]: any}?) -- line: 91
+local function resolveMutatingNetwork(t5: {[any]: any}?) -- line: 90
 	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
 	return (t5 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 end
-local function toNumber(p3) -- line: 96
+local function toNumber(p3) -- line: 95
 	if type(p3) == "number" then
 		return p3
 	end
@@ -97,7 +97,7 @@ local function toNumber(p3) -- line: 96
 end
 
 return {
-	fetchHistory = function(n6: number, t6: {[any]: any}?, p4) -- line: 108
+	fetchHistory = function(n6: number, t6: {[any]: any}?, p4) -- line: 107
 		-- upvalues: UrlBase (copy), historyUrl (copy), fetch (copy), asPromise (copy)
 		local v51 = t6 or {}
 		local network = v51.network
@@ -108,14 +108,14 @@ return {
 			analyticsKey = "place-version-history.get-history",
 			network = network,
 			url = v54,
-			decode = function(p5) -- line: 120
+			decode = function(p5) -- line: 119
 				return p5
 			end
 		})
 
 		return asPromise(v55)
 	end,
-	revertVersion = function(n7: number, n8: number, t7: {[any]: any}?) -- line: 127
+	revertVersion = function(n7: number, n8: number, t7: {[any]: any}?) -- line: 126
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), asPromise (copy)
 		local v59 = ("%s/v1/assets/%d/revert-version?assetVersionNumber=%d"):format((t7 or {}).developBaseUrl or UrlBase.new("develop"), n7, n8)
 		local v60 = fetch({
@@ -125,7 +125,7 @@ return {
 			network = (t7 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
 			url = v59,
 			body = {},
-			decode = function(_) -- line: 141
+			decode = function(_) -- line: 140
 				-- upvalues: n7 (copy), n8 (copy)
 				return {
 					assetId = n7,
@@ -136,7 +136,7 @@ return {
 
 		return asPromise(v60)
 	end,
-	rollbackPlace = function(n9: number, n10: number, s9: string?, b1: boolean?, t8: {[any]: any}?) -- line: 151
+	rollbackPlace = function(n9: number, n10: number, s9: string?, b1: boolean?, t8: {[any]: any}?) -- line: 150
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), bodyPreview (copy), asPromise (copy)
 		local v66 = t8 or {}
 		local _ = v66.network
@@ -151,7 +151,7 @@ return {
 				message = s9,
 				published = b1
 			},
-			analytics = function(_, p8, p9, p10, p11, p12) -- line: 170
+			analytics = function(_, p8, p9, p10, p11, p12) -- line: 169
 				-- upvalues: bodyPreview (copy)
 				if p10 == nil then
 					if p12 ~= "succeeded" then
@@ -171,7 +171,7 @@ return {
 
 				print(`[PlaceVersionHistoryRestoreDebug] { v89 }`)
 			end,
-			decode = function(p13) -- line: 192
+			decode = function(p13) -- line: 191
 				-- upvalues: n9 (copy), n10 (copy), s9 (copy)
 				local t9 = {
 					placeId = n9,
@@ -188,7 +188,7 @@ return {
 
 		return asPromise(v69)
 	end,
-	addVersionNote = function(n11: number, s10: string, p14, t10: {[any]: any}?) -- line: 204
+	addVersionNote = function(n11: number, s10: string, p14, t10: {[any]: any}?) -- line: 203
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), bodyPreview (copy), asPromise (copy)
 		local v74 = t10 or {}
 		local _ = v74.network
@@ -201,7 +201,7 @@ return {
 			network = (t10 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
 			url = ("%s/place-version-history-api/v1/%d/version/%s/notes"):format(v76, n11, s10),
 			body = p14,
-			analytics = function(_, p16, p17, p18, p19, p20) -- line: 219
+			analytics = function(_, p16, p17, p18, p19, p20) -- line: 218
 				-- upvalues: v77 (copy), v78 (copy), bodyPreview (copy)
 				if p18 == nil then
 					if p20 ~= "succeeded" then
@@ -221,7 +221,7 @@ return {
 
 				print(`[PlaceVersionHistoryNoteDebug] { v100 }`)
 			end,
-			decode = function(p21) -- line: 243
+			decode = function(p21) -- line: 242
 				-- upvalues: n11 (copy), s10 (copy)
 				return {
 					placeId = n11,

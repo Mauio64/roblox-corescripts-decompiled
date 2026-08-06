@@ -18,7 +18,7 @@ local t1 = {
 	size = InputSize.Large
 }
 
-local function ChatTextArea(p1, p2) -- line: 37
+local function ChatTextArea(p1, p2) -- line: 36
 	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), React (copy), InputField (copy), withCommonProps (copy), ChatInternalTextInput (copy)
 	local v16 = withDefaults(p1, t1)
 	local v17 = useTokens()
@@ -31,7 +31,7 @@ local function ChatTextArea(p1, p2) -- line: 37
 		hasError = v16.hasError,
 		isDisabled = v16.trailingElement == nil and v16.isDisabled,
 		isRequired = v16.isRequired,
-		input = function(p3) -- line: 52
+		input = function(p3) -- line: 51
 			-- upvalues: React (copy), ChatInternalTextInput (copy), v16 (copy), v17 (copy), v18 (copy)
 			return React.createElement(ChatInternalTextInput, {
 				alwaysMultiLine = true,

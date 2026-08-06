@@ -5,7 +5,7 @@ local turnState = require(script.Parent.turnState)
 
 require(script.Parent.types)
 
-local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1: {[any]: any}?) -- line: 34
+local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1: {[any]: any}?) -- line: 33
 	-- upvalues: createSignal (copy), turnState (copy), AcpProtocol (copy)
 	local v11, v12 = createSignal(p3 or turnState.createEmptyTurnState(s1, p1))
 	local t2 = {}
@@ -36,9 +36,9 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 		end
 	end
 
-	local function mutate(p4: ((...any) -> ...any)) -- line: 94
+	local function mutate(p4: ((...any) -> ...any)) -- line: 93
 		-- upvalues: v12 (copy)
-		v12(function(p5) -- line: 95
+		v12(function(p5) -- line: 94
 			-- upvalues: p4 (copy)
 			if p5.isDone then
 				return p5
@@ -51,10 +51,10 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 			return v63
 		end)
 	end
-	local function fireHandlers(p6) -- line: 105
+	local function fireHandlers(p6) -- line: 104
 		-- upvalues: t2 (copy)
 		for _, v32 in t2 do
-			local ok, result = pcall(function() -- line: 108
+			local ok, result = pcall(function() -- line: 107
 				-- upvalues: v32 (copy), p6 (copy)
 				v32(p6)
 			end)
@@ -64,12 +64,12 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 			end
 		end
 	end
-	local function completeFromResponse(p7) -- line: 117
+	local function completeFromResponse(p7) -- line: 116
 		-- upvalues: v12 (copy)
 		if p7.error then
 			local error = p7.error
 
-			local function v37(p8) -- line: 120
+			local function v37(p8) -- line: 119
 				-- upvalues: error (copy)
 				p8.error = tostring(error.message or "JSON-RPC error")
 				p8.errorCode = tonumber(error.code)
@@ -77,7 +77,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				p8.isDone = true
 			end
 
-			v12(function(p9) -- line: 95
+			v12(function(p9) -- line: 94
 				-- upvalues: v37 (copy)
 				if p9.isDone then
 					return p9
@@ -91,7 +91,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 			end)
 		end
 	end
-	local function getEventSequenceId(p10, p11) -- line: 129
+	local function getEventSequenceId(p10, p11) -- line: 128
 		local sequenceId = p10.sequenceId
 
 		if typeof(sequenceId) == "number" then
@@ -106,7 +106,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 
 		return nil
 	end
-	local function applyTerminalUpdate(p12) -- line: 143
+	local function applyTerminalUpdate(p12) -- line: 142
 		-- upvalues: v11 (copy), v12 (copy)
 		local v43 = p12.sessionUpdate == "state_change" and p12.state == "idle"
 
@@ -114,7 +114,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 			return
 		end
 
-		local function v44(p13) -- line: 148
+		local function v44(p13) -- line: 147
 			-- upvalues: v43 (copy), p12 (copy)
 			if p13.status == "queued" then
 				p13.status = "streaming"
@@ -129,7 +129,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 			end
 		end
 
-		v12(function(p14) -- line: 95
+		v12(function(p14) -- line: 94
 			-- upvalues: v44 (copy)
 			if p14.isDone then
 				return p14
@@ -145,27 +145,27 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 
 	return {
 		state = v11,
-		onNotification = function(p15) -- line: 84
+		onNotification = function(p15) -- line: 83
 			-- upvalues: n1 (ref), t2 (copy)
 			local v28 = n1
 
 			n1 += 1
 			t2[v28] = p15
 
-			return function() -- line: 88
+			return function() -- line: 87
 				-- upvalues: t2 (copy), v28 (copy)
 				t2[v28] = nil
 			end
 		end,
-		getLatestProcessedSequenceNumber = function() -- line: 214
+		getLatestProcessedSequenceNumber = function() -- line: 213
 			-- upvalues: u16 (ref)
 			return u16
 		end,
-		hasSequenceGap = function() -- line: 71
+		hasSequenceGap = function() -- line: 70
 			-- upvalues: n2 (ref)
 			return n2 > 0
 		end,
-		noteProcessedSequenceNumber = function(n3: number) -- line: 218
+		noteProcessedSequenceNumber = function(n3: number) -- line: 217
 			-- upvalues: t3 (copy), u16 (ref), u17 (ref), n2 (ref)
 			if t3[n3] == true then
 				return
@@ -198,7 +198,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 		end,
 		cancel = p2
 	}, {
-		dispatchFrame = function(p16, p17, b1: boolean?) -- line: 161
+		dispatchFrame = function(p16, p17, b1: boolean?) -- line: 160
 			-- upvalues: v11 (copy), AcpProtocol (copy), t3 (copy), u16 (ref), u17 (ref), n2 (ref), v12 (copy), fireHandlers (copy)
 			if v11(false).isDone then
 				return false
@@ -248,7 +248,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 						local v52 = v49.sessionUpdate == "state_change" and v49.state == "idle"
 
 						if v52 or v11(false).status == "queued" then
-							local function v53(p18) -- line: 148
+							local function v53(p18) -- line: 147
 								-- upvalues: v52 (copy), v49 (copy)
 								if p18.status == "queued" then
 									p18.status = "streaming"
@@ -263,7 +263,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 								end
 							end
 
-							v12(function(p19) -- line: 95
+							v12(function(p19) -- line: 94
 								-- upvalues: v53 (copy)
 								if p19.isDone then
 									return p19
@@ -290,7 +290,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				if response.error then
 					local error = response.error
 
-					local function v56(p20) -- line: 120
+					local function v56(p20) -- line: 119
 						-- upvalues: error (copy)
 						p20.error = tostring(error.message or "JSON-RPC error")
 						p20.errorCode = tonumber(error.code)
@@ -298,7 +298,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 						p20.isDone = true
 					end
 
-					v12(function(p21) -- line: 95
+					v12(function(p21) -- line: 94
 						-- upvalues: v56 (copy)
 						if p21.isDone then
 							return p21
@@ -317,7 +317,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 
 			return v48
 		end,
-		noteProcessedSequenceNumber = function(n4: number) -- line: 50
+		noteProcessedSequenceNumber = function(n4: number) -- line: 49
 			-- upvalues: t3 (copy), u16 (ref), u17 (ref), n2 (ref)
 			if t3[n4] == true then
 				return false
@@ -340,9 +340,9 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 
 			return true
 		end,
-		fail = function(s2: string, n5: number?) -- line: 194
+		fail = function(s2: string, n5: number?) -- line: 193
 			-- upvalues: v12 (copy)
-			local function v59(p22) -- line: 195
+			local function v59(p22) -- line: 194
 				-- upvalues: s2 (copy), n5 (copy)
 				p22.error = s2
 				p22.errorCode = n5
@@ -350,7 +350,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				p22.isDone = true
 			end
 
-			v12(function(p23) -- line: 95
+			v12(function(p23) -- line: 94
 				-- upvalues: v59 (copy)
 				if p23.isDone then
 					return p23
@@ -363,15 +363,15 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				return v80
 			end)
 		end,
-		markCancelled = function() -- line: 203
+		markCancelled = function() -- line: 202
 			-- upvalues: v12 (copy)
-			local function v60(p24) -- line: 204
+			local function v60(p24) -- line: 203
 				p24.status = "cancelled"
 				p24.stopReason = "cancelled"
 				p24.isDone = true
 			end
 
-			v12(function(p25) -- line: 95
+			v12(function(p25) -- line: 94
 				-- upvalues: v60 (copy)
 				if p25.isDone then
 					return p25
@@ -384,7 +384,7 @@ local function createTurnHandle(s1: string, p1, p2: ((...any) -> ...any), p3, t1
 				return v83
 			end)
 		end,
-		isDone = function() -- line: 229
+		isDone = function() -- line: 228
 			-- upvalues: v11 (copy)
 			return v11(false).isDone
 		end,

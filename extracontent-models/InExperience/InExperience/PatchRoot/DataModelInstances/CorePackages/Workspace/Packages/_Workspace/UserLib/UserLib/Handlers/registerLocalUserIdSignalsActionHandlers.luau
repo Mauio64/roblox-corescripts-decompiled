@@ -3,7 +3,7 @@ local UserLibParent = UserLib.Parent
 local ActionHandlers = require(UserLibParent.SignalsMiddleware).ActionHandlers
 local SetLocalUserId = require(UserLib.Actions.SetLocalUserId)
 local ClearUserSpecificData = require(UserLib.Actions.ClearUserSpecificData)
-local LocalUserIdStore = require(UserLib.Stores.LocalUserIdStore)
+local LocalUserIdStore = require(UserLibParent.LocalUserIdStore).LocalUserIdStore
 
 local function handleSetLocalUserId(t1: {[any]: any}) -- line: 21
 	-- upvalues: LocalUserIdStore (copy)

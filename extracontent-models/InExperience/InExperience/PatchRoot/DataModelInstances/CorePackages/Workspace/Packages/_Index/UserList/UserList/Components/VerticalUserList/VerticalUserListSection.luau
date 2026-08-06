@@ -12,10 +12,11 @@ local UserListHeader = require(UserList.Components.UserListHeader)
 local UserListFooter = require(UserList.Components.UserListFooter)
 local VerticalUserList = require(script.Parent.VerticalUserList)
 local v8 = game:DefineFastFlag("UserListTightHeaderSpacing", false)
+local FFlagUserListCtaIntegrationEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaIntegrationEnabled
 
-local function VerticalUserListSection(t1: {[any]: any}) -- line: 39
-	-- upvalues: React (copy), View (copy), v8 (copy), UserListHeader (copy), UserListFooter (copy), VerticalUserList (copy)
-	local v11 = if not t1.header then nil else React.createElement(View, {
+local function VerticalUserListSection(t1: {[any]: any}) -- line: 42
+	-- upvalues: React (copy), View (copy), v8 (copy), UserListHeader (copy), UserListFooter (copy), VerticalUserList (copy), FFlagUserListCtaIntegrationEnabled (copy)
+	local v12 = if not t1.header then nil else React.createElement(View, {
 		tag = {
 			["size-full-0 auto-y"] = true,
 			["padding-bottom-small"] = v8,
@@ -25,7 +26,7 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 39
 	}, {
 		HeaderContent = React.createElement(UserListHeader, t1.header)
 	})
-	local v12 = if not t1.hasMore or not t1.onLoadMore then nil else React.createElement(View, {
+	local v13 = if not t1.hasMore or not t1.onLoadMore then nil else React.createElement(View, {
 		tag = {
 			["size-full-0 auto-y"] = true,
 			["padding-top-large"] = v8 or t1.isScrollEnabled
@@ -48,9 +49,10 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 39
 			entities = t1.entities,
 			initialRowCount = t1.initialRowCount,
 			onRowSelected = t1.onRowSelectedOverride,
-			ListHeaderComponent = v11,
-			ListFooterComponent = v12,
+			ListHeaderComponent = v12,
+			ListFooterComponent = v13,
 			renderRow = t1.renderRow,
+			ctaConfig = if not FFlagUserListCtaIntegrationEnabled then nil else t1.ctaConfig,
 			layoutOrder = t1.layoutOrder,
 			configs = t1.configs
 		})
@@ -63,7 +65,7 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 39
 		},
 		LayoutOrder = t1.layoutOrder
 	}, {
-		Header = v11,
+		Header = v12,
 		List = React.createElement(VerticalUserList, {
 			layoutOrder = 2,
 			isScrollEnabled = false,
@@ -71,9 +73,10 @@ local function VerticalUserListSection(t1: {[any]: any}) -- line: 39
 			initialRowCount = t1.initialRowCount,
 			onRowSelected = t1.onRowSelectedOverride,
 			renderRow = t1.renderRow,
+			ctaConfig = if not FFlagUserListCtaIntegrationEnabled then nil else t1.ctaConfig,
 			configs = t1.configs
 		}),
-		Footer = v12
+		Footer = v13
 	})
 end
 

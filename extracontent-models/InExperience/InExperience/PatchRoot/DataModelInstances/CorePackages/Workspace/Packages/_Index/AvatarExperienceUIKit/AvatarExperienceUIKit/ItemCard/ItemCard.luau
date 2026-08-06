@@ -14,17 +14,16 @@ require(AvatarExperienceUIKit.BackgroundLayers.BackgroundLayers)
 local ItemCardBackgroundsWrapper = require(script.Parent.ItemCardBackgroundsWrapper)
 local AvatarExperienceFlags = require(AvatarExperienceUIKitParent.AvatarExperienceFlags)
 local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
-local FFlagAXLookAndFeelBackgrounds = AvatarExperienceFlags.FFlagAXLookAndFeelBackgrounds
 local FFlagAXSelectedBorderWrapsBackground = AvatarExperienceFlags.FFlagAXSelectedBorderWrapsBackground
 
-return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 33
-	-- upvalues: FFlagAXMigrateAXToGlobalAutofocus (copy), useSelectionCursor (copy), CursorKind (copy), useTokens (copy), React (copy), FFlagAXMISEnableMultiShopping (copy), FFlagAXLookAndFeelBackgrounds (copy), ItemCardBackgroundsWrapper (copy), FFlagAXSelectedBorderWrapsBackground (copy), View (copy)
-	local v18 = if not FFlagAXMigrateAXToGlobalAutofocus then nil else useSelectionCursor(CursorKind.RoundedRect)
-	local v19 = useTokens()
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 32
+	-- upvalues: FFlagAXMigrateAXToGlobalAutofocus (copy), useSelectionCursor (copy), CursorKind (copy), useTokens (copy), React (copy), FFlagAXMISEnableMultiShopping (copy), ItemCardBackgroundsWrapper (copy), FFlagAXSelectedBorderWrapsBackground (copy), View (copy)
+	local v17 = if not FFlagAXMigrateAXToGlobalAutofocus then nil else useSelectionCursor(CursorKind.RoundedRect)
+	local v18 = useTokens()
 
 	return React.createElement("TextButton", {
 		Selectable = if not FFlagAXMISEnableMultiShopping then nil else t1.Selectable,
-		SelectionImageObject = v18,
+		SelectionImageObject = v17,
 		Text = "",
 		AutoButtonColor = false,
 		BackgroundTransparency = 1,
@@ -36,12 +35,12 @@ return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 33
 		LayoutOrder = t1.LayoutOrder,
 		SelectionGroup = true,
 		[React.Tag] = t1.tag
-	}, if not FFlagAXLookAndFeelBackgrounds or (t1.backgroundLayers == nil or not (#t1.backgroundLayers > 0)) then {
+	}, if t1.backgroundLayers == nil or not (#t1.backgroundLayers > 0) then {
 		ItemCardListLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, v19.Gap.Small)
+			Padding = UDim.new(0, v18.Gap.Small)
 		}),
 		ItemCardHeaderSlot = t1.headerSlot,
 		ItemCardFooterSlot = t1.footerSlot

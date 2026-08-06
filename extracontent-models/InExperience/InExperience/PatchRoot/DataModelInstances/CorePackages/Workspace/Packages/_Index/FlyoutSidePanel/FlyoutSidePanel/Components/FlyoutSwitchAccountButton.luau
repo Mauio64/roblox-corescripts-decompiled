@@ -5,10 +5,11 @@ local Foundation = require(Parent.Foundation)
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local ButtonSize = Foundation.Enums.ButtonSize
+local FFlagCTAChangeMorePageFlyoutButtonText = require(Parent.SharedFlags).FFlagCTAChangeMorePageFlyoutButtonText
 
-local function FlyoutSwitchAccountButton(p1) -- line: 16
-	-- upvalues: React (copy), useLocalization (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
-	local v10 = React.useCallback(function() -- line: 17
+local function FlyoutSwitchAccountButton(p1) -- line: 19
+	-- upvalues: React (copy), useLocalization (copy), FFlagCTAChangeMorePageFlyoutButtonText (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
+	local v11 = React.useCallback(function() -- line: 20
 		-- upvalues: p1 (copy)
 		p1.closeDrawer()
 
@@ -19,16 +20,16 @@ local function FlyoutSwitchAccountButton(p1) -- line: 16
 		p1.onSwitchAccountActivated,
 		p1.closeDrawer
 	})
-	local v11 = useLocalization({
-		title = "Authentication.AccountSwitch.Action.SwitchAccount"
+	local v12 = useLocalization({
+		title = not FFlagCTAChangeMorePageFlyoutButtonText and "Authentication.AccountSwitch.Action.SwitchAccount" or "Authentication.AccountSwitch.Header.SwitchAccountSentenceCase"
 	})
 
 	return React.createElement(Button, {
 		isDisabled = false,
-		text = v11.title,
+		text = v12.title,
 		variant = ButtonVariant.Standard,
 		LayoutOrder = p1.layoutOrder,
-		onActivated = v10,
+		onActivated = v11,
 		size = ButtonSize.Large,
 		width = UDim.new(1, 0)
 	})

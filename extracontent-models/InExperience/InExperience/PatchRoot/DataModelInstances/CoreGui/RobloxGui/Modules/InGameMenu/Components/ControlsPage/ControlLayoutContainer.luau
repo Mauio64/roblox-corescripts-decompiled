@@ -26,7 +26,7 @@ local v22 = t.strictInterface({
 	closeButtonRef = t.optional(t.table)
 })
 
-local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 52
+local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 53
 	-- upvalues: GlobalConfig (copy), v22 (copy), withLocalization (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), v11 (copy), ImageSetButton (copy), ThemedTextLabel (copy), Divider (copy), ImageSetLabel (copy)
 	if GlobalConfig.propValidation then
 		assert(v22(p1))
@@ -34,9 +34,9 @@ local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 52
 
 	return withLocalization({
 		titleText = p1.titleText
-	})(function(p3) -- line: 59
+	})(function(p3) -- line: 60
 		-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), p1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), p2 (copy), v11 (copy), ImageSetButton (copy), ThemedTextLabel (copy), Divider (copy), ImageSetLabel (copy)
-		return withFoundationOrUIBloxStyle(function(p4) -- line: 60
+		return withFoundationOrUIBloxStyle(function(p4) -- line: 61
 			return {
 				Theme = {
 					Overlay = {
@@ -45,7 +45,7 @@ local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 52
 					}
 				}
 			}
-		end, function(p5) -- line: 69
+		end, function(p5) -- line: 70
 			-- upvalues: Roact (copy), p1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), Assets (copy), p2 (copy), v11 (copy), ImageSetButton (copy), ThemedTextLabel (copy), p3 (copy), Divider (copy), ImageSetLabel (copy)
 			return Roact.createElement("Frame", {
 				BackgroundTransparency = 0,
@@ -115,6 +115,9 @@ local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 52
 					Image = Assets.Images.RadialGlow,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
+					backgroundStyle = {
+						Transparency = 1
+					},
 					SizeConstraint = Enum.SizeConstraint.RelativeXX,
 					Size = UDim2.new(1, 0, 1, 0)
 				}),
@@ -129,6 +132,9 @@ local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 52
 					Image = Assets.Images.RadialGlow,
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 1, 0),
+					backgroundStyle = {
+						Transparency = 1
+					},
 					SizeConstraint = Enum.SizeConstraint.RelativeXX,
 					Size = UDim2.new(1, 0, 0.6, 0)
 				})
@@ -136,18 +142,18 @@ local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 52
 		end)
 	end)
 end
-local function ControlLayoutContainer(p6) -- line: 179
+local function ControlLayoutContainer(p6) -- line: 182
 	-- upvalues: v10 (copy), ControlLayoutContainerWithSelectionCursor (copy)
-	return v10(function(p7) -- line: 180
+	return v10(function(p7) -- line: 183
 		-- upvalues: ControlLayoutContainerWithSelectionCursor (copy), p6 (copy)
 		return ControlLayoutContainerWithSelectionCursor(p6, p7)
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p8) -- line: 185
+return RoactRodux.UNSTABLE_connect2(nil, function(p8) -- line: 188
 	-- upvalues: NavigateBack (copy)
 	return {
-		onClosed = function() -- line: 187
+		onClosed = function() -- line: 190
 			-- upvalues: p8 (copy), NavigateBack (copy)
 			p8(NavigateBack())
 		end

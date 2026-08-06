@@ -5,7 +5,7 @@ local React = require(FoundationParent.React)
 local Button = require(Foundation.Components.Button)
 local CloseAffordance = require(Foundation.Components.CloseAffordance)
 local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local FillBehavior = require(Foundation.Enums.FillBehavior)
 local Flags = require(Foundation.Utility.Flags)
 local InputSize = require(Foundation.Enums.InputSize)
@@ -40,7 +40,7 @@ local function stepsText(n1: number, n2: number) -- line: 75
 	})
 end
 local function Coachmark(p1, p2) -- line: 79
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useScaledValue (copy), React (copy), Logger (copy), InputSize (copy), FillBehavior (copy), Dash (copy), Button (copy), Popover (copy), withCommonProps (copy), Flags (copy), Radius (copy), PresentationContext (copy), ColorMode (copy), View (copy), CloseAffordance (copy), CloseAffordanceVariant (copy), Text (copy), Translator (copy)
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useScaledValue (copy), React (copy), Logger (copy), InputSize (copy), FillBehavior (copy), Dash (copy), Button (copy), Popover (copy), withCommonProps (copy), Flags (copy), Radius (copy), PresentationContext (copy), ColorNamespace (copy), View (copy), CloseAffordance (copy), CloseAffordanceVariant (copy), Text (copy), Translator (copy)
 	local v32 = withDefaults(p1, t1)
 	local v33 = useTokens()
 	local v34 = useScaledValue(320)
@@ -109,7 +109,7 @@ local function Coachmark(p1, p2) -- line: 79
 	local Provider = PresentationContext.Provider
 	local t7 = {
 		value = {
-			colorMode = ColorMode.Inverse
+			colorNamespace = ColorNamespace.Inverse
 		}
 	}
 	local createElement4 = React.createElement

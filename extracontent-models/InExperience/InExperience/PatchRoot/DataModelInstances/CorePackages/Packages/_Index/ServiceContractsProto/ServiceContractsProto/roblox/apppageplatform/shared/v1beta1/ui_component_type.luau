@@ -4,7 +4,7 @@ require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
 return {
 	UiComponentType = ({
 		UiComponentType = {
-			fromNumber = function(n1: number) -- line: 102
+			fromNumber = function(n1: number) -- line: 104
 				if n1 == 0 then
 					return "UI_COMPONENT_TYPE_INVALID"
 				end
@@ -281,6 +281,14 @@ return {
 					return "UI_COMPONENT_TYPE_LOGO"
 				end
 
+				if n1 == 254 then
+					return "UI_COMPONENT_TYPE_FEEDBACK_BANNER"
+				end
+
+				if n1 == 255 then
+					return "UI_COMPONENT_TYPE_GAME_SORT_DROP_DOWN"
+				end
+
 				if n1 == 300 then
 					return "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS"
 				end
@@ -339,7 +347,7 @@ return {
 
 				return nil
 			end,
-			toNumber = function(p1) -- line: 274
+			toNumber = function(p1) -- line: 280
 				if p1 == "UI_COMPONENT_TYPE_INVALID" then
 					return 0
 				end
@@ -616,6 +624,14 @@ return {
 					return 253
 				end
 
+				if p1 == "UI_COMPONENT_TYPE_FEEDBACK_BANNER" then
+					return 254
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_GAME_SORT_DROP_DOWN" then
+					return 255
+				end
+
 				if p1 == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then
 					return 300
 				end
@@ -674,7 +690,7 @@ return {
 
 				return p1
 			end,
-			fromName = function(s1: string) -- line: 446
+			fromName = function(s1: string) -- line: 456
 				if s1 == "UI_COMPONENT_TYPE_INVALID" then
 					return "UI_COMPONENT_TYPE_INVALID"
 				end
@@ -949,6 +965,14 @@ return {
 
 				if s1 == "UI_COMPONENT_TYPE_LOGO" then
 					return "UI_COMPONENT_TYPE_LOGO"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_FEEDBACK_BANNER" then
+					return "UI_COMPONENT_TYPE_FEEDBACK_BANNER"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_GAME_SORT_DROP_DOWN" then
+					return "UI_COMPONENT_TYPE_GAME_SORT_DROP_DOWN"
 				end
 
 				if s1 == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then

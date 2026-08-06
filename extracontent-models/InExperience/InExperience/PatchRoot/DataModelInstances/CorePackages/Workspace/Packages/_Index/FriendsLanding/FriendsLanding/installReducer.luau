@@ -2,20 +2,19 @@ local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
 local dependencies = require(FriendsLanding.dependencies)
 local Rodux = dependencies.Rodux
 local RoduxNetworking = dependencies.RoduxNetworking
-local RoduxUserPermissions = dependencies.RoduxUserPermissions
-local RoduxAnalytics = dependencies.RoduxAnalytics
+local FFlagFriendsLandingDeprecateUnusedMapToUsers = require(FriendsLanding.Flags.FFlagFriendsLandingDeprecateUnusedMapToUsers)
 
-return function() -- line: 9
-	-- upvalues: Rodux (copy), RoduxUserPermissions (copy), RoduxNetworking (copy), RoduxAnalytics (copy)
+return function() -- line: 10
+	-- upvalues: Rodux (copy), FFlagFriendsLandingDeprecateUnusedMapToUsers (copy), dependencies (copy), RoduxNetworking (copy)
 	return Rodux.combineReducers({
-		DeletedUsers = require(script.DeletedUsers),
-		VerifiedUsers = require(script.VerifiedUsers),
-		InactiveFriends = require(script.InactiveFriends),
-		Users = require(script.Users),
+		DeletedUsers = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then require(script.DeletedUsers) else nil,
+		VerifiedUsers = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then require(script.VerifiedUsers) else nil,
+		InactiveFriends = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then require(script.InactiveFriends) else nil,
+		Users = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then require(script.Users) else nil,
 		Friends = require(script.Friends)(),
-		Presence = require(script.Presence),
-		UserPermissions = RoduxUserPermissions.installReducer(),
+		Presence = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then require(script.Presence) else nil,
+		UserPermissions = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then dependencies.RoduxUserPermissions.installReducer() else nil,
 		NetworkStatus = RoduxNetworking.installReducer(),
-		Analytics = RoduxAnalytics.installReducer()
+		Analytics = if not FFlagFriendsLandingDeprecateUnusedMapToUsers then dependencies.RoduxAnalytics.installReducer() else nil
 	})
 end

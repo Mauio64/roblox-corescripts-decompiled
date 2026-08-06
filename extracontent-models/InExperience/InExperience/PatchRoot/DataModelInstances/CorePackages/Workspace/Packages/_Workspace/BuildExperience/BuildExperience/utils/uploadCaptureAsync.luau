@@ -4,9 +4,9 @@ local debug = require(Parent.DataHydration.CreatorAgentChat).debug
 local CaptureService = game:GetService("CaptureService")
 local t1 = {}
 
-local function uploadCaptureAsync(p1) -- line: 21
+local function uploadCaptureAsync(p1) -- line: 20
 	-- upvalues: Promise (copy), t1 (copy), debug (copy), CaptureService (copy)
-	local ok, result = pcall(function() -- line: 22
+	local ok, result = pcall(function() -- line: 21
 		return game:GetEngineFeature("CaptureServiceStartUploadCoreScriptBypass")
 	end)
 
@@ -24,9 +24,9 @@ local function uploadCaptureAsync(p1) -- line: 21
 
 	debug.log("info", "capture_upload starting")
 
-	return Promise.new(function(resolve, reject) -- line: 36
+	return Promise.new(function(resolve, reject) -- line: 35
 		-- upvalues: CaptureService (copy), p1 (copy), debug (copy), t1 (copy)
-		local ok2, result2, v15 = pcall(function() -- line: 37
+		local ok2, result2, v15 = pcall(function() -- line: 36
 			-- upvalues: CaptureService (copy), p1 (copy)
 			return CaptureService:StartUploadCaptureAsync(p1)
 		end)
@@ -52,7 +52,7 @@ local function uploadCaptureAsync(p1) -- line: 21
 		for _ = 1, 30 do
 			task.wait(2)
 
-			local ok3, result3, v19 = pcall(function() -- line: 56
+			local ok3, result3, v19 = pcall(function() -- line: 55
 				-- upvalues: CaptureService (copy), v15 (copy)
 				return CaptureService:CheckUploadCaptureStatusAsync(v15)
 			end)

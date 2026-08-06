@@ -364,7 +364,6 @@ local function FriendsChatInputBarHost(t1: {[any]: any}) -- line: 115
 		}),
 		inputBar = React.createElement(ChatInputBarView, {
 			showSideChip = false,
-			retainFocusOnSend = true,
 			onSend = v68,
 			canLocalUserChat = not isTimedOut or false,
 			disabledOverlay = v72,

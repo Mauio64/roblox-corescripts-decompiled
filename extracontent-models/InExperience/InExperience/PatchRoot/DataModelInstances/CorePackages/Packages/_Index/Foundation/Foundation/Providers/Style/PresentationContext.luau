@@ -1,10 +1,10 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local React = require(FoundationParent.React)
 local v5 = React.createContext({
 	isIconSize = false,
-	colorMode = ColorMode.Color
+	colorNamespace = ColorNamespace.Color
 })
 
 return {

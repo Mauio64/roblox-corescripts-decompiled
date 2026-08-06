@@ -3,10 +3,9 @@ local Enums = require(WhatsNew.Enums)
 
 require(WhatsNew.Types)
 
-local TourTipCtaAccess = require(WhatsNew.TourTipCtaAccess)
 local t1 = {}
 
-local function clientGatesPass(p1, p2) -- line: 14
+local function clientGatesPass(p1, p2) -- line: 13
 	-- upvalues: Enums (copy)
 	if p1 == Enums.TourType.Onboarding then
 		return p2.grandfathered ~= true
@@ -14,16 +13,16 @@ local function clientGatesPass(p1, p2) -- line: 14
 
 	return true
 end
-local function isNonEmptyString(s1: string?) -- line: 21
+local function isNonEmptyString(s1: string?) -- line: 20
 	return s1 ~= nil and s1 ~= ""
 end
-local function isoDateToUnix(s2: string) -- line: 25
+local function isoDateToUnix(s2: string) -- line: 24
 	local dateTime = DateTime.fromIsoDate(s2)
 
 	return dateTime and dateTime.UnixTimestamp or nil
 end
 
-function t1.isEntryInScopeSubtree(p3, s3: string, t2: {[any]: any}) -- line: 30
+function t1.isEntryInScopeSubtree(p3, s3: string, t2: {[any]: any}) -- line: 29
 	local scopeId = p3.scopeId
 
 	while scopeId ~= nil do
@@ -31,18 +30,18 @@ function t1.isEntryInScopeSubtree(p3, s3: string, t2: {[any]: any}) -- line: 30
 			return true
 		end
 
-		local v17 = t2[scopeId]
+		local v16 = t2[scopeId]
 
-		if v17 == nil then
+		if v16 == nil then
 			return false
 		end
 
-		scopeId = v17.parentScopeId
+		scopeId = v16.parentScopeId
 	end
 
 	return false
 end
-function t1.isEntryExpired(p4, p5, p6, p7) -- line: 49
+function t1.isEntryExpired(p4, p5, p6, p7) -- line: 48
 	-- upvalues: Enums (copy)
 	if p5 == Enums.TourType.Onboarding then
 		return false
@@ -51,9 +50,9 @@ function t1.isEntryExpired(p4, p5, p6, p7) -- line: 49
 	if p4.disableTime ~= nil then
 		local disableTime = p4.disableTime
 		local dateTime = DateTime.fromIsoDate(disableTime)
-		local v24 = dateTime and dateTime.UnixTimestamp or nil
+		local v23 = dateTime and dateTime.UnixTimestamp or nil
 
-		if v24 ~= nil and v24 <= p6.currentTime then
+		if v23 ~= nil and v23 <= p6.currentTime then
 			return true
 		end
 	end
@@ -61,22 +60,22 @@ function t1.isEntryExpired(p4, p5, p6, p7) -- line: 49
 	if p4.publishedTime ~= nil then
 		local publishedTime = p4.publishedTime
 		local dateTime = DateTime.fromIsoDate(publishedTime)
-		local v27 = dateTime and dateTime.UnixTimestamp or nil
+		local v26 = dateTime and dateTime.UnixTimestamp or nil
 
-		if v27 ~= nil and v27 + p7.updateEntryDuration * 86400 <= p6.currentTime then
+		if v26 ~= nil and v26 + p7.updateEntryDuration * 86400 <= p6.currentTime then
 			return true
 		end
 	end
 
 	return false
 end
-function t1.deriveEntryDisplay(p8, p9, p10, p11) -- line: 82
+function t1.deriveEntryDisplay(p8, p9, p10, p11) -- line: 81
 	-- upvalues: t1 (copy), Enums (copy)
-	local v32 = t1.isEntryExpired(p8, p9, p10, p11)
-	local v33 = p10.storage[p8.id]
-	local v34 = if not v33 then nil else v33.seen
+	local v31 = t1.isEntryExpired(p8, p9, p10, p11)
+	local v32 = p10.storage[p8.id]
+	local v33 = if not v32 then nil else v32.seen
 	local meta = p10.meta
-	local v36 = p9 ~= Enums.TourType.Onboarding or meta.grandfathered ~= true
+	local v35 = p9 ~= Enums.TourType.Onboarding or meta.grandfathered ~= true
 
 	return {
 		id = p8.id,
@@ -87,14 +86,14 @@ function t1.deriveEntryDisplay(p8, p9, p10, p11) -- line: 82
 		enabled = p8.enabled,
 		publishedTime = p8.publishedTime,
 		disableTime = p8.disableTime,
-		expired = v32,
-		seen = v34,
-		optOutCount = not v33 and 0 or v33.optOutCount,
-		adopted = not not v33 and v33.adopted,
-		toShow = p8.enabled and (not v32 and (v34 == nil and v36))
+		expired = v31,
+		seen = v33,
+		optOutCount = not v32 and 0 or v32.optOutCount,
+		adopted = not not v32 and v32.adopted,
+		toShow = p8.enabled and (not v31 and (v33 == nil and v35))
 	}
 end
-function t1.getLabels(p12, p13) -- line: 111
+function t1.getLabels(p12, p13) -- line: 110
 	-- upvalues: Enums (copy)
 	if p13 == Enums.TourType.Onboarding then
 		return {
@@ -108,26 +107,23 @@ function t1.getLabels(p12, p13) -- line: 111
 		text = p12.updatesText or ""
 	}
 end
-function t1.hasLabels(p14) -- line: 125
+function t1.hasLabels(p14) -- line: 124
 	local title = p14.title
-	local v41 = title ~= nil and title ~= ""
+	local v40 = title ~= nil and title ~= ""
 
-	if not v41 then
+	if not v40 then
 		local text = p14.text
 
-		v41 = text ~= nil and text ~= ""
+		v40 = text ~= nil and text ~= ""
 	end
 
-	return v41
+	return v40
 end
-function t1.countScopeSteps(p15) -- line: 129
-	-- upvalues: TourTipCtaAccess (copy), Enums (copy), t1 (copy)
+function t1.countScopeSteps(p15) -- line: 128
 	local n1 = 0
 
-	for _, v46 in p15.tourTips do
-		local v47 = TourTipCtaAccess.wrap(v46.cta)
-
-		n1 = if v47:getKind() ~= Enums.TourTipCtaKind.Nested then n1 + v46.stepCount else n1 + (1 + t1.countScopeSteps(v47:getScope()))
+	for _, v45 in p15.tourTips do
+		n1 += v45.stepCount
 	end
 
 	return n1

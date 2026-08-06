@@ -10,17 +10,17 @@ require(script.Parent.AssetUserAuthStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function resolveBase(t1: {[any]: any}?) -- line: 28
+local function resolveBase(t1: {[any]: any}?) -- line: 27
 	-- upvalues: UrlBase (copy)
 	local v17 = t1 or {}
 
 	return v17.network, v17.baseUrl or UrlBase.APIS
 end
-local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 33
+local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 32
 	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
 	return (t2 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 end
-local function buildMultipartBody(s1: string, s2: string?, s3: string?) -- line: 38
+local function buildMultipartBody(s1: string, s2: string?, s3: string?) -- line: 37
 	local v22 = (((("" .. "--" .. "-------PublishServiceCreateAsset" .. "\r\n") .. "Content-Disposition: form-data; name=\"request\"" .. "\r\n") .. "Content-Type: application/json" .. "\r\n") .. "\r\n") .. s1 .. "\r\n"
 
 	if s2 then
@@ -34,7 +34,7 @@ local createRequest = HttpClient.createRequest
 local encodeRaw = HttpClient.encodeRaw
 local decodeJson = HttpClient.decodeJson
 
-local function multipartRequest(p1, s4: string, s5: string, s6: string, s7: string) -- line: 60
+local function multipartRequest(p1, s4: string, s5: string, s6: string, s7: string) -- line: 59
 	-- upvalues: createRequest (copy), encodeRaw (copy), decodeJson (copy), asPromise (copy)
 	local v28 = createRequest({
 		networkImpl = p1,
@@ -43,7 +43,7 @@ local function multipartRequest(p1, s4: string, s5: string, s6: string, s7: stri
 		body = s6,
 		headers = {},
 		encode = encodeRaw("multipart/form-data; boundary=-------PublishServiceCreateAsset"),
-		decode = decodeJson(function(p2) -- line: 74
+		decode = decodeJson(function(p2) -- line: 73
 			return p2
 		end),
 		analyticsKey = s7
@@ -53,7 +53,7 @@ local function multipartRequest(p1, s4: string, s5: string, s6: string, s7: stri
 end
 
 return {
-	patchAssetIcon = function(s8: string, p3, t3: {[any]: any}?) -- line: 84
+	patchAssetIcon = function(s8: string, p3, t3: {[any]: any}?) -- line: 83
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), asPromise (copy)
 		local v32 = t3 or {}
 		local _ = v32.network
@@ -64,14 +64,14 @@ return {
 			network = (t3 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
 			url = v34,
 			body = p3,
-			decode = function(p4) -- line: 97
+			decode = function(p4) -- line: 96
 				return p4
 			end
 		})
 
 		return asPromise(v35)
 	end,
-	updateIcon = function(s9: string, s10: string, t4: {[any]: any}?) -- line: 104
+	updateIcon = function(s9: string, s10: string, t4: {[any]: any}?) -- line: 103
 		-- upvalues: UrlBase (copy), HttpService (copy), multipartRequest (copy), withCsrfRetry (copy), HttpClient (copy)
 		local v39 = t4 or {}
 		local _ = v39.network
@@ -84,7 +84,7 @@ return {
 
 		return multipartRequest((t4 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()), "PATCH", v41, v43, "asset-user-auth.update-icon")
 	end,
-	getPreviews = function(s11: string, t5: {[any]: any}?) -- line: 119
+	getPreviews = function(s11: string, t5: {[any]: any}?) -- line: 118
 		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
 		local v46 = t5 or {}
 		local network = v46.network
@@ -94,14 +94,14 @@ return {
 			analyticsKey = "asset-user-auth.get-previews",
 			network = network,
 			url = v48,
-			decode = function(p5) -- line: 127
+			decode = function(p5) -- line: 126
 				return p5.previews or {}
 			end
 		})
 
 		return asPromise(v49)
 	end,
-	updatePreviews = function(s12: string, t6: {[any]: any}, t7: {[any]: any}?) -- line: 134
+	updatePreviews = function(s12: string, t6: {[any]: any}, t7: {[any]: any}?) -- line: 133
 		-- upvalues: UrlBase (copy), HttpService (copy), multipartRequest (copy), withCsrfRetry (copy), HttpClient (copy)
 		local v53 = t7 or {}
 		local _ = v53.network
@@ -114,7 +114,7 @@ return {
 
 		return multipartRequest((t7 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()), "PATCH", v55, v57, "asset-user-auth.update-previews")
 	end,
-	createImageAsset = function(s13: string, s14: string, p6, t8: {[any]: any}?) -- line: 149
+	createImageAsset = function(s13: string, s14: string, p6, t8: {[any]: any}?) -- line: 148
 		-- upvalues: UrlBase (copy), HttpService (copy), multipartRequest (copy), withCsrfRetry (copy), HttpClient (copy)
 		local v62 = t8 or {}
 		local _ = v62.network
@@ -142,7 +142,7 @@ return {
 
 		return multipartRequest((t8 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()), "POST", v64, v68, "asset-user-auth.create-image-asset")
 	end,
-	fetchOperation = function(s15: string, t9: {[any]: any}?) -- line: 170
+	fetchOperation = function(s15: string, t9: {[any]: any}?) -- line: 169
 		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
 		local v71 = t9 or {}
 		local network = v71.network
@@ -152,7 +152,7 @@ return {
 			analyticsKey = "asset-user-auth.get-operation",
 			network = network,
 			url = v73,
-			decode = function(p7) -- line: 178
+			decode = function(p7) -- line: 177
 				return p7
 			end
 		})

@@ -9,69 +9,79 @@ local setHumanoidDescriptionColorsFromBodyColor3s = require(script.Parent.setHum
 local createHumanoidDescriptionAccessoryInfo = require(script.Parent.createHumanoidDescriptionAccessoryInfo)
 local setMakeupDescriptions = require(script.Parent.setMakeupDescriptions)
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
-local FFlagAXMakeupEquipping = require(AvatarExperienceCommonParent.AvatarExperienceFlags).FFlagAXMakeupEquipping
+local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
+local FFlagAXMakeupEquipping = AvatarExperienceFlags.FFlagAXMakeupEquipping
+local FFlagAXOutfitPageRevamp = AvatarExperienceFlags.FFlagAXOutfitPageRevamp
+local getHumanoidDescriptionFromStateForOutfitType = require(AvatarExperienceCommon.Utils.Humanoid.getHumanoidDescriptionFromStateForOutfitType)
 
-return function(p1) -- line: 18
-	-- upvalues: ASSET_TYPE_TO_ACCESSORY_TYPE (copy), createHumanoidDescriptionAccessoryInfo (copy), ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP (copy), ASSET_TYPE_NAME_TO_ID_STRING (copy), FFlagAXMakeupEquipping (copy), isMakeupAssetType (copy), mutedError (copy), setMakeupDescriptions (copy), HUMANOID_DESCRIPTION_SCALE_TO_NAME (copy), setHumanoidDescriptionColorsFromBodyColor3s (copy)
-	local HumanoidDescription = Instance.new("HumanoidDescription")
-	local EquippedAssets = p1.AvatarEditor.Character.EquippedAssets
-	local AvatarScales = p1.AvatarEditor.Character.AvatarScales
+return function(p1) -- line: 22
+	-- upvalues: FFlagAXOutfitPageRevamp (copy), getHumanoidDescriptionFromStateForOutfitType (copy), ASSET_TYPE_TO_ACCESSORY_TYPE (copy), createHumanoidDescriptionAccessoryInfo (copy), ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP (copy), ASSET_TYPE_NAME_TO_ID_STRING (copy), FFlagAXMakeupEquipping (copy), isMakeupAssetType (copy), mutedError (copy), setMakeupDescriptions (copy), HUMANOID_DESCRIPTION_SCALE_TO_NAME (copy), setHumanoidDescriptionColorsFromBodyColor3s (copy)
+	local v17
 
-	if EquippedAssets then
-		local t1 = {}
+	if FFlagAXOutfitPageRevamp then
+		v17 = getHumanoidDescriptionFromStateForOutfitType(p1, nil)
+	else
+		v17 = Instance.new("HumanoidDescription")
 
-		for v18, v19 in EquippedAssets do
-			local t2 = {}
-			local v21 = ASSET_TYPE_TO_ACCESSORY_TYPE[v18]
+		local EquippedAssets = p1.AvatarEditor.Character.EquippedAssets
+		local AvatarScales = p1.AvatarEditor.Character.AvatarScales
 
-			for v22, v23 in v19 do
-				if v21 then
-					table.insert(t1, createHumanoidDescriptionAccessoryInfo(v18, v22, v23))
-				else
-					table.insert(t2, v22)
+		if EquippedAssets then
+			local t1 = {}
+
+			for v21, v22 in EquippedAssets do
+				local t2 = {}
+				local v24 = ASSET_TYPE_TO_ACCESSORY_TYPE[v21]
+
+				for v25, v26 in v22 do
+					if v24 then
+						table.insert(t1, createHumanoidDescriptionAccessoryInfo(v21, v25, v26))
+					else
+						table.insert(t2, v25)
+					end
+				end
+
+				if v24 == nil and #t2 > 0 then
+					local v27 = ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[v21]
+					local v28 = table.concat(t2, ",")
+
+					if v27 then
+						v17[v27] = v28
+					elseif v21 ~= ASSET_TYPE_NAME_TO_ID_STRING.Gear and (not FFlagAXMakeupEquipping or not isMakeupAssetType(v21)) then
+						mutedError(string.format("assetTypeId: %s not recognized as member of humanoidDescription", (tostring(v21))))
+					end
 				end
 			end
 
-			if v21 == nil and #t2 > 0 then
-				local v24 = ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[v18]
-				local v25 = table.concat(t2, ",")
+			v17:SetAccessories(t1, true)
 
-				if v24 then
-					HumanoidDescription[v24] = v25
-				elseif v18 ~= ASSET_TYPE_NAME_TO_ID_STRING.Gear and (not FFlagAXMakeupEquipping or not isMakeupAssetType(v18)) then
-					mutedError(string.format("assetTypeId: %s not recognized as member of humanoidDescription", (tostring(v18))))
-				end
+			if FFlagAXMakeupEquipping then
+				setMakeupDescriptions(v17, EquippedAssets)
 			end
 		end
 
-		HumanoidDescription:SetAccessories(t1, true)
-
-		if FFlagAXMakeupEquipping then
-			setMakeupDescriptions(HumanoidDescription, EquippedAssets)
+		if AvatarScales then
+			for v29, v30 in AvatarScales do
+				v17[HUMANOID_DESCRIPTION_SCALE_TO_NAME[v29]] = v30
+			end
 		end
-	end
 
-	if AvatarScales then
-		for v26, v27 in AvatarScales do
-			HumanoidDescription[HUMANOID_DESCRIPTION_SCALE_TO_NAME[v26]] = v27
-		end
+		setHumanoidDescriptionColorsFromBodyColor3s(v17, p1.AvatarEditor.Character.BodyColor3s)
 	end
-
-	setHumanoidDescriptionColorsFromBodyColor3s(HumanoidDescription, p1.AvatarEditor.Character.BodyColor3s)
 
 	local t3 = {}
 	local t4 = {}
 
-	for _, v31 in p1.AvatarEditor.EquippedEmotes.slotInfo do
-		t3[tostring(v31.assetId)] = { (tonumber(v31.assetId)) }
+	for _, v34 in p1.AvatarEditor.EquippedEmotes.slotInfo do
+		t3[tostring(v34.assetId)] = { (tonumber(v34.assetId)) }
 		table.insert(t4, {
-			Slot = v31.position,
-			Name = tostring(v31.assetId)
+			Slot = v34.position,
+			Name = tostring(v34.assetId)
 		})
 	end
 
-	HumanoidDescription:SetEmotes(t3)
-	HumanoidDescription:SetEquippedEmotes(t4)
+	v17:SetEmotes(t3)
+	v17:SetEquippedEmotes(t4)
 
-	return HumanoidDescription
+	return v17
 end

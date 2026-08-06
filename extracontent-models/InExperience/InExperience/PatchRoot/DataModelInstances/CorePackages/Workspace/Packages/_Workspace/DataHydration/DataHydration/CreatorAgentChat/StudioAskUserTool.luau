@@ -48,10 +48,10 @@ local t2 = {
 	}
 }
 
-local function valueLooksLikeToolName(p1) -- line: 75
+local function valueLooksLikeToolName(p1) -- line: 74
 	return typeof(p1) == "string" and string.lower(p1) == "studio_ask_user"
 end
-local function getQuestionsPayload(p2) -- line: 79
+local function getQuestionsPayload(p2) -- line: 78
 	if typeof(p2) ~= "table" then
 		return nil
 	end
@@ -70,7 +70,7 @@ local function getQuestionsPayload(p2) -- line: 79
 
 	return nil
 end
-local function resolveResponseType(p3, n1: number) -- line: 99
+local function resolveResponseType(p3, n1: number) -- line: 98
 	-- upvalues: t1 (copy)
 	local v22 = if typeof(p3) ~= "string" then nil else t1[p3]
 
@@ -84,7 +84,7 @@ local function resolveResponseType(p3, n1: number) -- line: 99
 
 	return v22
 end
-local function toAnswerQuestions(p4) -- line: 110
+local function toAnswerQuestions(p4) -- line: 109
 	-- upvalues: t1 (copy)
 	local v24 = if typeof(p4) == "table" then if typeof(p4[1]) ~= "table" then if typeof(p4.questions) ~= "table" then if typeof(p4.data) ~= "table" then nil else p4.data else p4.questions else p4 else nil
 
@@ -131,7 +131,7 @@ local function toAnswerQuestions(p4) -- line: 110
 
 	return nil
 end
-local function extractQuestionsFromToolCall(p5) -- line: 147
+local function extractQuestionsFromToolCall(p5) -- line: 146
 	-- upvalues: toAnswerQuestions (copy)
 	local v37 = toAnswerQuestions(p5.rawInput)
 
@@ -169,7 +169,7 @@ local function extractQuestionsFromToolCall(p5) -- line: 147
 
 	return v37
 end
-local function decodePersistedToolResultText(s1: string) -- line: 171
+local function decodePersistedToolResultText(s1: string) -- line: 170
 	-- upvalues: HttpService (copy)
 	local ok, result = pcall(HttpService.JSONDecode, HttpService, s1)
 
@@ -183,7 +183,7 @@ local function decodePersistedToolResultText(s1: string) -- line: 171
 
 	return nil
 end
-local function getPersistedToolResultText(p6) -- line: 181
+local function getPersistedToolResultText(p6) -- line: 180
 	-- upvalues: HttpService (copy)
 	if p6.content == nil then
 		return nil
@@ -213,7 +213,7 @@ local function getPersistedToolResultText(p6) -- line: 181
 
 	return nil
 end
-local function formatToolResultText(t7: {[any]: any}) -- line: 236
+local function formatToolResultText(t7: {[any]: any}) -- line: 235
 	-- upvalues: HttpService (copy)
 	local t8 = {}
 
@@ -254,7 +254,7 @@ local function formatToolResultText(t7: {[any]: any}) -- line: 236
 		answers = t8
 	})
 end
-local function findSelectedOptionById(p7, s2: string?) -- line: 277
+local function findSelectedOptionById(p7, s2: string?) -- line: 276
 	if s2 == nil then
 		return nil
 	end
@@ -267,7 +267,7 @@ local function findSelectedOptionById(p7, s2: string?) -- line: 277
 
 	return nil
 end
-local function findSelectedOptionsByIds(p8, t11: {[any]: any}) -- line: 289
+local function findSelectedOptionsByIds(p8, t11: {[any]: any}) -- line: 288
 	local t12 = {}
 
 	for _, v82 in p8.options do
@@ -288,7 +288,7 @@ local function findSelectedOptionsByIds(p8, t11: {[any]: any}) -- line: 289
 
 	return t13
 end
-local function normalizeSelectedOptionId(p9) -- line: 306
+local function normalizeSelectedOptionId(p9) -- line: 305
 	if typeof(p9) == "string" then
 		return p9
 	end
@@ -313,7 +313,7 @@ local function normalizeSelectedOptionId(p9) -- line: 306
 
 	return nil
 end
-local function getAnswersByQuestionId(s3: string) -- line: 324
+local function getAnswersByQuestionId(s3: string) -- line: 323
 	-- upvalues: HttpService (copy), normalizeSelectedOptionId (copy)
 	local t15 = {}
 	local ok, result = pcall(HttpService.JSONDecode, HttpService, s3)
@@ -340,7 +340,7 @@ local function getAnswersByQuestionId(s3: string) -- line: 324
 
 	return t15
 end
-local function getPromptFromToolResult(p10, t16: {[any]: any}?, s4: string, n2: number) -- line: 351
+local function getPromptFromToolResult(p10, t16: {[any]: any}?, s4: string, n2: number) -- line: 350
 	-- upvalues: findSelectedOptionsByIds (copy)
 	if t16 == nil then
 		return nil
@@ -401,7 +401,7 @@ local function getPromptFromToolResult(p10, t16: {[any]: any}?, s4: string, n2: 
 		callOrder = n2
 	}
 end
-local function getToolCallOrder(p11, s5: string) -- line: 390
+local function getToolCallOrder(p11, s5: string) -- line: 389
 	if p11.activityItems ~= nil then
 		for v110, v111 in p11.activityItems do
 			if v111.kind == "tool_call" and s5 == v111.toolCallId then
@@ -432,7 +432,7 @@ return {
 	CANCELLATION_TEXT = "User cancelled answering the question",
 	LOCAL_TOOL_DEFINITION = t2,
 	extractQuestionsFromToolCall = extractQuestionsFromToolCall,
-	findQuestionsInTurnState = function(p12, t18: {[any]: any}?) -- line: 209
+	findQuestionsInTurnState = function(p12, t18: {[any]: any}?) -- line: 208
 		-- upvalues: getPersistedToolResultText (copy), extractQuestionsFromToolCall (copy)
 		local t19 = {}
 
@@ -463,13 +463,13 @@ return {
 		return nil, nil, nil, nil, nil
 	end,
 	formatToolResultText = formatToolResultText,
-	formatToolResultContent = function(t20: {[any]: any}) -- line: 271
+	formatToolResultContent = function(t20: {[any]: any}) -- line: 270
 		-- upvalues: formatToolResultText (copy)
 		return {
 			text = formatToolResultText(t20)
 		}
 	end,
-	getAnsweredPromptsFromTurnState = function(p13) -- line: 413
+	getAnsweredPromptsFromTurnState = function(p13) -- line: 412
 		-- upvalues: extractQuestionsFromToolCall (copy), getPersistedToolResultText (copy), getAnswersByQuestionId (copy), getPromptFromToolResult (copy), getToolCallOrder (copy)
 		local t21 = {}
 		local t22 = {}
@@ -500,7 +500,7 @@ return {
 
 		return t21
 	end,
-	formatCancellationContent = function() -- line: 449
+	formatCancellationContent = function() -- line: 448
 		return {
 			text = "User cancelled answering the question"
 		}

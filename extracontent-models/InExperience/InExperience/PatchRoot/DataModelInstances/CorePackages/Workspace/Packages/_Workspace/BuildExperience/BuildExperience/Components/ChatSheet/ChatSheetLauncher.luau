@@ -6,20 +6,20 @@ local ReactRoblox = require(BuildExperienceParent.ReactRoblox)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local ChatActionsRow = require(BuildExperience.Components.Chat.ChatActionsRow)
 local TextArea = require(BuildExperience.FoundationFork.TextArea)
-local useHardwareInsets = require(BuildExperience.FoundationFork.Sheet.useHardwareInsets)
+local v9 = if not require(BuildExperience.Flags.FFlagBuildExperienceUseFoundationSheet) then require(BuildExperience.FoundationFork.Sheet.useHardwareInsets) else require(script.Parent.useHardwareInsets)
 local View = Foundation.View
 local InputSize = Foundation.Enums.InputSize
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local useOverlay = Foundation.Hooks.useOverlay
 local useTokens = Foundation.Hooks.useTokens
 
-local function noop() -- line: 28
+local function noop() -- line: 29
 end
-local function ChatSheetLauncher(t1: {[any]: any}) -- line: 30
-	-- upvalues: useTokens (copy), useOverlay (copy), useHardwareInsets (copy), React (copy), View (copy), TextArea (copy), noop (copy), LocalizationStrings (copy), InputSize (copy), ChatActionsRow (copy), StateLayerAffordance (copy), ReactRoblox (copy)
+local function ChatSheetLauncher(t1: {[any]: any}) -- line: 31
+	-- upvalues: useTokens (copy), useOverlay (copy), v9 (copy), React (copy), View (copy), TextArea (copy), noop (copy), LocalizationStrings (copy), InputSize (copy), ChatActionsRow (copy), StateLayerAffordance (copy), ReactRoblox (copy)
 	local v18 = useTokens()
 	local v19 = useOverlay()
-	local bottom = useHardwareInsets(v19).bottom
+	local bottom = v9(v19).bottom
 	local Small = v18.Margin.Small
 	local v22 = React.createElement(View, {
 		tag = "size-full-0 auto-y",

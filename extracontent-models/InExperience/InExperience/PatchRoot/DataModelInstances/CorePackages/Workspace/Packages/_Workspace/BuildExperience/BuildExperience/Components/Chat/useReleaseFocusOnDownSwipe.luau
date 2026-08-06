@@ -5,18 +5,18 @@ local React = require(BuildExperienceParent.React)
 
 require(BuildExperience.Chat.useChatSessionCore)
 
-local function getInputPosition(p1) -- line: 17
+local function getInputPosition(p1) -- line: 15
 	return Vector2.new(p1.Position.X, p1.Position.Y)
 end
-local function isPositionHorizontallyInsideGuiObject(vector2: Vector2, p2) -- line: 21
+local function isPositionHorizontallyInsideGuiObject(vector2: Vector2, p2) -- line: 19
 	local v13 = vector2.X - p2.AbsolutePosition.X
 
 	return v13 >= 0 and v13 <= p2.AbsoluteSize.X
 end
-local function isDownSwipe(vector2: Vector2) -- line: 26
+local function isDownSwipe(vector2: Vector2) -- line: 24
 	return vector2.Y >= 24 and vector2.Y > math.abs(vector2.X)
 end
-local function didDownSwipeCrossGuiObject(vector2: Vector2, vector2_2: Vector2, p3) -- line: 30
+local function didDownSwipeCrossGuiObject(vector2: Vector2, vector2_2: Vector2, p3) -- line: 28
 	local v18 = vector2_2 - vector2
 
 	if not (v18.Y >= 24) or not (v18.Y > math.abs(v18.X)) then
@@ -32,12 +32,12 @@ local function didDownSwipeCrossGuiObject(vector2: Vector2, vector2_2: Vector2, 
 
 	return AbsolutePositionX <= v22 and (v21 <= v20 and (v24 >= vector2.Y and AbsolutePositionY <= vector2_2.Y))
 end
-local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
+local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 51
 	-- upvalues: React (copy), didDownSwipeCrossGuiObject (copy), UserInputService (copy)
 	local v27 = React.useRef(nil)
 	local v28 = React.useRef(nil)
 	local v29 = React.useRef(nil)
-	local v30 = React.useCallback(function() -- line: 58
+	local v30 = React.useCallback(function() -- line: 56
 		-- upvalues: v29 (copy), v27 (copy), v28 (copy)
 		if v29.current then
 			v29.current:Disconnect()
@@ -47,7 +47,7 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 		v27.current = nil
 		v28.current = nil
 	end, {})
-	local v31 = React.useCallback(function() -- line: 67
+	local v31 = React.useCallback(function() -- line: 65
 		-- upvalues: p5 (copy)
 		local v32 = if not p5 then nil else p5.current
 
@@ -56,9 +56,9 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 		end
 	end, { p5 })
 
-	React.useEffect(function() -- line: 74
+	React.useEffect(function() -- line: 72
 		-- upvalues: v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy), UserInputService (copy), p5 (copy), v29 (copy)
-		local function maybeReleaseFocus(p6) -- line: 75
+		local function maybeReleaseFocus(p6) -- line: 73
 			-- upvalues: v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
 			local current = v28.current
 
@@ -78,7 +78,7 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 
 			return false
 		end
-		local function handleInputChanged(p7) -- line: 93
+		local function handleInputChanged(p7) -- line: 91
 			-- upvalues: v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
 			local current = v28.current
 			local v43
@@ -107,7 +107,7 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 			end
 		end
 
-		local connection = UserInputService.TouchStarted:Connect(function(p8) -- line: 104
+		local connection = UserInputService.TouchStarted:Connect(function(p8) -- line: 102
 			-- upvalues: v30 (copy), p4 (copy), p5 (copy), v27 (copy), v28 (copy), v29 (copy), didDownSwipeCrossGuiObject (copy), v31 (copy)
 			v30()
 
@@ -127,7 +127,7 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 
 			v27.current = p8
 			v28.current = vector2
-			v29.current = p8.Changed:Connect(function() -- line: 123
+			v29.current = p8.Changed:Connect(function() -- line: 121
 				-- upvalues: p8 (copy), v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
 				local v56 = p8
 				local current4 = v28.current
@@ -157,7 +157,7 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 				end
 			end)
 		end)
-		local connection2 = UserInputService.TouchEnded:Connect(function(part) -- line: 128
+		local connection2 = UserInputService.TouchEnded:Connect(function(part) -- line: 126
 			-- upvalues: v27 (copy), v28 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
 			if part == v27.current then
 				local current = v28.current
@@ -184,7 +184,7 @@ local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 53
 			end
 		end)
 
-		return function() -- line: 136
+		return function() -- line: 134
 			-- upvalues: connection (copy), connection2 (copy), v30 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()

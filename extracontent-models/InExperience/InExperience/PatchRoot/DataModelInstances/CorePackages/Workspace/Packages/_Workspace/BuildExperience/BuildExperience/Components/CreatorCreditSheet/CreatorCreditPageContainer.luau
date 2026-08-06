@@ -4,7 +4,7 @@ local CreatorCreditPageView = require(script.Parent.CreatorCreditPageView)
 local DailyLimitBottomSheet = require(script.Parent.DailyLimitBottomSheet)
 local useCreatorCreditPageViewModel = require(script.Parent.useCreatorCreditPageViewModel)
 
-local function CreatorCreditPageContainer(_: {[any]: any}) -- line: 14
+local function CreatorCreditPageContainer(_: {[any]: any}) -- line: 12
 	-- upvalues: useCreatorCreditPageViewModel (copy), React (copy), CreatorCreditPageView (copy), DailyLimitBottomSheet (copy)
 	local v8 = useCreatorCreditPageViewModel()
 

@@ -4,10 +4,10 @@ local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgen
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local SubagentTasks = CreatorAgentChat.SubagentTasks
 
-local function normalizeToolTitle(s1: string) -- line: 24
+local function normalizeToolTitle(s1: string) -- line: 23
 	return string.lower((string.gsub(s1, "[_%-%s]", "")))
 end
-local function isManageTasksToolTitle(s2: string?) -- line: 28
+local function isManageTasksToolTitle(s2: string?) -- line: 27
 	-- upvalues: SubagentTasks (copy)
 	local v18 = false
 
@@ -20,15 +20,15 @@ local function isManageTasksToolTitle(s2: string?) -- line: 28
 
 	return v18
 end
-local function formatStepCount(n1: number) -- line: 33
+local function formatStepCount(n1: number) -- line: 32
 	-- upvalues: LocalizationStrings (copy)
 	return LocalizationStrings.formatChatTaskCount(n1)
 end
-local function formatWorkedDuration(n2: number) -- line: 39
+local function formatWorkedDuration(n2: number) -- line: 38
 	-- upvalues: LocalizationStrings (copy)
 	return LocalizationStrings.formatChatWorkedDuration(n2)
 end
-local function parseEmittedTimeMillis(s3: string?) -- line: 43
+local function parseEmittedTimeMillis(s3: string?) -- line: 42
 	if typeof(s3) ~= "string" or s3 == "" then
 		return nil
 	end
@@ -41,14 +41,14 @@ local function parseEmittedTimeMillis(s3: string?) -- line: 43
 
 	return nil
 end
-local function isActiveToolActivity(p1) -- line: 71
+local function isActiveToolActivity(p1) -- line: 70
 	if p1.kind ~= "tool_call" then
 		return false
 	end
 
 	return p1.status == "pending" or (p1.status == "in_progress" or p1.status == nil)
 end
-local function getToolActivityLabel(p2) -- line: 78
+local function getToolActivityLabel(p2) -- line: 77
 	-- upvalues: LocalizationStrings (copy), SubagentTasks (copy)
 	if p2.kind ~= "tool_call" then
 		return LocalizationStrings.CHAT_TOOL
@@ -84,7 +84,7 @@ local function getToolActivityLabel(p2) -- line: 78
 
 	return LocalizationStrings.formatChatRunningTool(v39)
 end
-local function getActiveActivityLabel(t1: {[any]: any}, _: boolean) -- line: 112
+local function getActiveActivityLabel(t1: {[any]: any}, _: boolean) -- line: 111
 	-- upvalues: getToolActivityLabel (copy), LocalizationStrings (copy)
 	for i = #t1, 1, -1 do
 		local v51 = t1[i]
@@ -99,7 +99,7 @@ end
 
 return {
 	ASSISTANT_STOPPED_TEXT = LocalizationStrings.CHAT_ASSISTANT_STOPPED,
-	countToolCalls = function(t2: {[any]: any}) -- line: 102
+	countToolCalls = function(t2: {[any]: any}) -- line: 101
 		local n3 = 0
 
 		for _, v47 in t2 do
@@ -110,7 +110,7 @@ return {
 
 		return n3
 	end,
-	formatTurnFailureMessage = function(p3) -- line: 19
+	formatTurnFailureMessage = function(p3) -- line: 18
 		-- upvalues: LocalizationStrings (copy)
 		local v15 = p3.error or LocalizationStrings.CHAT_ASSISTANT_RESPONSE_FAILED
 
@@ -119,7 +119,7 @@ return {
 	formatStepCount = formatStepCount,
 	formatWorkedDuration = formatWorkedDuration,
 	getActiveActivityLabel = getActiveActivityLabel,
-	getAskUserActivityLabel = function(n4: number, n5: number?) -- line: 137
+	getAskUserActivityLabel = function(n4: number, n5: number?) -- line: 136
 		-- upvalues: LocalizationStrings (copy)
 		if n5 == 0 then
 			return LocalizationStrings.CHAT_QUESTION_COMPOSER_ANSWER
@@ -131,7 +131,7 @@ return {
 
 		return LocalizationStrings.CHAT_QUESTION_MULTIPLE
 	end,
-	getCompletedActivityLabel = function(t3: {[any]: any}) -- line: 122
+	getCompletedActivityLabel = function(t3: {[any]: any}) -- line: 121
 		-- upvalues: getToolActivityLabel (copy), formatStepCount (copy), getActiveActivityLabel (copy)
 		local n6 = 0
 
@@ -156,7 +156,7 @@ return {
 		return getActiveActivityLabel(t3, false)
 	end,
 	getToolActivityLabel = getToolActivityLabel,
-	getTurnWorkedDurationLabel = function(t4: {[any]: any}?, n7: number?, n8: number?, n9: number) -- line: 51
+	getTurnWorkedDurationLabel = function(t4: {[any]: any}?, n7: number?, n8: number?, n9: number) -- line: 50
 		-- upvalues: formatWorkedDuration (copy), LocalizationStrings (copy)
 		if t4 ~= nil and (n7 ~= nil and n8 ~= nil) then
 			local v29 = t4[n7]

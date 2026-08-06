@@ -10,12 +10,12 @@ local sharePrivateExperience = require(BuildExperience.utils.sharePrivateExperie
 
 require(script.Parent.PrivateInvitesManagementView)
 
-local function usePrivateInvitesManagementViewModel(t1: {[any]: any}) -- line: 29
+local function usePrivateInvitesManagementViewModel(t1: {[any]: any}) -- line: 28
 	-- upvalues: React (copy), sendBuildExperienceEvent (copy), getPrivatePlaytestersStore (copy), SignalsReact (copy), sharePrivateExperience (copy), Logger (copy), LocalizationStrings (copy)
 	local universeId = t1.universeId
 	local v13 = React.useRef(false)
 
-	React.useEffect(function() -- line: 34
+	React.useEffect(function() -- line: 33
 		-- upvalues: v13 (copy), sendBuildExperienceEvent (copy), universeId (copy)
 		if v13.current then
 			return
@@ -28,7 +28,7 @@ local function usePrivateInvitesManagementViewModel(t1: {[any]: any}) -- line: 2
 	end, { universeId })
 
 	local v14 = getPrivatePlaytestersStore(false)
-	local v15 = React.useMemo(function() -- line: 43
+	local v15 = React.useMemo(function() -- line: 42
 		-- upvalues: v14 (copy), universeId (copy)
 		return v14.getAndFetchInvitedPlayers(universeId)
 	end, {
@@ -37,9 +37,9 @@ local function usePrivateInvitesManagementViewModel(t1: {[any]: any}) -- line: 2
 	})
 	local v16 = SignalsReact.useSignalState(v15.players)
 	local v17, v18 = React.useState({})
-	local v19 = React.useCallback(function(n1: number) -- line: 49
+	local v19 = React.useCallback(function(n1: number) -- line: 48
 		-- upvalues: v18 (copy), v14 (copy), universeId (copy), sendBuildExperienceEvent (copy)
-		v18(function(p1) -- line: 50
+		v18(function(p1) -- line: 49
 			-- upvalues: n1 (copy)
 			local v26 = table.clone(p1)
 
@@ -47,14 +47,14 @@ local function usePrivateInvitesManagementViewModel(t1: {[any]: any}) -- line: 2
 
 			return v26
 		end)
-		v14.removeInvite(universeId, n1):andThen(function() -- line: 57
+		v14.removeInvite(universeId, n1):andThen(function() -- line: 56
 			-- upvalues: sendBuildExperienceEvent (copy), universeId (copy)
 			sendBuildExperienceEvent("PLAYTESTER_REMOVED", {
 				universeId = universeId
 			})
-		end):finally(function() -- line: 60
+		end):finally(function() -- line: 59
 			-- upvalues: v18 (copy), n1 (copy)
-			v18(function(p2) -- line: 61
+			v18(function(p2) -- line: 60
 				-- upvalues: n1 (copy)
 				local v29 = table.clone(p2)
 
@@ -67,19 +67,19 @@ local function usePrivateInvitesManagementViewModel(t1: {[any]: any}) -- line: 2
 		v14,
 		universeId
 	})
-	local v20 = React.useCallback(function() -- line: 72
+	local v20 = React.useCallback(function() -- line: 71
 		-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), sharePrivateExperience (copy), Logger (copy)
 		sendBuildExperienceEvent("PLAYTEST_SHARE_CLICK", {
 			universeId = universeId
 		}, {
 			source = "management_page"
 		})
-		sharePrivateExperience(universeId):catch(function(p3) -- line: 76
+		sharePrivateExperience(universeId):catch(function(p3) -- line: 75
 			-- upvalues: Logger (copy), universeId (copy)
 			Logger:warning("PrivateInvitesManagement: share link failed for universe {}: {}", universeId, p3)
 		end)
 	end, { universeId })
-	local v21 = React.useCallback(function() -- line: 81
+	local v21 = React.useCallback(function() -- line: 80
 		-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), t1 (copy)
 		sendBuildExperienceEvent("ADD_TO_PLAYTEST_CLICK", {
 			universeId = universeId

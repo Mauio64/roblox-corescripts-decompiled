@@ -10,7 +10,7 @@ local t2 = {}
 
 t2.__index = t2
 
-function t2.new(t3: {[any]: any}?) -- line: 406
+function t2.new(t3: {[any]: any}?) -- line: 442
 	-- upvalues: hydration_stream_mode (copy), t2 (copy)
 	return (setmetatable({
 		feed_page_token = if t3 ~= nil and t3.feed_page_token ~= nil then t3.feed_page_token else "",
@@ -30,108 +30,108 @@ function t2.new(t3: {[any]: any}?) -- line: 406
 		client_capabilities = if t3 ~= nil and t3.client_capabilities ~= nil then t3.client_capabilities else nil
 	}, t2))
 end
-function t2.encode(p1) -- line: 442
+function t2.encode(p1) -- line: 478
 	-- upvalues: proto (copy), hydration_stream_mode (copy)
 	local buf = buffer.create(0)
 	local n1 = 0
 
 	if p1.feed_page_token ~= nil and p1.feed_page_token ~= "" then
-		local v24, v25 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+		local v25, v26 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v24, v25, p1.feed_page_token)
+		buf, n1 = proto.writeString(v25, v26, p1.feed_page_token)
 	end
 
 	if p1.device ~= nil and p1.device ~= "" then
-		local v26, v27 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+		local v27, v28 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v26, v27, p1.device)
+		buf, n1 = proto.writeString(v27, v28, p1.device)
 	end
 
 	if p1.country ~= nil and p1.country ~= "" then
-		local v28, v29 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+		local v29, v30 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v28, v29, p1.country)
+		buf, n1 = proto.writeString(v29, v30, p1.country)
 	end
 
 	if p1.age_group ~= nil and p1.age_group ~= "" then
-		local v30, v31 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
+		local v31, v32 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v30, v31, p1.age_group)
+		buf, n1 = proto.writeString(v31, v32, p1.age_group)
 	end
 
 	if p1.session_id ~= nil and p1.session_id ~= "" then
-		local v32, v33 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
+		local v33, v34 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v32, v33, p1.session_id)
+		buf, n1 = proto.writeString(v33, v34, p1.session_id)
 	end
 
 	if p1.entry_pagination_key ~= nil and p1.entry_pagination_key ~= "" then
-		local v34, v35 = proto.writeTag(buf, n1, 6, proto.wireTypes.lengthDelimited)
+		local v35, v36 = proto.writeTag(buf, n1, 6, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v34, v35, p1.entry_pagination_key)
+		buf, n1 = proto.writeString(v35, v36, p1.entry_pagination_key)
 	end
 
 	if p1.entry_page_token ~= nil and p1.entry_page_token ~= "" then
-		local v36, v37 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
+		local v37, v38 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v36, v37, p1.entry_page_token)
+		buf, n1 = proto.writeString(v37, v38, p1.entry_page_token)
 	end
 
 	if p1.max_memory ~= nil and p1.max_memory ~= "" then
-		local v38, v39 = proto.writeTag(buf, n1, 8, proto.wireTypes.lengthDelimited)
+		local v39, v40 = proto.writeTag(buf, n1, 8, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v38, v39, p1.max_memory)
+		buf, n1 = proto.writeString(v39, v40, p1.max_memory)
 	end
 
 	if p1.page_type ~= nil and p1.page_type ~= "" then
-		local v40, v41 = proto.writeTag(buf, n1, 9, proto.wireTypes.lengthDelimited)
+		local v41, v42 = proto.writeTag(buf, n1, 9, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeString(v40, v41, p1.page_type)
+		buf, n1 = proto.writeString(v41, v42, p1.page_type)
 	end
 
 	if p1.include_placeholders ~= nil then
-		local v42, v43 = proto.writeTag(buf, n1, 10, proto.wireTypes.varint)
+		local v43, v44 = proto.writeTag(buf, n1, 10, proto.wireTypes.varint)
 
-		buf, n1 = proto.writeVarInt(v42, v43, not p1.include_placeholders and 0 or 1)
+		buf, n1 = proto.writeVarInt(v43, v44, not p1.include_placeholders and 0 or 1)
 	end
 
 	if p1.hydration_stream_enabled ~= nil then
-		local v44, v45 = proto.writeTag(buf, n1, 11, proto.wireTypes.varint)
+		local v45, v46 = proto.writeTag(buf, n1, 11, proto.wireTypes.varint)
 
-		buf, n1 = proto.writeVarInt(v44, v45, not p1.hydration_stream_enabled and 0 or 1)
+		buf, n1 = proto.writeVarInt(v45, v46, not p1.hydration_stream_enabled and 0 or 1)
 	end
 
 	if p1.hydration_stream_mode ~= nil and (p1.hydration_stream_mode ~= nil and p1.hydration_stream_mode ~= 0 or p1.hydration_stream_mode ~= hydration_stream_mode.HydrationStreamMode.fromNumber(0)) then
-		local v46, v47 = proto.writeTag(buf, n1, 12, proto.wireTypes.varint)
+		local v47, v48 = proto.writeTag(buf, n1, 12, proto.wireTypes.varint)
 
-		buf, n1 = proto.writeVarInt(v46, v47, hydration_stream_mode.HydrationStreamMode.toNumber(p1.hydration_stream_mode))
+		buf, n1 = proto.writeVarInt(v47, v48, hydration_stream_mode.HydrationStreamMode.toNumber(p1.hydration_stream_mode))
 	end
 
 	if p1.collection_layout ~= nil then
-		local v48 = p1.collection_layout:encode()
-		local v49, v50 = proto.writeTag(buf, n1, 13, proto.wireTypes.lengthDelimited)
+		local v49 = p1.collection_layout:encode()
+		local v50, v51 = proto.writeTag(buf, n1, 13, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeBuffer(v49, v50, v48, buffer.len(v48))
+		buf, n1 = proto.writeBuffer(v50, v51, v49, buffer.len(v49))
 	end
 
 	if p1.cached_roblox_component_to_template_id ~= nil and next(p1.cached_roblox_component_to_template_id) ~= nil then
-		for v51, v52 in p1.cached_roblox_component_to_template_id do
+		for v52, v53 in p1.cached_roblox_component_to_template_id do
 			local buf2 = buffer.create(0)
-			local v54, v55 = proto.writeTag(buf2, 0, 1, proto.wireTypes.lengthDelimited)
-			local v56, v57 = proto.writeString(v54, v55, v51)
-			local v58, v59 = proto.writeTag(v56, v57, 2, proto.wireTypes.lengthDelimited)
-			local v60, v61 = proto.writeString(v58, v59, v52)
-			local v62, v63 = proto.writeTag(buf, n1, 14, proto.wireTypes.lengthDelimited)
+			local v55, v56 = proto.writeTag(buf2, 0, 1, proto.wireTypes.lengthDelimited)
+			local v57, v58 = proto.writeString(v55, v56, v52)
+			local v59, v60 = proto.writeTag(v57, v58, 2, proto.wireTypes.lengthDelimited)
+			local v61, v62 = proto.writeString(v59, v60, v53)
+			local v63, v64 = proto.writeTag(buf, n1, 14, proto.wireTypes.lengthDelimited)
 
-			buf, n1 = proto.writeBuffer(v62, v63, v60, v61)
+			buf, n1 = proto.writeBuffer(v63, v64, v61, v62)
 		end
 	end
 
 	if p1.client_capabilities ~= nil then
-		local v64 = p1.client_capabilities:encode()
-		local v65, v66 = proto.writeTag(buf, n1, 15, proto.wireTypes.lengthDelimited)
+		local v65 = p1.client_capabilities:encode()
+		local v66, v67 = proto.writeTag(buf, n1, 15, proto.wireTypes.lengthDelimited)
 
-		buf, n1 = proto.writeBuffer(v65, v66, v64, buffer.len(v64))
+		buf, n1 = proto.writeBuffer(v66, v67, v65, buffer.len(v65))
 	end
 
 	local buf3 = buffer.create(n1)
@@ -140,122 +140,122 @@ function t2.encode(p1) -- line: 442
 
 	return buf3
 end
-function t2.decode(p2: buffer) -- line: 552
+function t2.decode(p2: buffer) -- line: 588
 	-- upvalues: t2 (copy), proto (copy), hydration_stream_mode (copy), t1 (copy), client_capabilities (copy)
-	local v69 = t2.new()
+	local v70 = t2.new()
 	local n2 = 0
 
 	while n2 < buffer.len(p2) do
-		local v71, v72
+		local v72, v73
 
-		v71, v72, n2 = proto.readTag(p2, n2)
+		v72, v73, n2 = proto.readTag(p2, n2)
 
-		if v72 == proto.wireTypes.varint then
-			if v71 == 10 then
-				local v73
-
-				v73, n2 = proto.readVarInt(p2, n2)
-				v69.include_placeholders = v73 ~= 0
-			elseif v71 == 11 then
+		if v73 == proto.wireTypes.varint then
+			if v72 == 10 then
 				local v74
 
 				v74, n2 = proto.readVarInt(p2, n2)
-				v69.hydration_stream_enabled = v74 ~= 0
-			elseif v71 == 12 then
+				v70.include_placeholders = v74 ~= 0
+			elseif v72 == 11 then
 				local v75
 
-				v75, n2 = proto.readVarIntI32(p2, n2)
-				v69.hydration_stream_mode = hydration_stream_mode.HydrationStreamMode.fromNumber(v75) or v75
-			else
+				v75, n2 = proto.readVarInt(p2, n2)
+				v70.hydration_stream_enabled = v75 ~= 0
+			elseif v72 == 12 then
 				local v76
 
-				v76, n2 = proto.readVarInt(p2, n2)
-			end
-		elseif v72 == proto.wireTypes.lengthDelimited then
-			if v71 == 1 then
+				v76, n2 = proto.readVarIntI32(p2, n2)
+				v70.hydration_stream_mode = hydration_stream_mode.HydrationStreamMode.fromNumber(v76) or v76
+			else
 				local v77
 
-				v77, n2 = proto.readBuffer(p2, n2)
-				v69.feed_page_token = buffer.tostring(v77)
-			elseif v71 == 2 then
+				v77, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v73 == proto.wireTypes.lengthDelimited then
+			if v72 == 1 then
 				local v78
 
 				v78, n2 = proto.readBuffer(p2, n2)
-				v69.device = buffer.tostring(v78)
-			elseif v71 == 3 then
+				v70.feed_page_token = buffer.tostring(v78)
+			elseif v72 == 2 then
 				local v79
 
 				v79, n2 = proto.readBuffer(p2, n2)
-				v69.country = buffer.tostring(v79)
-			elseif v71 == 4 then
+				v70.device = buffer.tostring(v79)
+			elseif v72 == 3 then
 				local v80
 
 				v80, n2 = proto.readBuffer(p2, n2)
-				v69.age_group = buffer.tostring(v80)
-			elseif v71 == 5 then
+				v70.country = buffer.tostring(v80)
+			elseif v72 == 4 then
 				local v81
 
 				v81, n2 = proto.readBuffer(p2, n2)
-				v69.session_id = buffer.tostring(v81)
-			elseif v71 == 6 then
+				v70.age_group = buffer.tostring(v81)
+			elseif v72 == 5 then
 				local v82
 
 				v82, n2 = proto.readBuffer(p2, n2)
-				v69.entry_pagination_key = buffer.tostring(v82)
-			elseif v71 == 7 then
+				v70.session_id = buffer.tostring(v82)
+			elseif v72 == 6 then
 				local v83
 
 				v83, n2 = proto.readBuffer(p2, n2)
-				v69.entry_page_token = buffer.tostring(v83)
-			elseif v71 == 8 then
+				v70.entry_pagination_key = buffer.tostring(v83)
+			elseif v72 == 7 then
 				local v84
 
 				v84, n2 = proto.readBuffer(p2, n2)
-				v69.max_memory = buffer.tostring(v84)
-			elseif v71 == 9 then
+				v70.entry_page_token = buffer.tostring(v84)
+			elseif v72 == 8 then
 				local v85
 
 				v85, n2 = proto.readBuffer(p2, n2)
-				v69.page_type = buffer.tostring(v85)
-			elseif v71 == 13 then
+				v70.max_memory = buffer.tostring(v85)
+			elseif v72 == 9 then
 				local v86
 
 				v86, n2 = proto.readBuffer(p2, n2)
-				v69.collection_layout = t1.CollectionLayoutInfo.decode(v86)
-			elseif v71 == 14 then
+				v70.page_type = buffer.tostring(v86)
+			elseif v72 == 13 then
 				local v87
 
 				v87, n2 = proto.readBuffer(p2, n2)
+				v70.collection_layout = t1.CollectionLayoutInfo.decode(v87)
+			elseif v72 == 14 then
+				local v88
 
-				local v88 = t1.GetChartsPageRequest_CachedRobloxComponentToTemplateIdEntry.decode(v87)
+				v88, n2 = proto.readBuffer(p2, n2)
 
-				v69.cached_roblox_component_to_template_id[v88.key or ""] = v88.value or ""
-			elseif v71 == 15 then
-				local v89
+				local v89 = t1.GetChartsPageRequest_CachedRobloxComponentToTemplateIdEntry.decode(v88)
 
-				v89, n2 = proto.readBuffer(p2, n2)
-				v69.client_capabilities = client_capabilities.ClientCapabilities.decode(v89)
+				v70.cached_roblox_component_to_template_id[v89.key or ""] = v89.value or ""
+			elseif v72 == 15 then
+				local v90
+
+				v90, n2 = proto.readBuffer(p2, n2)
+				v70.client_capabilities = client_capabilities.ClientCapabilities.decode(v90)
 			else
-				local v90, v91 = proto.readVarInt(p2, n2)
+				local v91, v92 = proto.readVarInt(p2, n2)
 
-				n2 = v91 + v90
+				n2 = v92 + v91
 			end
-		elseif v72 == proto.wireTypes.i32 then
-			local v92
-
-			v92, n2 = proto.readFixed32(p2, n2)
-		elseif v72 == proto.wireTypes.i64 then
+		elseif v73 == proto.wireTypes.i32 then
 			local v93
 
-			v93, n2 = proto.readFixed64(p2, n2)
+			v93, n2 = proto.readFixed32(p2, n2)
+		elseif v73 == proto.wireTypes.i64 then
+			local v94
+
+			v94, n2 = proto.readFixed64(p2, n2)
 		else
-			error("Unsupported wire type: " .. v72)
+			error("Unsupported wire type: " .. v73)
 		end
 	end
 
-	return v69
+	return v70
 end
-function t2.jsonEncode(p3) -- line: 678
+function t2.jsonEncode(p3) -- line: 714
 	-- upvalues: hydration_stream_mode (copy)
 	local t4 = {}
 
@@ -314,8 +314,8 @@ function t2.jsonEncode(p3) -- line: 678
 	if p3.cached_roblox_component_to_template_id ~= nil and next(p3.cached_roblox_component_to_template_id) ~= nil then
 		local t5 = {}
 
-		for v97, v98 in p3.cached_roblox_component_to_template_id do
-			t5[v97] = v98
+		for v98, v99 in p3.cached_roblox_component_to_template_id do
+			t5[v98] = v99
 		end
 
 		t4.cachedRobloxComponentToTemplateId = t5
@@ -327,135 +327,135 @@ function t2.jsonEncode(p3) -- line: 678
 
 	return t4
 end
-function t2.jsonDecode(t6: {[any]: any}) -- line: 762
+function t2.jsonDecode(t6: {[any]: any}) -- line: 798
 	-- upvalues: t2 (copy), hydration_stream_mode (copy), t1 (copy), client_capabilities (copy)
-	local v100 = t2.new()
+	local v101 = t2.new()
 
 	if t6.feed_page_token ~= nil then
-		v100.feed_page_token = t6.feed_page_token
+		v101.feed_page_token = t6.feed_page_token
 	end
 
 	if t6.feedPageToken ~= nil then
-		v100.feed_page_token = t6.feedPageToken
+		v101.feed_page_token = t6.feedPageToken
 	end
 
 	if t6.device ~= nil then
-		v100.device = t6.device
+		v101.device = t6.device
 	end
 
 	if t6.country ~= nil then
-		v100.country = t6.country
+		v101.country = t6.country
 	end
 
 	if t6.age_group ~= nil then
-		v100.age_group = t6.age_group
+		v101.age_group = t6.age_group
 	end
 
 	if t6.ageGroup ~= nil then
-		v100.age_group = t6.ageGroup
+		v101.age_group = t6.ageGroup
 	end
 
 	if t6.session_id ~= nil then
-		v100.session_id = t6.session_id
+		v101.session_id = t6.session_id
 	end
 
 	if t6.sessionId ~= nil then
-		v100.session_id = t6.sessionId
+		v101.session_id = t6.sessionId
 	end
 
 	if t6.entry_pagination_key ~= nil then
-		v100.entry_pagination_key = t6.entry_pagination_key
+		v101.entry_pagination_key = t6.entry_pagination_key
 	end
 
 	if t6.entryPaginationKey ~= nil then
-		v100.entry_pagination_key = t6.entryPaginationKey
+		v101.entry_pagination_key = t6.entryPaginationKey
 	end
 
 	if t6.entry_page_token ~= nil then
-		v100.entry_page_token = t6.entry_page_token
+		v101.entry_page_token = t6.entry_page_token
 	end
 
 	if t6.entryPageToken ~= nil then
-		v100.entry_page_token = t6.entryPageToken
+		v101.entry_page_token = t6.entryPageToken
 	end
 
 	if t6.max_memory ~= nil then
-		v100.max_memory = t6.max_memory
+		v101.max_memory = t6.max_memory
 	end
 
 	if t6.maxMemory ~= nil then
-		v100.max_memory = t6.maxMemory
+		v101.max_memory = t6.maxMemory
 	end
 
 	if t6.page_type ~= nil then
-		v100.page_type = t6.page_type
+		v101.page_type = t6.page_type
 	end
 
 	if t6.pageType ~= nil then
-		v100.page_type = t6.pageType
+		v101.page_type = t6.pageType
 	end
 
 	if t6.include_placeholders ~= nil then
-		v100.include_placeholders = t6.include_placeholders
+		v101.include_placeholders = t6.include_placeholders
 	end
 
 	if t6.includePlaceholders ~= nil then
-		v100.include_placeholders = t6.includePlaceholders
+		v101.include_placeholders = t6.includePlaceholders
 	end
 
 	if t6.hydration_stream_enabled ~= nil then
-		v100.hydration_stream_enabled = t6.hydration_stream_enabled
+		v101.hydration_stream_enabled = t6.hydration_stream_enabled
 	end
 
 	if t6.hydrationStreamEnabled ~= nil then
-		v100.hydration_stream_enabled = t6.hydrationStreamEnabled
+		v101.hydration_stream_enabled = t6.hydrationStreamEnabled
 	end
 
 	if t6.hydration_stream_mode ~= nil then
-		v100.hydration_stream_mode = if typeof(t6.hydration_stream_mode) ~= "number" then hydration_stream_mode.HydrationStreamMode.fromName(t6.hydration_stream_mode) or t6.hydration_stream_mode else hydration_stream_mode.HydrationStreamMode.fromNumber(t6.hydration_stream_mode) or t6.hydration_stream_mode
+		v101.hydration_stream_mode = if typeof(t6.hydration_stream_mode) ~= "number" then hydration_stream_mode.HydrationStreamMode.fromName(t6.hydration_stream_mode) or t6.hydration_stream_mode else hydration_stream_mode.HydrationStreamMode.fromNumber(t6.hydration_stream_mode) or t6.hydration_stream_mode
 	end
 
 	if t6.hydrationStreamMode ~= nil then
-		v100.hydration_stream_mode = if typeof(t6.hydrationStreamMode) ~= "number" then hydration_stream_mode.HydrationStreamMode.fromName(t6.hydrationStreamMode) or t6.hydrationStreamMode else hydration_stream_mode.HydrationStreamMode.fromNumber(t6.hydrationStreamMode) or t6.hydrationStreamMode
+		v101.hydration_stream_mode = if typeof(t6.hydrationStreamMode) ~= "number" then hydration_stream_mode.HydrationStreamMode.fromName(t6.hydrationStreamMode) or t6.hydrationStreamMode else hydration_stream_mode.HydrationStreamMode.fromNumber(t6.hydrationStreamMode) or t6.hydrationStreamMode
 	end
 
 	if t6.collection_layout ~= nil then
-		v100.collection_layout = t1.CollectionLayoutInfo.jsonDecode(t6.collection_layout)
+		v101.collection_layout = t1.CollectionLayoutInfo.jsonDecode(t6.collection_layout)
 	end
 
 	if t6.collectionLayout ~= nil then
-		v100.collection_layout = t1.CollectionLayoutInfo.jsonDecode(t6.collectionLayout)
+		v101.collection_layout = t1.CollectionLayoutInfo.jsonDecode(t6.collectionLayout)
 	end
 
 	if t6.cached_roblox_component_to_template_id ~= nil then
 		local t7 = {}
 
-		for v102, v103 in t6.cached_roblox_component_to_template_id do
-			t7[v102] = v103
+		for v103, v104 in t6.cached_roblox_component_to_template_id do
+			t7[v103] = v104
 		end
 
-		v100.cached_roblox_component_to_template_id = t7
+		v101.cached_roblox_component_to_template_id = t7
 	end
 
 	if t6.cachedRobloxComponentToTemplateId ~= nil then
 		local t8 = {}
 
-		for v105, v106 in t6.cachedRobloxComponentToTemplateId do
-			t8[v105] = v106
+		for v106, v107 in t6.cachedRobloxComponentToTemplateId do
+			t8[v106] = v107
 		end
 
-		v100.cached_roblox_component_to_template_id = t8
+		v101.cached_roblox_component_to_template_id = t8
 	end
 
 	if t6.client_capabilities ~= nil then
-		v100.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(t6.client_capabilities)
+		v101.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(t6.client_capabilities)
 	end
 
 	if t6.clientCapabilities ~= nil then
-		v100.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(t6.clientCapabilities)
+		v101.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(t6.clientCapabilities)
 	end
 
-	return v100
+	return v101
 end
 
 t2.descriptor = {
@@ -469,28 +469,28 @@ local t9 = {}
 
 t9.__index = t9
 
-function t9.new(t10: {[any]: any}?) -- line: 923
+function t9.new(t10: {[any]: any}?) -- line: 959
 	-- upvalues: t9 (copy)
 	return (setmetatable({
 		key = if t10 ~= nil and t10.key ~= nil then t10.key else "",
 		value = if t10 ~= nil and t10.value ~= nil then t10.value else ""
 	}, t9))
 end
-function t9.encode(p4) -- line: 935
+function t9.encode(p4) -- line: 971
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n3 = 0
 
 	if p4.key ~= nil and p4.key ~= "" then
-		local v111, v112 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+		local v112, v113 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n3 = proto.writeString(v111, v112, p4.key)
+		buf, n3 = proto.writeString(v112, v113, p4.key)
 	end
 
 	if p4.value ~= nil and p4.value ~= "" then
-		local v113, v114 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
+		local v114, v115 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n3 = proto.writeString(v113, v114, p4.value)
+		buf, n3 = proto.writeString(v114, v115, p4.value)
 	end
 
 	local buf4 = buffer.create(n3)
@@ -499,52 +499,52 @@ function t9.encode(p4) -- line: 935
 
 	return buf4
 end
-function t9.decode(p5: buffer) -- line: 956
+function t9.decode(p5: buffer) -- line: 992
 	-- upvalues: t9 (copy), proto (copy)
-	local v117 = t9.new()
+	local v118 = t9.new()
 	local n4 = 0
 
 	while n4 < buffer.len(p5) do
-		local v119, v120
+		local v120, v121
 
-		v119, v120, n4 = proto.readTag(p5, n4)
+		v120, v121, n4 = proto.readTag(p5, n4)
 
-		if v120 == proto.wireTypes.varint then
-			local v121
+		if v121 == proto.wireTypes.varint then
+			local v122
 
-			v121, n4 = proto.readVarInt(p5, n4)
-		elseif v120 == proto.wireTypes.lengthDelimited then
-			if v119 == 1 then
-				local v122
-
-				v122, n4 = proto.readBuffer(p5, n4)
-				v117.key = buffer.tostring(v122)
-			elseif v119 == 2 then
+			v122, n4 = proto.readVarInt(p5, n4)
+		elseif v121 == proto.wireTypes.lengthDelimited then
+			if v120 == 1 then
 				local v123
 
 				v123, n4 = proto.readBuffer(p5, n4)
-				v117.value = buffer.tostring(v123)
+				v118.key = buffer.tostring(v123)
+			elseif v120 == 2 then
+				local v124
+
+				v124, n4 = proto.readBuffer(p5, n4)
+				v118.value = buffer.tostring(v124)
 			else
-				local v124, v125 = proto.readVarInt(p5, n4)
+				local v125, v126 = proto.readVarInt(p5, n4)
 
-				n4 = v125 + v124
+				n4 = v126 + v125
 			end
-		elseif v120 == proto.wireTypes.i32 then
-			local v126
-
-			v126, n4 = proto.readFixed32(p5, n4)
-		elseif v120 == proto.wireTypes.i64 then
+		elseif v121 == proto.wireTypes.i32 then
 			local v127
 
-			v127, n4 = proto.readFixed64(p5, n4)
+			v127, n4 = proto.readFixed32(p5, n4)
+		elseif v121 == proto.wireTypes.i64 then
+			local v128
+
+			v128, n4 = proto.readFixed64(p5, n4)
 		else
-			error("Unsupported wire type: " .. v120)
+			error("Unsupported wire type: " .. v121)
 		end
 	end
 
-	return v117
+	return v118
 end
-function t9.jsonEncode(p6) -- line: 1006
+function t9.jsonEncode(p6) -- line: 1042
 	local t11 = {}
 
 	if p6.key ~= nil and p6.key ~= "" then
@@ -557,19 +557,19 @@ function t9.jsonEncode(p6) -- line: 1006
 
 	return t11
 end
-function t9.jsonDecode(t12: {[any]: any}) -- line: 1022
+function t9.jsonDecode(t12: {[any]: any}) -- line: 1058
 	-- upvalues: t9 (copy)
-	local v131 = t9.new()
+	local v132 = t9.new()
 
 	if t12.key ~= nil then
-		v131.key = t12.key
+		v132.key = t12.key
 	end
 
 	if t12.value ~= nil then
-		v131.value = t12.value
+		v132.value = t12.value
 	end
 
-	return v131
+	return v132
 end
 
 t9.descriptor = {
@@ -583,35 +583,35 @@ local t13 = {}
 
 t13.__index = t13
 
-function t13.new(t14: {[any]: any}?) -- line: 1053
+function t13.new(t14: {[any]: any}?) -- line: 1089
 	-- upvalues: t13 (copy)
 	return (setmetatable({
 		items_per_row = if t14 ~= nil and t14.items_per_row ~= nil then t14.items_per_row else {},
 		rows_above_fold = if t14 ~= nil and t14.rows_above_fold ~= nil then t14.rows_above_fold else 0
 	}, t13))
 end
-function t13.encode(p7) -- line: 1060
+function t13.encode(p7) -- line: 1096
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n5 = 0
 
 	if p7.items_per_row ~= nil and next(p7.items_per_row) ~= nil then
-		for v136, v137 in p7.items_per_row do
+		for v137, v138 in p7.items_per_row do
 			local buf5 = buffer.create(0)
-			local v139, v140 = proto.writeTag(buf5, 0, 1, proto.wireTypes.lengthDelimited)
-			local v141, v142 = proto.writeString(v139, v140, v136)
-			local v143, v144 = proto.writeTag(v141, v142, 2, proto.wireTypes.varint)
-			local v145, v146 = proto.writeVarInt(v143, v144, v137)
-			local v147, v148 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+			local v140, v141 = proto.writeTag(buf5, 0, 1, proto.wireTypes.lengthDelimited)
+			local v142, v143 = proto.writeString(v140, v141, v137)
+			local v144, v145 = proto.writeTag(v142, v143, 2, proto.wireTypes.varint)
+			local v146, v147 = proto.writeVarInt(v144, v145, v138)
+			local v148, v149 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n5 = proto.writeBuffer(v147, v148, v145, v146)
+			buf, n5 = proto.writeBuffer(v148, v149, v146, v147)
 		end
 	end
 
 	if p7.rows_above_fold ~= nil and p7.rows_above_fold ~= 0 then
-		local v149, v150 = proto.writeTag(buf, n5, 2, proto.wireTypes.varint)
+		local v150, v151 = proto.writeTag(buf, n5, 2, proto.wireTypes.varint)
 
-		buf, n5 = proto.writeVarInt(v149, v150, p7.rows_above_fold)
+		buf, n5 = proto.writeVarInt(v150, v151, p7.rows_above_fold)
 	end
 
 	local buf6 = buffer.create(n5)
@@ -620,64 +620,64 @@ function t13.encode(p7) -- line: 1060
 
 	return buf6
 end
-function t13.decode(p8: buffer) -- line: 1087
+function t13.decode(p8: buffer) -- line: 1123
 	-- upvalues: t13 (copy), proto (copy), t1 (copy)
-	local v153 = t13.new()
+	local v154 = t13.new()
 	local n6 = 0
 
 	while n6 < buffer.len(p8) do
-		local v155, v156
+		local v156, v157
 
-		v155, v156, n6 = proto.readTag(p8, n6)
+		v156, v157, n6 = proto.readTag(p8, n6)
 
-		if v156 == proto.wireTypes.varint then
-			if v155 == 2 then
-				local v157
-
-				v157, n6 = proto.readVarIntI32(p8, n6)
-				v153.rows_above_fold = v157
-			else
+		if v157 == proto.wireTypes.varint then
+			if v156 == 2 then
 				local v158
 
-				v158, n6 = proto.readVarInt(p8, n6)
-			end
-		elseif v156 == proto.wireTypes.lengthDelimited then
-			if v155 == 1 then
+				v158, n6 = proto.readVarIntI32(p8, n6)
+				v154.rows_above_fold = v158
+			else
 				local v159
 
-				v159, n6 = proto.readBuffer(p8, n6)
-
-				local v160 = t1.CollectionLayoutInfo_ItemsPerRowEntry.decode(v159)
-
-				v153.items_per_row[v160.key or ""] = v160.value or 0
-			else
-				local v161, v162 = proto.readVarInt(p8, n6)
-
-				n6 = v162 + v161
+				v159, n6 = proto.readVarInt(p8, n6)
 			end
-		elseif v156 == proto.wireTypes.i32 then
-			local v163
+		elseif v157 == proto.wireTypes.lengthDelimited then
+			if v156 == 1 then
+				local v160
 
-			v163, n6 = proto.readFixed32(p8, n6)
-		elseif v156 == proto.wireTypes.i64 then
+				v160, n6 = proto.readBuffer(p8, n6)
+
+				local v161 = t1.CollectionLayoutInfo_ItemsPerRowEntry.decode(v160)
+
+				v154.items_per_row[v161.key or ""] = v161.value or 0
+			else
+				local v162, v163 = proto.readVarInt(p8, n6)
+
+				n6 = v163 + v162
+			end
+		elseif v157 == proto.wireTypes.i32 then
 			local v164
 
-			v164, n6 = proto.readFixed64(p8, n6)
+			v164, n6 = proto.readFixed32(p8, n6)
+		elseif v157 == proto.wireTypes.i64 then
+			local v165
+
+			v165, n6 = proto.readFixed64(p8, n6)
 		else
-			error("Unsupported wire type: " .. v156)
+			error("Unsupported wire type: " .. v157)
 		end
 	end
 
-	return v153
+	return v154
 end
-function t13.jsonEncode(p9) -- line: 1142
+function t13.jsonEncode(p9) -- line: 1178
 	local t15 = {}
 
 	if p9.items_per_row ~= nil and next(p9.items_per_row) ~= nil then
 		local t16 = {}
 
-		for v168, v169 in p9.items_per_row do
-			t16[v168] = v169
+		for v169, v170 in p9.items_per_row do
+			t16[v169] = v170
 		end
 
 		t15.itemsPerRow = t16
@@ -689,39 +689,39 @@ function t13.jsonEncode(p9) -- line: 1142
 
 	return t15
 end
-function t13.jsonDecode(t17: {[any]: any}) -- line: 1160
+function t13.jsonDecode(t17: {[any]: any}) -- line: 1196
 	-- upvalues: t13 (copy)
-	local v171 = t13.new()
+	local v172 = t13.new()
 
 	if t17.items_per_row ~= nil then
 		local t18 = {}
 
-		for v173, v174 in t17.items_per_row do
-			t18[v173] = v174
+		for v174, v175 in t17.items_per_row do
+			t18[v174] = v175
 		end
 
-		v171.items_per_row = t18
+		v172.items_per_row = t18
 	end
 
 	if t17.itemsPerRow ~= nil then
 		local t19 = {}
 
-		for v176, v177 in t17.itemsPerRow do
-			t19[v176] = v177
+		for v177, v178 in t17.itemsPerRow do
+			t19[v177] = v178
 		end
 
-		v171.items_per_row = t19
+		v172.items_per_row = t19
 	end
 
 	if t17.rows_above_fold ~= nil then
-		v171.rows_above_fold = t17.rows_above_fold
+		v172.rows_above_fold = t17.rows_above_fold
 	end
 
 	if t17.rowsAboveFold ~= nil then
-		v171.rows_above_fold = t17.rowsAboveFold
+		v172.rows_above_fold = t17.rowsAboveFold
 	end
 
-	return v171
+	return v172
 end
 
 t13.descriptor = {
@@ -735,28 +735,28 @@ local t20 = {}
 
 t20.__index = t20
 
-function t20.new(t21: {[any]: any}?) -- line: 1206
+function t20.new(t21: {[any]: any}?) -- line: 1242
 	-- upvalues: t20 (copy)
 	return (setmetatable({
 		key = if t21 ~= nil and t21.key ~= nil then t21.key else "",
 		value = if t21 ~= nil and t21.value ~= nil then t21.value else 0
 	}, t20))
 end
-function t20.encode(p10) -- line: 1215
+function t20.encode(p10) -- line: 1251
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n7 = 0
 
 	if p10.key ~= nil and p10.key ~= "" then
-		local v182, v183 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+		local v183, v184 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n7 = proto.writeString(v182, v183, p10.key)
+		buf, n7 = proto.writeString(v183, v184, p10.key)
 	end
 
 	if p10.value ~= nil and p10.value ~= 0 then
-		local v184, v185 = proto.writeTag(buf, n7, 2, proto.wireTypes.varint)
+		local v185, v186 = proto.writeTag(buf, n7, 2, proto.wireTypes.varint)
 
-		buf, n7 = proto.writeVarInt(v184, v185, p10.value)
+		buf, n7 = proto.writeVarInt(v185, v186, p10.value)
 	end
 
 	local buf7 = buffer.create(n7)
@@ -765,54 +765,54 @@ function t20.encode(p10) -- line: 1215
 
 	return buf7
 end
-function t20.decode(p11: buffer) -- line: 1234
+function t20.decode(p11: buffer) -- line: 1270
 	-- upvalues: t20 (copy), proto (copy)
-	local v188 = t20.new()
+	local v189 = t20.new()
 	local n8 = 0
 
 	while n8 < buffer.len(p11) do
-		local v190, v191
+		local v191, v192
 
-		v190, v191, n8 = proto.readTag(p11, n8)
+		v191, v192, n8 = proto.readTag(p11, n8)
 
-		if v191 == proto.wireTypes.varint then
-			if v190 == 2 then
-				local v192
-
-				v192, n8 = proto.readVarIntI32(p11, n8)
-				v188.value = v192
-			else
+		if v192 == proto.wireTypes.varint then
+			if v191 == 2 then
 				local v193
 
-				v193, n8 = proto.readVarInt(p11, n8)
-			end
-		elseif v191 == proto.wireTypes.lengthDelimited then
-			if v190 == 1 then
+				v193, n8 = proto.readVarIntI32(p11, n8)
+				v189.value = v193
+			else
 				local v194
 
-				v194, n8 = proto.readBuffer(p11, n8)
-				v188.key = buffer.tostring(v194)
-			else
-				local v195, v196 = proto.readVarInt(p11, n8)
-
-				n8 = v196 + v195
+				v194, n8 = proto.readVarInt(p11, n8)
 			end
-		elseif v191 == proto.wireTypes.i32 then
-			local v197
+		elseif v192 == proto.wireTypes.lengthDelimited then
+			if v191 == 1 then
+				local v195
 
-			v197, n8 = proto.readFixed32(p11, n8)
-		elseif v191 == proto.wireTypes.i64 then
+				v195, n8 = proto.readBuffer(p11, n8)
+				v189.key = buffer.tostring(v195)
+			else
+				local v196, v197 = proto.readVarInt(p11, n8)
+
+				n8 = v197 + v196
+			end
+		elseif v192 == proto.wireTypes.i32 then
 			local v198
 
-			v198, n8 = proto.readFixed64(p11, n8)
+			v198, n8 = proto.readFixed32(p11, n8)
+		elseif v192 == proto.wireTypes.i64 then
+			local v199
+
+			v199, n8 = proto.readFixed64(p11, n8)
 		else
-			error("Unsupported wire type: " .. v191)
+			error("Unsupported wire type: " .. v192)
 		end
 	end
 
-	return v188
+	return v189
 end
-function t20.jsonEncode(p12) -- line: 1282
+function t20.jsonEncode(p12) -- line: 1318
 	local t22 = {}
 
 	if p12.key ~= nil and p12.key ~= "" then
@@ -825,19 +825,19 @@ function t20.jsonEncode(p12) -- line: 1282
 
 	return t22
 end
-function t20.jsonDecode(t23: {[any]: any}) -- line: 1296
+function t20.jsonDecode(t23: {[any]: any}) -- line: 1332
 	-- upvalues: t20 (copy)
-	local v202 = t20.new()
+	local v203 = t20.new()
 
 	if t23.key ~= nil then
-		v202.key = t23.key
+		v203.key = t23.key
 	end
 
 	if t23.value ~= nil then
-		v202.value = t23.value
+		v203.value = t23.value
 	end
 
-	return v202
+	return v203
 end
 
 t20.descriptor = {
@@ -851,7 +851,7 @@ local t24 = {}
 
 t24.__index = t24
 
-function t24.new(t25: {[any]: any}?) -- line: 1326
+function t24.new(t25: {[any]: any}?) -- line: 1362
 	-- upvalues: t24 (copy)
 	return (setmetatable({
 		page_entries = if t25 ~= nil and t25.page_entries ~= nil then t25.page_entries else {},
@@ -860,51 +860,51 @@ function t24.new(t25: {[any]: any}?) -- line: 1326
 		localized_literals = if t25 ~= nil and t25.localized_literals ~= nil then t25.localized_literals else {}
 	}, t24))
 end
-function t24.encode(p13) -- line: 1335
+function t24.encode(p13) -- line: 1371
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n9 = 0
 
 	if p13.page_entries ~= nil and #p13.page_entries > 0 then
-		for _, v208 in p13.page_entries do
-			local v209 = v208:encode()
-			local v210, v211 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
+		for _, v209 in p13.page_entries do
+			local v210 = v209:encode()
+			local v211, v212 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v210, v211, v209, buffer.len(v209))
+			buf, n9 = proto.writeBuffer(v211, v212, v210, buffer.len(v210))
 		end
 	end
 
 	if p13.hydration_data ~= nil then
-		local v212 = p13.hydration_data:encode()
-		local v213, v214 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
+		local v213 = p13.hydration_data:encode()
+		local v214, v215 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n9 = proto.writeBuffer(v213, v214, v212, buffer.len(v212))
+		buf, n9 = proto.writeBuffer(v214, v215, v213, buffer.len(v213))
 	end
 
 	if p13.templates ~= nil and next(p13.templates) ~= nil then
-		for v215, v216 in p13.templates do
+		for v216, v217 in p13.templates do
 			local buf8 = buffer.create(0)
-			local v218, v219 = proto.writeTag(buf8, 0, 1, proto.wireTypes.lengthDelimited)
-			local v220, v221 = proto.writeString(v218, v219, v215)
-			local v222 = v216:encode()
-			local v223, v224 = proto.writeTag(v220, v221, 2, proto.wireTypes.lengthDelimited)
-			local v225, v226 = proto.writeBuffer(v223, v224, v222, buffer.len(v222))
-			local v227, v228 = proto.writeTag(buf, n9, 3, proto.wireTypes.lengthDelimited)
+			local v219, v220 = proto.writeTag(buf8, 0, 1, proto.wireTypes.lengthDelimited)
+			local v221, v222 = proto.writeString(v219, v220, v216)
+			local v223 = v217:encode()
+			local v224, v225 = proto.writeTag(v221, v222, 2, proto.wireTypes.lengthDelimited)
+			local v226, v227 = proto.writeBuffer(v224, v225, v223, buffer.len(v223))
+			local v228, v229 = proto.writeTag(buf, n9, 3, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v227, v228, v225, v226)
+			buf, n9 = proto.writeBuffer(v228, v229, v226, v227)
 		end
 	end
 
 	if p13.localized_literals ~= nil and next(p13.localized_literals) ~= nil then
-		for v229, v230 in p13.localized_literals do
+		for v230, v231 in p13.localized_literals do
 			local buf9 = buffer.create(0)
-			local v232, v233 = proto.writeTag(buf9, 0, 1, proto.wireTypes.lengthDelimited)
-			local v234, v235 = proto.writeString(v232, v233, v229)
-			local v236, v237 = proto.writeTag(v234, v235, 2, proto.wireTypes.lengthDelimited)
-			local v238, v239 = proto.writeString(v236, v237, v230)
-			local v240, v241 = proto.writeTag(buf, n9, 4, proto.wireTypes.lengthDelimited)
+			local v233, v234 = proto.writeTag(buf9, 0, 1, proto.wireTypes.lengthDelimited)
+			local v235, v236 = proto.writeString(v233, v234, v230)
+			local v237, v238 = proto.writeTag(v235, v236, 2, proto.wireTypes.lengthDelimited)
+			local v239, v240 = proto.writeString(v237, v238, v231)
+			local v241, v242 = proto.writeTag(buf, n9, 4, proto.wireTypes.lengthDelimited)
 
-			buf, n9 = proto.writeBuffer(v240, v241, v238, v239)
+			buf, n9 = proto.writeBuffer(v241, v242, v239, v240)
 		end
 	end
 
@@ -914,76 +914,76 @@ function t24.encode(p13) -- line: 1335
 
 	return buf10
 end
-function t24.decode(p14: buffer) -- line: 1385
+function t24.decode(p14: buffer) -- line: 1421
 	-- upvalues: t24 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
-	local v244 = t24.new()
+	local v245 = t24.new()
 	local n10 = 0
 
 	while n10 < buffer.len(p14) do
-		local v246, v247
+		local v247, v248
 
-		v246, v247, n10 = proto.readTag(p14, n10)
+		v247, v248, n10 = proto.readTag(p14, n10)
 
-		if v247 == proto.wireTypes.varint then
-			local v248
+		if v248 == proto.wireTypes.varint then
+			local v249
 
-			v248, n10 = proto.readVarInt(p14, n10)
-		elseif v247 == proto.wireTypes.lengthDelimited then
-			if v246 == 1 then
-				local v249
-
-				v249, n10 = proto.readBuffer(p14, n10)
-				table.insert(v244.page_entries, page_entry_content.UniversalPageEntry.decode(v249))
-			elseif v246 == 2 then
+			v249, n10 = proto.readVarInt(p14, n10)
+		elseif v248 == proto.wireTypes.lengthDelimited then
+			if v247 == 1 then
 				local v250
 
 				v250, n10 = proto.readBuffer(p14, n10)
-				v244.hydration_data = hydration_content.HydrationContent.decode(v250)
-			elseif v246 == 3 then
+				table.insert(v245.page_entries, page_entry_content.UniversalPageEntry.decode(v250))
+			elseif v247 == 2 then
 				local v251
 
 				v251, n10 = proto.readBuffer(p14, n10)
+				v245.hydration_data = hydration_content.HydrationContent.decode(v251)
+			elseif v247 == 3 then
+				local v252
 
-				local v252 = t1.GetChartsPageResponse_TemplatesEntry.decode(v251)
-				local v253 = template_entry.TemplateEntry.new()
+				v252, n10 = proto.readBuffer(p14, n10)
 
-				v244.templates[v252.key or ""] = v252.value or v253
-			elseif v246 == 4 then
-				local v254
+				local v253 = t1.GetChartsPageResponse_TemplatesEntry.decode(v252)
+				local v254 = template_entry.TemplateEntry.new()
 
-				v254, n10 = proto.readBuffer(p14, n10)
+				v245.templates[v253.key or ""] = v253.value or v254
+			elseif v247 == 4 then
+				local v255
 
-				local v255 = t1.GetChartsPageResponse_LocalizedLiteralsEntry.decode(v254)
+				v255, n10 = proto.readBuffer(p14, n10)
 
-				v244.localized_literals[v255.key or ""] = v255.value or ""
+				local v256 = t1.GetChartsPageResponse_LocalizedLiteralsEntry.decode(v255)
+
+				v245.localized_literals[v256.key or ""] = v256.value or ""
 			else
-				local v256, v257 = proto.readVarInt(p14, n10)
+				local v257, v258 = proto.readVarInt(p14, n10)
 
-				n10 = v257 + v256
+				n10 = v258 + v257
 			end
-		elseif v247 == proto.wireTypes.i32 then
-			local v258
-
-			v258, n10 = proto.readFixed32(p14, n10)
-		elseif v247 == proto.wireTypes.i64 then
+		elseif v248 == proto.wireTypes.i32 then
 			local v259
 
-			v259, n10 = proto.readFixed64(p14, n10)
+			v259, n10 = proto.readFixed32(p14, n10)
+		elseif v248 == proto.wireTypes.i64 then
+			local v260
+
+			v260, n10 = proto.readFixed64(p14, n10)
 		else
-			error("Unsupported wire type: " .. v247)
+			error("Unsupported wire type: " .. v248)
 		end
 	end
 
-	return v244
+	return v245
 end
-function t24.jsonEncode(p15) -- line: 1461
+function t24.jsonEncode(p15) -- line: 1497
 	local t26 = {}
 
 	if p15.page_entries ~= nil and #p15.page_entries > 0 then
 		local t27 = {}
 
-		for _, v264 in p15.page_entries do
-			table.insert(t27, v264:jsonEncode())
+		for _, v265 in p15.page_entries do
+			table.insert(t27, v265:jsonEncode())
 		end
 
 		t26.pageEntries = t27
@@ -996,8 +996,8 @@ function t24.jsonEncode(p15) -- line: 1461
 	if p15.templates ~= nil and next(p15.templates) ~= nil then
 		local t28 = {}
 
-		for v266, v267 in p15.templates do
-			t28[v266] = v267:jsonEncode()
+		for v267, v268 in p15.templates do
+			t28[v267] = v268:jsonEncode()
 		end
 
 		t26.templates = t28
@@ -1006,8 +1006,8 @@ function t24.jsonEncode(p15) -- line: 1461
 	if p15.localized_literals ~= nil and next(p15.localized_literals) ~= nil then
 		local t29 = {}
 
-		for v269, v270 in p15.localized_literals do
-			t29[v269] = v270
+		for v270, v271 in p15.localized_literals do
+			t29[v270] = v271
 		end
 
 		t26.localizedLiterals = t29
@@ -1015,69 +1015,69 @@ function t24.jsonEncode(p15) -- line: 1461
 
 	return t26
 end
-function t24.jsonDecode(t30: {[any]: any}) -- line: 1495
+function t24.jsonDecode(t30: {[any]: any}) -- line: 1531
 	-- upvalues: t24 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
-	local v272 = t24.new()
+	local v273 = t24.new()
 
 	if t30.page_entries ~= nil then
 		local t31 = {}
 
-		for _, v275 in t30.page_entries do
-			table.insert(t31, page_entry_content.UniversalPageEntry.jsonDecode(v275))
+		for _, v276 in t30.page_entries do
+			table.insert(t31, page_entry_content.UniversalPageEntry.jsonDecode(v276))
 		end
 
-		v272.page_entries = t31
+		v273.page_entries = t31
 	end
 
 	if t30.pageEntries ~= nil then
 		local t32 = {}
 
-		for _, v278 in t30.pageEntries do
-			table.insert(t32, page_entry_content.UniversalPageEntry.jsonDecode(v278))
+		for _, v279 in t30.pageEntries do
+			table.insert(t32, page_entry_content.UniversalPageEntry.jsonDecode(v279))
 		end
 
-		v272.page_entries = t32
+		v273.page_entries = t32
 	end
 
 	if t30.hydration_data ~= nil then
-		v272.hydration_data = hydration_content.HydrationContent.jsonDecode(t30.hydration_data)
+		v273.hydration_data = hydration_content.HydrationContent.jsonDecode(t30.hydration_data)
 	end
 
 	if t30.hydrationData ~= nil then
-		v272.hydration_data = hydration_content.HydrationContent.jsonDecode(t30.hydrationData)
+		v273.hydration_data = hydration_content.HydrationContent.jsonDecode(t30.hydrationData)
 	end
 
 	if t30.templates ~= nil then
 		local t33 = {}
 
-		for v280, v281 in t30.templates do
-			t33[v280] = template_entry.TemplateEntry.jsonDecode(v281)
+		for v281, v282 in t30.templates do
+			t33[v281] = template_entry.TemplateEntry.jsonDecode(v282)
 		end
 
-		v272.templates = t33
+		v273.templates = t33
 	end
 
 	if t30.localized_literals ~= nil then
 		local t34 = {}
 
-		for v283, v284 in t30.localized_literals do
-			t34[v283] = v284
+		for v284, v285 in t30.localized_literals do
+			t34[v284] = v285
 		end
 
-		v272.localized_literals = t34
+		v273.localized_literals = t34
 	end
 
 	if t30.localizedLiterals ~= nil then
 		local t35 = {}
 
-		for v286, v287 in t30.localizedLiterals do
-			t35[v286] = v287
+		for v287, v288 in t30.localizedLiterals do
+			t35[v287] = v288
 		end
 
-		v272.localized_literals = t35
+		v273.localized_literals = t35
 	end
 
-	return v272
+	return v273
 end
 
 t24.descriptor = {
@@ -1091,29 +1091,29 @@ local t36 = {}
 
 t36.__index = t36
 
-function t36.new(t37: {[any]: any}?) -- line: 1578
+function t36.new(t37: {[any]: any}?) -- line: 1614
 	-- upvalues: t36 (copy)
 	return (setmetatable({
 		key = if t37 ~= nil and t37.key ~= nil then t37.key else "",
 		value = if t37 ~= nil and t37.value ~= nil then t37.value else nil
 	}, t36))
 end
-function t36.encode(p16) -- line: 1587
+function t36.encode(p16) -- line: 1623
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n11 = 0
 
 	if p16.key ~= nil and p16.key ~= "" then
-		local v292, v293 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
+		local v293, v294 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n11 = proto.writeString(v292, v293, p16.key)
+		buf, n11 = proto.writeString(v293, v294, p16.key)
 	end
 
 	if p16.value ~= nil then
-		local v294 = p16.value:encode()
-		local v295, v296 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
+		local v295 = p16.value:encode()
+		local v296, v297 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n11 = proto.writeBuffer(v295, v296, v294, buffer.len(v294))
+		buf, n11 = proto.writeBuffer(v296, v297, v295, buffer.len(v295))
 	end
 
 	local buf11 = buffer.create(n11)
@@ -1122,52 +1122,52 @@ function t36.encode(p16) -- line: 1587
 
 	return buf11
 end
-function t36.decode(p17: buffer) -- line: 1607
+function t36.decode(p17: buffer) -- line: 1643
 	-- upvalues: t36 (copy), proto (copy), template_entry (copy)
-	local v299 = t36.new()
+	local v300 = t36.new()
 	local n12 = 0
 
 	while n12 < buffer.len(p17) do
-		local v301, v302
+		local v302, v303
 
-		v301, v302, n12 = proto.readTag(p17, n12)
+		v302, v303, n12 = proto.readTag(p17, n12)
 
-		if v302 == proto.wireTypes.varint then
-			local v303
+		if v303 == proto.wireTypes.varint then
+			local v304
 
-			v303, n12 = proto.readVarInt(p17, n12)
-		elseif v302 == proto.wireTypes.lengthDelimited then
-			if v301 == 1 then
-				local v304
-
-				v304, n12 = proto.readBuffer(p17, n12)
-				v299.key = buffer.tostring(v304)
-			elseif v301 == 2 then
+			v304, n12 = proto.readVarInt(p17, n12)
+		elseif v303 == proto.wireTypes.lengthDelimited then
+			if v302 == 1 then
 				local v305
 
 				v305, n12 = proto.readBuffer(p17, n12)
-				v299.value = template_entry.TemplateEntry.decode(v305)
+				v300.key = buffer.tostring(v305)
+			elseif v302 == 2 then
+				local v306
+
+				v306, n12 = proto.readBuffer(p17, n12)
+				v300.value = template_entry.TemplateEntry.decode(v306)
 			else
-				local v306, v307 = proto.readVarInt(p17, n12)
+				local v307, v308 = proto.readVarInt(p17, n12)
 
-				n12 = v307 + v306
+				n12 = v308 + v307
 			end
-		elseif v302 == proto.wireTypes.i32 then
-			local v308
-
-			v308, n12 = proto.readFixed32(p17, n12)
-		elseif v302 == proto.wireTypes.i64 then
+		elseif v303 == proto.wireTypes.i32 then
 			local v309
 
-			v309, n12 = proto.readFixed64(p17, n12)
+			v309, n12 = proto.readFixed32(p17, n12)
+		elseif v303 == proto.wireTypes.i64 then
+			local v310
+
+			v310, n12 = proto.readFixed64(p17, n12)
 		else
-			error("Unsupported wire type: " .. v302)
+			error("Unsupported wire type: " .. v303)
 		end
 	end
 
-	return v299
+	return v300
 end
-function t36.jsonEncode(p18) -- line: 1655
+function t36.jsonEncode(p18) -- line: 1691
 	local t38 = {}
 
 	if p18.key ~= nil and p18.key ~= "" then
@@ -1180,19 +1180,19 @@ function t36.jsonEncode(p18) -- line: 1655
 
 	return t38
 end
-function t36.jsonDecode(t39: {[any]: any}) -- line: 1669
+function t36.jsonDecode(t39: {[any]: any}) -- line: 1705
 	-- upvalues: t36 (copy), template_entry (copy)
-	local v313 = t36.new()
+	local v314 = t36.new()
 
 	if t39.key ~= nil then
-		v313.key = t39.key
+		v314.key = t39.key
 	end
 
 	if t39.value ~= nil then
-		v313.value = template_entry.TemplateEntry.jsonDecode(t39.value)
+		v314.value = template_entry.TemplateEntry.jsonDecode(t39.value)
 	end
 
-	return v313
+	return v314
 end
 
 t36.descriptor = {
@@ -1206,28 +1206,28 @@ local t40 = {}
 
 t40.__index = t40
 
-function t40.new(t41: {[any]: any}?) -- line: 1699
+function t40.new(t41: {[any]: any}?) -- line: 1735
 	-- upvalues: t40 (copy)
 	return (setmetatable({
 		key = if t41 ~= nil and t41.key ~= nil then t41.key else "",
 		value = if t41 ~= nil and t41.value ~= nil then t41.value else ""
 	}, t40))
 end
-function t40.encode(p19) -- line: 1708
+function t40.encode(p19) -- line: 1744
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n13 = 0
 
 	if p19.key ~= nil and p19.key ~= "" then
-		local v318, v319 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
+		local v319, v320 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n13 = proto.writeString(v318, v319, p19.key)
+		buf, n13 = proto.writeString(v319, v320, p19.key)
 	end
 
 	if p19.value ~= nil and p19.value ~= "" then
-		local v320, v321 = proto.writeTag(buf, n13, 2, proto.wireTypes.lengthDelimited)
+		local v321, v322 = proto.writeTag(buf, n13, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n13 = proto.writeString(v320, v321, p19.value)
+		buf, n13 = proto.writeString(v321, v322, p19.value)
 	end
 
 	local buf12 = buffer.create(n13)
@@ -1236,52 +1236,52 @@ function t40.encode(p19) -- line: 1708
 
 	return buf12
 end
-function t40.decode(p20: buffer) -- line: 1729
+function t40.decode(p20: buffer) -- line: 1765
 	-- upvalues: t40 (copy), proto (copy)
-	local v324 = t40.new()
+	local v325 = t40.new()
 	local n14 = 0
 
 	while n14 < buffer.len(p20) do
-		local v326, v327
+		local v327, v328
 
-		v326, v327, n14 = proto.readTag(p20, n14)
+		v327, v328, n14 = proto.readTag(p20, n14)
 
-		if v327 == proto.wireTypes.varint then
-			local v328
+		if v328 == proto.wireTypes.varint then
+			local v329
 
-			v328, n14 = proto.readVarInt(p20, n14)
-		elseif v327 == proto.wireTypes.lengthDelimited then
-			if v326 == 1 then
-				local v329
-
-				v329, n14 = proto.readBuffer(p20, n14)
-				v324.key = buffer.tostring(v329)
-			elseif v326 == 2 then
+			v329, n14 = proto.readVarInt(p20, n14)
+		elseif v328 == proto.wireTypes.lengthDelimited then
+			if v327 == 1 then
 				local v330
 
 				v330, n14 = proto.readBuffer(p20, n14)
-				v324.value = buffer.tostring(v330)
+				v325.key = buffer.tostring(v330)
+			elseif v327 == 2 then
+				local v331
+
+				v331, n14 = proto.readBuffer(p20, n14)
+				v325.value = buffer.tostring(v331)
 			else
-				local v331, v332 = proto.readVarInt(p20, n14)
+				local v332, v333 = proto.readVarInt(p20, n14)
 
-				n14 = v332 + v331
+				n14 = v333 + v332
 			end
-		elseif v327 == proto.wireTypes.i32 then
-			local v333
-
-			v333, n14 = proto.readFixed32(p20, n14)
-		elseif v327 == proto.wireTypes.i64 then
+		elseif v328 == proto.wireTypes.i32 then
 			local v334
 
-			v334, n14 = proto.readFixed64(p20, n14)
+			v334, n14 = proto.readFixed32(p20, n14)
+		elseif v328 == proto.wireTypes.i64 then
+			local v335
+
+			v335, n14 = proto.readFixed64(p20, n14)
 		else
-			error("Unsupported wire type: " .. v327)
+			error("Unsupported wire type: " .. v328)
 		end
 	end
 
-	return v324
+	return v325
 end
-function t40.jsonEncode(p21) -- line: 1779
+function t40.jsonEncode(p21) -- line: 1815
 	local t42 = {}
 
 	if p21.key ~= nil and p21.key ~= "" then
@@ -1294,19 +1294,19 @@ function t40.jsonEncode(p21) -- line: 1779
 
 	return t42
 end
-function t40.jsonDecode(t43: {[any]: any}) -- line: 1795
+function t40.jsonDecode(t43: {[any]: any}) -- line: 1831
 	-- upvalues: t40 (copy)
-	local v338 = t40.new()
+	local v339 = t40.new()
 
 	if t43.key ~= nil then
-		v338.key = t43.key
+		v339.key = t43.key
 	end
 
 	if t43.value ~= nil then
-		v338.value = t43.value
+		v339.value = t43.value
 	end
 
-	return v338
+	return v339
 end
 
 t40.descriptor = {
@@ -1320,7 +1320,7 @@ local t44 = {}
 
 t44.__index = t44
 
-function t44.new(t45: {[any]: any}?) -- line: 1825
+function t44.new(t45: {[any]: any}?) -- line: 1861
 	-- upvalues: t44 (copy)
 	return (setmetatable({
 		sort_id = if t45 ~= nil and t45.sort_id ~= nil then t45.sort_id else "",
@@ -1330,144 +1330,179 @@ function t44.new(t45: {[any]: any}?) -- line: 1825
 		session_id = if t45 ~= nil and t45.session_id ~= nil then t45.session_id else "",
 		age_group = if t45 ~= nil and t45.age_group ~= nil then t45.age_group else "",
 		max_memory = if t45 ~= nil and t45.max_memory ~= nil then t45.max_memory else "",
-		selected_genre = if t45 ~= nil and t45.selected_genre ~= nil then t45.selected_genre else ""
+		selected_genre = if t45 ~= nil and t45.selected_genre ~= nil then t45.selected_genre else "",
+		cached_roblox_component_to_template_id = if t45 ~= nil and t45.cached_roblox_component_to_template_id ~= nil then t45.cached_roblox_component_to_template_id else {},
+		client_capabilities = if t45 ~= nil and t45.client_capabilities ~= nil then t45.client_capabilities else nil
 	}, t44))
 end
-function t44.encode(p22) -- line: 1840
+function t44.encode(p22) -- line: 1883
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n15 = 0
 
 	if p22.sort_id ~= nil and p22.sort_id ~= "" then
-		local v343, v344 = proto.writeTag(buf, n15, 1, proto.wireTypes.lengthDelimited)
+		local v344, v345 = proto.writeTag(buf, n15, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v343, v344, p22.sort_id)
+		buf, n15 = proto.writeString(v344, v345, p22.sort_id)
 	end
 
 	if p22.content_page_token ~= nil and p22.content_page_token ~= "" then
-		local v345, v346 = proto.writeTag(buf, n15, 2, proto.wireTypes.lengthDelimited)
+		local v346, v347 = proto.writeTag(buf, n15, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v345, v346, p22.content_page_token)
+		buf, n15 = proto.writeString(v346, v347, p22.content_page_token)
 	end
 
 	if p22.device ~= nil and p22.device ~= "" then
-		local v347, v348 = proto.writeTag(buf, n15, 3, proto.wireTypes.lengthDelimited)
+		local v348, v349 = proto.writeTag(buf, n15, 3, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v347, v348, p22.device)
+		buf, n15 = proto.writeString(v348, v349, p22.device)
 	end
 
 	if p22.country ~= nil and p22.country ~= "" then
-		local v349, v350 = proto.writeTag(buf, n15, 4, proto.wireTypes.lengthDelimited)
+		local v350, v351 = proto.writeTag(buf, n15, 4, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v349, v350, p22.country)
+		buf, n15 = proto.writeString(v350, v351, p22.country)
 	end
 
 	if p22.session_id ~= nil and p22.session_id ~= "" then
-		local v351, v352 = proto.writeTag(buf, n15, 5, proto.wireTypes.lengthDelimited)
+		local v352, v353 = proto.writeTag(buf, n15, 5, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v351, v352, p22.session_id)
+		buf, n15 = proto.writeString(v352, v353, p22.session_id)
 	end
 
 	if p22.age_group ~= nil and p22.age_group ~= "" then
-		local v353, v354 = proto.writeTag(buf, n15, 6, proto.wireTypes.lengthDelimited)
+		local v354, v355 = proto.writeTag(buf, n15, 6, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v353, v354, p22.age_group)
+		buf, n15 = proto.writeString(v354, v355, p22.age_group)
 	end
 
 	if p22.max_memory ~= nil and p22.max_memory ~= "" then
-		local v355, v356 = proto.writeTag(buf, n15, 7, proto.wireTypes.lengthDelimited)
+		local v356, v357 = proto.writeTag(buf, n15, 7, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v355, v356, p22.max_memory)
+		buf, n15 = proto.writeString(v356, v357, p22.max_memory)
 	end
 
 	if p22.selected_genre ~= nil and p22.selected_genre ~= "" then
-		local v357, v358 = proto.writeTag(buf, n15, 8, proto.wireTypes.lengthDelimited)
+		local v358, v359 = proto.writeTag(buf, n15, 8, proto.wireTypes.lengthDelimited)
 
-		buf, n15 = proto.writeString(v357, v358, p22.selected_genre)
+		buf, n15 = proto.writeString(v358, v359, p22.selected_genre)
 	end
 
-	local buf13 = buffer.create(n15)
+	if p22.cached_roblox_component_to_template_id ~= nil and next(p22.cached_roblox_component_to_template_id) ~= nil then
+		for v360, v361 in p22.cached_roblox_component_to_template_id do
+			local buf13 = buffer.create(0)
+			local v363, v364 = proto.writeTag(buf13, 0, 1, proto.wireTypes.lengthDelimited)
+			local v365, v366 = proto.writeString(v363, v364, v360)
+			local v367, v368 = proto.writeTag(v365, v366, 2, proto.wireTypes.lengthDelimited)
+			local v369, v370 = proto.writeString(v367, v368, v361)
+			local v371, v372 = proto.writeTag(buf, n15, 9, proto.wireTypes.lengthDelimited)
 
-	buffer.copy(buf13, 0, buf, 0, n15)
-
-	return buf13
-end
-function t44.decode(p23: buffer) -- line: 1889
-	-- upvalues: t44 (copy), proto (copy)
-	local v361 = t44.new()
-	local n16 = 0
-
-	while n16 < buffer.len(p23) do
-		local v363, v364
-
-		v363, v364, n16 = proto.readTag(p23, n16)
-
-		if v364 == proto.wireTypes.varint then
-			local v365
-
-			v365, n16 = proto.readVarInt(p23, n16)
-		elseif v364 == proto.wireTypes.lengthDelimited then
-			if v363 == 1 then
-				local v366
-
-				v366, n16 = proto.readBuffer(p23, n16)
-				v361.sort_id = buffer.tostring(v366)
-			elseif v363 == 2 then
-				local v367
-
-				v367, n16 = proto.readBuffer(p23, n16)
-				v361.content_page_token = buffer.tostring(v367)
-			elseif v363 == 3 then
-				local v368
-
-				v368, n16 = proto.readBuffer(p23, n16)
-				v361.device = buffer.tostring(v368)
-			elseif v363 == 4 then
-				local v369
-
-				v369, n16 = proto.readBuffer(p23, n16)
-				v361.country = buffer.tostring(v369)
-			elseif v363 == 5 then
-				local v370
-
-				v370, n16 = proto.readBuffer(p23, n16)
-				v361.session_id = buffer.tostring(v370)
-			elseif v363 == 6 then
-				local v371
-
-				v371, n16 = proto.readBuffer(p23, n16)
-				v361.age_group = buffer.tostring(v371)
-			elseif v363 == 7 then
-				local v372
-
-				v372, n16 = proto.readBuffer(p23, n16)
-				v361.max_memory = buffer.tostring(v372)
-			elseif v363 == 8 then
-				local v373
-
-				v373, n16 = proto.readBuffer(p23, n16)
-				v361.selected_genre = buffer.tostring(v373)
-			else
-				local v374, v375 = proto.readVarInt(p23, n16)
-
-				n16 = v375 + v374
-			end
-		elseif v364 == proto.wireTypes.i32 then
-			local v376
-
-			v376, n16 = proto.readFixed32(p23, n16)
-		elseif v364 == proto.wireTypes.i64 then
-			local v377
-
-			v377, n16 = proto.readFixed64(p23, n16)
-		else
-			error("Unsupported wire type: " .. v364)
+			buf, n15 = proto.writeBuffer(v371, v372, v369, v370)
 		end
 	end
 
-	return v361
+	if p22.client_capabilities ~= nil then
+		local v373 = p22.client_capabilities:encode()
+		local v374, v375 = proto.writeTag(buf, n15, 10, proto.wireTypes.lengthDelimited)
+
+		buf, n15 = proto.writeBuffer(v374, v375, v373, buffer.len(v373))
+	end
+
+	local buf14 = buffer.create(n15)
+
+	buffer.copy(buf14, 0, buf, 0, n15)
+
+	return buf14
 end
-function t44.jsonEncode(p24) -- line: 1967
+function t44.decode(p23: buffer) -- line: 1954
+	-- upvalues: t44 (copy), proto (copy), t1 (copy), client_capabilities (copy)
+	local v378 = t44.new()
+	local n16 = 0
+
+	while n16 < buffer.len(p23) do
+		local v380, v381
+
+		v380, v381, n16 = proto.readTag(p23, n16)
+
+		if v381 == proto.wireTypes.varint then
+			local v382
+
+			v382, n16 = proto.readVarInt(p23, n16)
+		elseif v381 == proto.wireTypes.lengthDelimited then
+			if v380 == 1 then
+				local v383
+
+				v383, n16 = proto.readBuffer(p23, n16)
+				v378.sort_id = buffer.tostring(v383)
+			elseif v380 == 2 then
+				local v384
+
+				v384, n16 = proto.readBuffer(p23, n16)
+				v378.content_page_token = buffer.tostring(v384)
+			elseif v380 == 3 then
+				local v385
+
+				v385, n16 = proto.readBuffer(p23, n16)
+				v378.device = buffer.tostring(v385)
+			elseif v380 == 4 then
+				local v386
+
+				v386, n16 = proto.readBuffer(p23, n16)
+				v378.country = buffer.tostring(v386)
+			elseif v380 == 5 then
+				local v387
+
+				v387, n16 = proto.readBuffer(p23, n16)
+				v378.session_id = buffer.tostring(v387)
+			elseif v380 == 6 then
+				local v388
+
+				v388, n16 = proto.readBuffer(p23, n16)
+				v378.age_group = buffer.tostring(v388)
+			elseif v380 == 7 then
+				local v389
+
+				v389, n16 = proto.readBuffer(p23, n16)
+				v378.max_memory = buffer.tostring(v389)
+			elseif v380 == 8 then
+				local v390
+
+				v390, n16 = proto.readBuffer(p23, n16)
+				v378.selected_genre = buffer.tostring(v390)
+			elseif v380 == 9 then
+				local v391
+
+				v391, n16 = proto.readBuffer(p23, n16)
+
+				local v392 = t1.GetChartsSortDetailRequest_CachedRobloxComponentToTemplateIdEntry.decode(v391)
+
+				v378.cached_roblox_component_to_template_id[v392.key or ""] = v392.value or ""
+			elseif v380 == 10 then
+				local v393
+
+				v393, n16 = proto.readBuffer(p23, n16)
+				v378.client_capabilities = client_capabilities.ClientCapabilities.decode(v393)
+			else
+				local v394, v395 = proto.readVarInt(p23, n16)
+
+				n16 = v395 + v394
+			end
+		elseif v381 == proto.wireTypes.i32 then
+			local v396
+
+			v396, n16 = proto.readFixed32(p23, n16)
+		elseif v381 == proto.wireTypes.i64 then
+			local v397
+
+			v397, n16 = proto.readFixed64(p23, n16)
+		else
+			error("Unsupported wire type: " .. v381)
+		end
+	end
+
+	return v378
+end
+function t44.jsonEncode(p24) -- line: 2052
 	local t46 = {}
 
 	if p24.sort_id ~= nil and p24.sort_id ~= "" then
@@ -1502,69 +1537,111 @@ function t44.jsonEncode(p24) -- line: 1967
 		t46.selectedGenre = p24.selected_genre
 	end
 
+	if p24.cached_roblox_component_to_template_id ~= nil and next(p24.cached_roblox_component_to_template_id) ~= nil then
+		local t47 = {}
+
+		for v401, v402 in p24.cached_roblox_component_to_template_id do
+			t47[v401] = v402
+		end
+
+		t46.cachedRobloxComponentToTemplateId = t47
+	end
+
+	if p24.client_capabilities ~= nil then
+		t46.clientCapabilities = p24.client_capabilities:jsonEncode()
+	end
+
 	return t46
 end
-function t44.jsonDecode(t47: {[any]: any}) -- line: 2005
-	-- upvalues: t44 (copy)
-	local v381 = t44.new()
+function t44.jsonDecode(t48: {[any]: any}) -- line: 2105
+	-- upvalues: t44 (copy), client_capabilities (copy)
+	local v404 = t44.new()
 
-	if t47.sort_id ~= nil then
-		v381.sort_id = t47.sort_id
+	if t48.sort_id ~= nil then
+		v404.sort_id = t48.sort_id
 	end
 
-	if t47.sortId ~= nil then
-		v381.sort_id = t47.sortId
+	if t48.sortId ~= nil then
+		v404.sort_id = t48.sortId
 	end
 
-	if t47.content_page_token ~= nil then
-		v381.content_page_token = t47.content_page_token
+	if t48.content_page_token ~= nil then
+		v404.content_page_token = t48.content_page_token
 	end
 
-	if t47.contentPageToken ~= nil then
-		v381.content_page_token = t47.contentPageToken
+	if t48.contentPageToken ~= nil then
+		v404.content_page_token = t48.contentPageToken
 	end
 
-	if t47.device ~= nil then
-		v381.device = t47.device
+	if t48.device ~= nil then
+		v404.device = t48.device
 	end
 
-	if t47.country ~= nil then
-		v381.country = t47.country
+	if t48.country ~= nil then
+		v404.country = t48.country
 	end
 
-	if t47.session_id ~= nil then
-		v381.session_id = t47.session_id
+	if t48.session_id ~= nil then
+		v404.session_id = t48.session_id
 	end
 
-	if t47.sessionId ~= nil then
-		v381.session_id = t47.sessionId
+	if t48.sessionId ~= nil then
+		v404.session_id = t48.sessionId
 	end
 
-	if t47.age_group ~= nil then
-		v381.age_group = t47.age_group
+	if t48.age_group ~= nil then
+		v404.age_group = t48.age_group
 	end
 
-	if t47.ageGroup ~= nil then
-		v381.age_group = t47.ageGroup
+	if t48.ageGroup ~= nil then
+		v404.age_group = t48.ageGroup
 	end
 
-	if t47.max_memory ~= nil then
-		v381.max_memory = t47.max_memory
+	if t48.max_memory ~= nil then
+		v404.max_memory = t48.max_memory
 	end
 
-	if t47.maxMemory ~= nil then
-		v381.max_memory = t47.maxMemory
+	if t48.maxMemory ~= nil then
+		v404.max_memory = t48.maxMemory
 	end
 
-	if t47.selected_genre ~= nil then
-		v381.selected_genre = t47.selected_genre
+	if t48.selected_genre ~= nil then
+		v404.selected_genre = t48.selected_genre
 	end
 
-	if t47.selectedGenre ~= nil then
-		v381.selected_genre = t47.selectedGenre
+	if t48.selectedGenre ~= nil then
+		v404.selected_genre = t48.selectedGenre
 	end
 
-	return v381
+	if t48.cached_roblox_component_to_template_id ~= nil then
+		local t49 = {}
+
+		for v406, v407 in t48.cached_roblox_component_to_template_id do
+			t49[v406] = v407
+		end
+
+		v404.cached_roblox_component_to_template_id = t49
+	end
+
+	if t48.cachedRobloxComponentToTemplateId ~= nil then
+		local t50 = {}
+
+		for v409, v410 in t48.cachedRobloxComponentToTemplateId do
+			t50[v409] = v410
+		end
+
+		v404.cached_roblox_component_to_template_id = t50
+	end
+
+	if t48.client_capabilities ~= nil then
+		v404.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(t48.client_capabilities)
+	end
+
+	if t48.clientCapabilities ~= nil then
+		v404.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(t48.clientCapabilities)
+	end
+
+	return v404
 end
 
 t44.descriptor = {
@@ -1574,497 +1651,611 @@ t44.descriptor = {
 t1.GetChartsSortDetailRequest = t44
 typeRegistry.default:register(t1.GetChartsSortDetailRequest)
 
-local t48 = {}
+local t51 = {}
 
-t48.__index = t48
+t51.__index = t51
 
-function t48.new(t49: {[any]: any}?) -- line: 2081
-	-- upvalues: t48 (copy)
+function t51.new(t52: {[any]: any}?) -- line: 2214
+	-- upvalues: t51 (copy)
 	return (setmetatable({
-		page_entries = if t49 ~= nil and t49.page_entries ~= nil then t49.page_entries else {},
-		hydration_data = if t49 ~= nil and t49.hydration_data ~= nil then t49.hydration_data else nil,
-		templates = if t49 ~= nil and t49.templates ~= nil then t49.templates else {},
-		next_content_page_token = if t49 ~= nil and t49.next_content_page_token ~= nil then t49.next_content_page_token else "",
-		localized_literals = if t49 ~= nil and t49.localized_literals ~= nil then t49.localized_literals else {}
-	}, t48))
+		key = if t52 ~= nil and t52.key ~= nil then t52.key else "",
+		value = if t52 ~= nil and t52.value ~= nil then t52.value else ""
+	}, t51))
 end
-function t48.encode(p25) -- line: 2095
+function t51.encode(p25) -- line: 2226
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n17 = 0
 
-	if p25.page_entries ~= nil and #p25.page_entries > 0 then
-		for _, v387 in p25.page_entries do
-			local v388 = v387:encode()
-			local v389, v390 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
+	if p25.key ~= nil and p25.key ~= "" then
+		local v415, v416 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
 
-			buf, n17 = proto.writeBuffer(v389, v390, v388, buffer.len(v388))
-		end
+		buf, n17 = proto.writeString(v415, v416, p25.key)
 	end
 
-	if p25.hydration_data ~= nil then
-		local v391 = p25.hydration_data:encode()
-		local v392, v393 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
+	if p25.value ~= nil and p25.value ~= "" then
+		local v417, v418 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n17 = proto.writeBuffer(v392, v393, v391, buffer.len(v391))
+		buf, n17 = proto.writeString(v417, v418, p25.value)
 	end
 
-	if p25.templates ~= nil and next(p25.templates) ~= nil then
-		for v394, v395 in p25.templates do
-			local buf14 = buffer.create(0)
-			local v397, v398 = proto.writeTag(buf14, 0, 1, proto.wireTypes.lengthDelimited)
-			local v399, v400 = proto.writeString(v397, v398, v394)
-			local v401 = v395:encode()
-			local v402, v403 = proto.writeTag(v399, v400, 2, proto.wireTypes.lengthDelimited)
-			local v404, v405 = proto.writeBuffer(v402, v403, v401, buffer.len(v401))
-			local v406, v407 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
+	local buf15 = buffer.create(n17)
 
-			buf, n17 = proto.writeBuffer(v406, v407, v404, v405)
-		end
-	end
+	buffer.copy(buf15, 0, buf, 0, n17)
 
-	if p25.next_content_page_token ~= nil and p25.next_content_page_token ~= "" then
-		local v408, v409 = proto.writeTag(buf, n17, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n17 = proto.writeString(v408, v409, p25.next_content_page_token)
-	end
-
-	if p25.localized_literals ~= nil and next(p25.localized_literals) ~= nil then
-		for v410, v411 in p25.localized_literals do
-			local buf15 = buffer.create(0)
-			local v413, v414 = proto.writeTag(buf15, 0, 1, proto.wireTypes.lengthDelimited)
-			local v415, v416 = proto.writeString(v413, v414, v410)
-			local v417, v418 = proto.writeTag(v415, v416, 2, proto.wireTypes.lengthDelimited)
-			local v419, v420 = proto.writeString(v417, v418, v411)
-			local v421, v422 = proto.writeTag(buf, n17, 5, proto.wireTypes.lengthDelimited)
-
-			buf, n17 = proto.writeBuffer(v421, v422, v419, v420)
-		end
-	end
-
-	local buf16 = buffer.create(n17)
-
-	buffer.copy(buf16, 0, buf, 0, n17)
-
-	return buf16
+	return buf15
 end
-function t48.decode(p26: buffer) -- line: 2150
-	-- upvalues: t48 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
-	local v425 = t48.new()
+function t51.decode(p26: buffer) -- line: 2247
+	-- upvalues: t51 (copy), proto (copy)
+	local v421 = t51.new()
 	local n18 = 0
 
 	while n18 < buffer.len(p26) do
-		local v427, v428
+		local v423, v424
 
-		v427, v428, n18 = proto.readTag(p26, n18)
+		v423, v424, n18 = proto.readTag(p26, n18)
 
-		if v428 == proto.wireTypes.varint then
-			local v429
+		if v424 == proto.wireTypes.varint then
+			local v425
 
-			v429, n18 = proto.readVarInt(p26, n18)
-		elseif v428 == proto.wireTypes.lengthDelimited then
-			if v427 == 1 then
-				local v430
+			v425, n18 = proto.readVarInt(p26, n18)
+		elseif v424 == proto.wireTypes.lengthDelimited then
+			if v423 == 1 then
+				local v426
 
-				v430, n18 = proto.readBuffer(p26, n18)
-				table.insert(v425.page_entries, page_entry_content.UniversalPageEntry.decode(v430))
-			elseif v427 == 2 then
-				local v431
+				v426, n18 = proto.readBuffer(p26, n18)
+				v421.key = buffer.tostring(v426)
+			elseif v423 == 2 then
+				local v427
 
-				v431, n18 = proto.readBuffer(p26, n18)
-				v425.hydration_data = hydration_content.HydrationContent.decode(v431)
-			elseif v427 == 3 then
-				local v432
-
-				v432, n18 = proto.readBuffer(p26, n18)
-
-				local v433 = t1.GetChartsSortDetailResponse_TemplatesEntry.decode(v432)
-				local v434 = template_entry.TemplateEntry.new()
-
-				v425.templates[v433.key or ""] = v433.value or v434
-			elseif v427 == 4 then
-				local v435
-
-				v435, n18 = proto.readBuffer(p26, n18)
-				v425.next_content_page_token = buffer.tostring(v435)
-			elseif v427 == 5 then
-				local v436
-
-				v436, n18 = proto.readBuffer(p26, n18)
-
-				local v437 = t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry.decode(v436)
-
-				v425.localized_literals[v437.key or ""] = v437.value or ""
+				v427, n18 = proto.readBuffer(p26, n18)
+				v421.value = buffer.tostring(v427)
 			else
-				local v438, v439 = proto.readVarInt(p26, n18)
+				local v428, v429 = proto.readVarInt(p26, n18)
 
-				n18 = v439 + v438
+				n18 = v429 + v428
 			end
-		elseif v428 == proto.wireTypes.i32 then
-			local v440
+		elseif v424 == proto.wireTypes.i32 then
+			local v430
 
-			v440, n18 = proto.readFixed32(p26, n18)
-		elseif v428 == proto.wireTypes.i64 then
-			local v441
+			v430, n18 = proto.readFixed32(p26, n18)
+		elseif v424 == proto.wireTypes.i64 then
+			local v431
 
-			v441, n18 = proto.readFixed64(p26, n18)
+			v431, n18 = proto.readFixed64(p26, n18)
 		else
-			error("Unsupported wire type: " .. v428)
+			error("Unsupported wire type: " .. v424)
 		end
 	end
 
-	return v425
+	return v421
 end
-function t48.jsonEncode(p27) -- line: 2231
-	local t50 = {}
+function t51.jsonEncode(p27) -- line: 2297
+	local t53 = {}
 
-	if p27.page_entries ~= nil and #p27.page_entries > 0 then
-		local t51 = {}
-
-		for _, v446 in p27.page_entries do
-			table.insert(t51, v446:jsonEncode())
-		end
-
-		t50.pageEntries = t51
+	if p27.key ~= nil and p27.key ~= "" then
+		t53.key = p27.key
 	end
 
-	if p27.hydration_data ~= nil then
-		t50.hydrationData = p27.hydration_data:jsonEncode()
+	if p27.value ~= nil and p27.value ~= "" then
+		t53.value = p27.value
 	end
 
-	if p27.templates ~= nil and next(p27.templates) ~= nil then
-		local t52 = {}
-
-		for v448, v449 in p27.templates do
-			t52[v448] = v449:jsonEncode()
-		end
-
-		t50.templates = t52
-	end
-
-	if p27.next_content_page_token ~= nil and p27.next_content_page_token ~= "" then
-		t50.nextContentPageToken = p27.next_content_page_token
-	end
-
-	if p27.localized_literals ~= nil and next(p27.localized_literals) ~= nil then
-		local t53 = {}
-
-		for v451, v452 in p27.localized_literals do
-			t53[v451] = v452
-		end
-
-		t50.localizedLiterals = t53
-	end
-
-	return t50
+	return t53
 end
-function t48.jsonDecode(t54: {[any]: any}) -- line: 2269
-	-- upvalues: t48 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
-	local v454 = t48.new()
+function t51.jsonDecode(t54: {[any]: any}) -- line: 2313
+	-- upvalues: t51 (copy)
+	local v435 = t51.new()
 
-	if t54.page_entries ~= nil then
-		local t55 = {}
-
-		for _, v457 in t54.page_entries do
-			table.insert(t55, page_entry_content.UniversalPageEntry.jsonDecode(v457))
-		end
-
-		v454.page_entries = t55
+	if t54.key ~= nil then
+		v435.key = t54.key
 	end
 
-	if t54.pageEntries ~= nil then
-		local t56 = {}
-
-		for _, v460 in t54.pageEntries do
-			table.insert(t56, page_entry_content.UniversalPageEntry.jsonDecode(v460))
-		end
-
-		v454.page_entries = t56
+	if t54.value ~= nil then
+		v435.value = t54.value
 	end
 
-	if t54.hydration_data ~= nil then
-		v454.hydration_data = hydration_content.HydrationContent.jsonDecode(t54.hydration_data)
-	end
-
-	if t54.hydrationData ~= nil then
-		v454.hydration_data = hydration_content.HydrationContent.jsonDecode(t54.hydrationData)
-	end
-
-	if t54.templates ~= nil then
-		local t57 = {}
-
-		for v462, v463 in t54.templates do
-			t57[v462] = template_entry.TemplateEntry.jsonDecode(v463)
-		end
-
-		v454.templates = t57
-	end
-
-	if t54.next_content_page_token ~= nil then
-		v454.next_content_page_token = t54.next_content_page_token
-	end
-
-	if t54.nextContentPageToken ~= nil then
-		v454.next_content_page_token = t54.nextContentPageToken
-	end
-
-	if t54.localized_literals ~= nil then
-		local t58 = {}
-
-		for v465, v466 in t54.localized_literals do
-			t58[v465] = v466
-		end
-
-		v454.localized_literals = t58
-	end
-
-	if t54.localizedLiterals ~= nil then
-		local t59 = {}
-
-		for v468, v469 in t54.localizedLiterals do
-			t59[v468] = v469
-		end
-
-		v454.localized_literals = t59
-	end
-
-	return v454
+	return v435
 end
 
-t48.descriptor = {
-	name = "GetChartsSortDetailResponse",
-	fullName = "roblox.apppageplatform.charts.v1beta1.GetChartsSortDetailResponse"
+t51.descriptor = {
+	name = "GetChartsSortDetailRequest_CachedRobloxComponentToTemplateIdEntry",
+	fullName = "roblox.apppageplatform.charts.v1beta1.CachedRobloxComponentToTemplateIdEntry"
 }
-t1.GetChartsSortDetailResponse = t48
-typeRegistry.default:register(t1.GetChartsSortDetailResponse)
+t1.GetChartsSortDetailRequest_CachedRobloxComponentToTemplateIdEntry = t51
+typeRegistry.default:register(t1.GetChartsSortDetailRequest_CachedRobloxComponentToTemplateIdEntry)
 
-local t60 = {}
+local t55 = {}
 
-t60.__index = t60
+t55.__index = t55
 
-function t60.new(t61: {[any]: any}?) -- line: 2360
-	-- upvalues: t60 (copy)
+function t55.new(t56: {[any]: any}?) -- line: 2344
+	-- upvalues: t55 (copy)
 	return (setmetatable({
-		key = if t61 ~= nil and t61.key ~= nil then t61.key else "",
-		value = if t61 ~= nil and t61.value ~= nil then t61.value else nil
-	}, t60))
+		page_entries = if t56 ~= nil and t56.page_entries ~= nil then t56.page_entries else {},
+		hydration_data = if t56 ~= nil and t56.hydration_data ~= nil then t56.hydration_data else nil,
+		templates = if t56 ~= nil and t56.templates ~= nil then t56.templates else {},
+		next_content_page_token = if t56 ~= nil and t56.next_content_page_token ~= nil then t56.next_content_page_token else "",
+		localized_literals = if t56 ~= nil and t56.localized_literals ~= nil then t56.localized_literals else {}
+	}, t55))
 end
-function t60.encode(p28) -- line: 2369
+function t55.encode(p28) -- line: 2358
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n19 = 0
 
-	if p28.key ~= nil and p28.key ~= "" then
-		local v474, v475 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
+	if p28.page_entries ~= nil and #p28.page_entries > 0 then
+		for _, v441 in p28.page_entries do
+			local v442 = v441:encode()
+			local v443, v444 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n19 = proto.writeString(v474, v475, p28.key)
-	end
-
-	if p28.value ~= nil then
-		local v476 = p28.value:encode()
-		local v477, v478 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n19 = proto.writeBuffer(v477, v478, v476, buffer.len(v476))
-	end
-
-	local buf17 = buffer.create(n19)
-
-	buffer.copy(buf17, 0, buf, 0, n19)
-
-	return buf17
-end
-function t60.decode(p29: buffer) -- line: 2391
-	-- upvalues: t60 (copy), proto (copy), template_entry (copy)
-	local v481 = t60.new()
-	local n20 = 0
-
-	while n20 < buffer.len(p29) do
-		local v483, v484
-
-		v483, v484, n20 = proto.readTag(p29, n20)
-
-		if v484 == proto.wireTypes.varint then
-			local v485
-
-			v485, n20 = proto.readVarInt(p29, n20)
-		elseif v484 == proto.wireTypes.lengthDelimited then
-			if v483 == 1 then
-				local v486
-
-				v486, n20 = proto.readBuffer(p29, n20)
-				v481.key = buffer.tostring(v486)
-			elseif v483 == 2 then
-				local v487
-
-				v487, n20 = proto.readBuffer(p29, n20)
-				v481.value = template_entry.TemplateEntry.decode(v487)
-			else
-				local v488, v489 = proto.readVarInt(p29, n20)
-
-				n20 = v489 + v488
-			end
-		elseif v484 == proto.wireTypes.i32 then
-			local v490
-
-			v490, n20 = proto.readFixed32(p29, n20)
-		elseif v484 == proto.wireTypes.i64 then
-			local v491
-
-			v491, n20 = proto.readFixed64(p29, n20)
-		else
-			error("Unsupported wire type: " .. v484)
+			buf, n19 = proto.writeBuffer(v443, v444, v442, buffer.len(v442))
 		end
 	end
 
-	return v481
+	if p28.hydration_data ~= nil then
+		local v445 = p28.hydration_data:encode()
+		local v446, v447 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n19 = proto.writeBuffer(v446, v447, v445, buffer.len(v445))
+	end
+
+	if p28.templates ~= nil and next(p28.templates) ~= nil then
+		for v448, v449 in p28.templates do
+			local buf16 = buffer.create(0)
+			local v451, v452 = proto.writeTag(buf16, 0, 1, proto.wireTypes.lengthDelimited)
+			local v453, v454 = proto.writeString(v451, v452, v448)
+			local v455 = v449:encode()
+			local v456, v457 = proto.writeTag(v453, v454, 2, proto.wireTypes.lengthDelimited)
+			local v458, v459 = proto.writeBuffer(v456, v457, v455, buffer.len(v455))
+			local v460, v461 = proto.writeTag(buf, n19, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n19 = proto.writeBuffer(v460, v461, v458, v459)
+		end
+	end
+
+	if p28.next_content_page_token ~= nil and p28.next_content_page_token ~= "" then
+		local v462, v463 = proto.writeTag(buf, n19, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n19 = proto.writeString(v462, v463, p28.next_content_page_token)
+	end
+
+	if p28.localized_literals ~= nil and next(p28.localized_literals) ~= nil then
+		for v464, v465 in p28.localized_literals do
+			local buf17 = buffer.create(0)
+			local v467, v468 = proto.writeTag(buf17, 0, 1, proto.wireTypes.lengthDelimited)
+			local v469, v470 = proto.writeString(v467, v468, v464)
+			local v471, v472 = proto.writeTag(v469, v470, 2, proto.wireTypes.lengthDelimited)
+			local v473, v474 = proto.writeString(v471, v472, v465)
+			local v475, v476 = proto.writeTag(buf, n19, 5, proto.wireTypes.lengthDelimited)
+
+			buf, n19 = proto.writeBuffer(v475, v476, v473, v474)
+		end
+	end
+
+	local buf18 = buffer.create(n19)
+
+	buffer.copy(buf18, 0, buf, 0, n19)
+
+	return buf18
 end
-function t60.jsonEncode(p30) -- line: 2441
-	local t62 = {}
+function t55.decode(p29: buffer) -- line: 2413
+	-- upvalues: t55 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
+	local v479 = t55.new()
+	local n20 = 0
 
-	if p30.key ~= nil and p30.key ~= "" then
-		t62.key = p30.key
+	while n20 < buffer.len(p29) do
+		local v481, v482
+
+		v481, v482, n20 = proto.readTag(p29, n20)
+
+		if v482 == proto.wireTypes.varint then
+			local v483
+
+			v483, n20 = proto.readVarInt(p29, n20)
+		elseif v482 == proto.wireTypes.lengthDelimited then
+			if v481 == 1 then
+				local v484
+
+				v484, n20 = proto.readBuffer(p29, n20)
+				table.insert(v479.page_entries, page_entry_content.UniversalPageEntry.decode(v484))
+			elseif v481 == 2 then
+				local v485
+
+				v485, n20 = proto.readBuffer(p29, n20)
+				v479.hydration_data = hydration_content.HydrationContent.decode(v485)
+			elseif v481 == 3 then
+				local v486
+
+				v486, n20 = proto.readBuffer(p29, n20)
+
+				local v487 = t1.GetChartsSortDetailResponse_TemplatesEntry.decode(v486)
+				local v488 = template_entry.TemplateEntry.new()
+
+				v479.templates[v487.key or ""] = v487.value or v488
+			elseif v481 == 4 then
+				local v489
+
+				v489, n20 = proto.readBuffer(p29, n20)
+				v479.next_content_page_token = buffer.tostring(v489)
+			elseif v481 == 5 then
+				local v490
+
+				v490, n20 = proto.readBuffer(p29, n20)
+
+				local v491 = t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry.decode(v490)
+
+				v479.localized_literals[v491.key or ""] = v491.value or ""
+			else
+				local v492, v493 = proto.readVarInt(p29, n20)
+
+				n20 = v493 + v492
+			end
+		elseif v482 == proto.wireTypes.i32 then
+			local v494
+
+			v494, n20 = proto.readFixed32(p29, n20)
+		elseif v482 == proto.wireTypes.i64 then
+			local v495
+
+			v495, n20 = proto.readFixed64(p29, n20)
+		else
+			error("Unsupported wire type: " .. v482)
+		end
 	end
 
-	if p30.value ~= nil then
-		t62.value = p30.value:jsonEncode()
-	end
-
-	return t62
+	return v479
 end
-function t60.jsonDecode(t63: {[any]: any}) -- line: 2457
-	-- upvalues: t60 (copy), template_entry (copy)
-	local v495 = t60.new()
+function t55.jsonEncode(p30) -- line: 2494
+	local t57 = {}
 
-	if t63.key ~= nil then
-		v495.key = t63.key
+	if p30.page_entries ~= nil and #p30.page_entries > 0 then
+		local t58 = {}
+
+		for _, v500 in p30.page_entries do
+			table.insert(t58, v500:jsonEncode())
+		end
+
+		t57.pageEntries = t58
 	end
 
-	if t63.value ~= nil then
-		v495.value = template_entry.TemplateEntry.jsonDecode(t63.value)
+	if p30.hydration_data ~= nil then
+		t57.hydrationData = p30.hydration_data:jsonEncode()
 	end
 
-	return v495
+	if p30.templates ~= nil and next(p30.templates) ~= nil then
+		local t59 = {}
+
+		for v502, v503 in p30.templates do
+			t59[v502] = v503:jsonEncode()
+		end
+
+		t57.templates = t59
+	end
+
+	if p30.next_content_page_token ~= nil and p30.next_content_page_token ~= "" then
+		t57.nextContentPageToken = p30.next_content_page_token
+	end
+
+	if p30.localized_literals ~= nil and next(p30.localized_literals) ~= nil then
+		local t60 = {}
+
+		for v505, v506 in p30.localized_literals do
+			t60[v505] = v506
+		end
+
+		t57.localizedLiterals = t60
+	end
+
+	return t57
+end
+function t55.jsonDecode(t61: {[any]: any}) -- line: 2532
+	-- upvalues: t55 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
+	local v508 = t55.new()
+
+	if t61.page_entries ~= nil then
+		local t62 = {}
+
+		for _, v511 in t61.page_entries do
+			table.insert(t62, page_entry_content.UniversalPageEntry.jsonDecode(v511))
+		end
+
+		v508.page_entries = t62
+	end
+
+	if t61.pageEntries ~= nil then
+		local t63 = {}
+
+		for _, v514 in t61.pageEntries do
+			table.insert(t63, page_entry_content.UniversalPageEntry.jsonDecode(v514))
+		end
+
+		v508.page_entries = t63
+	end
+
+	if t61.hydration_data ~= nil then
+		v508.hydration_data = hydration_content.HydrationContent.jsonDecode(t61.hydration_data)
+	end
+
+	if t61.hydrationData ~= nil then
+		v508.hydration_data = hydration_content.HydrationContent.jsonDecode(t61.hydrationData)
+	end
+
+	if t61.templates ~= nil then
+		local t64 = {}
+
+		for v516, v517 in t61.templates do
+			t64[v516] = template_entry.TemplateEntry.jsonDecode(v517)
+		end
+
+		v508.templates = t64
+	end
+
+	if t61.next_content_page_token ~= nil then
+		v508.next_content_page_token = t61.next_content_page_token
+	end
+
+	if t61.nextContentPageToken ~= nil then
+		v508.next_content_page_token = t61.nextContentPageToken
+	end
+
+	if t61.localized_literals ~= nil then
+		local t65 = {}
+
+		for v519, v520 in t61.localized_literals do
+			t65[v519] = v520
+		end
+
+		v508.localized_literals = t65
+	end
+
+	if t61.localizedLiterals ~= nil then
+		local t66 = {}
+
+		for v522, v523 in t61.localizedLiterals do
+			t66[v522] = v523
+		end
+
+		v508.localized_literals = t66
+	end
+
+	return v508
 end
 
-t60.descriptor = {
-	name = "GetChartsSortDetailResponse_TemplatesEntry",
-	fullName = "roblox.apppageplatform.charts.v1beta1.TemplatesEntry"
+t55.descriptor = {
+	name = "GetChartsSortDetailResponse",
+	fullName = "roblox.apppageplatform.charts.v1beta1.GetChartsSortDetailResponse"
 }
-t1.GetChartsSortDetailResponse_TemplatesEntry = t60
-typeRegistry.default:register(t1.GetChartsSortDetailResponse_TemplatesEntry)
+t1.GetChartsSortDetailResponse = t55
+typeRegistry.default:register(t1.GetChartsSortDetailResponse)
 
-local t64 = {}
+local t67 = {}
 
-t64.__index = t64
+t67.__index = t67
 
-function t64.new(t65: {[any]: any}?) -- line: 2488
-	-- upvalues: t64 (copy)
+function t67.new(t68: {[any]: any}?) -- line: 2623
+	-- upvalues: t67 (copy)
 	return (setmetatable({
-		key = if t65 ~= nil and t65.key ~= nil then t65.key else "",
-		value = if t65 ~= nil and t65.value ~= nil then t65.value else ""
-	}, t64))
+		key = if t68 ~= nil and t68.key ~= nil then t68.key else "",
+		value = if t68 ~= nil and t68.value ~= nil then t68.value else nil
+	}, t67))
 end
-function t64.encode(p31) -- line: 2500
+function t67.encode(p31) -- line: 2632
 	-- upvalues: proto (copy)
 	local buf = buffer.create(0)
 	local n21 = 0
 
 	if p31.key ~= nil and p31.key ~= "" then
-		local v500, v501 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
+		local v528, v529 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
 
-		buf, n21 = proto.writeString(v500, v501, p31.key)
+		buf, n21 = proto.writeString(v528, v529, p31.key)
 	end
 
-	if p31.value ~= nil and p31.value ~= "" then
-		local v502, v503 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
+	if p31.value ~= nil then
+		local v530 = p31.value:encode()
+		local v531, v532 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
 
-		buf, n21 = proto.writeString(v502, v503, p31.value)
+		buf, n21 = proto.writeBuffer(v531, v532, v530, buffer.len(v530))
 	end
 
-	local buf18 = buffer.create(n21)
+	local buf19 = buffer.create(n21)
 
-	buffer.copy(buf18, 0, buf, 0, n21)
+	buffer.copy(buf19, 0, buf, 0, n21)
 
-	return buf18
+	return buf19
 end
-function t64.decode(p32: buffer) -- line: 2521
-	-- upvalues: t64 (copy), proto (copy)
-	local v506 = t64.new()
+function t67.decode(p32: buffer) -- line: 2654
+	-- upvalues: t67 (copy), proto (copy), template_entry (copy)
+	local v535 = t67.new()
 	local n22 = 0
 
 	while n22 < buffer.len(p32) do
-		local v508, v509
+		local v537, v538
 
-		v508, v509, n22 = proto.readTag(p32, n22)
+		v537, v538, n22 = proto.readTag(p32, n22)
 
-		if v509 == proto.wireTypes.varint then
-			local v510
+		if v538 == proto.wireTypes.varint then
+			local v539
 
-			v510, n22 = proto.readVarInt(p32, n22)
-		elseif v509 == proto.wireTypes.lengthDelimited then
-			if v508 == 1 then
-				local v511
+			v539, n22 = proto.readVarInt(p32, n22)
+		elseif v538 == proto.wireTypes.lengthDelimited then
+			if v537 == 1 then
+				local v540
 
-				v511, n22 = proto.readBuffer(p32, n22)
-				v506.key = buffer.tostring(v511)
-			elseif v508 == 2 then
-				local v512
+				v540, n22 = proto.readBuffer(p32, n22)
+				v535.key = buffer.tostring(v540)
+			elseif v537 == 2 then
+				local v541
 
-				v512, n22 = proto.readBuffer(p32, n22)
-				v506.value = buffer.tostring(v512)
+				v541, n22 = proto.readBuffer(p32, n22)
+				v535.value = template_entry.TemplateEntry.decode(v541)
 			else
-				local v513, v514 = proto.readVarInt(p32, n22)
+				local v542, v543 = proto.readVarInt(p32, n22)
 
-				n22 = v514 + v513
+				n22 = v543 + v542
 			end
-		elseif v509 == proto.wireTypes.i32 then
-			local v515
+		elseif v538 == proto.wireTypes.i32 then
+			local v544
 
-			v515, n22 = proto.readFixed32(p32, n22)
-		elseif v509 == proto.wireTypes.i64 then
-			local v516
+			v544, n22 = proto.readFixed32(p32, n22)
+		elseif v538 == proto.wireTypes.i64 then
+			local v545
 
-			v516, n22 = proto.readFixed64(p32, n22)
+			v545, n22 = proto.readFixed64(p32, n22)
 		else
-			error("Unsupported wire type: " .. v509)
+			error("Unsupported wire type: " .. v538)
 		end
 	end
 
-	return v506
+	return v535
 end
-function t64.jsonEncode(p33) -- line: 2571
-	local t66 = {}
+function t67.jsonEncode(p33) -- line: 2704
+	local t69 = {}
 
 	if p33.key ~= nil and p33.key ~= "" then
-		t66.key = p33.key
+		t69.key = p33.key
 	end
 
-	if p33.value ~= nil and p33.value ~= "" then
-		t66.value = p33.value
+	if p33.value ~= nil then
+		t69.value = p33.value:jsonEncode()
 	end
 
-	return t66
+	return t69
 end
-function t64.jsonDecode(t67: {[any]: any}) -- line: 2587
-	-- upvalues: t64 (copy)
-	local v520 = t64.new()
+function t67.jsonDecode(t70: {[any]: any}) -- line: 2720
+	-- upvalues: t67 (copy), template_entry (copy)
+	local v549 = t67.new()
 
-	if t67.key ~= nil then
-		v520.key = t67.key
+	if t70.key ~= nil then
+		v549.key = t70.key
 	end
 
-	if t67.value ~= nil then
-		v520.value = t67.value
+	if t70.value ~= nil then
+		v549.value = template_entry.TemplateEntry.jsonDecode(t70.value)
 	end
 
-	return v520
+	return v549
 end
 
-t64.descriptor = {
+t67.descriptor = {
+	name = "GetChartsSortDetailResponse_TemplatesEntry",
+	fullName = "roblox.apppageplatform.charts.v1beta1.TemplatesEntry"
+}
+t1.GetChartsSortDetailResponse_TemplatesEntry = t67
+typeRegistry.default:register(t1.GetChartsSortDetailResponse_TemplatesEntry)
+
+local t71 = {}
+
+t71.__index = t71
+
+function t71.new(t72: {[any]: any}?) -- line: 2751
+	-- upvalues: t71 (copy)
+	return (setmetatable({
+		key = if t72 ~= nil and t72.key ~= nil then t72.key else "",
+		value = if t72 ~= nil and t72.value ~= nil then t72.value else ""
+	}, t71))
+end
+function t71.encode(p34) -- line: 2763
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n23 = 0
+
+	if p34.key ~= nil and p34.key ~= "" then
+		local v554, v555 = proto.writeTag(buf, n23, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n23 = proto.writeString(v554, v555, p34.key)
+	end
+
+	if p34.value ~= nil and p34.value ~= "" then
+		local v556, v557 = proto.writeTag(buf, n23, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n23 = proto.writeString(v556, v557, p34.value)
+	end
+
+	local buf20 = buffer.create(n23)
+
+	buffer.copy(buf20, 0, buf, 0, n23)
+
+	return buf20
+end
+function t71.decode(p35: buffer) -- line: 2784
+	-- upvalues: t71 (copy), proto (copy)
+	local v560 = t71.new()
+	local n24 = 0
+
+	while n24 < buffer.len(p35) do
+		local v562, v563
+
+		v562, v563, n24 = proto.readTag(p35, n24)
+
+		if v563 == proto.wireTypes.varint then
+			local v564
+
+			v564, n24 = proto.readVarInt(p35, n24)
+		elseif v563 == proto.wireTypes.lengthDelimited then
+			if v562 == 1 then
+				local v565
+
+				v565, n24 = proto.readBuffer(p35, n24)
+				v560.key = buffer.tostring(v565)
+			elseif v562 == 2 then
+				local v566
+
+				v566, n24 = proto.readBuffer(p35, n24)
+				v560.value = buffer.tostring(v566)
+			else
+				local v567, v568 = proto.readVarInt(p35, n24)
+
+				n24 = v568 + v567
+			end
+		elseif v563 == proto.wireTypes.i32 then
+			local v569
+
+			v569, n24 = proto.readFixed32(p35, n24)
+		elseif v563 == proto.wireTypes.i64 then
+			local v570
+
+			v570, n24 = proto.readFixed64(p35, n24)
+		else
+			error("Unsupported wire type: " .. v563)
+		end
+	end
+
+	return v560
+end
+function t71.jsonEncode(p36) -- line: 2834
+	local t73 = {}
+
+	if p36.key ~= nil and p36.key ~= "" then
+		t73.key = p36.key
+	end
+
+	if p36.value ~= nil and p36.value ~= "" then
+		t73.value = p36.value
+	end
+
+	return t73
+end
+function t71.jsonDecode(t74: {[any]: any}) -- line: 2850
+	-- upvalues: t71 (copy)
+	local v574 = t71.new()
+
+	if t74.key ~= nil then
+		v574.key = t74.key
+	end
+
+	if t74.value ~= nil then
+		v574.value = t74.value
+	end
+
+	return v574
+end
+
+t71.descriptor = {
 	name = "GetChartsSortDetailResponse_LocalizedLiteralsEntry",
 	fullName = "roblox.apppageplatform.charts.v1beta1.LocalizedLiteralsEntry"
 }
-t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry = t64
+t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry = t71
 typeRegistry.default:register(t1.GetChartsSortDetailResponse_LocalizedLiteralsEntry)
 
 return {

@@ -15,7 +15,9 @@ local GameConfigurationLabels = require(BuildExperience.utils.GameConfigurationL
 local ArchiveGameDialog = require(BuildExperience.Components.GameConfigurations.ArchiveGameDialog)
 local ExperienceShareOverlays = require(BuildExperience.Components.ShareAudience.ExperienceShareOverlays)
 local BuildMaturityBanner = require(BuildExperience.Components.GameConfigurations.BuildMaturityBanner.BuildMaturityBanner)
+local ContentMaturityUtils = require(BuildExperience.utils.ContentMaturityUtils)
 local GameConfigurationActions = require(BuildExperience.utils.GameConfigurationActions)
+local refreshPublishEligibility = require(BuildExperience.utils.refreshPublishEligibility)
 local useArchiveGameFlow = require(BuildExperience.utils.useArchiveGameFlow)
 local useExperienceShareFlow = require(BuildExperience.utils.useExperienceShareFlow)
 local GameConfigurationList = require(script.Parent.Parent.GameConfigurationList.GameConfigurationList)
@@ -24,64 +26,95 @@ local FFlagBuildExperiencePrivateInvites = require(BuildExperience.Flags.FFlagBu
 local FoundationText = Foundation.Text
 local View = Foundation.View
 local IconName = Foundation.Enums.IconName
-local v27 = SharedFlags.FFlagMyStatsMediaSelector and (CaptureService.PromptCaptureGalleryPermissionAsync and game:GetEngineFeature("CaptureServiceStartUploadCoreScriptBypass"))
+local v29 = SharedFlags.FFlagMyStatsMediaSelector and (CaptureService.PromptCaptureGalleryPermissionAsync and game:GetEngineFeature("CaptureServiceStartUploadCoreScriptBypass"))
 local FFlagEnableProvisionalRating = require(BuildExperience.Flags.FFlagEnableProvisionalRating)
+local FFlagBuildRehydrateOnPublish = require(BuildExperience.Flags.FFlagBuildRehydrateOnPublish)
 
-local function GameConfigurationContent(t1: {[any]: any}) -- line: 61
-	-- upvalues: useOpenWebView (copy), useArchiveGameFlow (copy), FFlagBuildExperiencePrivateInvites (copy), useExperienceShareFlow (copy), React (copy), UniverseConfiguration (copy), ExperienceGuidelines (copy), SignalsReact (copy), GameConfigurationLabels (copy), LocalizationStrings (copy), FFlagEnableProvisionalRating (copy), UniverseActivation (copy), GameConfigurationActions (copy), v27 (copy), IconName (copy), getPrivatePlaytestersStore (copy), Signals (copy), View (copy), GameConfigurationList (copy), BuildMaturityBanner (copy), FoundationText (copy), ArchiveGameDialog (copy), ExperienceShareOverlays (copy)
-	local v31 = t1.testId or "game-configuration-content"
-	local v32 = useOpenWebView()
-	local v33 = useArchiveGameFlow()
-	local v34 = if not FFlagBuildExperiencePrivateInvites then nil else useExperienceShareFlow(t1.universeId, t1.placeId)
-	local v35 = if v34 == nil then nil else v34.onShare
-	local v36 = React.useMemo(function() -- line: 73
+local function GameConfigurationContent(t1: {[any]: any}) -- line: 64
+	-- upvalues: useOpenWebView (copy), useArchiveGameFlow (copy), FFlagBuildExperiencePrivateInvites (copy), useExperienceShareFlow (copy), React (copy), UniverseConfiguration (copy), ExperienceGuidelines (copy), SignalsReact (copy), GameConfigurationLabels (copy), LocalizationStrings (copy), FFlagEnableProvisionalRating (copy), UniverseActivation (copy), ContentMaturityUtils (copy), FFlagBuildRehydrateOnPublish (copy), GameConfigurationActions (copy), refreshPublishEligibility (copy), v29 (copy), IconName (copy), getPrivatePlaytestersStore (copy), Signals (copy), View (copy), GameConfigurationList (copy), BuildMaturityBanner (copy), FoundationText (copy), ArchiveGameDialog (copy), ExperienceShareOverlays (copy)
+	local v34 = t1.testId or "game-configuration-content"
+	local v35 = useOpenWebView()
+	local v36 = useArchiveGameFlow()
+	local v37 = if not FFlagBuildExperiencePrivateInvites then nil else useExperienceShareFlow(t1.universeId, t1.placeId)
+	local v38 = if v37 == nil then nil else v37.onShare
+	local v39 = React.useMemo(function() -- line: 76
 		-- upvalues: UniverseConfiguration (copy), t1 (copy)
 		return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchConfiguration(t1.universeId)
 	end, { t1.universeId })
-	local v37 = React.useMemo(function() -- line: 76
+	local v40 = React.useMemo(function() -- line: 79
 		-- upvalues: ExperienceGuidelines (copy), t1 (copy)
 		return ExperienceGuidelines.getExperienceGuidelinesStore().getAndFetchDetailedGuidelines(t1.universeId)
 	end, { t1.universeId })
-	local v38 = SignalsReact.useSignalState(v36.data)
-	local v39 = SignalsReact.useSignalState(v37.data)
-	local v40 = if not v38 then LocalizationStrings.GAME_CONFIGURATION_LOADING else GameConfigurationLabels.getAudienceText(v38) or GameConfigurationLabels.UNKNOWN_AUDIENCE_TEXT
-	local v41 = GameConfigurationLabels.getContentRatingText(v39) or LocalizationStrings.GAME_CONFIGURATION_LOADING
+	local v41 = SignalsReact.useSignalState(v39.data)
+	local v42 = SignalsReact.useSignalState(v40.data)
+	local v43 = if not v41 then LocalizationStrings.GAME_CONFIGURATION_LOADING else GameConfigurationLabels.getAudienceText(v41) or GameConfigurationLabels.UNKNOWN_AUDIENCE_TEXT
 	local GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER = nil
+	local v45 = nil
+	local v46 = false
 
 	if FFlagEnableProvisionalRating then
-		local v43 = React.useMemo(function() -- line: 89
+		local v47 = React.useMemo(function() -- line: 92
 			-- upvalues: UniverseActivation (copy), t1 (copy)
 			return UniverseActivation.getUniverseActivationStore().getAndFetchEligibility(t1.universeId)
 		end, { t1.universeId })
-		local v44 = SignalsReact.useSignalState(v43.data)
+		local v48 = SignalsReact.useSignalState(v47.data)
+		local v49 = React.useMemo(function() -- line: 96
+			-- upvalues: ContentMaturityUtils (copy), t1 (copy)
+			return ContentMaturityUtils.isSealBroken(t1.universeId)
+		end, {
+			v48,
+			t1.universeId
+		})
+		local v50 = React.useMemo(function() -- line: 99
+			-- upvalues: ContentMaturityUtils (copy), t1 (copy)
+			return ContentMaturityUtils.isContentUnrated(t1.universeId)
+		end, {
+			v48,
+			t1.universeId
+		})
 
-		if v44 ~= nil and v44.maturityRated ~= true and v44.provisionalRatingAllowed ~= true then
+		if FFlagBuildRehydrateOnPublish then
+			v45 = if not v48 then nil else v48.provisionalRating
+			v46 = v50 and not v49
+		end
+
+		if v49 and v50 then
 			GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER = LocalizationStrings.GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER
 		end
 	end
 
-	local v45 = React.useCallback(function() -- line: 102
-		-- upvalues: v32 (copy), GameConfigurationActions (copy), t1 (copy), LocalizationStrings (copy)
-		v32(GameConfigurationActions.getCreatorHubConfigureUrl(t1.universeId), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB)
+	local v51 = GameConfigurationLabels.getContentMaturityText(v42, v45, v46) or LocalizationStrings.GAME_CONFIGURATION_LOADING
+	local v52 = React.useCallback(function() -- line: 117
+		-- upvalues: v35 (copy), GameConfigurationActions (copy), t1 (copy), LocalizationStrings (copy)
+		v35(GameConfigurationActions.getCreatorHubConfigureUrl(t1.universeId), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB)
 	end, {
-		v32,
+		v35,
 		t1.universeId
 	})
-	local v46 = React.useCallback(function() -- line: 109
-		-- upvalues: v32 (copy), GameConfigurationActions (copy), t1 (copy), LocalizationStrings (copy)
-		v32(GameConfigurationActions.getExperienceQuestionnaireUrl(t1.universeId), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB)
+	local v53 = React.useCallback(function() -- line: 124
+		-- upvalues: FFlagBuildRehydrateOnPublish (copy), v35 (copy), GameConfigurationActions (copy), t1 (copy), LocalizationStrings (copy), refreshPublishEligibility (copy)
+		if FFlagBuildRehydrateOnPublish then
+			v35(GameConfigurationActions.getExperienceQuestionnaireUrl(t1.universeId), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB, function() -- line: 129
+				-- upvalues: refreshPublishEligibility (copy), t1 (copy)
+				refreshPublishEligibility(t1.universeId)
+			end)
+
+			return
+		end
+
+		v35(GameConfigurationActions.getExperienceQuestionnaireUrl(t1.universeId), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB)
 	end, {
-		v32,
+		v35,
 		t1.universeId
 	})
-	local v47 = React.useMemo(function() -- line: 117
-		-- upvalues: LocalizationStrings (copy), v27 (copy), IconName (copy), t1 (copy), v45 (copy)
+	local v54 = React.useMemo(function() -- line: 142
+		-- upvalues: LocalizationStrings (copy), v29 (copy), IconName (copy), t1 (copy), v52 (copy)
 		return {
 			{
 				id = "icon-thumbnails",
 				title = LocalizationStrings.GAME_CONFIGURATION_ICON_AND_THUMBNAILS,
-				trailingIcon = if not v27 then IconName.ArrowUpRightFromSquare else nil,
-				onActivated = if not v27 then v45 else t1.onOpenMediaSelectionPage
+				trailingIcon = if not v29 then IconName.ArrowUpRightFromSquare else nil,
+				onActivated = if not v29 then v52 else t1.onOpenMediaSelectionPage
 			},
 			{
 				id = "title-description",
@@ -92,60 +125,60 @@ local function GameConfigurationContent(t1: {[any]: any}) -- line: 61
 			}
 		}
 	end, {
-		v45,
+		v52,
 		t1.experienceName,
 		t1.onOpenMediaSelectionPage,
 		t1.onOpenTitleDescriptionPage
 	})
 	local onOpenPlaytestPicker = t1.onOpenPlaytestPicker
 	local onOpenPlaytestManagement = t1.onOpenPlaytestManagement
-	local v50 = FFlagBuildExperiencePrivateInvites and (onOpenPlaytestPicker ~= nil and onOpenPlaytestManagement ~= nil)
-	local v51 = React.useMemo(function() -- line: 145
-		-- upvalues: v50 (copy), getPrivatePlaytestersStore (copy), t1 (copy)
-		if not v50 then
+	local v57 = FFlagBuildExperiencePrivateInvites and (onOpenPlaytestPicker ~= nil and onOpenPlaytestManagement ~= nil)
+	local v58 = React.useMemo(function() -- line: 170
+		-- upvalues: v57 (copy), getPrivatePlaytestersStore (copy), t1 (copy)
+		if not v57 then
 			return nil
 		end
 
 		return getPrivatePlaytestersStore(false).getAndFetchInvitedPlayers(t1.universeId)
 	end, {
-		v50,
+		v57,
 		t1.universeId
 	})
-	local v52 = React.useMemo(function() -- line: 152
-		-- upvalues: Signals (copy), v51 (copy)
-		return Signals.createComputed(function(p1) -- line: 153
-			-- upvalues: v51 (copy)
-			if v51 ~= nil then
-				return #v51.players(p1)
+	local v59 = React.useMemo(function() -- line: 177
+		-- upvalues: Signals (copy), v58 (copy)
+		return Signals.createComputed(function(p1) -- line: 178
+			-- upvalues: v58 (copy)
+			if v58 ~= nil then
+				return #v58.players(p1)
 			end
 
 			return 0
 		end)
-	end, { v51 })
-	local v53 = SignalsReact.useSignalState(v52)
-	local v54 = React.useMemo(function() -- line: 159
-		-- upvalues: Signals (copy), v51 (copy)
-		return Signals.createComputed(function(p2) -- line: 160
-			-- upvalues: v51 (copy)
-			if v51 ~= nil then
-				return (v51.status(p2))
+	end, { v58 })
+	local v60 = SignalsReact.useSignalState(v59)
+	local v61 = React.useMemo(function() -- line: 184
+		-- upvalues: Signals (copy), v58 (copy)
+		return Signals.createComputed(function(p2) -- line: 185
+			-- upvalues: v58 (copy)
+			if v58 ~= nil then
+				return (v58.status(p2))
 			end
 
 			return "NotReady"
 		end)
-	end, { v51 })
-	local v55 = SignalsReact.useSignalState(v54)
+	end, { v58 })
+	local v62 = SignalsReact.useSignalState(v61)
 	local MAX_INVITES = getPrivatePlaytestersStore(false).MAX_INVITES
-	local u57 = nil
+	local u64 = nil
 
-	if v50 then
-		u57 = if v55 ~= "Ready" then {
+	if v57 then
+		u64 = if v62 ~= "Ready" then {
 			id = "playtest",
 			trailingIcon = nil,
 			onActivated = nil,
 			title = LocalizationStrings.PRIVATE_INVITES_ROW_TITLE,
-			description = if v55 ~= "Failed" then LocalizationStrings.GAME_CONFIGURATION_LOADING else LocalizationStrings.PRIVATE_INVITES_ROW_LOAD_ERROR
-		} else if not (v53 > 0) then {
+			description = if v62 ~= "Failed" then LocalizationStrings.GAME_CONFIGURATION_LOADING else LocalizationStrings.PRIVATE_INVITES_ROW_LOAD_ERROR
+		} else if not (v60 > 0) then {
 			id = "playtest",
 			trailingIcon = nil,
 			title = LocalizationStrings.PRIVATE_INVITES_ROW_TITLE_EMPTY,
@@ -155,77 +188,77 @@ local function GameConfigurationContent(t1: {[any]: any}) -- line: 61
 			id = "playtest",
 			trailingIcon = nil,
 			title = LocalizationStrings.PRIVATE_INVITES_ROW_TITLE,
-			description = LocalizationStrings.formatPrivateInvitesSent(v53, MAX_INVITES),
+			description = LocalizationStrings.formatPrivateInvitesSent(v60, MAX_INVITES),
 			onActivated = onOpenPlaytestManagement
 		}
 	end
 
-	local v58 = React.useMemo(function() -- line: 205
-		-- upvalues: LocalizationStrings (copy), v40 (copy), t1 (copy), u57 (ref), v35 (copy), v41 (copy), IconName (copy), v46 (copy)
+	local v65 = React.useMemo(function() -- line: 230
+		-- upvalues: LocalizationStrings (copy), v43 (copy), t1 (copy), u64 (ref), v38 (copy), v51 (copy), IconName (copy), v53 (copy)
 		local t2 = {{
 			id = "audience",
 			trailingIcon = nil,
 			title = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE,
-			description = v40,
+			description = v43,
 			onActivated = t1.onOpenAudiencePage
 		}}
 
-		if u57 ~= nil then
-			table.insert(t2, u57)
+		if u64 ~= nil then
+			table.insert(t2, u64)
 			table.insert(t2, {
 				id = "playtest-share-link",
 				trailingIcon = nil,
 				title = LocalizationStrings.PRIVATE_INVITES_SHARE_LINK,
-				onActivated = v35
+				onActivated = v38
 			})
 		end
 
 		table.insert(t2, {
 			id = "content-rating",
 			title = LocalizationStrings.GAME_CONFIGURATION_CONTENT_RATING,
-			description = v41,
+			description = v51,
 			trailingIcon = IconName.ArrowUpRightFromSquare,
-			onActivated = v46
+			onActivated = v53
 		})
 
 		return t2
 	end, {
-		v40,
-		v41,
-		v46,
-		u57,
-		v35,
+		v43,
+		v51,
+		v53,
+		u64,
+		v38,
 		t1.onOpenAudiencePage
 	})
-	local v59 = React.useMemo(function() -- line: 246
-		-- upvalues: LocalizationStrings (copy), IconName (copy), v45 (copy)
+	local v66 = React.useMemo(function() -- line: 271
+		-- upvalues: LocalizationStrings (copy), IconName (copy), v52 (copy)
 		return {{
 			id = "creator-hub",
 			title = LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB,
 			description = LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB_DESCRIPTION,
 			trailingIcon = IconName.ArrowUpRightFromSquare,
-			onActivated = v45
+			onActivated = v52
 		}}
-	end, { v45 })
-	local v60 = React.useCallback(function() -- line: 258
-		-- upvalues: v33 (copy), t1 (copy)
-		v33.requestArchive(t1.universeId)
+	end, { v52 })
+	local v67 = React.useCallback(function() -- line: 283
+		-- upvalues: v36 (copy), t1 (copy)
+		v36.requestArchive(t1.universeId)
 	end, {
-		v33.requestArchive,
+		v36.requestArchive,
 		t1.universeId
 	})
 
 	return React.createElement(View, {
 		tag = "col gap-xlarge size-full-0 auto-y padding-y-large",
 		LayoutOrder = t1.layoutOrder,
-		testId = v31
+		testId = v34
 	}, {
 		GameDetails = React.createElement(GameConfigurationList, {
 			layoutOrder = 1,
 			title = LocalizationStrings.GAME_CONFIGURATION_GAME_DETAILS,
 			body = LocalizationStrings.GAME_CONFIGURATION_GAME_DETAILS_BODY,
-			rows = v47,
-			testId = `{ v31 }-game-details`
+			rows = v54,
+			testId = `{ v34 }-game-details`
 		}),
 		Access = React.createElement(View, {
 			LayoutOrder = 2,
@@ -233,10 +266,10 @@ local function GameConfigurationContent(t1: {[any]: any}) -- line: 61
 		}, {
 			Configuration = React.createElement(GameConfigurationList, {
 				layoutOrder = 1,
-				title = if not v50 then LocalizationStrings.GAME_CONFIGURATION_ACCESS else LocalizationStrings.GAME_CONFIGURATION_ACCESS_AND_SHARING,
+				title = if not v57 then LocalizationStrings.GAME_CONFIGURATION_ACCESS else LocalizationStrings.GAME_CONFIGURATION_ACCESS_AND_SHARING,
 				body = LocalizationStrings.GAME_CONFIGURATION_ACCESS_BODY,
-				rows = v58,
-				testId = `{ v31 }-access`
+				rows = v65,
+				testId = `{ v34 }-access`
 			}),
 			BuildMaturityBanner = if GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER == nil then nil else React.createElement(BuildMaturityBanner, {
 				text = GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER
@@ -245,15 +278,15 @@ local function GameConfigurationContent(t1: {[any]: any}) -- line: 61
 		CreatorHub = React.createElement(GameConfigurationList, {
 			layoutOrder = 3,
 			title = LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB,
-			rows = v59,
-			testId = `{ v31 }-creator-hub`
+			rows = v66,
+			testId = `{ v34 }-creator-hub`
 		}),
 		ArchiveGame = React.createElement(View, {
 			LayoutOrder = 4,
 			tag = "row align-y-center size-full-0 auto-y padding-large stroke-standard stroke-default radius-large bg-surface-0",
-			onActivated = v60,
+			onActivated = v67,
 			stateLayer = {},
-			testId = `{ v31 }-archive-game`
+			testId = `{ v34 }-archive-game`
 		}, {
 			Label = React.createElement(FoundationText, {
 				LayoutOrder = 1,
@@ -262,16 +295,16 @@ local function GameConfigurationContent(t1: {[any]: any}) -- line: 61
 			})
 		}),
 		ArchiveDialog = React.createElement(ArchiveGameDialog, {
-			isOpen = v33.isOpen,
-			onArchive = v33.confirm,
-			onCancel = v33.cancel
+			isOpen = v36.isOpen,
+			onArchive = v36.confirm,
+			onCancel = v36.cancel
 		}),
-		ShareOverlays = if not FFlagBuildExperiencePrivateInvites or v34 == nil then nil else React.createElement(ExperienceShareOverlays, {
-			activeDialog = v34.activeDialog,
-			hasShareError = v34.hasShareError,
-			onCancel = v34.onCancelDialog,
-			onConfirmFriends = v34.onConfirmFriends,
-			onConfirmPlaytesters = v34.onConfirmPlaytesters
+		ShareOverlays = if not FFlagBuildExperiencePrivateInvites or v37 == nil then nil else React.createElement(ExperienceShareOverlays, {
+			activeDialog = v37.activeDialog,
+			hasShareError = v37.hasShareError,
+			onCancel = v37.onCancelDialog,
+			onConfirmFriends = v37.onConfirmFriends,
+			onConfirmPlaytesters = v37.onConfirmPlaytesters
 		})
 	})
 end

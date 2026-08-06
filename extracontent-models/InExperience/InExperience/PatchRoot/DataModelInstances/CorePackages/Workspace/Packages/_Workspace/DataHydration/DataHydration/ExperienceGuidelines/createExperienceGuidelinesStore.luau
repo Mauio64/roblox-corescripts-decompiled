@@ -29,11 +29,21 @@ local function createExperienceGuidelinesStore(t1: {[any]: any}?) -- line: 20
 	return {
 		getDetailedGuidelines = v10.get,
 		fetchDetailedGuidelines = v10.fetch,
+		refreshDetailedGuidelines = function(n2: number) -- line: 33
+			-- upvalues: fetchExperienceGuidelines (copy), t2 (copy), v10 (copy), syncGuidelinesAgeToGameStores (copy)
+			return fetchExperienceGuidelines.fetchDetailedGuidelines(n2, t2):andThen(function(p2) -- line: 36
+				-- upvalues: v10 (copy), n2 (copy), syncGuidelinesAgeToGameStores (copy)
+				v10.cache.replaceItem(tostring(n2), p2)
+				syncGuidelinesAgeToGameStores(n2, p2)
+
+				return p2
+			end)
+		end,
 		getAndFetchDetailedGuidelines = v10.getAndFetch,
-		updateDetailedGuidelines = function(n2: number, p2) -- line: 37
+		updateDetailedGuidelines = function(n3: number, p3) -- line: 48
 			-- upvalues: v10 (copy), syncGuidelinesAgeToGameStores (copy)
-			v10.update(n2, p2)
-			syncGuidelinesAgeToGameStores(n2, p2)
+			v10.update(n3, p3)
+			syncGuidelinesAgeToGameStores(n3, p3)
 		end,
 		clear = v10.clear,
 		dispose = v10.dispose

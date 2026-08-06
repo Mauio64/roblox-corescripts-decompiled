@@ -41,7 +41,7 @@ local t1 = {
 	size = InputSize.Large,
 	variant = InputVariant.Standard
 }
-local v32 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 131
+local v32 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 132
 	-- upvalues: React (copy), isPluginSecurity (copy), Padding (copy)
 	local isBoundsChecker = t2.isBoundsChecker
 	local v37 = t2.isMultiLine or isBoundsChecker
@@ -60,6 +60,7 @@ local v32 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 
 		TextWrapped = v37,
 		TextYAlignment = if not v37 then Enum.TextYAlignment.Center else Enum.TextYAlignment.Top,
 		TextEditable = not isBoundsChecker and not t2.isDisabled,
+		Interactable = t2.Interactable,
 		PlaceholderText = t2.placeholder,
 		TextInputType = if not isPluginSecurity() then nil else t2.textInputType,
 		Size = if t2.Size == nil then UDim2.fromScale(1, 1) else t2.Size,
@@ -80,7 +81,7 @@ local v32 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 
 	}, t2.children)
 end))
 
-local function InternalTextInput(p2, p3) -- line: 177
+local function InternalTextInput(p2, p3) -- line: 179
 	-- upvalues: Flags (copy), withDefaults (copy), t1 (copy), useTokens (copy), React (copy), getBindableValue (copy), useTextInputVariants (copy), useStyleTags (copy), usePreferredInput (copy), getDisabledStyle (copy), InputFocusBehavior (copy), getMultiLineTextHeight (copy), truncateTextToCursor (copy), useBindable (copy), ReactUtils (copy), View (copy), withCommonProps (copy), blendTransparencies (copy), Constants (copy), Radius (copy), StateLayerAffordance (copy), ScrollView (copy), v32 (copy), mapBindable (copy), Icon (copy)
 	if Flags.FoundationInputSelectionProps and p2.Selectable == nil then
 		p2.Selectable = true
@@ -98,21 +99,47 @@ local function InternalTextInput(p2, p3) -- line: 177
 	local v49 = React.useRef(getBindableValue(v40.text))
 	local v50 = React.useRef(nil)
 	local v51 = React.useRef(Vector2.zero)
-	local v52, v53 = React.useState(false)
-	local v54 = useTextInputVariants(v41, v40.size, v40.variant, v40.radius, v52, v40.hasError)
-	local container = v54.container
-	local v56 = useStyleTags(v54.textBox.tag)
-	local v57 = usePreferredInput()
-	local v58, v59 = React.useState(false)
-	local v60 = v57 == Enum.PreferredInput.Touch
+	local u52 = nil
+	local v53 = nil
+	local u54 = nil
+	local u57, u59
+
+	if Flags.FoundationRemoveSecondUIDDFromScrubbableTextboxes then
+		local v55, v56 = React.useState(false)
+
+		u57 = v55
+		u52 = v56
+
+		local v58
+
+		v53, v58 = React.useBinding(false)
+		u54 = v58
+		u59 = React.useCallback(function(b1: boolean) -- line: 207
+			-- upvalues: u54 (ref), u52 (ref)
+			u54(b1)
+			u52(b1)
+		end, {})
+	else
+		local v60, v61 = React.useState(false)
+
+		u57 = v60
+		u59 = v61
+	end
+
+	local v62 = useTextInputVariants(v41, v40.size, v40.variant, v40.radius, u57, v40.hasError)
+	local container = v62.container
+	local v64 = useStyleTags(v62.textBox.tag)
+	local v65 = usePreferredInput()
+	local v66, v67 = React.useState(false)
+	local v68 = v65 == Enum.PreferredInput.Touch
 	local Standard = v41.Stroke.Standard
-	local v62 = math.ceil(Standard) * 2
-	local v63 = math.ceil(v41.Stroke.Thick) * 2
-	local v64 = getDisabledStyle(v41.Color.Content.Emphasis, v40.isDisabled)
-	local fontStyle = v54.textBox.fontStyle
+	local v70 = math.ceil(Standard) * 2
+	local v71 = math.ceil(v41.Stroke.Thick) * 2
+	local v72 = getDisabledStyle(v41.Color.Content.Emphasis, v40.isDisabled)
+	local fontStyle = v62.textBox.fontStyle
 	local FontSize = fontStyle.FontSize
 	local LineHeight = fontStyle.LineHeight
-	local v68 = React.useCallback(function(p4) -- line: 218
+	local v76 = React.useCallback(function(p4) -- line: 234
 		-- upvalues: v44 (copy), v45 (copy)
 		if v44.current then
 			v44.current.SelectionStart = p4
@@ -122,7 +149,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 			v45.current.SelectionStart = p4
 		end
 	end, {})
-	local v69 = React.useCallback(function(p5) -- line: 227
+	local v77 = React.useCallback(function(p5) -- line: 243
 		-- upvalues: v44 (copy), v45 (copy)
 		if v44.current then
 			v44.current.CursorPosition = p5
@@ -132,52 +159,46 @@ local function InternalTextInput(p2, p3) -- line: 177
 			v45.current.CursorPosition = p5
 		end
 	end, {})
-	local v70 = React.useCallback(function() -- line: 236
-		-- upvalues: v44 (copy), v45 (copy), v68 (copy), v69 (copy)
-		local v106 = v44.current or v45.current
+	local v78 = React.useCallback(function() -- line: 252
+		-- upvalues: v44 (copy), v45 (copy), v76 (copy), v77 (copy)
+		local v115 = v44.current or v45.current
 
-		if v106 == nil or v106.Parent == nil then
+		if v115 == nil or v115.Parent == nil then
 			return
 		end
 
-		local v107 = utf8.len(v106.Text)
+		local v116 = utf8.len(v115.Text)
 
-		if v107 then
-			v68(0)
-			v69(v107 + 1)
+		if v116 then
+			v76(0)
+			v77(v116 + 1)
 		end
 	end, {
-		v68,
-		v69
+		v76,
+		v77
 	})
-	local v71 = React.useCallback(function() -- line: 249
-		-- upvalues: Flags (copy), v44 (copy), v40 (copy), InputFocusBehavior (copy), v70 (copy)
-		if Flags.FoundationTextInputHighlightFix then
-			if v44.current == nil then
-				return
-			end
+	local v79 = React.useCallback(function() -- line: 266
+		-- upvalues: v44 (copy), v40 (copy), InputFocusBehavior (copy), v78 (copy)
+		if v44.current == nil then
+			return
+		end
 
-			v44.current:CaptureFocus()
+		v44.current:CaptureFocus()
 
-			if v40.focusBehavior == InputFocusBehavior.Highlight then
-				task.spawn(v70)
-
-				return
-			end
-		elseif v44.current then
-			v44.current:CaptureFocus()
+		if v40.focusBehavior == InputFocusBehavior.Highlight then
+			task.spawn(v78)
 		end
 	end, {
-		if not Flags.FoundationTextInputHighlightFix then nil else v70,
-		if not Flags.FoundationTextInputHighlightFix then nil else v40.focusBehavior
+		v78,
+		v40.focusBehavior
 	})
-	local v72 = React.useCallback(function() -- line: 270
+	local v80 = React.useCallback(function() -- line: 283
 		-- upvalues: v44 (copy)
 		if v44.current then
 			v44.current:ReleaseFocus()
 		end
 	end, {})
-	local v73 = React.useCallback(function() -- line: 276
+	local v81 = React.useCallback(function() -- line: 289
 		-- upvalues: v44 (copy)
 		if v44.current then
 			return (v44.current:IsFocused())
@@ -185,7 +206,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 
 		return nil
 	end, {})
-	local v74 = React.useCallback(function() -- line: 283
+	local v82 = React.useCallback(function() -- line: 296
 		-- upvalues: v44 (copy)
 		if v44.current then
 			return v44.current.SelectionStart
@@ -193,7 +214,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 
 		return nil
 	end, {})
-	local v75 = React.useCallback(function() -- line: 290
+	local v83 = React.useCallback(function() -- line: 303
 		-- upvalues: v44 (copy)
 		if v44.current then
 			return v44.current.CursorPosition
@@ -201,35 +222,35 @@ local function InternalTextInput(p2, p3) -- line: 177
 
 		return nil
 	end, {})
-	local v76 = React.useCallback(function() -- line: 297
+	local v84 = React.useCallback(function() -- line: 310
 		-- upvalues: v44 (copy)
 		if v44.current then
 			v44.current.Text = ""
 		end
 	end, {})
 
-	React.useImperativeHandle(p3, function() -- line: 305
-		-- upvalues: v73 (copy), v71 (copy), v72 (copy), v74 (copy), v75 (copy), v69 (copy), v68 (copy)
+	React.useImperativeHandle(p3, function() -- line: 318
+		-- upvalues: v81 (copy), v79 (copy), v80 (copy), v82 (copy), v83 (copy), v77 (copy), v76 (copy)
 		return {
-			getIsFocused = v73,
-			focus = v71,
-			releaseFocus = v72,
-			getSelectionStart = v74,
-			getCursorPosition = v75,
-			setCursorPosition = v69,
-			setSelectionStart = v68
+			getIsFocused = v81,
+			focus = v79,
+			releaseFocus = v80,
+			getSelectionStart = v82,
+			getCursorPosition = v83,
+			setCursorPosition = v77,
+			setSelectionStart = v76
 		}
 	end, {
-		v75,
-		v73,
-		v74,
-		v71,
-		v72,
-		v69,
-		v68
+		v83,
+		v81,
+		v82,
+		v79,
+		v80,
+		v77,
+		v76
 	})
 
-	local v77 = React.useCallback(function(p6) -- line: 327
+	local v85 = React.useCallback(function(p6) -- line: 340
 		-- upvalues: v48 (copy), v49 (copy), v43 (copy), v46 (copy), v40 (copy)
 		if p6 == nil or (p6.Parent == nil or v48.current ~= "") then
 			return
@@ -251,24 +272,24 @@ local function InternalTextInput(p2, p3) -- line: 177
 	end, {
 		v40.onChanged,
 		v43,
-		v58
+		v66
 	})
-	local v78 = React.useRef(false)
-	local v79 = React.useCallback(function() -- line: 349
-		-- upvalues: v40 (copy), v43 (copy), v60 (copy), v44 (copy), v48 (copy), v59 (copy), v53 (copy), InputFocusBehavior (copy), v45 (copy), Flags (copy), v78 (copy), v68 (copy), v69 (copy)
+	local v86 = React.useRef(false)
+	local v87 = React.useCallback(function() -- line: 362
+		-- upvalues: v40 (copy), v43 (copy), v68 (copy), v44 (copy), v48 (copy), v67 (copy), u59 (ref), InputFocusBehavior (copy), v45 (copy), v86 (copy)
 		if v40.isDisabled then
 			return
 		end
 
-		if v43 and v60 then
+		if v43 and v68 then
 			if v44.current and v44.current.Parent then
 				v48.current = v44.current.Text
 			end
 
-			v59(true)
+			v67(true)
 		end
 
-		v53(true)
+		u59(true)
 
 		if v40.onFocus then
 			v40.onFocus()
@@ -289,81 +310,53 @@ local function InternalTextInput(p2, p3) -- line: 177
 				return
 			end
 		elseif focusBehavior == InputFocusBehavior.Highlight then
-			if Flags.FoundationTextInputHighlightFix then
-				v78.current = true
-
-				return
-			end
-
-			task.spawn(function() -- line: 382
-				-- upvalues: v44 (copy), v45 (copy), v68 (copy), v69 (copy)
-				local v143 = v44.current or v45.current
-
-				if v143 and v143.Parent ~= nil then
-					local v144 = utf8.len(v143.Text)
-
-					if v144 then
-						v68(0)
-						v69(v144 + 1)
-					end
-				end
-			end)
+			v86.current = true
 		end
 	end, {
 		v40.onFocus,
 		v40.isDisabled,
-		v60,
+		v68,
 		v43,
-		v40.focusBehavior,
-		if Flags.FoundationTextInputHighlightFix then nil else v68,
-		if Flags.FoundationTextInputHighlightFix then nil else v69
+		v40.focusBehavior
 	})
-	local v80 = React.useCallback(function(_, p8) -- line: 406
-		-- upvalues: Flags (copy), v78 (copy)
-		if not Flags.FoundationTextInputHighlightFix then
-			return
-		end
-
+	local v88 = React.useCallback(function(_, p8) -- line: 403
+		-- upvalues: v86 (copy)
 		if p8.UserInputType == Enum.UserInputType.MouseMovement then
-			v78.current = false
+			v86.current = false
 		end
 	end, {})
-	local v81 = React.useCallback(function(_, p10) -- line: 417
-		-- upvalues: Flags (copy), v78 (copy), v70 (copy)
-		if not Flags.FoundationTextInputHighlightFix then
+	local v89 = React.useCallback(function(_, p10) -- line: 410
+		-- upvalues: v86 (copy), v78 (copy)
+		if not v86.current then
 			return
 		end
 
-		if not v78.current then
-			return
-		end
-
-		v78.current = false
+		v86.current = false
 
 		if p10.UserInputType ~= Enum.UserInputType.MouseButton1 then
 			return
 		end
 
-		v70()
+		v78()
 	end, {
-		if not Flags.FoundationTextInputHighlightFix then nil else v68,
-		if not Flags.FoundationTextInputHighlightFix then nil else v69,
-		if not Flags.FoundationTextInputHighlightFix then nil else v70
+		v76,
+		v77,
+		v78
 	})
-	local v82 = React.useCallback(function(_, b1: boolean, p12) -- line: 441
-		-- upvalues: v53 (copy), v78 (copy), v43 (copy), v59 (copy), v40 (copy)
-		v53(false)
-		v78.current = false
+	local v90 = React.useCallback(function(_, b2: boolean, p12) -- line: 430
+		-- upvalues: u59 (ref), v86 (copy), v43 (copy), v67 (copy), v40 (copy)
+		u59(false)
+		v86.current = false
 
 		if v43 then
-			v59(false)
+			v67(false)
 		end
 
 		if v40.onFocusLost then
 			v40.onFocusLost(p12)
 		end
 
-		if b1 and v40.onReturnPressed then
+		if b2 and v40.onReturnPressed then
 			v40.onReturnPressed()
 		end
 	end, {
@@ -371,7 +364,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 		v43,
 		v40.onFocusLost
 	})
-	local v83 = React.useCallback(function(p13, vector2: Vector2) -- line: 460
+	local v91 = React.useCallback(function(p13, vector2: Vector2) -- line: 449
 		-- upvalues: v50 (copy), v40 (copy)
 		v50.current = vector2
 
@@ -379,19 +372,19 @@ local function InternalTextInput(p2, p3) -- line: 177
 			v40.onDragStarted(p13, vector2)
 		end
 	end, { v40.onDragStarted })
-	local v84 = React.useCallback(function(p14, vector2: Vector2) -- line: 467
+	local v92 = React.useCallback(function(p14, vector2: Vector2) -- line: 456
 		-- upvalues: v40 (copy)
 		if v40.onDrag then
 			v40.onDrag(p14, vector2)
 		end
 	end, { v40.onDrag })
-	local v85 = React.useCallback(function(p15, vector2: Vector2) -- line: 473
-		-- upvalues: v50 (copy), v71 (copy), v72 (copy), v53 (copy), v40 (copy)
+	local v93 = React.useCallback(function(p15, vector2: Vector2) -- line: 462
+		-- upvalues: v50 (copy), v79 (copy), v80 (copy), u59 (ref), v40 (copy)
 		if vector2 == v50.current then
-			v71()
+			v79()
 		else
-			v72()
-			v53(false)
+			v80()
+			u59(false)
 		end
 
 		v50.current = nil
@@ -400,7 +393,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 			v40.onDragEnded(p15, vector2)
 		end
 	end, { v40.onDragEnded })
-	local v86 = React.useMemo(function() -- line: 486
+	local v94 = React.useMemo(function() -- line: 475
 		-- upvalues: container (copy), v41 (copy)
 		return {
 			radius = UDim.new(0, container.radius),
@@ -411,7 +404,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 		v41,
 		container.radius
 	})
-	local v87 = React.useMemo(function() -- line: 494
+	local v95 = React.useMemo(function() -- line: 483
 		-- upvalues: getMultiLineTextHeight (copy), FontSize (copy), v42 (copy), LineHeight (copy)
 		return getMultiLineTextHeight(FontSize, v42, LineHeight)
 	end, {
@@ -419,37 +412,37 @@ local function InternalTextInput(p2, p3) -- line: 177
 		v42,
 		LineHeight
 	})
-	local v88, v89 = React.useMemo(function() -- line: 499
-		-- upvalues: container (copy), v62 (copy), getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), v87 (copy)
-		local v124 = math.round((container.minHeight - v62 - getMultiLineTextHeight(FontSize, 1, LineHeight)) * 2) / 2
-		local uDim = UDim.new(0, (math.floor(v124 / 2)))
-		local uDim2 = UDim.new(0, (math.ceil(v124 / 2)))
-		local v127 = v87 + math.round(v124) + v62
+	local v96, v97 = React.useMemo(function() -- line: 488
+		-- upvalues: container (copy), v70 (copy), getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), v95 (copy)
+		local v133 = math.round((container.minHeight - v70 - getMultiLineTextHeight(FontSize, 1, LineHeight)) * 2) / 2
+		local uDim = UDim.new(0, (math.floor(v133 / 2)))
+		local uDim2 = UDim.new(0, (math.ceil(v133 / 2)))
+		local v136 = v95 + math.round(v133) + v70
 
 		return {
 			top = uDim,
 			bottom = uDim2,
 			left = UDim.new(0, 0),
 			right = UDim.new(0, 0)
-		}, v127
+		}, v136
 	end, {
 		container.minHeight,
-		v62,
-		v63,
+		v70,
+		v71,
 		FontSize,
-		v87,
+		v95,
 		LineHeight
 	})
-	local v90 = if not Flags.FoundationNumberInputBeta then nil else React.useMemo(function() -- line: 529
+	local v98 = if not Flags.FoundationNumberInputBeta then nil else React.useMemo(function() -- line: 518
 		-- upvalues: v40 (copy)
 		return {
 			left = if not v40.horizontalPadding then nil else v40.horizontalPadding.innerLeft,
 			right = if not v40.horizontalPadding then nil else v40.horizontalPadding.innerRight
 		}
 	end, { v40.horizontalPadding })
-	local v91 = v88.bottom.Offset + v88.top.Offset
-	local uDim2 = UDim2.new(1, 0, 0, v87 + v91)
-	local v93 = React.useMemo(function() -- line: 540
+	local v99 = v96.bottom.Offset + v96.top.Offset
+	local uDim2 = UDim2.new(1, 0, 0, v95 + v99)
+	local v101 = React.useMemo(function() -- line: 529
 		-- upvalues: v43 (copy)
 		if v43 then
 			return {
@@ -460,7 +453,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 
 		return nil
 	end, { v43 })
-	local v94 = React.useMemo(function() -- line: 549
+	local v102 = React.useMemo(function() -- line: 538
 		-- upvalues: v43 (copy)
 		if v43 then
 			return {
@@ -473,8 +466,8 @@ local function InternalTextInput(p2, p3) -- line: 177
 
 		return nil
 	end, { v43 })
-	local v95 = React.useCallback(function(p16) -- line: 560
-		-- upvalues: v47 (copy), v46 (copy), truncateTextToCursor (copy), v88 (copy)
+	local v103 = React.useCallback(function(p16) -- line: 549
+		-- upvalues: v47 (copy), v46 (copy), truncateTextToCursor (copy), v96 (copy)
 		local current = v47.current
 		local current2 = v46.current
 
@@ -482,24 +475,24 @@ local function InternalTextInput(p2, p3) -- line: 177
 			return
 		end
 
-		local v131 = p16.TextSize * p16.LineHeight
+		local v140 = p16.TextSize * p16.LineHeight
 		local CanvasPositionY = current.CanvasPosition.Y
 
 		current2.Text = truncateTextToCursor(p16)
 
 		local TextBoundsY = current2.TextBounds.Y
-		local v134 = CanvasPositionY - v88.top.Offset + v88.bottom.Offset
-		local v135 = CanvasPositionY + current.AbsoluteSize.Y - v88.top.Offset - v88.bottom.Offset
+		local v143 = CanvasPositionY - v96.top.Offset + v96.bottom.Offset
+		local v144 = CanvasPositionY + current.AbsoluteSize.Y - v96.top.Offset - v96.bottom.Offset
 
-		if v134 > TextBoundsY - v131 then
-			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v131 - v134)
+		if v143 > TextBoundsY - v140 then
+			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v140 - v143)
 		end
 
-		if v135 < TextBoundsY then
-			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v135)
+		if v144 < TextBoundsY then
+			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v144)
 		end
-	end, { v88 })
-	local v96 = React.useCallback(function(p17) -- line: 593
+	end, { v96 })
+	local v104 = React.useCallback(function(p17) -- line: 582
 		-- upvalues: v47 (copy), v51 (copy)
 		if p17 == nil then
 			return
@@ -509,14 +502,14 @@ local function InternalTextInput(p2, p3) -- line: 177
 		p17.ClipsDescendants = true
 		p17.CanvasPosition = v51.current
 	end, {})
-	local v97 = React.useCallback(function(p18) -- line: 603
+	local v105 = React.useCallback(function(p18) -- line: 592
 		-- upvalues: v48 (copy), Flags (copy)
 		if p18 then
 			p18.Text = v48.current
 			v48.current = ""
 
 			if Flags.FoundationTextAreaDelayMobileFocus then
-				task.delay(0, function() -- line: 608
+				task.delay(0, function() -- line: 597
 					-- upvalues: p18 (copy)
 					if p18.Parent ~= nil then
 						p18:CaptureFocus()
@@ -529,33 +522,33 @@ local function InternalTextInput(p2, p3) -- line: 177
 			p18:CaptureFocus()
 		end
 	end, {})
-	local v98 = React.useCallback(function(p19) -- line: 619
+	local v106 = React.useCallback(function(p19) -- line: 608
 		-- upvalues: v51 (copy)
 		v51.current = p19.CanvasPosition
 	end, {})
-	local v99 = React.useMemo(function() -- line: 623
-		-- upvalues: v40 (copy), React (copy), v83 (copy), v84 (copy), v85 (copy), v52 (copy)
+	local v107 = React.useMemo(function() -- line: 612
+		-- upvalues: v40 (copy), React (copy), v91 (copy), v92 (copy), v93 (copy), u57 (ref)
 		if not v40.onDragStarted and (not v40.onDrag and not v40.onDragEnded) then
 			return nil
 		end
 
 		return React.createElement("UIDragDetector", {
 			DragStyle = Enum.UIDragDetectorDragStyle.Scriptable,
-			[React.Event.DragStart] = v83,
-			[React.Event.DragContinue] = v84,
-			[React.Event.DragEnd] = v85,
-			Enabled = not v52 and not v40.isDisabled
+			[React.Event.DragStart] = v91,
+			[React.Event.DragContinue] = v92,
+			[React.Event.DragEnd] = v93,
+			Enabled = not u57 and not v40.isDisabled
 		})
 	end, {
-		v83,
-		v84,
-		v85,
-		v52,
+		v91,
+		v92,
+		v93,
+		u57,
 		v40.isDisabled
 	})
-	local v100 = useBindable(if not v40.horizontalPadding then UDim.new(0, 0) else v40.horizontalPadding.left or UDim.new(0, 0))
-	local v101 = useBindable(if not v40.horizontalPadding then UDim.new(0, 0) else v40.horizontalPadding.right or UDim.new(0, 0))
-	local v102 = React.useMemo(function() -- line: 643
+	local v108 = useBindable(if not v40.horizontalPadding then UDim.new(0, 0) else v40.horizontalPadding.left or UDim.new(0, 0))
+	local v109 = useBindable(if not v40.horizontalPadding then UDim.new(0, 0) else v40.horizontalPadding.right or UDim.new(0, 0))
+	local v110 = React.useMemo(function() -- line: 632
 		-- upvalues: v40 (copy), container (copy), v41 (copy)
 		if v40.hasClearButton then
 			return (UDim2.fromOffset(0, (container.minHeight - v41.Stroke.Standard) / 2))
@@ -567,11 +560,11 @@ local function InternalTextInput(p2, p3) -- line: 177
 		container.minHeight,
 		v41.Stroke.Standard
 	})
-	local v103 = ReactUtils.useComposedRef(v45, v97)
+	local v111 = ReactUtils.useComposedRef(v45, v105)
 
 	return React.createElement(View, withCommonProps(v40, {
 		ref = v40.inputRef,
-		Size = UDim2.new(1, 0, 0, v89),
+		Size = UDim2.new(1, 0, 0, v97),
 		selection = {
 			Selectable = if not Flags.FoundationInputSelectionProps then not v40.isDisabled else v40.Selectable and not v40.isDisabled,
 			NextSelectionUp = if not Flags.FoundationInputSelectionProps then nil else v40.NextSelectionUp,
@@ -579,27 +572,27 @@ local function InternalTextInput(p2, p3) -- line: 177
 			NextSelectionLeft = if not Flags.FoundationInputSelectionProps then nil else v40.NextSelectionLeft,
 			NextSelectionRight = if not Flags.FoundationInputSelectionProps then nil else v40.NextSelectionRight
 		},
-		cursor = v86,
+		cursor = v94,
 		stroke = if not container.strokeStyle or not container.strokeThickness then nil else {
 			Color = container.strokeStyle.Color3,
 			Transparency = if not v40.isDisabled then container.strokeStyle.Transparency else blendTransparencies(container.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY),
 			Thickness = container.strokeThickness,
-			BorderStrokePosition = if not v52 then Enum.BorderStrokePosition.Inner else Enum.BorderStrokePosition.Center
+			BorderStrokePosition = if not u57 then Enum.BorderStrokePosition.Inner else Enum.BorderStrokePosition.Center
 		},
 		cornerRadius = if v40.radius ~= Radius.Circle then nil else UDim.new(0, (math.ceil(container.minHeight / 2))),
 		padding = {
-			left = v100:map(function(p20) -- line: 688
+			left = v108:map(function(p20) -- line: 677
 				-- upvalues: Standard (copy)
 				return UDim.new(0, Standard) + p20
 			end),
-			right = if v40.trailingElement ~= nil or not v40.hasClearButton then v101:map(function(p21) -- line: 694
+			right = if v40.trailingElement ~= nil or not v40.hasClearButton then v109:map(function(p21) -- line: 683
 				-- upvalues: Standard (copy)
 				return UDim.new(0, Standard) + p21
 			end) else UDim.new(0, Standard),
 			top = UDim.new(0, Standard),
 			bottom = UDim.new(0, Standard)
 		},
-		onActivated = if v40.isDisabled then nil else v71,
+		onActivated = if v40.isDisabled then nil else v79,
 		isDisabled = v40.isDisabled,
 		backgroundStyle = if not container.bgStyle then nil else getDisabledStyle({
 			Color3 = container.bgStyle.Color3,
@@ -611,7 +604,7 @@ local function InternalTextInput(p2, p3) -- line: 177
 		tag = container.tag,
 		testId = `{ v40.testId }--outer-container`
 	}), {
-		DragDetector = v99,
+		DragDetector = v107,
 		Background = v40.backgroundGradient,
 		Leading = if not v40.leadingElement then nil else React.createElement(View, {
 			LayoutOrder = 1,
@@ -625,87 +618,89 @@ local function InternalTextInput(p2, p3) -- line: 177
 			selection = {
 				Selectable = false
 			},
-			scroll = v94,
-			layout = v93,
-			onCanvasPositionChanged = if not v43 then nil else v98,
-			scrollingFrameRef = if not v43 then nil else v96,
-			padding = if not Flags.FoundationNumberInputBeta then nil else v90,
+			scroll = v102,
+			layout = v101,
+			onCanvasPositionChanged = if not v43 then nil else v106,
+			scrollingFrameRef = if not v43 then nil else v104,
+			padding = if not Flags.FoundationNumberInputBeta then nil else v98,
 			testId = `{ v40.testId }--textbox-wrapper`
 		}, {
-			TextBox = if v58 then nil else React.createElement(v32, {
+			TextBox = if v66 then nil else React.createElement(v32, {
 				text = v40.text,
 				placeholder = v40.placeholder,
 				textInputType = v40.textInputType,
 				fontStyle = fontStyle,
-				textStyle = v64,
+				textStyle = v72,
 				isMultiLine = v43,
 				isDisabled = v40.isDisabled,
 				ref = v44,
-				tag = `{ v56 or "" } data-testid={ v40.testId }--textbox`,
+				tag = `{ v64 or "" } data-testid={ v40.testId }--textbox`,
+				Interactable = if not Flags.FoundationRemoveSecondUIDDFromScrubbableTextboxes or v107 == nil then nil else v53,
 				Size = if not v43 then nil else uDim2,
-				automaticSize = mapBindable(v40.text, function(p22) -- line: 748
-					-- upvalues: v43 (copy), v58 (copy)
-					if v43 and (not v58 and p22 ~= "") then
+				automaticSize = mapBindable(v40.text, function(p22) -- line: 741
+					-- upvalues: v43 (copy), v66 (copy)
+					if v43 and (not v66 and p22 ~= "") then
 						return Enum.AutomaticSize.Y
 					end
 
 					return nil
 				end),
-				padding = v88,
-				onFocusGained = v79,
-				onFocusLost = if not v43 or not v60 then v82 else nil,
-				onTextChanged = v77,
-				onCursorPositionChanged = if not v43 then nil else v95,
-				onInputChanged = v80,
-				onInputEnded = v81
+				padding = v96,
+				onFocusGained = v87,
+				onFocusLost = if not v43 or not v68 then v90 else nil,
+				onTextChanged = v85,
+				onCursorPositionChanged = if not v43 then nil else v103,
+				onInputChanged = v88,
+				onInputEnded = v89
 			}, {
-				DragDetector = v99,
+				DragDetector = if Flags.FoundationRemoveSecondUIDDFromScrubbableTextboxes then nil else v107,
 				BoundsChecker = if not v43 then nil else React.createElement(v32, {
 					isBoundsChecker = true,
 					fontStyle = fontStyle,
-					textStyle = v64,
-					Size = UDim2.new(1, 0, 1, v91),
+					textStyle = v72,
+					Size = UDim2.new(1, 0, 1, v99),
 					ref = v46
 				})
 			}),
-			MobileTextBox = if not v43 or not v58 then nil else React.createElement(v32, {
+			MobileTextBox = if not v43 or not v66 then nil else React.createElement(v32, {
 				text = v40.text,
 				placeholder = v40.placeholder,
 				textInputType = v40.textInputType,
 				fontStyle = fontStyle,
-				textStyle = v64,
+				textStyle = v72,
 				isMultiLine = v43,
 				isDisabled = v40.isDisabled,
-				padding = v88,
-				ref = v103,
-				tag = `{ v56 or "" } data-testid={ v40.testId }--mobile-textbox`,
+				padding = v96,
+				ref = v111,
+				tag = `{ v64 or "" } data-testid={ v40.testId }--mobile-textbox`,
+				Interactable = if not Flags.FoundationRemoveSecondUIDDFromScrubbableTextboxes or v107 == nil then nil else v53,
 				Size = uDim2,
-				onFocusLost = if not v43 or not v60 then nil else v82,
-				onTextChanged = v77,
-				onCursorPositionChanged = if not v43 then nil else v95
+				onFocusLost = if not v43 or not v68 then nil else v90,
+				onTextChanged = v85,
+				onCursorPositionChanged = if not v43 then nil else v103
 			})
 		}),
 		Clear = if not v40.hasClearButton then nil else React.createElement(View, {
 			LayoutOrder = 3,
 			isDisabled = v40.isDisabled,
 			GroupTransparency = if not v40.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-			Visible = mapBindable(v40.text, function(p23) -- line: 803
+			Visible = mapBindable(v40.text, function(p23) -- line: 802
 				return p23 ~= ""
 			end),
-			tag = v54.clearButton.tag
+			tag = v62.clearButton.tag
 		}, {
 			ClearButton = React.createElement(View, {
 				tag = "anchor-center-left auto-xy",
-				onActivated = v76,
-				padding = UDim.new(0, v54.clearButton.padding),
-				Position = v102,
+				onActivated = v84,
+				padding = UDim.new(0, v62.clearButton.padding),
+				Position = v110,
 				stateLayer = {
 					affordance = StateLayerAffordance.None
 				},
 				testId = `{ v40.testId }--clear-button`
 			}, {
 				Icon = React.createElement(Icon, {
-					name = v54.clearButton.icon
+					name = v62.clearButton.icon
 				})
 			})
 		}),

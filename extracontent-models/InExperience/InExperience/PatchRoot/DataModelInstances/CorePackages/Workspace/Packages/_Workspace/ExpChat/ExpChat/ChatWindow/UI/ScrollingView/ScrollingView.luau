@@ -5,16 +5,17 @@ local Dictionary = require(ExpChatParent.llama).Dictionary
 local ExpChatShared = require(ExpChatParent.ExpChatShared)
 local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
 local FFlagExpChatEnableV2ChatWindow = require(ExpChat.Flags.FFlagExpChatEnableV2ChatWindow)
+local FFlagExpChatEnableFriendsTab = require(ExpChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
 local FFlagExpChatWindowMessageSourceRefactor = require(ExpChatParent.SharedFlags).FFlagExpChatWindowMessageSourceRefactor
 local FFlagExpChatChannelTabRefactor = require(ExpChatParent.SharedFlags).FFlagExpChatChannelTabRefactor
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 local BottomLockedScrollViewV3 = require(ExpChat.ChatWindow.UI.BottomLockedScrollViewV3)
-local v12 = Roact.PureComponent:extend("ScrollingView")
+local v13 = Roact.PureComponent:extend("ScrollingView")
 
-v12.defaultProps = {}
+v13.defaultProps = {}
 
-function v12.render(p1) -- line: 18
-	-- upvalues: FFlagExpChatEnableV2ChatWindow (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatWindowMessageSourceRefactor (copy), Roact (copy), FFlagExpChatEnableFocusNavigation (copy), BottomLockedScrollViewV3 (copy), Dictionary (copy), FFlagExpChatChannelTabRefactor (copy)
+function v13.render(p1) -- line: 19
+	-- upvalues: FFlagExpChatEnableV2ChatWindow (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatWindowMessageSourceRefactor (copy), Roact (copy), FFlagExpChatEnableFocusNavigation (copy), BottomLockedScrollViewV3 (copy), Dictionary (copy), FFlagExpChatChannelTabRefactor (copy), FFlagExpChatEnableFriendsTab (copy)
 	local t1 = {}
 
 	if FFlagExpChatEnableV2ChatWindow then
@@ -43,9 +44,11 @@ function v12.render(p1) -- line: 18
 			Size = UDim2.fromScale(1, 1),
 			targetTextChannel = p1.props.targetTextChannel,
 			isChannelBarVisible = p1.props.isChannelBarVisible,
-			scrollResetKey = if not FFlagExpChatChannelTabRefactor then nil else p1.props.scrollResetKey
+			scrollResetKey = if not FFlagExpChatChannelTabRefactor then nil else p1.props.scrollResetKey,
+			onCanvasPositionChanged = if not FFlagExpChatEnableFriendsTab then nil else p1.props.onCanvasPositionChanged,
+			contentTopPadding = if not FFlagExpChatEnableFriendsTab then nil else p1.props.contentTopPadding
 		}, t1), if not FFlagExpChatEnableV2ChatWindow and not FFlagExpChatWindowMessageSourceRefactor then p1.props[Roact.Children] else nil)
 	})
 end
 
-return v12
+return v13

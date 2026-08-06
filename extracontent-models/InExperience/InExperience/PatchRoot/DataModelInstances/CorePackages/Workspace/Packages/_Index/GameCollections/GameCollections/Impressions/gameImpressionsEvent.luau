@@ -20,6 +20,8 @@ local v19 = game:DefineFastFlag("LuaAppFixRecommendedImpressionsInterface", fals
 local FFlagLuaAppGameImpressionsAddUnifiedFields = require(Parent.SharedFlags).FFlagLuaAppGameImpressionsAddUnifiedFields
 local FFlagLuaAppGameItemTelemetryServiceTarget = require(Parent.SharedFlags).FFlagLuaAppGameItemTelemetryServiceTarget
 local FFlagLuaAppSduiLandingPageEnabled = require(Parent.SharedFlags).FFlagLuaAppSduiLandingPageEnabled
+local FFlagLuaAppAddAnalyticsDataToSeeAllImpressions = require(Parent.SharedFlags).FFlagLuaAppAddAnalyticsDataToSeeAllImpressions
+local FFlagSduiSearchResultsPageEnabled = require(Parent.SharedFlags).FFlagSduiSearchResultsPageEnabled
 local t1 = nil
 
 if FFlagLuaAppMigrateGameEventsTelemetryService then
@@ -52,7 +54,7 @@ if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
 	}
 end
 
-local v25 = t.strictInterface({
+local v27 = t.strictInterface({
 	absPositions = t.string,
 	topicDataPositions = t.string,
 	rootPlaceIds = t.string,
@@ -84,7 +86,7 @@ local v25 = t.strictInterface({
 	interactionUuid = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	hasSponsoredContent = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.boolean)
 })
-local v26 = t.strictInterface({
+local v28 = t.strictInterface({
 	absPositions = t.string,
 	topicDataPositions = t.string,
 	rootPlaceIds = t.string,
@@ -105,11 +107,12 @@ local v26 = t.strictInterface({
 	footerTextLiterals = t.optional(t.string),
 	footerLocalizationKeys = t.optional(t.string),
 	tileTypes = t.optional(t.string),
+	analyticsData = if not FFlagLuaAppAddAnalyticsDataToSeeAllImpressions then nil else t.optional(t.table),
 	contentType = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	interactionUuid = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	hasSponsoredContent = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.boolean)
 })
-local v27 = t.strictInterface({
+local v29 = t.strictInterface({
 	absPositions = t.string,
 	topicDataPositions = t.string,
 	rootPlaceIds = t.string,
@@ -133,11 +136,12 @@ local v27 = t.strictInterface({
 	tileBadgeContexts = t.optional(t.string),
 	componentType = if not FFlagLuaAppAddComponentTypeToSearchImpressions then nil else t.optional(t.string),
 	tileTypes = t.optional(t.string),
+	analyticsData = if not FFlagSduiSearchResultsPageEnabled then nil else t.optional(t.table),
 	contentType = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	interactionUuid = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	hasSponsoredContent = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.boolean)
 })
-local v28 = t.strictInterface({
+local v30 = t.strictInterface({
 	absPositions = t.string,
 	topicDataPositions = t.string,
 	rootPlaceIds = t.string,
@@ -153,7 +157,7 @@ local v28 = t.strictInterface({
 	interactionUuid = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	hasSponsoredContent = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.boolean)
 })
-local v29 = if not FFlagSearchOmniAutocompletePage then nil else t.strictInterface({
+local v31 = if not FFlagSearchOmniAutocompletePage then nil else t.strictInterface({
 	absPositions = t.string,
 	topicDataPositions = t.string,
 	rootPlaceIds = t.string,
@@ -177,7 +181,7 @@ local v29 = if not FFlagSearchOmniAutocompletePage then nil else t.strictInterfa
 	interactionUuid = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.string),
 	hasSponsoredContent = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.boolean)
 })
-local v30 = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else t.strictInterface({
+local v32 = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else t.strictInterface({
 	absPositions = t.string,
 	positionsInRows = t.optional(t.string),
 	rootPlaceIds = t.string,
@@ -192,25 +196,25 @@ local v30 = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else t.stric
 	hasSponsoredContent = if not FFlagLuaAppGameImpressionsAddUnifiedFields then nil else t.optional(t.boolean)
 })
 local t3 = {
-	[AppPage.Home] = v25,
-	[AppPage.Games] = v25,
-	[AppPage.SduiLandingPage] = if not FFlagLuaAppSduiLandingPageEnabled then nil else v25,
-	[AppPage.SearchPage] = v27,
-	[AppPage.SearchLandingPage] = if not FFlagSearchOmniAutocompletePage then nil else v29,
-	recommended = v28,
-	Deeplink = v26,
-	InExpHistoryPage = v30
+	[AppPage.Home] = v27,
+	[AppPage.Games] = v27,
+	[AppPage.SduiLandingPage] = if not FFlagLuaAppSduiLandingPageEnabled then nil else v27,
+	[AppPage.SearchPage] = v29,
+	[AppPage.SearchLandingPage] = if not FFlagSearchOmniAutocompletePage then nil else v31,
+	recommended = v30,
+	Deeplink = v28,
+	InExpHistoryPage = v32
 }
 
-return function(p1, p2, p3) -- line: 231
-	-- upvalues: AppPage (copy), v26 (copy), t3 (copy), DiscoveryEventErrorLogger (copy), FFlagLuaAppGameImpressionsAddUnifiedFields (copy), Cryo (copy), HttpService (copy), ContentType (copy), FFlagLuaAppMigrateGameEventsTelemetryService (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppGameEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
-	local v35 = if not p3.seeAllFlag or p2 ~= AppPage.Home and p2 ~= AppPage.Games then t3[p2] else v26
+return function(p1, p2, p3) -- line: 236
+	-- upvalues: AppPage (copy), v28 (copy), t3 (copy), DiscoveryEventErrorLogger (copy), FFlagLuaAppGameImpressionsAddUnifiedFields (copy), Cryo (copy), HttpService (copy), ContentType (copy), FFlagLuaAppMigrateGameEventsTelemetryService (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppGameEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
+	local v37 = if not p3.seeAllFlag or p2 ~= AppPage.Home and p2 ~= AppPage.Games then t3[p2] else v28
 
-	if v35 then
-		local v36, v37 = v35(p3)
+	if v37 then
+		local v38, v39 = v37(p3)
 
-		if not v36 then
-			DiscoveryEventErrorLogger.reportError("GameImpressionsEventInvalidInterface", v37)
+		if not v38 then
+			DiscoveryEventErrorLogger.reportError("GameImpressionsEventInvalidInterface", v39)
 		end
 	else
 		DiscoveryEventErrorLogger.reportError("GameImpressionsEventMissingInterface", `Missing interface for eventContext { p2 } to type check gameImpressions event parameters`, {

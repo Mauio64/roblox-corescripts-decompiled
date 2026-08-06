@@ -1,12 +1,8 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
-local InGameAssetReportingParent = InGameAssetReporting.Parent
 
 require(InGameAssetReporting.Analysis.Types)
 
-local FFlagReportIPInfringement = require(InGameAssetReportingParent.SharedFlags).FFlagReportIPInfringement
-
-function extractAssetIdsFromInstance(p1) -- line: 7
-	-- upvalues: FFlagReportIPInfringement (copy)
+function extractAssetIdsFromInstance(p1) -- line: 5
 	local t1 = {
 		Package = {},
 		Model = {},
@@ -106,7 +102,7 @@ function extractAssetIdsFromInstance(p1) -- line: 7
 					return t1
 				end
 			else
-				if not FFlagReportIPInfringement or not p1:IsA("VideoFrame") then
+				if not p1:IsA("VideoFrame") then
 					return nil
 				end
 

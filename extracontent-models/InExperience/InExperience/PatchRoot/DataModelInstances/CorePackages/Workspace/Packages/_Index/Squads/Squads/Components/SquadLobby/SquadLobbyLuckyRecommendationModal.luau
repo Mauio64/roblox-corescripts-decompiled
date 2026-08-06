@@ -31,18 +31,23 @@ local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExtern
 local Enums = require(SquadsParent.SquadsCore.Enums)
 local SquadExperienceInviteSource = Enums.SquadExperienceInviteSource
 local SquadLuckyRecommendationPhase = Enums.SquadLuckyRecommendationPhase
-local useLuckyRecommendation = require(SquadsParent.SquadsCore.Hooks).useLuckyRecommendation
+local Hooks = require(SquadsParent.SquadsCore.Hooks)
+local useLuckyRecommendation = Hooks.useLuckyRecommendation
+local useLuckyRecommendationAnalytics = Hooks.useLuckyRecommendationAnalytics
+local EventNames = require(SquadsParent.SquadsCore.EventNames)
 
-local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
-	-- upvalues: useTokens (copy), useDispatch (copy), React (copy), SquadExternalContractContext (copy), useLuckyRecommendation (copy), useLocalization (copy), SquadLuckyRecommendationPhase (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), useSelector (copy), CreateExperienceInvite (copy), SquadExperienceInviteSource (copy), setTimeout (copy), clearTimeout (copy), ReactOtter (copy), FoundationText (copy), View (copy), FoundationImage (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), OverlayProvider (copy), Dialog (copy), DialogSize (copy), Button (copy), ButtonVariant (copy), Icon (copy), IconSize (copy)
-	local v37 = useTokens()
-	local v38 = useDispatch()
-	local Size_300 = v37.Size.Size_300
-	local v40 = React.useContext(SquadExternalContractContext)
-	local v41 = useLuckyRecommendation()
-	local state = v41.state
-	local actions = v41.actions
-	local v44 = useLocalization({
+local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 67
+	-- upvalues: useTokens (copy), useDispatch (copy), React (copy), SquadExternalContractContext (copy), useLuckyRecommendation (copy), useLuckyRecommendationAnalytics (copy), useLocalization (copy), SquadLuckyRecommendationPhase (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), useSelector (copy), EventNames (copy), CreateExperienceInvite (copy), SquadExperienceInviteSource (copy), setTimeout (copy), clearTimeout (copy), ReactOtter (copy), FoundationText (copy), View (copy), FoundationImage (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), OverlayProvider (copy), Dialog (copy), DialogSize (copy), Button (copy), ButtonVariant (copy), Icon (copy), IconSize (copy)
+	local v40 = useTokens()
+	local v41 = useDispatch()
+	local Size_300 = v40.Size.Size_300
+	local v43 = React.useContext(SquadExternalContractContext)
+	local v44 = useLuckyRecommendation()
+	local state = v44.state
+	local actions = v44.actions
+	local sessionId = t1.sessionId
+	local v48 = useLuckyRecommendationAnalytics(sessionId)
+	local v49 = useLocalization({
 		rollingTitle = "Feature.Squads.Label.LuckyRecommendationRolling",
 		rollingSubtitle = "Feature.Squads.Description.LuckyRecommendationRolling",
 		revealedTitle = "Feature.Squads.Label.LuckyRecommendationRevealed",
@@ -53,78 +58,132 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
 		retryText = "Feature.Squads.Action.Retry"
 	})
 	local phase = state.phase
-	local v46 = phase == SquadLuckyRecommendationPhase.Rolling
-	local v47 = phase == SquadLuckyRecommendationPhase.Revealed
-	local v48 = v47 or phase == SquadLuckyRecommendationPhase.Errored
-	local v49 = if state.phase ~= SquadLuckyRecommendationPhase.Revealed then nil else state.recommendation
-	local v50 = v49 and v49.universeId
-	local v51 = v49 and v49.rootPlaceId
-	local v52 = if v50 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v50), Constants.RbxthumbTypes.GameIcon, 150, false)
-	local v53 = React.useCallback(function(p1) -- line: 100
+	local v51 = phase == SquadLuckyRecommendationPhase.Rolling
+	local v52 = phase == SquadLuckyRecommendationPhase.Revealed
+	local v53 = v52 or phase == SquadLuckyRecommendationPhase.Errored
+	local v54 = if state.phase ~= SquadLuckyRecommendationPhase.Revealed then nil else state.recommendation
+	local v55 = v54 and v54.universeId
+	local v56 = v54 and v54.rootPlaceId
+	local v57 = if v55 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v55), Constants.RbxthumbTypes.GameIcon, 150, false)
+	local v58 = React.useCallback(function(p1) -- line: 107
 		return p1.Squad and (p1.Squad.Squad and (p1.Squad.Squad.currentSquad and p1.Squad.Squad.currentSquad.squadId))
 	end, {})
-	local v54 = useSelector(v53)
-	local v55 = React.useCallback(function(p2) -- line: 108
+	local v59 = useSelector(v58)
+	local v60 = React.useCallback(function(p2) -- line: 115
 		return p2.Squad and (p2.Squad.Squad and p2.Squad.Squad.currentExperienceInvite)
 	end, {})
-	local v56 = useSelector(v55)
-	local v57 = React.useCallback(function() -- line: 113
-		-- upvalues: actions (copy), v54 (copy)
-		actions.startRoll(v54, false)
+	local v61 = useSelector(v60)
+	local v62 = React.useCallback(function() -- line: 120
+		-- upvalues: v48 (copy), EventNames (copy), phase (copy), t1 (copy)
+		v48.fire(EventNames.LuckyRecommendationDismissed, {
+			phaseAtDismiss = phase
+		})
+		t1.onClose()
+	end, {
+		v48,
+		phase,
+		t1.onClose
+	})
+	local v63 = React.useCallback(function() -- line: 127
+		-- upvalues: v48 (copy), EventNames (copy), phase (copy), actions (copy), v59 (copy)
+		v48.fire(EventNames.LuckyRecommendationRerolled, {
+			phaseAtReroll = phase
+		})
+		actions.startRoll(v59, false)
 	end, {
 		actions.startRoll,
-		v54
+		v59,
+		v48,
+		phase
 	})
-	local v58 = React.useCallback(function() -- line: 117
-		-- upvalues: v51 (copy), v38 (copy), CreateExperienceInvite (copy), v40 (copy), SquadExperienceInviteSource (copy)
-		if v51 == nil then
+	local v64 = React.useCallback(function() -- line: 134
+		-- upvalues: v48 (copy), EventNames (copy), v56 (copy), v41 (copy), CreateExperienceInvite (copy), v43 (copy), SquadExperienceInviteSource (copy)
+		local v72 = v48.getContext()
+
+		v48.fire(EventNames.LuckyRecommendationJoinTapped, {
+			rootPlaceId = v56
+		})
+
+		if v56 == nil then
 			return
 		end
 
-		v38(CreateExperienceInvite(tostring(v51), v40, SquadExperienceInviteSource.LuckyRecommendation))
+		v41(CreateExperienceInvite(tostring(v56), v43, SquadExperienceInviteSource.LuckyRecommendation)):andThen(function(s1: string) -- line: 144
+			-- upvalues: v48 (copy), EventNames (copy), v72 (copy), v56 (copy)
+			if s1 then
+				v48.fire(EventNames.LuckyRecommendationExperienceInviteCreated, {
+					pickRequestId = v72.pickRequestId,
+					revealType = v72.revealType,
+					rootPlaceId = v56,
+					experienceInviteId = s1
+				})
+			end
+		end)
 	end, {
-		v38,
-		v51,
-		v40
+		v41,
+		v56,
+		v43,
+		v48
 	})
 
-	React.useLayoutEffect(function() -- line: 126
-		-- upvalues: actions (copy), v54 (copy)
-		actions.startRoll(v54, true)
+	React.useLayoutEffect(function() -- line: 156
+		-- upvalues: actions (copy), v59 (copy)
+		actions.startRoll(v59, true)
 	end, {
 		actions.startRoll,
-		v54
+		v59
 	})
-	React.useEffect(function() -- line: 130
+	React.useEffect(function() -- line: 160
 		-- upvalues: phase (copy), SquadLuckyRecommendationPhase (copy), setTimeout (copy), actions (copy), clearTimeout (copy)
 		if phase ~= SquadLuckyRecommendationPhase.Rolling then
 			return
 		end
 
-		local v66 = setTimeout(actions.endRoll, 1000)
+		local v73 = setTimeout(actions.endRoll, 1000)
 
-		return function() -- line: 135
-			-- upvalues: clearTimeout (copy), v66 (copy)
-			clearTimeout(v66)
+		return function() -- line: 165
+			-- upvalues: clearTimeout (copy), v73 (copy)
+			clearTimeout(v73)
 		end
 	end, {
 		phase,
 		actions.endRoll
 	})
-	React.useEffect(function() -- line: 140
+	React.useEffect(function() -- line: 170
 		-- upvalues: actions (copy)
-		return function() -- line: 141
+		return function() -- line: 171
 			-- upvalues: actions (copy)
 			actions.cancelFetch()
 		end
 	end, { actions.cancelFetch })
+	React.useEffect(function() -- line: 176
+		-- upvalues: phase (copy), SquadLuckyRecommendationPhase (copy), v48 (copy), EventNames (copy), v55 (copy), state (copy)
+		if phase == SquadLuckyRecommendationPhase.Revealed then
+			v48.fire(EventNames.LuckyRecommendationRevealShown, {
+				universeId = v55
+			})
 
-	local v59, v60 = ReactOtter.useAnimatedBinding(0)
+			return
+		end
 
-	React.useEffect(function() -- line: 148
-		-- upvalues: v46 (copy), v60 (copy), ReactOtter (copy), v48 (copy)
-		if v46 then
-			v60(ReactOtter.ease(100, {
+		if phase == SquadLuckyRecommendationPhase.Errored then
+			v48.fire(EventNames.LuckyRecommendationErrorShown, {
+				errorType = state.error
+			})
+		end
+	end, {
+		phase,
+		v48,
+		state,
+		v55
+	})
+
+	local v65, v66 = ReactOtter.useAnimatedBinding(0)
+
+	React.useEffect(function() -- line: 190
+		-- upvalues: v51 (copy), v66 (copy), ReactOtter (copy), v53 (copy)
+		if v51 then
+			v66(ReactOtter.ease(100, {
 				duration = 1,
 				startingValue = 0,
 				easingStyle = Enum.EasingStyle.Quad
@@ -133,46 +192,46 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
 			return
 		end
 
-		if v48 then
-			v60(ReactOtter.ease(100, {
+		if v53 then
+			v66(ReactOtter.ease(100, {
 				duration = 0
 			}))
 		end
 	end, {
-		v46,
-		v48,
-		v60
+		v51,
+		v53,
+		v66
 	})
 
-	local v61 = if not v47 then if v48 then {
-		title = v44.errorTitle,
-		actionText = v44.retryText,
-		onAction = v57
+	local v67 = if not v52 then if v53 then {
+		title = v49.errorTitle,
+		actionText = v49.retryText,
+		onAction = v63
 	} else {
-		title = v44.rollingTitle,
-		subtitle = v44.rollingSubtitle,
-		actionText = v44.cancelText,
-		onAction = t1.onClose
+		title = v49.rollingTitle,
+		subtitle = v49.rollingSubtitle,
+		actionText = v49.cancelText,
+		onAction = v62
 	} else {
-		title = v44.revealedTitle,
-		subtitle = v44.revealedSubtitle,
-		actionText = v44.joinText,
-		onAction = v58,
-		isActionDisabled = v56 ~= nil
+		title = v49.revealedTitle,
+		subtitle = v49.revealedSubtitle,
+		actionText = v49.joinText,
+		onAction = v64,
+		isActionDisabled = v61 ~= nil
 	}
 	local t2 = {
 		Title = React.createElement(FoundationText, {
 			tag = "size-full-0 auto-y text-heading-small text-align-x-left content-emphasis",
 			LayoutOrder = 1,
-			Text = v61.title
+			Text = v67.title
 		})
 	}
 
-	if v61.subtitle ~= nil then
+	if v67.subtitle ~= nil then
 		t2.Subtitle = React.createElement(FoundationText, {
 			tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-default",
 			LayoutOrder = 2,
-			Text = v61.subtitle
+			Text = v67.subtitle
 		})
 	end
 
@@ -183,41 +242,41 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
 		}, t2)
 	}
 
-	if v49 then
+	if v54 then
 		t3.GameResult = React.createElement(View, {
 			tag = "row align-y-center gap-medium size-full-0 auto-y padding-large stroke-standard stroke-position-inner stroke-default radius-medium bg-surface-200",
 			LayoutOrder = 2
 		}, {
-			Thumbnail = if not v52 then nil else React.createElement(FoundationImage, {
+			Thumbnail = if not v57 then nil else React.createElement(FoundationImage, {
 				tag = "radius-small",
 				LayoutOrder = 1,
-				Image = v52,
-				Size = UDim2.fromOffset(v37.Size.Size_1000, v37.Size.Size_1000)
+				Image = v57,
+				Size = UDim2.fromOffset(v40.Size.Size_1000, v40.Size.Size_1000)
 			}),
 			GameInfo = React.createElement(View, {
 				tag = "col align-y-center fill",
 				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v37.Size.Size_1000)
+				Size = UDim2.new(1, 0, 0, v40.Size.Size_1000)
 			}, {
 				GameName = React.createElement(FoundationText, {
 					tag = "size-full-0 auto-y text-title-medium text-no-wrap text-align-x-left text-truncate-end content-emphasis",
 					LayoutOrder = 1,
-					Text = v49.universeName
+					Text = v54.universeName
 				})
 			})
 		})
 	end
 
-	if not v48 then
+	if not v53 then
 		t3.ProgressBar = React.createElement(View, {
 			tag = "row align-y-center size-full-0",
 			LayoutOrder = 3,
-			Size = UDim2.new(1, 0, 0, v37.Size.Size_500)
+			Size = UDim2.new(1, 0, 0, v40.Size.Size_500)
 		}, {
 			Bar = React.createElement(Progress, {
 				shape = ProgressShape.Bar,
 				size = ProgressSize.Medium,
-				value = v59,
+				value = v65,
 				width = UDim.new(1, 0)
 			})
 		})
@@ -227,7 +286,7 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
 		DisplayOrder = 11
 	}, {
 		Dialog = React.createElement(Dialog.Root, {
-			onClose = t1.onClose,
+			onClose = v62,
 			size = DialogSize.Small,
 			hasBackdrop = t1.hasBackdrop == nil or t1.hasBackdrop,
 			disablePortal = t1.disablePortal ~= nil and t1.disablePortal
@@ -239,7 +298,7 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
 				Main = React.createElement(View, {
 					tag = "col size-full-0 auto-y",
 					padding = {
-						top = UDim.new(0, Size_300 + v37.Size.Size_200)
+						top = UDim.new(0, Size_300 + v40.Size.Size_200)
 					}
 				}, {
 					Body = React.createElement(View, {
@@ -248,25 +307,25 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 63
 					}, t3),
 					ActionButton = React.createElement(Button, {
 						LayoutOrder = 2,
-						onActivated = v61.onAction,
-						text = v61.actionText,
+						onActivated = v67.onAction,
+						text = v67.actionText,
 						variant = ButtonVariant.Standard,
 						width = UDim.new(1, 0),
-						isDisabled = v61.isActionDisabled
+						isDisabled = v67.isActionDisabled
 					})
 				}),
-				ResetButton = if not v47 then nil else React.createElement(View, {
+				ResetButton = if not v52 then nil else React.createElement(View, {
 					tag = "row align-x-center align-y-center auto-xy padding-small radius-circle clip bg-over-media-100",
 					ZIndex = 2,
-					onActivated = v57,
-					Size = UDim2.fromOffset(v37.Size.Size_1000, v37.Size.Size_1000),
+					onActivated = v63,
+					Size = UDim2.fromOffset(v40.Size.Size_1000, v40.Size.Size_1000),
 					AnchorPoint = Vector2.new(1, 0),
-					Position = UDim2.new(1, -v37.Size.Size_1000, 0, Size_300)
+					Position = UDim2.new(1, -v40.Size.Size_1000, 0, Size_300)
 				}, {
 					Icon = React.createElement(Icon, {
 						name = "arrow-spin-clockwise",
 						size = IconSize.Small,
-						style = v37.Color.Content.Emphasis
+						style = v40.Color.Content.Emphasis
 					})
 				})
 			})

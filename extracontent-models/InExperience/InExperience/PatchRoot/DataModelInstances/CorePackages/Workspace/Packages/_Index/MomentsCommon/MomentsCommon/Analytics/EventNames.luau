@@ -34,6 +34,7 @@ return {
 	EditingFlowTextOverlayBackButtonPressed = "EditingFlowTextOverlayBackButtonPressed",
 	EditingFlowTextOverlayDoneButtonPressed = "EditingFlowTextOverlayDoneButtonPressed",
 	EditingFlowStickerOverlayButtonPressed = "EditingFlowStickerOverlayButtonPressed",
+	EditingFlowStickerSelected = "EditingFlowStickerSelected",
 	EditingFlowStickerOverlayBackButtonPressed = "EditingFlowStickerOverlayBackButtonPressed",
 	EditingFlowStickerOverlayDoneButtonPressed = "EditingFlowStickerOverlayDoneButtonPressed",
 	EditingFlowTrimButtonPressed = "EditingFlowTrimButtonPressed",

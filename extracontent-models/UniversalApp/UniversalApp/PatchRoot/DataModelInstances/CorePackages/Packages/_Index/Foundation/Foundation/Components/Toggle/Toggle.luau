@@ -16,7 +16,7 @@ local Flags = require(Foundation.Utility.Flags)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 
 require(Foundation.Enums.ControlState)
 
@@ -36,7 +36,7 @@ local t2 = {
 	placement = InputPlacement.Start
 }
 local t3 = {
-	colorMode = ColorMode.Color
+	colorNamespace = ColorNamespace.Color
 }
 
 local function Toggle(p1, p2) -- line: 66

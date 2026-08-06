@@ -21,7 +21,7 @@ local withDefaults = require(Foundation.Utility.withDefaults)
 local useKnobVariants = require(script.Parent.useKnobVariants)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local usePresentationContext = require(Foundation.Providers.Style.PresentationContext).usePresentationContext
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local InputSize = require(Foundation.Enums.InputSize)
 local Flags = require(Foundation.Utility.Flags)
 local t1 = {
@@ -32,13 +32,13 @@ local t1 = {
 }
 
 local function Knob(p1) -- line: 49
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useKnobVariants (copy), ColorMode (copy), React (copy), useBindable (copy), ReactIs (copy), View (copy), withCommonProps (copy), Flags (copy), Icon (copy), blendTransparencies (copy), Constants (copy), Dash (copy), Image (copy)
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useKnobVariants (copy), ColorNamespace (copy), React (copy), useBindable (copy), ReactIs (copy), View (copy), withCommonProps (copy), Flags (copy), Icon (copy), blendTransparencies (copy), Constants (copy), Dash (copy), Image (copy)
 	local v24 = withDefaults(p1, t1)
 	local v25 = useTokens()
 	local v26 = usePresentationContext()
-	local v27 = useKnobVariants(v25, v24.size, v26 and v26.colorMode == ColorMode.Inverse)
+	local v27 = useKnobVariants(v25, v24.size, v26 and v26.colorNamespace == ColorNamespace.Inverse)
 	local v28 = v24.style or v27.knob.style
-	local v29 = React.useCallback(function(p2) -- line: 57
+	local v29 = React.useCallback(function(p2) -- line: 60
 		-- upvalues: v25 (copy)
 		return {
 			Color3 = v25.Color.Extended.White.White_100.Color3,
@@ -48,13 +48,13 @@ local function Knob(p1) -- line: 49
 	local v30 = useBindable(if not v24.stroke then nil else v24.stroke.Transparency)
 	local v31 = useBindable(v28)
 	local v32 = useBindable(v27.knob.style)
-	local v33 = React.useMemo(function() -- line: 68
+	local v33 = React.useMemo(function() -- line: 71
 		-- upvalues: v27 (copy), v24 (copy), ReactIs (copy)
 		local size = v27.knob.size
 
 		if v24.stroke and v24.stroke.Thickness then
 			if ReactIs.isBinding(v24.stroke.Thickness) then
-				return v24.stroke.Thickness:map(function(n1: number) -- line: 72
+				return v24.stroke.Thickness:map(function(n1: number) -- line: 75
 					-- upvalues: size (ref)
 					return size - UDim2.fromOffset(n1 * 2, n1 * 2)
 				end)
@@ -78,7 +78,7 @@ local function Knob(p1) -- line: 49
 		Icon = if not Flags.FoundationToggleVisualUpdate or not v24.icon then React.createElement(View, {
 			ZIndex = 4,
 			tag = v27.knob.tag,
-			backgroundStyle = if not v24.isDisabled then v28 else v31:map(function(p3) -- line: 121
+			backgroundStyle = if not v24.isDisabled then v28 else v31:map(function(p3) -- line: 124
 				-- upvalues: blendTransparencies (copy), Constants (copy)
 				return {
 					Color3 = p3.Color3,
@@ -86,7 +86,7 @@ local function Knob(p1) -- line: 49
 				}
 			end),
 			Size = v33,
-			stroke = v30:map(function(p4) -- line: 130
+			stroke = v30:map(function(p4) -- line: 133
 				-- upvalues: v24 (copy), Dash (copy), blendTransparencies (copy), Constants (copy)
 				local stroke = v24.stroke
 
@@ -107,7 +107,7 @@ local function Knob(p1) -- line: 49
 		}, React.createElement(Icon, {
 			name = v24.icon.name,
 			variant = v24.icon.variant,
-			style = if not v24.isDisabled then v27.knob.style else v32:map(function(p5) -- line: 104
+			style = if not v24.isDisabled then v27.knob.style else v32:map(function(p5) -- line: 107
 				-- upvalues: blendTransparencies (copy), Constants (copy)
 				return {
 					Color3 = p5.Color3,

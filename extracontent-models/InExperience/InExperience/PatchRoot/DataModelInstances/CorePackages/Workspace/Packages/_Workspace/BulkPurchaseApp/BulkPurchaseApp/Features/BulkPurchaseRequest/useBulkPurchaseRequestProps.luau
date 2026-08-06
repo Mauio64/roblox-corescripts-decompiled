@@ -2,6 +2,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local BrowserService = game:GetService("BrowserService")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
 local BulkPurchaseAppParent = BulkPurchaseApp.Parent
 local useDispatch = require(BulkPurchaseAppParent.RoactUtils).Hooks.RoactRodux.useDispatch
@@ -27,44 +28,45 @@ local getCommonItemStatus = require(script.Parent.Utils.getCommonItemStatus)
 local handleEconomicRestrictionError = require(script.Parent.Utils.handleEconomicRestrictionError)
 local selectBulkPurchaseRequestState = require(script.Parent.Utils.selectBulkPurchaseRequestState)
 local selectOptions = require(script.Parent.Utils.selectOptions)
-local v30 = game:DefineFastFlag("FixBuyRobuxForAndroid", false)
+local v31 = game:DefineFastFlag("FixBuyRobuxForAndroid", false)
+local v32 = game:DefineFastFlag("FixBulkPurchaseStarterGuiRename", false)
 
 require(script.Parent.BulkPurchaseRequest)
 
-local function useBulkPurchaseRequestProps() -- line: 41
-	-- upvalues: useDispatch (copy), useSelector (copy), selectBulkPurchaseRequestState (copy), selectPurchaseResults (copy), selectOrderRequest (copy), selectOptions (copy), selectItemData (copy), MarketplaceService (copy), BulkPurchaseEnded (copy), isErrorReasonContainsEconomicRestrictions (copy), handleEconomicRestrictionError (copy), getItemResultsFromResponse (copy), getCommonItemStatus (copy), BulkPurchaseSucceeded (copy), BulkPurchasePromptStateEnum (copy), BulkPurchaseFailed (copy), ItemStatusToErrorCodeMap (copy), ErrorCodeEnum (copy), getPaymentPlatform (copy), PaymentPlatformEnum (copy), v30 (copy), HttpService (copy), getRobuxStoreUrl (copy), BrowserService (copy), FFlagFixVP8143 (copy), React (copy), RunService (copy), getGuiObjectIsObscured (copy)
-	local v32 = useDispatch()
-	local v33 = useSelector(selectBulkPurchaseRequestState)
-	local v34 = useSelector(selectPurchaseResults)
-	local v35 = useSelector(selectOrderRequest)
-	local v36 = useSelector(selectOptions)
-	local v37 = useSelector(selectItemData)
-	local totalCost = v33.totalCost
-	local balance = v33.balance
-	local u40 = nil
-	local v41 = nil
+local function useBulkPurchaseRequestProps() -- line: 43
+	-- upvalues: useDispatch (copy), useSelector (copy), selectBulkPurchaseRequestState (copy), selectPurchaseResults (copy), selectOrderRequest (copy), selectOptions (copy), selectItemData (copy), MarketplaceService (copy), BulkPurchaseEnded (copy), isErrorReasonContainsEconomicRestrictions (copy), handleEconomicRestrictionError (copy), getItemResultsFromResponse (copy), getCommonItemStatus (copy), BulkPurchaseSucceeded (copy), BulkPurchasePromptStateEnum (copy), BulkPurchaseFailed (copy), ItemStatusToErrorCodeMap (copy), ErrorCodeEnum (copy), getPaymentPlatform (copy), PaymentPlatformEnum (copy), v31 (copy), HttpService (copy), getRobuxStoreUrl (copy), BrowserService (copy), FFlagFixVP8143 (copy), React (copy), RunService (copy), getGuiObjectIsObscured (copy), v32 (copy), StarterGui (copy)
+	local v34 = useDispatch()
+	local v35 = useSelector(selectBulkPurchaseRequestState)
+	local v36 = useSelector(selectPurchaseResults)
+	local v37 = useSelector(selectOrderRequest)
+	local v38 = useSelector(selectOptions)
+	local v39 = useSelector(selectItemData)
+	local totalCost = v35.totalCost
+	local balance = v35.balance
 	local u42 = nil
+	local v43 = nil
+	local u44 = nil
 
 	if FFlagFixVP8143 then
-		u40 = React.useRef(nil)
+		u42 = React.useRef(nil)
 
-		local v43
+		local v45
 
-		v41, v43 = React.useState(true)
-		u42 = v43
-		React.useEffect(function() -- line: 127
-			-- upvalues: RunService (copy), u40 (ref), getGuiObjectIsObscured (copy), u42 (ref)
-			local connection = RunService.Heartbeat:Connect(function() -- line: 128
-				-- upvalues: u40 (ref), getGuiObjectIsObscured (copy), u42 (ref)
-				if u40.current and (typeof(u40.current) == "Instance" and u40.current:IsA("GuiObject")) then
-					local v51 = getGuiObjectIsObscured(u40.current)
-					local Core = game.StarterGui:GetCore("DevConsoleVisible")
+		v43, v45 = React.useState(true)
+		u44 = v45
+		React.useEffect(function() -- line: 129
+			-- upvalues: RunService (copy), u42 (ref), getGuiObjectIsObscured (copy), v32 (copy), StarterGui (copy), u44 (ref)
+			local connection = RunService.Heartbeat:Connect(function() -- line: 130
+				-- upvalues: u42 (ref), getGuiObjectIsObscured (copy), v32 (copy), StarterGui (copy), u44 (ref)
+				if u42.current and (typeof(u42.current) == "Instance" and u42.current:IsA("GuiObject")) then
+					local v53 = getGuiObjectIsObscured(u42.current)
+					local v54 = if not v32 then game.StarterGui:GetCore("DevConsoleVisible") else StarterGui:GetCore("DevConsoleVisible")
 
-					u42(v51 or Core)
+					u44(v53 or v54)
 				end
 			end)
 
-			return function() -- line: 139
+			return function() -- line: 143
 				-- upvalues: connection (copy)
 				connection:Disconnect()
 			end
@@ -72,62 +74,62 @@ local function useBulkPurchaseRequestProps() -- line: 41
 	end
 
 	return {
-		currentBalance = v33.balance,
-		items = v33.items,
-		ownedItems = v33.ownedItems,
-		unpurchasableItems = v33.unpurchasableItems,
-		onClose = function() -- line: 51
-			-- upvalues: MarketplaceService (copy), v34 (copy), v32 (copy), BulkPurchaseEnded (copy)
-			MarketplaceService:signalPromptBulkPurchaseFinished(2, v34)
-			v32(BulkPurchaseEnded())
+		currentBalance = v35.balance,
+		items = v35.items,
+		ownedItems = v35.ownedItems,
+		unpurchasableItems = v35.unpurchasableItems,
+		onClose = function() -- line: 53
+			-- upvalues: MarketplaceService (copy), v36 (copy), v34 (copy), BulkPurchaseEnded (copy)
+			MarketplaceService:signalPromptBulkPurchaseFinished(2, v36)
+			v34(BulkPurchaseEnded())
 		end,
-		onAccept = not (balance < totalCost) and function() -- line: 58
-			-- upvalues: MarketplaceService (copy), v35 (copy), v36 (copy), isErrorReasonContainsEconomicRestrictions (copy), handleEconomicRestrictionError (copy), v32 (copy), getItemResultsFromResponse (copy), v37 (copy), getCommonItemStatus (copy), BulkPurchaseSucceeded (copy), BulkPurchasePromptStateEnum (copy), BulkPurchaseFailed (copy), ItemStatusToErrorCodeMap (copy), ErrorCodeEnum (copy)
-			local ok, result = pcall(function() -- line: 59
-				-- upvalues: MarketplaceService (copy), v35 (copy), v36 (copy)
-				return MarketplaceService:PerformBulkPurchase(v35, v36)
+		onAccept = not (balance < totalCost) and function() -- line: 60
+			-- upvalues: MarketplaceService (copy), v37 (copy), v38 (copy), isErrorReasonContainsEconomicRestrictions (copy), handleEconomicRestrictionError (copy), v34 (copy), getItemResultsFromResponse (copy), v39 (copy), getCommonItemStatus (copy), BulkPurchaseSucceeded (copy), BulkPurchasePromptStateEnum (copy), BulkPurchaseFailed (copy), ItemStatusToErrorCodeMap (copy), ErrorCodeEnum (copy)
+			local ok, result = pcall(function() -- line: 61
+				-- upvalues: MarketplaceService (copy), v37 (copy), v38 (copy)
+				return MarketplaceService:PerformBulkPurchase(v37, v38)
 			end)
 
 			if ok and result then
 				if result.message and isErrorReasonContainsEconomicRestrictions(result.message) then
-					handleEconomicRestrictionError(result.message, v32)
+					handleEconomicRestrictionError(result.message, v34)
 
 					return
 				end
 
-				local v46 = getItemResultsFromResponse(result, v37)
-				local v47 = getCommonItemStatus(v46)
+				local v48 = getItemResultsFromResponse(result, v39)
+				local v49 = getCommonItemStatus(v48)
 
-				if not v47 then
-					v32(BulkPurchaseSucceeded(BulkPurchasePromptStateEnum.PartialSuccess, v46))
-
-					return
-				end
-
-				if v47 == Enum.MarketplaceItemPurchaseStatus.Success then
-					v32(BulkPurchaseSucceeded(BulkPurchasePromptStateEnum.Success, v46))
+				if not v49 then
+					v34(BulkPurchaseSucceeded(BulkPurchasePromptStateEnum.PartialSuccess, v48))
 
 					return
 				end
 
-				v32(BulkPurchaseFailed(ItemStatusToErrorCodeMap[v47]))
+				if v49 == Enum.MarketplaceItemPurchaseStatus.Success then
+					v34(BulkPurchaseSucceeded(BulkPurchasePromptStateEnum.Success, v48))
+
+					return
+				end
+
+				v34(BulkPurchaseFailed(ItemStatusToErrorCodeMap[v49]))
 
 				return
 			end
 
 			if string.find(result, "403") then
-				v32(BulkPurchaseFailed(ErrorCodeEnum.TwoStepVerificationRequired))
+				v34(BulkPurchaseFailed(ErrorCodeEnum.TwoStepVerificationRequired))
 
 				return
 			end
 
-			v32(BulkPurchaseFailed(ErrorCodeEnum.Generic))
-		end or function() -- line: 96
-			-- upvalues: getPaymentPlatform (copy), PaymentPlatformEnum (copy), v30 (copy), HttpService (copy), getRobuxStoreUrl (copy), BrowserService (copy), v32 (copy), BulkPurchaseEnded (copy), BulkPurchaseFailed (copy), ErrorCodeEnum (copy)
-			local v48 = getPaymentPlatform()
+			v34(BulkPurchaseFailed(ErrorCodeEnum.Generic))
+		end or function() -- line: 98
+			-- upvalues: getPaymentPlatform (copy), PaymentPlatformEnum (copy), v31 (copy), HttpService (copy), getRobuxStoreUrl (copy), BrowserService (copy), v34 (copy), BulkPurchaseEnded (copy), BulkPurchaseFailed (copy), ErrorCodeEnum (copy)
+			local v50 = getPaymentPlatform()
 
-			if v48 == PaymentPlatformEnum.Desktop or v48 == PaymentPlatformEnum.Mobile then
-				if v30 then
+			if v50 == PaymentPlatformEnum.Desktop or v50 == PaymentPlatformEnum.Mobile then
+				if v31 then
 					local json = HttpService:JSONEncode({
 						command = "open",
 						url = getRobuxStoreUrl()
@@ -138,17 +140,17 @@ local function useBulkPurchaseRequestProps() -- line: 41
 					BrowserService:OpenBrowserWindow(getRobuxStoreUrl())
 				end
 
-				v32(BulkPurchaseEnded())
+				v34(BulkPurchaseEnded())
 
 				return
 			end
 
-			v32(BulkPurchaseFailed(ErrorCodeEnum.InsufficientRobux))
+			v34(BulkPurchaseFailed(ErrorCodeEnum.InsufficientRobux))
 		end,
-		totalCost = v33.totalCost,
-		isDisabled = FFlagFixVP8143 and v41 or #v33.items == 0,
-		purchaseButtonRef = if not FFlagFixVP8143 then nil else u40,
-		discountInformation = v33.discountInformation
+		totalCost = v35.totalCost,
+		isDisabled = FFlagFixVP8143 and v43 or #v35.items == 0,
+		purchaseButtonRef = if not FFlagFixVP8143 then nil else u42,
+		discountInformation = v35.discountInformation
 	}
 end
 

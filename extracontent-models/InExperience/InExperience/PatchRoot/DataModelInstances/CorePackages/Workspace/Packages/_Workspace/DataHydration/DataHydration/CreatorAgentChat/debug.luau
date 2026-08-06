@@ -4,10 +4,10 @@ local elapsed = nil
 local u4 = nil
 local u5 = nil
 
-local function roundSec(n1: number) -- line: 18
+local function roundSec(n1: number) -- line: 17
 	return math.floor(n1 * 1000 + 0.5) / 1000
 end
-local function timelineFields() -- line: 33
+local function timelineFields() -- line: 32
 	-- upvalues: elapsed (ref), u4 (ref), u5 (ref)
 	local elapsed2 = os.clock()
 	local t1 = {
@@ -26,7 +26,7 @@ local function timelineFields() -- line: 33
 
 	return t1
 end
-local function mergeTimeline(p1) -- line: 49
+local function mergeTimeline(p1) -- line: 48
 	-- upvalues: timelineFields (copy)
 	local v17 = timelineFields()
 
@@ -51,7 +51,7 @@ local function mergeTimeline(p1) -- line: 49
 
 	return v18
 end
-local function encode(p2) -- line: 69
+local function encode(p2) -- line: 68
 	-- upvalues: HttpService (copy)
 	local ok, result = pcall(HttpService.JSONEncode, HttpService, p2)
 
@@ -61,7 +61,7 @@ local function encode(p2) -- line: 69
 
 	return (tostring(p2))
 end
-local function previewString(p3, n2: number?) -- line: 77
+local function previewString(p3, n2: number?) -- line: 76
 	if typeof(p3) ~= "string" then
 		return nil
 	end
@@ -74,7 +74,7 @@ local function previewString(p3, n2: number?) -- line: 77
 
 	return string.sub(p3, 1, v26) .. "..."
 end
-local function formatRequestState(p4) -- line: 154
+local function formatRequestState(p4) -- line: 153
 	if typeof(p4) ~= "table" then
 		return {
 			raw = tostring(p4)
@@ -91,11 +91,11 @@ end
 
 return {
 	LOG_PREFIX = "[MyStats]",
-	isEnabled = function() -- line: 22
+	isEnabled = function() -- line: 21
 		-- upvalues: v2 (copy)
 		return v2
 	end,
-	log = function(s1: string, s2: string, p5) -- line: 88
+	log = function(s1: string, s2: string, p5) -- line: 87
 		-- upvalues: v2 (copy), mergeTimeline (copy), HttpService (copy)
 		if not v2 then
 			return
@@ -113,14 +113,14 @@ return {
 
 		print(`[MyStats] { s2 }{ v33 }`)
 	end,
-	resetTimeline = function(s3: string?) -- line: 27
+	resetTimeline = function(s3: string?) -- line: 26
 		-- upvalues: elapsed (ref), u4 (ref), u5 (ref)
 		elapsed = os.clock()
 		u4 = s3
 		u5 = nil
 	end,
 	timelineFields = timelineFields,
-	formatStudioAskUserQuestions = function(p6) -- line: 100
+	formatStudioAskUserQuestions = function(p6) -- line: 99
 		if typeof(p6) ~= "table" then
 			return {
 				raw = tostring(p6)
@@ -165,7 +165,7 @@ return {
 			firstOption = v38
 		}
 	end,
-	formatToolResultPayload = function(p7) -- line: 137
+	formatToolResultPayload = function(p7) -- line: 136
 		if typeof(p7) ~= "table" then
 			return {
 				raw = tostring(p7)
@@ -185,7 +185,7 @@ return {
 		}
 	end,
 	formatRequestState = formatRequestState,
-	formatTurnState = function(p8) -- line: 166
+	formatTurnState = function(p8) -- line: 165
 		if typeof(p8) ~= "table" then
 			return {
 				raw = tostring(p8)
@@ -203,7 +203,7 @@ return {
 			sessionId = p8.sessionId
 		}
 	end,
-	rpcFailureMessage = function(s4: string, p9) -- line: 182
+	rpcFailureMessage = function(s4: string, p9) -- line: 181
 		-- upvalues: formatRequestState (copy)
 		local v53 = formatRequestState(p9)
 		local status = v53.status

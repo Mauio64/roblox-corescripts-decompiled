@@ -57,19 +57,19 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		end
 
 		local t2 = {}
-		local v57 = false
+		local v56 = false
 
-		for _, v59 in displayItems do
-			local id = v59.id
+		for _, v58 in displayItems do
+			local id = v58.id
 
-			if isItemPurchasable(v59) and not v46.current[id] then
+			if isItemPurchasable(v58) and not v46.current[id] then
 				v46.current[id] = true
 				t2[id] = true
-				v57 = true
+				v56 = true
 			end
 		end
 
-		if not v57 then
+		if not v56 then
 			return
 		end
 
@@ -98,34 +98,34 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		local t6 = {}
 		local t7 = {}
 
-		for _, v70 in displayItems do
-			if v70.id then
-				local id = v70.id
+		for _, v69 in displayItems do
+			if v69.id then
+				local id = v69.id
 
-				if v44[id] and isItemPurchasable(v70) then
-					local v72 = InspectAvatarUtils.getEffectivePrice(v70)
+				if v44[id] and isItemPurchasable(v69) then
+					local v71 = InspectAvatarUtils.getEffectivePrice(v69)
 
 					table.insert(t3, {
-						collectibleProductId = if getPriceStatus(v70) ~= PriceStatusEnum.PurchaseFromResale or not v70.collectibleItemDetails then v70.collectibleProductId else v70.collectibleItemDetails.collectibleLowestAvailableResaleProductId or v70.collectibleProductId,
-						agreedPriceRobux = v72
+						collectibleProductId = if getPriceStatus(v69) ~= PriceStatusEnum.PurchaseFromResale or not v69.collectibleItemDetails then v69.collectibleProductId else v69.collectibleItemDetails.collectibleLowestAvailableResaleProductId or v69.collectibleProductId,
+						agreedPriceRobux = v71
 					})
-					n1 += v72
+					n1 += v71
 					n2 += 1
 					table.insert(t5, id)
 
-					if v70.itemType == Enums.ItemTypes.Bundle then
+					if v69.itemType == Enums.ItemTypes.Bundle then
 						table.insert(t6, id)
 					end
 
-					if #v70.bundleAssetIds > 0 then
-						for _, v74 in v70.bundleAssetIds do
-							if not t7[v74] then
-								t7[v74] = true
-								table.insert(t4, v74)
+					if #v69.bundleAssetIds > 0 then
+						for _, v73 in v69.bundleAssetIds do
+							if not t7[v73] then
+								t7[v73] = true
+								table.insert(t4, v73)
 							end
 						end
 					else
-						local num = tonumber(v70.id)
+						local num = tonumber(v69.id)
 
 						if num and not t7[num] then
 							t7[num] = true
@@ -152,18 +152,18 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		-- upvalues: displayItems (copy)
 		local t8 = {}
 
-		for _, v78 in displayItems do
-			local num = tonumber(v78.id)
-			local num2 = tonumber(v78.itemSubType)
+		for _, v77 in displayItems do
+			local num = tonumber(v77.id)
+			local num2 = tonumber(v77.itemSubType)
 
 			if num and num2 then
 				t8[num] = num2
 			end
 
-			if v78.assetsInBundle then
-				for _, v82 in v78.assetsInBundle do
-					local num3 = tonumber(v82.id)
-					local num4 = tonumber(v82.assetType)
+			if v77.assetsInBundle then
+				for _, v81 in v77.assetsInBundle do
+					local num3 = tonumber(v81.id)
+					local num4 = tonumber(v81.assetType)
 
 					if num3 and num4 then
 						t8[num3] = num4
@@ -175,7 +175,7 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		return t8
 	end, { displayItems })
 	local v50 = React.useCallback(function() -- line: 193
-		-- upvalues: v48 (copy), v42 (copy), FFlagSocialEnableProfileInspectAndBuyAnalytics (copy), v30 (copy), EventNames (copy), v29 (copy), t1 (copy), Enums (copy), v49 (copy)
+		-- upvalues: v48 (copy), v42 (copy), FFlagSocialEnableProfileInspectAndBuyAnalytics (copy), v30 (copy), EventNames (copy), v29 (copy), v32 (copy), t1 (copy), Enums (copy), v49 (copy)
 		if #v48.lineItems == 0 or not v42.localUserId then
 			return
 		end
@@ -188,6 +188,15 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 			})
 		end
 
+		if v32 ~= nil and v48.totalPrice > v32 then
+			t1.navigation.navigate(Enums.Screens.InsufficientRobuxDialog, {
+				totalPrice = v48.totalPrice,
+				robuxBalance = v32
+			})
+
+			return
+		end
+
 		t1.navigation.navigate(Enums.Screens.PurchaseConfirmationModal, {
 			totalPrice = v48.totalPrice,
 			itemCount = v48.count,
@@ -197,7 +206,8 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 			ownedAssetIds = v42.ownedAssetIds,
 			purchasedItemIds = v48.purchasedItemIds,
 			purchasedBundleIds = v48.purchasedBundleIds,
-			wearTypeMap = v49
+			wearTypeMap = v49,
+			robuxBalance = v32
 		})
 	end, {
 		v48,
@@ -205,17 +215,18 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		v42.ownedAssetIds,
 		t1.navigation,
 		v49,
+		v32,
 		if not FFlagSocialEnableProfileInspectAndBuyAnalytics then nil else v30,
 		if not FFlagSocialEnableProfileInspectAndBuyAnalytics then nil else v29.profileSessionId
 	})
-	local v51 = React.useCallback(function() -- line: 227
+	local v51 = React.useCallback(function() -- line: 238
 		-- upvalues: t1 (copy)
 		t1.navigation.pop()
 	end, { t1.navigation })
-	local v52 = React.useCallback(function() -- line: 231
+	local v52 = React.useCallback(function() -- line: 242
 		-- upvalues: t1 (copy), v29 (copy)
 		t1.navigation.pop()
-		task.defer(function() -- line: 233
+		task.defer(function() -- line: 244
 			-- upvalues: v29 (copy)
 			v29.navigateTo.previousView(false)
 		end)
@@ -223,7 +234,7 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		t1.navigation,
 		v29.navigateTo
 	})
-	local v53 = React.useCallback(function(s2: string, s3: string, n3: number?) -- line: 239
+	local v53 = React.useCallback(function(s2: string, s3: string, n3: number?) -- line: 250
 		-- upvalues: v29 (copy), v30 (copy), EventNames (copy), v31 (copy)
 		v29.navigateTo.itemOrBundleDetails(s2, s3)
 		v30.fireAnalyticsEvent(EventNames.CatalogItemOpened, {
@@ -238,7 +249,6 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 		v30,
 		v31
 	})
-	local v54 = v32 ~= nil and v32 < v48.totalPrice
 
 	return React.createElement(InspectAvatarSheet, {
 		displayItems = displayItems,
@@ -254,7 +264,6 @@ local function InspectAvatarSheetContainer(t1: {[any]: any}) -- line: 47
 			totalPrice = v48.totalPrice,
 			count = v48.count
 		},
-		hasInsufficientFunds = v54,
 		onToggleItem = v47,
 		onBuyAll = v50,
 		onClose = v51,

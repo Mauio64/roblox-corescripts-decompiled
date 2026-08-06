@@ -7,779 +7,1257 @@ local Signals = require(WhatsNewParent.Signals)
 
 require(WhatsNew.Types)
 
-local TourTipCtaAccess = require(WhatsNew.TourTipCtaAccess)
 local WhatsNewTelemetry = require(WhatsNew.telemetry.WhatsNewTelemetry)
 local LoadWhatsNewRegistry = require(WhatsNew.registry.LoadWhatsNewRegistry)
 
 require(WhatsNew.registry.ScopeActions)
 
-local function createIdleState() -- line: 31
+local function createIdleState(s1: string) -- line: 30
 	-- upvalues: Enums (copy)
 	return {
-		screenScopeId = "",
 		activeTourType = nil,
 		globalTotalSteps = 0,
 		globalStepIndex = nil,
 		currentScopeTour = nil,
 		currentEntry = nil,
 		currentTipIndex = 0,
-		openMenu = nil,
+		screenScopeId = s1,
 		scopeStack = {},
 		surface = Enums.WhatsNewSurface.Idle
 	}
 end
-local function tourHasEligibleTips(p1) -- line: 46
-	-- upvalues: TourTipCtaAccess (copy), Enums (copy), tourHasEligibleTips (copy)
-	for _, v22 in p1.tourTips do
-		if v22.toShow then
-			return true
+local function hasBeenSeen(s2: string) -- line: 45
+	-- upvalues: EntryStorage (copy)
+	local v26 = EntryStorage.getEntries()[s2]
+
+	return v26 ~= nil and v26.seen ~= nil
+end
+local function isEligibleForNewSession(p1) -- line: 51
+	-- upvalues: EntryStorage (copy)
+	local toShow = p1.toShow
+
+	if toShow then
+		local id = p1.id
+		local v30 = EntryStorage.getEntries()[id]
+
+		toShow = not (v30 ~= nil and v30.seen ~= nil)
+	end
+
+	return toShow
+end
+local function countEligibleTips(p2) -- line: 55
+	-- upvalues: EntryStorage (copy)
+	local n1 = 0
+
+	for _, v34 in p2.tourTips do
+		local toShow = v34.toShow
+
+		if toShow then
+			local id = v34.id
+			local v37 = EntryStorage.getEntries()[id]
+
+			toShow = not (v37 ~= nil and v37.seen ~= nil)
 		end
 
-		local v23 = TourTipCtaAccess.wrap(v22.cta)
+		if toShow then
+			n1 += v34.stepCount
+		end
+	end
 
-		if v23:getKind() == Enums.TourTipCtaKind.Nested and tourHasEligibleTips(v23:getScope()) then
+	return n1
+end
+local function tourHasEligibleRootTips(p3) -- line: 66
+	-- upvalues: EntryStorage (copy)
+	for _, v40 in p3.tourTips do
+		local toShow = v40.toShow
+
+		if toShow then
+			local id = v40.id
+			local v43 = EntryStorage.getEntries()[id]
+
+			toShow = not (v43 ~= nil and v43.seen ~= nil)
+		end
+
+		if toShow then
 			return true
 		end
 	end
 
 	return false
 end
-local function findFirstVisibleTipIndex(p2) -- line: 59
-	for v25, v26 in p2.tourTips do
-		if v26.toShow then
-			return v25
+local function findFirstEligibleTipIndex(p4) -- line: 75
+	-- upvalues: EntryStorage (copy)
+	for v45, v46 in p4.tourTips do
+		local toShow = v46.toShow
+
+		if toShow then
+			local id = v46.id
+			local v49 = EntryStorage.getEntries()[id]
+
+			toShow = not (v49 ~= nil and v49.seen ~= nil)
+		end
+
+		if toShow then
+			return v45
 		end
 	end
 
 	return nil
 end
-local function findNextVisibleTipIndexFrom(p3, n1: number) -- line: 68
-	for i = n1, #p3.tourTips do
-		if p3.tourTips[i].toShow then
+local function findNextVisibleTipIndexFrom(p5, n2: number) -- line: 85
+	for i = n2, #p5.tourTips do
+		if p5.tourTips[i].toShow then
 			return i
 		end
 	end
 
 	return nil
 end
-local function findPreviousVisibleTipIndexFrom(p4, n2: number) -- line: 77
-	for i = n2, 1, -1 do
-		if p4.tourTips[i].toShow then
+local function findPreviousVisibleTipIndexFrom(p6, n3: number) -- line: 94
+	for i = n3, 1, -1 do
+		if p6.tourTips[i].toShow then
 			return i
 		end
 	end
 
 	return nil
 end
-local function getCloseActionKeyForFrame(p5) -- line: 86
-	-- upvalues: TourTipCtaAccess (copy)
-	local v34 = p5.parentScopeTour.tourTips[p5.parentTipIndex]
+local function findGatewayTipByOpenActionKey(p7, s3: string) -- line: 103
+	-- upvalues: findGatewayTipByOpenActionKey (copy)
+	for _, v59 in p7.tourTips do
+		local gateway = v59.gateway
 
-	return TourTipCtaAccess.wrap(v34.cta):getCloseActionKey()
+		if gateway ~= nil and s3 == gateway.openActionKey then
+			return v59
+		end
+
+		if gateway ~= nil then
+			local v61 = findGatewayTipByOpenActionKey(gateway.scope, s3)
+
+			if v61 == nil then
+				continue
+			end
+
+			return v61
+		end
+	end
+
+	return nil
 end
-local function popScopeStack(t1: {[any]: any}) -- line: 92
-	local v36 = t1[#t1]
-	local v37 = table.clone(t1)
+local function findCloseActionKeyForScope(p8, s4: string) -- line: 119
+	-- upvalues: findCloseActionKeyForScope (copy)
+	for _, v65 in p8.tourTips do
+		local gateway = v65.gateway
 
-	table.remove(v37)
+		if gateway == nil then
+			continue
+		end
 
-	return v36, v37
+		if s4 == gateway.scope.id then
+			return gateway.closeActionKey
+		end
+
+		local v67 = findCloseActionKeyForScope(gateway.scope, s4)
+
+		if v67 ~= nil then
+			return v67
+		end
+	end
+
+	return nil
 end
-local function markEntrySeen(s1: string) -- line: 99
+local function getCloseActionKeyForFrame(p9) -- line: 135
+	local v69 = p9.parentScopeTour.tourTips[p9.parentTipIndex]
+	local gateway = v69.gateway
+
+	assert(gateway ~= nil, `parent tip '{ v69.id }' is missing gateway for scope stack frame`)
+
+	return gateway.closeActionKey
+end
+local function popScopeStack(t1: {[any]: any}) -- line: 143
+	local v72 = t1[#t1]
+	local v73 = table.clone(t1)
+
+	table.remove(v73)
+
+	return v72, v73
+end
+local function markEntrySeen(s5: string) -- line: 150
 	-- upvalues: EntryStorage (copy), _DateTime (copy)
-	EntryStorage.markSeen(s1, _DateTime.now():ToIsoDate())
+	EntryStorage.markSeen(s5, _DateTime.now():ToIsoDate())
 end
-local function markTipsSeenFromCurrent(p6, s2: string, p7) -- line: 103
-	-- upvalues: EntryStorage (copy), _DateTime (copy), WhatsNewTelemetry (copy), TourTipCtaAccess (copy), Enums (copy)
-	local u42 = false
+local function markTipsSeenFromCurrent(p10, s6: string, p11) -- line: 154
+	-- upvalues: EntryStorage (copy), _DateTime (copy), WhatsNewTelemetry (copy)
+	local v78 = false
 
-	local function runtimeStateForTip(p8) -- line: 110
-		-- upvalues: p7 (copy)
-		local v64 = table.clone(p7)
+	local function runtimeStateForTip(p12) -- line: 161
+		-- upvalues: p11 (copy)
+		local v113 = table.clone(p11)
 
-		v64.currentEntry = p8
+		v113.currentEntry = p12
 
-		return v64
+		return v113
 	end
-	local function walkScope(p9) -- line: 116
-		-- upvalues: s2 (copy), u42 (ref), EntryStorage (copy), _DateTime (copy), WhatsNewTelemetry (copy), p7 (copy), TourTipCtaAccess (copy), Enums (copy), walkScope (copy)
-		for _, v67 in p9.tourTips do
-			local v68 = v67.id == s2
 
-			if v68 then
-				u42 = true
-			end
+	for _, v81 in p10.tourTips do
+		local v82 = s6 == v81.id
 
-			if u42 then
-				local id = v67.id
+		if v82 then
+			v78 = true
+		end
 
-				EntryStorage.markSeen(id, _DateTime.now():ToIsoDate())
+		if v78 then
+			local id = v81.id
 
-				if not v68 then
-					local logTourtipInteraction = WhatsNewTelemetry.logTourtipInteraction
-					local id2 = v67.id
-					local v72 = table.clone(p7)
+			EntryStorage.markSeen(id, _DateTime.now():ToIsoDate())
 
-					v72.currentEntry = v67
-					logTourtipInteraction("skip", id2, nil, v72, "tour_ended_early")
-				end
-			end
+			if not v82 then
+				local logTourtipInteraction = WhatsNewTelemetry.logTourtipInteraction
+				local SKIP = WhatsNewTelemetry.InteractionType.SKIP
+				local id2 = v81.id
+				local v87 = table.clone(p11)
 
-			local v73 = TourTipCtaAccess.wrap(v67.cta)
-
-			if v73:getKind() == Enums.TourTipCtaKind.Nested then
-				walkScope(v73:getScope())
+				v87.currentEntry = v81
+				logTourtipInteraction(SKIP, id2, nil, v87, WhatsNewTelemetry.SkipReason.TOUR_ENDED_EARLY)
 			end
 		end
 	end
-
-	walkScope(p6)
 end
-local function createWhatsNewStore() -- line: 144
-	-- upvalues: Signals (copy), createIdleState (copy), Enums (copy), WhatsNewTelemetry (copy), getCloseActionKeyForFrame (copy), LoadWhatsNewRegistry (copy), EntryStorage (copy), _DateTime (copy), TourTipCtaAccess (copy), tourHasEligibleTips (copy)
+local function createWhatsNewStore() -- line: 187
+	-- upvalues: Signals (copy), createIdleState (copy), Enums (copy), WhatsNewTelemetry (copy), markTipsSeenFromCurrent (copy), LoadWhatsNewRegistry (copy), findCloseActionKeyForScope (copy), EntryStorage (copy), findGatewayTipByOpenActionKey (copy), _DateTime (copy)
 	local rootTourMap = nil
 	local scopeActions = nil
-	local u47 = false
+	local u90 = false
 
-	local function assertInitialized() -- line: 149
-		-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref)
-		assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+	local function assertInitialized() -- line: 192
+		-- upvalues: u90 (ref), rootTourMap (ref), scopeActions (ref)
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
 	end
-	local function getRootTourAndScopeActions() -- line: 153
-		-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref)
-		assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+	local function getRootTourAndScopeActions() -- line: 196
+		-- upvalues: u90 (ref), rootTourMap (ref), scopeActions (ref)
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
 
 		return rootTourMap, scopeActions
 	end
 
 	local t2 = {}
-	local v51, v52 = Signals.createSignal((createIdleState()))
+	local v94, v95 = Signals.createSignal((createIdleState("")))
 
-	local function resolveSurfaceForAnchor(s3: string) -- line: 161
+	local function resolveSurfaceForAnchor(s7: string) -- line: 204
 		-- upvalues: t2 (copy), Enums (copy)
-		local v75 = t2[s3]
+		local v115 = t2[s7]
 
-		if v75 ~= nil and v75.isReady then
+		if v115 ~= nil and v115.isReady then
 			return Enums.WhatsNewSurface.TourTip
 		end
 
 		return Enums.WhatsNewSurface.WaitingForAnchor
 	end
-	local function refreshSurfaceForCurrentEntry() -- line: 169
-		-- upvalues: v51 (copy), v52 (copy), t2 (copy), Enums (copy)
-		local v76 = v51(false)
-		local currentEntry = v76.currentEntry
+	local function refreshSurfaceForCurrentEntry() -- line: 212
+		-- upvalues: v94 (copy), v95 (copy), t2 (copy), Enums (copy)
+		local v116 = v94(false)
+		local currentEntry = v116.currentEntry
 
 		if currentEntry == nil then
 			return
 		end
 
-		local v78 = v52
+		local v118 = v95
 		local t3 = {
-			scopeStack = v76.scopeStack,
-			screenScopeId = v76.screenScopeId,
-			activeTourType = v76.activeTourType,
-			globalTotalSteps = v76.globalTotalSteps,
-			globalStepIndex = v76.globalStepIndex,
-			currentScopeTour = v76.currentScopeTour,
+			scopeStack = v116.scopeStack,
+			screenScopeId = v116.screenScopeId,
+			activeTourType = v116.activeTourType,
+			globalTotalSteps = v116.globalTotalSteps,
+			globalStepIndex = v116.globalStepIndex,
+			currentScopeTour = v116.currentScopeTour,
 			currentEntry = currentEntry,
-			currentTipIndex = v76.currentTipIndex,
-			openMenu = v76.openMenu
+			currentTipIndex = v116.currentTipIndex
 		}
-		local v80 = t2[currentEntry.anchorId]
+		local v120 = t2[currentEntry.anchorId]
 
-		t3.surface = if v80 == nil or not v80.isReady then Enums.WhatsNewSurface.WaitingForAnchor else Enums.WhatsNewSurface.TourTip
-		v78(t3)
+		t3.surface = if v120 == nil or not v120.isReady then Enums.WhatsNewSurface.WaitingForAnchor else Enums.WhatsNewSurface.TourTip
+		v118(t3)
 	end
-	local function showTipAt(p10, n3: number, p11, t4: {[any]: any}) -- line: 189
-		-- upvalues: v51 (copy), v52 (copy), t2 (copy), Enums (copy)
-		local v85 = v51(false)
-		local v86 = v52
+	local function showTipAt(p13, n4: number, p14, t4: {[any]: any}) -- line: 231
+		-- upvalues: v94 (copy), v95 (copy), t2 (copy), Enums (copy)
+		local v125 = v94(false)
+		local v126 = v95
 		local t5 = {
-			openMenu = nil,
-			screenScopeId = t4.screenScopeId or v85.screenScopeId,
-			activeTourType = if t4.activeTourType == nil then v85.activeTourType else t4.activeTourType,
-			globalTotalSteps = t4.globalTotalSteps or v85.globalTotalSteps,
-			globalStepIndex = if t4.globalStepIndex == nil then v85.globalStepIndex else t4.globalStepIndex,
-			currentScopeTour = p10,
-			currentEntry = p11,
-			currentTipIndex = n3,
-			scopeStack = t4.scopeStack or v85.scopeStack
+			screenScopeId = t4.screenScopeId or v125.screenScopeId,
+			activeTourType = if t4.activeTourType == nil then v125.activeTourType else t4.activeTourType,
+			globalTotalSteps = t4.globalTotalSteps or v125.globalTotalSteps,
+			globalStepIndex = if t4.globalStepIndex == nil then v125.globalStepIndex else t4.globalStepIndex,
+			currentScopeTour = p13,
+			currentEntry = p14,
+			currentTipIndex = n4,
+			scopeStack = t4.scopeStack or v125.scopeStack
 		}
-		local v88 = t2[p11.anchorId]
+		local v128 = t2[p14.anchorId]
 
-		t5.surface = if v88 == nil or not v88.isReady then Enums.WhatsNewSurface.WaitingForAnchor else Enums.WhatsNewSurface.TourTip
-		v86(t5)
+		t5.surface = if v128 == nil or not v128.isReady then Enums.WhatsNewSurface.WaitingForAnchor else Enums.WhatsNewSurface.TourTip
+		v126(t5)
 	end
-	local function resetToIdle() -- line: 216
-		-- upvalues: v52 (copy), createIdleState (copy)
-		v52((createIdleState()))
+	local function resetToIdle() -- line: 257
+		-- upvalues: v95 (copy), createIdleState (copy), v94 (copy)
+		v95((createIdleState(v94(false).screenScopeId)))
 	end
-	local function closeScopeStack(t6: {[any]: any}) -- line: 228
-		-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref), getCloseActionKeyForFrame (copy)
-		assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
 
-		local _ = rootTourMap
-		local v92 = scopeActions
+	local u100 = false
 
-		for i = #t6, 1, -1 do
-			v92:invoke(getCloseActionKeyForFrame(t6[i]))
+	local function invokeCloseAction(p15, s8: string) -- line: 277
+		-- upvalues: u100 (ref)
+		u100 = true
+
+		local ok, result = pcall(function() -- line: 279
+			-- upvalues: p15 (copy), s8 (copy)
+			p15:invoke(s8)
+		end)
+
+		u100 = false
+
+		if not ok then
+			error(result)
 		end
 	end
-	local function completeTour(p12) -- line: 235
-		-- upvalues: v51 (copy), Enums (copy), WhatsNewTelemetry (copy), u47 (ref), rootTourMap (ref), scopeActions (ref), LoadWhatsNewRegistry (copy), EntryStorage (copy), _DateTime (copy), TourTipCtaAccess (copy), closeScopeStack (copy), v52 (copy), createIdleState (copy)
-		local v95 = v51(false)
+	local function exitNestedScope(p16, t6: {[any]: any}) -- line: 288
+		-- upvalues: u100 (ref)
+		local v136 = t6[#t6]
+		local v137 = table.clone(t6)
 
-		if v95.surface == Enums.WhatsNewSurface.Idle or v95.surface == Enums.WhatsNewSurface.UpdateMenu then
+		table.remove(v137)
+
+		local v138 = v136.parentScopeTour.tourTips[v136.parentTipIndex]
+		local gateway = v138.gateway
+
+		assert(gateway ~= nil, `parent tip '{ v138.id }' is missing gateway for scope stack frame`)
+
+		local closeActionKey = gateway.closeActionKey
+
+		u100 = true
+
+		local ok, result = pcall(function() -- line: 279
+			-- upvalues: p16 (copy), closeActionKey (copy)
+			p16:invoke(closeActionKey)
+		end)
+
+		u100 = false
+
+		if not ok then
+			error(result)
+		end
+
+		return v136, v137
+	end
+	local function markActiveScopeEndedEarly(p17) -- line: 297
+		-- upvalues: WhatsNewTelemetry (copy), markTipsSeenFromCurrent (copy)
+		if p17.currentEntry ~= nil then
+			WhatsNewTelemetry.logTourtipInteraction(WhatsNewTelemetry.InteractionType.DISMISS, p17.currentEntry.id, WhatsNewTelemetry.Button.CLOSE, p17)
+		end
+
+		local currentScopeTour = p17.currentScopeTour
+		local currentEntry = p17.currentEntry
+
+		if currentScopeTour ~= nil and currentEntry ~= nil then
+			markTipsSeenFromCurrent(currentScopeTour, currentEntry.id, p17)
+		end
+
+		WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_STOPPED, p17, WhatsNewTelemetry.StopReason.DISMISS)
+	end
+	local function completeTour(p18) -- line: 321
+		-- upvalues: v94 (copy), Enums (copy), markActiveScopeEndedEarly (copy), u90 (ref), rootTourMap (ref), scopeActions (ref), WhatsNewTelemetry (copy), u100 (ref), showTipAt (copy), v95 (copy), createIdleState (copy), LoadWhatsNewRegistry (copy), findCloseActionKeyForScope (copy)
+		local v147 = v94(false)
+
+		if v147.surface == Enums.WhatsNewSurface.Idle then
 			return
 		end
 
-		if p12 ~= nil and p12.earlyDismiss == true then
-			if v95.currentEntry ~= nil then
-				WhatsNewTelemetry.logTourtipInteraction("dismiss", v95.currentEntry.id, "close", v95)
+		local v148 = p18 ~= nil and p18.earlyDismiss == true
+		local g161 = nil
+		local v160 = nil
+
+		if v148 then
+			markActiveScopeEndedEarly(v147)
+		end
+
+		local scopeStack = v147.scopeStack
+
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+		local _ = rootTourMap
+		local v151 = scopeActions
+
+		if #scopeStack > 0 then
+			if not v148 then
+				WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_COMPLETED, v147)
 			end
 
-			if v95.activeTourType ~= nil then
-				assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+			while #scopeStack > 0 do
+				local v152 = scopeStack[#scopeStack]
 
-				local v96 = rootTourMap
-				local _ = scopeActions
-				local v98 = v96[LoadWhatsNewRegistry.makeRootTourKey(v95.screenScopeId, v95.activeTourType)]
-				local currentEntry = v95.currentEntry
+				scopeStack = table.clone(scopeStack)
+				table.remove(scopeStack)
 
-				if v98 ~= nil and currentEntry ~= nil then
-					local scopeTree = v98.scopeTree
-					local id = currentEntry.id
-					local u102 = false
+				local v153 = v152.parentScopeTour.tourTips[v152.parentTipIndex]
+				local gateway = v153.gateway
 
-					local function runtimeStateForTip(p13) -- line: 110
-						-- upvalues: v95 (copy)
-						local v196 = table.clone(v95)
+				assert(gateway ~= nil, `parent tip '{ v153.id }' is missing gateway for scope stack frame`)
 
-						v196.currentEntry = p13
+				local closeActionKey = gateway.closeActionKey
 
-						return v196
-					end
-					local function walkScope(p14) -- line: 116
-						-- upvalues: id (copy), u102 (ref), EntryStorage (copy), _DateTime (copy), WhatsNewTelemetry (copy), v95 (copy), TourTipCtaAccess (copy), Enums (copy), walkScope (copy)
-						for _, v199 in p14.tourTips do
-							local v200 = v199.id == id
+				u100 = true
 
-							if v200 then
-								u102 = true
-							end
+				local ok, result = pcall(function() -- line: 279
+					-- upvalues: v151 (copy), closeActionKey (copy)
+					v151:invoke(closeActionKey)
+				end)
 
-							if u102 then
-								local id3 = v199.id
+				u100 = false
 
-								EntryStorage.markSeen(id3, _DateTime.now():ToIsoDate())
+				if not ok then
+					error(result)
+				end
 
-								if not v200 then
-									local logTourtipInteraction = WhatsNewTelemetry.logTourtipInteraction
-									local id4 = v199.id
-									local v204 = table.clone(v95)
+				local parentScopeTour = v152.parentScopeTour
 
-									v204.currentEntry = v199
-									logTourtipInteraction("skip", id4, nil, v204, "tour_ended_early")
-								end
-							end
-
-							local v205 = TourTipCtaAccess.wrap(v199.cta)
-
-							if v205:getKind() == Enums.TourTipCtaKind.Nested then
-								walkScope(v205:getScope())
-							end
-						end
+				for i = v152.parentTipIndex + 1, #parentScopeTour.tourTips do
+					if parentScopeTour.tourTips[i].toShow then
+						v160 = i
+						g161 = true
 					end
 
-					walkScope(scopeTree)
+					if g161 then
+						break
+					end
+				end
+
+				if not g161 then
+					v160 = nil
+				end
+
+				g161 = false
+
+				if v160 ~= nil then
+					showTipAt(v152.parentScopeTour, v160, v152.parentScopeTour.tourTips[v160], {
+						scopeStack = scopeStack,
+						globalStepIndex = v152.parentGlobalStepIndex + 1,
+						globalTotalSteps = v152.parentGlobalTotalSteps
+					})
+
+					return
+				end
+
+				local v162 = v152.parentScopeTour.tourTips[v152.parentTipIndex]
+				local t7 = {
+					screenScopeId = v147.screenScopeId,
+					activeTourType = v147.activeTourType,
+					globalTotalSteps = v152.parentGlobalTotalSteps,
+					globalStepIndex = v152.parentGlobalStepIndex,
+					currentScopeTour = v152.parentScopeTour,
+					currentEntry = v162,
+					currentTipIndex = v152.parentTipIndex,
+					scopeStack = scopeStack,
+					surface = v147.surface
+				}
+
+				WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_COMPLETED, t7)
+			end
+
+			v95((createIdleState(v94(false).screenScopeId)))
+
+			return
+		end
+
+		if not v148 then
+			WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_COMPLETED, v147)
+		end
+
+		local currentScopeTour = v147.currentScopeTour
+
+		if currentScopeTour ~= nil and v147.activeTourType ~= nil and v147.screenScopeId ~= "" then
+			assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+			local v165 = rootTourMap
+			local _ = scopeActions
+			local v167 = v165[LoadWhatsNewRegistry.makeRootTourKey(v147.screenScopeId, v147.activeTourType)]
+
+			if v167 ~= nil then
+				local v168 = findCloseActionKeyForScope(v167.scopeTree, currentScopeTour.id)
+
+				if v168 ~= nil then
+					u100 = true
+
+					local ok, result = pcall(function() -- line: 279
+						-- upvalues: v151 (copy), v168 (copy)
+						v151:invoke(v168)
+					end)
+
+					u100 = false
+
+					if not ok then
+						error(result)
+					end
+				end
+			end
+		end
+
+		v95((createIdleState(v94(false).screenScopeId)))
+	end
+	local function startTour(s9: string, p19) -- line: 395
+		-- upvalues: u90 (ref), rootTourMap (ref), scopeActions (ref), LoadWhatsNewRegistry (copy), EntryStorage (copy), showTipAt (copy), WhatsNewTelemetry (copy), v94 (copy)
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+		local v173 = rootTourMap
+		local _ = scopeActions
+		local v175 = v173[LoadWhatsNewRegistry.makeRootTourKey(s9, p19)]
+
+		if v175 == nil then
+			return
+		end
+
+		local g182 = nil
+		local v181 = nil
+
+		for v176, v177 in v175.scopeTree.tourTips do
+			local toShow = v177.toShow
+
+			if toShow then
+				local id = v177.id
+				local v180 = EntryStorage.getEntries()[id]
+
+				toShow = not (v180 ~= nil and v180.seen ~= nil)
+			end
+
+			if toShow then
+				v181 = v176
+				g182 = true
+			end
+
+			if g182 then
+				break
+			end
+		end
+
+		if not g182 then
+			v181 = nil
+		end
+
+		g182 = false
+
+		if v181 == nil then
+			return
+		end
+
+		local v183 = v175.scopeTree.tourTips[v181]
+		local v184 = showTipAt
+		local scopeTree = v175.scopeTree
+		local t8 = {
+			globalStepIndex = 0,
+			screenScopeId = s9,
+			activeTourType = p19
+		}
+		local n5 = 0
+
+		for _, v189 in v175.scopeTree.tourTips do
+			local toShow = v189.toShow
+
+			if toShow then
+				local id = v189.id
+				local v192 = EntryStorage.getEntries()[id]
+
+				toShow = not (v192 ~= nil and v192.seen ~= nil)
+			end
+
+			if toShow then
+				n5 += v189.stepCount
+			end
+		end
+
+		t8.globalTotalSteps = n5
+		t8.scopeStack = {}
+		v184(scopeTree, v181, v183, t8)
+		WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_STARTED, v94(false), nil, WhatsNewTelemetry.StartContext.ROOT)
+	end
+	local function tryStartTour(s10: string, p20) -- line: 424
+		-- upvalues: u90 (ref), rootTourMap (ref), scopeActions (ref), LoadWhatsNewRegistry (copy), EntryStorage (copy), startTour (copy)
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+		local v195 = rootTourMap
+		local _ = scopeActions
+		local v197 = v195[LoadWhatsNewRegistry.makeRootTourKey(s10, p20)]
+
+		if v197 ~= nil then
+			local g204 = nil
+			local v203 = nil
+
+			for _, v199 in v197.scopeTree.tourTips do
+				local toShow = v199.toShow
+
+				if toShow then
+					local id = v199.id
+					local v202 = EntryStorage.getEntries()[id]
+
+					toShow = not (v202 ~= nil and v202.seen ~= nil)
+				end
+
+				if toShow then
+					v203 = true
+					g204 = true
+				end
+
+				if g204 then
+					break
 				end
 			end
 
-			WhatsNewTelemetry.logTourLifecycle("tour_stopped", v95, "dismiss")
-		else
-			WhatsNewTelemetry.logTourLifecycle("tour_completed", v95)
-		end
-
-		closeScopeStack(v95.scopeStack)
-		v52((createIdleState()))
-	end
-	local function exitNestedScope(p15, t7: {[any]: any}) -- line: 267
-		-- upvalues: getCloseActionKeyForFrame (copy)
-		local v107 = t7[#t7]
-		local v108 = table.clone(t7)
-
-		table.remove(v108)
-		p15:invoke(getCloseActionKeyForFrame(v107))
-
-		return v107, v108
-	end
-	local function resumeAfterScopeEnd(t8: {[any]: any}, p16, n4: number, n5: number) -- line: 276
-		-- upvalues: showTipAt (copy), v52 (copy), createIdleState (copy), u47 (ref), rootTourMap (ref), scopeActions (ref), getCloseActionKeyForFrame (copy), resumeAfterScopeEnd (copy)
-		local g115 = nil
-		local v114 = nil
-
-		for i = n4 + 1, #p16.tourTips do
-			if p16.tourTips[i].toShow then
-				v114 = i
-				g115 = true
+			if not g204 then
+				v203 = false
 			end
 
-			if g115 then
-				break
+			g204 = false
+
+			if v203 then
+				startTour(s10, p20)
+
+				return true
 			end
-		end
-
-		if not g115 then
-			v114 = nil
-		end
-
-		g115 = false
-
-		if v114 ~= nil then
-			showTipAt(p16, v114, p16.tourTips[v114], {
-				scopeStack = t8,
-				globalStepIndex = n5
-			})
-
-			return
-		end
-
-		if #t8 == 0 then
-			v52((createIdleState()))
-
-			return
-		end
-
-		assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
-
-		local _ = rootTourMap
-		local v117 = scopeActions
-		local v118 = t8[#t8]
-		local v119 = table.clone(t8)
-
-		table.remove(v119)
-		v117:invoke(getCloseActionKeyForFrame(v118))
-		resumeAfterScopeEnd(v119, v118.parentScopeTour, v118.parentTipIndex, n5)
-	end
-	local function startTour(s4: string, p17) -- line: 301
-		-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref), LoadWhatsNewRegistry (copy), showTipAt (copy), WhatsNewTelemetry (copy), v51 (copy)
-		assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
-
-		local v122 = rootTourMap
-		local _ = scopeActions
-		local v124 = v122[LoadWhatsNewRegistry.makeRootTourKey(s4, p17)]
-
-		if v124 == nil or v124.globalTotalSteps == 0 then
-			return
-		end
-
-		local g128 = nil
-		local v127 = nil
-
-		for v125, v126 in v124.scopeTree.tourTips do
-			if v126.toShow then
-				v127 = v125
-				g128 = true
-			end
-
-			if g128 then
-				break
-			end
-		end
-
-		if not g128 then
-			v127 = nil
-		end
-
-		g128 = false
-
-		if v127 == nil then
-			return
-		end
-
-		local v129 = v124.scopeTree.tourTips[v127]
-
-		showTipAt(v124.scopeTree, v127, v129, {
-			globalStepIndex = 0,
-			screenScopeId = s4,
-			activeTourType = p17,
-			globalTotalSteps = v124.globalTotalSteps,
-			scopeStack = {}
-		})
-		WhatsNewTelemetry.logTourLifecycle("tour_started", v51(false))
-	end
-	local function tryStartTour(s5: string, p18) -- line: 325
-		-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref), LoadWhatsNewRegistry (copy), tourHasEligibleTips (copy), startTour (copy)
-		assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
-
-		local v132 = rootTourMap
-		local _ = scopeActions
-		local v134 = v132[LoadWhatsNewRegistry.makeRootTourKey(s5, p18)]
-
-		if v134 ~= nil and v134.globalTotalSteps > 0 and tourHasEligibleTips(v134.scopeTree) then
-			startTour(s5, p18)
-
-			return true
 		end
 
 		return false
 	end
 
-	return {
-		initialize = function(p19) -- line: 518
-			-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref)
-			if u47 then
+	local u107 = false
+
+	local function tryEnterNestedScope(t9: {[any]: any}) -- line: 510
+		-- upvalues: u107 (ref), v94 (copy), Enums (copy), EntryStorage (copy), showTipAt (copy), WhatsNewTelemetry (copy)
+		if u107 then
+			return false
+		end
+
+		local v236 = v94(false)
+
+		if v236.surface == Enums.WhatsNewSurface.Idle or v236.currentEntry == nil or v236.currentScopeTour == nil or v236.globalStepIndex == nil then
+			return false
+		end
+
+		local currentEntry = v236.currentEntry
+		local currentScopeTour = v236.currentScopeTour
+		local gateway = currentEntry.gateway
+
+		if gateway == nil or t9.openActionKey ~= nil and gateway.openActionKey ~= t9.openActionKey then
+			return false
+		end
+
+		local scope = gateway.scope
+		local g247 = nil
+		local v246 = nil
+
+		for v241, v242 in scope.tourTips do
+			local toShow = v242.toShow
+
+			if toShow then
+				local id = v242.id
+				local v245 = EntryStorage.getEntries()[id]
+
+				toShow = not (v245 ~= nil and v245.seen ~= nil)
+			end
+
+			if toShow then
+				v246 = v241
+				g247 = true
+			end
+
+			if g247 then
+				break
+			end
+		end
+
+		if not g247 then
+			v246 = nil
+		end
+
+		g247 = false
+
+		local v248 = v246
+
+		if v248 == nil then
+			return false
+		end
+
+		u107 = true
+
+		local ok, result = pcall(function() -- line: 541
+			-- upvalues: v236 (copy), currentScopeTour (copy), scope (copy), v248 (copy), showTipAt (copy), EntryStorage (copy), WhatsNewTelemetry (copy), v94 (copy)
+			local v315 = table.clone(v236.scopeStack)
+
+			table.insert(v315, {
+				parentTipIndex = v236.currentTipIndex,
+				parentScopeTour = currentScopeTour,
+				parentGlobalStepIndex = v236.globalStepIndex,
+				parentGlobalTotalSteps = v236.globalTotalSteps
+			})
+
+			local v316 = scope.tourTips[v248]
+			local v317 = showTipAt
+			local v318 = scope
+			local v319 = v248
+			local t10 = {
+				globalStepIndex = 0,
+				scopeStack = v315
+			}
+			local n6 = 0
+
+			for _, v323 in scope.tourTips do
+				local toShow = v323.toShow
+
+				if toShow then
+					local id = v323.id
+					local v326 = EntryStorage.getEntries()[id]
+
+					toShow = not (v326 ~= nil and v326.seen ~= nil)
+				end
+
+				if toShow then
+					n6 += v323.stepCount
+				end
+			end
+
+			t10.globalTotalSteps = n6
+			v317(v318, v319, v316, t10)
+			WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_STARTED, v94(false), nil, WhatsNewTelemetry.StartContext.GATEWAY)
+		end)
+
+		u107 = false
+
+		if not ok then
+			error(result)
+		end
+
+		return true
+	end
+	local function tryStartNestedFromIdle(s11: string) -- line: 570
+		-- upvalues: v94 (copy), u90 (ref), rootTourMap (ref), scopeActions (ref), Enums (copy), LoadWhatsNewRegistry (copy), findGatewayTipByOpenActionKey (copy), EntryStorage (copy), showTipAt (copy), WhatsNewTelemetry (copy)
+		local screenScopeId = v94(false).screenScopeId
+
+		if screenScopeId == "" then
+			return false
+		end
+
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+		local v253 = rootTourMap
+		local _ = scopeActions
+		local g267 = nil
+		local v266 = nil
+
+		for _, v256 in Enums.TourTypeList do
+			local v257 = v253[LoadWhatsNewRegistry.makeRootTourKey(screenScopeId, v256)]
+
+			if v257 == nil then
+				continue
+			end
+
+			local v258 = findGatewayTipByOpenActionKey(v257.scopeTree, s11)
+			local v259 = if v258 == nil then nil else v258.gateway
+
+			if v259 ~= nil then
+				local scope = v259.scope
+
+				for v261, v262 in scope.tourTips do
+					local toShow = v262.toShow
+
+					if toShow then
+						local id = v262.id
+						local v265 = EntryStorage.getEntries()[id]
+
+						toShow = not (v265 ~= nil and v265.seen ~= nil)
+					end
+
+					if toShow then
+						v266 = v261
+						g267 = true
+					end
+
+					if g267 then
+						break
+					end
+				end
+
+				if not g267 then
+					v266 = nil
+				end
+
+				g267 = false
+
+				if v266 == nil then
+					continue
+				end
+
+				local v268 = scope.tourTips[v266]
+				local v269 = showTipAt
+				local t11 = {
+					globalStepIndex = 0,
+					screenScopeId = screenScopeId,
+					activeTourType = v256,
+					scopeStack = {}
+				}
+				local n7 = 0
+
+				for _, v273 in scope.tourTips do
+					local toShow = v273.toShow
+
+					if toShow then
+						local id = v273.id
+						local v276 = EntryStorage.getEntries()[id]
+
+						toShow = not (v276 ~= nil and v276.seen ~= nil)
+					end
+
+					if toShow then
+						n7 += v273.stepCount
+					end
+				end
+
+				t11.globalTotalSteps = n7
+				v269(scope, v266, v268, t11)
+				WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_STARTED, v94(false), nil, WhatsNewTelemetry.StartContext.IDLE)
+
+				return true
+			end
+		end
+
+		return false
+	end
+	local function notifyScopeOpened(s12: string) -- line: 610
+		-- upvalues: v94 (copy), Enums (copy), tryStartNestedFromIdle (copy), EntryStorage (copy), _DateTime (copy), tryEnterNestedScope (copy)
+		local v278 = v94(false)
+
+		if v278.surface == Enums.WhatsNewSurface.Idle then
+			tryStartNestedFromIdle(s12)
+
+			return
+		end
+
+		if v278.currentEntry == nil then
+			return
+		end
+
+		local currentEntry = v278.currentEntry
+		local gateway = currentEntry.gateway
+
+		if gateway == nil or s12 ~= gateway.openActionKey then
+			return
+		end
+
+		if v278.currentScopeTour ~= nil and v278.currentScopeTour.id == gateway.scope.id then
+			return
+		end
+
+		local g287 = nil
+		local v286 = nil
+
+		for v281, v282 in gateway.scope.tourTips do
+			local toShow = v282.toShow
+
+			if toShow then
+				local id = v282.id
+				local v285 = EntryStorage.getEntries()[id]
+
+				toShow = not (v285 ~= nil and v285.seen ~= nil)
+			end
+
+			if toShow then
+				v286 = v281
+				g287 = true
+			end
+
+			if g287 then
+				break
+			end
+		end
+
+		if not g287 then
+			v286 = nil
+		end
+
+		g287 = false
+
+		if v286 == nil then
+			return
+		end
+
+		local id = currentEntry.id
+
+		EntryStorage.markSeen(id, _DateTime.now():ToIsoDate())
+		tryEnterNestedScope({
+			openActionKey = s12
+		})
+	end
+	local function notifyScopeClosed(s13: string) -- line: 643
+		-- upvalues: v94 (copy), u100 (ref), u107 (ref), Enums (copy), completeTour (copy), u90 (ref), rootTourMap (ref), scopeActions (ref), LoadWhatsNewRegistry (copy), findCloseActionKeyForScope (copy)
+		local v290 = v94(false)
+
+		if u100 or (u107 or v290.surface == Enums.WhatsNewSurface.Idle) then
+			return
+		end
+
+		local scopeStack = v290.scopeStack
+		local v292 = scopeStack[#scopeStack]
+
+		if v292 ~= nil then
+			local v293 = v292.parentScopeTour.tourTips[v292.parentTipIndex]
+			local gateway = v293.gateway
+
+			assert(gateway ~= nil, `parent tip '{ v293.id }' is missing gateway for scope stack frame`)
+
+			if s13 ~= gateway.closeActionKey then
 				return
 			end
 
-			rootTourMap = p19.rootTourMap
-			scopeActions = p19.scopeActions
-			u47 = true
+			completeTour({
+				earlyDismiss = true
+			})
+
+			return
+		end
+
+		local currentScopeTour = v290.currentScopeTour
+
+		if currentScopeTour == nil or v290.activeTourType == nil or v290.screenScopeId == "" then
+			return
+		end
+
+		assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+		local v296 = rootTourMap
+		local _ = scopeActions
+		local v298 = v296[LoadWhatsNewRegistry.makeRootTourKey(v290.screenScopeId, v290.activeTourType)]
+
+		if v298 == nil then
+			return
+		end
+
+		if s13 ~= findCloseActionKeyForScope(v298.scopeTree, currentScopeTour.id) then
+			return
+		end
+
+		completeTour({
+			earlyDismiss = true
+		})
+	end
+
+	return {
+		initialize = function(p21) -- line: 754
+			-- upvalues: u90 (ref), rootTourMap (ref), scopeActions (ref), notifyScopeOpened (copy), notifyScopeClosed (copy), v94 (copy)
+			if u90 then
+				return
+			end
+
+			rootTourMap = p21.rootTourMap
+			scopeActions = p21.scopeActions
+			assert(scopeActions ~= nil, "scopeActions is required")
+			u90 = true
+			scopeActions:startOpenStateWiring({
+				notifyScopeOpened = notifyScopeOpened,
+				notifyScopeClosed = notifyScopeClosed,
+				getRuntimeStateSignal = v94
+			})
 		end,
-		resetForTests = function() -- line: 527
-			-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref), t2 (copy), v52 (copy), createIdleState (copy)
-			u47 = false
+		resetForTests = function() -- line: 769
+			-- upvalues: scopeActions (ref), u90 (ref), rootTourMap (ref), t2 (copy), v95 (copy), createIdleState (copy)
+			if scopeActions ~= nil then
+				scopeActions:stopOpenStateWiring()
+			end
+
+			u90 = false
 			rootTourMap = nil
 			scopeActions = nil
 			table.clear(t2)
-			v52((createIdleState()))
+			v95((createIdleState("")))
 		end,
-		getRuntimeState = function() -- line: 539
-			-- upvalues: v51 (copy)
-			return v51(false)
+		getRuntimeState = function() -- line: 784
+			-- upvalues: v94 (copy)
+			return v94(false)
 		end,
-		getRuntimeStateSignal = v51,
-		getCurrentScope = function() -- line: 545
-			-- upvalues: v51 (copy)
-			return v51(false).currentScopeTour
+		getRuntimeStateSignal = v94,
+		getCurrentScope = function() -- line: 790
+			-- upvalues: v94 (copy)
+			return v94(false).currentScopeTour
 		end,
-		getCurrentEntry = function() -- line: 549
-			-- upvalues: v51 (copy)
-			return v51(false).currentEntry
+		getCurrentEntry = function() -- line: 794
+			-- upvalues: v94 (copy)
+			return v94(false).currentEntry
 		end,
-		getOpenMenu = function() -- line: 553
-			-- upvalues: v51 (copy)
-			return v51(false).openMenu
+		getGlobalStepIndex = function() -- line: 798
+			-- upvalues: v94 (copy)
+			return v94(false).globalStepIndex
 		end,
-		getGlobalStepIndex = function() -- line: 557
-			-- upvalues: v51 (copy)
-			return v51(false).globalStepIndex
-		end,
-		getGlobalTotalSteps = function() -- line: 561
-			-- upvalues: v51 (copy)
-			local v193 = v51(false)
+		getGlobalTotalSteps = function() -- line: 802
+			-- upvalues: v94 (copy)
+			local v314 = v94(false)
 
-			if v193.activeTourType == nil then
+			if v314.activeTourType == nil then
 				return 0
 			end
 
-			return v193.globalTotalSteps
+			return v314.globalTotalSteps
 		end,
-		registerAnchor = function(s6: string, p20) -- line: 346
-			-- upvalues: t2 (copy), v51 (copy), refreshSurfaceForCurrentEntry (copy)
-			local v144 = t2[s6]
+		registerAnchor = function(s14: string, p22) -- line: 449
+			-- upvalues: t2 (copy), v94 (copy), refreshSurfaceForCurrentEntry (copy)
+			local v222 = t2[s14]
 
-			if v144 ~= nil and p20 == v144.ref then
+			if v222 ~= nil and p22 == v222.ref then
 				return
 			end
 
-			if v144 ~= nil and v144.ref.Parent ~= nil then
-				warn(`WhatsNew anchor '{ s6 }' is already registered; replacing with new registration`)
+			if v222 ~= nil and v222.ref.Parent ~= nil then
+				warn(`WhatsNew anchor '{ s14 }' is already registered; replacing with new registration`)
 			end
 
-			t2[s6] = {
+			t2[s14] = {
 				isReady = false,
-				ref = p20
+				ref = p22
 			}
 
-			local v145 = v51(false)
+			local v223 = v94(false)
 
-			if v145.currentEntry ~= nil and s6 == v145.currentEntry.anchorId then
+			if v223.currentEntry ~= nil and s14 == v223.currentEntry.anchorId then
 				refreshSurfaceForCurrentEntry()
 			end
 		end,
-		getAnchorRef = function(s7: string) -- line: 366
+		getAnchorRef = function(s15: string) -- line: 469
 			-- upvalues: t2 (copy)
-			local v147 = t2[s7]
+			local v225 = t2[s15]
 
-			if v147 == nil then
+			if v225 == nil then
 				return nil
 			end
 
-			return v147.ref
+			return v225.ref
 		end,
-		setAnchorReady = function(s8: string, b1: boolean, p21) -- line: 374
-			-- upvalues: t2 (copy), v51 (copy), refreshSurfaceForCurrentEntry (copy)
-			local v151 = t2[s8]
+		setAnchorReady = function(s16: string, b1: boolean, p23) -- line: 477
+			-- upvalues: t2 (copy), v94 (copy), refreshSurfaceForCurrentEntry (copy)
+			local v229 = t2[s16]
 
-			if v151 == nil then
+			if v229 == nil then
 				return
 			end
 
-			if p21 ~= nil and p21 ~= v151.ref then
+			if p23 ~= nil and p23 ~= v229.ref then
 				return
 			end
 
-			v151.isReady = b1
+			v229.isReady = b1
 
-			local v152 = v51(false)
+			local v230 = v94(false)
 
-			if v152.currentEntry ~= nil and s8 == v152.currentEntry.anchorId then
+			if v230.currentEntry ~= nil and s16 == v230.currentEntry.anchorId then
 				refreshSurfaceForCurrentEntry()
 			end
 		end,
-		unregisterAnchor = function(s9: string, p22) -- line: 389
-			-- upvalues: t2 (copy), v51 (copy), refreshSurfaceForCurrentEntry (copy)
-			local v155 = t2[s9]
+		unregisterAnchor = function(s17: string, p24) -- line: 492
+			-- upvalues: t2 (copy), v94 (copy), refreshSurfaceForCurrentEntry (copy)
+			local v233 = t2[s17]
 
-			if v155 == nil then
+			if v233 == nil then
 				return
 			end
 
-			if p22 ~= nil and p22 ~= v155.ref then
+			if p24 ~= nil and p24 ~= v233.ref then
 				return
 			end
 
-			t2[s9] = nil
+			t2[s17] = nil
 
-			local v156 = v51(false)
+			local v234 = v94(false)
 
-			if v156.currentEntry ~= nil and s9 == v156.currentEntry.anchorId then
+			if v234.currentEntry ~= nil and s17 == v234.currentEntry.anchorId then
 				refreshSurfaceForCurrentEntry()
 			end
 		end,
-		startEligibleTour = function(s10: string) -- line: 336
-			-- upvalues: u47 (ref), rootTourMap (ref), scopeActions (ref), Enums (copy), LoadWhatsNewRegistry (copy), tourHasEligibleTips (copy), startTour (copy)
-			assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+		startEligibleTour = function(s18: string) -- line: 434
+			-- upvalues: u90 (ref), rootTourMap (ref), scopeActions (ref), v94 (copy), Enums (copy), v95 (copy), createIdleState (copy), LoadWhatsNewRegistry (copy), EntryStorage (copy), startTour (copy)
+			assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
 
-			for _, v137 in {
-				Enums.TourType.Onboarding,
-				Enums.TourType.WhatsNew
-			} do
-				assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+			local g211 = nil
+			local g218 = nil
+			local v217 = nil
+			local v219 = nil
 
-				local v138 = rootTourMap
+			if v94(false).surface == Enums.WhatsNewSurface.Idle then
+				v95((createIdleState(s18)))
+			end
+
+			for _, v207 in Enums.TourTypeList do
+				assert(u90 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
+
+				local v208 = rootTourMap
 				local _ = scopeActions
-				local v140 = v138[LoadWhatsNewRegistry.makeRootTourKey(s10, v137)]
-				local v141
+				local v210 = v208[LoadWhatsNewRegistry.makeRootTourKey(s18, v207)]
 
-				if v140 ~= nil and v140.globalTotalSteps > 0 and tourHasEligibleTips(v140.scopeTree) then
-					startTour(s10, v137)
-					v141 = true
-				else
-					v141 = false
-				end
+				repeat
+					if not g211 and v210 ~= nil then
+						for _, v213 in v210.scopeTree.tourTips do
+							local toShow = v213.toShow
 
-				if v141 then
+							if toShow then
+								local id = v213.id
+								local v216 = EntryStorage.getEntries()[id]
+
+								toShow = not (v216 ~= nil and v216.seen ~= nil)
+							end
+
+							if toShow then
+								v217 = true
+								g218 = true
+							end
+
+							if g218 then
+								break
+							end
+						end
+
+						if not g218 then
+							v217 = false
+						end
+
+						g218 = false
+
+						if not v217 then
+							g211 = true
+						end
+
+						if not g211 then
+							startTour(s18, v207)
+							v219 = true
+						end
+					else
+						g211 = false
+						v219 = false
+					end
+				until not g211
+
+				if v219 then
 					return
 				end
 			end
 		end,
 		startTour = startTour,
-		stopTour = function() -- line: 220
-			-- upvalues: v51 (copy), Enums (copy), WhatsNewTelemetry (copy), v52 (copy), createIdleState (copy)
-			local v89 = v51(false)
+		stopTour = function() -- line: 261
+			-- upvalues: v94 (copy), Enums (copy), WhatsNewTelemetry (copy), v95 (copy), createIdleState (copy)
+			local v129 = v94(false)
 
-			if v89.surface ~= Enums.WhatsNewSurface.Idle and v89.surface ~= Enums.WhatsNewSurface.UpdateMenu then
-				WhatsNewTelemetry.logTourLifecycle("tour_stopped", v89, "abort")
+			if v129.surface ~= Enums.WhatsNewSurface.Idle then
+				WhatsNewTelemetry.logTourLifecycle(WhatsNewTelemetry.LifecycleType.TOUR_STOPPED, v129, WhatsNewTelemetry.StopReason.ABORT)
 			end
 
-			v52((createIdleState()))
+			v95((createIdleState(v94(false).screenScopeId)))
 		end,
-		next = function() -- line: 404
-			-- upvalues: v51 (copy), Enums (copy), EntryStorage (copy), _DateTime (copy), WhatsNewTelemetry (copy), TourTipCtaAccess (copy), u47 (ref), rootTourMap (ref), scopeActions (ref), showTipAt (copy), completeTour (copy), getCloseActionKeyForFrame (copy), resumeAfterScopeEnd (copy)
-			local v157 = v51(false)
+		next = function() -- line: 678
+			-- upvalues: v94 (copy), Enums (copy), EntryStorage (copy), _DateTime (copy), WhatsNewTelemetry (copy), completeTour (copy), showTipAt (copy)
+			local v299 = v94(false)
 
-			if v157.surface == Enums.WhatsNewSurface.Idle or v157.surface == Enums.WhatsNewSurface.UpdateMenu then
+			if v299.surface == Enums.WhatsNewSurface.Idle then
 				return
 			end
 
-			assert(v157.currentEntry ~= nil and (v157.currentScopeTour ~= nil and v157.globalStepIndex ~= nil), "next() called with inconsistent active tour state")
+			assert(v299.currentEntry ~= nil and (v299.currentScopeTour ~= nil and v299.globalStepIndex ~= nil), "next() called with inconsistent active tour state")
 
-			local currentEntry = v157.currentEntry
+			local currentEntry = v299.currentEntry
 			local id = currentEntry.id
 
 			EntryStorage.markSeen(id, _DateTime.now():ToIsoDate())
-			WhatsNewTelemetry.logTourtipInteraction("click", currentEntry.id, "next", v157)
+			WhatsNewTelemetry.logTourtipInteraction(WhatsNewTelemetry.InteractionType.CLICK, currentEntry.id, WhatsNewTelemetry.Button.NEXT, v299)
 
-			local currentScopeTour = v157.currentScopeTour
-			local v161 = TourTipCtaAccess.wrap(currentEntry.cta)
-			local v162 = v161:getKind()
+			local currentScopeTour = v299.currentScopeTour
+			local v303 = v299.globalStepIndex + 1
 
-			if v162 == Enums.TourTipCtaKind.Nested then
-				local v163 = v161:getScope()
-				local g167 = nil
-				local v166 = nil
-
-				for v164, v165 in v163.tourTips do
-					if v165.toShow then
-						v166 = v164
-						g167 = true
-					end
-
-					if g167 then
-						break
-					end
-				end
-
-				if not g167 then
-					v166 = nil
-				end
-
-				g167 = false
-				assert(v166 ~= nil, `nested tour tip '{ currentEntry.id }' has no visible child tips; loader should not emit empty nested gateways`)
-				assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
-
-				local _ = rootTourMap
-
-				scopeActions:invoke(v161:getOpenActionKey())
-
-				local v169 = table.clone(v157.scopeStack)
-
-				table.insert(v169, {
-					parentTipIndex = v157.currentTipIndex,
-					parentScopeTour = currentScopeTour
-				})
-
-				local v170 = v163.tourTips[v166]
-
-				showTipAt(v163, v166, v170, {
-					scopeStack = v169,
-					globalStepIndex = v157.globalStepIndex + 1
-				})
-
-				return
-			end
-
-			if v162 ~= Enums.TourTipCtaKind.None then
-				return
-			end
-
-			local v171 = v157.globalStepIndex + 1
-
-			if v171 >= v157.globalTotalSteps then
+			if v303 >= v299.globalTotalSteps then
 				completeTour()
 
 				return
 			end
 
-			local g174 = nil
-			local v173 = nil
+			local g306 = nil
+			local v305 = nil
 
-			for i = v157.currentTipIndex + 1, #currentScopeTour.tourTips do
+			for i = v299.currentTipIndex + 1, #currentScopeTour.tourTips do
 				if currentScopeTour.tourTips[i].toShow then
-					v173 = i
-					g174 = true
+					v305 = i
+					g306 = true
 				end
 
-				if g174 then
+				if g306 then
 					break
 				end
 			end
 
-			if not g174 then
-				v173 = nil
+			if not g306 then
+				v305 = nil
 			end
 
-			g174 = false
+			g306 = false
 
-			if v173 ~= nil then
-				showTipAt(currentScopeTour, v173, currentScopeTour.tourTips[v173], {
-					globalStepIndex = v171
+			if v305 ~= nil then
+				showTipAt(currentScopeTour, v305, currentScopeTour.tourTips[v305], {
+					globalStepIndex = v303
 				})
 
 				return
 			end
 
-			if #v157.scopeStack == 0 then
-				completeTour()
-
-				return
-			end
-
-			assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
-
-			local _ = rootTourMap
-			local v176 = scopeActions
-			local scopeStack = v157.scopeStack
-			local v178 = scopeStack[#scopeStack]
-			local v179 = table.clone(scopeStack)
-
-			table.remove(v179)
-			v176:invoke(getCloseActionKeyForFrame(v178))
-			resumeAfterScopeEnd(v179, v178.parentScopeTour, v178.parentTipIndex, v171)
+			completeTour()
 		end,
-		back = function() -- line: 479
-			-- upvalues: v51 (copy), Enums (copy), WhatsNewTelemetry (copy), showTipAt (copy), u47 (ref), rootTourMap (ref), scopeActions (ref), getCloseActionKeyForFrame (copy)
-			local v180 = v51(false)
+		back = function() -- line: 718
+			-- upvalues: v94 (copy), Enums (copy), WhatsNewTelemetry (copy), showTipAt (copy)
+			local v307 = v94(false)
 
-			if v180.surface == Enums.WhatsNewSurface.Idle or v180.surface == Enums.WhatsNewSurface.UpdateMenu then
+			if v307.surface == Enums.WhatsNewSurface.Idle then
 				return
 			end
 
-			assert(v180.currentEntry ~= nil and (v180.currentScopeTour ~= nil and v180.globalStepIndex ~= nil), "back() called with inconsistent active tour state")
+			assert(v307.currentEntry ~= nil and (v307.currentScopeTour ~= nil and v307.globalStepIndex ~= nil), "back() called with inconsistent active tour state")
 
-			if v180.globalStepIndex == 0 then
+			if v307.globalStepIndex == 0 then
 				return
 			end
 
-			WhatsNewTelemetry.logTourtipInteraction("click", v180.currentEntry.id, "back", v180)
+			WhatsNewTelemetry.logTourtipInteraction(WhatsNewTelemetry.InteractionType.CLICK, v307.currentEntry.id, WhatsNewTelemetry.Button.BACK, v307)
 
-			local currentScopeTour = v180.currentScopeTour
-			local v182 = v180.globalStepIndex - 1
-			local g185 = nil
-			local v184 = nil
+			local currentScopeTour = v307.currentScopeTour
+			local v309 = v307.globalStepIndex - 1
+			local g312 = nil
+			local v311 = nil
 
-			for i = v180.currentTipIndex - 1, 1, -1 do
+			for i = v307.currentTipIndex - 1, 1, -1 do
 				if currentScopeTour.tourTips[i].toShow then
-					v184 = i
-					g185 = true
+					v311 = i
+					g312 = true
 				end
 
-				if g185 then
+				if g312 then
 					break
 				end
 			end
 
-			if not g185 then
-				v184 = nil
+			if not g312 then
+				v311 = nil
 			end
 
-			g185 = false
+			g312 = false
 
-			if v184 ~= nil then
-				showTipAt(currentScopeTour, v184, currentScopeTour.tourTips[v184], {
-					globalStepIndex = v182
+			if v311 ~= nil then
+				showTipAt(currentScopeTour, v311, currentScopeTour.tourTips[v311], {
+					globalStepIndex = v309
 				})
 
 				return
 			end
 
-			assert(#v180.scopeStack > 0, "back() cannot resolve previous tip at globalStepIndex > 0")
-			assert(u47 and (rootTourMap ~= nil and scopeActions ~= nil), "WhatsNew store not initialized. Call initialize first.")
-
-			local _ = rootTourMap
-			local v187 = scopeActions
-			local scopeStack = v180.scopeStack
-			local v189 = scopeStack[#scopeStack]
-			local v190 = table.clone(scopeStack)
-
-			table.remove(v190)
-			v187:invoke(getCloseActionKeyForFrame(v189))
-
-			local v191 = v189.parentScopeTour.tourTips[v189.parentTipIndex]
-
-			showTipAt(v189.parentScopeTour, v189.parentTipIndex, v191, {
-				scopeStack = v190,
-				globalStepIndex = v182
-			})
+			assert(false, "back() cannot resolve previous tip at globalStepIndex > 0 within current scope")
 		end,
-		completeTour = completeTour,
-		openUpdateMenu = function(_: string) -- line: 579
-		end,
-		closeUpdateMenu = function() -- line: 580
-		end
+		notifyScopeOpened = notifyScopeOpened,
+		notifyScopeClosed = notifyScopeClosed,
+		completeTour = completeTour
 	}
 end
 

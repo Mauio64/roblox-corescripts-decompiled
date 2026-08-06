@@ -25,6 +25,7 @@ local FriendsListContext = require(scriptParent.FriendsListContext)
 local useFriendsListOrderedByPresence = FriendsCommon.Hooks.useFriendsListOrderedByPresence
 local generateDummyFriends = require(utils.generateDummyFriends)
 local FFlagFilterOutDeletedAccountsGameInvites = require(scriptParentParent.Flags.FFlagFilterOutDeletedAccountsGameInvites)
+local FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt = require(scriptParentParentParent.SharedFlags).FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt
 local UserModel = UserLib.Models.UserModel
 local t1 = {
 	InviteAvatarThumbnailType = Constants.RbxAvatarThumbnailTypesFromEnum.HeadShot,
@@ -36,49 +37,49 @@ t1.ThumbnailRequest = {
 	InviteToGame = { ThumbnailRequest.fromData(t1.InviteAvatarThumbnailType, t1.InviteAvatarThumbnailSize) }
 }
 
-return function(t2: {[any]: any}) -- line: 55
-	-- upvalues: SortInvitesByScoreIXP (copy), networkImpl (copy), Players (copy), useDispatch (copy), React (copy), generateDummyFriends (copy), useFriendsListOrderedByPresence (copy), UserProfiles (copy), PreloadUsersThumbnail (copy), t1 (copy), UserModel (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), sortFriendsByCorrectedPresenceAndRank (copy), Cryo (copy), GetFriendsSearch (copy), FriendsListContext (copy)
-	local v31 = if not SortInvitesByScoreIXP.FFlagEnableSortInvitesByScoreExperiment then nil else SortInvitesByScoreIXP.useSortInvitesByScoreExperiment()
-	local u32 = if not t2.networkImplOverride then networkImpl else t2.networkImplOverride
-	local v33 = not Players.LocalPlayer and "0" or tostring(Players.LocalPlayer.UserId)
-	local v34 = useDispatch()
-	local v35, v36 = React.useState("")
-	local v37, v38 = React.useState(true)
+return function(t2: {[any]: any}) -- line: 57
+	-- upvalues: SortInvitesByScoreIXP (copy), networkImpl (copy), Players (copy), useDispatch (copy), React (copy), generateDummyFriends (copy), useFriendsListOrderedByPresence (copy), UserProfiles (copy), PreloadUsersThumbnail (copy), t1 (copy), UserModel (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), sortFriendsByCorrectedPresenceAndRank (copy), Cryo (copy), GetFriendsSearch (copy), FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt (copy), FriendsListContext (copy)
+	local v32 = if not SortInvitesByScoreIXP.FFlagEnableSortInvitesByScoreExperiment then nil else SortInvitesByScoreIXP.useSortInvitesByScoreExperiment()
+	local u33 = if not t2.networkImplOverride then networkImpl else t2.networkImplOverride
+	local v34 = not Players.LocalPlayer and "0" or tostring(Players.LocalPlayer.UserId)
+	local v35 = useDispatch()
+	local v36, v37 = React.useState("")
+	local v38, v39 = React.useState(true)
 	local t3 = {}
-	local v40, v41 = React.useState((generateDummyFriends(10)))
-	local v42 = useFriendsListOrderedByPresence({
+	local v41, v42 = React.useState((generateDummyFriends(10)))
+	local v43 = useFriendsListOrderedByPresence({
 		pageSize = 50,
 		shouldListenToPresenceUpdates = false,
-		userId = v33
+		userId = v34
 	})
-	local v43 = UserProfiles.Hooks.useUserProfilesFetch({
+	local v44 = UserProfiles.Hooks.useUserProfilesFetch({
 		userIds = {},
 		query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
 	})
 
-	local function v44(p1, p2) -- line: 85
-		-- upvalues: v34 (copy), PreloadUsersThumbnail (copy), t1 (copy), v43 (copy), t2 (copy), UserModel (copy), v42 (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), v31 (copy), SortInvitesByScoreIXP (copy), sortFriendsByCorrectedPresenceAndRank (copy), v41 (copy), v38 (copy), t3 (ref), Cryo (copy)
-		v34(PreloadUsersThumbnail(p1, t1.ThumbnailRequest.InviteToGame, nil))
-		v43:fetchMore({
+	local function v45(p1, p2) -- line: 87
+		-- upvalues: v35 (copy), PreloadUsersThumbnail (copy), t1 (copy), v44 (copy), t2 (copy), UserModel (copy), v43 (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), v32 (copy), SortInvitesByScoreIXP (copy), sortFriendsByCorrectedPresenceAndRank (copy), v42 (copy), v39 (copy), t3 (ref), Cryo (copy)
+		v35(PreloadUsersThumbnail(p1, t1.ThumbnailRequest.InviteToGame, nil))
+		v44:fetchMore({
 			variables = {
 				userIds = p1
 			}
-		}):andThen(function(p3) -- line: 93
-			-- upvalues: p1 (copy), t2 (copy), UserModel (copy), v42 (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), v31 (copy), SortInvitesByScoreIXP (copy), p2 (copy), sortFriendsByCorrectedPresenceAndRank (copy), v41 (copy), v38 (copy)
+		}):andThen(function(p3) -- line: 95
+			-- upvalues: p1 (copy), t2 (copy), UserModel (copy), v43 (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), v32 (copy), SortInvitesByScoreIXP (copy), p2 (copy), sortFriendsByCorrectedPresenceAndRank (copy), v42 (copy), v39 (copy)
 			local t4 = {}
 
-			for _, v54 in p1 do
-				if not t2.excludedFriendsSet or not t2.excludedFriendsSet[v54] then
+			for _, v55 in p1 do
+				if not t2.excludedFriendsSet or not t2.excludedFriendsSet[v55] then
 					local OFFLINE = UserModel.PresenceType.OFFLINE
 					local lastLocation = nil
 
-					for _, v58 in v42.onlineFriends do
-						if v54 == v58.id then
-							if not v58.presence then
+					for _, v59 in v43.onlineFriends do
+						if v55 == v59.id then
+							if not v59.presence then
 								break
 							end
 
-							local userPresenceType = v58.presence.userPresenceType
+							local userPresenceType = v59.presence.userPresenceType
 
 							if userPresenceType == PresenceType.InGame then
 								OFFLINE = UserModel.PresenceType.IN_GAME
@@ -88,21 +89,21 @@ return function(t2: {[any]: any}) -- line: 55
 								OFFLINE = UserModel.PresenceType.IN_STUDIO
 							end
 
-							lastLocation = v58.presence.lastLocation
+							lastLocation = v59.presence.lastLocation
 
 							break
 						end
 					end
 
-					for _, v61 in p3.data.userProfiles do
-						if (not FFlagFilterOutDeletedAccountsGameInvites or v61.names.username ~= Constants2.NameAccountDeleted) and v54 == v61.id then
+					for _, v62 in p3.data.userProfiles do
+						if (not FFlagFilterOutDeletedAccountsGameInvites or v62.names.username ~= Constants2.NameAccountDeleted) and v55 == v62.id then
 							table.insert(t4, {
-								id = v54,
+								id = v55,
 								presence = OFFLINE,
 								lastLocation = lastLocation,
-								displayName = v61.names.combinedName,
-								name = v61.names.username,
-								friendRank = if not v31 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else p2 and p2[v54]
+								displayName = v62.names.combinedName,
+								name = v62.names.username,
+								friendRank = if not v32 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else p2 and p2[v55]
 							})
 
 							break
@@ -112,12 +113,12 @@ return function(t2: {[any]: any}) -- line: 55
 			end
 
 			table.sort(t4, sortFriendsByCorrectedPresenceAndRank)
-			v41(t4)
-			v38(false)
-		end):catch(function(p4) -- line: 144
-			-- upvalues: v38 (copy)
+			v42(t4)
+			v39(false)
+		end):catch(function(p4) -- line: 146
+			-- upvalues: v39 (copy)
 			print("error", p4)
-			v38(false)
+			v39(false)
 		end)
 
 		if t3 then
@@ -127,61 +128,73 @@ return function(t2: {[any]: any}) -- line: 55
 		return p1
 	end
 
-	t3 = React.useMemo(function() -- line: 152
-		-- upvalues: v35 (copy), GetFriendsSearch (copy), u32 (ref), v33 (copy), v31 (copy), SortInvitesByScoreIXP (copy), Cryo (copy), v44 (copy), v42 (copy), t3 (ref)
-		if v35 ~= "" then
-			GetFriendsSearch(u32, v33, v35, 20):andThen(function(p5) -- line: 154
-				-- upvalues: v31 (copy), SortInvitesByScoreIXP (copy), Cryo (copy), v44 (copy)
-				local v64 = if not v31 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else {}
-				local v65 = Cryo.List.map(p5.responseBody.PageItems, function(p6, p7) -- line: 159
-					-- upvalues: v31 (copy), SortInvitesByScoreIXP (copy), v64 (copy)
-					if v31 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
-						v64[p6.id] = p7
+	t3 = React.useMemo(function() -- line: 154
+		-- upvalues: v36 (copy), GetFriendsSearch (copy), u33 (ref), v34 (copy), v32 (copy), SortInvitesByScoreIXP (copy), Cryo (copy), v45 (copy), v43 (copy), t3 (ref), FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt (copy), v42 (copy), v39 (copy)
+		if v36 ~= "" then
+			GetFriendsSearch(u33, v34, v36, 20):andThen(function(p5) -- line: 156
+				-- upvalues: v32 (copy), SortInvitesByScoreIXP (copy), Cryo (copy), v45 (copy)
+				local v65 = if not v32 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else {}
+				local v66 = Cryo.List.map(p5.responseBody.PageItems, function(p6, p7) -- line: 161
+					-- upvalues: v32 (copy), SortInvitesByScoreIXP (copy), v65 (copy)
+					if v32 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
+						v65[p6.id] = p7
 					end
 
 					return (tostring(p6.id))
 				end)
 
-				return (v44(v65, v64))
-			end):catch(function(p8) -- line: 166
+				return (v45(v66, v65))
+			end):catch(function(p8) -- line: 168
 				print("error", p8)
 			end)
-		elseif v42.onlineFriends and v42.offlineFriends then
+		elseif v43.onlineFriends and v43.offlineFriends then
 			local t5 = {}
-			local v48 = if not v31 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else {}
+			local v49 = if not v32 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else {}
 
-			for v49, v50 in (Cryo.List.join(v42.offlineFriends, v42.onlineFriends)) do
-				if Cryo.List.find(t3, v50.id) == nil then
-					table.insert(t5, v50.id)
+			for v50, v51 in (Cryo.List.join(v43.offlineFriends, v43.onlineFriends)) do
+				if Cryo.List.find(t3, v51.id) == nil then
+					table.insert(t5, v51.id)
 
-					if v31 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
-						v48[v50.id] = v49
+					if v32 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
+						v49[v51.id] = v50
 					end
 				end
 			end
 
-			return (v44(t5, v48))
+			if FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt and #t5 == 0 then
+				if v43.isLoading then
+					return {}
+				end
+
+				v42({})
+				v39(false)
+
+				return {}
+			end
+
+			return (v45(t5, v49))
 		end
 
 		return {}
 	end, {
-		v42.onlineFriends,
-		v42.offlineFriends,
-		v35
+		v43.onlineFriends,
+		v43.offlineFriends,
+		v36,
+		if not FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt then nil else v43.isLoading
 	})
 
 	return React.createElement(FriendsListContext.Provider, {
 		value = {
 			isFriendsListFetchFailed = false,
-			friends = v40,
-			hasFriends = not Cryo.isEmpty(v42.onlineFriends) or not Cryo.isEmpty(v42.offlineFriends),
-			isFetchingFriends = v43.loading or (t2.isLoadingCustomParams or v37),
+			friends = v41,
+			hasFriends = not Cryo.isEmpty(v43.onlineFriends) or not Cryo.isEmpty(v43.offlineFriends),
+			isFetchingFriends = v44.loading or (t2.isLoadingCustomParams or (v38 or FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt and v43.isLoading)),
 			friendsNames = {
-				loading = v43 and v43.loading
+				loading = v44 and v44.loading
 			},
-			fetchMoreFriends = v42.fetchMoreFriends,
-			searchFriends = v36,
-			searchFriendsString = v35
+			fetchMoreFriends = v43.fetchMoreFriends,
+			searchFriends = v37,
+			searchFriendsString = v36
 		}
 	}, t2.children)
 end

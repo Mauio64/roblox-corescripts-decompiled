@@ -9,7 +9,7 @@ local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 
-local function isOptionSelected(p1, s1: string) -- line: 37
+local function isOptionSelected(p1, s1: string) -- line: 36
 	if typeof(p1) == "string" then
 		return p1 == s1
 	end
@@ -26,7 +26,7 @@ local function isOptionSelected(p1, s1: string) -- line: 37
 
 	return false
 end
-local function getFirstSelectedOptionId(p2) -- line: 52
+local function getFirstSelectedOptionId(p2) -- line: 51
 	if typeof(p2) == "string" then
 		return p2
 	end
@@ -37,7 +37,7 @@ local function getFirstSelectedOptionId(p2) -- line: 52
 
 	return nil
 end
-local function AnswerStack(t1: {[any]: any}) -- line: 62
+local function AnswerStack(t1: {[any]: any}) -- line: 61
 	-- upvalues: React (copy), OptionSelector (copy), View (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy)
 	local onOptionSelected = t1.onOptionSelected
 	local options = t1.options
@@ -88,7 +88,7 @@ local function AnswerStack(t1: {[any]: any}) -- line: 62
 			t3.selectionStyle = v25 and "intermediate" or "committed"
 			t3.testId = `AnswerStack.Option.{ v29.id }`
 
-			function t3.onActivated() -- line: 88
+			function t3.onActivated() -- line: 87
 				-- upvalues: onOptionSelected (copy), v29 (copy)
 				onOptionSelected(v29)
 			end

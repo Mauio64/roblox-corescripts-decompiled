@@ -1,14 +1,14 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 
-require(Foundation.Enums.ColorMode)
+require(Foundation.Enums.ColorNamespace)
 
 local React = require(FoundationParent.React)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local v5 = React.forwardRef(function(t1: {[any]: any}, p1) -- line: 19
 	-- upvalues: useTokens (copy), React (copy)
 	local v8 = useTokens()
-	local colorMode = t1.colorMode
+	local colorNamespace = t1.colorNamespace
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
@@ -21,8 +21,8 @@ local v5 = React.forwardRef(function(t1: {[any]: any}, p1) -- line: 19
 			CornerRadius = t1.cornerRadius
 		}),
 		UIStroke = React.createElement("UIStroke", {
-			Color = v8[colorMode].Selection.Start.Color3,
-			Transparency = v8[colorMode].Selection.Start.Transparency,
+			Color = v8[colorNamespace].Selection.Start.Color3,
+			Transparency = v8[colorNamespace].Selection.Start.Transparency,
 			Thickness = t1.borderWidth
 		}, {})
 	})

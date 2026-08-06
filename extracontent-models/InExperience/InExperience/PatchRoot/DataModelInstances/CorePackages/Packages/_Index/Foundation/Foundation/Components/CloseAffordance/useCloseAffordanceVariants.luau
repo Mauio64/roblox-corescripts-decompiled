@@ -1,7 +1,7 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local Dash = require(FoundationParent.Dash)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local InputSize = require(Foundation.Enums.InputSize)
 
 require(Foundation.Components.Types)
@@ -17,7 +17,7 @@ local Constants = require(Foundation.Constants)
 local getSharedVariants = require(Foundation.Components.Button.getSharedVariants)
 
 local function v12(p1) -- line: 45
-	-- upvalues: getSharedVariants (copy), InputSize (copy), IconSize (copy), CloseAffordanceVariant (copy), Dash (copy), ColorMode (copy), Constants (copy)
+	-- upvalues: getSharedVariants (copy), InputSize (copy), IconSize (copy), CloseAffordanceVariant (copy), Dash (copy), ColorNamespace (copy), Constants (copy)
 	local t1 = {
 		container = {
 			tag = "row align-x-center align-y-center auto-xy clip"
@@ -73,7 +73,7 @@ local function v12(p1) -- line: 45
 		}
 	}
 	local t3 = {
-		[CloseAffordanceVariant.OverMedia] = Dash.map(ColorMode, function() -- line: 101
+		[CloseAffordanceVariant.OverMedia] = Dash.map(ColorNamespace, function() -- line: 101
 			-- upvalues: p1 (copy)
 			return {
 				container = {
@@ -84,12 +84,12 @@ local function v12(p1) -- line: 45
 				}
 			}
 		end),
-		[CloseAffordanceVariant.Utility] = Dash.map(ColorMode, function(p2) -- line: 107
+		[CloseAffordanceVariant.Utility] = Dash.map(ColorNamespace, function(p2) -- line: 107
 			-- upvalues: Constants (copy), p1 (copy)
 			return {
 				container = {
 					stateLayer = {
-						mode = Constants.COLOR_MODE_TO_STATE_LAYER_MODE[false][p2]
+						mode = Constants.COLOR_NAMESPACE_TO_STATE_LAYER_MODE[false][p2]
 					}
 				},
 				content = {
@@ -129,9 +129,9 @@ local function v12(p1) -- line: 45
 end
 
 return function(p3, p4, p5, p6, b1: boolean, b2: boolean) -- line: 138
-	-- upvalues: VariantsContext (copy), v12 (copy), CloseAffordanceVariant (copy), composeStyleVariant (copy), ColorMode (copy)
+	-- upvalues: VariantsContext (copy), v12 (copy), CloseAffordanceVariant (copy), composeStyleVariant (copy), ColorNamespace (copy)
 	local v26 = VariantsContext.useVariants("CloseAffordance", v12, p3)
 	local v27 = p5 == CloseAffordanceVariant.OverMedia or b2
 
-	return composeStyleVariant(v26.common, v26.types[p5][p6 or ColorMode.Color], v26.sizes[b1][p4], v26.padding[b1], v26.circular[v27])
+	return composeStyleVariant(v26.common, v26.types[p5][p6 or ColorNamespace.Color], v26.sizes[b1][p4], v26.padding[b1], v26.circular[v27])
 end

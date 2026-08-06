@@ -8,5 +8,6 @@ return {
 	CatalogMultiItemCheckoutPage = "CatalogMultiItemCheckoutPage",
 	DeepLinkUpsell = "DeepLinkUpsell",
 	HomepageFaeTrialBanner = "HomepageFaeTrialBanner",
-	InGameRobuxUpsell = "InGameRobuxUpsell"
+	InGameRobuxUpsell = "InGameRobuxUpsell",
+	SettingsAppThemeUpsell = "SettingsAppThemeUpsell"
 }

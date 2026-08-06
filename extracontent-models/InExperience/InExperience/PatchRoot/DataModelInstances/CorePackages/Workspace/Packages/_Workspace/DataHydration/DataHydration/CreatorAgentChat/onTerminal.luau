@@ -5,13 +5,13 @@ require(script.Parent.types)
 
 local t1 = {}
 
-local function onTerminal(p1, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any)?) -- line: 26
+local function onTerminal(p1, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any)?) -- line: 25
 	-- upvalues: t1 (copy), createEffect (copy)
 	local t2 = {}
 	local u9 = false
 	local u10 = false
 
-	local function cleanupEffect() -- line: 35
+	local function cleanupEffect() -- line: 34
 		-- upvalues: u10 (ref), t1 (copy), t2 (copy)
 		if u10 then
 			return
@@ -27,7 +27,7 @@ local function onTerminal(p1, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any
 			v16()
 		end
 	end
-	local function settle(p4) -- line: 47
+	local function settle(p4) -- line: 46
 		-- upvalues: u9 (ref), u10 (ref), t1 (copy), t2 (copy), p2 (copy), p3 (copy)
 		if u9 then
 			return
@@ -86,7 +86,7 @@ local function onTerminal(p1, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any
 		return
 	end
 
-	local v15 = createEffect(function(p5) -- line: 68
+	local v15 = createEffect(function(p5) -- line: 67
 		-- upvalues: p1 (copy), u9 (ref), u10 (ref), t1 (copy), t2 (copy), p2 (copy), p3 (copy)
 		local v20 = p1(p5)
 

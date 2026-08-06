@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 
-local function getDefaultAuthHeaders() -- line: 10
+local function getDefaultAuthHeaders() -- line: 9
 	-- upvalues: Players (copy)
 	local LocalPlayer = Players.LocalPlayer
 

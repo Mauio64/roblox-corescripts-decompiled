@@ -4,7 +4,7 @@ require(script.Parent.Parent.createTurnHandle)
 require(script.Parent.Parent.types)
 
 return {
-	ingestFrame = function(t1: {[any]: any}, p1, p2) -- line: 23
+	ingestFrame = function(t1: {[any]: any}, p1, p2) -- line: 22
 		-- upvalues: AcpProtocol (copy)
 		assert(p1 and (p1.kind == "notification" or p1.kind == "response"), "ingestFrame requires an IncomingFrame")
 

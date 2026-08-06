@@ -8,7 +8,7 @@ local useOpenBuyRobuxWebView = require(BuildExperience.Components.CreatorCreditS
 local useRefreshCreatorCreditOnUnhide = require(BuildExperience.Components.CreatorCreditSheet.useRefreshCreatorCreditOnUnhide)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
-local function getQuotaBlockReason(p1) -- line: 36
+local function getQuotaBlockReason(p1) -- line: 34
 	-- upvalues: CreatorCreditConfig (copy)
 	if p1 == nil then
 		return nil
@@ -40,10 +40,10 @@ local function getQuotaBlockReason(p1) -- line: 36
 
 	return nil
 end
-local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
+local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 59
 	-- upvalues: CreatorCredit (copy), React (copy), SignalsReact (copy), CreatorCreditConfig (copy), useOpenBuyRobuxWebView (copy), useRefreshCreatorCreditOnUnhide (copy), LocalizationStrings (copy)
 	local v14 = CreatorCredit.getCreatorCreditStore(false)
-	local v15 = React.useMemo(function() -- line: 63
+	local v15 = React.useMemo(function() -- line: 61
 		-- upvalues: v14 (copy)
 		return v14.getQuotaSummary()
 	end, { v14 })
@@ -54,20 +54,20 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 	local v21 = React.useRef(v20)
 	local v22 = React.useRef(0)
 	local v23, v24 = React.useState(nil)
-	local v25 = React.useCallback(function() -- line: 75
+	local v25 = React.useCallback(function() -- line: 73
 		-- upvalues: v22 (copy), v14 (copy), v24 (copy), CreatorCreditConfig (copy)
 		local current = v22.current
 
-		v14.refreshQuotaSummary():andThen(function(p2) -- line: 79
+		v14.refreshQuotaSummary():andThen(function(p2) -- line: 77
 			-- upvalues: current (copy), v22 (copy), v24 (copy), CreatorCreditConfig (copy)
 			if p2 ~= nil and current == v22.current then
 				v24(if p2 ~= nil then if p2.allowed == nil then if not (p2.freeTrialRemaining > 0) then if p2.limitSettings.additionalUsageEnabled then if not (p2.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance) then if not p2.limitSettings.dailyLimitSet or not (p2.limitRemaining < CreatorCreditConfig.FIntMinimumUsableRobuxBalance) then nil else "DailyLimitReached" else "InsufficientRobuxBalance" else "FreeTrialExhausted" else nil else if not p2.allowed then p2.reason else nil else nil)
 			end
-		end):catch(function() -- line: 84
+		end):catch(function() -- line: 82
 		end)
 	end, { v14 })
 
-	React.useEffect(function() -- line: 86
+	React.useEffect(function() -- line: 84
 		-- upvalues: v20 (copy), v21 (copy), v22 (copy), v24 (copy), t1 (copy), v19 (copy), v25 (copy)
 		if v20 > v21.current then
 			local v37 = v22
@@ -87,7 +87,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 
 	local v26 = React.useRef(t1.isAssistantResponding)
 
-	React.useEffect(function() -- line: 97
+	React.useEffect(function() -- line: 95
 		-- upvalues: v26 (copy), t1 (copy), CreatorCreditConfig (copy), v25 (copy)
 		local v38 = v26.current and not t1.isAssistantResponding
 
@@ -99,7 +99,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 
 		local thread = task.delay(CreatorCreditConfig.FIntPostTurnRefreshDelaySeconds, v25)
 
-		return function() -- line: 104
+		return function() -- line: 102
 			-- upvalues: thread (copy)
 			task.cancel(thread)
 		end
@@ -107,7 +107,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 		t1.isAssistantResponding,
 		v25
 	})
-	React.useEffect(function() -- line: 109
+	React.useEffect(function() -- line: 107
 		-- upvalues: v17 (copy), CreatorCreditConfig (copy), v25 (copy)
 		if v17 == nil or v17 == "" then
 			return
@@ -122,7 +122,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 		local v41 = math.max(1, dateTime.UnixTimestamp - DateTime.now().UnixTimestamp + CreatorCreditConfig.FIntResetRefreshBufferSeconds)
 		local thread = task.delay(v41, v25)
 
-		return function() -- line: 124
+		return function() -- line: 122
 			-- upvalues: thread (copy)
 			task.cancel(thread)
 		end
@@ -131,7 +131,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 		v25
 	})
 
-	local v27 = React.useCallback(function() -- line: 129
+	local v27 = React.useCallback(function() -- line: 127
 		-- upvalues: v25 (copy), v19 (copy)
 		v25()
 		v19(true)
@@ -140,7 +140,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 
 	useRefreshCreatorCreditOnUnhide(v25)
 
-	local v29 = React.useCallback(function() -- line: 136
+	local v29 = React.useCallback(function() -- line: 134
 		-- upvalues: v19 (copy), t1 (copy)
 		v19(true)
 
@@ -148,7 +148,7 @@ local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 61
 			t1.onOpenCreatorCreditPage()
 		end
 	end, { t1.onOpenCreatorCreditPage })
-	local v30 = React.useCallback(function() -- line: 142
+	local v30 = React.useCallback(function() -- line: 140
 		-- upvalues: v19 (copy)
 		v19(true)
 	end, {})

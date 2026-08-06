@@ -7,9 +7,6 @@ return function() -- line: 11
 
 	return {
 		getSelectedConversationId = v3,
-		setSelectedConversationId = function(s1: string?) -- line: 15
-			-- upvalues: v4 (copy)
-			v4(s1)
-		end
+		setSelectedConversationId = v4
 	}
 end

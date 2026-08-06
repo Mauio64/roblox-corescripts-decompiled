@@ -29,7 +29,7 @@ local t2 = {
 	Marketing = IconName.Wallet
 }
 
-local function getDisplayGroups(t3: {[any]: any}) -- line: 51
+local function getDisplayGroups(t3: {[any]: any}) -- line: 49
 	-- upvalues: t1 (copy)
 	local t4 = {}
 
@@ -58,7 +58,7 @@ local function getDisplayGroups(t3: {[any]: any}) -- line: 51
 
 	return t5
 end
-local function getStatusText(p1) -- line: 79
+local function getStatusText(p1) -- line: 77
 	-- upvalues: LocalizationStrings (copy)
 	if #p1.tasks == 0 then
 		return LocalizationStrings.SUBAGENT_STATUS_NOT_STARTED
@@ -70,13 +70,13 @@ local function getStatusText(p1) -- line: 79
 
 	return LocalizationStrings.SUBAGENT_STATUS_BUILDING
 end
-local function AgentTaskList(t6: {[any]: any}) -- line: 97
+local function AgentTaskList(t6: {[any]: any}) -- line: 95
 	-- upvalues: React (copy), ScrollView (copy), ScrollBarVisibility (copy), View (copy), StateLayerAffordance (copy)
 	local v37, v38 = React.useBinding(0)
-	local v39 = v37:map(function(p2) -- line: 99
+	local v39 = v37:map(function(p2) -- line: 97
 		return UDim2.new(1, 0, 0, p2)
 	end)
-	local v40 = React.useCallback(function(p3) -- line: 102
+	local v40 = React.useCallback(function(p3) -- line: 100
 		-- upvalues: v38 (copy)
 		v38(p3.AbsoluteCanvasSize.Y)
 	end, { v38 })
@@ -108,11 +108,11 @@ local function AgentTaskList(t6: {[any]: any}) -- line: 97
 		}, t6.children)
 	})
 end
-local function AgentCard(t7: {[any]: any}) -- line: 143
+local function AgentCard(t7: {[any]: any}) -- line: 141
 	-- upvalues: t2 (copy), React (copy), View (copy), FoundationText (copy), LoadingIndicator (copy), Icon (copy), IconSize (copy), LocalizationStrings (copy), AgentTaskList (copy)
 	local group = t7.group
 	local v43 = t2[group.name]
-	local v44 = React.useCallback(function() -- line: 146
+	local v44 = React.useCallback(function() -- line: 144
 		-- upvalues: t7 (copy), group (copy)
 		t7.onAgentActivated(group)
 	end, {
@@ -180,7 +180,7 @@ local function AgentCard(t7: {[any]: any}) -- line: 143
 		}, t8)
 	})
 end
-local function AgentsList(t9: {[any]: any}) -- line: 215
+local function AgentsList(t9: {[any]: any}) -- line: 213
 	-- upvalues: useTokens (copy), useScaledValue (copy), getDisplayGroups (copy), React (copy), AgentCard (copy), View (copy)
 	local v49 = useTokens()
 	local v50 = useScaledValue(156)

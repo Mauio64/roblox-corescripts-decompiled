@@ -8,7 +8,7 @@ local View = Foundation.View
 local InputSize = Foundation.Enums.InputSize
 local SubagentTaskStatus = CreatorAgentChat.SubagentTaskStatus
 
-local function createTrailingIndicator(t1: {[any]: any}, s1: string) -- line: 36
+local function createTrailingIndicator(t1: {[any]: any}, s1: string) -- line: 34
 	-- upvalues: SubagentTaskStatus (copy), React (copy), View (copy), LoadingIndicator (copy)
 	if t1.status == nil or t1.status == SubagentTaskStatus.Pending then
 		return nil
@@ -23,7 +23,7 @@ local function createTrailingIndicator(t1: {[any]: any}, s1: string) -- line: 36
 		})
 	})
 end
-local function TodoList(t2: {[any]: any}) -- line: 51
+local function TodoList(t2: {[any]: any}) -- line: 49
 	-- upvalues: React (copy), List (copy), createTrailingIndicator (copy), InputSize (copy)
 	local v15 = t2.testId or "subagent-status-list"
 	local t3 = {}

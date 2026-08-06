@@ -9,23 +9,16 @@ local t1 = {
 local t2 = {
 	Idle = "idle",
 	TourTip = "tourTip",
-	UpdateMenu = "updateMenu",
 	WaitingForAnchor = "waitingForAnchor"
-}
-local t3 = {
-	None = "none",
-	Menu = "menu",
-	Nested = "nested"
 }
 
 return {
 	TourType = t1,
 	TourTypeList = {
-		t1.WhatsNew,
-		t1.Onboarding
+		t1.Onboarding,
+		t1.WhatsNew
 	},
 	WhatsNewSurface = t2,
 	PopoverSide = Foundation.Enums.PopoverSide,
-	PopoverAlign = Foundation.Enums.PopoverAlign,
-	TourTipCtaKind = t3
+	PopoverAlign = Foundation.Enums.PopoverAlign
 }

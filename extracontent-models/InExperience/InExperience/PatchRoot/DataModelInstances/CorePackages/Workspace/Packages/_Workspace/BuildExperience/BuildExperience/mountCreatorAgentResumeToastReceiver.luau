@@ -5,7 +5,7 @@ local React = require(BuildExperienceParent.React)
 local ReactRoblox = require(BuildExperienceParent.ReactRoblox)
 local BuildEventReceiver = require(BuildExperience.BuildEventReceiver)
 
-local function mountCreatorAgentResumeToastReceiver(b1: boolean) -- line: 13
+local function mountCreatorAgentResumeToastReceiver(b1: boolean) -- line: 11
 	-- upvalues: CoreGui (copy), ReactRoblox (copy), React (copy), BuildEventReceiver (copy)
 	local Folder = Instance.new("Folder")
 

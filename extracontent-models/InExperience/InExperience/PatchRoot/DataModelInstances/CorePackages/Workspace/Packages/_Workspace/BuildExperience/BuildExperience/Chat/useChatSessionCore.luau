@@ -11,6 +11,7 @@ local ReactUtils = require(BuildExperienceParent.ReactUtils)
 local Signals = require(BuildExperienceParent.Signals)
 local SignalsReact = require(BuildExperienceParent.SignalsReact)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local FFlagBuildExperienceToolResultFailureRecovery = require(BuildExperience.Flags.FFlagBuildExperienceToolResultFailureRecovery)
 
 require(script.Parent.chatTypes)
 
@@ -36,16 +37,16 @@ local t2 = {
 	onAnswerConfirmedByToolCallId = {},
 	onPlanAcceptedByToolCallId = {}
 }
-local v25 = Signals.createSignal(t1)
-local v26 = Signals.createSignal(t2)
-local v27 = Signals.createSignal(nil)
-local v28 = Signals.createSignal({
+local v26 = Signals.createSignal(t1)
+local v27 = Signals.createSignal(t2)
+local v28 = Signals.createSignal(nil)
+local v29 = Signals.createSignal({
 	session = nil,
 	sessionId = nil,
 	events = {}
 })
 
-local function sessionOwnerMatches(t3: {[any]: any}?, p1, s1: string?) -- line: 130
+local function sessionOwnerMatches(t3: {[any]: any}?, p1, s1: string?) -- line: 132
 	if t3 == nil or p1 ~= t3.session then
 		return false
 	end
@@ -56,25 +57,25 @@ local function sessionOwnerMatches(t3: {[any]: any}?, p1, s1: string?) -- line: 
 
 	return s1 == t3.sessionId or t3.sessionId == nil and s1 == t3.session.getCasSessionId()
 end
-local function hasPendingLocalToolResponse(p2) -- line: 140
-	for v40 in p2.askUserByToolCallId do
-		if not p2.submittedToolCallIds[v40] then
+local function hasPendingLocalToolResponse(p2) -- line: 142
+	for v41 in p2.askUserByToolCallId do
+		if not p2.submittedToolCallIds[v41] then
 			return true
 		end
 	end
 
-	for v41 in p2.planByToolCallId do
-		if not p2.submittedToolCallIds[v41] then
+	for v42 in p2.planByToolCallId do
+		if not p2.submittedToolCallIds[v42] then
 			return true
 		end
 	end
 
 	return false
 end
-local function trimMessage(s2: string) -- line: 154
+local function trimMessage(s2: string) -- line: 156
 	return string.gsub(s2, "^%s*(.-)%s*$", "%1")
 end
-local function refreshVersionHistoryAfterPublish(n1: number?) -- line: 158
+local function refreshVersionHistoryAfterPublish(n1: number?) -- line: 160
 	-- upvalues: PlaceVersionHistory (copy)
 	if n1 == nil then
 		return
@@ -82,10 +83,10 @@ local function refreshVersionHistoryAfterPublish(n1: number?) -- line: 158
 
 	PlaceVersionHistory.getPlaceVersionHistoryStore().fetchHistory(n1)
 end
-local function scheduleComposerAutoFocus(t4: {[any]: any}, p3: ((...any) -> ...any)) -- line: 165
+local function scheduleComposerAutoFocus(t4: {[any]: any}, p3: ((...any) -> ...any)) -- line: 167
 	local n2 = 8
 
-	local function tryFocus() -- line: 167
+	local function tryFocus() -- line: 169
 		-- upvalues: p3 (copy), t4 (copy), n2 (ref), tryFocus (copy)
 		if p3() then
 			return
@@ -108,11 +109,11 @@ local function scheduleComposerAutoFocus(t4: {[any]: any}, p3: ((...any) -> ...a
 
 	task.defer(tryFocus)
 end
-local function getResumeSessionKey(p4) -- line: 184
-	local v49 = p4.getCasSessionId()
+local function getResumeSessionKey(p4) -- line: 186
+	local v50 = p4.getCasSessionId()
 
-	if typeof(v49) == "string" and v49 ~= "" then
-		return v49
+	if typeof(v50) == "string" and v50 ~= "" then
+		return v50
 	end
 
 	local universeId = p4.universeId
@@ -124,221 +125,221 @@ local function getResumeSessionKey(p4) -- line: 184
 
 	return nil
 end
-local function useChatSessionCore(t5: {[any]: any}) -- line: 197
-	-- upvalues: React (copy), CreatorAgentChat (copy), v28 (copy), Signals (copy), SignalsReact (copy), v25 (copy), v26 (copy), v27 (copy), parseSessionStream (copy), hasPendingLocalToolResponse (copy), PlaceVersionHistory (copy), ReactUtils (copy), useChatScroll (copy), GetPlaytestLoadingStore (copy), MessageBusService (copy), MessageId (copy), AppLifecycleObserverService (copy), creatorAgentChat (copy), UniverseCreate (copy), getDefaultTemplatePlaceId (copy), debug (copy), UniverseConfiguration (copy), CHAT_CREATE_UNIVERSE_ERROR (copy), launchPlaytestWithLoadingState (copy)
-	local v53, v54 = React.useState(nil)
-	local v55, v56 = React.useState(nil)
+local function useChatSessionCore(t5: {[any]: any}) -- line: 199
+	-- upvalues: React (copy), CreatorAgentChat (copy), v29 (copy), Signals (copy), SignalsReact (copy), v26 (copy), v27 (copy), v28 (copy), parseSessionStream (copy), hasPendingLocalToolResponse (copy), PlaceVersionHistory (copy), ReactUtils (copy), useChatScroll (copy), GetPlaytestLoadingStore (copy), MessageBusService (copy), MessageId (copy), AppLifecycleObserverService (copy), FFlagBuildExperienceToolResultFailureRecovery (copy), creatorAgentChat (copy), UniverseCreate (copy), getDefaultTemplatePlaceId (copy), debug (copy), UniverseConfiguration (copy), CHAT_CREATE_UNIVERSE_ERROR (copy), launchPlaytestWithLoadingState (copy)
+	local v54, v55 = React.useState(nil)
+	local v56, v57 = React.useState(nil)
 	local placeId = t5.placeId
 	local universeId = t5.universeId
 	local sessionId = t5.sessionId
 
-	if v53 ~= nil then
-		placeId = v53.placeId
-		universeId = v53.universeId
-		sessionId = v53.sessionId
+	if v54 ~= nil then
+		placeId = v54.placeId
+		universeId = v54.universeId
+		sessionId = v54.sessionId
 	end
 
-	if (sessionId == nil or sessionId == "") and v55 ~= nil and v55.universeId == universeId and v55.placeId == placeId then
-		sessionId = v55.sessionId
+	if (sessionId == nil or sessionId == "") and v56 ~= nil and v56.universeId == universeId and v56.placeId == placeId then
+		sessionId = v56.sessionId
 	end
 
-	local v60 = t5.hydrateHistoryWhen == nil or t5.hydrateHistoryWhen
-	local v61 = CreatorAgentChat.getCreatorAgentChatStore()
-	local v62 = React.useMemo(function() -- line: 219
-		-- upvalues: universeId (ref), v61 (copy), placeId (ref), sessionId (ref)
+	local v61 = t5.hydrateHistoryWhen == nil or t5.hydrateHistoryWhen
+	local v62 = CreatorAgentChat.getCreatorAgentChatStore()
+	local v63 = React.useMemo(function() -- line: 221
+		-- upvalues: universeId (ref), v62 (copy), placeId (ref), sessionId (ref)
 		if universeId == nil then
 			return nil
 		end
 
-		return v61.getSessionForProject(universeId, placeId, sessionId)
+		return v62.getSessionForProject(universeId, placeId, sessionId)
 	end, {
 		universeId,
 		placeId,
 		sessionId,
-		v61
+		v62
 	})
 
-	React.useLayoutEffect(function() -- line: 226
-		-- upvalues: v62 (copy), sessionId (ref)
-		if v62 == nil or (sessionId == nil or sessionId == "") then
+	React.useLayoutEffect(function() -- line: 228
+		-- upvalues: v63 (copy), sessionId (ref)
+		if v63 == nil or (sessionId == nil or sessionId == "") then
 			return
 		end
 
-		v62.setCasSessionId(sessionId)
+		v63.setCasSessionId(sessionId)
 	end, {
-		v62,
+		v63,
 		sessionId
 	})
 
-	local v63 = React.useMemo(function() -- line: 233
-		-- upvalues: v62 (copy), v28 (copy), Signals (copy)
-		if v62 == nil then
-			return v28
+	local v64 = React.useMemo(function() -- line: 235
+		-- upvalues: v63 (copy), v29 (copy), Signals (copy)
+		if v63 == nil then
+			return v29
 		end
 
-		return (Signals.createComputed(function(p5) -- line: 238
-			-- upvalues: v62 (copy)
+		return (Signals.createComputed(function(p5) -- line: 240
+			-- upvalues: v63 (copy)
 			return {
-				session = v62,
-				sessionId = v62.getCasSessionId(),
-				events = v62.getMergedHistory(p5)
+				session = v63,
+				sessionId = v63.getCasSessionId(),
+				events = v63.getMergedHistory(p5)
 			}
 		end))
-	end, { v62 })
-	local v64 = SignalsReact.useSignalState(v63)
-	local v65 = if v62 == nil then nil else v62.getCasSessionId()
-	local v66 = if v62 ~= v64.session or v65 ~= v64.sessionId then {} else v64.events
-	local v67, v68 = React.useState(nil)
-	local v69, v70 = React.useState(nil)
+	end, { v63 })
+	local v65 = SignalsReact.useSignalState(v64)
+	local v66 = if v63 == nil then nil else v63.getCasSessionId()
+	local v67 = if v63 ~= v65.session or v66 ~= v65.sessionId then {} else v65.events
+	local v68, v69 = React.useState(nil)
+	local v70, v71 = React.useState(nil)
 
-	React.useEffect(function() -- line: 268
-		-- upvalues: v70 (copy)
-		v70(nil)
+	React.useEffect(function() -- line: 270
+		-- upvalues: v71 (copy)
+		v71(nil)
 	end, {
-		v62,
+		v63,
 		sessionId
 	})
 
-	local v71 = sessionId
-	local v72 = if not (v69 ~= nil and (v62 == v69.session and (v71 == nil or (v71 == "" or (v71 == v69.sessionId or v69.sessionId == nil and v71 == v69.session.getCasSessionId()))))) then nil else v69
-	local v73, v74 = React.useState(nil)
-	local v75 = React.useRef(nil)
+	local v72 = sessionId
+	local v73 = if not (v70 ~= nil and (v63 == v70.session and (v72 == nil or (v72 == "" or (v72 == v70.sessionId or v70.sessionId == nil and v72 == v70.session.getCasSessionId()))))) then nil else v70
+	local v74, v75 = React.useState(nil)
 	local v76 = React.useRef(nil)
-	local v77 = React.useRef(0)
-	local v78 = React.useRef(nil)
-	local v79 = React.useCallback(function(p6, p7) -- line: 283
-		-- upvalues: v75 (copy), v76 (copy), v74 (copy)
+	local v77 = React.useRef(nil)
+	local v78 = React.useRef(0)
+	local v79 = React.useRef(nil)
+	local v80 = React.useCallback(function(p6, p7) -- line: 285
+		-- upvalues: v76 (copy), v77 (copy), v75 (copy)
 		assert(p6 == nil or p7 ~= nil, "Active turns require an owning session")
-		v75.current = p6
-		v76.current = if p6 == nil then nil else {
+		v76.current = p6
+		v77.current = if p6 == nil then nil else {
 			session = p7,
 			sessionId = p7.getCasSessionId()
 		}
-		v74(p6)
-	end, { v74 })
-	local current = v76.current
-	local v81 = sessionId
-	local v82 = if not (current ~= nil and (v62 == current.session and (v81 == nil or (v81 == "" or (v81 == current.sessionId or current.sessionId == nil and v81 == current.session.getCasSessionId()))))) then nil else v73
+		v75(p6)
+	end, { v75 })
+	local current = v77.current
+	local v82 = sessionId
+	local v83 = if not (current ~= nil and (v63 == current.session and (v82 == nil or (v82 == "" or (v82 == current.sessionId or current.sessionId == nil and v82 == current.session.getCasSessionId()))))) then nil else v74
 
-	React.useLayoutEffect(function() -- line: 300
-		-- upvalues: v73 (copy), v76 (copy), v62 (copy), sessionId (ref), v77 (copy), v78 (copy), v79 (copy), v68 (copy), v70 (copy)
-		if v73 ~= nil then
-			local current2 = v76.current
-			local v125 = v62
-			local v126 = sessionId
+	React.useLayoutEffect(function() -- line: 302
+		-- upvalues: v74 (copy), v77 (copy), v63 (copy), sessionId (ref), v78 (copy), v79 (copy), v80 (copy), v69 (copy), v71 (copy)
+		if v74 ~= nil then
+			local current2 = v77.current
+			local v127 = v63
+			local v128 = sessionId
 
-			if not (current2 ~= nil and (v125 == current2.session and (v126 == nil or (v126 == "" or (v126 == current2.sessionId or current2.sessionId == nil and v126 == current2.session.getCasSessionId()))))) then
-				local v127 = v77
+			if not (current2 ~= nil and (v127 == current2.session and (v128 == nil or (v128 == "" or (v128 == current2.sessionId or current2.sessionId == nil and v128 == current2.session.getCasSessionId()))))) then
+				local v129 = v78
 
-				v127.current = v127.current + 1
-				v78.current = nil
-				v73.detach()
-				v79(nil, nil)
-				v68(nil)
-				v70(nil)
+				v129.current = v129.current + 1
+				v79.current = nil
+				v74.detach()
+				v80(nil, nil)
+				v69(nil)
+				v71(nil)
 
 				return
 			end
 		end
 	end, {
-		v62,
+		v63,
 		sessionId,
-		v73,
-		v79
+		v74,
+		v80
 	})
 
-	local v83 = if v82 == nil then v25 else v82.getOptimisticLocalTools
-	local v84 = if v82 == nil then v26 else v82.getLocalToolActions
-	local v85 = if v82 == nil then v27 else v82.getSetupErrorText
-	local v86 = SignalsReact.useSignalState(v83)
+	local v84 = if v83 == nil then v26 else v83.getOptimisticLocalTools
+	local v85 = if v83 == nil then v27 else v83.getLocalToolActions
+	local v86 = if v83 == nil then v28 else v83.getSetupErrorText
 	local v87 = SignalsReact.useSignalState(v84)
 	local v88 = SignalsReact.useSignalState(v85)
-	local v89 = React.useMemo(function() -- line: 328
-		-- upvalues: v82 (copy), v88 (copy)
-		if v82 == nil then
+	local v89 = SignalsReact.useSignalState(v86)
+	local v90 = React.useMemo(function() -- line: 330
+		-- upvalues: v83 (copy), v89 (copy)
+		if v83 == nil then
 			return nil
 		end
 
 		return {
-			setupErrorText = v88
+			setupErrorText = v89
 		}
 	end, {
-		v82,
-		v88
+		v83,
+		v89
 	})
-	local v90 = React.useMemo(function() -- line: 336
-		-- upvalues: parseSessionStream (copy), v66 (copy), v62 (copy), sessionId (ref), universeId (ref), placeId (ref), v86 (copy), v67 (copy), v89 (copy), v72 (copy)
-		return parseSessionStream(v66, {
-			sessionId = if v62 == nil then sessionId else v62.getCasSessionId() or sessionId,
-			universeId = if v62 == nil then universeId else v62.universeId,
-			placeId = if v62 == nil then placeId else v62.placeId,
-			optimisticLocalTools = v86,
-			pendingUserMessage = if v67 == nil then nil else v67.text,
-			pendingUserMessageAfterSequenceId = if v67 == nil then nil else v67.afterSequenceId,
-			liveAssistantMessage = v89,
-			optimisticCancelledStartSequenceId = if v72 == nil then nil else v72.startSequenceId
+	local v91 = React.useMemo(function() -- line: 338
+		-- upvalues: parseSessionStream (copy), v67 (copy), v63 (copy), sessionId (ref), universeId (ref), placeId (ref), v87 (copy), v68 (copy), v90 (copy), v73 (copy)
+		return parseSessionStream(v67, {
+			sessionId = if v63 == nil then sessionId else v63.getCasSessionId() or sessionId,
+			universeId = if v63 == nil then universeId else v63.universeId,
+			placeId = if v63 == nil then placeId else v63.placeId,
+			optimisticLocalTools = v87,
+			pendingUserMessage = if v68 == nil then nil else v68.text,
+			pendingUserMessageAfterSequenceId = if v68 == nil then nil else v68.afterSequenceId,
+			liveAssistantMessage = v90,
+			optimisticCancelledStartSequenceId = if v73 == nil then nil else v73.startSequenceId
 		})
 	end, {
-		v66,
-		v62,
+		v67,
+		v63,
 		sessionId,
 		universeId,
 		placeId,
-		v86,
-		v67,
-		v89,
-		v72
+		v87,
+		v68,
+		v90,
+		v73
 	})
-	local messages = v90.messages
-	local subagentTaskState = v90.subagentTaskState
-	local includesPublishTool = v90.includesPublishTool
-	local v94 = messages[#messages]
-	local v95 = v82 ~= nil or v94 ~= nil and (v94.kind == "assistant_turn" and not v94.isDone)
-	local v96 = v95 and hasPendingLocalToolResponse(v86)
-	local activeTurnState = v90.activeTurnState
+	local messages = v91.messages
+	local subagentTaskState = v91.subagentTaskState
+	local includesPublishTool = v91.includesPublishTool
+	local v95 = messages[#messages]
+	local v96 = v83 ~= nil or v95 ~= nil and (v95.kind == "assistant_turn" and not v95.isDone)
+	local v97 = v96 and hasPendingLocalToolResponse(v87)
+	local activeTurnState = v91.activeTurnState
 
-	React.useEffect(function() -- line: 379
-		-- upvalues: v82 (copy), activeTurnState (copy)
-		if v82 == nil or activeTurnState == nil then
+	React.useEffect(function() -- line: 381
+		-- upvalues: v83 (copy), activeTurnState (copy)
+		if v83 == nil or activeTurnState == nil then
 			return
 		end
 
-		v82.syncFromTurnState(activeTurnState)
+		v83.syncFromTurnState(activeTurnState)
 	end, {
-		v82,
+		v83,
 		activeTurnState
 	})
-	React.useEffect(function() -- line: 386
-		-- upvalues: v90 (copy), placeId (ref), PlaceVersionHistory (copy)
-		if not v90.includesPublishTool then
+	React.useEffect(function() -- line: 388
+		-- upvalues: v91 (copy), placeId (ref), PlaceVersionHistory (copy)
+		if not v91.includesPublishTool then
 			return
 		end
 
-		local v128 = placeId
+		local v130 = placeId
 
-		if v128 == nil then
+		if v130 == nil then
 			return
 		end
 
-		PlaceVersionHistory.getPlaceVersionHistoryStore().fetchHistory(v128)
+		PlaceVersionHistory.getPlaceVersionHistoryStore().fetchHistory(v130)
 	end, {
-		v90.includesPublishTool,
+		v91.includesPublishTool,
 		placeId
 	})
 
-	local v98, v99 = React.useBinding("")
-	local v100, v101 = React.useState(nil)
-	local v102 = React.useRef("")
-	local v103 = React.useRef(nil)
-	local v104 = ReactUtils.useClock()
-	local v105 = useChatScroll()
-	local v106 = React.useCallback(function(n3: number, p8) -- line: 401
+	local v99, v100 = React.useBinding("")
+	local v101, v102 = React.useState(nil)
+	local v103 = React.useRef("")
+	local v104 = React.useRef(nil)
+	local v105 = ReactUtils.useClock()
+	local v106 = useChatScroll()
+	local v107 = React.useCallback(function(n3: number, p8) -- line: 403
 		-- upvalues: GetPlaytestLoadingStore (copy)
 		GetPlaytestLoadingStore().setAgentStatusForPlaceId(n3, p8)
 	end, {})
-	local v107 = React.useCallback(function(p9: ((...any) -> ...any)?) -- line: 405
-		-- upvalues: v105 (copy), v62 (copy)
-		local function v132() -- line: 406
+	local v108 = React.useCallback(function(p9: ((...any) -> ...any)?) -- line: 407
+		-- upvalues: v106 (copy), v63 (copy)
+		local function v134() -- line: 408
 			-- upvalues: p9 (copy)
 			if p9 ~= nil then
 				return p9()
@@ -347,266 +348,297 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 			return false
 		end
 
-		v105.captureDistanceFromBottom()
-		task.spawn(function() -- line: 413
-			-- upvalues: v62 (copy), v132 (copy), v105 (copy), p9 (copy)
-			if v62 == nil then
+		v106.captureDistanceFromBottom()
+		task.spawn(function() -- line: 415
+			-- upvalues: v63 (copy), v134 (copy), v106 (copy), p9 (copy)
+			if v63 == nil then
 				return
 			end
 
-			if v62.loadOlderHistory(v132) and v62.getNextHistoryPageToken() ~= nil and v105.isAtTopRef.current then
-				task.delay(0.1, function() -- line: 419
-					-- upvalues: p9 (copy), v105 (copy), v62 (copy), v132 (copy)
+			if v63.loadOlderHistory(v134) and v63.getNextHistoryPageToken() ~= nil and v106.isAtTopRef.current then
+				task.delay(0.1, function() -- line: 421
+					-- upvalues: p9 (copy), v106 (copy), v63 (copy), v134 (copy)
 					if p9 ~= nil and p9() then
 						return
 					end
 
-					if v105.isViewportUnderfilled() then
-						v62.loadOlderHistory(v132)
+					if v106.isViewportUnderfilled() then
+						v63.loadOlderHistory(v134)
 					end
 				end)
 			end
 		end)
 	end, {
-		v62,
-		v105
+		v63,
+		v106
 	})
-	local v108 = React.useCallback(function(p10: ((...any) -> ...any)) -- line: 431
-		-- upvalues: v62 (copy), v105 (copy), v107 (copy)
-		task.delay(0.1, function() -- line: 432
-			-- upvalues: p10 (copy), v62 (copy), v105 (copy), v107 (copy)
+	local v109 = React.useCallback(function(p10: ((...any) -> ...any)) -- line: 433
+		-- upvalues: v63 (copy), v106 (copy), v108 (copy)
+		task.delay(0.1, function() -- line: 434
+			-- upvalues: p10 (copy), v63 (copy), v106 (copy), v108 (copy)
 			if p10() then
 				return
 			end
 
-			if v62 == nil then
+			if v63 == nil then
 				return
 			end
 
-			if v62.getNextHistoryPageToken() == nil then
+			if v63.getNextHistoryPageToken() == nil then
 				return
 			end
 
-			if not v105.isViewportUnderfilled() then
+			if not v106.isViewportUnderfilled() then
 				return
 			end
 
-			v107(p10)
+			v108(p10)
 		end)
-	end, {
-		v107,
-		v105,
-		v62
-	})
-	local v109 = React.useCallback(function(p11: ((...any) -> ...any)) -- line: 450
-		-- upvalues: v62 (copy), v108 (copy)
-		if v62 == nil then
-			return
-		end
-
-		if v62.getNextHistoryPageToken() == nil then
-			return
-		end
-
-		v108(p11)
 	end, {
 		v108,
-		v62
+		v106,
+		v63
 	})
-	local v110 = React.useRef(v109)
-
-	v110.current = v109
-	React.useEffect(function() -- line: 462
-		-- upvalues: v105 (copy), v107 (copy)
-		v105.setOnScrolledToTop(function() -- line: 463
-			-- upvalues: v107 (copy)
-			v107(nil)
-		end)
-
-		return function() -- line: 466
-			-- upvalues: v105 (copy)
-			v105.setOnScrolledToTop(nil)
-		end
-	end, {
-		v105.setOnScrolledToTop,
-		v107
-	})
-	React.useEffect(function() -- line: 471
-		-- upvalues: v60 (copy), v62 (copy), sessionId (ref), v110 (copy), universeId (ref), v61 (copy), v56 (copy), placeId (ref)
-		if not v60 or v62 == nil then
+	local v110 = React.useCallback(function(p11: ((...any) -> ...any)) -- line: 452
+		-- upvalues: v63 (copy), v109 (copy)
+		if v63 == nil then
 			return
 		end
 
-		local u135 = false
-		local v136 = sessionId
+		if v63.getNextHistoryPageToken() == nil then
+			return
+		end
 
-		local function isHydrateCancelled() -- line: 478
-			-- upvalues: u135 (ref), v136 (copy), v62 (copy)
-			if u135 then
+		v109(p11)
+	end, {
+		v109,
+		v63
+	})
+	local v111 = React.useRef(v110)
+
+	v111.current = v110
+	React.useEffect(function() -- line: 464
+		-- upvalues: v106 (copy), v108 (copy)
+		v106.setOnScrolledToTop(function() -- line: 465
+			-- upvalues: v108 (copy)
+			v108(nil)
+		end)
+
+		return function() -- line: 468
+			-- upvalues: v106 (copy)
+			v106.setOnScrolledToTop(nil)
+		end
+	end, {
+		v106.setOnScrolledToTop,
+		v108
+	})
+	React.useEffect(function() -- line: 473
+		-- upvalues: v61 (copy), v63 (copy), sessionId (ref), v111 (copy), universeId (ref), v62 (copy), v57 (copy), placeId (ref)
+		if not v61 or v63 == nil then
+			return
+		end
+
+		local u137 = false
+		local v138 = sessionId
+
+		local function isHydrateCancelled() -- line: 480
+			-- upvalues: u137 (ref), v138 (copy), v63 (copy)
+			if u137 then
 				return true
 			end
 
-			if v136 ~= nil and v136 ~= "" then
-				return v62.getCasSessionId() ~= v136
+			if v138 ~= nil and v138 ~= "" then
+				return v63.getCasSessionId() ~= v138
 			end
 
 			return false
 		end
-		local function continueAfterSessionReady() -- line: 487
-			-- upvalues: u135 (ref), v136 (copy), v62 (copy), v110 (copy), isHydrateCancelled (copy)
-			if not not u135 or v136 ~= nil and (v136 ~= "" and v62.getCasSessionId() ~= v136) then
+		local function continueAfterSessionReady() -- line: 489
+			-- upvalues: u137 (ref), v138 (copy), v63 (copy), v111 (copy), isHydrateCancelled (copy)
+			if not not u137 or v138 ~= nil and (v138 ~= "" and v63.getCasSessionId() ~= v138) then
 				return
 			end
 
-			v110.current(isHydrateCancelled)
+			v111.current(isHydrateCancelled)
 		end
-		local function hydrateKnownSession(s3: string) -- line: 494
-			-- upvalues: v62 (copy), u135 (ref), v136 (copy), v110 (copy), isHydrateCancelled (copy)
-			v62.setCasSessionId(s3)
+		local function hydrateKnownSession(s3: string) -- line: 496
+			-- upvalues: v63 (copy), u137 (ref), v138 (copy), v111 (copy), isHydrateCancelled (copy)
+			v63.setCasSessionId(s3)
 
-			if v62.hasLoadedHistory() and #v62.getMergedHistory(false) > 0 then
-				if not not u135 or v136 ~= nil and (v136 ~= "" and v62.getCasSessionId() ~= v136) then
+			if v63.hasLoadedHistory() and #v63.getMergedHistory(false) > 0 then
+				if not not u137 or v138 ~= nil and (v138 ~= "" and v63.getCasSessionId() ~= v138) then
 					return
 				end
 
-				v110.current(isHydrateCancelled)
+				v111.current(isHydrateCancelled)
 
 				return
 			end
 
-			if v62.refreshSession(isHydrateCancelled) and (not u135 and (v136 == nil or (v136 == "" or v62.getCasSessionId() == v136))) then
-				if not not u135 or v136 ~= nil and (v136 ~= "" and v62.getCasSessionId() ~= v136) then
+			if v63.refreshSession(isHydrateCancelled) and (not u137 and (v138 == nil or (v138 == "" or v63.getCasSessionId() == v138))) then
+				if not not u137 or v138 ~= nil and (v138 ~= "" and v63.getCasSessionId() ~= v138) then
 					return
 				end
 
-				v110.current(isHydrateCancelled)
+				v111.current(isHydrateCancelled)
 			end
 		end
 
-		task.spawn(function() -- line: 505
-			-- upvalues: sessionId (ref), hydrateKnownSession (copy), universeId (ref), v62 (copy), v61 (copy), u135 (ref), v136 (copy), v56 (copy), placeId (ref)
+		task.spawn(function() -- line: 507
+			-- upvalues: sessionId (ref), hydrateKnownSession (copy), universeId (ref), v63 (copy), v62 (copy), u137 (ref), v138 (copy), v57 (copy), placeId (ref)
 			if sessionId ~= nil and sessionId ~= "" then
 				hydrateKnownSession(sessionId)
 
 				return
 			end
 
-			if universeId == nil or universeId == 0 or v62.hasLoadedHistory() and #v62.getMergedHistory(false) > 0 then
+			if universeId == nil or universeId == 0 or v63.hasLoadedHistory() and #v63.getMergedHistory(false) > 0 then
 				return
 			end
 
-			local v196 = v61.sessionFindByUniverse({
+			local v199 = v62.sessionFindByUniverse({
 				sort = "desc",
 				universeId = universeId
 			})
 
-			while v196.state(false).status == "pending" and (not u135 and (v136 == nil or (v136 == "" or v62.getCasSessionId() == v136))) do
+			while v199.state(false).status == "pending" and (not u137 and (v138 == nil or (v138 == "" or v63.getCasSessionId() == v138))) do
 				task.wait()
 			end
 
-			if u135 or v136 ~= nil and (v136 ~= "" and v62.getCasSessionId() ~= v136) or v196.state(false).status ~= "succeeded" then
+			if u137 or v138 ~= nil and (v138 ~= "" and v63.getCasSessionId() ~= v138) or v199.state(false).status ~= "succeeded" then
 				return
 			end
 
-			local result = v196.state(false).result
-			local v198 = if result == nil then nil else result.sessions
-			local v199 = if typeof(v198) ~= "table" then nil else v198[1]
-			local v200 = if typeof(v199) ~= "table" then nil else v199.sessionId
+			local result = v199.state(false).result
+			local v201 = if result == nil then nil else result.sessions
+			local v202 = if typeof(v201) ~= "table" then nil else v201[1]
+			local v203 = if typeof(v202) ~= "table" then nil else v202.sessionId
 
-			if typeof(v200) ~= "string" or v200 == "" then
-				v62.markHistoryLoaded()
+			if typeof(v203) ~= "string" or v203 == "" then
+				v63.markHistoryLoaded()
 
 				return
 			end
 
-			v56({
+			v57({
 				universeId = universeId,
 				placeId = placeId,
-				sessionId = v200
+				sessionId = v203
 			})
 		end)
 
-		return function() -- line: 546
-			-- upvalues: u135 (ref)
-			u135 = true
+		return function() -- line: 548
+			-- upvalues: u137 (ref)
+			u137 = true
 		end
 	end, {
-		v62,
+		v63,
 		sessionId,
 		universeId,
 		placeId,
-		v61,
-		v60
+		v62,
+		v61
 	})
-	React.useEffect(function() -- line: 551
-		-- upvalues: v62 (copy), sessionId (ref), v110 (copy), MessageBusService (copy), MessageId (copy), AppLifecycleObserverService (copy)
-		if v62 == nil then
+	React.useEffect(function() -- line: 553
+		-- upvalues: v63 (copy), sessionId (ref), v111 (copy), MessageBusService (copy), MessageId (copy), AppLifecycleObserverService (copy)
+		if v63 == nil then
 			return
 		end
 
-		local u140 = false
+		local u142 = false
 
-		local function refreshKnownSession() -- line: 556
-			-- upvalues: v62 (copy), sessionId (ref), u140 (ref), v110 (copy)
-			local v201 = v62.getCasSessionId()
+		local function refreshKnownSession() -- line: 558
+			-- upvalues: v63 (copy), sessionId (ref), u142 (ref), v111 (copy)
+			local v204 = v63.getCasSessionId()
 
-			if (v201 == nil or v201 == "") and (sessionId ~= nil and sessionId ~= "") then
-				v201 = sessionId
+			if (v204 == nil or v204 == "") and (sessionId ~= nil and sessionId ~= "") then
+				v204 = sessionId
 			end
 
-			if v201 == nil or v201 == "" then
+			if v204 == nil or v204 == "" then
 				return
 			end
 
-			task.spawn(function() -- line: 564
-				-- upvalues: v62 (copy), u140 (ref), v110 (copy)
-				if v62.refreshSession(function() -- line: 565
-					-- upvalues: u140 (ref)
-					return u140
-				end) and not u140 then
-					v110.current(function() -- line: 568
-						-- upvalues: u140 (ref)
-						return u140
+			task.spawn(function() -- line: 566
+				-- upvalues: v63 (copy), u142 (ref), v111 (copy)
+				if v63.refreshSession(function() -- line: 567
+					-- upvalues: u142 (ref)
+					return u142
+				end) and not u142 then
+					v111.current(function() -- line: 570
+						-- upvalues: u142 (ref)
+						return u142
 					end)
 				end
 			end)
 		end
 
-		local v142 = MessageBusService:Subscribe(MessageId, function(_) -- line: 575
+		local v144 = MessageBusService:Subscribe(MessageId, function(_) -- line: 577
 			-- upvalues: refreshKnownSession (copy)
 			refreshKnownSession()
 		end, false, true)
 		local connection = AppLifecycleObserverService.OnUnhide:Connect(refreshKnownSession)
 
-		return function() -- line: 580
-			-- upvalues: u140 (ref), v142 (copy), connection (copy)
-			u140 = true
-			v142:Disconnect()
+		return function() -- line: 582
+			-- upvalues: u142 (ref), v144 (copy), connection (copy)
+			u142 = true
+			v144:Disconnect()
 			connection:Disconnect()
 		end
 	end, {
-		v62,
+		v63,
 		sessionId
 	})
 
-	local v111 = React.useCallback(function(s4: string) -- line: 587
-		-- upvalues: v102 (copy), v99 (copy), v101 (copy)
-		v102.current = s4
-		v99(s4)
-		v101(nil)
+	local v112 = React.useCallback(function(s4: string) -- line: 589
+		-- upvalues: v103 (copy), v100 (copy), v102 (copy)
+		v103.current = s4
+		v100(s4)
+		v102(nil)
 	end, {
-		v99,
-		v101
+		v100,
+		v102
 	})
-	local v112 = React.useCallback(function(n4: number, p13, s5: string?, p14) -- line: 594
-		-- upvalues: v77 (copy), v79 (copy), v78 (copy), v68 (copy), t5 (copy), v106 (copy), v111 (copy), v101 (copy), creatorAgentChat (copy), v105 (copy), sessionId (ref), v54 (copy)
-		if n4 ~= v77.current then
+	local u113 = nil
+
+	if FFlagBuildExperienceToolResultFailureRecovery then
+		u113 = React.useCallback(function(n4: number) -- line: 597
+			-- upvalues: v78 (copy), v77 (copy), v63 (copy), sessionId (ref), v103 (copy), v112 (copy), v102 (copy), creatorAgentChat (copy)
+			return function(s5: string?, n5: number?) -- line: 598
+				-- upvalues: v78 (copy), n4 (copy), v77 (copy), v63 (copy), sessionId (ref), v103 (copy), v112 (copy), v102 (copy), creatorAgentChat (copy)
+				if v78.current == n4 then
+					local current3 = v77.current
+					local v209 = v63
+					local v210 = sessionId
+
+					if current3 ~= nil and (v209 == current3.session and (v210 == nil or (v210 == "" or (v210 == current3.sessionId or current3.sessionId == nil and v210 == current3.session.getCasSessionId())))) then
+						if s5 ~= nil and v103.current == "" then
+							v112(s5)
+						end
+
+						v102(creatorAgentChat.getToolResultFailureComposerError(n5))
+
+						return
+					end
+				end
+			end
+		end, {
+			v63,
+			sessionId,
+			v112,
+			v102
+		})
+	end
+
+	local v114 = React.useCallback(function(n6: number, p13, s6: string?, p14) -- line: 614
+		-- upvalues: v78 (copy), v80 (copy), v79 (copy), v69 (copy), t5 (copy), v107 (copy), v112 (copy), v102 (copy), creatorAgentChat (copy), v106 (copy), sessionId (ref), v55 (copy)
+		if n6 ~= v78.current then
 			return
 		end
 
-		v79(nil)
-		v78.current = nil
-		v68(nil)
+		v80(nil)
+		v79.current = nil
+		v69(nil)
 
 		if p13 ~= nil then
 			if t5.onPromptFailure ~= nil then
@@ -614,19 +646,19 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 			end
 
 			if p14.placeId ~= nil then
-				v106(p14.placeId, "Idle")
+				v107(p14.placeId, "Idle")
 			end
 
-			if s5 ~= nil then
-				v111(s5)
-				v101(creatorAgentChat.getPromptFailureComposerError(p13))
+			if s6 ~= nil then
+				v112(s6)
+				v102(creatorAgentChat.getPromptFailureComposerError(p13))
 			end
 
-			task.spawn(function() -- line: 621
-				-- upvalues: p14 (copy), v77 (copy), n4 (copy)
-				p14.refreshSession(function() -- line: 622
-					-- upvalues: v77 (copy), n4 (copy)
-					return v77.current ~= n4
+			task.spawn(function() -- line: 641
+				-- upvalues: p14 (copy), v78 (copy), n6 (copy)
+				p14.refreshSession(function() -- line: 642
+					-- upvalues: v78 (copy), n6 (copy)
+					return v78.current ~= n6
 				end)
 			end)
 
@@ -634,33 +666,33 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 		end
 
 		if p14.placeId ~= nil then
-			v106(p14.placeId, "Completed")
+			v107(p14.placeId, "Completed")
 		end
 
-		v105.scrollToBottomAfterSend()
+		v106.scrollToBottomAfterSend()
 
-		local v149 = p14.getCasSessionId()
+		local v152 = p14.getCasSessionId()
 
-		if v149 ~= nil and v149 ~= "" then
+		if v152 ~= nil and v152 ~= "" then
 			if t5.createUniverseOnFirstPrompt and sessionId == nil and p14.universeId ~= nil then
 				local t6 = {
 					universeId = p14.universeId,
 					placeId = p14.placeId,
-					sessionId = v149
+					sessionId = v152
 				}
 
-				v54(t6)
+				v55(t6)
 
 				if t5.onProjectResolved ~= nil then
 					t5.onProjectResolved(t6)
 				end
 			end
 
-			task.spawn(function() -- line: 650
-				-- upvalues: p14 (copy), v77 (copy), n4 (copy)
-				p14.refreshSession(function() -- line: 651
-					-- upvalues: v77 (copy), n4 (copy)
-					return v77.current ~= n4
+			task.spawn(function() -- line: 670
+				-- upvalues: p14 (copy), v78 (copy), n6 (copy)
+				p14.refreshSession(function() -- line: 671
+					-- upvalues: v78 (copy), n6 (copy)
+					return v78.current ~= n6
 				end)
 			end)
 		end
@@ -669,174 +701,176 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 		t5.onPromptFailure,
 		t5.onProjectResolved,
 		sessionId,
+		v107,
+		v55,
 		v106,
-		v54,
-		v105,
-		v111,
-		v101,
-		v79,
-		v68
+		v112,
+		v102,
+		v80,
+		v69
 	})
-	local v113 = React.useRef(v60)
+	local v115 = React.useRef(v61)
 
-	React.useEffect(function() -- line: 674
-		-- upvalues: v60 (copy), v113 (copy), v95 (copy), v82 (copy), v105 (copy)
-		local v151 = v60 and not v113.current
+	React.useEffect(function() -- line: 694
+		-- upvalues: v61 (copy), v115 (copy), v96 (copy), v83 (copy), v106 (copy)
+		local v154 = v61 and not v115.current
 
-		v113.current = v60
+		v115.current = v61
 
-		if not v60 then
+		if not v61 then
 			return
 		end
 
-		if not v151 and not v95 and v82 == nil then
+		if not v154 and not v96 and v83 == nil then
 			return
 		end
 
-		v105.scrollToBottomUnconditionally()
-		task.defer(v105.scrollToBottomUnconditionally)
-		task.delay(0.15, v105.scrollToBottomUnconditionally)
+		v106.scrollToBottomUnconditionally()
+		task.defer(v106.scrollToBottomUnconditionally)
+		task.delay(0.15, v106.scrollToBottomUnconditionally)
 	end, {
-		v60,
-		v95,
-		v82,
+		v61,
+		v96,
+		v83,
 		#messages,
-		v105
+		v106
 	})
-	React.useEffect(function() -- line: 700
-		-- upvalues: v75 (copy), v76 (copy), v62 (copy), sessionId (ref), v72 (copy), v77 (copy), v78 (copy), placeId (ref), v106 (copy), creatorAgentChat (copy), v112 (copy), v79 (copy), v105 (copy), v90 (copy), v82 (copy), v61 (copy), v95 (copy)
-		if v75.current ~= nil then
-			local current3 = v76.current
-			local v153 = v62
-			local v154 = sessionId
+	React.useEffect(function() -- line: 720
+		-- upvalues: v76 (copy), v77 (copy), v63 (copy), sessionId (ref), v73 (copy), v78 (copy), v79 (copy), placeId (ref), v107 (copy), creatorAgentChat (copy), v114 (copy), FFlagBuildExperienceToolResultFailureRecovery (copy), u113 (ref), v80 (copy), v106 (copy), v91 (copy), v83 (copy), v62 (copy), v96 (copy)
+		if v76.current ~= nil then
+			local current4 = v77.current
+			local v156 = v63
+			local v157 = sessionId
 
-			if current3 ~= nil and (v153 == current3.session and (v154 == nil or (v154 == "" or (v154 == current3.sessionId or current3.sessionId == nil and v154 == current3.session.getCasSessionId())))) then
+			if current4 ~= nil and (v156 == current4.session and (v157 == nil or (v157 == "" or (v157 == current4.sessionId or current4.sessionId == nil and v157 == current4.session.getCasSessionId())))) then
 				return
 			end
 		end
 
-		if v72 ~= nil then
+		if v73 ~= nil then
 			return
 		end
 
-		if v62 == nil then
+		if v63 == nil then
 			return
 		end
 
-		local v155 = v62
-		local v156 = v155.getCasSessionId()
+		local v158 = v63
+		local v159 = v158.getCasSessionId()
 
-		if typeof(v156) == "string" and v156 ~= "" then
+		if typeof(v159) == "string" and v159 ~= "" then
 		else
-			local universeId2 = v155.universeId
-			local placeId2 = v155.placeId
+			local universeId2 = v158.universeId
+			local placeId2 = v158.placeId
 
-			v156 = if universeId2 == nil or placeId2 == nil then nil else `{ universeId2 }:{ placeId2 }`
+			v159 = if universeId2 == nil or placeId2 == nil then nil else `{ universeId2 }:{ placeId2 }`
 		end
 
-		if v156 == nil then
+		if v159 == nil then
 			return
 		end
 
-		local function attachResumedTurn(p15, n5: number?) -- line: 722
-			-- upvalues: v77 (copy), v78 (copy), placeId (ref), v106 (copy), creatorAgentChat (copy), v62 (copy), v112 (copy), v79 (copy), v105 (copy)
-			local v205 = v77
+		local function attachResumedTurn(p15, n7: number?) -- line: 742
+			-- upvalues: v78 (copy), v79 (copy), placeId (ref), v107 (copy), creatorAgentChat (copy), v63 (copy), v114 (copy), FFlagBuildExperienceToolResultFailureRecovery (copy), u113 (ref), v80 (copy), v106 (copy)
+			local v213 = v78
 
-			v205.current = v205.current + 1
+			v213.current = v213.current + 1
 
-			local current4 = v77.current
+			local current5 = v78.current
 
-			v78.current = n5
+			v79.current = n7
 
 			if placeId ~= nil then
-				v106(placeId, "Loading")
+				v107(placeId, "Loading")
 			end
 
-			local v207 = creatorAgentChat.createResumedAssistantTurn(v62, p15, function(p16) -- line: 732
-				-- upvalues: v112 (copy), current4 (copy), v62 (copy)
-				v112(current4, p16, nil, v62)
-			end, if n5 == nil then nil else n5 - 1)
+			local v215 = creatorAgentChat.createResumedAssistantTurn(v63, p15, function(p16) -- line: 752
+				-- upvalues: v114 (copy), current5 (copy), v63 (copy)
+				v114(current5, p16, nil, v63)
+			end, if n7 == nil then nil else n7 - 1, if not FFlagBuildExperienceToolResultFailureRecovery then nil else u113(current5))
 
-			v79(v207, v62)
-			v207.start()
-			v105.scrollToBottomUnconditionally()
+			v80(v215, v63)
+			v215.start()
+			v106.scrollToBottomUnconditionally()
 		end
 
-		if v90.activeTurnState ~= nil and v90.activeTurnItemIndex ~= nil and not v90.activeTurnState.isDone then
-			local activeTurnStartSequenceId = v90.activeTurnStartSequenceId
+		if v91.activeTurnState ~= nil and v91.activeTurnItemIndex ~= nil and not v91.activeTurnState.isDone then
+			local activeTurnStartSequenceId = v91.activeTurnStartSequenceId
 
-			if activeTurnStartSequenceId == v78.current and v82 ~= nil then
+			if activeTurnStartSequenceId == v79.current and v83 ~= nil then
 				return
 			end
 
-			local v161 = v61.resumeTurnFromHistory(v156, v90.activeTurnState, v90.activeTurnSequenceIds)
+			local v164 = v62.resumeTurnFromHistory(v159, v91.activeTurnState, v91.activeTurnSequenceIds)
 
-			if v161 ~= nil then
-				attachResumedTurn(v161, activeTurnStartSequenceId)
+			if v164 ~= nil then
+				attachResumedTurn(v164, activeTurnStartSequenceId)
 			end
 
 			return
 		end
 
-		v78.current = nil
+		v79.current = nil
 
-		local v162 = v61.getActiveTurnHandle(v156)
-		local v163 = if v162 == nil then nil else v162.state(false)
-		local v164 = v162 ~= nil and (v163 ~= nil and not v163.isDone)
+		local v165 = v62.getActiveTurnHandle(v159)
+		local v166 = if v165 == nil then nil else v165.state(false)
+		local v167 = v165 ~= nil and (v166 ~= nil and not v166.isDone)
 
-		if not v95 and not v164 then
+		if not v96 and not v167 then
 			return
 		end
 
-		if v164 then
-			attachResumedTurn(v162, nil)
+		if v167 then
+			attachResumedTurn(v165, nil)
 		end
 	end, {
-		v90,
-		v62,
+		v91,
+		v63,
 		sessionId,
-		v61,
-		v95,
-		v82,
+		v62,
+		v96,
+		v83,
 		placeId,
+		v107,
+		v114,
 		v106,
-		v112,
-		v105,
-		v79,
-		v72
+		v80,
+		v73,
+		u113
 	})
 
-	local v114 = React.useCallback(function(p17, s6: string, n6: number, n7: number?) -- line: 794
-		-- upvalues: v68 (copy), creatorAgentChat (copy), v112 (copy), v106 (copy), v79 (copy), v105 (copy)
-		v68({
-			text = s6,
-			afterSequenceId = n7
-		})
-
-		local v169 = creatorAgentChat.createLiveAssistantTurn(p17, s6, function(p18) -- line: 801
-			-- upvalues: v112 (copy), n6 (copy), s6 (copy), p17 (copy)
-			v112(n6, p18, s6, p17)
-		end)
-
-		if p17.placeId ~= nil then
-			v106(p17.placeId, "Loading")
-		end
-
-		v79(v169, p17)
-		v105.scrollToBottomAfterSend()
-		v169.start()
-	end, {
-		v112,
-		v106,
-		v105,
-		v79,
-		v68
-	})
-	local v115 = React.useCallback(function(s7: string, n8: number, n9: number?) -- line: 823
-		-- upvalues: v68 (copy), UniverseCreate (copy), getDefaultTemplatePlaceId (copy), debug (copy), v77 (copy), UniverseConfiguration (copy), v54 (copy), t5 (copy), v61 (copy), sessionId (ref), v114 (copy), v79 (copy), v111 (copy), v101 (copy), CHAT_CREATE_UNIVERSE_ERROR (copy)
-		v68({
+	local v116 = React.useCallback(function(p17, s7: string, n8: number, n9: number?) -- line: 818
+		-- upvalues: v69 (copy), creatorAgentChat (copy), v114 (copy), FFlagBuildExperienceToolResultFailureRecovery (copy), u113 (ref), v107 (copy), v80 (copy), v106 (copy)
+		v69({
 			text = s7,
 			afterSequenceId = n9
+		})
+
+		local v172 = creatorAgentChat.createLiveAssistantTurn(p17, s7, function(p18) -- line: 825
+			-- upvalues: v114 (copy), n8 (copy), s7 (copy), p17 (copy)
+			v114(n8, p18, s7, p17)
+		end, if not FFlagBuildExperienceToolResultFailureRecovery then nil else u113(n8))
+
+		if p17.placeId ~= nil then
+			v107(p17.placeId, "Loading")
+		end
+
+		v80(v172, p17)
+		v106.scrollToBottomAfterSend()
+		v172.start()
+	end, {
+		v114,
+		v107,
+		v106,
+		v80,
+		v69,
+		u113
+	})
+	local v117 = React.useCallback(function(s8: string, n10: number, n11: number?) -- line: 851
+		-- upvalues: v69 (copy), UniverseCreate (copy), getDefaultTemplatePlaceId (copy), debug (copy), v78 (copy), UniverseConfiguration (copy), v55 (copy), t5 (copy), v62 (copy), sessionId (ref), v116 (copy), v80 (copy), v112 (copy), v102 (copy), CHAT_CREATE_UNIVERSE_ERROR (copy)
+		v69({
+			text = s8,
+			afterSequenceId = n11
 		})
 
 		local elapsed = os.clock()
@@ -844,28 +878,28 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 		UniverseCreate.getUniverseCreateStore().createUniverse({
 			isPublish = true,
 			templatePlaceId = getDefaultTemplatePlaceId()
-		}):andThen(function(p19) -- line: 831
-			-- upvalues: debug (copy), elapsed (copy), v77 (copy), n8 (copy), UniverseConfiguration (copy), v54 (copy), t5 (copy), v61 (copy), sessionId (ref), v114 (copy), s7 (copy), n9 (copy)
+		}):andThen(function(p19) -- line: 859
+			-- upvalues: debug (copy), elapsed (copy), v78 (copy), n10 (copy), UniverseConfiguration (copy), v55 (copy), t5 (copy), v62 (copy), sessionId (ref), v116 (copy), s8 (copy), n11 (copy)
 			debug.log("info", "build_experience create_universe succeeded", {
 				durationMs = math.floor((os.clock() - elapsed) * 1000 + 0.5),
 				universeId = p19.universeId,
 				rootPlaceId = p19.rootPlaceId
 			})
 
-			if v77.current ~= n8 then
+			if v78.current ~= n10 then
 				return nil
 			end
 
-			local v210 = UniverseConfiguration.getUniverseConfigurationStore()
+			local v218 = UniverseConfiguration.getUniverseConfigurationStore()
 
-			return v210.patchConfiguration(p19.universeId, {
+			return v218.patchConfiguration(p19.universeId, {
 				audiences = { 1 }
-			}):andThen(function() -- line: 846
-				-- upvalues: v210 (copy), p19 (copy)
-				return v210.setTeamCreate(p19.universeId, true)
-			end):andThen(function() -- line: 849
-				-- upvalues: v77 (copy), n8 (copy), p19 (copy), v54 (copy), t5 (copy), v61 (copy), sessionId (ref), v114 (copy), s7 (copy), n9 (copy)
-				if v77.current ~= n8 then
+			}):andThen(function() -- line: 874
+				-- upvalues: v218 (copy), p19 (copy)
+				return v218.setTeamCreate(p19.universeId, true)
+			end):andThen(function() -- line: 877
+				-- upvalues: v78 (copy), n10 (copy), p19 (copy), v55 (copy), t5 (copy), v62 (copy), sessionId (ref), v116 (copy), s8 (copy), n11 (copy)
+				if v78.current ~= n10 then
 					return nil
 				end
 
@@ -874,70 +908,70 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 					placeId = p19.rootPlaceId
 				}
 
-				v54(t7)
+				v55(t7)
 
 				if t5.onProjectResolved ~= nil then
 					t5.onProjectResolved(t7)
 				end
 
-				local v215 = v61.getSessionForProject(p19.universeId, p19.rootPlaceId, sessionId)
+				local v223 = v62.getSessionForProject(p19.universeId, p19.rootPlaceId, sessionId)
 
-				v114(v215, s7, n8, n9)
+				v116(v223, s8, n10, n11)
 
 				return nil
 			end)
-		end):catch(function(p20) -- line: 872
-			-- upvalues: debug (copy), elapsed (copy), v77 (copy), n8 (copy), v79 (copy), v68 (copy), v111 (copy), s7 (copy), v101 (copy), CHAT_CREATE_UNIVERSE_ERROR (copy)
+		end):catch(function(p20) -- line: 900
+			-- upvalues: debug (copy), elapsed (copy), v78 (copy), n10 (copy), v80 (copy), v69 (copy), v112 (copy), s8 (copy), v102 (copy), CHAT_CREATE_UNIVERSE_ERROR (copy)
 			debug.log("warn", "build_experience create_or_configure_universe failed", {
 				durationMs = math.floor((os.clock() - elapsed) * 1000 + 0.5),
 				error = p20
 			})
 
-			if v77.current ~= n8 then
+			if v78.current ~= n10 then
 				return
 			end
 
-			v79(nil)
-			v68(nil)
-			v111(s7)
-			v101(CHAT_CREATE_UNIVERSE_ERROR)
+			v80(nil)
+			v69(nil)
+			v112(s8)
+			v102(CHAT_CREATE_UNIVERSE_ERROR)
 		end)
 	end, {
 		sessionId,
-		v61,
+		v62,
 		t5.onProjectResolved,
-		v79,
-		v111,
-		v101,
-		v54,
-		v68,
-		v114
+		v80,
+		v112,
+		v102,
+		v55,
+		v69,
+		v116
 	})
-	local v116 = React.useCallback(function() -- line: 900
-		-- upvalues: v102 (copy), v111 (copy), v95 (copy), v76 (copy), v62 (copy), sessionId (ref), v75 (copy), v103 (copy), v105 (copy), t5 (copy), universeId (ref), v77 (copy), v70 (copy), v115 (copy), v90 (copy), v114 (copy)
-		local current5 = v102.current
-		local v175 = string.gsub(current5, "^%s*(.-)%s*$", "%1")
+	local v118 = React.useCallback(function() -- line: 928
+		-- upvalues: v103 (copy), v112 (copy), v96 (copy), v77 (copy), v63 (copy), sessionId (ref), v76 (copy), v104 (copy), v106 (copy), t5 (copy), universeId (ref), v78 (copy), v71 (copy), v117 (copy), v91 (copy), v116 (copy)
+		local current6 = v103.current
+		local v178 = string.gsub(current6, "^%s*(.-)%s*$", "%1")
 
-		if v175 == "" then
-			v111("")
+		if v178 == "" then
+			v112("")
 
 			return false
 		end
 
-		if v95 then
-			local current6 = v76.current
-			local v177 = v62
-			local v178 = sessionId
-			local v179 = if not (current6 ~= nil and (v177 == current6.session and (v178 == nil or (v178 == "" or (v178 == current6.sessionId or current6.sessionId == nil and v178 == current6.session.getCasSessionId()))))) then nil else v75.current
+		if v96 then
+			local current7 = v77.current
+			local v180 = v63
+			local v181 = sessionId
+			local v182 = if not (current7 ~= nil and (v180 == current7.session and (v181 == nil or (v181 == "" or (v181 == current7.sessionId or current7.sessionId == nil and v181 == current7.session.getCasSessionId()))))) then nil else v76.current
 
-			if v179 ~= nil and v179.trySubmitComposerText(v175) then
-				v111("")
+			if v182 ~= nil and v182.trySubmitComposerText(v178) then
+				v112("")
 
-				if v103.current then
-					v103.current.releaseFocus()
+				if v104.current then
+					v104.current.releaseFocus()
 				end
 
-				v105.scrollToBottomAfterSend()
+				v106.scrollToBottomAfterSend()
 
 				return true
 			end
@@ -945,161 +979,161 @@ local function useChatSessionCore(t5: {[any]: any}) -- line: 197
 			return false
 		end
 
-		local v180 = t5.createUniverseOnFirstPrompt == true and universeId == nil
+		local v183 = t5.createUniverseOnFirstPrompt == true and universeId == nil
 
-		if not v180 and v62 == nil then
+		if not v183 and v63 == nil then
 			return false
 		end
 
-		v105.captureStickToBottomForSend()
+		v106.captureStickToBottomForSend()
 
-		local v181 = v77
+		local v184 = v78
 
-		v181.current = v181.current + 1
+		v184.current = v184.current + 1
 
-		local current7 = v77.current
+		local current8 = v78.current
 
-		v70(nil)
-		v111("")
+		v71(nil)
+		v112("")
 
-		if v103.current then
-			v103.current.releaseFocus()
+		if v104.current then
+			v104.current.releaseFocus()
 		end
 
-		if v180 then
-			v115(v175, current7, v90.latestSequenceId)
+		if v183 then
+			v117(v178, current8, v91.latestSequenceId)
 		else
-			v114(v62, v175, current7, v90.latestSequenceId)
+			v116(v63, v178, current8, v91.latestSequenceId)
 		end
 
 		return true
 	end, {
-		v62,
+		v63,
 		sessionId,
 		universeId,
-		v95,
-		v105,
-		v111,
-		v115,
-		v114,
+		v96,
+		v106,
+		v112,
+		v117,
+		v116,
 		t5.createUniverseOnFirstPrompt,
-		v70,
-		v90
+		v71,
+		v91
 	})
-	local v117 = React.useCallback(function() -- line: 957
-		-- upvalues: v76 (copy), v62 (copy), sessionId (ref), v75 (copy), v77 (copy), v79 (copy), v78 (copy), v68 (copy), v70 (copy), v90 (copy), placeId (ref), v106 (copy)
-		local current8 = v76.current
-		local v184 = v62
-		local v185 = sessionId
-		local v186 = if not (current8 ~= nil and (v184 == current8.session and (v185 == nil or (v185 == "" or (v185 == current8.sessionId or current8.sessionId == nil and v185 == current8.session.getCasSessionId()))))) then nil else v75.current
+	local v119 = React.useCallback(function() -- line: 985
+		-- upvalues: v77 (copy), v63 (copy), sessionId (ref), v76 (copy), v78 (copy), v80 (copy), v79 (copy), v69 (copy), v71 (copy), v91 (copy), placeId (ref), v107 (copy)
+		local current9 = v77.current
+		local v187 = v63
+		local v188 = sessionId
+		local v189 = if not (current9 ~= nil and (v187 == current9.session and (v188 == nil or (v188 == "" or (v188 == current9.sessionId or current9.sessionId == nil and v188 == current9.session.getCasSessionId()))))) then nil else v76.current
 
-		if v186 == nil then
+		if v189 == nil then
 			return
 		end
 
-		local v187 = v77
+		local v190 = v78
 
-		v187.current = v187.current + 1
-		v186.stop()
-		v79(nil)
-		v78.current = nil
-		v68(nil)
-		v70({
-			session = v62,
-			sessionId = v62.getCasSessionId(),
-			startSequenceId = v90.activeTurnStartSequenceId
+		v190.current = v190.current + 1
+		v189.stop()
+		v80(nil)
+		v79.current = nil
+		v69(nil)
+		v71({
+			session = v63,
+			sessionId = v63.getCasSessionId(),
+			startSequenceId = v91.activeTurnStartSequenceId
 		})
 
 		if placeId ~= nil then
-			v106(placeId, "Idle")
+			v107(placeId, "Idle")
 		end
 	end, {
-		v62,
+		v63,
 		sessionId,
 		placeId,
-		v106,
-		v79,
-		v68,
-		v70,
-		v90
+		v107,
+		v80,
+		v69,
+		v71,
+		v91
 	})
-	local v118 = t5.autoFocusComposer == nil or t5.autoFocusComposer
-	local v119 = if t5.focusComposerWhen ~= nil then t5.focusComposerWhen else v118
+	local v120 = t5.autoFocusComposer == nil or t5.autoFocusComposer
+	local v121 = if t5.focusComposerWhen ~= nil then t5.focusComposerWhen else v120
 
-	React.useEffect(function() -- line: 992
-		-- upvalues: v118 (copy), v119 (copy), v103 (copy)
-		if not v118 or not v119 then
-			return function() -- line: 994
+	React.useEffect(function() -- line: 1020
+		-- upvalues: v120 (copy), v121 (copy), v104 (copy)
+		if not v120 or not v121 then
+			return function() -- line: 1022
 			end
 		end
 
-		local u188 = false
-		local v189 = v103
+		local u191 = false
+		local v192 = v104
 
-		local function v190() -- line: 997
-			-- upvalues: u188 (ref)
-			return u188
+		local function v193() -- line: 1025
+			-- upvalues: u191 (ref)
+			return u191
 		end
 
-		local n10 = 8
+		local n12 = 8
 
-		local function tryFocus() -- line: 167
-			-- upvalues: v190 (copy), v189 (copy), n10 (ref), tryFocus (copy)
-			if v190() then
+		local function tryFocus() -- line: 169
+			-- upvalues: v193 (copy), v192 (copy), n12 (ref), tryFocus (copy)
+			if v193() then
 				return
 			end
 
-			local current9 = v189.current
+			local current10 = v192.current
 
-			if current9 then
-				current9.focus()
+			if current10 then
+				current10.focus()
 
 				return
 			end
 
-			n10 -= 1
+			n12 -= 1
 
-			if n10 > 0 then
+			if n12 > 0 then
 				task.delay(0, tryFocus)
 			end
 		end
 
 		task.defer(tryFocus)
 
-		return function() -- line: 1000
-			-- upvalues: u188 (ref)
-			u188 = true
+		return function() -- line: 1028
+			-- upvalues: u191 (ref)
+			u191 = true
 		end
 	end, {
-		v118,
-		v119
+		v120,
+		v121
 	})
 
-	local v120 = React.useCallback(function(s8: string) -- line: 1005
+	local v122 = React.useCallback(function(s9: string) -- line: 1033
 		-- upvalues: placeId (ref), launchPlaytestWithLoadingState (copy)
 		if placeId == nil then
 			return
 		end
 
-		launchPlaytestWithLoadingState(placeId, s8, true)
+		launchPlaytestWithLoadingState(placeId, s9, true)
 	end, { placeId })
 
 	return {
 		messages = messages,
-		localToolActions = v87,
-		composerText = v98,
-		composerErrorText = v100,
-		setComposerText = v111,
-		isAssistantResponding = v95,
-		canStopAssistantResponse = v82 ~= nil,
-		canSendWhileResponding = v96,
-		sendMessage = v116,
-		stopAssistantResponse = v117,
-		setScrollingFrame = v105.setScrollingFrame,
-		textBoxRef = v103,
-		clockBinding = v104,
+		localToolActions = v88,
+		composerText = v99,
+		composerErrorText = v101,
+		setComposerText = v112,
+		isAssistantResponding = v96,
+		canStopAssistantResponse = v83 ~= nil,
+		canSendWhileResponding = v97,
+		sendMessage = v118,
+		stopAssistantResponse = v119,
+		setScrollingFrame = v106.setScrollingFrame,
+		textBoxRef = v104,
+		clockBinding = v105,
 		playtestPlaceId = placeId,
-		launchPlaytest = if placeId == nil then nil else v120,
+		launchPlaytest = if placeId == nil then nil else v122,
 		hasPublishedTurn = includesPublishTool,
 		subagentTaskState = subagentTaskState
 	}

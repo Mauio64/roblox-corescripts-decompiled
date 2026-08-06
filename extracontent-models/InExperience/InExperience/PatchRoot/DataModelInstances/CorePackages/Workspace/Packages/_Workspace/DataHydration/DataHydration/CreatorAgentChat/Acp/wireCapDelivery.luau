@@ -12,17 +12,17 @@ local n1 = 0
 local u9 = nil
 local n2 = 0
 
-local function isConnectionState(p1) -- line: 29
+local function isConnectionState(p1) -- line: 28
 	return typeof(p1) == "EnumItem" and p1.EnumType == Enum.ConnectionState
 end
-local function previewString(s1: string) -- line: 33
+local function previewString(s1: string) -- line: 32
 	if #s1 <= 4000 then
 		return s1
 	end
 
 	return string.sub(s1, 1, 4000) .. "…"
 end
-local function summarizeDetail(p2, p3) -- line: 40
+local function summarizeDetail(p2, p3) -- line: 39
 	if typeof(p2) == "string" then
 		return {
 			shape = "string",
@@ -54,7 +54,7 @@ local function summarizeDetail(p2, p3) -- line: 40
 		detailType = p3
 	}
 end
-local function extractRawFrame(p4) -- line: 70
+local function extractRawFrame(p4) -- line: 69
 	if typeof(p4) == "string" then
 		return p4
 	end
@@ -79,14 +79,14 @@ local function extractRawFrame(p4) -- line: 70
 
 	return nil
 end
-local function extractRtnSequenceNumber(p5) -- line: 86
+local function extractRtnSequenceNumber(p5) -- line: 85
 	if typeof(p5) ~= "table" then
 		return nil
 	end
 
 	return p5.sequence_number
 end
-local function describeParsedFrame(p6) -- line: 93
+local function describeParsedFrame(p6) -- line: 92
 	if typeof(p6) ~= "table" then
 		return {
 			kind = "unknown"
@@ -132,7 +132,7 @@ local function describeParsedFrame(p6) -- line: 93
 		kind = p6.kind
 	}
 end
-local function onCapConnectionState(p7, p8, p9) -- line: 129
+local function onCapConnectionState(p7, p8, p9) -- line: 128
 	-- upvalues: debug (copy), AcpProtocol (copy)
 	debug.log("info", "CAP RTN connection state", {
 		namespace = AcpProtocol.CapRtnNamespace,
@@ -141,7 +141,7 @@ local function onCapConnectionState(p7, p8, p9) -- line: 129
 		seqByNamespace = p9
 	})
 end
-local function onSignalRConnectionState(p10, p11, p12) -- line: 138
+local function onSignalRConnectionState(p10, p11, p12) -- line: 137
 	-- upvalues: AcpProtocol (copy), debug (copy)
 	local v45 = if typeof(p12) ~= "table" then nil else p12[AcpProtocol.CapRtnNamespace]
 
@@ -152,7 +152,7 @@ local function onSignalRConnectionState(p10, p11, p12) -- line: 138
 		capSequenceNumber = v45
 	})
 end
-local function onCapEvent(p13, p14, p15) -- line: 152
+local function onCapEvent(p13, p14, p15) -- line: 151
 	-- upvalues: n2 (ref), debug (copy), AcpProtocol (copy), summarizeDetail (copy), extractRawFrame (copy), parseFrame (copy), describeParsedFrame (copy)
 	n2 += 1
 
@@ -218,7 +218,7 @@ local function onCapEvent(p13, p14, p15) -- line: 152
 
 	local sessionId = v52.sessionId
 
-	local function logTurnSnapshot(s2: string) -- line: 211
+	local function logTurnSnapshot(s2: string) -- line: 210
 		-- upvalues: sessionId (copy), p13 (copy), debug (copy), v49 (copy)
 		if typeof(sessionId) ~= "string" then
 			return
@@ -240,7 +240,7 @@ local function onCapEvent(p13, p14, p15) -- line: 152
 		logTurnSnapshot(`CAP turn state after { v52.sessionUpdate }`)
 	end
 end
-local function onNamespaceSignal(p16, p17, p18, p19) -- line: 230
+local function onNamespaceSignal(p16, p17, p18, p19) -- line: 229
 	-- upvalues: debug (copy), AcpProtocol (copy), onCapEvent (copy)
 	if typeof(p17) == "EnumItem" and p17.EnumType == Enum.ConnectionState then
 		debug.log("info", "CAP RTN connection state", {
@@ -255,13 +255,13 @@ local function onNamespaceSignal(p16, p17, p18, p19) -- line: 230
 
 	onCapEvent(p16, p17, p18)
 end
-local function ensureReceiver() -- line: 239
+local function ensureReceiver() -- line: 238
 	-- upvalues: u7 (ref), RealtimeDelivery (copy), NotificationService (copy)
 	if u7 == nil then
 		u7 = RealtimeDelivery.RobloxEventReceiver.new(NotificationService)
 	end
 end
-local function subscribeCapNamespace(p20) -- line: 245
+local function subscribeCapNamespace(p20) -- line: 244
 	-- upvalues: AcpProtocol (copy), debug (copy), u7 (ref), onCapEvent (copy), onSignalRConnectionState (copy)
 	local CapRtnNamespace = AcpProtocol.CapRtnNamespace
 
@@ -270,7 +270,7 @@ local function subscribeCapNamespace(p20) -- line: 245
 		namespace = CapRtnNamespace
 	})
 
-	local v61 = u7:observeEvent(CapRtnNamespace, function(p21, p22, p23) -- line: 252
+	local v61 = u7:observeEvent(CapRtnNamespace, function(p21, p22, p23) -- line: 251
 		-- upvalues: p20 (copy), debug (copy), AcpProtocol (copy), onCapEvent (copy)
 		local v69 = p20
 
@@ -287,20 +287,20 @@ local function subscribeCapNamespace(p20) -- line: 245
 
 		onCapEvent(v69, p21, p22)
 	end)
-	local v62 = u7:observeEvent("signalR", function(p24, p25, p26) -- line: 258
+	local v62 = u7:observeEvent("signalR", function(p24, p25, p26) -- line: 257
 		-- upvalues: onSignalRConnectionState (copy)
 		if typeof(p24) == "EnumItem" and p24.EnumType == Enum.ConnectionState then
 			onSignalRConnectionState(p24, p25, p26)
 		end
 	end)
 
-	return function() -- line: 265
+	return function() -- line: 264
 		-- upvalues: v61 (copy), v62 (copy)
 		v61:Disconnect()
 		v62:Disconnect()
 	end
 end
-local function wireCapDelivery(p27) -- line: 271
+local function wireCapDelivery(p27) -- line: 270
 	-- upvalues: u7 (ref), RealtimeDelivery (copy), NotificationService (copy), n1 (ref), u9 (ref), n2 (ref), subscribeCapNamespace (copy), debug (copy), AcpProtocol (copy)
 	if u7 == nil then
 		u7 = RealtimeDelivery.RobloxEventReceiver.new(NotificationService)
@@ -316,7 +316,7 @@ local function wireCapDelivery(p27) -- line: 271
 		})
 	end
 
-	return function() -- line: 283
+	return function() -- line: 282
 		-- upvalues: n1 (ref), u9 (ref), debug (copy), AcpProtocol (copy), n2 (ref)
 		n1 -= 1
 

@@ -1,20 +1,18 @@
 local Parent = script:FindFirstAncestor("GameCollections").Parent
 local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
 local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(Parent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
-local FFlagLuaAppFixCustomTileBugs = require(Parent.SharedFlags).FFlagLuaAppFixCustomTileBugs
 local React = require(Parent.React)
 local EmphasisGameTile = require(Parent.GameTile).EmphasisGameTile
 
 require(Parent.VideoUtils)
 
-local v7 = React.memo(function(t1: {[any]: any}) -- line: 52
-	-- upvalues: React (copy), EmphasisGameTile (copy), FFlagLuaAppFixCustomTileBugs (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy)
+local v6 = React.memo(function(t1: {[any]: any}) -- line: 49
+	-- upvalues: React (copy), EmphasisGameTile (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy)
 	return React.createElement(EmphasisGameTile, {
 		size = t1.item.sizeOverride,
 		index = t1.index,
 		layoutOrder = t1.index,
-		selectionOrder = if not FFlagLuaAppFixCustomTileBugs then t1.selectionOrder else nil,
-		SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t1.SelectionOrder,
+		SelectionOrder = t1.SelectionOrder,
 		isDisabled = t1.isDisabled,
 		onSelectionGained = t1.onHoldableFocused,
 		onSelectionLost = t1.onHoldableUnfocused,
@@ -41,7 +39,7 @@ local v7 = React.memo(function(t1: {[any]: any}) -- line: 52
 	})
 end)
 
-return function(t2: {[any]: any}) -- line: 86
-	-- upvalues: React (copy), v7 (copy), GameCollectionItemTypes (copy)
-	return React.createElement(v7, t2), GameCollectionItemTypes.GameCollectionItemType.EmphasisTile
+return function(t2: {[any]: any}) -- line: 82
+	-- upvalues: React (copy), v6 (copy), GameCollectionItemTypes (copy)
+	return React.createElement(v6, t2), GameCollectionItemTypes.GameCollectionItemType.EmphasisTile
 end

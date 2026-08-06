@@ -3,7 +3,7 @@ local BuildExperienceParent = BuildExperience.Parent
 local Foundation = require(BuildExperienceParent.Foundation)
 local React = require(BuildExperienceParent.React)
 local UserPickerList = require(BuildExperience.Components.UserPicker.UserPickerList)
-local Sheet = require(BuildExperience.FoundationFork.Sheet)
+local v6 = if not require(BuildExperience.Flags.FFlagBuildExperienceUseFoundationSheet) then require(BuildExperience.FoundationFork.Sheet) else Foundation.Sheet
 local Button = Foundation.Button
 local IconButton = Foundation.IconButton
 local SearchInput = Foundation.SearchInput
@@ -13,7 +13,7 @@ local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
 
 local function PrivateInvitesPickerView(t1: {[any]: any}) -- line: 54
-	-- upvalues: React (copy), View (copy), Button (copy), ButtonVariant (copy), InputSize (copy), Sheet (copy), IconButton (copy), IconName (copy), SearchInput (copy), UserPickerList (copy)
+	-- upvalues: React (copy), View (copy), Button (copy), ButtonVariant (copy), InputSize (copy), v6 (copy), IconButton (copy), IconName (copy), SearchInput (copy), UserPickerList (copy)
 	local v16 = t1.testId or "private-invites-picker"
 	local v17 = React.createElement(View, {
 		tag = "col gap-small size-full-0 auto-y",
@@ -32,14 +32,14 @@ local function PrivateInvitesPickerView(t1: {[any]: any}) -- line: 54
 		})
 	})
 
-	return React.createElement(Sheet.Root, {
+	return React.createElement(v6.Root, {
 		defaultSnapPointIndex = 1,
 		isOpen = t1.isOpen,
 		snapPoints = { 1 },
 		onClose = t1.onClose,
 		testId = v16
 	}, {
-		Header = React.createElement(Sheet.Header, {
+		Header = React.createElement(v6.Header, {
 			hasCloseAffordance = false
 		}, {
 			Back = React.createElement(IconButton, {
@@ -64,7 +64,7 @@ local function PrivateInvitesPickerView(t1: {[any]: any}) -- line: 54
 				})
 			})
 		}),
-		Content = React.createElement(Sheet.Content, {
+		Content = React.createElement(v6.Content, {
 			scrollingFrameRef = t1.scrollingFrameRef
 		}, {
 			List = React.createElement(UserPickerList, {
@@ -78,7 +78,7 @@ local function PrivateInvitesPickerView(t1: {[any]: any}) -- line: 54
 				testId = v16
 			})
 		}),
-		Actions = React.createElement(Sheet.Actions, nil, {
+		Actions = React.createElement(v6.Actions, nil, {
 			Footer = v17
 		})
 	})

@@ -14,6 +14,7 @@ require(Foundation.Components.Types)
 
 local View = require(Foundation.Components.View)
 local useTokens = require(Foundation.Providers.Style.useTokens)
+local useBindable = require(Foundation.Utility.useBindable)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local useComposedRef = require(FoundationParent.ReactUtils).useComposedRef
@@ -26,13 +27,14 @@ local Radius = require(Foundation.Enums.Radius)
 local Flags = require(Foundation.Utility.Flags)
 local BaseMenuItemAccessory = require(script.Parent.BaseMenuItemAccessory)
 local BaseMenuContext = require(script.Parent.BaseMenuContext)
+local BaseMenuScrollContainer = require(script.Parent.BaseMenuScrollContainer)
 local useBaseMenuItemVariants = require(script.Parent.useBaseMenuItemVariants)
 local useMenuItemHover = require(script.Parent.useMenuItemHover)
 local t1 = {
 	isChecked = false
 }
 
-local function resolveAccessory(p1) -- line: 68
+local function resolveAccessory(p1) -- line: 71
 	if p1 == nil then
 		return nil
 	end
@@ -45,7 +47,7 @@ local function resolveAccessory(p1) -- line: 68
 
 	return p1
 end
-local function getInputSinkAll() -- line: 81
+local function getInputSinkAll() -- line: 84
 	-- upvalues: Flags (copy)
 	if not Flags.FoundationGuiObjectInputSinkProperty then
 		return nil
@@ -57,7 +59,7 @@ local function getInputSinkAll() -- line: 81
 		return nil
 	end
 
-	local ok2, result2 = pcall(function() -- line: 91
+	local ok2, result2 = pcall(function() -- line: 94
 		return Enum.InputSink.All
 	end)
 
@@ -68,234 +70,236 @@ local function getInputSinkAll() -- line: 81
 	return nil
 end
 
-local v28 = getInputSinkAll()
+local v30 = getInputSinkAll()
 
-local function getContainerPadding(p2, b1: boolean) -- line: 100
-	local v38 = if not b1 then p2.paddingLeftWithoutCheck else p2.paddingLeftWithCheck
+local function getContainerPadding(p2, b1: boolean) -- line: 103
+	local v40 = if not b1 then p2.paddingLeftWithoutCheck else p2.paddingLeftWithCheck
 
 	return {
-		left = UDim.new(0, v38 or 0),
+		left = UDim.new(0, v40 or 0),
 		right = UDim.new(0, p2.paddingRight or 0)
 	}
 end
-local function BaseMenuItem(p3, p4) -- line: 109
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), BaseMenuContext (copy), Flags (copy), useTokens (copy), useBaseMenuItemVariants (copy), useMenuItemHover (copy), Logger (copy), BuilderIcons (copy), useComposedRef (copy), getContainerPadding (copy), View (copy), Icon (copy), BaseMenuItemAccessory (copy), Text (copy), withCommonProps (copy), Constants (copy), isBuilderOrMigratedIcon (copy), Image (copy), Popover (copy), PopoverSide (copy), PopoverAlign (copy), Radius (copy), v28 (copy)
-	local v41 = withDefaults(p3, t1)
-	local v42 = React.useContext(BaseMenuContext)
-	local v43, v44
+local function BaseMenuItem(p3, p4) -- line: 112
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), BaseMenuContext (copy), Flags (copy), useTokens (copy), useBaseMenuItemVariants (copy), useMenuItemHover (copy), Logger (copy), useBindable (copy), BuilderIcons (copy), useComposedRef (copy), getContainerPadding (copy), View (copy), Icon (copy), BaseMenuItemAccessory (copy), Text (copy), withCommonProps (copy), Constants (copy), isBuilderOrMigratedIcon (copy), Image (copy), BaseMenuScrollContainer (copy), v30 (copy), Popover (copy), PopoverSide (copy), PopoverAlign (copy), Radius (copy)
+	local v43 = withDefaults(p3, t1)
+	local v44 = React.useContext(BaseMenuContext)
+	local v45, v46
 
 	if Flags.FoundationBaseMenuBeta then
-		v43 = if v41.menuHasLeading == nil then v42.hasLeading == true else v41.menuHasLeading
-		v44 = if v41.menuHasCheck == nil then v41.isChecked == true else v41.menuHasCheck
+		v45 = if v43.menuHasLeading == nil then v44.hasLeading == true else v43.menuHasLeading
+		v46 = if v43.menuHasCheck == nil then v43.isChecked == true else v43.menuHasCheck
 	else
-		v43 = v42.hasLeading == true
-		v44 = false
+		v45 = v44.hasLeading == true
+		v46 = false
 	end
 
-	local v45 = useTokens()
-	local v46 = v41.size or v42.size
-	local depth = v42.depth
-	local v48 = v41.children ~= nil
-	local v49 = v48 and v42.hoverOpenPath[depth] == v41.id
-	local v51
-
-	if Flags.FoundationBaseMenuBeta then
-		local v50 = v41.leading or v41.icon
-
-		v51 = if v50 ~= nil then if type(v50) ~= "string" then v50 else {
-			iconName = v50
-		} else nil
-	else
-		v51 = nil
-	end
-
+	local v47 = useTokens()
+	local v48 = v43.size or v44.size
+	local depth = v44.depth
+	local v50 = v43.children ~= nil
+	local v51 = v50 and v44.hoverOpenPath[depth] == v43.id
 	local v53
 
 	if Flags.FoundationBaseMenuBeta then
-		local trailing = v41.trailing
+		local v52 = v43.leading or v43.icon
 
-		v53 = if trailing ~= nil then if type(trailing) ~= "string" then trailing else {
-			iconName = trailing
+		v53 = if v52 ~= nil then if type(v52) ~= "string" then v52 else {
+			iconName = v52
 		} else nil
 	else
 		v53 = nil
 	end
 
-	local v54 = useBaseMenuItemVariants(v45, v46, not v48 and v41.isChecked)
-	local v55 = React.useRef(nil)
-	local v56 = v41.isChecked == true and not v48
-	local v57, v58 = React.useState(false)
-	local v59 = React.useCallback(function() -- line: 138
-		-- upvalues: v58 (copy)
-		v58(true)
-	end, {})
-	local v60 = if not Flags.FoundationBaseMenuBeta then v41.icon ~= nil else v51 ~= nil
+	local v55
 
-	React.useEffect(function() -- line: 143
-		-- upvalues: v60 (copy), v42 (copy)
-		if v60 and v42.setHasLeading then
-			v42.setHasLeading()
+	if Flags.FoundationBaseMenuBeta then
+		local trailing = v43.trailing
+
+		v55 = if trailing ~= nil then if type(trailing) ~= "string" then trailing else {
+			iconName = trailing
+		} else nil
+	else
+		v55 = nil
+	end
+
+	local v56 = Flags.FoundationBaseMenuSubmenuMaxHeight and v44.maxHeight ~= nil
+	local v57 = useBaseMenuItemVariants(v47, v48, not v50 and v43.isChecked, v56)
+	local v58 = React.useRef(nil)
+	local v59 = v43.isChecked == true and not v50
+	local v60, v61 = React.useState(false)
+	local v62 = React.useCallback(function() -- line: 143
+		-- upvalues: v61 (copy)
+		v61(true)
+	end, {})
+	local v63 = if not Flags.FoundationBaseMenuBeta then v43.icon ~= nil else v53 ~= nil
+
+	React.useEffect(function() -- line: 148
+		-- upvalues: v63 (copy), v44 (copy)
+		if v63 and v44.setHasLeading then
+			v44.setHasLeading()
 		end
 	end, {
-		v60,
-		v42.setHasLeading
+		v63,
+		v44.setHasLeading
 	})
 	useMenuItemHover({
-		itemRef = v55,
-		id = v41.id,
+		itemRef = v58,
+		id = v43.id,
 		depth = depth,
-		isSubmenu = v48,
-		isDisabled = v41.isDisabled,
-		hoverOpenAtDepth = v42.hoverOpenAtDepth,
-		hoverCloseAtDepth = v42.hoverCloseAtDepth
+		isSubmenu = v50,
+		isDisabled = v43.isDisabled,
+		hoverOpenAtDepth = v44.hoverOpenAtDepth,
+		hoverCloseAtDepth = v44.hoverCloseAtDepth
 	})
 
-	local v61 = React.useCallback(function() -- line: 160
-		-- upvalues: v48 (copy), v41 (copy), v42 (copy), v49 (copy), depth (copy), Logger (copy)
-		if v48 then
-			if v41.isDisabled then
+	local v64 = React.useCallback(function() -- line: 165
+		-- upvalues: v50 (copy), v43 (copy), v44 (copy), v51 (copy), depth (copy), Logger (copy)
+		if v50 then
+			if v43.isDisabled then
 				return
 			end
 
-			if v42.hoverOpenAtDepth and not v49 then
-				v42.hoverOpenAtDepth(depth, v41.id, true)
+			if v44.hoverOpenAtDepth and not v51 then
+				v44.hoverOpenAtDepth(depth, v43.id, true)
 
 				return
 			end
 		else
-			if v42.hoverReset then
-				v42.hoverReset()
+			if v44.hoverReset then
+				v44.hoverReset()
 			end
 
-			local v76 = if not v41.onActivated then v42.onActivated else v41.onActivated
+			local v82 = if not v43.onActivated then v44.onActivated else v43.onActivated
 
-			if not v76 then
+			if not v82 then
 				Logger:warning("Menu should have either onActivated on itself or on all of its children")
 			else
-				v76(v41.id)
+				v82(v43.id)
 			end
 
-			if depth > 1 and v42.onNestedLeafActivated then
-				v42.onNestedLeafActivated()
+			if depth > 1 and v44.onNestedLeafActivated then
+				v44.onNestedLeafActivated()
 			end
 		end
 	end, {
-		v48,
-		v41.isDisabled,
-		v49,
+		v50,
+		v43.isDisabled,
+		v51,
 		depth,
-		v41.id,
-		v41.onActivated,
-		v42.onActivated,
-		v42.onNestedLeafActivated,
-		v42.hoverOpenAtDepth,
-		v42.hoverReset
+		v43.id,
+		v43.onActivated,
+		v44.onActivated,
+		v44.onNestedLeafActivated,
+		v44.hoverOpenAtDepth,
+		v44.hoverReset
 	})
-	local v62 = React.useCallback(function() -- line: 201
-		-- upvalues: v42 (copy)
-		if v42.hoverReset then
-			v42.hoverReset()
+	local v65 = React.useCallback(function() -- line: 206
+		-- upvalues: v44 (copy)
+		if v44.hoverReset then
+			v44.hoverReset()
 		end
-	end, { v42.hoverReset })
-	local v63 = React.useMemo(function() -- line: 207
-		-- upvalues: v45 (copy)
+	end, { v44.hoverReset })
+	local v66 = useBindable(v44.maxHeight)
+	local v67 = React.useMemo(function() -- line: 214
+		-- upvalues: v47 (copy)
 		return {
-			radius = UDim.new(0, v45.Radius.Small),
-			offset = v45.Size.Size_200,
-			borderWidth = v45.Stroke.Thicker
+			radius = UDim.new(0, v47.Radius.Small),
+			offset = v47.Size.Size_200,
+			borderWidth = v47.Stroke.Thicker
 		}
-	end, { v45 })
-	local v64 = React.useMemo(function() -- line: 215
-		-- upvalues: BuilderIcons (copy), v41 (copy)
-		return BuilderIcons.Migration.uiblox[v41.icon]
-	end, { v41.icon })
-	local v65 = useComposedRef(v55, p4)
-	local v73
+	end, { v47 })
+	local v68 = React.useMemo(function() -- line: 222
+		-- upvalues: BuilderIcons (copy), v43 (copy)
+		return BuilderIcons.Migration.uiblox[v43.icon]
+	end, { v43.icon })
+	local v69 = useComposedRef(v58, p4)
+	local v77
 
 	if Flags.FoundationBaseMenuBeta then
-		local v66 = getContainerPadding(v54.container, v44)
+		local v70 = getContainerPadding(v57.container, v46)
 		local t2 = {
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Padding = UDim.new(0, 0),
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}
-		local v68 = v54.wrapper and v54.wrapper.gap or 0
-		local v69 = nil
+		local v72 = v57.wrapper and v57.wrapper.gap or 0
+		local v73 = nil
 
-		if v44 then
-			v69 = React.createElement(View, {
+		if v46 then
+			v73 = React.createElement(View, {
 				LayoutOrder = 1,
-				tag = `{ v54.slotAlign.tag } { v54.check.tag }`,
-				testId = `{ v41.testId }--check-column`
+				tag = `{ v57.slotAlign.tag } { v57.check.tag }`,
+				testId = `{ v43.testId }--check-column`
 			}, {
-				Check = if not v56 then nil else React.createElement(Icon, {
+				Check = if not v59 then nil else React.createElement(Icon, {
 					name = BuilderIcons.Icon.Check,
-					style = v54.check.style,
-					size = v54.check.size,
-					testId = `{ v41.testId }--checkmark`
+					style = v57.check.style,
+					size = v57.check.size,
+					testId = `{ v43.testId }--checkmark`
 				})
 			})
 		end
 
-		local v70 = nil
+		local v74 = nil
 
-		if v51 ~= nil then
-			v70 = React.createElement(BaseMenuItemAccessory, {
+		if v53 ~= nil then
+			v74 = React.createElement(BaseMenuItemAccessory, {
 				LayoutOrder = 1,
-				accessory = v51,
-				iconVariant = v54.icon,
-				size = v46,
-				tokens = v45,
-				testId = `{ v41.testId }--leading`
+				accessory = v53,
+				iconVariant = v57.icon,
+				size = v48,
+				tokens = v47,
+				testId = `{ v43.testId }--leading`
 			})
-		elseif v43 then
-			v70 = React.createElement(View, {
+		elseif v45 then
+			v74 = React.createElement(View, {
 				LayoutOrder = 1,
-				tag = `{ v54.slotAlign.tag } { v54.icon.tag }`
+				tag = `{ v57.slotAlign.tag } { v57.icon.tag }`
 			})
 		end
 
-		local v71 = React.createElement(Text, {
+		local v75 = React.createElement(Text, {
 			LayoutOrder = 2,
-			Text = v41.text,
-			tag = v54.text.tag
+			Text = v43.text,
+			tag = v57.text.tag
 		})
-		local v72 = nil
+		local v76 = nil
 
-		if v48 then
-			v72 = React.createElement(Icon, {
+		if v50 then
+			v76 = React.createElement(Icon, {
 				LayoutOrder = 3,
 				name = BuilderIcons.Icon.ChevronSmallRight,
-				style = v54.check.style,
-				size = v54.chevron.size,
-				testId = `{ v41.testId }--chevron`
+				style = v57.check.style,
+				size = v57.chevron.size,
+				testId = `{ v43.testId }--chevron`
 			})
-		elseif v53 ~= nil then
-			v72 = React.createElement(BaseMenuItemAccessory, {
+		elseif v55 ~= nil then
+			v76 = React.createElement(BaseMenuItemAccessory, {
 				LayoutOrder = 3,
-				accessory = v53,
-				iconVariant = v54.icon,
-				size = v46,
-				tokens = v45,
-				testId = `{ v41.testId }--trailing`
+				accessory = v55,
+				iconVariant = v57.icon,
+				size = v48,
+				tokens = v47,
+				testId = `{ v43.testId }--trailing`
 			})
 		end
 
-		v73 = React.createElement(View, withCommonProps(v41, {
-			GroupTransparency = if not v41.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-			isDisabled = v41.isDisabled,
-			onActivated = v61,
+		v77 = React.createElement(View, withCommonProps(v43, {
+			GroupTransparency = if not v43.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
+			isDisabled = v43.isDisabled,
+			onActivated = v64,
 			selection = {
-				Selectable = not v41.isDisabled
+				Selectable = not v43.isDisabled
 			},
-			cursor = v63,
-			tag = v54.container.tag,
-			padding = v66,
+			cursor = v67,
+			tag = v57.container.tag,
+			padding = v70,
 			layout = t2,
-			ref = v65
+			ref = v69
 		}), {
-			Check = v69,
+			Check = v73,
 			Wrapper = React.createElement(View, {
 				LayoutOrder = 2,
 				tag = "auto-xy",
@@ -306,78 +310,103 @@ local function BaseMenuItem(p3, p4) -- line: 109
 					FillDirection = Enum.FillDirection.Horizontal,
 					HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
-					Padding = UDim.new(0, v68),
+					Padding = UDim.new(0, v72),
 					SortOrder = Enum.SortOrder.LayoutOrder
 				}
 			}, {
-				Leading = v70,
-				Title = v71,
-				Trailing = v72
+				Leading = v74,
+				Title = v75,
+				Trailing = v76
 			})
 		})
 	else
-		v73 = React.createElement(View, withCommonProps(v41, {
-			GroupTransparency = if not v41.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-			isDisabled = v41.isDisabled,
-			onActivated = v61,
+		v77 = React.createElement(View, withCommonProps(v43, {
+			GroupTransparency = if not v43.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
+			isDisabled = v43.isDisabled,
+			onActivated = v64,
 			selection = {
-				Selectable = not v41.isDisabled
+				Selectable = not v43.isDisabled
 			},
-			cursor = v63,
-			tag = v54.container.tag,
-			ref = v65
+			cursor = v67,
+			tag = v57.container.tag,
+			ref = v69
 		}), {
-			Icon = if not v41.icon and not v43 then nil else if not v41.icon or not isBuilderOrMigratedIcon(v41.icon) then React.createElement(Image, {
+			Icon = if not v43.icon and not v45 then nil else if not v43.icon or not isBuilderOrMigratedIcon(v43.icon) then React.createElement(Image, {
 				LayoutOrder = 1,
-				Image = v41.icon,
-				tag = v54.icon.tag
+				Image = v43.icon,
+				tag = v57.icon.tag
 			}) else React.createElement(View, {
 				LayoutOrder = 1,
-				tag = `align-x-center align-y-center { v54.icon.tag }`
+				tag = `align-x-center align-y-center { v57.icon.tag }`
 			}, {
 				Icon = React.createElement(Icon, {
-					name = if not v64 then v41.icon else v64.name,
-					style = v54.icon.style,
-					size = v54.icon.size
+					name = if not v68 then v43.icon else v68.name,
+					style = v57.icon.style,
+					size = v57.icon.size
 				})
 			}),
 			Text = React.createElement(Text, {
 				LayoutOrder = 2,
-				Text = v41.text,
-				tag = v54.text.tag
+				Text = v43.text,
+				tag = v57.text.tag
 			}),
-			Chevron = if not v48 then nil else React.createElement(Icon, {
+			Chevron = if not v50 then nil else React.createElement(Icon, {
 				LayoutOrder = 3,
 				name = BuilderIcons.Icon.ChevronSmallRight,
-				style = v54.check.style,
-				size = v54.chevron.size,
-				testId = `{ v41.testId }--chevron`
+				style = v57.check.style,
+				size = v57.chevron.size,
+				testId = `{ v43.testId }--chevron`
 			}),
-			Check = if v48 or not v41.isChecked then nil else React.createElement(Icon, {
+			Check = if v50 or not v43.isChecked then nil else React.createElement(Icon, {
 				LayoutOrder = 3,
 				name = BuilderIcons.Icon.Check,
-				style = v54.check.style,
-				size = v54.check.size,
-				testId = `{ v41.testId }--checkmark`
+				style = v57.check.style,
+				size = v57.check.size,
+				testId = `{ v43.testId }--checkmark`
 			})
 		})
 	end
 
-	if not v48 then
-		return v73
+	if not v50 then
+		return v77
 	end
 
-	local Standard = v45.Stroke.Standard
-	local size = v54.groupPadding.size
+	local Standard = v47.Stroke.Standard
+	local size = v57.groupPadding.size
+	local v80 = React.createElement(BaseMenuContext.Provider, {
+		value = {
+			onActivated = v44.onActivated,
+			onNestedLeafActivated = v44.onNestedLeafActivated,
+			size = v48,
+			hasLeading = v60,
+			setHasLeading = v62,
+			hoverOpenPath = v44.hoverOpenPath,
+			hoverOpenAtDepth = v44.hoverOpenAtDepth,
+			hoverCloseAtDepth = v44.hoverCloseAtDepth,
+			hoverReset = v44.hoverReset,
+			depth = depth + 1,
+			maxHeight = v44.maxHeight
+		}
+	}, v43.children)
+	local v81 = if not v56 then React.createElement(View, {
+		tag = v57.submenuContent.tag,
+		InputSink = v30
+	}, v80) else React.createElement(BaseMenuScrollContainer, {
+		maxHeight = v66,
+		scrollViewProps = {
+			tag = v57.submenuContent.tag,
+			InputSink = v30
+		}
+	}, v80)
 
 	return React.createElement(React.Fragment, nil, {
-		Item = v73,
+		Item = v77,
 		Submenu = React.createElement(Popover.Root, {
-			isOpen = v49,
-			testId = `{ v41.testId }--submenu`
+			isOpen = v51,
+			testId = `{ v43.testId }--submenu`
 		}, {
 			Anchor = React.createElement(Popover.Anchor, {
-				anchorRef = v55
+				anchorRef = v58
 			}),
 			Content = React.createElement(Popover.Content, {
 				hasArrow = false,
@@ -389,26 +418,10 @@ local function BaseMenuItem(p3, p4) -- line: 109
 					position = PopoverAlign.Start,
 					offset = -size
 				},
-				onPressedOutside = v62,
-				backgroundStyle = if not Flags.FoundationBaseMenuBeta then v45.Color.Surface.Surface_100 else v45.Color.Surface.Surface_200,
+				onPressedOutside = v65,
+				backgroundStyle = if not Flags.FoundationBaseMenuBeta then v47.Color.Surface.Surface_100 else v47.Color.Surface.Surface_200,
 				radius = Radius.Medium
-			}, React.createElement(View, {
-				tag = v54.submenuContent.tag,
-				InputSink = v28
-			}, React.createElement(BaseMenuContext.Provider, {
-				value = {
-					onActivated = v42.onActivated,
-					onNestedLeafActivated = v42.onNestedLeafActivated,
-					size = v46,
-					hasLeading = v57,
-					setHasLeading = v59,
-					hoverOpenPath = v42.hoverOpenPath,
-					hoverOpenAtDepth = v42.hoverOpenAtDepth,
-					hoverCloseAtDepth = v42.hoverCloseAtDepth,
-					hoverReset = v42.hoverReset,
-					depth = depth + 1
-				}
-			}, v41.children)))
+			}, v81)
 		})
 	})
 end

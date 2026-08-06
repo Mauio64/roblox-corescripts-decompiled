@@ -9,7 +9,7 @@ require(BuildExperience.Chat.chatTypes)
 
 local BUILD_ASSISTANT_FALLBACK_NAME = LocalizationStrings.BUILD_ASSISTANT_FALLBACK_NAME
 
-local function resolveUniverseIdFromSessionLoad(p1) -- line: 38
+local function resolveUniverseIdFromSessionLoad(p1) -- line: 37
 	if p1 == nil then
 		return nil
 	end
@@ -24,10 +24,10 @@ local function resolveUniverseIdFromSessionLoad(p1) -- line: 38
 
 	return nil
 end
-local function gameIconForUniverseId(n1: number) -- line: 51
+local function gameIconForUniverseId(n1: number) -- line: 50
 	return string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", n1)
 end
-local function makeTarget(n2: number?, s1: string?, p2) -- line: 55
+local function makeTarget(n2: number?, s1: string?, p2) -- line: 54
 	-- upvalues: BUILD_ASSISTANT_FALLBACK_NAME (copy)
 	local v20 = n2 or 0
 
@@ -39,7 +39,7 @@ local function makeTarget(n2: number?, s1: string?, p2) -- line: 55
 		gameIcon = if v20 == 0 then nil else string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v20)
 	}
 end
-local function resumeBuildChat(t1: {[any]: any}) -- line: 66
+local function resumeBuildChat(t1: {[any]: any}) -- line: 65
 	-- upvalues: CreatorAgentChat (copy), UniverseConfiguration (copy), Signals (copy), BUILD_ASSISTANT_FALLBACK_NAME (copy), makeTarget (copy)
 	local sessionId = t1.sessionId
 	local v23 = typeof(sessionId) == "string" and sessionId ~= ""
@@ -57,7 +57,7 @@ local function resumeBuildChat(t1: {[any]: any}) -- line: 66
 
 	local configurationStore = t1.configurationStore
 
-	local function getConfigurationStore() -- line: 82
+	local function getConfigurationStore() -- line: 81
 		-- upvalues: configurationStore (ref), UniverseConfiguration (copy)
 		local v29 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
 
@@ -68,7 +68,7 @@ local function resumeBuildChat(t1: {[any]: any}) -- line: 66
 
 	local u28 = false
 
-	return Signals.createEffect(function(p3) -- line: 90
+	return Signals.createEffect(function(p3) -- line: 89
 		-- upvalues: u28 (ref), v24 (copy), t1 (copy), u25 (ref), sessionId (copy), BUILD_ASSISTANT_FALLBACK_NAME (copy), configurationStore (ref), UniverseConfiguration (copy), makeTarget (copy)
 		if u28 then
 			return

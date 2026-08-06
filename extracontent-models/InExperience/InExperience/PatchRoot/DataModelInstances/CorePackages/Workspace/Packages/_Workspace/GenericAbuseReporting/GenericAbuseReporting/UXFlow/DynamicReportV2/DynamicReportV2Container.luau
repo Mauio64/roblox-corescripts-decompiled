@@ -47,30 +47,31 @@ local FFlagAbuseReportMenuV2 = require(GenericAbuseReportingParent.SharedFlags).
 local FFlagAbuseReportConfigProfileUseAttributesPayload = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportConfigProfileUseAttributesPayload
 local FFlagEnableInlineSurveyOnUserReport = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableInlineSurveyOnUserReport
 local FFlagSurvBloxEventTypeEnabled = require(GenericAbuseReportingParent.SharedFlags).FFlagSurvBloxEventTypeEnabled
+local FFlagEnableReportingFlowForMomentsFeed = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForMomentsFeed
 
-local function DynamicReportV2Container(t1: {[any]: any}) -- line: 73
-	-- upvalues: useRoactService (copy), RoactNetworking (copy), React (copy), FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), fetchConfig (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), getNewRunId (copy), TelemetryEventType (copy), useAbuseSheetFlow (copy), useFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), CoreGui (copy), useIsSpatial (copy), v41 (copy), useVrOverlay (copy), Sheet (copy), DialogSize (copy), ArTranslationProvider (copy), AbuseReportAnalyticsProvider (copy), LayoutSlotsProvider (copy), sheetSlots (copy), AbuseReportDialog (copy), DynamicReportV2Loading (copy), DynamicReportV2Error (copy), OverlayProvider (copy)
-	local v50 = useRoactService(RoactNetworking)
-	local v51, v52 = React.useState(nil)
-	local v53, v54 = React.useState(false)
-	local v55, v56 = React.useState(true)
+local function DynamicReportV2Container(t1: {[any]: any}) -- line: 76
+	-- upvalues: useRoactService (copy), RoactNetworking (copy), React (copy), FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), fetchConfig (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), getNewRunId (copy), TelemetryEventType (copy), useAbuseSheetFlow (copy), FFlagEnableReportingFlowForMomentsFeed (copy), useFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), CoreGui (copy), useIsSpatial (copy), v41 (copy), useVrOverlay (copy), Sheet (copy), DialogSize (copy), ArTranslationProvider (copy), AbuseReportAnalyticsProvider (copy), LayoutSlotsProvider (copy), sheetSlots (copy), AbuseReportDialog (copy), DynamicReportV2Loading (copy), DynamicReportV2Error (copy), OverlayProvider (copy)
+	local v51 = useRoactService(RoactNetworking)
+	local v52, v53 = React.useState(nil)
+	local v54, v55 = React.useState(false)
+	local v56, v57 = React.useState(true)
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), v50 (copy), t1 (copy), fetchConfig (copy), v52 (copy), v54 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), getNewRunId (copy), TelemetryEventType (copy);
-		((if not FFlagAbuseReportConfigProfileUseAttributesPayload then fetchConfig(v50, t1.abuseVector, t1.targetId) else fetchConfigWithAttributes(v50, t1.abuseVector, {
+	React.useEffect(function() -- line: 82
+		-- upvalues: FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), v51 (copy), t1 (copy), fetchConfig (copy), v53 (copy), v55 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), getNewRunId (copy), TelemetryEventType (copy);
+		((if not FFlagAbuseReportConfigProfileUseAttributesPayload then fetchConfig(v51, t1.abuseVector, t1.targetId) else fetchConfigWithAttributes(v51, t1.abuseVector, {
 			targetId = t1.targetId
-		}))):andThen(function(p1) -- line: 84
-			-- upvalues: v52 (copy)
-			v52(p1.responseBody)
-		end):catch(function(p2) -- line: 87
-			-- upvalues: v54 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), t1 (copy), getNewRunId (copy), TelemetryEventType (copy)
+		}))):andThen(function(p1) -- line: 87
+			-- upvalues: v53 (copy)
+			v53(p1.responseBody)
+		end):catch(function(p2) -- line: 90
+			-- upvalues: v55 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), t1 (copy), getNewRunId (copy), TelemetryEventType (copy)
 			warn("Failed to fetch Dynamic Report V2 config:", p2)
-			v54(true)
+			v55(true)
 
-			local v114 = nil
+			local v117 = nil
 
 			if FFlagFixAnalyticsForDynamicReportV2 then
-				v114 = Dash.pretty(p2, {
+				v117 = Dash.pretty(p2, {
 					depth = 10,
 					multiline = true
 				})
@@ -85,145 +86,152 @@ local function DynamicReportV2Container(t1: {[any]: any}) -- line: 73
 			}, {
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
-					error_message = if not FFlagFixAnalyticsForDynamicReportV2 then `Failed to fetch config: ${ tostring(p2) }` else `Failed to fetch config: ${ v114 }`
+					error_message = if not FFlagFixAnalyticsForDynamicReportV2 then `Failed to fetch config: ${ tostring(p2) }` else `Failed to fetch config: ${ v117 }`
 				}
 			})
 		end)
 	end, {
-		v50,
+		v51,
 		t1.abuseVector,
 		t1.targetId
 	})
 
-	local v57 = useAbuseSheetFlow(v51, {
+	local v58 = React.useCallback(function(t2: {[any]: any}) -- line: 114
+		-- upvalues: t1 (copy)
+		if t2.didSubmit and t1.onSubmit then
+			t1.onSubmit()
+		end
+	end, { t1.onSubmit })
+	local v59 = useAbuseSheetFlow(v52, {
 		abuseVector = t1.abuseVector,
 		targetId = t1.targetId,
 		onClose = t1.onClose,
-		open = v55
+		onFinish = if not FFlagEnableReportingFlowForMomentsFeed or not t1.onSubmit then nil else v58,
+		open = v56
 	})
 
-	if not v57 and v51 then
-		v53 = true
+	if not v59 and v52 then
+		v54 = true
 	end
 
-	local v58 = React.useCallback(function() -- line: 120
-		-- upvalues: v57 (copy), v56 (copy), t1 (copy)
-		if v57 then
-			v57.onClose()
+	local v60 = React.useCallback(function() -- line: 132
+		-- upvalues: v59 (copy), v57 (copy), t1 (copy)
+		if v59 then
+			v59.onClose()
 		end
 
-		v56(false)
+		v57(false)
 		t1.onClose()
 	end, {
-		v57,
+		v59,
 		t1.onClose
 	})
-	local v59 = useFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, function() -- line: 134
-		-- upvalues: v58 (copy)
-		v58()
+	local v61 = useFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, function() -- line: 146
+		-- upvalues: v60 (copy)
+		v60()
 	end)
-	local v60, v61 = React.useState(true)
-	local v62 = React.useCallback(function(b1: boolean) -- line: 139
-		-- upvalues: v61 (copy)
-		v61(not b1)
+	local v62, v63 = React.useState(true)
+	local v64 = React.useCallback(function(b1: boolean) -- line: 151
+		-- upvalues: v63 (copy)
+		v63(not b1)
 	end, {})
-	local v63 = React.useCallback(function(p3) -- line: 143
-		-- upvalues: v60 (copy), v59 (copy)
-		local v104 = if not v60 then nil else p3
+	local v65 = React.useCallback(function(p3) -- line: 155
+		-- upvalues: v62 (copy), v61 (copy)
+		local v107 = if not v62 then nil else p3
 
-		if typeof(v59) == "function" then
-			v59(v104)
+		if typeof(v61) == "function" then
+			v61(v107)
 
 			return
 		end
 
-		if v59 and typeof(v59) == "table" then
-			v59.current = v104
+		if v61 and typeof(v61) == "table" then
+			v61.current = v107
 		end
 	end, {
-		v60,
-		v59
+		v62,
+		v61
 	})
 	local VRCentralOverlay = CoreGui:FindFirstChild("VRCentralOverlay")
-	local v65 = if not VRCentralOverlay then nil else VRCentralOverlay:FindFirstChild("CentralOverlay_SurfaceGui")
-	local v66 = useIsSpatial()
-	local v67 = if not v41 then v65 else useVrOverlay()
-	local v68 = React.createElement(Sheet.Root, {
+	local v67 = if not VRCentralOverlay then nil else VRCentralOverlay:FindFirstChild("CentralOverlay_SurfaceGui")
+	local v68 = useIsSpatial()
+	local v69 = if not v41 then v67 else useVrOverlay()
+	local v70 = React.createElement(Sheet.Root, {
 		centerSheetHeight = 1,
 		preferCenterSheet = true,
-		isOpen = v55,
-		onClose = v58,
+		isOpen = v56,
+		onClose = v60,
 		snapPoints = { 0.9 },
 		size = DialogSize.Medium,
-		ref = v63
+		ref = v65
 	}, {
-		AbuseReportDialog = if not v51 or (v53 or not v57) then nil else React.createElement(ArTranslationProvider, {
-			translations = v57.config.translations
+		AbuseReportDialog = if not v52 or (v54 or not v59) then nil else React.createElement(ArTranslationProvider, {
+			translations = v59.config.translations
 		}, React.createElement(AbuseReportAnalyticsProvider, {
-			analytics = v57.analytics
+			analytics = v59.analytics
 		}, React.createElement(LayoutSlotsProvider, {
 			slots = sheetSlots
 		}, React.createElement(AbuseReportDialog, {
 			abuseVector = t1.abuseVector,
 			targetId = t1.targetId,
-			onClose = v58,
-			abuseReportFlow = v57,
-			takeoverFocus = v62
+			onClose = v60,
+			abuseReportFlow = v59,
+			takeoverFocus = v64
 		})))),
-		LoadingDialog = if v51 or v53 then nil else React.createElement(DynamicReportV2Loading, nil),
-		ErrorDialog = if not v53 then nil else React.createElement(DynamicReportV2Error, nil)
+		LoadingDialog = if v52 or v54 then nil else React.createElement(DynamicReportV2Loading, nil),
+		ErrorDialog = if not v54 then nil else React.createElement(DynamicReportV2Error, nil)
 	})
 
-	if v41 and v66 and not v67 then
+	if v41 and v68 and not v69 then
 		return nil
 	end
 
 	return React.createElement(OverlayProvider, {
-		gui = v67
+		gui = v69
 	}, {
-		Sheet = v68
+		Sheet = v70
 	})
 end
-local function DynamicReportV2ContainerV2(t2: {[any]: any}) -- line: 221
-	-- upvalues: useRoactService (copy), RoactNetworking (copy), React (copy), FFlagEnableInlineSurveyOnUserReport (copy), FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), fetchConfig (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), getNewRunId (copy), FFlagSurvBloxEventTypeEnabled (copy), SurveyEventPublisher (copy), WebViewEventType (copy), AbuseVector (copy), sendBoundaryErrorTelemetry (copy), useFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), CoreGui (copy), useIsSpatial (copy), v41 (copy), useVrOverlay (copy), Sheet (copy), DialogSize (copy), AbuseReportErrorBoundary (copy), AbuseReportContent (copy), DynamicReportV2Loading (copy), DynamicReportV2Error (copy), OverlayProvider (copy), InlineSurvey (copy), InlineEventType (copy)
-	local v70 = useRoactService(RoactNetworking)
-	local v71, v72 = React.useState(nil)
-	local v73, v74 = React.useState(false)
-	local v75, v76 = React.useState(true)
-	local v77 = nil
-	local u78 = nil
-	local u79 = nil
+local function DynamicReportV2ContainerV2(t3: {[any]: any}) -- line: 233
+	-- upvalues: useRoactService (copy), RoactNetworking (copy), React (copy), FFlagEnableInlineSurveyOnUserReport (copy), FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), fetchConfig (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), getNewRunId (copy), FFlagEnableReportingFlowForMomentsFeed (copy), FFlagSurvBloxEventTypeEnabled (copy), SurveyEventPublisher (copy), WebViewEventType (copy), AbuseVector (copy), sendBoundaryErrorTelemetry (copy), useFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), CoreGui (copy), useIsSpatial (copy), v41 (copy), useVrOverlay (copy), Sheet (copy), DialogSize (copy), AbuseReportErrorBoundary (copy), AbuseReportContent (copy), DynamicReportV2Loading (copy), DynamicReportV2Error (copy), OverlayProvider (copy), InlineSurvey (copy), InlineEventType (copy)
+	local v72 = useRoactService(RoactNetworking)
+	local v73, v74 = React.useState(nil)
+	local v75, v76 = React.useState(false)
+	local v77, v78 = React.useState(true)
+	local v79 = nil
+	local u80 = nil
+	local u81 = nil
 
 	if FFlagEnableInlineSurveyOnUserReport then
-		local v80
+		local v82
 
-		v77, v80 = React.useState(false)
-		u78 = v80
-		u79 = React.useRef(false)
+		v79, v82 = React.useState(false)
+		u80 = v82
+		u81 = React.useRef(false)
 	end
 
-	React.useEffect(function() -- line: 235
-		-- upvalues: FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), v70 (copy), t2 (copy), fetchConfig (copy), v72 (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v74 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), getNewRunId (copy)
-		local u105 = false
+	React.useEffect(function() -- line: 247
+		-- upvalues: FFlagAbuseReportConfigProfileUseAttributesPayload (copy), fetchConfigWithAttributes (copy), v72 (copy), t3 (copy), fetchConfig (copy), v74 (copy), sendAnalyticsEvent (copy), TelemetryEventType (copy), v76 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), getNewRunId (copy)
+		local u108 = false
 		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis;
 
-		((if not FFlagAbuseReportConfigProfileUseAttributesPayload then fetchConfig(v70, t2.abuseVector, t2.targetId) else fetchConfigWithAttributes(v70, t2.abuseVector, {
-			targetId = t2.targetId
-		}))):andThen(function(p4) -- line: 243
-			-- upvalues: u105 (ref), UnixTimestampMillis (copy), v72 (copy), sendAnalyticsEvent (copy), t2 (copy), TelemetryEventType (copy)
-			if u105 then
+		((if not FFlagAbuseReportConfigProfileUseAttributesPayload then fetchConfig(v72, t3.abuseVector, t3.targetId) else fetchConfigWithAttributes(v72, t3.abuseVector, {
+			targetId = t3.targetId
+		}))):andThen(function(p4) -- line: 255
+			-- upvalues: u108 (ref), UnixTimestampMillis (copy), v74 (copy), sendAnalyticsEvent (copy), t3 (copy), TelemetryEventType (copy)
+			if u108 then
 				return
 			end
 
 			local responseBody = p4.responseBody
-			local v117 = DateTime.now().UnixTimestampMillis - UnixTimestampMillis
+			local v120 = DateTime.now().UnixTimestampMillis - UnixTimestampMillis
 
-			v72(responseBody)
+			v74(responseBody)
 			sendAnalyticsEvent({
 				run_id = "unknown",
 				total_duration = 0,
-				abuse_vector = t2.abuseVector,
-				target_id = t2.targetId,
+				abuse_vector = t3.abuseVector,
+				target_id = t3.targetId,
 				path = {},
 				config_name = responseBody.name
 			}, {
@@ -231,22 +239,22 @@ local function DynamicReportV2ContainerV2(t2: {[any]: any}) -- line: 221
 				config_load_detail = {
 					cache_hit = false,
 					retry_count = 0,
-					load_duration_ms = v117
+					load_duration_ms = v120
 				}
 			})
-		end):catch(function(p5) -- line: 268
-			-- upvalues: u105 (ref), v74 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), t2 (copy), getNewRunId (copy), TelemetryEventType (copy)
-			if u105 then
+		end):catch(function(p5) -- line: 280
+			-- upvalues: u108 (ref), v76 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), sendAnalyticsEvent (copy), t3 (copy), getNewRunId (copy), TelemetryEventType (copy)
+			if u108 then
 				return
 			end
 
 			warn("Failed to fetch Dynamic Report V2 config:", p5)
-			v74(true)
+			v76(true)
 
-			local v119 = nil
+			local v122 = nil
 
 			if FFlagFixAnalyticsForDynamicReportV2 then
-				v119 = Dash.pretty(p5, {
+				v122 = Dash.pretty(p5, {
 					depth = 10,
 					multiline = true
 				})
@@ -254,196 +262,200 @@ local function DynamicReportV2ContainerV2(t2: {[any]: any}) -- line: 221
 
 			sendAnalyticsEvent({
 				total_duration = 0,
-				abuse_vector = t2.abuseVector,
-				target_id = t2.targetId,
+				abuse_vector = t3.abuseVector,
+				target_id = t3.targetId,
 				run_id = getNewRunId(),
 				path = {}
 			}, {
 				sub_event_type = TelemetryEventType.Error,
 				error_detail = {
-					error_message = if not FFlagFixAnalyticsForDynamicReportV2 then `Failed to fetch config: { tostring(p5) }` else `Failed to fetch config: { v119 }`
+					error_message = if not FFlagFixAnalyticsForDynamicReportV2 then `Failed to fetch config: { tostring(p5) }` else `Failed to fetch config: { v122 }`
 				}
 			})
 		end)
 
-		return function() -- line: 293
-			-- upvalues: u105 (ref)
-			u105 = true
+		return function() -- line: 305
+			-- upvalues: u108 (ref)
+			u108 = true
 		end
 	end, {
-		v70,
-		t2.abuseVector,
-		t2.targetId
+		v72,
+		t3.abuseVector,
+		t3.targetId
 	})
 
-	local v81 = React.useRef(nil)
-	local v82 = React.useRef(false)
-	local u83 = nil
-	local v84 = nil
+	local v83 = React.useRef(nil)
+	local v84 = React.useRef(false)
 	local u85 = nil
 	local v86 = nil
-	local v87 = nil
+	local u87 = nil
+	local v88 = nil
+	local v89 = nil
 
 	if FFlagEnableInlineSurveyOnUserReport then
-		u83 = React.useRef(false)
-		v84 = React.useCallback(function(t3: {[any]: any}) -- line: 317
-			-- upvalues: u83 (ref)
-			if t3.didSubmit then
-				u83.current = true
+		u85 = React.useRef(false)
+		v86 = React.useCallback(function(t4: {[any]: any}) -- line: 329
+			-- upvalues: u85 (ref), FFlagEnableReportingFlowForMomentsFeed (copy), t3 (copy)
+			if t4.didSubmit then
+				u85.current = true
+
+				if FFlagEnableReportingFlowForMomentsFeed and t3.onSubmit then
+					t3.onSubmit()
+				end
 			end
-		end, {})
-		u85 = React.useCallback(function() -- line: 323
+		end, { t3.onSubmit })
+		u87 = React.useCallback(function() -- line: 338
 			-- upvalues: FFlagSurvBloxEventTypeEnabled (copy), SurveyEventPublisher (copy), WebViewEventType (copy)
 			if FFlagSurvBloxEventTypeEnabled then
 				SurveyEventPublisher.publishSurveyEvent(WebViewEventType.ReportSubmitted)
 			end
 		end, {})
-		v86 = React.useCallback(function() -- line: 329
-			-- upvalues: u79 (ref)
-			u79.current = true
+		v88 = React.useCallback(function() -- line: 344
+			-- upvalues: u81 (ref)
+			u81.current = true
 		end, {})
-		v87 = React.useCallback(function() -- line: 333
-			-- upvalues: u79 (ref), u85 (ref), t2 (copy)
-			if not u79.current then
-				u85()
+		v89 = React.useCallback(function() -- line: 348
+			-- upvalues: u81 (ref), u87 (ref), t3 (copy)
+			if not u81.current then
+				u87()
 			end
 
-			t2.onClose()
+			t3.onClose()
 		end, {
-			u85,
-			t2.onClose
+			u87,
+			t3.onClose
 		})
 	end
 
-	local v88 = React.useCallback(function() -- line: 341
-		-- upvalues: v82 (copy), v76 (copy)
-		v82.current = true
-		v76(false)
+	local v90 = React.useCallback(function() -- line: 356
+		-- upvalues: v84 (copy), v78 (copy)
+		v84.current = true
+		v78(false)
 	end, {})
-	local v89 = React.useCallback(function() -- line: 349
-		-- upvalues: v82 (copy), v81 (copy), v76 (copy), FFlagEnableInlineSurveyOnUserReport (copy), u83 (ref), t2 (copy), AbuseVector (copy), u78 (ref), u85 (ref)
-		if not v82.current and v81.current then
-			v81.current.requestClose()
+	local v91 = React.useCallback(function() -- line: 364
+		-- upvalues: v84 (copy), v83 (copy), v78 (copy), FFlagEnableInlineSurveyOnUserReport (copy), u85 (ref), t3 (copy), AbuseVector (copy), u80 (ref), u87 (ref)
+		if not v84.current and v83.current then
+			v83.current.requestClose()
 		end
 
-		v76(false)
+		v78(false)
 
 		if FFlagEnableInlineSurveyOnUserReport then
-			if not u83.current then
-				t2.onClose()
+			if not u85.current then
+				t3.onClose()
 
 				return
 			end
 
-			if t2.abuseVector == AbuseVector.UserProfile then
-				u78(true)
+			if t3.abuseVector == AbuseVector.UserProfile then
+				u80(true)
 
 				return
 			end
 
-			u85()
+			u87()
 		end
 
-		t2.onClose()
+		t3.onClose()
 	end, {
-		t2.onClose,
-		t2.abuseVector,
-		u85
+		t3.onClose,
+		t3.abuseVector,
+		u87
 	})
-	local v90 = React.useCallback(function() -- line: 373
-		-- upvalues: v74 (copy)
-		v74(true)
+	local v92 = React.useCallback(function() -- line: 388
+		-- upvalues: v76 (copy)
+		v76(true)
 	end, {})
-	local v91 = React.useCallback(function(p6) -- line: 377
-		-- upvalues: sendBoundaryErrorTelemetry (copy), t2 (copy), v74 (copy)
+	local v93 = React.useCallback(function(p6) -- line: 392
+		-- upvalues: sendBoundaryErrorTelemetry (copy), t3 (copy), v76 (copy)
 		warn("AbuseReportErrorBoundary caught:", p6)
 		sendBoundaryErrorTelemetry(p6, {
-			abuse_vector = t2.abuseVector,
-			target_id = t2.targetId
+			abuse_vector = t3.abuseVector,
+			target_id = t3.targetId
 		})
-		v74(true)
+		v76(true)
 	end, {
-		t2.abuseVector,
-		t2.targetId
+		t3.abuseVector,
+		t3.targetId
 	})
-	local v92 = useFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, function() -- line: 386
-		-- upvalues: v76 (copy)
-		v76(false)
+	local v94 = useFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, function() -- line: 401
+		-- upvalues: v78 (copy)
+		v78(false)
 	end)
-	local v93, v94 = React.useState(true)
-	local v95 = React.useCallback(function(b2: boolean) -- line: 390
-		-- upvalues: v94 (copy)
-		v94(not b2)
+	local v95, v96 = React.useState(true)
+	local v97 = React.useCallback(function(b2: boolean) -- line: 405
+		-- upvalues: v96 (copy)
+		v96(not b2)
 	end, {})
-	local v96 = React.useCallback(function(p7) -- line: 393
-		-- upvalues: v93 (copy), v92 (copy)
-		local v111 = if not v93 then nil else p7
+	local v98 = React.useCallback(function(p7) -- line: 408
+		-- upvalues: v95 (copy), v94 (copy)
+		local v114 = if not v95 then nil else p7
 
-		if typeof(v92) == "function" then
-			v92(v111)
+		if typeof(v94) == "function" then
+			v94(v114)
 
 			return
 		end
 
-		if v92 and typeof(v92) == "table" then
-			v92.current = v111
+		if v94 and typeof(v94) == "table" then
+			v94.current = v114
 		end
 	end, {
-		v93,
-		v92
+		v95,
+		v94
 	})
 	local VRCentralOverlay = CoreGui:FindFirstChild("VRCentralOverlay")
-	local v98 = if not VRCentralOverlay then nil else VRCentralOverlay:FindFirstChild("CentralOverlay_SurfaceGui")
-	local v99 = useIsSpatial()
-	local v100 = if not v41 then v98 else useVrOverlay()
-	local v101 = React.createElement(Sheet.Root, {
+	local v100 = if not VRCentralOverlay then nil else VRCentralOverlay:FindFirstChild("CentralOverlay_SurfaceGui")
+	local v101 = useIsSpatial()
+	local v102 = if not v41 then v100 else useVrOverlay()
+	local v103 = React.createElement(Sheet.Root, {
 		centerSheetHeight = 1,
 		preferCenterSheet = true,
-		isOpen = v75,
-		onClose = v89,
+		isOpen = v77,
+		onClose = v91,
 		snapPoints = { 0.9 },
 		size = DialogSize.Medium,
-		ref = v96
+		ref = v98
 	}, {
-		AbuseReportDialog = if not v71 or v73 then nil else React.createElement(AbuseReportErrorBoundary, {
-			onError = v91
+		AbuseReportDialog = if not v73 or v75 then nil else React.createElement(AbuseReportErrorBoundary, {
+			onError = v93
 		}, {
 			AbuseReportContent = React.createElement(AbuseReportContent, {
-				ref = v81,
-				rawConfig = v71,
-				abuseVector = t2.abuseVector,
-				targetId = t2.targetId,
-				onClose = v88,
-				open = v75,
-				takeoverFocus = v95,
-				onResolveError = v90,
-				onFinish = v84
+				ref = v83,
+				rawConfig = v73,
+				abuseVector = t3.abuseVector,
+				targetId = t3.targetId,
+				onClose = v90,
+				open = v77,
+				takeoverFocus = v97,
+				onResolveError = v92,
+				onFinish = v86
 			})
 		}),
-		LoadingDialog = if v71 or v73 then nil else React.createElement(DynamicReportV2Loading, nil),
-		ErrorDialog = if not v73 then nil else React.createElement(DynamicReportV2Error, nil)
+		LoadingDialog = if v73 or v75 then nil else React.createElement(DynamicReportV2Loading, nil),
+		ErrorDialog = if not v75 then nil else React.createElement(DynamicReportV2Error, nil)
 	})
 
-	if v41 and v99 and not v100 then
+	if v41 and v101 and not v102 then
 		return nil
 	end
 
-	if FFlagEnableInlineSurveyOnUserReport and v77 then
+	if FFlagEnableInlineSurveyOnUserReport and v79 then
 		return React.createElement(OverlayProvider, {
-			gui = v100
+			gui = v102
 		}, {
 			Survey = React.createElement(InlineSurvey, {
 				eventType = InlineEventType.UserReportButtonClicked,
-				onEligible = v86,
-				onClose = v87
+				onEligible = v88,
+				onClose = v89
 			})
 		})
 	end
 
 	return React.createElement(OverlayProvider, {
-		gui = v100
+		gui = v102
 	}, {
-		Sheet = v101
+		Sheet = v103
 	})
 end
 

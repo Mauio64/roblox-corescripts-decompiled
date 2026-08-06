@@ -15,14 +15,14 @@ require(script.Parent.types)
 
 local withCsrfRetry = require(DataHydration.withCsrfRetry)
 
-local function normalizeNextPageToken(p1) -- line: 40
+local function normalizeNextPageToken(p1) -- line: 39
 	if typeof(p1) == "string" and p1 ~= "" then
 		return p1
 	end
 
 	return nil
 end
-local function appendSessionListEntries(t1: {[any]: any}, t2: {[any]: any}) -- line: 47
+local function appendSessionListEntries(t1: {[any]: any}, t2: {[any]: any}) -- line: 46
 	local t3 = {}
 	local t4 = {}
 
@@ -47,7 +47,7 @@ local function appendSessionListEntries(t1: {[any]: any}, t2: {[any]: any}) -- l
 
 	return t4
 end
-local function normalizePrompt(p2) -- line: 72
+local function normalizePrompt(p2) -- line: 71
 	if typeof(p2) == "string" then
 		return {{
 			type = "text",
@@ -59,24 +59,24 @@ local function normalizePrompt(p2) -- line: 72
 end
 
 local t5 = {
-	debug = function() -- line: 80
+	debug = function() -- line: 79
 	end,
-	info = function() -- line: 81
+	info = function() -- line: 80
 	end,
-	warning = function() -- line: 82
+	warning = function() -- line: 81
 	end,
-	error = function() -- line: 83
+	error = function() -- line: 82
 	end
 }
 
-local function createCreatorAgentChatStore(p3) -- line: 86
+local function createCreatorAgentChatStore(p3) -- line: 85
 	-- upvalues: withCsrfRetry (copy), HttpClient (copy), AcpProtocol (copy), t5 (copy), rpcDecoder (copy), Signals (copy), onTerminal (copy), appendSessionListEntries (copy), createTurnHandle (copy), historyIngest (copy), sessionRegistry (copy), constants (copy), ingestFrameHandler (copy)
 	local v32 = p3 or {}
 	local v33 = v32.network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 	local v34 = v32.baseUrl or AcpProtocol.acpUrl()
 	local v35 = v32.logger or t5
 
-	local function authHeaders() -- line: 93
+	local function authHeaders() -- line: 92
 		-- upvalues: v32 (copy)
 		if v32.getAuthHeaders then
 			return (v32.getAuthHeaders())
@@ -87,7 +87,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 	local n1 = 0
 
-	local function nextId() -- line: 98
+	local function nextId() -- line: 97
 		-- upvalues: v32 (copy), n1 (ref)
 		if v32.generateRequestId then
 			return v32.generateRequestId()
@@ -102,14 +102,14 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 	local t7 = {}
 	local t8 = {}
 
-	local function requestIdKey(p4) -- line: 110
+	local function requestIdKey(p4) -- line: 109
 		if p4 == nil then
 			return nil
 		end
 
 		return (tostring(p4))
 	end
-	local function unregisterHandle(p5) -- line: 114
+	local function unregisterHandle(p5) -- line: 113
 		-- upvalues: t6 (copy), t8 (copy), t7 (copy)
 		for v72, v73 in t6 do
 			if v73 == p5 then
@@ -127,7 +127,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			t7[v75] = nil
 		end
 	end
-	local function rpcCall(p6, s1: string, p7) -- line: 128
+	local function rpcCall(p6, s1: string, p7) -- line: 127
 		-- upvalues: v35 (copy), HttpClient (copy), v33 (copy), v34 (copy), v32 (copy), rpcDecoder (copy)
 		v35:debug(`[CAS] -> { s1 } id={ tostring(p6) }`)
 
@@ -146,7 +146,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			decode = rpcDecoder()
 		})
 	end
-	local function rpcCallSync(s2: string, p8) -- line: 146
+	local function rpcCallSync(s2: string, p8) -- line: 145
 		-- upvalues: rpcCall (copy), v32 (copy), n1 (ref)
 		local v81 = rpcCall
 		local v82
@@ -160,7 +160,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 		return v81(v82, s2, p8)
 	end
-	local function submitToolResult(p9) -- line: 150
+	local function submitToolResult(p9) -- line: 149
 		-- upvalues: v32 (copy), n1 (ref), AcpProtocol (copy), HttpClient (copy), v33 (copy), v34 (copy), rpcDecoder (copy)
 		assert(typeof(p9.sessionId) == "string" and p9.sessionId ~= "", "sessionId is required")
 		assert(typeof(p9.content) == "table" and typeof(p9.content.text) == "string", "content.text is required")
@@ -211,13 +211,13 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			decode = rpcDecoder()
 		})
 	end
-	local function initialize(p10) -- line: 190
+	local function initialize(p10) -- line: 189
 		-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 		return rpcCallSync(AcpProtocol.Methods.Initialize, p10 or {
 			protocolVersion = AcpProtocol.ProtocolVersion
 		})
 	end
-	local function sessionNew(p11) -- line: 194
+	local function sessionNew(p11) -- line: 193
 		-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 		assert(p11 ~= nil, "sessionNew requires params")
 		assert(typeof(p11.project) == "table", "sessionNew requires params.project")
@@ -240,7 +240,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 	local u58 = nil
 	local n2 = 0
 
-	local function refreshSessionList() -- line: 222
+	local function refreshSessionList() -- line: 221
 		-- upvalues: u57 (ref), n2 (ref), u58 (ref), v54 (copy), v56 (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), v50 (copy), v52 (copy)
 		if u57 ~= nil then
 			if u57.state(false).status == "pending" then
@@ -272,7 +272,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 		local v93 = v91(v92, SessionList, {})
 
 		u57 = v93
-		onTerminal(v93.state, function(p12) -- line: 239
+		onTerminal(v93.state, function(p12) -- line: 238
 			-- upvalues: v89 (copy), n2 (ref), u57 (ref), v50 (copy), v52 (copy), v54 (copy)
 			if v89 ~= n2 then
 				return
@@ -287,7 +287,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			v50(v151)
 			v52(v153)
 			v54("succeeded")
-		end, function(_) -- line: 249
+		end, function(_) -- line: 248
 			-- upvalues: v89 (copy), n2 (ref), u57 (ref), v54 (copy)
 			if v89 ~= n2 then
 				return
@@ -299,7 +299,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 		return v93
 	end
-	local function loadMoreSessionList() -- line: 259
+	local function loadMoreSessionList() -- line: 258
 		-- upvalues: v51 (copy), u57 (ref), u58 (ref), v53 (copy), n2 (ref), v56 (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), appendSessionListEntries (copy), v49 (copy), v50 (copy), v52 (copy)
 		local v94 = v51(false)
 
@@ -341,7 +341,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 		local v101 = v99(v100, SessionList, v98)
 
 		u58 = v101
-		onTerminal(v101.state, function(p14) -- line: 281
+		onTerminal(v101.state, function(p14) -- line: 280
 			-- upvalues: v95 (copy), n2 (ref), u58 (ref), appendSessionListEntries (copy), v49 (copy), v50 (copy), v52 (copy), v56 (copy)
 			if v95 ~= n2 then
 				return
@@ -357,7 +357,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			v50(v159)
 			v52(v158)
 			v56("succeeded")
-		end, function(_) -- line: 292
+		end, function(_) -- line: 291
 			-- upvalues: v95 (copy), n2 (ref), u58 (ref), v56 (copy)
 			if v95 ~= n2 then
 				return
@@ -379,7 +379,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 		loadMore = loadMoreSessionList
 	}
 
-	local function sessionLoad(s3: string, t12: {[any]: any}?) -- line: 319
+	local function sessionLoad(s3: string, t12: {[any]: any}?) -- line: 318
 		-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 		assert(typeof(s3) == "string" and s3 ~= "", "sessionId is required")
 
@@ -390,15 +390,15 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			historyPageToken = t12 and t12.historyPageToken
 		})
 	end
-	local function postSessionCancel(s4: string) -- line: 337
+	local function postSessionCancel(s4: string) -- line: 336
 		-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 		return rpcCallSync(AcpProtocol.Methods.SessionCancel, {
 			sessionId = s4
 		})
 	end
-	local function registerTurnHandle(s5: string, p16, p17, t13: {[any]: any}?) -- line: 382
+	local function registerTurnHandle(s5: string, p16, p17, t13: {[any]: any}?) -- line: 381
 		-- upvalues: createTurnHandle (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
-		local v126, v127 = createTurnHandle(s5, p16, function() -- line: 388
+		local v126, v127 = createTurnHandle(s5, p16, function() -- line: 387
 			-- upvalues: s5 (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 			local v171 = s5
 
@@ -420,7 +420,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			local v176 = v174(v175, SessionCancel, t14)
 
-			onTerminal(v176.state, function() -- line: 344
+			onTerminal(v176.state, function() -- line: 343
 				-- upvalues: t6 (copy), v171 (copy), t8 (copy), t7 (copy)
 				local v194 = t6[v171]
 
@@ -455,7 +455,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 		return v126
 	end
-	local function sessionPrompt(p18) -- line: 399
+	local function sessionPrompt(p18) -- line: 398
 		-- upvalues: v32 (copy), n1 (ref), createTurnHandle (copy), AcpProtocol (copy), rpcCall (copy), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 		assert(p18 and (typeof(p18.sessionId) == "string" and p18.sessionId ~= ""), "sessionId is required")
 		assert(p18.prompt, "prompt is required")
@@ -470,7 +470,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			v130 = n1
 		end
 
-		local v131, v132 = createTurnHandle(sessionId, v130, function() -- line: 388
+		local v131, v132 = createTurnHandle(sessionId, v130, function() -- line: 387
 			-- upvalues: sessionId (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 			local v177 = sessionId
 
@@ -492,7 +492,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			local v182 = v180(v181, SessionCancel, t15)
 
-			onTerminal(v182.state, function() -- line: 344
+			onTerminal(v182.state, function() -- line: 343
 				-- upvalues: t6 (copy), v177 (copy), t8 (copy), t7 (copy)
 				local v199 = t6[v177]
 
@@ -542,9 +542,9 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 		local v136 = rpcCall(v130, AcpProtocol.Methods.SessionPrompt, t16)
 
-		onTerminal(v136.state, nil, function(p19, p20) -- line: 418
+		onTerminal(v136.state, nil, function(p19, p20) -- line: 417
 			-- upvalues: v133 (copy), t6 (copy), t8 (copy), t7 (copy)
-			task.defer(function() -- line: 419
+			task.defer(function() -- line: 418
 				-- upvalues: v133 (copy), p19 (copy), p20 (copy), t6 (copy), t8 (copy), t7 (copy)
 				if v133.isDone() then
 					return
@@ -574,14 +574,14 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 		return v131
 	end
-	local function getActiveTurnHandle(s6: string) -- line: 447
+	local function getActiveTurnHandle(s6: string) -- line: 446
 		-- upvalues: t8 (copy)
 		return t8[s6]
 	end
-	local function ingestSessionHistory(s7: string, t17: {[any]: any}, n3: number?) -- line: 451
+	local function ingestSessionHistory(s7: string, t17: {[any]: any}, n3: number?) -- line: 450
 		-- upvalues: historyIngest (copy), t6 (copy), unregisterHandle (copy)
 		return historyIngest.ingestSessionHistory({
-			getActiveTurnInternals = function(s8: string) -- line: 457
+			getActiveTurnInternals = function(s8: string) -- line: 456
 				-- upvalues: t6 (copy)
 				return t6[s8]
 			end,
@@ -597,7 +597,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 		ingestSessionHistory = ingestSessionHistory,
 		submitToolResult = submitToolResult,
 		getActiveTurnHandle = getActiveTurnHandle,
-		onCasSessionIdChanged = function(_: string?) -- line: 472
+		onCasSessionIdChanged = function(_: string?) -- line: 471
 		end,
 		rpcTimeoutSeconds = constants.getRpcTimeoutSeconds()
 	})
@@ -605,15 +605,15 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 	return {
 		initialize = initialize,
 		sessionNew = sessionNew,
-		sessionList = function(p21) -- line: 210
+		sessionList = function(p21) -- line: 209
 			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 			return rpcCallSync(AcpProtocol.Methods.SessionList, p21 or {})
 		end,
-		getSessionListStore = function() -- line: 495
+		getSessionListStore = function() -- line: 494
 			-- upvalues: t11 (copy)
 			return t11
 		end,
-		sessionFindByUniverse = function(p22) -- line: 311
+		sessionFindByUniverse = function(p22) -- line: 310
 			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 			assert(typeof(p22) == "table", "sessionFindByUniverse requires params")
 			assert(typeof(p22.universeId) == "number" and p22.universeId ~= 0, "universeId is required")
@@ -621,7 +621,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			return rpcCallSync(AcpProtocol.Methods.SessionFindByUniverse, p22)
 		end,
 		sessionLoad = sessionLoad,
-		sessionReadTasks = function(s10: string) -- line: 332
+		sessionReadTasks = function(s10: string) -- line: 331
 			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 			assert(typeof(s10) == "string" and s10 ~= "", "sessionId is required")
 
@@ -631,7 +631,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 		end,
 		sessionPrompt = sessionPrompt,
 		submitToolResult = submitToolResult,
-		sessionCancel = function(s11: string) -- line: 341
+		sessionCancel = function(s11: string) -- line: 340
 			-- upvalues: AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 			assert(typeof(s11) == "string" and s11 ~= "", "sessionId is required")
 
@@ -651,7 +651,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			local v112 = v110(v111, SessionCancel, t18)
 
-			onTerminal(v112.state, function() -- line: 344
+			onTerminal(v112.state, function() -- line: 343
 				-- upvalues: t6 (copy), s11 (copy), t8 (copy), t7 (copy)
 				local v161 = t6[s11]
 
@@ -678,7 +678,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			return v112
 		end,
-		sessionDelete = function(s12: string) -- line: 354
+		sessionDelete = function(s12: string) -- line: 353
 			-- upvalues: AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 			assert(typeof(s12) == "string" and s12 ~= "", "sessionId is required")
 
@@ -698,7 +698,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			local v118 = v116(v117, SessionDelete, t19)
 
-			onTerminal(v118.state, function() -- line: 357
+			onTerminal(v118.state, function() -- line: 356
 				-- upvalues: t6 (copy), s12 (copy), AcpProtocol (copy), t8 (copy), t7 (copy)
 				local v166 = t6[s12]
 
@@ -725,7 +725,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 			return v118
 		end,
-		sessionUpdateInfo = function(s13: string, s14: string?) -- line: 367
+		sessionUpdateInfo = function(s13: string, s14: string?) -- line: 366
 			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 			assert(typeof(s13) == "string" and s13 ~= "", "sessionId is required")
 
@@ -734,7 +734,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 				title = s14
 			})
 		end,
-		sessionSaveAndPublish = function(p23) -- line: 372
+		sessionSaveAndPublish = function(p23) -- line: 371
 			-- upvalues: rpcCallSync (copy), AcpProtocol (copy)
 			assert(typeof(p23) == "table", "sessionSaveAndPublish requires params")
 			assert(typeof(p23.placeId) == "number" and p23.placeId > 0, "placeId must be a positive number")
@@ -744,24 +744,24 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 			return rpcCallSync(AcpProtocol.Methods.SessionSaveAndPublish, p23)
 		end,
 		ingestSessionHistory = ingestSessionHistory,
-		ingestFrame = function(p24, p25) -- line: 476
+		ingestFrame = function(p24, p25) -- line: 475
 			-- upvalues: ingestFrameHandler (copy), v35 (copy), v69 (copy), t6 (copy), t7 (copy), unregisterHandle (copy)
 			ingestFrameHandler.ingestFrame({
 				logger = v35,
 				getSessionByCasSessionId = v69.getSessionByCasSessionId,
 				getSessionForProject = v69.getSessionForProject,
-				getActiveTurnBySession = function(s15: string) -- line: 481
+				getActiveTurnBySession = function(s15: string) -- line: 480
 					-- upvalues: t6 (copy)
 					return t6[s15]
 				end,
-				getActiveTurnByRequestId = function(s16: string) -- line: 484
+				getActiveTurnByRequestId = function(s16: string) -- line: 483
 					-- upvalues: t7 (copy)
 					return t7[s16]
 				end,
 				onTurnDone = unregisterHandle
 			}, p24, p25)
 		end,
-		resumeTurnFromHistory = function(s17: string, p26, t20: {[any]: any}?) -- line: 431
+		resumeTurnFromHistory = function(s17: string, p26, t20: {[any]: any}?) -- line: 430
 			-- upvalues: t8 (copy), createTurnHandle (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t7 (copy)
 			assert(typeof(s17) == "string" and s17 ~= "", "sessionId is required")
 
@@ -775,7 +775,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 				return v140
 			end
 
-			local v141, v142 = createTurnHandle(s17, nil, function() -- line: 388
+			local v141, v142 = createTurnHandle(s17, nil, function() -- line: 387
 				-- upvalues: s17 (copy), AcpProtocol (copy), rpcCall (copy), v32 (copy), n1 (ref), onTerminal (copy), t6 (copy), t8 (copy), t7 (copy)
 				local v185 = s17
 
@@ -797,7 +797,7 @@ local function createCreatorAgentChatStore(p3) -- line: 86
 
 				local v190 = v188(v189, SessionCancel, t21)
 
-				onTerminal(v190.state, function() -- line: 344
+				onTerminal(v190.state, function() -- line: 343
 					-- upvalues: t6 (copy), v185 (copy), t8 (copy), t7 (copy)
 					local v209 = t6[v185]
 

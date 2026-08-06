@@ -10,27 +10,28 @@ local Enums = Foundation.Enums
 local useTokens = Foundation.Hooks.useTokens
 local useLocalization = require(Parent.Localization).Hooks.useLocalization
 local TiltLockup = require(script.Parent.Components.TiltLockup)
+local TiltLoadingScreenStatusPanel = require(script.Parent.Components.TiltLoadingScreenStatusPanel)
 
 require(script.Parent.Types)
 
-local function TiltLoadingScreenView(p1) -- line: 21
-	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), View (copy), IconButton (copy), Enums (copy), TiltLockup (copy), Badge (copy), Progress (copy), ProgressShape (copy)
-	local v15 = useTokens()
-	local v16 = useLocalization({
+local function TiltLoadingScreenView(p1) -- line: 22
+	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), View (copy), IconButton (copy), Enums (copy), TiltLockup (copy), Badge (copy), TiltLoadingScreenStatusPanel (copy), Progress (copy), ProgressShape (copy)
+	local v16 = useTokens()
+	local v17 = useLocalization({
 		autoTranslate = "CoreScripts.TopBar.LoadingScreen.AutoTranslate"
 	})
 
 	return React.createElement(View, {
 		tag = "size-full bg-surface-0",
 		testId = "tilt-loading-screen-root",
-		GroupTransparency = p1.chromeReveal:map(function(n1: number) -- line: 29
+		GroupTransparency = p1.chromeReveal:map(function(n1: number) -- line: 30
 			return 1 - n1
 		end)
 	}, {
 		Overlay = React.createElement(View, {
 			tag = "size-full",
 			ZIndex = 0,
-			backgroundStyle = v15.Color.Extended.Black.Black_50
+			backgroundStyle = v16.Color.Extended.Black.Black_50
 		}),
 		CancelButton = React.createElement(View, {
 			tag = "col size-full align-x-left align-y-top padding-xlarge",
@@ -65,12 +66,12 @@ local function TiltLoadingScreenView(p1) -- line: 21
 				AutoTranslate = if not p1.isAutoTranslated then nil else React.createElement(View, {
 					LayoutOrder = 2,
 					tag = "auto-xy",
-					GroupTransparency = p1.animation.creator.reveal:map(function(p2) -- line: 73
+					GroupTransparency = p1.animation.creator.reveal:map(function(p2) -- line: 74
 						return 1 - p2
 					end)
 				}, {
 					Badge = React.createElement(Badge, {
-						text = v16.autoTranslate,
+						text = v17.autoTranslate,
 						variant = Enums.BadgeVariant.Neutral,
 						shape = Enums.BadgeShape.Box,
 						icon = {
@@ -81,8 +82,21 @@ local function TiltLoadingScreenView(p1) -- line: 21
 					})
 				})
 			}),
-			ProgressBar = React.createElement(View, {
-				LayoutOrder = 2,
+			StatusPanel = React.createElement(TiltLoadingScreenStatusPanel, {
+				LayoutOrder = 3,
+				status = p1.statusPanel.status,
+				statusText = p1.statusPanel.statusText,
+				queuePosition = p1.statusPanel.queuePosition,
+				queueTreatment = p1.statusPanel.queueTreatment,
+				followUserId = p1.statusPanel.followUserId,
+				isSubjectToChinaPolicies = p1.statusPanel.isSubjectToChinaPolicies,
+				onAutoJoinNewServer = p1.statusPanel.onAutoJoinNewServer,
+				onJoinNewServer = p1.statusPanel.onJoinNewServer,
+				onJoinTheLine = p1.statusPanel.onJoinTheLine,
+				onShowConnectionHealth = p1.statusPanel.onShowConnectionHealth
+			}),
+			ProgressBar = if p1.statusPanel.queueTreatment ~= nil then nil else React.createElement(View, {
+				LayoutOrder = 4,
 				testId = "tilt-loading-screen-progress-slot",
 				tag = {
 					["size-full-0 auto-y padding-x-medium padding-bottom-xlarge"] = p1.isMobile,

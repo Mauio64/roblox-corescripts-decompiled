@@ -60,6 +60,10 @@ return {
 		funnelType = FunnelTypes.StickerOverlayEnhancement,
 		stepKey = StickerOverlayEnhancementSteps.StickerOverlayButtonPressed
 	}},
+	[EventNames.EditingFlowStickerSelected] = {{
+		funnelType = FunnelTypes.StickerOverlayEnhancement,
+		stepKey = StickerOverlayEnhancementSteps.StickerOverlaySelected
+	}},
 	[EventNames.EditingFlowStickerOverlayDoneButtonPressed] = {{
 		endSession = true,
 		funnelType = FunnelTypes.StickerOverlayEnhancement,

@@ -9,9 +9,9 @@ local getConversationTitle = require(Parent.AppChat.getConversationTitle)
 local GetConversationStore = require(Parent.AppChat.GetConversationStore)
 local logger = AppChat.Components.ChatConversation.logger
 
-local function getMessageTimestamp(p1) -- line: 81
+local function getMessageTimestamp(p1) -- line: 75
 	if type(p1.created_at) == "string" then
-		local ok, result = pcall(function() -- line: 83
+		local ok, result = pcall(function() -- line: 77
 			-- upvalues: p1 (copy)
 			return DateTime.fromIsoDate(p1.created_at)
 		end)
@@ -23,7 +23,7 @@ local function getMessageTimestamp(p1) -- line: 81
 
 	return nil
 end
-local function getUnixTime(p2) -- line: 94
+local function getUnixTime(p2) -- line: 88
 	if p2 == nil then
 		return nil
 	end
@@ -38,10 +38,10 @@ local function getUnixTime(p2) -- line: 94
 
 	return nil
 end
-local function getPreviewContent(p3) -- line: 107
+local function getPreviewContent(p3) -- line: 101
 	return p3.preview_content or p3.content
 end
-local function getMessageUnixTime(p4) -- line: 111
+local function getMessageUnixTime(p4) -- line: 105
 	local g36 = nil
 	local ok = nil
 	local result = nil
@@ -49,7 +49,7 @@ local function getMessageUnixTime(p4) -- line: 111
 	repeat
 		if g36 or type(p4.created_at) == "string" then
 			if not g36 then
-				ok, result = pcall(function() -- line: 83
+				ok, result = pcall(function() -- line: 77
 					-- upvalues: p4 (copy)
 					return DateTime.fromIsoDate(p4.created_at)
 				end)
@@ -70,10 +70,10 @@ local function getMessageUnixTime(p4) -- line: 111
 		g36 = true
 	until not g36
 end
-local function isPreviewableMessage(p5) -- line: 116
+local function isPreviewableMessage(p5) -- line: 110
 	return p5 ~= nil and (p5.id ~= nil and (p5.is_previewable == true and (p5.preview_content or p5.content) ~= nil))
 end
-local function getNewestPreviewableMessage(t1: {[any]: any}) -- line: 125
+local function getNewestPreviewableMessage(t1: {[any]: any}) -- line: 119
 	local v41 = nil
 	local v42 = nil
 	local g45 = nil
@@ -89,7 +89,7 @@ local function getNewestPreviewableMessage(t1: {[any]: any}) -- line: 125
 			if not g45 and type(v44.created_at) == "string" then
 				local ok
 
-				ok, result = pcall(function() -- line: 83
+				ok, result = pcall(function() -- line: 77
 					-- upvalues: v44 (copy)
 					return DateTime.fromIsoDate(v44.created_at)
 				end)
@@ -116,7 +116,7 @@ local function getNewestPreviewableMessage(t1: {[any]: any}) -- line: 125
 
 	return v41
 end
-local function shouldUpdatePreview(p6, p7) -- line: 144
+local function shouldUpdatePreview(p6, p7) -- line: 138
 	if p7 == nil then
 		return true
 	end
@@ -130,7 +130,7 @@ local function shouldUpdatePreview(p6, p7) -- line: 144
 
 	return v52 <= p7.UnixTimestamp
 end
-local function isUnreadCandidateMessage(p8, t2: {[any]: any}?) -- line: 157
+local function isUnreadCandidateMessage(p8, t2: {[any]: any}?) -- line: 151
 	if p8 == nil or p8.is_badgeable ~= true then
 		return false
 	end
@@ -147,7 +147,7 @@ local function isUnreadCandidateMessage(p8, t2: {[any]: any}?) -- line: 157
 
 	return true
 end
-local function hasNewerUnreadMessage(t3: {[any]: any}, t4: {[any]: any}?) -- line: 178
+local function hasNewerUnreadMessage(t3: {[any]: any}, t4: {[any]: any}?) -- line: 172
 	if t4 == nil or t4.hasUnreadMessages ~= true then
 		return false
 	end
@@ -177,7 +177,7 @@ local function hasNewerUnreadMessage(t3: {[any]: any}, t4: {[any]: any}?) -- lin
 			if not g64 and type(v61.created_at) == "string" then
 				local ok
 
-				ok, result = pcall(function() -- line: 83
+				ok, result = pcall(function() -- line: 77
 					-- upvalues: v61 (copy)
 					return DateTime.fromIsoDate(v61.created_at)
 				end)
@@ -206,12 +206,12 @@ return {
 	createConversationFromFriendPlaceholder = createConversationFromFriendPlaceholder,
 	fetchConversationDetailsToSignals = fetchConversationDetailsToSignals,
 	fetchConversationListPageToSignals = fetchConversationListPageToSignals,
-	getConversationStore = function() -- line: 35
+	getConversationStore = function() -- line: 29
 		-- upvalues: GetConversationStore (copy)
 		return GetConversationStore(false)
 	end,
 	getConversationTitle = getConversationTitle,
-	isFriendPlaceholder = function(s1: string?, p9) -- line: 39
+	isFriendPlaceholder = function(s1: string?, p9) -- line: 33
 		-- upvalues: GetConversationStore (copy), ConversationChannels (copy)
 		if s1 == nil or s1 == "" then
 			return false
@@ -225,7 +225,7 @@ return {
 
 		return string.sub(s1, 1, 8) == "friends:"
 	end,
-	markConversationRead = function(s2: string, b1: boolean?) -- line: 50
+	markConversationRead = function(s2: string, b1: boolean?) -- line: 44
 		-- upvalues: GetConversationStore (copy), AppChatNetworking (copy), logger (copy)
 		local v25 = GetConversationStore(false)
 		local v26 = v25.getConversation(s2, false)
@@ -247,23 +247,23 @@ return {
 			return
 		end
 
-		return AppChatNetworking.http.MarkConversationRead(nil, s2):catch(function(p10) -- line: 69
+		return AppChatNetworking.http.MarkConversationRead(nil, s2):catch(function(p10) -- line: 63
 			-- upvalues: logger (copy), s2 (copy)
 			logger:warning(`Failed to mark conversation read for { s2 }: { tostring(p10) }`)
 		end)
 	end,
-	removeConversation = function(s3: string) -- line: 77
+	removeConversation = function(s3: string) -- line: 71
 		-- upvalues: GetConversationStore (copy)
 		GetConversationStore(false).removeConversation(s3)
 	end,
-	updateConversationPreviewFromMessages = function(s4: string, t5: {[any]: any}, t6: {[any]: any}?) -- line: 203
+	updateConversationPreviewFromMessages = function(s4: string, t5: {[any]: any}, t6: {[any]: any}?) -- line: 197
 		-- upvalues: GetConversationStore (copy), fetchConversationListPageToSignals (copy), logger (copy), hasNewerUnreadMessage (copy), getNewestPreviewableMessage (copy)
 		local v71 = GetConversationStore(false)
 		local v72 = v71.getConversation(s4, false)
 
 		if v72 == nil then
 			if t6 ~= nil and t6.refreshListOnMissingConversation == true then
-				fetchConversationListPageToSignals():catch(function(p11) -- line: 212
+				fetchConversationListPageToSignals():catch(function(p11) -- line: 206
 					-- upvalues: logger (copy)
 					logger:warning(`Failed to refresh conversation list after realtime update: { tostring(p11) }`)
 				end)
@@ -302,7 +302,7 @@ return {
 			repeat
 				if g77 or type(v74.created_at) == "string" then
 					if not g77 then
-						ok, result = pcall(function() -- line: 83
+						ok, result = pcall(function() -- line: 77
 							-- upvalues: v74 (copy)
 							return DateTime.fromIsoDate(v74.created_at)
 						end)

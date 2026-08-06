@@ -1,6 +1,6 @@
 require(script.Parent.types)
 
-local function getSequenceId(p1) -- line: 8
+local function getSequenceId(p1) -- line: 7
 	local sequenceId = p1.sequenceId
 
 	if typeof(sequenceId) == "number" and sequenceId >= 0 then
@@ -11,7 +11,7 @@ local function getSequenceId(p1) -- line: 8
 end
 
 return {
-	mergeHistoryIntoMap = function(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 13
+	mergeHistoryIntoMap = function(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 12
 		for _, v8 in t2 do
 			local sequenceId = v8.sequenceId
 			local v10 = if typeof(sequenceId) ~= "number" or not (sequenceId >= 0) then nil else sequenceId
@@ -21,7 +21,7 @@ return {
 			end
 		end
 	end,
-	orderMergedHistoryItems = function(t4: {[any]: any}, t5: {[any]: any}) -- line: 26
+	orderMergedHistoryItems = function(t4: {[any]: any}, t5: {[any]: any}) -- line: 25
 		local v13 = table.clone(t4)
 
 		for v14, v15 in t5 do
@@ -34,7 +34,7 @@ return {
 			table.insert(t6, v18)
 		end
 
-		table.sort(t6, function(p2, p3) -- line: 40
+		table.sort(t6, function(p2, p3) -- line: 39
 			local sequenceId = p2.sequenceId
 			local v27 = ((if typeof(sequenceId) ~= "number" or not (sequenceId >= 0) then nil else sequenceId)) or -1
 			local sequenceId2 = p3.sequenceId
@@ -44,7 +44,7 @@ return {
 
 		return t6
 	end,
-	ingestOverlayUpdate = function(t7: {[any]: any}, _: {[any]: any}, p4, n1: number) -- line: 49
+	ingestOverlayUpdate = function(t7: {[any]: any}, _: {[any]: any}, p4, n1: number) -- line: 48
 		if typeof(n1) ~= "number" or n1 < 0 then
 			return false
 		end

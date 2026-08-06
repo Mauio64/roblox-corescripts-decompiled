@@ -11,26 +11,38 @@ local SocialLuaAnalytics = require(ChatUIPrimitivesParent.SocialLuaAnalytics)
 local ScrollIntervalTracker = require(ChatUIPrimitivesParent.ScrollIntervalTracker)
 local FFlagExpChatScrollPerfTracking = require(ChatUIPrimitives.Flags.FFlagExpChatScrollPerfTracking)
 local FFlagExpChatMigrateScrollIntervalTracker = require(ChatUIPrimitives.Flags.FFlagExpChatMigrateScrollIntervalTracker)
-local t1 = {
-	start = function(p1, p2) -- line: 24
-		-- upvalues: EventConfig (copy), EventTypes (copy), TimeToInteractiveTracker (copy), IntervalPerformanceTracker (copy), v5 (copy)
-		local v17 = EventConfig[p1] or {}
+local FFlagExpChatPerfTrackerTabName = require(ChatUIPrimitives.Flags.FFlagExpChatPerfTrackerTabName)
+local t3 = {
+	start = function(p1, p2, t1: {[any]: any}?) -- line: 27
+		-- upvalues: EventConfig (copy), EventTypes (copy), TimeToInteractiveTracker (copy), FFlagExpChatPerfTrackerTabName (copy), IntervalPerformanceTracker (copy), v5 (copy)
+		local v19 = EventConfig[p1] or {}
 
-		if v17.type == EventTypes.TTI then
-			v17.onStart(p2)
-			TimeToInteractiveTracker.trackStart(v17.baseName)
+		if v19.type == EventTypes.TTI then
+			v19.onStart(p2)
+			TimeToInteractiveTracker.trackStart(v19.baseName)
+
+			if FFlagExpChatPerfTrackerTabName and t1 and t1.tabName then
+				TimeToInteractiveTracker.updateMetadata(v19.baseName, {
+					page = t1.tabName
+				})
+			end
 
 			return true
 		end
 
-		if v17.type == EventTypes.Interval then
-			if not v17.canStart(p2) then
+		if v19.type == EventTypes.Interval then
+			if not v19.canStart(p2) then
 				return false
 			end
 
-			IntervalPerformanceTracker:cancelTracking(v17.name)
-			v17.onStart(p2)
-			IntervalPerformanceTracker:startTracking(v17.name, nil, v17.intervalMetrics, true, true)
+			IntervalPerformanceTracker:cancelTracking(v19.name)
+			v19.onStart(p2)
+
+			if FFlagExpChatPerfTrackerTabName and t1 then
+				IntervalPerformanceTracker:startTracking(v19.name, nil, v19.intervalMetrics, true, true, t1)
+			else
+				IntervalPerformanceTracker:startTracking(v19.name, nil, v19.intervalMetrics, true, true)
+			end
 
 			return true
 		end
@@ -39,46 +51,56 @@ local t1 = {
 
 		return false
 	end,
-	finish = function(p3, p4) -- line: 46
-		-- upvalues: EventConfig (copy), EventTypes (copy), TimeToInteractiveTracker (copy), IntervalPerformanceTracker (copy), v5 (copy)
-		local v20 = EventConfig[p3] or {}
+	finish = function(p3, p4, t2: {[any]: any}?) -- line: 63
+		-- upvalues: EventConfig (copy), EventTypes (copy), FFlagExpChatPerfTrackerTabName (copy), TimeToInteractiveTracker (copy), v5 (copy), IntervalPerformanceTracker (copy)
+		local v23 = EventConfig[p3] or {}
 
-		if v20.type == EventTypes.TTI then
-			if not v20.canFinish(p4) then
+		if v23.type == EventTypes.TTI then
+			if not v23.canFinish(p4) then
 				return
 			end
 
-			TimeToInteractiveTracker.trackEnd(v20.baseName)
+			if FFlagExpChatPerfTrackerTabName and t2 and t2.tabName then
+				TimeToInteractiveTracker.updateMetadata(v23.baseName, {
+					page = t2.tabName
+				})
+			end
+
+			TimeToInteractiveTracker.trackEnd(v23.baseName)
 
 			return
 		end
 
-		if v20.type == EventTypes.Interval then
-			if not v20.canFinish(p4) then
+		if v23.type == EventTypes.Interval then
+			if not v23.canFinish(p4) then
 				return
 			end
 
-			v20.onFinish(p4)
-			IntervalPerformanceTracker:stopAndLogTracking(v20.name)
+			if FFlagExpChatPerfTrackerTabName and t2 then
+				v5:warning("Unable to update finished interval extra fields")
+			end
+
+			v23.onFinish(p4)
+			IntervalPerformanceTracker:stopAndLogTracking(v23.name)
 
 			return
 		end
 
 		v5:warning(`ExpChatPerfTracker.finish: unknown event type for event: { p3 }`)
 	end,
-	cancel = function(p5, p6) -- line: 64
+	cancel = function(p5, p6) -- line: 87
 		-- upvalues: EventConfig (copy), EventTypes (copy), TimeToInteractiveTracker (copy), IntervalPerformanceTracker (copy), v5 (copy)
-		local v23 = EventConfig[p5] or {}
+		local v26 = EventConfig[p5] or {}
 
-		if v23.type == EventTypes.TTI then
-			TimeToInteractiveTracker.resetEvent(v23.baseName)
+		if v26.type == EventTypes.TTI then
+			TimeToInteractiveTracker.resetEvent(v26.baseName)
 
 			return
 		end
 
-		if v23.type == EventTypes.Interval then
-			v23.onFinish(p6)
-			IntervalPerformanceTracker:cancelTracking(v23.name)
+		if v26.type == EventTypes.Interval then
+			v26.onFinish(p6)
+			IntervalPerformanceTracker:cancelTracking(v26.name)
 
 			return
 		end
@@ -87,37 +109,37 @@ local t1 = {
 	end
 }
 
-function t1.cancelAll() -- line: 76
-	-- upvalues: EventConfig (copy), t1 (copy)
-	for v24, _ in EventConfig do
-		t1.cancel(v24)
+function t3.cancelAll() -- line: 99
+	-- upvalues: EventConfig (copy), t3 (copy)
+	for v27, _ in EventConfig do
+		t3.cancel(v27)
 	end
 end
 
-t1.Events = Events
+t3.Events = Events
 
 if FFlagExpChatScrollPerfTracking then
-	function t1.startChatWindowScrollInterval(p7, p8, p9) -- line: 85
-		-- upvalues: t1 (copy), FFlagExpChatMigrateScrollIntervalTracker (copy), ScrollIntervalTracker (copy), SocialLuaAnalytics (copy)
-		local t2 = {
+	function t3.startChatWindowScrollInterval(p7, p8, p9, t4: {[any]: any}?) -- line: 108
+		-- upvalues: t3 (copy), FFlagExpChatMigrateScrollIntervalTracker (copy), ScrollIntervalTracker (copy), SocialLuaAnalytics (copy)
+		local t5 = {
 			debugName = p7
 		}
 
-		local function v30(p10) -- line: 93
-			-- upvalues: t1 (copy), p7 (copy)
-			return t1.start(p7, p10)
+		local function v34(p10) -- line: 117
+			-- upvalues: t3 (copy), p7 (copy), t4 (copy)
+			return t3.start(p7, p10, t4)
 		end
-		local function v31(p11) -- line: 96
-			-- upvalues: t1 (copy), p7 (copy)
-			t1.finish(p7, p11)
+		local function v35(p11) -- line: 120
+			-- upvalues: t3 (copy), p7 (copy)
+			t3.finish(p7, p11)
 		end
 
 		if FFlagExpChatMigrateScrollIntervalTracker then
-			return ScrollIntervalTracker.createScrollIntervalTracker(v30, v31, p8, p9, t2)
+			return ScrollIntervalTracker.createScrollIntervalTracker(v34, v35, p8, p9, t5)
 		end
 
-		return SocialLuaAnalytics.Performance.createScrollIntervalTracker(v30, v31, p8, p9, t2)
+		return SocialLuaAnalytics.Performance.createScrollIntervalTracker(v34, v35, p8, p9, t5)
 	end
 end
 
-return t1
+return t3

@@ -13,9 +13,9 @@ local InputSize = Foundation.Enums.InputSize
 local EnumsRadius = Foundation.Enums.Radius
 local useScaledValue = Foundation.Hooks.useScaledValue
 
-local function noop() -- line: 30
+local function noop() -- line: 29
 end
-local function PublishGameSheet(t1: {[any]: any}) -- line: 32
+local function PublishGameSheet(t1: {[any]: any}) -- line: 31
 	-- upvalues: noop (copy), useScaledValue (copy), React (copy), Skeleton (copy), EnumsRadius (copy), Sheet (copy), FoundationText (copy), LocalizationStrings (copy), View (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
 	local v18 = t1.onClose or noop
 	local v19 = useScaledValue(330)

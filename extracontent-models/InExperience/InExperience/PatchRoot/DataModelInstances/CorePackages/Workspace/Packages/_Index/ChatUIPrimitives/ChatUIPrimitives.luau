@@ -24,6 +24,7 @@ return {
 	},
 	Flags = {
 		FFlagExpChatScrollPerfTracking = require(script.Flags.FFlagExpChatScrollPerfTracking),
-		FFlagExpChatAddressFrame0Flash = require(script.Flags.FFlagExpChatAddressFrame0Flash)
+		FFlagExpChatAddressFrame0Flash = require(script.Flags.FFlagExpChatAddressFrame0Flash),
+		FFlagExpChatPerfTrackerTabName = require(script.Flags.FFlagExpChatPerfTrackerTabName)
 	}
 }

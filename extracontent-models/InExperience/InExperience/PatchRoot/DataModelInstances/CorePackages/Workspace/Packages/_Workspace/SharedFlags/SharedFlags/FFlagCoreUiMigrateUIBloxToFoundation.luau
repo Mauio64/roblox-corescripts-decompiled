@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CoreUiMigrateUIBloxToFoundation", false)
+return game:DefineFastFlag("CoreUiMigrateUIBloxToFoundation2", false)

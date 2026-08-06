@@ -10,28 +10,28 @@ return {
 	["jest.config"] = script["jest.config"],
 	SduiFocusTags = require(script.FocusNavigation.SduiFocusTags),
 	OnNavigateBackWrapper = require(script.FocusNavigation.NavigateBackBindings).OnNavigateBackWrapper,
-	useOnNavigateBack = function(p1: ((...any) -> ...any), p2) -- line: 23
+	useOnNavigateBack = function(p1: ((...any) -> ...any), p2) -- line: 24
 		return require(script.FocusNavigation.NavigateBackBindings).useOnNavigateBack(p1, p2)
 	end,
-	useInitialFocusOnTag = function(s1: string, t1: {[any]: any}) -- line: 26
+	useInitialFocusOnTag = function(s1: string, t1: {[any]: any}) -- line: 27
 		require(script.FocusNavigation.useInitialFocusOnTag)(s1, t1)
 	end,
-	useSelectionOrderTracking = function(t2: {[any]: any}) -- line: 29
+	useSelectionOrderTracking = function(t2: {[any]: any}) -- line: 30
 		require(script.FocusNavigation.useSelectionOrderTracking)(t2)
 	end,
-	usePageButtonBindings = function(t3: {[any]: any}, p3, p4) -- line: 32
+	usePageButtonBindings = function(t3: {[any]: any}, p3, p4) -- line: 33
 		return require(script.FocusNavigation.usePageButtonBindings)(t3, p3, p4)
 	end,
-	useBackButtonBinding = function(p5: ((...any) -> ...any)) -- line: 39
+	useBackButtonBinding = function(p5: ((...any) -> ...any)) -- line: 40
 		return require(script.FocusNavigation.useBackButtonBinding)(p5)
 	end,
-	createSduiFocusActivationStore = function() -- line: 42
+	createSduiFocusActivationStore = function() -- line: 43
 		return require(script.FocusNavigation.createSduiFocusActivationStore)()
 	end,
-	getSduiFocusActivationStore = function() -- line: 45
+	getSduiFocusActivationStore = function() -- line: 46
 		return require(script.FocusNavigation.getSduiFocusActivationStore)()
 	end,
-	useSduiFocusActivation = function(s2: string?, p6: ((...any) -> ...any)?) -- line: 48
+	useSduiFocusActivation = function(s2: string?, p6: ((...any) -> ...any)?) -- line: 49
 		require(script.FocusNavigation.useSduiFocusActivation)(s2, p6)
 	end,
 	createSduiApiStore = require(script.createSduiApiStore),
@@ -59,5 +59,6 @@ return {
 	getSduiClientPageScope = require(scriptParent.SduiCoreSystem).getSduiClientPageScope,
 	usePageScopeRef = require(scriptParent.SduiCoreSystem).usePageScopeRef,
 	SduiCapabilities = require(scriptParent.SduiCoreSystem).SduiCapabilities,
-	streamingFeedMergeStrategy = require(script.streamingFeedMergeStrategy)
+	streamingFeedMergeStrategy = require(script.streamingFeedMergeStrategy),
+	buildSduiCollectionInfo = require(script.buildSduiCollectionInfo)
 }

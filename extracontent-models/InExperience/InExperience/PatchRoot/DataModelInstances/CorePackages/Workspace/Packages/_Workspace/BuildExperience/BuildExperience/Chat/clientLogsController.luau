@@ -7,7 +7,7 @@ local StudioClientLogsTool = CreatorAgentChat.StudioClientLogsTool
 local debug = CreatorAgentChat.debug
 local awaitRequestState = toolControllerUtils.awaitRequestState
 
-local function getClientLogsReason(p1) -- line: 34
+local function getClientLogsReason(p1) -- line: 33
 	if typeof(p1) ~= "table" then
 		return nil
 	end
@@ -18,9 +18,9 @@ local function getClientLogsReason(p1) -- line: 34
 
 	return nil
 end
-local function createClientLogsController(p2, t1: {[any]: any}) -- line: 41
+local function createClientLogsController(p2, t1: {[any]: any}) -- line: 40
 	-- upvalues: debug (copy), clientLogsCollector (copy), awaitRequestState (copy), chatConstants (copy), StudioClientLogsTool (copy)
-	local function submitClientLogsResult(t2: {[any]: any}) -- line: 45
+	local function submitClientLogsResult(t2: {[any]: any}) -- line: 44
 		-- upvalues: debug (copy), clientLogsCollector (copy), p2 (copy), awaitRequestState (copy), chatConstants (copy)
 		debug.log("info", "ask_for_logs tool_result collecting", {
 			sessionId = t2.sessionId,
@@ -73,7 +73,7 @@ local function createClientLogsController(p2, t1: {[any]: any}) -- line: 41
 	end
 
 	return {
-		syncClientLogsRequest = function(p3) -- line: 93
+		syncClientLogsRequest = function(p3) -- line: 92
 			-- upvalues: StudioClientLogsTool (copy), t1 (copy), submitClientLogsResult (copy)
 			local v24, v25, v26, v27 = StudioClientLogsTool.findClientLogsRequestInTurnState(p3, t1)
 
@@ -91,7 +91,7 @@ local function createClientLogsController(p2, t1: {[any]: any}) -- line: 41
 				reason = if typeof(v25) == "table" then if typeof(v25.reason) ~= "string" or v25.reason == "" then nil else v25.reason else nil
 			}
 
-			task.spawn(function() -- line: 108
+			task.spawn(function() -- line: 107
 				-- upvalues: submitClientLogsResult (copy), t3 (copy)
 				submitClientLogsResult(t3)
 			end)

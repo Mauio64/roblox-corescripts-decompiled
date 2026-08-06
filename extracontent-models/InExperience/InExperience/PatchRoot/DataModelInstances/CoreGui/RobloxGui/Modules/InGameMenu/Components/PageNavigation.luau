@@ -7,10 +7,11 @@ local UIBlox = InGameMenuDependencies.UIBlox
 local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Foundation = require(CorePackages.Packages.Foundation)
-local FoundationImage = Foundation.Image
+local Icon = Foundation.Icon
+local IconSize = Foundation.Enums.IconSize
 local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local v12 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
-local v13 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
+local v13 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
+local v14 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
 local ParentParent = script.Parent.Parent
 local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
 local Pages = require(script.Parent.Pages)
@@ -20,28 +21,28 @@ local withLocalization = require(ParentParent.Localization.withLocalization)
 local divideTransparency = require(ParentParent.Utility.divideTransparency)
 local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
 local Constants = require(ParentParent.Resources.Constants)
-local v23 = Roact.PureComponent:extend("NavigationButton")
+local v24 = Roact.PureComponent:extend("NavigationButton")
 
-function v23.init(p1, p2) -- line: 54
+function v24.init(p1, p2) -- line: 55
 	-- upvalues: Roact (copy), Otter (copy)
-	local v27 = not p2.selected and 0 or 1
-	local v28, v29 = Roact.createBinding(v27)
+	local v28 = not p2.selected and 0 or 1
+	local v29, v30 = Roact.createBinding(v28)
 
-	p1.fillSize = v28:map(function(p3) -- line: 58
+	p1.fillSize = v29:map(function(p3) -- line: 59
 		return UDim2.new(p3, 0, 1, 0)
 	end)
 
-	local v30, v31 = Roact.createBinding(0)
+	local v31, v32 = Roact.createBinding(0)
 
-	p1.hoverTransparency = v30
-	p1.setHoverTransparency = v31
+	p1.hoverTransparency = v31
+	p1.setHoverTransparency = v32
 	p1.motor = Otter.createGroupMotor({
 		hoverTransparency = 0,
-		fillProgress = v27
+		fillProgress = v28
 	})
-	p1.motor:onStep(function(p4) -- line: 70
-		-- upvalues: v29 (copy), p1 (copy)
-		v29(p4.fillProgress)
+	p1.motor:onStep(function(p4) -- line: 71
+		-- upvalues: v30 (copy), p1 (copy)
+		v30(p4.fillProgress)
 		p1.setHoverTransparency(p4.hoverTransparency)
 	end)
 	p1:setState({
@@ -49,15 +50,15 @@ function v23.init(p1, p2) -- line: 54
 		pressing = false
 	})
 end
-function v23.renderWithSelectionCursor(p5, p6) -- line: 81
-	-- upvalues: withLocalization (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), v13 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), divideTransparency (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
+function v24.renderWithSelectionCursor(p5, p6) -- line: 82
+	-- upvalues: withLocalization (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), v14 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), divideTransparency (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
 	local props = p5.props
 
 	return withLocalization({
 		text = props.text
-	})(function(p7) -- line: 86
-		-- upvalues: withFoundationOrUIBloxStyle (copy), p5 (copy), props (copy), Roact (copy), p6 (copy), v13 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), divideTransparency (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
-		return withFoundationOrUIBloxStyle(function(p8) -- line: 87
+	})(function(p7) -- line: 87
+		-- upvalues: withFoundationOrUIBloxStyle (copy), p5 (copy), props (copy), Roact (copy), p6 (copy), v14 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), divideTransparency (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
+		return withFoundationOrUIBloxStyle(function(p8) -- line: 88
 			return {
 				Theme = {
 					BackgroundOnPress = {
@@ -82,9 +83,9 @@ function v23.renderWithSelectionCursor(p5, p6) -- line: 81
 					}
 				}
 			}
-		end, function(p9) -- line: 97
-			-- upvalues: p5 (copy), props (copy), Roact (copy), p6 (copy), v13 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), FoundationImage (copy), divideTransparency (copy), ImageSetLabel (copy), ThemedTextLabel (copy), p7 (copy)
-			local v53 = p5.state.pressing and not props.selected
+		end, function(p9) -- line: 98
+			-- upvalues: p5 (copy), props (copy), Roact (copy), p6 (copy), v14 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), divideTransparency (copy), ImageSetLabel (copy), ThemedTextLabel (copy), p7 (copy)
+			local v54 = p5.state.pressing and not props.selected
 			local t1 = {
 				Transparency = 1,
 				Color = Color3.new(1, 1, 1)
@@ -104,23 +105,23 @@ function v23.renderWithSelectionCursor(p5, p6) -- line: 81
 				LayoutOrder = props.LayoutOrder,
 				Size = UDim2.new(1, 0, 0, 70),
 				Text = "",
-				SelectionImageObject = p6(v13.Square),
+				SelectionImageObject = p6(v14.Square),
 				[Roact.Event.Activated] = props.onActivated,
 				[Roact.Ref] = props.LayoutOrder == 1 and props.mainPageFirstButtonRef or nil,
-				[Roact.Event.MouseEnter] = function() -- line: 121
+				[Roact.Event.MouseEnter] = function() -- line: 122
 					-- upvalues: p5 (copy)
 					p5:setState({
 						hovering = true
 					})
 				end,
-				[Roact.Event.MouseLeave] = function() -- line: 126
+				[Roact.Event.MouseLeave] = function() -- line: 127
 					-- upvalues: p5 (copy)
 					p5:setState({
 						hovering = false,
 						pressing = false
 					})
 				end,
-				[Roact.Event.InputBegan] = function(_, p11) -- line: 132
+				[Roact.Event.InputBegan] = function(_, p11) -- line: 133
 					-- upvalues: p5 (copy)
 					if p11.UserInputType == Enum.UserInputType.MouseButton1 or p11.UserInputType == Enum.UserInputType.Touch then
 						p5:setState({
@@ -128,7 +129,7 @@ function v23.renderWithSelectionCursor(p5, p6) -- line: 81
 						})
 					end
 				end,
-				[Roact.Event.InputEnded] = function(_, p13) -- line: 142
+				[Roact.Event.InputEnded] = function(_, p13) -- line: 143
 					-- upvalues: p5 (copy)
 					if p13.UserInputType == Enum.UserInputType.MouseButton1 or p13.UserInputType == Enum.UserInputType.Touch then
 						p5:setState({
@@ -148,25 +149,21 @@ function v23.renderWithSelectionCursor(p5, p6) -- line: 81
 						BackgroundTransparency = 1,
 						ZIndex = 3,
 						AnchorPoint = Vector2.new(0, 0.5),
-						Image = props.image,
+						Image = props.icon,
 						ImageColor3 = p9.Theme.IconEmphasis.Color,
-						ImageTransparency = divideTransparency(p9.Theme.IconEmphasis.Transparency, not v53 and 1 or 2),
+						ImageTransparency = divideTransparency(p9.Theme.IconEmphasis.Transparency, not v54 and 1 or 2),
 						Position = UDim2.new(0, 28, 0.5, 0),
 						Size = UDim2.new(0, 36, 0, 36)
-					}) else Roact.createElement(FoundationImage, {
+					}) else Roact.createElement(Icon, {
 						ZIndex = 3,
 						AnchorPoint = Vector2.new(0, 0.5),
-						Image = props.image.Image,
-						imageRect = {
-							offset = props.image.ImageRectOffset,
-							size = props.image.ImageRectSize
-						},
-						imageStyle = {
+						name = props.icon,
+						size = IconSize.Medium,
+						style = {
 							Color3 = p9.Theme.IconEmphasis.Color,
-							Transparency = divideTransparency(p9.Theme.IconEmphasis.Transparency, not v53 and 1 or 2)
+							Transparency = divideTransparency(p9.Theme.IconEmphasis.Transparency, not v54 and 1 or 2)
 						},
-						Position = UDim2.new(0, 28, 0.5, 0),
-						Size = UDim2.new(0, 36, 0, 36)
+						Position = UDim2.new(0, 28, 0.5, 0)
 					}),
 					Text = Roact.createElement(ThemedTextLabel, {
 						fontKey = "Header1",
@@ -176,7 +173,7 @@ function v23.renderWithSelectionCursor(p5, p6) -- line: 81
 						Position = UDim2.new(0, 80, 0.5, 0),
 						Size = UDim2.new(1, -104, 1, 0),
 						Text = p7.text,
-						TextTransparency = divideTransparency(p9.Theme.TextEmphasis.Transparency, not v53 and 1 or 2),
+						TextTransparency = divideTransparency(p9.Theme.TextEmphasis.Transparency, not v54 and 1 or 2),
 						TextXAlignment = Enum.TextXAlignment.Left
 					})
 				}),
@@ -190,14 +187,14 @@ function v23.renderWithSelectionCursor(p5, p6) -- line: 81
 		end)
 	end)
 end
-function v23.render(p14) -- line: 213
-	-- upvalues: v12 (copy)
-	return v12(function(p15) -- line: 214
+function v24.render(p14) -- line: 213
+	-- upvalues: v13 (copy)
+	return v13(function(p15) -- line: 214
 		-- upvalues: p14 (copy)
 		return p14:renderWithSelectionCursor(p15)
 	end)
 end
-function v23.didUpdate(p16) -- line: 219
+function v24.didUpdate(p16) -- line: 219
 	-- upvalues: Otter (copy)
 	p16.motor:setGoal({
 		fillProgress = Otter.spring(not p16.props.selected and 0 or 1, {
@@ -210,20 +207,20 @@ function v23.didUpdate(p16) -- line: 219
 end
 
 local function PageNavigation(p17) -- line: 230
-	-- upvalues: Roact (copy), Pages (copy), Constants (copy), v23 (copy), Divider (copy)
+	-- upvalues: Roact (copy), Pages (copy), Constants (copy), v24 (copy), Divider (copy)
 	local t2 = {
 		Layout = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Right
 		})
 	}
-	local v39 = #Pages.pagesByIndex
+	local v40 = #Pages.pagesByIndex
 	local n1 = 1
 
 	for i, v in ipairs(Pages.pagesByIndex) do
 		if v.parentPage == Constants.MainPagePageKey then
-			t2["Page" .. v.key] = Roact.createElement(v23, {
-				image = v.icon,
+			t2["Page" .. v.key] = Roact.createElement(v24, {
+				icon = v.icon,
 				LayoutOrder = n1,
 				selected = p17.currentPage == v.key,
 				text = v.title,
@@ -235,7 +232,7 @@ local function PageNavigation(p17) -- line: 230
 			})
 			n1 += 1
 
-			if i < v39 then
+			if i < v40 then
 				t2["Divider" .. n1] = Roact.createElement(Divider, {
 					LayoutOrder = n1,
 					Size = UDim2.new(1, -24, 0, 1)
@@ -248,7 +245,7 @@ local function PageNavigation(p17) -- line: 230
 	return Roact.createElement("Frame", {
 		BackgroundTransparency = 1,
 		Position = p17.Position,
-		Size = UDim2.new(1, -Constants.Zone.ContentOffset, 0, v39 * 70 + (v39 - 1))
+		Size = UDim2.new(1, -Constants.Zone.ContentOffset, 0, v40 * 70 + (v40 - 1))
 	}, t2)
 end
 

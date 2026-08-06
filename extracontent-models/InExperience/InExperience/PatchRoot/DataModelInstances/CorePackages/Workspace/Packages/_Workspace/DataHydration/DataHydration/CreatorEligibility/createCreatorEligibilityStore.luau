@@ -8,14 +8,14 @@ local fetchCreatorEligibility = require(script.Parent.fetchCreatorEligibility)
 
 require(script.Parent.CreatorEligibilityStoreTypes)
 
-local function createCreatorEligibilityStore(t1: {[any]: any}?) -- line: 19
+local function createCreatorEligibilityStore(t1: {[any]: any}?) -- line: 18
 	-- upvalues: createSingleEntityResolver (copy), fetchCreatorEligibility (copy)
 	local v7 = t1 or {}
 	local t2 = {
 		network = v7.network,
 		baseUrl = v7.baseUrl
 	}
-	local v9 = createSingleEntityResolver(function(n1: number) -- line: 23
+	local v9 = createSingleEntityResolver(function(n1: number) -- line: 22
 		-- upvalues: fetchCreatorEligibility (copy), t2 (copy)
 		return fetchCreatorEligibility.fetchEligibility(n1, t2)
 	end)

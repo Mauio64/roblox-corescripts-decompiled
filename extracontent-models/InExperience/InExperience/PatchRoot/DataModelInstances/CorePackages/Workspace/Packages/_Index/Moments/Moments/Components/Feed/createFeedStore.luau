@@ -150,11 +150,13 @@ local function createFeedStore(p1, p2: ((...any) -> ...any)?, b1: boolean?) -- l
 				if v54 then
 					if v61 == "Loaded" then
 						MomentsSurfaceLoadManager.primaryDataReady()
-
-						return
+					else
+						MomentsSurfaceLoadManager.abort()
 					end
+				end
 
-					MomentsSurfaceLoadManager.abort()
+				if v55.onAccepted ~= nil then
+					v55.onAccepted()
 
 					return
 				end
@@ -181,7 +183,7 @@ local function createFeedStore(p1, p2: ((...any) -> ...any)?, b1: boolean?) -- l
 			end
 		end)
 	end
-	local function loadInitial() -- line: 277
+	local function loadInitial() -- line: 280
 		-- upvalues: runFetch (copy)
 		runFetch(true)
 	end
@@ -193,7 +195,7 @@ local function createFeedStore(p1, p2: ((...any) -> ...any)?, b1: boolean?) -- l
 		getHasMore = v20,
 		getLoadMoreFailed = v22,
 		loadInitial = loadInitial,
-		loadMore = function() -- line: 281
+		loadMore = function() -- line: 284
 			-- upvalues: u25 (ref), v22 (copy), u26 (ref), v20 (copy), n2 (ref), v23 (copy), v15 (copy), t1 (copy), v17 (copy), nextCursor (ref), p1 (copy), FFlagMomentsSurfaceLoadTTI (copy), b1 (copy), MomentsSurfaceLoadManager (copy), t2 (ref), dedupeAndTrack (copy), n1 (ref), v21 (copy), v19 (copy)
 			if u25 or v22(false) then
 				return
@@ -275,11 +277,13 @@ local function createFeedStore(p1, p2: ((...any) -> ...any)?, b1: boolean?) -- l
 					if v66 then
 						if v73 == "Loaded" then
 							MomentsSurfaceLoadManager.primaryDataReady()
-
-							return
+						else
+							MomentsSurfaceLoadManager.abort()
 						end
+					end
 
-						MomentsSurfaceLoadManager.abort()
+					if v67.onAccepted ~= nil then
+						v67.onAccepted()
 
 						return
 					end
@@ -306,7 +310,7 @@ local function createFeedStore(p1, p2: ((...any) -> ...any)?, b1: boolean?) -- l
 				end
 			end)
 		end,
-		prependItem = function(p3) -- line: 299
+		prependItem = function(p3) -- line: 302
 			-- upvalues: dedupeAndTrack (copy), v15 (copy), v16 (copy), v17 (copy)
 			local v51 = dedupeAndTrack({ p3 })
 
@@ -321,11 +325,11 @@ local function createFeedStore(p1, p2: ((...any) -> ...any)?, b1: boolean?) -- l
 			end
 		end,
 		refresh = loadInitial,
-		retry = function() -- line: 313
+		retry = function() -- line: 316
 			-- upvalues: runFetch (copy), v15 (copy)
 			runFetch(v15.getCount(false) == 0)
 		end,
-		dispose = function() -- line: 317
+		dispose = function() -- line: 320
 			-- upvalues: u26 (ref), p1 (copy), v15 (copy)
 			u26 = true
 

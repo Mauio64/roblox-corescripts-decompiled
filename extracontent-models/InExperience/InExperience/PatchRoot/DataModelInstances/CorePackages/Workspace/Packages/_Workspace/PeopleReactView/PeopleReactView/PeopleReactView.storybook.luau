@@ -18,6 +18,8 @@ local t2 = {
 	["Feature.SettingsHub.Label.Mute"] = "Mute",
 	["Feature.SettingsHub.Label.Unmute"] = "Unmute",
 	["CoreScripts.InGameMenu.QuickActions.Report"] = "Report",
+	["CoreScripts.InGameMenu.GameSettings.Volume"] = "Volume",
+	["Feature.SettingsHub.Label.VoiceChat"] = "Voice chat",
 	["CoreScripts.InGameMenu.VoiceChatVolumeLower"] = "Voice chat volume",
 	["Feature.SettingsHub.Prompt.BuyWhatTheyreWearing"] = "Buy what they’re wearing\t",
 	["Feature.SettingsHub.Description.SelectAvatarToCheckoutItems"] = "Select an avatar to check out their items.",
@@ -25,17 +27,17 @@ local t2 = {
 	["Feature.SettingsHub.Action.Ok"] = "Ok"
 }
 local t3 = {
-	Format = function(_, s1: string) -- line: 38
+	Format = function(_, s1: string) -- line: 40
 		-- upvalues: t2 (copy)
 		return t2[s1] or s1
 	end,
 	changed = Signal.new(),
-	GetLocale = function() -- line: 42
+	GetLocale = function() -- line: 44
 		return "en-us"
 	end
 }
 
-local function StyleLinkPortal(t4: {[any]: any}) -- line: 47
+local function StyleLinkPortal(t4: {[any]: any}) -- line: 49
 	-- upvalues: useStyleSheet (copy), ReactRoblox (copy), React (copy)
 	local v18 = useStyleSheet()
 
@@ -43,9 +45,9 @@ local function StyleLinkPortal(t4: {[any]: any}) -- line: 47
 		StyleSheet = v18
 	}), t4.overlay)
 end
-local function StoryBookMapStory(p2) -- line: 58
+local function StoryBookMapStory(p2) -- line: 60
 	-- upvalues: React (copy), LocalizationProvider (copy), t3 (copy), FoundationProvider (copy), Foundation (copy), t1 (copy), StyleLinkPortal (copy)
-	return function(p3) -- line: 59
+	return function(p3) -- line: 61
 		-- upvalues: React (copy), LocalizationProvider (copy), t3 (copy), FoundationProvider (copy), Foundation (copy), t1 (copy), p2 (copy), StyleLinkPortal (copy)
 		local v21 = React.useRef(Instance.new("Frame"))
 
@@ -53,7 +55,7 @@ local function StoryBookMapStory(p2) -- line: 58
 			v21.current.Parent = p3.focus
 		end
 
-		React.useLayoutEffect(function() -- line: 65
+		React.useLayoutEffect(function() -- line: 67
 			-- upvalues: v21 (copy)
 			v21.current.Size = UDim2.fromScale(1, 1)
 			v21.current.BackgroundTransparency = 1

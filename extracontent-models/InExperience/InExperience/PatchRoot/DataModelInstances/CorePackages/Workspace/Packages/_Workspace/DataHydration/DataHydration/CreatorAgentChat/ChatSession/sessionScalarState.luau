@@ -2,7 +2,7 @@ local Parent = script:FindFirstAncestor("DataHydration").Parent
 local Signals = require(Parent.Signals)
 
 return {
-	createSessionScalarState = function(s1: string?) -- line: 28
+	createSessionScalarState = function(s1: string?) -- line: 27
 		-- upvalues: Signals (copy)
 		local v4, v5 = Signals.createSignal(s1)
 		local v6, v7 = Signals.createSignal(false)
@@ -17,7 +17,7 @@ return {
 			setCasSessionId = v5,
 			getHasLoadedHistory = v6,
 			setHasLoadedHistory = v7,
-			markHistoryLoaded = function() -- line: 63
+			markHistoryLoaded = function() -- line: 62
 				-- upvalues: v7 (copy)
 				v7(true)
 			end,
@@ -28,7 +28,7 @@ return {
 			getInitialized = v12,
 			setInitialized = v13,
 			getAssistantTurnSequence = v14,
-			incrementAssistantTurnSequence = function() -- line: 52
+			incrementAssistantTurnSequence = function() -- line: 51
 				-- upvalues: v14 (copy), v15 (copy)
 				local v21 = v14(false) + 1
 
@@ -37,11 +37,11 @@ return {
 				return v21
 			end,
 			getLatestObservedHistorySequenceId = v16,
-			setLatestObservedHistorySequenceId = function(n1: number?) -- line: 38
+			setLatestObservedHistorySequenceId = function(n1: number?) -- line: 37
 				-- upvalues: v17 (copy)
 				v17(n1)
 			end,
-			noteHistorySequenceId = function(n2: number?) -- line: 42
+			noteHistorySequenceId = function(n2: number?) -- line: 41
 				-- upvalues: v16 (copy), v17 (copy)
 				if n2 == nil then
 					return

@@ -1,5 +1,4 @@
 local Parent = script:FindFirstAncestor("GameCollections").Parent
-local SharedFlags = require(Parent.SharedFlags)
 local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
 local React = require(Parent.React)
 local GameTile = require(Parent.GameTile)
@@ -8,12 +7,11 @@ local getTileBadgeByPositionConfigFromEntry = GameTile.getTileBadgeByPositionCon
 
 require(Parent.VideoUtils)
 
-local FFlagLuaAppFixCustomTileBugs = SharedFlags.FFlagLuaAppFixCustomTileBugs
-local v9 = React.memo(function(t1: {[any]: any}) -- line: 41
-	-- upvalues: React (copy), getTileBadgeByPositionConfigFromEntry (copy), TwoByOneGameTile (copy), FFlagLuaAppFixCustomTileBugs (copy)
-	local v11 = -((t1.maxItemIndex or 0) + 1)
-	local v12 = if not t1.zIndex then v11 else t1.zIndex + v11
-	local v13 = React.useCallback(function() -- line: 46
+local v7 = React.memo(function(t1: {[any]: any}) -- line: 39
+	-- upvalues: React (copy), getTileBadgeByPositionConfigFromEntry (copy), TwoByOneGameTile (copy)
+	local v9 = -((t1.maxItemIndex or 0) + 1)
+	local v10 = if not t1.zIndex then v9 else t1.zIndex + v9
+	local v11 = React.useCallback(function() -- line: 44
 		-- upvalues: t1 (copy)
 		if t1.onSelectionGained then
 			t1.onSelectionGained(t1.item, t1.index, t1.item.universeId)
@@ -23,12 +21,12 @@ local v9 = React.memo(function(t1: {[any]: any}) -- line: 41
 		t1.item,
 		t1.index
 	})
-	local v14 = getTileBadgeByPositionConfigFromEntry(t1.item)
+	local v12 = getTileBadgeByPositionConfigFromEntry(t1.item)
 
 	return React.createElement(TwoByOneGameTile, {
 		size = t1.item.sizeOverride,
 		layoutOrder = t1.index,
-		zIndex = v12,
+		zIndex = v10,
 		universeId = t1.item.universeId,
 		placeId = t1.item.placeId,
 		topicId = t1.topicId,
@@ -38,7 +36,7 @@ local v9 = React.memo(function(t1: {[any]: any}) -- line: 41
 		subtitle = t1.item.subtitle,
 		ctaText = t1.item.ctaText,
 		tileVariant = t1.item.tileVariant,
-		badgeOverride = v14,
+		badgeOverride = v12,
 		payerName = t1.item.payerName,
 		adId = t1.item.adId,
 		isSponsored = t1.item.isSponsored,
@@ -56,15 +54,15 @@ local v9 = React.memo(function(t1: {[any]: any}) -- line: 41
 		enableExplicitFeedback = t1.enableExplicitFeedback,
 		placeIdOverride = t1.item.placeIdOverride,
 		launchDataOverride = t1.item.launchDataOverride,
-		onSelectionGained = v13,
+		onSelectionGained = v11,
 		onSelectionLost = t1.onSelectionLost,
 		primaryWideImageAssetId = t1.item.primaryWideImageAssetId,
 		videoPlaybackContext = t1.videoPlaybackContext,
-		SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t1.SelectionOrder
+		SelectionOrder = t1.SelectionOrder
 	})
 end)
 
-return function(t2: {[any]: any}) -- line: 95
-	-- upvalues: React (copy), v9 (copy), GameCollectionItemTypes (copy)
-	return React.createElement(v9, t2), GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile
+return function(t2: {[any]: any}) -- line: 93
+	-- upvalues: React (copy), v7 (copy), GameCollectionItemTypes (copy)
+	return React.createElement(v7, t2), GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile
 end

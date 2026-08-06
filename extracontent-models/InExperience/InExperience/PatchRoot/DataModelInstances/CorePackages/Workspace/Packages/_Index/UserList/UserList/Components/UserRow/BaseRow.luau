@@ -13,19 +13,25 @@ local useLocalization = require(UserListParent.Localization).Hooks.useLocalizati
 local v10 = game:DefineFastFlag("UserListUseActionAddTranslation", false)
 local FFlagFriendsPageViewBtnEnabled = require(UserListParent.SharedFlags).FFlagFriendsPageViewBtnEnabled
 local FFlagEnableBlackbirdCheck = require(UserListParent.SharedFlags).FFlagEnableBlackbirdCheck
+local FFlagUserListCtaIntegrationEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaIntegrationEnabled
+local FFlagAddStatusIndicatorToBaseRow = require(UserListParent.SharedFlags).FFlagAddStatusIndicatorToBaseRow
 local View = Foundation.View
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 local IconButton = Foundation.IconButton
 local IconSize = Foundation.Enums.IconSize
+local Skeleton = Foundation.Skeleton
+local EnumsRadius = Foundation.Enums.Radius
+local StatusIndicator = Foundation.StatusIndicator
+local StatusIndicatorVariant = Foundation.Enums.StatusIndicatorVariant
 local useTokens = Foundation.Hooks.useTokens
 local FillBehavior = Foundation.Enums.FillBehavior
 
-local function BaseRow(t1: {[any]: any}) -- line: 68
-	-- upvalues: useTokens (copy), v10 (copy), useLocalization (copy), TextKeys (copy), Enums (copy), FFlagFriendsPageViewBtnEnabled (copy), React (copy), View (copy), Constants (copy), UserTile (copy), Foundation (copy), FFlagEnableBlackbirdCheck (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), IconButton (copy), IconSize (copy)
-	local v23 = useTokens()
-	local v24 = if not v10 then nil else useLocalization({
+local function BaseRow(t1: {[any]: any}) -- line: 79
+	-- upvalues: useTokens (copy), v10 (copy), useLocalization (copy), TextKeys (copy), Enums (copy), FFlagFriendsPageViewBtnEnabled (copy), React (copy), View (copy), Constants (copy), UserTile (copy), Foundation (copy), FFlagEnableBlackbirdCheck (copy), FFlagAddStatusIndicatorToBaseRow (copy), StatusIndicator (copy), StatusIndicatorVariant (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), FFlagUserListCtaIntegrationEnabled (copy), Skeleton (copy), EnumsRadius (copy), IconButton (copy), IconSize (copy)
+	local v29 = useTokens()
+	local v30 = if not v10 then nil else useLocalization({
 		Accept = TextKeys.Accept,
 		Add = TextKeys.Add,
 		Chat = TextKeys.Chat,
@@ -63,7 +69,7 @@ local function BaseRow(t1: {[any]: any}) -- line: 68
 				isSubtitleLoading = t1.isSubtitleLoading,
 				contextualInfo = t1.contextualInfo and t1.contextualInfo.text,
 				isContextualInfoLoading = t1.isContextualInfoLoading,
-				avatarSize = if t1.layoutMode ~= Enums.RowLayoutMode.Compact then nil else UDim2.new(0, v23.Size.Size_1400, 0, v23.Size.Size_1400),
+				avatarSize = if t1.layoutMode ~= Enums.RowLayoutMode.Compact then nil else UDim2.new(0, v29.Size.Size_1400, 0, v29.Size.Size_1400),
 				trustedConnectionIndicatorEnabled = t1.trustedConnectionIndicatorEnabled,
 				isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else t1.isRobloxSubscriber
 			})
@@ -76,25 +82,37 @@ local function BaseRow(t1: {[any]: any}) -- line: 68
 				["col size-full-0 auto-y align-x-center"] = t1.layoutMode == Enums.RowLayoutMode.Compact
 			}
 		}, {
-			PrimaryActionCta = if not t1.primaryCta or not t1.primaryCta.onActivated then nil else if t1.layoutMode ~= Enums.RowLayoutMode.Wide then React.createElement(Button, {
+			StatusIndicatorContainer = if not FFlagAddStatusIndicatorToBaseRow or not t1.shouldShowStatusIndicator then nil else React.createElement(View, {
 				LayoutOrder = 1,
-				text = if not v10 then t1.primaryCta.type else v24[t1.primaryCta.type],
+				tag = "auto-xy padding-right-small"
+			}, {
+				StatusIndicator = React.createElement(StatusIndicator, {
+					variant = StatusIndicatorVariant.Emphasis
+				})
+			}),
+			PrimaryActionCta = if not t1.primaryCta or not t1.primaryCta.onActivated then if not FFlagUserListCtaIntegrationEnabled or (not t1.ctaLoading or t1.layoutMode ~= Enums.RowLayoutMode.Wide) then nil else React.createElement(Skeleton, {
+				LayoutOrder = not FFlagAddStatusIndicatorToBaseRow and 1 or 2,
+				Size = UDim2.fromOffset(t1.ctaLoading.minWidth or 0, v29.Size.Size_800),
+				radius = EnumsRadius.Medium
+			}) else if t1.layoutMode ~= Enums.RowLayoutMode.Wide then React.createElement(Button, {
+				text = if not v10 then t1.primaryCta.type else v30[t1.primaryCta.type],
 				size = InputSize.Small,
 				variant = if not FFlagFriendsPageViewBtnEnabled then ButtonVariant.SoftEmphasis else t1.primaryCta.variant or ButtonVariant.SoftEmphasis,
 				onActivated = t1.primaryCta.onActivated,
 				isDisabled = t1.primaryCta.isDisabled,
 				isLoading = t1.primaryCta.isLoading,
+				LayoutOrder = not FFlagAddStatusIndicatorToBaseRow and 1 or 2,
 				width = if t1.layoutMode ~= Enums.RowLayoutMode.Compact then nil else UDim.new(1, 0)
 			}) else React.createElement(View, {
-				LayoutOrder = 1,
 				tag = "auto-xy",
+				LayoutOrder = not FFlagAddStatusIndicatorToBaseRow and 1 or 2,
 				sizeConstraint = {
 					MinSize = if not t1.primaryCta.minWidth then nil else Vector2.new(t1.primaryCta.minWidth, 0),
 					MaxSize = if not t1.primaryCta.maxWidth then nil else Vector2.new(t1.primaryCta.maxWidth, 1e999)
 				}
 			}, {
 				Button = React.createElement(Button, {
-					text = if not v10 then t1.primaryCta.type else v24[t1.primaryCta.type],
+					text = if not v10 then t1.primaryCta.type else v30[t1.primaryCta.type],
 					size = InputSize.Small,
 					variant = if not FFlagFriendsPageViewBtnEnabled then ButtonVariant.SoftEmphasis else t1.primaryCta.variant or ButtonVariant.SoftEmphasis,
 					onActivated = t1.primaryCta.onActivated,
@@ -104,17 +122,17 @@ local function BaseRow(t1: {[any]: any}) -- line: 68
 				})
 			}),
 			SecondaryActionCta = if t1.layoutMode ~= Enums.RowLayoutMode.Wide or (not t1.secondaryCta or (not t1.secondaryCta.icon or not t1.secondaryCta.onActivated)) then nil else React.createElement(IconButton, {
-				LayoutOrder = 2,
 				icon = t1.secondaryCta.icon,
 				size = IconSize.Small,
 				variant = ButtonVariant.Utility,
 				onActivated = t1.secondaryCta.onActivated,
 				isDisabled = t1.secondaryCta.isDisabled,
-				isLoading = t1.secondaryCta.isLoading
+				isLoading = t1.secondaryCta.isLoading,
+				LayoutOrder = not FFlagAddStatusIndicatorToBaseRow and 2 or 3
 			}),
 			TrailingContentWrapper = if t1.layoutMode ~= Enums.RowLayoutMode.Wide or not t1.trailingContent then nil else React.createElement(View, {
 				tag = "auto-xy",
-				LayoutOrder = 3
+				LayoutOrder = not FFlagAddStatusIndicatorToBaseRow and 3 or 4
 			}, {
 				Content = t1.trailingContent
 			})

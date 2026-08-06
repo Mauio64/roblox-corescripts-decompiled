@@ -4,10 +4,10 @@ local Signals = require(Parent.Signals)
 require(script.Parent.Parent.types)
 
 return {
-	createSendPrompt = function(t1: {[any]: any}) -- line: 31
+	createSendPrompt = function(t1: {[any]: any}) -- line: 30
 		-- upvalues: Signals (copy)
 		return {
-			sendPrompt = function(p1) -- line: 32
+			sendPrompt = function(p1) -- line: 31
 				-- upvalues: t1 (copy), Signals (copy)
 				local v5 = t1.incrementAssistantTurnSequence()
 				local v6, v7 = Signals.createSignal(nil)
@@ -19,7 +19,7 @@ return {
 				local u14 = nil
 				local u15 = nil
 
-				local function fireCompleted(p2) -- line: 45
+				local function fireCompleted(p2) -- line: 44
 					-- upvalues: u11 (ref), v5 (copy), t1 (copy), u15 (ref), u14 (ref), u13 (ref), p1 (copy)
 					if u11 then
 						return
@@ -50,7 +50,7 @@ return {
 						p1.onCompleted(p2)
 					end
 				end
-				local function stop() -- line: 132
+				local function stop() -- line: 131
 					-- upvalues: u11 (ref), u12 (ref), u13 (ref), u15 (ref), u14 (ref), fireCompleted (copy)
 					if u11 then
 						return
@@ -82,14 +82,14 @@ return {
 				return {
 					getTurnHandle = v6,
 					getSetupError = v8,
-					start = function() -- line: 70
+					start = function() -- line: 69
 						-- upvalues: u10 (ref), u12 (ref), fireCompleted (copy), t1 (copy), v9 (copy), p1 (copy), u13 (ref), v7 (copy), u14 (ref), u15 (ref), Signals (copy)
 						if u10 then
 							return
 						end
 
 						u10 = true
-						task.spawn(function() -- line: 76
+						task.spawn(function() -- line: 75
 							-- upvalues: u12 (ref), fireCompleted (copy), t1 (copy), v9 (copy), p1 (copy), u13 (ref), v7 (copy), u14 (ref), u15 (ref), Signals (copy)
 							if u12 then
 								fireCompleted(nil)
@@ -153,7 +153,7 @@ return {
 								afterSequenceId = t1.getLatestObservedHistorySequenceId(),
 								onDroppedChatMessage = p1.onDroppedChatMessage
 							})
-							u15 = Signals.createEffect(function(p3) -- line: 124
+							u15 = Signals.createEffect(function(p3) -- line: 123
 								-- upvalues: v24 (copy), fireCompleted (copy)
 								if v24.state(p3).isDone then
 									fireCompleted(v24.state(false))

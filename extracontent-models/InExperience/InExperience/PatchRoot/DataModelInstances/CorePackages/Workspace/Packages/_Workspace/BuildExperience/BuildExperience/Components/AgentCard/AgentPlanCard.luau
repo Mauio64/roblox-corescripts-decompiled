@@ -16,11 +16,11 @@ local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
 local MarkdownViewer = Markdown.Components.MarkdownViewer
 
-local function AgentPlanSheet(t1: {[any]: any}) -- line: 44
+local function AgentPlanSheet(t1: {[any]: any}) -- line: 42
 	-- upvalues: Foundation (copy), React (copy), getMarkdownRendererProps (copy), Sheet (copy), FoundationText (copy), View (copy), LocalizationStrings (copy), MarkdownViewer (copy)
 	local v21 = Foundation.Hooks.useTokens()
 	local Default = v21.Color.Content.Default
-	local v23 = React.useMemo(function() -- line: 47
+	local v23 = React.useMemo(function() -- line: 45
 		-- upvalues: getMarkdownRendererProps (copy), v21 (copy), Default (copy)
 		return getMarkdownRendererProps(v21, Default)
 	end, {
@@ -67,11 +67,11 @@ local function AgentPlanSheet(t1: {[any]: any}) -- line: 44
 		})
 	})
 end
-local function AgentPlanCard(t2: {[any]: any}) -- line: 93
+local function AgentPlanCard(t2: {[any]: any}) -- line: 91
 	-- upvalues: React (copy), AgentCard (copy), AgentCardActions (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), AgentPlanSheet (copy)
 	local v25 = t2.testId or "agent-plan-card"
 	local v26, v27 = React.useState(false)
-	local v28 = React.useCallback(function() -- line: 97
+	local v28 = React.useCallback(function() -- line: 95
 		-- upvalues: t2 (copy)
 		if t2.isBuildDisabled == true then
 			return
@@ -82,11 +82,11 @@ local function AgentPlanCard(t2: {[any]: any}) -- line: 93
 		t2.isBuildDisabled,
 		t2.onBuild
 	})
-	local v29 = React.useCallback(function() -- line: 104
+	local v29 = React.useCallback(function() -- line: 102
 		-- upvalues: v27 (copy)
 		v27(true)
 	end, {})
-	local v30 = React.useCallback(function() -- line: 108
+	local v30 = React.useCallback(function() -- line: 106
 		-- upvalues: v27 (copy)
 		v27(false)
 	end, {})

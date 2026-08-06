@@ -149,6 +149,7 @@ return {
 		CommunityVerificationModal = "CommunityVerificationModal",
 		PurchaseConfirmationModal = "PurchaseConfirmationModal",
 		TransferRobuxFlow = not FFlagProfilePlatformEnableCurrencyTransfer and "" or "TransferRobuxFlow",
+		InsufficientRobuxDialog = not FFlagSocialEnableProfileInspectAndBuy and "" or "InsufficientRobuxDialog",
 		InspectAvatarSheet = not FFlagSocialEnableProfileInspectAndBuy and "" or "InspectAvatarSheet",
 		MomentsAll = not FFlagProfilePlatformEnableMoments and "" or "MomentsAll",
 		MomentsFeed = not FFlagProfilePlatformEnableMoments and "" or "MomentsFeed"

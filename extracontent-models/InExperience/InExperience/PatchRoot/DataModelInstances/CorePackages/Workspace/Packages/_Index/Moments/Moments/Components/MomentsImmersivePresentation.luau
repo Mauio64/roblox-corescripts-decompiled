@@ -29,7 +29,7 @@ local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
 local createRecommendationTelemetry = Feed.createRecommendationTelemetry
 local createMockFeedSource = Feed.createMockFeedSource
 
-local function PushedFeedSafeAreaProvider(t1: {[any]: any}) -- line: 74
+local function PushedFeedSafeAreaProvider(t1: {[any]: any}) -- line: 75
 	-- upvalues: useDeviceInsets (copy), React (copy), MomentPushedFeedSafeAreaContext (copy)
 	local v34 = useDeviceInsets()
 
@@ -39,7 +39,7 @@ local function PushedFeedSafeAreaProvider(t1: {[any]: any}) -- line: 74
 		Content = t1.children
 	})
 end
-local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
+local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 85
 	-- upvalues: React (copy), createMomentsStore (copy), FFlagEnableArgus (copy), createSignalTracker (copy), createUserMomentsFeedSource (copy), isStudio (copy), GetFFlagArgusStudioMockFeed (copy), createMockFeedSource (copy), createMomentsFeedSource (copy), createRecommendationTelemetry (copy), fireAnalyticsEvent (copy), EventNames (copy), useNavigationFocus (copy), useSignalState (copy), feedPlaybackSuspension (copy), GetMomentsPreferencesStore (copy), MomentsBackHeader (copy), MomentsFeedSurface (copy), GetFFlagMomentsPushedFeedSafeArea (copy), PushedFeedSafeAreaProvider (copy), MomentsHostShell (copy)
 	local v36 = React.useRef(nil)
 
@@ -58,7 +58,7 @@ local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
 	local feedKind = t2.feedKind
 	local targetUserId = t2.targetUserId
 	local initialIndex = t2.initialIndex
-	local v43 = React.useMemo(function() -- line: 103
+	local v43 = React.useMemo(function() -- line: 104
 		-- upvalues: feedKind (copy), createUserMomentsFeedSource (copy), targetUserId (copy), initialIndex (copy), isStudio (copy), GetFFlagArgusStudioMockFeed (copy), createMockFeedSource (copy), createMomentsFeedSource (copy), current (copy), current2 (copy)
 		if feedKind == "user" then
 			return createUserMomentsFeedSource(targetUserId or 0, {
@@ -80,7 +80,7 @@ local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
 		current,
 		current2
 	})
-	local v44 = React.useMemo(function() -- line: 117
+	local v44 = React.useMemo(function() -- line: 118
 		-- upvalues: feedKind (copy), FFlagEnableArgus (copy), createRecommendationTelemetry (copy), current (copy), current2 (copy)
 		if feedKind ~= "trending" or not FFlagEnableArgus then
 			return nil
@@ -97,7 +97,7 @@ local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
 	})
 	local sessionSource = t2.sessionSource
 
-	React.useEffect(function() -- line: 133
+	React.useEffect(function() -- line: 134
 		-- upvalues: current (copy), sessionSource (copy), fireAnalyticsEvent (copy), EventNames (copy)
 		current.setSessionSource(sessionSource)
 		fireAnalyticsEvent(EventNames.TapMomentsTab, {
@@ -105,7 +105,7 @@ local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
 			source = sessionSource
 		})
 
-		return function() -- line: 140
+		return function() -- line: 141
 			-- upvalues: current (copy), fireAnalyticsEvent (copy), EventNames (copy), sessionSource (copy)
 			local v54 = os.clock() - current.getSessionStartTime(false)
 
@@ -125,7 +125,7 @@ local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
 	local v48 = useSignalState(GetMomentsPreferencesStore(false).getIsTeleporting)
 	local v49 = v46 and (not v47 and not v48)
 	local onBack = t2.onBack
-	local v51 = React.useMemo(function() -- line: 164
+	local v51 = React.useMemo(function() -- line: 165
 		-- upvalues: React (copy), MomentsBackHeader (copy), onBack (copy)
 		return React.createElement(MomentsBackHeader, {
 			onBack = onBack
@@ -144,7 +144,8 @@ local function MomentsImmersivePresentation(t2: {[any]: any}) -- line: 84
 	return React.createElement(MomentsHostShell, {
 		sessionStore = current,
 		openProfile = t2.openProfile,
-		openOwnMoments = t2.openOwnMoments
+		openOwnMoments = t2.openOwnMoments,
+		openMomentsFeedReport = t2.openMomentsFeedReport
 	}, v53)
 end
 

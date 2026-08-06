@@ -11,7 +11,7 @@ require(script.Parent.types)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
+local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 30
 	-- upvalues: config (copy), createDataCache (copy), Promise (copy), asPromise (copy), fetch (copy), responseDecoders (copy), createDataResolver (copy)
 	local v12 = t1 or {}
 	local v13 = v12.quotaSummaryUrl or config.quotaSummaryUrl
@@ -27,13 +27,13 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 	local u23 = Promise.resolve()
 	local u24 = false
 
-	local function fetchQuotaSummary(_: string) -- line: 48
+	local function fetchQuotaSummary(_: string) -- line: 46
 		-- upvalues: n1 (ref), n2 (ref), u21 (ref), u24 (ref), Promise (copy), asPromise (copy), fetch (copy), v13 (copy), network (copy), responseDecoders (copy), v18 (copy)
 		local v30 = n1
 		local v31 = n2
-		local v32 = u21:catch(function() -- line: 51
+		local v32 = u21:catch(function() -- line: 49
 			return nil
-		end):andThen(function() -- line: 54
+		end):andThen(function() -- line: 52
 			-- upvalues: u24 (ref), v30 (copy), n1 (ref), Promise (copy), asPromise (copy), fetch (copy), v13 (copy), network (copy), responseDecoders (copy), v31 (copy), n2 (ref), v18 (copy)
 			if u24 or v30 ~= n1 then
 				return Promise.reject("Creator Credit store changed before queued quota read")
@@ -45,7 +45,7 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 				url = v13,
 				network = network,
 				decode = responseDecoders.decodeQuotaSummary
-			})):andThen(function(p1) -- line: 64
+			})):andThen(function(p1) -- line: 62
 				-- upvalues: u24 (ref), v30 (copy), n1 (ref), Promise (copy), v31 (copy), n2 (ref), v18 (copy)
 				if u24 or v30 ~= n1 then
 					return Promise.reject("Creator Credit store changed during quota read")
@@ -74,13 +74,13 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 		fetchFn = fetchQuotaSummary
 	})
 
-	local function fetchDailyLimit(_: string) -- line: 87
+	local function fetchDailyLimit(_: string) -- line: 85
 		-- upvalues: n1 (ref), n2 (ref), u22 (ref), u24 (ref), Promise (copy), asPromise (copy), fetch (copy), v14 (copy), network (copy), responseDecoders (copy), v18 (copy)
 		local v34 = n1
 		local v35 = n2
-		local v36 = u22:catch(function() -- line: 90
+		local v36 = u22:catch(function() -- line: 88
 			return nil
-		end):andThen(function() -- line: 93
+		end):andThen(function() -- line: 91
 			-- upvalues: u24 (ref), v34 (copy), n1 (ref), Promise (copy), asPromise (copy), fetch (copy), v14 (copy), network (copy), responseDecoders (copy), v35 (copy), n2 (ref), v18 (copy)
 			if u24 or v34 ~= n1 then
 				return Promise.reject("Creator Credit store changed before queued daily-limit read")
@@ -92,7 +92,7 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 				url = v14,
 				network = network,
 				decode = responseDecoders.decodeDailyLimitSettings
-			})):andThen(function(p2) -- line: 103
+			})):andThen(function(p2) -- line: 101
 				-- upvalues: u24 (ref), v34 (copy), n1 (ref), Promise (copy), v35 (copy), n2 (ref), v18 (copy)
 				if u24 or v34 ~= n1 then
 					return Promise.reject("Creator Credit store changed during daily-limit read")
@@ -118,19 +118,19 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 	})
 
 	return {
-		getQuotaSummary = function() -- line: 123
+		getQuotaSummary = function() -- line: 121
 			-- upvalues: v26 (copy)
 			return v26.getAndFetchItem("current-user")
 		end,
-		getQuotaSummarySignals = function() -- line: 127
+		getQuotaSummarySignals = function() -- line: 125
 			-- upvalues: v26 (copy)
 			return v26.getCachedItem("current-user")
 		end,
-		refreshQuotaSummary = function() -- line: 131
+		refreshQuotaSummary = function() -- line: 129
 			-- upvalues: n1 (ref), fetchQuotaSummary (copy), u24 (ref), Promise (copy), v17 (copy)
 			local v37 = n1
 
-			return fetchQuotaSummary("current-user"):andThen(function(p3) -- line: 133
+			return fetchQuotaSummary("current-user"):andThen(function(p3) -- line: 131
 				-- upvalues: u24 (ref), v37 (copy), n1 (ref), Promise (copy), v17 (copy)
 				if u24 or v37 ~= n1 then
 					return Promise.reject("Creator Credit store changed during quota refresh")
@@ -141,19 +141,19 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 				return p3
 			end)
 		end,
-		getDailyLimit = function() -- line: 142
+		getDailyLimit = function() -- line: 140
 			-- upvalues: v28 (copy)
 			return v28.getAndFetchItem("current-user")
 		end,
-		getDailyLimitSignals = function() -- line: 146
+		getDailyLimitSignals = function() -- line: 144
 			-- upvalues: v28 (copy)
 			return v28.getCachedItem("current-user")
 		end,
-		refreshDailyLimit = function() -- line: 150
+		refreshDailyLimit = function() -- line: 148
 			-- upvalues: n1 (ref), fetchDailyLimit (copy), u24 (ref), Promise (copy), v18 (copy)
 			local v38 = n1
 
-			return fetchDailyLimit("current-user"):andThen(function(p4) -- line: 152
+			return fetchDailyLimit("current-user"):andThen(function(p4) -- line: 150
 				-- upvalues: u24 (ref), v38 (copy), n1 (ref), Promise (copy), v18 (copy)
 				if u24 or v38 ~= n1 then
 					return Promise.reject("Creator Credit store changed during daily-limit refresh")
@@ -164,11 +164,11 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 				return p4
 			end)
 		end,
-		setDailyLimit = function(p5) -- line: 161
+		setDailyLimit = function(p5) -- line: 159
 			-- upvalues: n1 (ref), u23 (ref), u24 (ref), Promise (copy), fetch (copy), v14 (copy), network (copy), responseDecoders (copy), asPromise (copy), n2 (ref), v18 (copy), v17 (copy)
 			local v40 = n1
-			local v41 = u23:catch(function() -- line: 163
-			end):andThen(function() -- line: 164
+			local v41 = u23:catch(function() -- line: 161
+			end):andThen(function() -- line: 162
 				-- upvalues: u24 (ref), v40 (copy), n1 (ref), Promise (copy), fetch (copy), v14 (copy), p5 (copy), network (copy), responseDecoders (copy), asPromise (copy)
 				if u24 or v40 ~= n1 then
 					return Promise.reject("Creator Credit store changed before queued daily-limit write")
@@ -188,7 +188,7 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 
 			u23 = v41
 
-			return v41:andThen(function(p6) -- line: 181
+			return v41:andThen(function(p6) -- line: 179
 				-- upvalues: u24 (ref), v40 (copy), n1 (ref), n2 (ref), v18 (copy), v17 (copy)
 				if not u24 and v40 == n1 then
 					n2 += 1
@@ -207,14 +207,14 @@ local function createCreatorCreditStore(t1: {[any]: any}?) -- line: 32
 				return p6
 			end)
 		end,
-		clear = function() -- line: 196
+		clear = function() -- line: 194
 			-- upvalues: n1 (ref), n2 (ref), v26 (copy), v28 (copy)
 			n1 += 1
 			n2 += 1
 			v26.clear()
 			v28.clear()
 		end,
-		dispose = function() -- line: 203
+		dispose = function() -- line: 201
 			-- upvalues: u24 (ref), n1 (ref), n2 (ref), v26 (copy), v28 (copy)
 			if u24 then
 				return

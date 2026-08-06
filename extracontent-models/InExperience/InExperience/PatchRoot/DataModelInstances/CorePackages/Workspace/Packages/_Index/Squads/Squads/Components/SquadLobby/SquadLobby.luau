@@ -68,16 +68,16 @@ local v64 = game:DefineFastInt("PartyUserInvitedDurationSeconds", 10)
 local SquadQuickStartExperimentation = dependencies.SocialExperiments.SquadQuickStartExperimentation
 local SquadCoordinationExperienceJoinExperimentation = dependencies.SocialExperiments.SquadCoordinationExperienceJoinExperimentation
 local SquadRegroupExperimentation = dependencies.SocialExperiments.SquadRegroupExperimentation
+local LuckyRecommendationExperimentation = dependencies.SocialExperiments.LuckyRecommendationExperimentation
 local FFlagEnablePartyQuickStartButton = SharedFlags.FFlagEnablePartyQuickStartButton
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
 local FFlagEnableSquadRegroupExperimentation = SharedFlags.FFlagEnableSquadRegroupExperimentation
 local FFlagEnableSquadRegroupExperimentationSmallScreenFix = SharedFlags.FFlagEnableSquadRegroupExperimentationSmallScreenFix
 local FFlagEnableSquadRegroupServerCapacityCheck = SharedFlags.FFlagEnableSquadRegroupServerCapacityCheck
 local FFlagAppChatShowOSAOnPageEntry = SharedFlags.FFlagAppChatShowOSAOnPageEntry
-local FFlagEnableLuckyRecommendation = SharedFlags.FFlagEnableLuckyRecommendation
 
 local function SquadLobby(t1: {[any]: any}) -- line: 110
-	-- upvalues: useTokens (copy), useDispatch (copy), useLocalUserId (copy), useStyle (copy), useSquadState (copy), useNavigation (copy), React (copy), SquadExternalContractContext (copy), useVoiceStatus (copy), FFlagEnableSquadTopBannerWideMode (copy), HttpService (copy), RoactNavigation (copy), SquadViewFlags (copy), useCurrentSquadSelector (copy), useSelector (copy), useStore (copy), SquadQuickStartExperimentation (copy), FFlagEnablePartyQuickStartButton (copy), SquadPromptType (copy), FFlagMakeCreateOrJoinSquadAThunks (copy), createOrJoinSquad (copy), NetworkingSquads (copy), FFlagEnableSquadCoplayAnalytic (copy), logInExpCoplayTelemetry (copy), SquadCoplayJoin (copy), useEffectOnce (copy), FFlagAppChatShowOSAOnPageEntry (copy), Logger (copy), Cryo (copy), SquadUserPartyStatus (copy), v64 (copy), v63 (copy), setInterval (copy), clearInterval (copy), usePrevious (copy), UserBlockingNetworking (copy), FFlagSquadsPresenceStoreMigration (copy), NetworkingPresence (copy), Constants (copy), Signals (copy), v52 (copy), useSignalState (copy), FFlagEnableSquadRegroupServerCapacityCheck (copy), Players (copy), SquadRegroupExperimentation (copy), v53 (copy), PresenceType (copy), FFlagEnableLuckyRecommendation (copy), FFlagEnableSquadRegroupExperimentationSmallScreenFix (copy), v59 (copy), SquadLobbyBanners (copy), Foundation (copy), SquadLobbyUserGrid (copy), EventNames (copy), SquadPartySheetActionEnum (copy), SquadLobbyRegroupRow (copy), SquadLobbyActionBar (copy), SquadLobbyLuckyRecommendationRow (copy), StateLayerAffordance (copy), SquadLobbyVoiceChatMenu (copy), FFlagEnablePartyVoiceChangersInLua (copy), SquadLobbyUserDropdownMenu (copy), SquadCoordinationExperienceJoinExperimentation (copy), FFlagEnableSquadRegroupExperimentation (copy), Roact (copy), SquadLobbySessionProvider (copy)
+	-- upvalues: useTokens (copy), useDispatch (copy), useLocalUserId (copy), useStyle (copy), useSquadState (copy), useNavigation (copy), React (copy), SquadExternalContractContext (copy), useVoiceStatus (copy), FFlagEnableSquadTopBannerWideMode (copy), HttpService (copy), RoactNavigation (copy), SquadViewFlags (copy), useCurrentSquadSelector (copy), useSelector (copy), useStore (copy), SquadQuickStartExperimentation (copy), FFlagEnablePartyQuickStartButton (copy), SquadPromptType (copy), FFlagMakeCreateOrJoinSquadAThunks (copy), createOrJoinSquad (copy), NetworkingSquads (copy), FFlagEnableSquadCoplayAnalytic (copy), logInExpCoplayTelemetry (copy), SquadCoplayJoin (copy), useEffectOnce (copy), FFlagAppChatShowOSAOnPageEntry (copy), Logger (copy), Cryo (copy), SquadUserPartyStatus (copy), v64 (copy), v63 (copy), setInterval (copy), clearInterval (copy), usePrevious (copy), UserBlockingNetworking (copy), FFlagSquadsPresenceStoreMigration (copy), NetworkingPresence (copy), Constants (copy), Signals (copy), v52 (copy), useSignalState (copy), FFlagEnableSquadRegroupServerCapacityCheck (copy), Players (copy), SquadRegroupExperimentation (copy), v53 (copy), PresenceType (copy), LuckyRecommendationExperimentation (copy), FFlagEnableSquadRegroupExperimentationSmallScreenFix (copy), v59 (copy), SquadLobbyBanners (copy), Foundation (copy), SquadLobbyUserGrid (copy), EventNames (copy), SquadPartySheetActionEnum (copy), SquadLobbyRegroupRow (copy), SquadLobbyActionBar (copy), SquadLobbyLuckyRecommendationRow (copy), StateLayerAffordance (copy), SquadLobbyVoiceChatMenu (copy), FFlagEnablePartyVoiceChangersInLua (copy), SquadLobbyUserDropdownMenu (copy), SquadCoordinationExperienceJoinExperimentation (copy), FFlagEnableSquadRegroupExperimentation (copy), Roact (copy), SquadLobbySessionProvider (copy)
 	local v77 = useTokens()
 	local v78 = useDispatch()
 	local v79 = tonumber(useLocalUserId()) or 0
@@ -600,7 +600,7 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 	})
 	local u130 = false
 
-	if FFlagEnableLuckyRecommendation then
+	if LuckyRecommendationExperimentation.getLuckyRecommendationEnabled() then
 		local v131 = v96 ~= nil and #v96 >= 2
 
 		u130 = not t1.isInExperience and v131
@@ -767,30 +767,25 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 		v77,
 		v132
 	})
-	local v140 = nil
+	local v140 = React.useMemo(function() -- line: 855
+		-- upvalues: u130 (ref), React (copy), Foundation (copy), Constants (copy), v77 (copy), v132 (copy), SquadLobbyLuckyRecommendationRow (copy)
+		if not u130 then
+			return nil
+		end
 
-	if FFlagEnableLuckyRecommendation then
-		v140 = React.useMemo(function() -- line: 857
-			-- upvalues: u130 (ref), React (copy), Foundation (copy), Constants (copy), v77 (copy), v132 (copy), SquadLobbyLuckyRecommendationRow (copy)
-			if not u130 then
-				return nil
-			end
-
-			return React.createElement(Foundation.View, {
-				tag = "anchor-bottom-center auto-none gui-object-defaults",
-				Position = UDim2.new(0.5, 0, 1, -(20 + Constants.SQUAD_LOBBY_ACTION_BAR_HEIGHT + v77.Gap.XXLarge)),
-				Size = UDim2.new(1, 0, 0, v132)
-			}, {
-				Row = React.createElement(SquadLobbyLuckyRecommendationRow)
-			})
-		end, {
-			u130,
-			v77,
-			v132
+		return React.createElement(Foundation.View, {
+			tag = "anchor-bottom-center auto-none gui-object-defaults",
+			Position = UDim2.new(0.5, 0, 1, -(20 + Constants.SQUAD_LOBBY_ACTION_BAR_HEIGHT + v77.Gap.XXLarge)),
+			Size = UDim2.new(1, 0, 0, v132)
+		}, {
+			Row = React.createElement(SquadLobbyLuckyRecommendationRow)
 		})
-	end
-
-	local v141 = React.useMemo(function() -- line: 877
+	end, {
+		u130,
+		v77,
+		v132
+	})
+	local v141 = React.useMemo(function() -- line: 874
 		-- upvalues: v89 (copy), React (copy), Foundation (copy), StateLayerAffordance (copy), v90 (copy), v119 (copy), v77 (copy), SquadLobbyVoiceChatMenu (copy), FFlagEnablePartyVoiceChangersInLua (copy), t1 (copy)
 		if v89 then
 			return (React.createElement(Foundation.View, {
@@ -798,7 +793,7 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 				stateLayer = {
 					affordance = StateLayerAffordance.None
 				},
-				onActivated = function() -- line: 883
+				onActivated = function() -- line: 880
 					-- upvalues: v90 (copy)
 					v90(false)
 				end
@@ -828,7 +823,7 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 					stateLayer = {
 						affordance = StateLayerAffordance.None
 					},
-					onActivated = function() -- line: 907
+					onActivated = function() -- line: 904
 						-- upvalues: v90 (copy)
 						v90(false)
 					end
@@ -845,7 +840,7 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 					stateLayer = {
 						affordance = StateLayerAffordance.None
 					},
-					onActivated = function() -- line: 920
+					onActivated = function() -- line: 917
 					end
 				}, {
 					SquadLobbyVoiceChatMenu = React.createElement(SquadLobbyVoiceChatMenu, {
@@ -858,7 +853,7 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 					stateLayer = {
 						affordance = StateLayerAffordance.None
 					},
-					onActivated = function() -- line: 933
+					onActivated = function() -- line: 930
 						-- upvalues: v90 (copy)
 						v90(false)
 					end
@@ -873,18 +868,18 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 		v90,
 		v77
 	})
-	local v142 = React.useMemo(function() -- line: 942
+	local v142 = React.useMemo(function() -- line: 939
 		-- upvalues: v122 (copy), v120 (copy), React (copy), SquadLobbyUserDropdownMenu (copy), t1 (copy), v121 (copy), v123 (copy), v98 (copy)
 		if v122 and v120 then
 			return (React.createElement(SquadLobbyUserDropdownMenu, {
 				userId = v120,
 				isInExperience = t1.isInExperience,
-				onDismiss = function() -- line: 947
+				onDismiss = function() -- line: 944
 					-- upvalues: v121 (copy), v123 (copy)
 					v121(nil)
 					v123(false)
 				end,
-				openViewProfile = function() -- line: 951
+				openViewProfile = function() -- line: 948
 					-- upvalues: t1 (copy), v120 (copy)
 					t1.openViewProfile(v120)
 				end,
@@ -904,13 +899,15 @@ local function SquadLobby(t1: {[any]: any}) -- line: 110
 		v121
 	})
 
-	React.useEffect(function() -- line: 968
-		-- upvalues: SquadCoordinationExperienceJoinExperimentation (copy), FFlagEnableSquadRegroupExperimentation (copy), SquadRegroupExperimentation (copy)
+	React.useEffect(function() -- line: 965
+		-- upvalues: SquadCoordinationExperienceJoinExperimentation (copy), FFlagEnableSquadRegroupExperimentation (copy), SquadRegroupExperimentation (copy), LuckyRecommendationExperimentation (copy)
 		SquadCoordinationExperienceJoinExperimentation.logExposure()
 
 		if FFlagEnableSquadRegroupExperimentation then
 			SquadRegroupExperimentation.logExposure()
 		end
+
+		LuckyRecommendationExperimentation.logExposure()
 	end, {})
 
 	local v143 = Roact.createFragment({

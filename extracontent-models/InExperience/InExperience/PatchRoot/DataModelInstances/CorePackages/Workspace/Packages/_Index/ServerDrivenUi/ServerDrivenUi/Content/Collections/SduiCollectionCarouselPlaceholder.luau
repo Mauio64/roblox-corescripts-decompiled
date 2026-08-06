@@ -9,17 +9,18 @@ local CollectionViews = require(Parent.CollectionViews)
 local useCollectionLayout = CollectionViews.useCollectionLayout
 local calculateItemWidth = CollectionViews.calculateItemWidth
 local SduiPlaceholder = require(Parent.SduiSharedContent).SduiPlaceholder
-local FFlagSduiCollectionCarouselPlaceholderItem = require(Parent.SharedFlags).FFlagSduiCollectionCarouselPlaceholderItem
-local v10 = game:DefineFastInt("LuaAppSduiCarouselPlaceholderHeaderHeightPx", 30)
-local v11 = game:DefineFastInt("LuaAppSduiCarouselPlaceholderHeaderMinWidthPct", 30)
-local v12 = game:DefineFastInt("LuaAppSduiCarouselPlaceholderHeaderMaxWidthPct", 60)
+local SharedFlags = require(Parent.SharedFlags)
+local FIntLuaAppSduiCarouselPlaceholderHeaderHeightPx = SharedFlags.FIntLuaAppSduiCarouselPlaceholderHeaderHeightPx
+local FFlagSduiCollectionCarouselPlaceholderItem = SharedFlags.FFlagSduiCollectionCarouselPlaceholderItem
+local v12 = game:DefineFastInt("LuaAppSduiCarouselPlaceholderHeaderMinWidthPct", 30)
+local v13 = game:DefineFastInt("LuaAppSduiCarouselPlaceholderHeaderMaxWidthPct", 60)
 local uDim = UDim.new(1, 72)
 
-local function SduiCollectionCarouselItemPlaceholderRow(t1: {[any]: any}) -- line: 51
+local function SduiCollectionCarouselItemPlaceholderRow(t1: {[any]: any}) -- line: 50
 	-- upvalues: React (copy)
-	local v17 = React.useMemo(function() -- line: 52
+	local v18 = React.useMemo(function() -- line: 51
 		-- upvalues: t1 (copy)
-		return t1.itemSizeBinding:map(function(vector2: Vector2) -- line: 53
+		return t1.itemSizeBinding:map(function(vector2: Vector2) -- line: 52
 			return UDim2.new(0, vector2.X, 0, vector2.Y)
 		end)
 	end, { t1.itemSizeBinding })
@@ -36,7 +37,7 @@ local function SduiCollectionCarouselItemPlaceholderRow(t1: {[any]: any}) -- lin
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = i,
-			Size = v17
+			Size = v18
 		}, {
 			ItemPlaceholder = React.cloneElement(t1.itemPlaceholderComponent, {
 				transparencyBinding = t1.transparencyBinding
@@ -52,68 +53,68 @@ local function SduiCollectionCarouselItemPlaceholderRow(t1: {[any]: any}) -- lin
 		Size = t1.rowSizeBinding
 	}, t2)
 end
-local function SduiCollectionCarouselPlaceholder(t3: {[any]: any}) -- line: 115
-	-- upvalues: useTokens (copy), useCollectionLayout (copy), SignalsReact (copy), uDim (copy), FFlagSduiCollectionCarouselPlaceholderItem (copy), React (copy), calculateItemWidth (copy), v11 (copy), v12 (copy), SduiPlaceholder (copy), v10 (copy), SduiCollectionCarouselItemPlaceholderRow (copy)
-	local v21 = useTokens()
-	local UIScale = v21.Config.UI.Scale
-	local v23 = useCollectionLayout(t3.collectionItemSize)
-	local v24 = SignalsReact.useSignalBinding(v23.getContainerWidth)
-	local v25 = t3.itemHeightFromWidth or uDim
-	local u26 = nil
-	local v27
+local function SduiCollectionCarouselPlaceholder(t3: {[any]: any}) -- line: 114
+	-- upvalues: useTokens (copy), useCollectionLayout (copy), SignalsReact (copy), uDim (copy), FFlagSduiCollectionCarouselPlaceholderItem (copy), React (copy), calculateItemWidth (copy), v12 (copy), v13 (copy), SduiPlaceholder (copy), FIntLuaAppSduiCarouselPlaceholderHeaderHeightPx (copy), SduiCollectionCarouselItemPlaceholderRow (copy)
+	local v22 = useTokens()
+	local UIScale = v22.Config.UI.Scale
+	local v24 = useCollectionLayout(t3.collectionItemSize)
+	local v25 = SignalsReact.useSignalBinding(v24.getContainerWidth)
+	local v26 = t3.itemHeightFromWidth or uDim
+	local u27 = nil
+	local v28
 
 	if FFlagSduiCollectionCarouselPlaceholderItem then
-		u26 = React.useMemo(function() -- line: 129
-			-- upvalues: v24 (copy), calculateItemWidth (copy), v23 (copy), v25 (copy), UIScale (copy)
-			return v24:map(function(n1: number) -- line: 130
-				-- upvalues: calculateItemWidth (copy), v23 (copy), v25 (copy), UIScale (copy)
-				local v34 = calculateItemWidth(v23.itemsPerRow, v23.gutter, v23.margin, n1, 0, v23.carouselPeek)
-				local v35 = v34 * v25.Scale + v25.Offset * UIScale
+		u27 = React.useMemo(function() -- line: 128
+			-- upvalues: v25 (copy), calculateItemWidth (copy), v24 (copy), v26 (copy), UIScale (copy)
+			return v25:map(function(n1: number) -- line: 129
+				-- upvalues: calculateItemWidth (copy), v24 (copy), v26 (copy), UIScale (copy)
+				local v35 = calculateItemWidth(v24.itemsPerRow, v24.gutter, v24.margin, n1, 0, v24.carouselPeek)
+				local v36 = v35 * v26.Scale + v26.Offset * UIScale
 
-				return Vector2.new(v34, (math.max(v35, 0)))
+				return Vector2.new(v35, (math.max(v36, 0)))
 			end)
 		end, {
-			v24,
-			v23.itemsPerRow,
-			v23.gutter,
-			v23.margin,
-			v23.carouselPeek,
 			v25,
+			v24.itemsPerRow,
+			v24.gutter,
+			v24.margin,
+			v24.carouselPeek,
+			v26,
 			UIScale
 		})
-		v27 = React.useMemo(function() -- line: 155
-			-- upvalues: u26 (ref)
-			return u26:map(function(vector2: Vector2) -- line: 156
+		v28 = React.useMemo(function() -- line: 154
+			-- upvalues: u27 (ref)
+			return u27:map(function(vector2: Vector2) -- line: 155
 				return UDim2.new(1, 0, 0, vector2.Y)
 			end)
-		end, { u26 })
+		end, { u27 })
 	else
-		v27 = React.useMemo(function() -- line: 162
-			-- upvalues: v24 (copy), calculateItemWidth (copy), v23 (copy), v25 (copy), UIScale (copy)
-			return v24:map(function(n2: number) -- line: 163
-				-- upvalues: calculateItemWidth (copy), v23 (copy), v25 (copy), UIScale (copy)
-				local v38 = calculateItemWidth(v23.itemsPerRow, v23.gutter, v23.margin, n2, 0, v23.carouselPeek) * v25.Scale + v25.Offset * UIScale
+		v28 = React.useMemo(function() -- line: 161
+			-- upvalues: v25 (copy), calculateItemWidth (copy), v24 (copy), v26 (copy), UIScale (copy)
+			return v25:map(function(n2: number) -- line: 162
+				-- upvalues: calculateItemWidth (copy), v24 (copy), v26 (copy), UIScale (copy)
+				local v39 = calculateItemWidth(v24.itemsPerRow, v24.gutter, v24.margin, n2, 0, v24.carouselPeek) * v26.Scale + v26.Offset * UIScale
 
-				return UDim2.new(1, 0, 0, (math.max(v38, 0)))
+				return UDim2.new(1, 0, 0, (math.max(v39, 0)))
 			end)
 		end, {
-			v24,
-			v23.itemsPerRow,
-			v23.gutter,
-			v23.margin,
-			v23.carouselPeek,
 			v25,
+			v24.itemsPerRow,
+			v24.gutter,
+			v24.margin,
+			v24.carouselPeek,
+			v26,
 			UIScale
 		})
 	end
 
-	local v28 = if not FFlagSduiCollectionCarouselPlaceholderItem or not t3.hideHeader then v21.Padding.Medium else 0
-	local v29 = React.useMemo(function() -- line: 194
-		-- upvalues: v11 (copy), v12 (copy)
-		local v30 = v11 / 100
+	local v29 = if not FFlagSduiCollectionCarouselPlaceholderItem or not t3.hideHeader then v22.Padding.Medium else 0
+	local v30 = React.useMemo(function() -- line: 193
+		-- upvalues: v12 (copy), v13 (copy)
 		local v31 = v12 / 100
+		local v32 = v13 / 100
 
-		return v30 + math.random() * (v31 - v30)
+		return v31 + math.random() * (v32 - v31)
 	end, {})
 
 	return React.createElement("Frame", {
@@ -131,29 +132,29 @@ local function SduiCollectionCarouselPlaceholder(t3: {[any]: any}) -- line: 115
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v28)
+			Padding = UDim.new(0, v29)
 		}),
 		Header = if not FFlagSduiCollectionCarouselPlaceholderItem or not t3.hideHeader then React.createElement(SduiPlaceholder, {
 			layoutOrder = 1,
 			backgroundStyle = t3.backgroundStyle,
 			cornerRadius = t3.cornerRadius,
-			size = UDim2.new(v29, 0, 0, v10 * UIScale),
+			size = UDim2.new(v30, 0, 0, FIntLuaAppSduiCarouselPlaceholderHeaderHeightPx * UIScale),
 			transparencyBinding = t3.transparencyBinding
 		}) else nil,
 		Row = if not FFlagSduiCollectionCarouselPlaceholderItem or not t3.itemPlaceholderComponent then React.createElement(SduiPlaceholder, {
 			layoutOrder = 2,
 			backgroundStyle = t3.backgroundStyle,
 			cornerRadius = t3.cornerRadius,
-			size = v27,
+			size = v28,
 			transparencyBinding = t3.transparencyBinding
 		}) else React.createElement(SduiCollectionCarouselItemPlaceholderRow, {
 			layoutOrder = 2,
-			carouselPeek = v23.carouselPeek,
-			gutter = v23.gutter,
+			carouselPeek = v24.carouselPeek,
+			gutter = v24.gutter,
 			itemPlaceholderComponent = t3.itemPlaceholderComponent,
-			itemSizeBinding = u26,
-			itemsPerRow = v23.itemsPerRow,
-			rowSizeBinding = v27,
+			itemSizeBinding = u27,
+			itemsPerRow = v24.itemsPerRow,
+			rowSizeBinding = v28,
 			transparencyBinding = t3.transparencyBinding
 		})
 	})

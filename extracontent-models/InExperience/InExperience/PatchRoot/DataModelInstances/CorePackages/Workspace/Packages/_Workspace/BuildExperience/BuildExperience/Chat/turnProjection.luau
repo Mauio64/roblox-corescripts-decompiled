@@ -20,7 +20,7 @@ local t1 = {
 	planByToolCallId = {}
 }
 
-local function contentBlocksToText(t2: {[any]: any}) -- line: 55
+local function contentBlocksToText(t2: {[any]: any}) -- line: 54
 	local t3 = {}
 
 	for _, v39 in t2 do
@@ -31,7 +31,7 @@ local function contentBlocksToText(t2: {[any]: any}) -- line: 55
 
 	return table.concat(t3)
 end
-local function getAssistantMessageTexts(p1) -- line: 65
+local function getAssistantMessageTexts(p1) -- line: 64
 	-- upvalues: contentBlocksToText (copy)
 	local t4 = {}
 
@@ -49,7 +49,7 @@ local function getAssistantMessageTexts(p1) -- line: 65
 
 	return t4
 end
-local function makeTurnKey(p2, t5: {[any]: any}) -- line: 79
+local function makeTurnKey(p2, t5: {[any]: any}) -- line: 78
 	if t5.turnKey ~= nil then
 		return t5.turnKey
 	end
@@ -63,7 +63,7 @@ local function makeTurnKey(p2, t5: {[any]: any}) -- line: 79
 
 	return v48
 end
-local function makeSegmentKey(s1: string, ...) -- line: 91
+local function makeSegmentKey(s1: string, ...) -- line: 90
 	local t6 = { s1 }
 
 	for _, v53 in { ... } do
@@ -72,7 +72,7 @@ local function makeSegmentKey(s1: string, ...) -- line: 91
 
 	return table.concat(t6, ":")
 end
-local function getSortedActivitySlotIndexes(p3) -- line: 99
+local function getSortedActivitySlotIndexes(p3) -- line: 98
 	local t7 = {}
 
 	for v56 in p3.activitySlots do
@@ -83,7 +83,7 @@ local function getSortedActivitySlotIndexes(p3) -- line: 99
 
 	return t7
 end
-local function makeTurnActivityItem(p4, p5) -- line: 108
+local function makeTurnActivityItem(p4, p5) -- line: 107
 	if p5.kind == "tool_call" then
 		local v59 = p4.toolCalls[p5.toolCallId]
 
@@ -97,7 +97,7 @@ local function makeTurnActivityItem(p4, p5) -- line: 108
 
 	return nil
 end
-local function makeAgentMessageSegment(s2: string, s3: string, b1: boolean?) -- line: 121
+local function makeAgentMessageSegment(s2: string, s3: string, b1: boolean?) -- line: 120
 	if s3 == "" then
 		return nil
 	end
@@ -109,7 +109,7 @@ local function makeAgentMessageSegment(s2: string, s3: string, b1: boolean?) -- 
 		isError = b1
 	}
 end
-local function makeCompletedActivitySummary(t8: {[any]: any}, s4: string) -- line: 133
+local function makeCompletedActivitySummary(t8: {[any]: any}, s4: string) -- line: 132
 	-- upvalues: getCompletedActivityLabel (copy), countToolCalls (copy)
 	if #t8 == 0 then
 		return nil
@@ -125,7 +125,7 @@ local function makeCompletedActivitySummary(t8: {[any]: any}, s4: string) -- lin
 		actionCount = countToolCalls(t8)
 	}
 end
-local function makeActiveActivitySummary(t9: {[any]: any}, b2: boolean, s5: string, s6: string?, b3: boolean?) -- line: 149
+local function makeActiveActivitySummary(t9: {[any]: any}, b2: boolean, s5: string, s6: string?, b3: boolean?) -- line: 148
 	-- upvalues: getActiveActivityLabel (copy)
 	if #t9 == 0 and not b2 then
 		return nil
@@ -141,7 +141,7 @@ local function makeActiveActivitySummary(t9: {[any]: any}, b2: boolean, s5: stri
 		isWaitingForLocalTool = b3
 	}
 end
-local function countActionsInSegments(t10: {[any]: any}) -- line: 171
+local function countActionsInSegments(t10: {[any]: any}) -- line: 170
 	-- upvalues: countToolCalls (copy)
 	local n1 = 0
 
@@ -153,7 +153,7 @@ local function countActionsInSegments(t10: {[any]: any}) -- line: 171
 
 	return n1
 end
-local function getAnsweredPromptsByToolCallId(p6) -- line: 181
+local function getAnsweredPromptsByToolCallId(p6) -- line: 180
 	-- upvalues: StudioAskUserTool (copy)
 	local t11 = {}
 
@@ -171,7 +171,7 @@ local function getAnsweredPromptsByToolCallId(p6) -- line: 181
 
 	return t11
 end
-local function getCompletedPlansByToolCallId(p7) -- line: 195
+local function getCompletedPlansByToolCallId(p7) -- line: 194
 	-- upvalues: StudioProposePlanTool (copy)
 	local t12 = {}
 
@@ -183,7 +183,7 @@ local function getCompletedPlansByToolCallId(p7) -- line: 195
 
 	return t12
 end
-local function makeClientToolSegment(s7: string, s8: string, n2: number, n3: number, b4: boolean, p8, p9) -- line: 205
+local function makeClientToolSegment(s7: string, s8: string, n2: number, n3: number, b4: boolean, p8, p9) -- line: 204
 	-- upvalues: makeSegmentKey (copy)
 	return {
 		kind = "client_tool",
@@ -195,7 +195,7 @@ local function makeClientToolSegment(s7: string, s8: string, n2: number, n3: num
 		planProposal = p9
 	}
 end
-local function projectAskUserSegments(p10, s9: string, s10: string, t13: {[any]: any}, p11) -- line: 225
+local function projectAskUserSegments(p10, s9: string, s10: string, t13: {[any]: any}, p11) -- line: 224
 	-- upvalues: makeSegmentKey (copy), StudioAskUserTool (copy)
 	local v95 = p10.toolCalls[s10]
 
@@ -285,7 +285,7 @@ local function projectAskUserSegments(p10, s9: string, s10: string, t13: {[any]:
 
 	return t14
 end
-local function projectPlanSegments(p12, s11: string, s12: string, t17: {[any]: any}, p13) -- line: 292
+local function projectPlanSegments(p12, s11: string, s12: string, t17: {[any]: any}, p13) -- line: 291
 	-- upvalues: makeSegmentKey (copy), StudioProposePlanTool (copy)
 	local v115 = p12.toolCalls[s12]
 
@@ -346,7 +346,7 @@ local function projectPlanSegments(p12, s11: string, s12: string, t17: {[any]: a
 
 	return t21
 end
-local function projectLocalToolSegments(p14, s13: string, s14: string, t23: {[any]: any}, t24: {[any]: any}, p15) -- line: 334
+local function projectLocalToolSegments(p14, s13: string, s14: string, t23: {[any]: any}, t24: {[any]: any}, p15) -- line: 333
 	-- upvalues: projectAskUserSegments (copy), projectPlanSegments (copy)
 	local v133 = projectAskUserSegments(p14, s13, s14, t23, p15)
 
@@ -356,7 +356,7 @@ local function projectLocalToolSegments(p14, s13: string, s14: string, t23: {[an
 
 	return (projectPlanSegments(p14, s13, s14, t24, p15))
 end
-local function getActiveAskUserActivityLabel(p16, s15: string, p17) -- line: 350
+local function getActiveAskUserActivityLabel(p16, s15: string, p17) -- line: 349
 	-- upvalues: StudioAskUserTool (copy), getAskUserActivityLabel (copy)
 	local v137 = p17.askUserByToolCallId[s15]
 	local v138 = p16.toolCalls[s15]
@@ -376,7 +376,7 @@ local function getActiveAskUserActivityLabel(p16, s15: string, p17) -- line: 350
 
 	return getAskUserActivityLabel(#v139, v141)
 end
-local function projectWorkSegments(p18, s16: string, p19, b5: boolean) -- line: 371
+local function projectWorkSegments(p18, s16: string, p19, b5: boolean) -- line: 370
 	-- upvalues: getAnsweredPromptsByToolCallId (copy), getCompletedPlansByToolCallId (copy), makeSegmentKey (copy), getActiveActivityLabel (copy), makeCompletedActivitySummary (copy), projectAskUserSegments (copy), projectPlanSegments (copy), StudioAskUserTool (copy), getAskUserActivityLabel (copy), contentBlocksToText (copy)
 	local t25 = {}
 	local t26 = {}
@@ -385,7 +385,7 @@ local function projectWorkSegments(p18, s16: string, p19, b5: boolean) -- line: 
 	local v150 = getAnsweredPromptsByToolCallId(p18)
 	local v151 = getCompletedPlansByToolCallId(p18)
 
-	local function flushActivity(b6: boolean, n4: number?) -- line: 384
+	local function flushActivity(b6: boolean, n4: number?) -- line: 383
 		-- upvalues: makeSegmentKey (copy), s16 (copy), t25 (copy), b5 (copy), t26 (ref), u148 (ref), u149 (ref), getActiveActivityLabel (copy), makeCompletedActivitySummary (copy)
 		local v225 = makeSegmentKey(s16, not b6 and "activity" or "activity-trailing", n4 or #t25 + 1)
 		local v229
@@ -551,7 +551,7 @@ local function projectWorkSegments(p18, s16: string, p19, b5: boolean) -- line: 
 
 	return t25
 end
-local function makeTurnWorkSegment(s17: string, t30: {[any]: any}, t31: {[any]: any}?, n5: number?, n6: number?) -- line: 464
+local function makeTurnWorkSegment(s17: string, t30: {[any]: any}, t31: {[any]: any}?, n5: number?, n6: number?) -- line: 463
 	-- upvalues: countActionsInSegments (copy), makeSegmentKey (copy), getTurnWorkedDurationLabel (copy)
 	if #t30 == 0 then
 		return nil
@@ -567,7 +567,7 @@ local function makeTurnWorkSegment(s17: string, t30: {[any]: any}, t31: {[any]: 
 		actionCount = v184
 	}
 end
-local function addTerminalAssistantMessageSegments(t32: {[any]: any}, p20, s18: string) -- line: 484
+local function addTerminalAssistantMessageSegments(t32: {[any]: any}, p20, s18: string) -- line: 483
 	-- upvalues: getAssistantMessageTexts (copy), makeSegmentKey (copy)
 	for v188, v189 in getAssistantMessageTexts(p20) do
 		local v190 = makeSegmentKey(s18, "terminal-agent-message", v188)
@@ -583,7 +583,7 @@ local function addTerminalAssistantMessageSegments(t32: {[any]: any}, p20, s18: 
 		end
 	end
 end
-local function projectTurnSegments(p21, t33: {[any]: any}, p22) -- line: 494
+local function projectTurnSegments(p21, t33: {[any]: any}, p22) -- line: 493
 	-- upvalues: projectWorkSegments (copy), makeTurnWorkSegment (copy), addTerminalAssistantMessageSegments (copy), makeSegmentKey (copy), turnDisplay (copy), ASSISTANT_STOPPED_TEXT (copy), PublishToolUtils (copy)
 	local turnKey
 
@@ -646,11 +646,11 @@ end
 
 return {
 	formatStepCount = formatStepCount,
-	projectActiveTurnSegments = function(p23, t35: {[any]: any}?) -- line: 565
+	projectActiveTurnSegments = function(p23, t35: {[any]: any}?) -- line: 564
 		-- upvalues: projectTurnSegments (copy), t1 (copy)
 		return (projectTurnSegments(p23, t35 or {}, if not t35 or not t35.optimisticLocalTools then t1 else t35.optimisticLocalTools))
 	end,
-	projectLoadingTurnSegments = function(t36: {[any]: any}?) -- line: 543
+	projectLoadingTurnSegments = function(t36: {[any]: any}?) -- line: 542
 		-- upvalues: makeSegmentKey (copy), getActiveActivityLabel (copy), makeTurnWorkSegment (copy)
 		local turnKey
 
@@ -696,7 +696,7 @@ return {
 
 		return {}
 	end,
-	projectSetupErrorSegments = function(s19: string, t40: {[any]: any}?) -- line: 554
+	projectSetupErrorSegments = function(s19: string, t40: {[any]: any}?) -- line: 553
 		-- upvalues: makeSegmentKey (copy)
 		local turnKey
 

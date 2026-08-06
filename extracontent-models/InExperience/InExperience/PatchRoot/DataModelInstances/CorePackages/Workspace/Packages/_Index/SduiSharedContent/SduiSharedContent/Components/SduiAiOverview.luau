@@ -7,22 +7,23 @@ require(Parent.AppCommonLib)
 local useLocalization = require(Parent.Localization).Hooks.useLocalization
 local Cryo = require(Parent.Cryo)
 local View = Foundation.View
-local Button = Foundation.Button
+local Chip = Foundation.Chip
+local Divider = Foundation.Divider
 local usePreferences = Foundation.Hooks.usePreferences
 local useTokens = Foundation.Hooks.useTokens
-local ButtonSize = Foundation.Enums.ButtonSize
-local ButtonVariant = Foundation.Enums.ButtonVariant
-local FillBehavior = Foundation.Enums.FillBehavior
+local ChipSize = Foundation.Enums.ChipSize
+local ChipVariant = Foundation.Enums.ChipVariant
+local IconName = Foundation.Enums.IconName
 local useAiOverviewExpansion = require(script.Parent.useAiOverviewExpansion)
 
-local function SduiAiOverview(t1: {[any]: any}) -- line: 47
-	-- upvalues: useTokens (copy), usePreferences (copy), useLocalization (copy), React (copy), Cryo (copy), useAiOverviewExpansion (copy), View (copy), Button (copy), ButtonSize (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v16 = useTokens()
-	local v17 = usePreferences()
-	local v18 = useLocalization({
+local function SduiAiOverview(t1: {[any]: any}) -- line: 48
+	-- upvalues: useTokens (copy), usePreferences (copy), useLocalization (copy), React (copy), Cryo (copy), useAiOverviewExpansion (copy), View (copy), Divider (copy), Chip (copy), IconName (copy), ChipSize (copy), ChipVariant (copy)
+	local v17 = useTokens()
+	local v18 = usePreferences()
+	local v19 = useLocalization({
 		expandButtonText = "CommonUI.Controls.Action.ShowMore"
 	})
-	local v19 = React.useMemo(function() -- line: 55
+	local v20 = React.useMemo(function() -- line: 56
 		-- upvalues: t1 (copy)
 		return {
 			index = t1.index,
@@ -36,16 +37,16 @@ local function SduiAiOverview(t1: {[any]: any}) -- line: 47
 		t1.verticalScrollingFrameRef,
 		t1.startRow
 	})
-	local v20 = React.useCallback(function(p1) -- line: 66
-		-- upvalues: React (copy), Cryo (copy), v19 (copy)
+	local v21 = React.useCallback(function(p1) -- line: 67
+		-- upvalues: React (copy), Cryo (copy), v20 (copy)
 		if p1 and typeof(p1) == "table" then
 			local t2 = {}
 
-			for v33, v34 in p1 do
-				local v35 = v34.props and v34.props.extraLocalProps or {}
+			for v34, v35 in p1 do
+				local v36 = v35.props and v35.props.extraLocalProps or {}
 
-				t2[v33] = React.cloneElement(v34, {
-					extraLocalProps = Cryo.Dictionary.join(v35, v19)
+				t2[v34] = React.cloneElement(v35, {
+					extraLocalProps = Cryo.Dictionary.join(v36, v20)
 				})
 			end
 
@@ -53,35 +54,35 @@ local function SduiAiOverview(t1: {[any]: any}) -- line: 47
 		end
 
 		return p1
-	end, { v19 })
-	local v21 = React.useMemo(function() -- line: 81
-		-- upvalues: v20 (copy), t1 (copy)
-		return v20(t1.content)
+	end, { v20 })
+	local v22 = React.useMemo(function() -- line: 82
+		-- upvalues: v21 (copy), t1 (copy)
+		return v21(t1.content)
 	end, {
 		t1.content,
-		v20
+		v21
 	})
-	local v22 = React.useMemo(function() -- line: 85
-		-- upvalues: v20 (copy), t1 (copy)
-		return v20(t1.footer)
+	local v23 = React.useMemo(function() -- line: 86
+		-- upvalues: v21 (copy), t1 (copy)
+		return v21(t1.footer)
 	end, {
 		t1.footer,
-		v20
+		v21
 	})
-	local v23 = t1.headerGap or v16.Gap.Small
-	local v24 = t1.sectionGap or v16.Gap.Large
-	local v25 = t1.titleComponent ~= nil or t1.descriptionComponent ~= nil
-	local v26 = t1.content ~= nil or t1.footer ~= nil
-	local v27 = t1.expandButtonText or v18.expandButtonText
-	local v28 = t1.backgroundStyle or v16.Color.Surface.Surface_0
-	local Size_1000 = v16.Size.Size_1000
-	local v30 = useAiOverviewExpansion({
+	local v24 = t1.headerGap or v17.Gap.Small
+	local v25 = t1.sectionGap or v17.Gap.Large
+	local v26 = t1.titleComponent ~= nil or t1.descriptionComponent ~= nil
+	local v27 = t1.content ~= nil or t1.footer ~= nil
+	local v28 = t1.expandButtonText or v19.expandButtonText
+	local v29 = t1.backgroundStyle or v17.Color.Surface.Surface_0
+	local Size_1000 = v17.Size.Size_1000
+	local v31 = useAiOverviewExpansion({
 		buttonHeight = Size_1000,
 		compactHeight = t1.compactHeight,
-		hasHeader = v25,
-		hasExpandableBody = v26,
-		sectionGap = v24,
-		reducedMotion = v17.reducedMotion
+		hasHeader = v26,
+		hasExpandableBody = v27,
+		sectionGap = v25,
+		reducedMotion = v18.reducedMotion
 	})
 
 	return React.createElement(View, {
@@ -89,24 +90,24 @@ local function SduiAiOverview(t1: {[any]: any}) -- line: 47
 		layout = {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v24)
+			Padding = UDim.new(0, v25)
 		},
 		backgroundStyle = t1.backgroundStyle,
 		LayoutOrder = t1.layoutOrder,
-		sizeConstraint = if not v30.shouldReserveCompactHeight then nil else {
+		sizeConstraint = if not v31.shouldReserveCompactHeight then nil else {
 			MinSize = Vector2.new(0, t1.compactHeight)
 		},
 		testId = t1.testId or "--sdui-ai-overview"
 	}, {
-		Header = if not v25 then nil else React.createElement(View, {
+		Header = if not v26 then nil else React.createElement(View, {
 			tag = "size-full-0 auto-y",
 			LayoutOrder = 1,
 			layout = {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, v23)
+				Padding = UDim.new(0, v24)
 			},
-			onAbsoluteSizeChanged = v30.onHeaderAbsoluteSizeChanged
+			onAbsoluteSizeChanged = v31.onHeaderAbsoluteSizeChanged
 		}, {
 			Title = if not t1.titleComponent then nil else React.createElement(View, {
 				tag = "size-full-0 auto-y",
@@ -123,18 +124,18 @@ local function SduiAiOverview(t1: {[any]: any}) -- line: 47
 				Slot = t1.descriptionComponent
 			})
 		}),
-		Body = if not v26 then nil else React.createElement(View, {
+		Body = if not v27 then nil else React.createElement(View, {
 			tag = "col size-full-0 auto-y",
 			LayoutOrder = 2
 		}, {
 			Inner = React.createElement(View, {
 				tag = {
-					clip = v30.useCompactViewport,
-					["no-clip"] = not v30.useCompactViewport,
-					["auto-none"] = v30.useCompactViewport,
-					["auto-y"] = not v30.useCompactViewport
+					clip = v31.useCompactViewport,
+					["no-clip"] = not v31.useCompactViewport,
+					["auto-none"] = v31.useCompactViewport,
+					["auto-y"] = not v31.useCompactViewport
 				},
-				Size = if not v30.useCompactViewport then UDim2.fromScale(1, 0) else v30.animatedViewportHeight:map(function(n1: number) -- line: 168
+				Size = if not v31.useCompactViewport then UDim2.fromScale(1, 0) else v31.animatedViewportHeight:map(function(n1: number) -- line: 169
 					return UDim2.new(1, 0, 0, (math.ceil(n1)))
 				end)
 			}, {
@@ -143,36 +144,36 @@ local function SduiAiOverview(t1: {[any]: any}) -- line: 47
 					layout = {
 						FillDirection = Enum.FillDirection.Vertical,
 						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, v24)
+						Padding = UDim.new(0, v25)
 					},
-					onAbsoluteSizeChanged = v30.onContentAbsoluteSizeChanged
+					onAbsoluteSizeChanged = v31.onContentAbsoluteSizeChanged
 				}, {
-					Content = if not v21 then nil else React.createElement(View, {
+					Content = if not v22 then nil else React.createElement(View, {
 						tag = "size-full-0 auto-y",
 						LayoutOrder = 3,
 						testId = "--sdui-ai-overview-content",
 						layout = {
 							FillDirection = Enum.FillDirection.Vertical,
 							SortOrder = Enum.SortOrder.LayoutOrder,
-							Padding = UDim.new(0, v24)
+							Padding = UDim.new(0, v25)
 						}
-					}, v21),
-					Footer = if not v22 then nil else React.createElement(View, {
+					}, v22),
+					Footer = if not v23 then nil else React.createElement(View, {
 						tag = "size-full-0 auto-y",
 						LayoutOrder = 4,
 						testId = "--sdui-ai-overview-footer",
 						layout = {
 							FillDirection = Enum.FillDirection.Vertical,
 							SortOrder = Enum.SortOrder.LayoutOrder,
-							Padding = UDim.new(0, v24)
+							Padding = UDim.new(0, v25)
 						}
-					}, v22)
+					}, v23)
 				}),
-				FadeOverlay = if not v30.isCompact then nil else React.createElement(View, {
+				FadeOverlay = if not v31.isCompact then nil else React.createElement(View, {
 					tag = "position-bottom-left anchor-bottom-left",
 					ZIndex = 2,
-					backgroundStyle = v28,
-					Size = v30.animatedViewportHeight:map(function(n2: number) -- line: 212
+					backgroundStyle = v29,
+					Size = v31.animatedViewportHeight:map(function(n2: number) -- line: 213
 						return UDim2.new(1, 0, 0, (math.ceil(n2 * 0.25)))
 					end)
 				}, {
@@ -186,18 +187,34 @@ local function SduiAiOverview(t1: {[any]: any}) -- line: 47
 				})
 			})
 		}),
-		ToggleButtonContainer = if not v30.isCompact then nil else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 3,
-			Size = UDim2.new(1, 0, 0, Size_1000)
+		ToggleButton = if not v31.isCompact then nil else React.createElement(View, {
+			tag = "row align-y-center gap-xsmall size-full-0 auto-y",
+			LayoutOrder = 3
 		}, {
-			ToggleButton = React.createElement(Button, {
-				testId = "--sdui-ai-overview-toggle",
-				text = v27,
-				size = ButtonSize.Medium,
-				variant = ButtonVariant.Standard,
-				fillBehavior = FillBehavior.Fill,
-				onActivated = v30.onExpand
+			LeadingLine = React.createElement(View, {
+				tag = "grow",
+				LayoutOrder = 1
+			}, {
+				Divider = React.createElement(Divider)
+			}),
+			ChipOutline = React.createElement(View, {
+				tag = "auto-xy stroke-default radius-circle",
+				LayoutOrder = 2
+			}, {
+				Chip = React.createElement(Chip, {
+					testId = "--sdui-ai-overview-toggle",
+					text = v28,
+					trailing = IconName.ChevronLargeDown,
+					size = ChipSize.Large,
+					variant = ChipVariant.Utility,
+					onActivated = v31.onExpand
+				})
+			}),
+			TrailingLine = React.createElement(View, {
+				tag = "grow",
+				LayoutOrder = 3
+			}, {
+				Divider = React.createElement(Divider)
 			})
 		})
 	})

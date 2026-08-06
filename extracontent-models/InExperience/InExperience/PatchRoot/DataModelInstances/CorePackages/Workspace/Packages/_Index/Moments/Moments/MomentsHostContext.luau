@@ -4,7 +4,7 @@ local v3 = React.createContext(nil)
 
 return {
 	MomentsHostContext = v3,
-	useMomentsHost = function() -- line: 15
+	useMomentsHost = function() -- line: 21
 		-- upvalues: React (copy), v3 (copy)
 		local v4 = React.useContext(v3)
 

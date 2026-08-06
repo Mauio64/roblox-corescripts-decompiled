@@ -14,10 +14,10 @@ local t1 = {
 	}
 }
 
-local function valueLooksLikeToolName(p1) -- line: 36
+local function valueLooksLikeToolName(p1) -- line: 34
 	return typeof(p1) == "string" and string.lower(p1) == "ask_for_logs"
 end
-local function decodePersistedToolResultText(s1: string) -- line: 57
+local function decodePersistedToolResultText(s1: string) -- line: 55
 	-- upvalues: HttpService (copy)
 	local ok, result = pcall(HttpService.JSONDecode, HttpService, s1)
 
@@ -31,7 +31,7 @@ local function decodePersistedToolResultText(s1: string) -- line: 57
 
 	return nil
 end
-local function getPersistedToolResultText(p2) -- line: 67
+local function getPersistedToolResultText(p2) -- line: 65
 	-- upvalues: HttpService (copy)
 	if p2.content == nil then
 		return nil
@@ -66,7 +66,7 @@ return {
 	TOOL_NAME = "ask_for_logs",
 	NOT_IN_GAME_MESSAGE = "The user is not in the game.",
 	LOCAL_TOOL_DEFINITION = t1,
-	toolCallLooksLikeClientLogsRequest = function(p3) -- line: 40
+	toolCallLooksLikeClientLogsRequest = function(p3) -- line: 38
 		local kind = p3.kind
 
 		if typeof(kind) ~= "string" or string.lower(kind) ~= "ask_for_logs" then
@@ -94,7 +94,7 @@ return {
 
 		return true
 	end,
-	findClientLogsRequestInTurnState = function(p4, t3: {[any]: any}?) -- line: 90
+	findClientLogsRequestInTurnState = function(p4, t3: {[any]: any}?) -- line: 88
 		-- upvalues: getPersistedToolResultText (copy)
 		local t4 = {}
 		local g34 = nil
@@ -157,7 +157,7 @@ return {
 
 		return nil, nil, nil, nil
 	end,
-	formatLogsContent = function(t5: {[any]: any}, t6: {[any]: any}) -- line: 116
+	formatLogsContent = function(t5: {[any]: any}, t6: {[any]: any}) -- line: 114
 		-- upvalues: HttpService (copy)
 		return {
 			text = HttpService:JSONEncode({
@@ -167,7 +167,7 @@ return {
 			})
 		}
 	end,
-	formatNotInGameContent = function() -- line: 126
+	formatNotInGameContent = function() -- line: 124
 		-- upvalues: HttpService (copy)
 		return {
 			text = HttpService:JSONEncode({

@@ -41,6 +41,7 @@ return {
 	FocusNavActions = "FocusNavActions",
 	Fragment = "Fragment",
 	FriendRequestButton = "FriendRequestButton",
+	GameSortDropDown = "GameSortDropDown",
 	GameTile = "GameTile",
 	GameTileActiveFriendsFooter = "GameTileActiveFriendsFooter",
 	HeroUnit = "HeroUnit",

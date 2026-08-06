@@ -32,15 +32,41 @@ return {
 			}
 		}
 	end,
-	renderWithFoundation = function(p1: ((...any) -> ...any), p2) -- line: 37
+	makeStatusPanelProps = function(p1) -- line: 37
+		local t1 = {
+			status = "",
+			statusText = "",
+			queuePosition = nil,
+			queueTreatment = nil,
+			followUserId = 0,
+			isSubjectToChinaPolicies = false,
+			onAutoJoinNewServer = function() -- line: 45
+			end,
+			onJoinNewServer = function() -- line: 46
+			end,
+			onJoinTheLine = function() -- line: 47
+			end,
+			onShowConnectionHealth = function() -- line: 48
+			end
+		}
+
+		if p1 then
+			for v9, v10 in p1 do
+				t1[v9] = v10
+			end
+		end
+
+		return t1
+	end,
+	renderWithFoundation = function(p2: ((...any) -> ...any), p3) -- line: 58
 		-- upvalues: React (copy), Foundation (copy), Localization (copy), InExperienceLocales (copy), LocalizationService (copy)
-		return p1(React.createElement(Foundation.FoundationProvider, {
+		return p2(React.createElement(Foundation.FoundationProvider, {
 			theme = Foundation.Enums.Theme.Dark
 		}, {
 			Localization = React.createElement(Localization.LocalizationProvider, {
 				localization = InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
 			}, {
-				Subject = p2
+				Subject = p3
 			})
 		}))
 	end

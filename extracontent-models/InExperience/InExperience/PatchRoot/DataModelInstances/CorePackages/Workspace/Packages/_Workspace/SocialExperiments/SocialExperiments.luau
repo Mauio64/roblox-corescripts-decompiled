@@ -9,6 +9,7 @@ return {
 	SquadUnifyCoplayExperimentation = require(script.SquadUnifyCoplayExperimentation),
 	SquadQuickStartExperimentation = require(script.SquadQuickStartExperimentation),
 	SquadRegroupExperimentation = require(script.SquadRegroupExperimentation),
+	LuckyRecommendationExperimentation = require(script.LuckyRecommendationExperimentation),
 	AppChatPerfExperimentation = require(script.AppChatPerfExperimentation),
 	PartyPageCarouselExperimentation = require(script.PartyPageCarouselExperimentation),
 	deviceMeetsRequirementsForFAE = require(script.DeviceMeetsRequirementsForFAE),

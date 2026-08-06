@@ -1,5 +1,5 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 
 require(Foundation.Components.Types)
 
@@ -11,16 +11,16 @@ local t1 = {
 }
 local t2 = {
 	[false] = {
-		[ColorMode.Color] = StateLayerMode.Default,
-		[ColorMode.Inverse] = StateLayerMode.Inverse,
-		[ColorMode.LightMode] = StateLayerMode.Light,
-		[ColorMode.DarkMode] = StateLayerMode.Dark
+		[ColorNamespace.Color] = StateLayerMode.Default,
+		[ColorNamespace.Inverse] = StateLayerMode.Inverse,
+		[ColorNamespace.LightMode] = StateLayerMode.Light,
+		[ColorNamespace.DarkMode] = StateLayerMode.Dark
 	},
 	[true] = {
-		[ColorMode.Color] = StateLayerMode.Inverse,
-		[ColorMode.Inverse] = StateLayerMode.Default,
-		[ColorMode.LightMode] = StateLayerMode.Dark,
-		[ColorMode.DarkMode] = StateLayerMode.Light
+		[ColorNamespace.Color] = StateLayerMode.Inverse,
+		[ColorNamespace.Inverse] = StateLayerMode.Default,
+		[ColorNamespace.LightMode] = StateLayerMode.Dark,
+		[ColorNamespace.DarkMode] = StateLayerMode.Light
 	}
 }
 
@@ -45,6 +45,6 @@ return {
 			SelectionBehaviorUp = Enum.SelectionBehavior.Stop
 		}
 	},
-	COLOR_MODE_TO_STATE_LAYER_MODE = t2,
+	COLOR_NAMESPACE_TO_STATE_LAYER_MODE = t2,
 	INPUT_PLACEMENT_TO_LABEL_ALIGNMENT = t1
 }

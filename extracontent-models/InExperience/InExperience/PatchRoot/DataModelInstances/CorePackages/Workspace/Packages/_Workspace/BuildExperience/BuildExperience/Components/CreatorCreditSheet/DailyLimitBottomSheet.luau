@@ -25,11 +25,11 @@ local t1 = {
 	5000
 }
 
-local function formatNumber(n1: number) -- line: 84
+local function formatNumber(n1: number) -- line: 83
 	-- upvalues: NumberLocalization (copy), LocalizationService (copy)
 	return NumberLocalization.localize(string.format("%.0f", (math.floor(n1))), LocalizationService.RobloxLocaleId)
 end
-local function DailyLimitBottomSheetContent(t2: {[any]: any}) -- line: 88
+local function DailyLimitBottomSheetContent(t2: {[any]: any}) -- line: 87
 	-- upvalues: React (copy), LocalizationStrings (copy), formatNumber (copy), Chip (copy), IconName (copy), ChipVariant (copy), ChipSize (copy), t1 (copy), NumberLocalization (copy), LocalizationService (copy), Sheet (copy), FoundationText (copy), View (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy), Icon (copy), IconSize (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), Button (copy), FillBehavior (copy)
 	local v29 = t2.testId or "creator-credit-limit-sheet"
 	local v30 = math.max(t2.initialValue or 500, 100)
@@ -37,32 +37,32 @@ local function DailyLimitBottomSheetContent(t2: {[any]: any}) -- line: 88
 	local v32 = t2.isSaving == true
 	local v33, v34 = React.useState(v30)
 	local v35, v36 = React.useState(t2.initialIsNoLimit == true)
-	local v37 = React.useCallback(function() -- line: 98
+	local v37 = React.useCallback(function() -- line: 97
 		-- upvalues: v36 (copy), v34 (copy)
 		v36(false)
-		v34(function(p1) -- line: 100
+		v34(function(p1) -- line: 99
 			return (math.max(p1 - 500, 100))
 		end)
 	end, {})
-	local v38 = React.useCallback(function() -- line: 105
+	local v38 = React.useCallback(function() -- line: 104
 		-- upvalues: v36 (copy), v34 (copy)
 		v36(false)
-		v34(function(p2) -- line: 107
+		v34(function(p2) -- line: 106
 			return p2 + 500
 		end)
 	end, {})
-	local v39 = React.useCallback(function(n2: number) -- line: 112
+	local v39 = React.useCallback(function(n2: number) -- line: 111
 		-- upvalues: v36 (copy), v34 (copy)
 		v36(false)
 		v34((math.max(n2, 100)))
 	end, {})
-	local v40 = React.useCallback(function() -- line: 117
+	local v40 = React.useCallback(function() -- line: 116
 		-- upvalues: v36 (copy)
 		v36(true)
 	end, {})
 	local v41 = not v35 and v33 < v31
 	local v42 = if not v41 then if not t2.saveError then nil else LocalizationStrings.CREATOR_CREDIT_SETTINGS_SAVE_ERROR else LocalizationStrings.formatCreatorCreditLimitBelowSpend(formatNumber(v31))
-	local v43 = React.useCallback(function() -- line: 129
+	local v43 = React.useCallback(function() -- line: 128
 		-- upvalues: v35 (copy), t2 (copy), v33 (copy), v31 (copy)
 		if v35 then
 			t2.onConfirm(nil)
@@ -101,7 +101,7 @@ local function DailyLimitBottomSheetContent(t2: {[any]: any}) -- line: 88
 			leading = IconName.Robux,
 			variant = ChipVariant.Standard,
 			size = ChipSize.Medium,
-			onActivated = function() -- line: 169
+			onActivated = function() -- line: 168
 				-- upvalues: v39 (copy), v46 (copy)
 				v39(v46)
 			end,
@@ -195,7 +195,7 @@ local function DailyLimitBottomSheetContent(t2: {[any]: any}) -- line: 88
 		})
 	})
 end
-local function DailyLimitBottomSheet(t4: {[any]: any}) -- line: 283
+local function DailyLimitBottomSheet(t4: {[any]: any}) -- line: 282
 	-- upvalues: React (copy), DailyLimitBottomSheetContent (copy)
 	if not t4.isOpen then
 		return nil

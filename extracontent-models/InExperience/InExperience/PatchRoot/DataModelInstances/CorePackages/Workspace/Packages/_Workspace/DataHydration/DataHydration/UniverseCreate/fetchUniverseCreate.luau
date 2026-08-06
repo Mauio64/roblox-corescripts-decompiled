@@ -7,7 +7,7 @@ local withCsrfRetry = require(DataHydration.withCsrfRetry)
 
 require(script.Parent.UniverseCreateStoreTypes)
 
-local function tryJsonDecode(p1) -- line: 16
+local function tryJsonDecode(p1) -- line: 15
 	-- upvalues: HttpService (copy)
 	if p1 == nil or p1 == "" then
 		return nil
@@ -22,7 +22,7 @@ local function tryJsonDecode(p1) -- line: 16
 
 	return nil
 end
-local function decode(p2) -- line: 26
+local function decode(p2) -- line: 25
 	-- upvalues: HttpService (copy)
 	local responseBody = p2.responseBody
 	local v16
@@ -48,7 +48,7 @@ local function decode(p2) -- line: 26
 
 	return v16, nil, nil
 end
-local function fetchUniverseCreate(p3, t1: {[any]: any}?) -- line: 44
+local function fetchUniverseCreate(p3, t1: {[any]: any}?) -- line: 43
 	-- upvalues: withCsrfRetry (copy), HttpClient (copy), UrlBase (copy), decode (copy)
 	local v23 = t1 or {}
 	local v24 = v23.network or withCsrfRetry(HttpClient.createRequestInternalNetwork())

@@ -26,7 +26,7 @@ local function ButtonIcon(t1: {[any]: any}) -- line: 38
 	local v21 = useTextSizeOffset()
 	local v22, v23 = getIconScale(t1.icon, t1.size)
 	local v24 = usePresentationContext()
-	local v25 = useButtonVariants(v20, t1.size, t1.variant, if not v24 then nil else v24.colorMode)
+	local v25 = useButtonVariants(v20, t1.size, t1.variant, if not v24 then nil else v24.colorNamespace)
 
 	if not t1.icon then
 		return nil

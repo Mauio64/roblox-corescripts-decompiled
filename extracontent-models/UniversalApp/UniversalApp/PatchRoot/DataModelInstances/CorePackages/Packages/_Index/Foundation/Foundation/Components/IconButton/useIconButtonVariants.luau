@@ -3,7 +3,7 @@ local InputSize = require(Foundation.Enums.InputSize)
 
 require(Foundation.Enums.ButtonVariant)
 
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 
 require(Foundation.Components.Types)
 
@@ -56,8 +56,8 @@ local function v7(p1) -- line: 41
 end
 
 return function(p2, p3, p4, p5) -- line: 92
-	-- upvalues: VariantsContext (copy), v7 (copy), composeStyleVariant (copy), ColorMode (copy)
+	-- upvalues: VariantsContext (copy), v7 (copy), composeStyleVariant (copy), ColorNamespace (copy)
 	local v15 = VariantsContext.useVariants("IconButton", v7, p2)
 
-	return composeStyleVariant(v15.common, v15.sizes[p3], v15.types[p4][p5 or ColorMode.Color])
+	return composeStyleVariant(v15.common, v15.sizes[p3], v15.types[p4][p5 or ColorNamespace.Color])
 end

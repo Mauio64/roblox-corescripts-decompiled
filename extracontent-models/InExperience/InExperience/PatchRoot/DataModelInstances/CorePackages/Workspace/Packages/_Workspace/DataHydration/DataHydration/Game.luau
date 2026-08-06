@@ -7,8 +7,11 @@ local createUserVoteFeedbackMetadataStore = require(script.Votes.createUserVoteF
 local createPlayabilityStore = require(script.Playability.createPlayabilityStore)
 local createAgeRecommendationStore = require(script.AgeRecommendations.createAgeRecommendationStore)
 local createGameMediaStore = require(script.GameMedia.createGameMediaStore)
+local createGameIconStore = require(script.GameIcon.createGameIconStore)
+local GameIconSize = require(script.GameIcon.GameIconSize)
 local getFavoritesStore = require(script.Favorites.getFavoritesStore)
 local getGameInfoStore = require(script.GameInfo.getGameInfoStore)
+local getGameIconStore = require(script.GameIcon.getGameIconStore)
 local getFollowingsStore = require(script.Followings.getFollowingsStore)
 local getVotesStore = require(script.Votes.getVotesStore)
 local getUserVoteFeedbackMetadataStore = require(script.Votes.getUserVoteFeedbackMetadataStore)
@@ -38,6 +41,7 @@ require(script.AgeRecommendations.AgeRecommendationStoreTypes)
 local AgeRecommendationUtils = require(script.AgeRecommendations.AgeRecommendationUtils)
 
 require(script.GameInfo.GameInfoStoreTypes)
+require(script.GameIcon.GameIconStoreTypes)
 require(script.Playability.PlayabilityStoreTypes)
 require(script.GameMedia.GameMediaStoreTypes)
 require(script.Votes.UserVoteFeedbackMetadataStoreTypes)
@@ -73,5 +77,8 @@ return {
 	AgeRecommendationUtils = AgeRecommendationUtils,
 	getConnectionsPlayedStore = if not FFlagLuaAppDataHydrationConnectionsPlayedStore then nil else getConnectionsPlayedStore,
 	createGameMediaStore = createGameMediaStore,
-	getGameMediaStore = getGameMediaStore
+	getGameMediaStore = getGameMediaStore,
+	createGameIconStore = createGameIconStore,
+	getGameIconStore = getGameIconStore,
+	GameIconSize = GameIconSize
 }

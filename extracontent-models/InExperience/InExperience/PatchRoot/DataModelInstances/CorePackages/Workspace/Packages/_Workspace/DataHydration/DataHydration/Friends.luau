@@ -2,5 +2,6 @@ require(script.createFriendsStore)
 
 return {
 	Enums = require(script.Enums),
-	FriendsStore = require(script.FriendsStore)
+	FriendsStore = require(script.FriendsStore),
+	Requests = require(script.Requests)
 }

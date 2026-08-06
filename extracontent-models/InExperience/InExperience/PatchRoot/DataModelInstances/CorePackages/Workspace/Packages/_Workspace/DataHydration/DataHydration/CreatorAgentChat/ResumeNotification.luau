@@ -11,7 +11,7 @@ local t1 = {
 	propose_plan = true
 }
 
-local function extractRawFrame(p1) -- line: 31
+local function extractRawFrame(p1) -- line: 29
 	if typeof(p1) == "string" then
 		return p1
 	end
@@ -36,7 +36,7 @@ local function extractRawFrame(p1) -- line: 31
 
 	return nil
 end
-local function normalizeUniverseId(p2) -- line: 47
+local function normalizeUniverseId(p2) -- line: 45
 	if typeof(p2) == "number" and p2 ~= 0 then
 		return p2
 	end
@@ -53,7 +53,7 @@ local function normalizeUniverseId(p2) -- line: 47
 
 	return nil
 end
-local function getUniverseId(t2: {[any]: any}) -- line: 58
+local function getUniverseId(t2: {[any]: any}) -- line: 56
 	local universeId = t2.universeId
 
 	if typeof(universeId) == "number" and universeId ~= 0 then
@@ -93,11 +93,11 @@ local function getUniverseId(t2: {[any]: any}) -- line: 58
 
 	return nil
 end
-local function valueLooksLikeLocalTool(p3) -- line: 71
+local function valueLooksLikeLocalTool(p3) -- line: 69
 	-- upvalues: t1 (copy)
 	return typeof(p3) == "string" and t1[string.lower(p3)] == true
 end
-local function updateLooksLikeLocalTool(p4) -- line: 75
+local function updateLooksLikeLocalTool(p4) -- line: 73
 	-- upvalues: t1 (copy)
 	local kind = p4.kind
 
@@ -126,7 +126,7 @@ local function updateLooksLikeLocalTool(p4) -- line: 75
 
 	return true
 end
-local function getSessionUpdate(p5) -- line: 88
+local function getSessionUpdate(p5) -- line: 86
 	-- upvalues: AcpProtocol (copy)
 	if p5.kind ~= "notification" then
 		return nil, nil, nil
@@ -185,7 +185,7 @@ local function getSessionUpdate(p5) -- line: 88
 
 	return update, sessionId, nil
 end
-local function classifyFrame(p6) -- line: 108
+local function classifyFrame(p6) -- line: 106
 	-- upvalues: AcpProtocol (copy), t1 (copy)
 	local g57 = nil
 	local title = nil
@@ -318,7 +318,7 @@ local function classifyFrame(p6) -- line: 108
 		g57 = true
 	until not g57
 end
-local function getResumeDeepLink(t3: {[any]: any}) -- line: 174
+local function getResumeDeepLink(t3: {[any]: any}) -- line: 172
 	-- upvalues: HttpService (copy)
 	local t4 = {}
 
@@ -330,14 +330,14 @@ local function getResumeDeepLink(t3: {[any]: any}) -- line: 174
 
 	return `roblox://navigation/build?{ table.concat(t4, "&") }`
 end
-local function getToastCopy(t5: {[any]: any}) -- line: 184
+local function getToastCopy(t5: {[any]: any}) -- line: 182
 	if t5.kind == "local_tool_call" then
 		return "Assistant needs your input", "Resume your build chat to continue."
 	end
 
 	return "Assistant finished", "Resume your build chat to review the result."
 end
-local function getActionEventParams(t6: {[any]: any}) -- line: 191
+local function getActionEventParams(t6: {[any]: any}) -- line: 189
 	-- upvalues: HttpService (copy), getResumeDeepLink (copy)
 	return HttpService:JSONEncode({
 		sessionId = t6.sessionId,
@@ -346,7 +346,7 @@ local function getActionEventParams(t6: {[any]: any}) -- line: 191
 		deepLink = getResumeDeepLink(t6)
 	})
 end
-local function getToastVisualItems(t7: {[any]: any}, s1: string, s2: string, s3: string) -- line: 200
+local function getToastVisualItems(t7: {[any]: any}, s1: string, s2: string, s3: string) -- line: 198
 	local t8 = {}
 
 	if t7.universeId ~= nil then
@@ -407,7 +407,7 @@ return {
 	ResumeEventName = "CreatorAgentResume",
 	CapRtnNamespace = AcpProtocol.CapRtnNamespace,
 	classifyFrame = classifyFrame,
-	classifyRtnDetail = function(p7) -- line: 138
+	classifyRtnDetail = function(p7) -- line: 136
 		-- upvalues: extractRawFrame (copy), parseFrame (copy), classifyFrame (copy)
 		local v65 = extractRawFrame(p7)
 
@@ -423,7 +423,7 @@ return {
 
 		return (classifyFrame(v66))
 	end,
-	targetMatchesNotification = function(t9: {[any]: any}?, t10: {[any]: any}) -- line: 152
+	targetMatchesNotification = function(t9: {[any]: any}?, t10: {[any]: any}) -- line: 150
 		if t9 == nil then
 			return false
 		end
@@ -434,7 +434,7 @@ return {
 
 		return t9.universeId ~= nil and (t10.universeId ~= nil and t9.universeId == t10.universeId)
 	end,
-	getNotificationId = function(t11: {[any]: any}) -- line: 167
+	getNotificationId = function(t11: {[any]: any}) -- line: 165
 		if t11.kind == "local_tool_call" and t11.toolCallId ~= nil then
 			return `CreatorAgentResume-{ t11.sessionId }-{ t11.toolCallId }`
 		end
@@ -442,7 +442,7 @@ return {
 		return `CreatorAgentResume-{ t11.sessionId }-{ t11.kind }`
 	end,
 	getResumeDeepLink = getResumeDeepLink,
-	buildToastNotification = function(t12: {[any]: any}) -- line: 253
+	buildToastNotification = function(t12: {[any]: any}) -- line: 251
 		-- upvalues: HttpService (copy), getResumeDeepLink (copy), getToastVisualItems (copy)
 		local s4, s5
 

@@ -100,7 +100,7 @@ local function Button(p3, p4) -- line: 100
 
 	local v44 = useTokens()
 	local v45 = usePresentationContext()
-	local v46 = useButtonVariants(v44, v35.size, v35.variant, if not v45 then nil else v45.colorMode)
+	local v46 = useButtonVariants(v44, v35.size, v35.variant, if not v45 then nil else v45.colorNamespace)
 	local v47 = useButtonMotionStates(v46.content.style.Transparency, Constants.DISABLED_TRANSPARENCY)
 	local v48, v49 = useMotion(v47.Default)
 	local v50, v51 = useMotion(v47.Default)

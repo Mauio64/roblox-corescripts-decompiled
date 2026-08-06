@@ -5,7 +5,7 @@ local StudioClientLogsTool = require(Parent.DataHydration.CreatorAgentChat).Stud
 
 game:DefineFastInt("MyStatsExperienceAskForLogsMaxEntries", 100)
 
-local function getDefaultMaxEntriesPerSource() -- line: 22
+local function getDefaultMaxEntriesPerSource() -- line: 20
 	return (math.max(0, game:GetFastInt("MyStatsExperienceAskForLogsMaxEntries")))
 end
 
@@ -16,7 +16,7 @@ local t1 = {
 	[Enum.MessageType.MessageError.Value] = "Error"
 }
 
-local function getMessageTypeValue(p1) -- line: 33
+local function getMessageTypeValue(p1) -- line: 31
 	if typeof(p1) == "EnumItem" then
 		return p1.Value
 	end
@@ -27,7 +27,7 @@ local function getMessageTypeValue(p1) -- line: 33
 
 	return nil
 end
-local function getMessageTypeLabel(p2) -- line: 43
+local function getMessageTypeLabel(p2) -- line: 41
 	-- upvalues: t1 (copy)
 	local v23 = if typeof(p2) ~= "EnumItem" then if typeof(p2) ~= "number" then nil else p2 else p2.Value
 
@@ -45,7 +45,7 @@ local function getMessageTypeLabel(p2) -- line: 43
 
 	return nil
 end
-local function encodeContext(p3) -- line: 57
+local function encodeContext(p3) -- line: 55
 	-- upvalues: HttpService (copy)
 	if typeof(p3) ~= "table" or next(p3) == nil then
 		return nil
@@ -53,7 +53,7 @@ local function encodeContext(p3) -- line: 57
 
 	return HttpService:JSONEncode(p3)
 end
-local function pushCapped(t2: {[any]: any}, p4, n1: number) -- line: 65
+local function pushCapped(t2: {[any]: any}, p4, n1: number) -- line: 63
 	if n1 <= 0 then
 		return
 	end
@@ -64,7 +64,7 @@ local function pushCapped(t2: {[any]: any}, p4, n1: number) -- line: 65
 		table.remove(t2, 1)
 	end
 end
-local function toLogEntry(p5, p6, p7, p8) -- line: 75
+local function toLogEntry(p5, p6, p7, p8) -- line: 73
 	-- upvalues: t1 (copy), HttpService (copy)
 	local v32 = if typeof(p5) ~= "string" then tostring(p5 or "") else p5
 	local v33 = if typeof(p7) ~= "number" then nil else p7
@@ -87,7 +87,7 @@ local connection2 = nil
 local u15 = false
 local u16 = math.max(0, game:GetFastInt("MyStatsExperienceAskForLogsMaxEntries"))
 
-local function collectClientLogs(p9, n2: number?) -- line: 93
+local function collectClientLogs(p9, n2: number?) -- line: 91
 	-- upvalues: LogService (copy), toLogEntry (copy)
 	local v38 = p9 or LogService
 	local v39 = n2 or math.max(0, game:GetFastInt("MyStatsExperienceAskForLogsMaxEntries"))
@@ -109,13 +109,13 @@ local function collectClientLogs(p9, n2: number?) -- line: 93
 
 	return t5
 end
-local function trimServerLogs(n3: number) -- line: 108
+local function trimServerLogs(n3: number) -- line: 106
 	-- upvalues: t4 (ref)
 	while n3 < #t4 do
 		table.remove(t4, 1)
 	end
 end
-local function startServerLogCollection(t6: {[any]: any}?) -- line: 129
+local function startServerLogCollection(t6: {[any]: any}?) -- line: 127
 	-- upvalues: u15 (ref), LogService (copy), u16 (ref), t4 (ref), connection (ref), toLogEntry (copy), connection2 (ref)
 	local v47 = t6 or {}
 
@@ -137,7 +137,7 @@ local function startServerLogCollection(t6: {[any]: any}?) -- line: 129
 		table.remove(t4, 1)
 	end
 
-	connection = v48.ServerMessageOut:Connect(function(p10, p11, p12, p13) -- line: 143
+	connection = v48.ServerMessageOut:Connect(function(p10, p11, p12, p13) -- line: 141
 		-- upvalues: t4 (ref), toLogEntry (copy), u16 (ref)
 		local v61 = t4
 		local v62 = toLogEntry(p10, p11, p12, p13)
@@ -153,7 +153,7 @@ local function startServerLogCollection(t6: {[any]: any}?) -- line: 129
 			table.remove(v61, 1)
 		end
 	end)
-	connection2 = v48.ServerContextOut:Connect(function(p14) -- line: 148
+	connection2 = v48.ServerContextOut:Connect(function(p14) -- line: 146
 		-- upvalues: t4 (ref), toLogEntry (copy), u16 (ref)
 		if typeof(p14) ~= "table" or p14._structuredContext == nil then
 			return
@@ -178,7 +178,7 @@ local function startServerLogCollection(t6: {[any]: any}?) -- line: 129
 
 	return true
 end
-local function getCollectedServerLogs(n4: number?) -- line: 165
+local function getCollectedServerLogs(n4: number?) -- line: 163
 	-- upvalues: t4 (ref)
 	local v51 = n4 or math.max(0, game:GetFastInt("MyStatsExperienceAskForLogsMaxEntries"))
 	local t7 = {}
@@ -192,7 +192,7 @@ end
 
 return {
 	startServerLogCollection = startServerLogCollection,
-	stopServerLogCollection = function(b1: boolean?) -- line: 114
+	stopServerLogCollection = function(b1: boolean?) -- line: 112
 		-- upvalues: connection (ref), connection2 (ref), u15 (ref), t4 (ref)
 		if connection ~= nil then
 			connection:Disconnect()
@@ -210,7 +210,7 @@ return {
 			t4 = {}
 		end
 	end,
-	collectToolResultContent = function(t8: {[any]: any}?) -- line: 175
+	collectToolResultContent = function(t8: {[any]: any}?) -- line: 173
 		-- upvalues: StudioClientLogsTool (copy), startServerLogCollection (copy), collectClientLogs (copy), getCollectedServerLogs (copy)
 		local v55 = t8 or {}
 

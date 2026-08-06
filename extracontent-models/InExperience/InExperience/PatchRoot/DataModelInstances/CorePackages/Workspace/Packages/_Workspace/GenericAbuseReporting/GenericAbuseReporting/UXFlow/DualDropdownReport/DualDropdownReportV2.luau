@@ -21,18 +21,17 @@ local useLocalization = Localization.Hooks.useLocalization
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
 local SideModalDropdownButton = require(GenericAbuseReporting.Common.SideModalDropdownButton)
-local FFlagReportIPInfringement = require(GenericAbuseReportingParent.SharedFlags).FFlagReportIPInfringement
 
-local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
-	-- upvalues: useTokens (copy), React (copy), useLocalization (copy), Dash (copy), FFlagReportIPInfringement (copy), Sheet (copy), View (copy), IconButton (copy), ButtonVariant (copy), IconName (copy), FoundationText (copy), InputLabel (copy), InputSize (copy), SideModalDropdownButton (copy), TextArea (copy), Button (copy), isShowGenericIllegalContentReportingLink (copy), GenericReportLink (copy), OptionSelectorGroup (copy)
-	local v27 = useTokens()
-	local v28, v29 = React.useState(true)
-	local v30, v31 = React.useState("None")
-	local v32, v33 = React.useState(t1.preselected and t1.preselected.problem or nil)
-	local v34, v35 = React.useState(t1.preselected and t1.preselected.surface or nil)
-	local v36, v37 = React.useState("")
-	local v38, v39 = React.useState("None")
-	local v40 = useLocalization({
+local function DualDropdownReportV2(t1: {[any]: any}) -- line: 46
+	-- upvalues: useTokens (copy), React (copy), useLocalization (copy), Dash (copy), Sheet (copy), View (copy), IconButton (copy), ButtonVariant (copy), IconName (copy), FoundationText (copy), InputLabel (copy), InputSize (copy), SideModalDropdownButton (copy), TextArea (copy), Button (copy), isShowGenericIllegalContentReportingLink (copy), GenericReportLink (copy), OptionSelectorGroup (copy)
+	local v26 = useTokens()
+	local v27, v28 = React.useState(true)
+	local v29, v30 = React.useState("None")
+	local v31, v32 = React.useState(t1.preselected and t1.preselected.problem or nil)
+	local v33, v34 = React.useState(t1.preselected and t1.preselected.surface or nil)
+	local v35, v36 = React.useState("")
+	local v37, v38 = React.useState("None")
+	local v39 = useLocalization({
 		problemHeading = "Feature.ReportAbuse.Label.WhatWasWrong",
 		surfaceHeading = "Feature.ReportAbuse.Label.WhereDidItHappen",
 		selectOnePrompt = "Feature.ReportAbuse.Label.PleaseSelectOne",
@@ -42,93 +41,93 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 		continueButton = "Feature.ReportAbuse.Action.Continue",
 		titleIpInfringement = "Feature.ReportAbuse.Title.SelectInSceneContinueYourReport"
 	})
-	local v41 = React.useCallback(function(p1) -- line: 69
-		-- upvalues: v37 (copy)
-		v37(p1)
+	local v40 = React.useCallback(function(p1) -- line: 67
+		-- upvalues: v36 (copy)
+		v36(p1)
 	end, {})
-	local v42 = React.useCallback(function() -- line: 73
-		-- upvalues: v31 (copy)
-		v31("Problem")
+	local v41 = React.useCallback(function() -- line: 71
+		-- upvalues: v30 (copy)
+		v30("Problem")
 	end, {})
-	local v43 = React.useCallback(function() -- line: 77
-		-- upvalues: v31 (copy)
-		v31("Surface")
+	local v42 = React.useCallback(function() -- line: 75
+		-- upvalues: v30 (copy)
+		v30("Surface")
 	end, {})
-	local v44 = React.useCallback(function() -- line: 81
-		-- upvalues: v29 (copy), t1 (copy)
-		v29(false)
+	local v43 = React.useCallback(function() -- line: 79
+		-- upvalues: v28 (copy), t1 (copy)
+		v28(false)
 		task.wait(0.3)
 		t1.onClose()
 	end, { t1.onClose })
-	local v45 = React.useCallback(function() -- line: 87
-		-- upvalues: v31 (copy)
-		v31("None")
+	local v44 = React.useCallback(function() -- line: 85
+		-- upvalues: v30 (copy)
+		v30("None")
 	end, {})
-	local v46 = React.useCallback(function(s1: string) -- line: 91
-		-- upvalues: v30 (copy), Dash (copy), t1 (copy), v33 (copy), v35 (copy), v45 (copy)
-		if v30 == "Problem" then
-			local v51 = Dash.find(t1.problems, function(t2: {[any]: any}) -- line: 93
+	local v45 = React.useCallback(function(s1: string) -- line: 89
+		-- upvalues: v29 (copy), Dash (copy), t1 (copy), v32 (copy), v34 (copy), v44 (copy)
+		if v29 == "Problem" then
+			local v50 = Dash.find(t1.problems, function(t2: {[any]: any}) -- line: 91
 				-- upvalues: s1 (copy)
 				return t2.value == s1
 			end)
 
-			v33(v51)
+			v32(v50)
 		else
-			local v52 = Dash.find(t1.surfaces, function(t3: {[any]: any}) -- line: 98
+			local v51 = Dash.find(t1.surfaces, function(t3: {[any]: any}) -- line: 96
 				-- upvalues: s1 (copy)
 				return t3.value == s1
 			end)
 
-			v35(v52)
+			v34(v51)
 		end
 
-		v45()
+		v44()
 	end, {
-		v30,
+		v29,
 		t1.problems,
 		t1.surfaces,
-		v45
+		v44
 	})
-	local v47 = FFlagReportIPInfringement and (v32 and v32.value == "ip infringement")
-	local v48 = React.useCallback(function() -- line: 110
-		-- upvalues: v32 (copy), v34 (copy), v39 (copy), v47 (copy), v44 (copy), t1 (copy), v36 (copy)
-		local v53 = v32 == nil and "" or v32.value
-		local v54 = v34 == nil and "" or v34.value
+	local v46 = v31 and v31.value == "ip infringement"
+	local v47 = React.useCallback(function() -- line: 106
+		-- upvalues: v31 (copy), v33 (copy), v38 (copy), v46 (copy), v43 (copy), t1 (copy), v35 (copy)
+		local v52 = v31 == nil and "" or v31.value
+		local v53 = v33 == nil and "" or v33.value
 
-		if v53 == "" and v54 == "" then
-			v39("Both")
-
-			return
-		end
-
-		if v53 == "" then
-			v39("Problem")
+		if v52 == "" and v53 == "" then
+			v38("Both")
 
 			return
 		end
 
-		if v54 == "" and not v47 then
-			v39("Surface")
+		if v52 == "" then
+			v38("Problem")
 
 			return
 		end
 
-		v39("None")
-		v44()
-		t1.onSubmit(v53, v54, v36)
+		if v53 == "" and not v46 then
+			v38("Surface")
+
+			return
+		end
+
+		v38("None")
+		v43()
+		t1.onSubmit(v52, v53, v35)
 	end, {
-		v32,
-		v34,
-		v36,
-		v44,
+		v31,
+		v33,
+		v35,
+		v43,
 		t1.onSubmit,
-		v47
+		v46
 	})
 
 	return React.createElement(React.Fragment, nil, {
 		MainSheet = React.createElement(Sheet.Root, {
-			isOpen = v28,
-			onClose = v44
+			isOpen = v27,
+			onClose = v43
 		}, {
 			Header = React.createElement(Sheet.Header, {
 				hasCloseAffordance = false
@@ -139,13 +138,13 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 					LayoutOrder = 1,
 					variant = ButtonVariant.Utility,
 					icon = IconName.X,
-					onActivated = v44
+					onActivated = v43
 				}),
 				Title = React.createElement(FoundationText, {
 					RichText = true,
 					tag = "auto-xy text-wrap text-heading-small text-align-x-left",
 					LayoutOrder = 2,
-					Text = if not v47 then t1.title else v40.titleIpInfringement
+					Text = if not v46 then t1.title else v39.titleIpInfringement
 				})
 			})),
 			Content = React.createElement(Sheet.Content, nil, {
@@ -155,53 +154,53 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 				}, {
 					ProblemHeading = React.createElement(InputLabel, {
 						LayoutOrder = 1,
-						Text = v40.problemHeading,
+						Text = v39.problemHeading,
 						size = InputSize.Small
 					}),
 					ProblemDropdownButton = React.createElement(SideModalDropdownButton, {
 						layoutOrder = 2,
-						text = v32 and v32.label or v40.chooseOne,
-						onActivated = v42,
-						isDropdownError = v38 == "Problem" or v38 == "Both"
+						text = v31 and v31.label or v39.chooseOne,
+						onActivated = v41,
+						isDropdownError = v37 == "Problem" or v37 == "Both"
 					}),
 					ProblemSubtext = React.createElement(FoundationText, {
 						RichText = true,
 						tag = "auto-xy text-wrap text-align-x-left text-body-small",
 						LayoutOrder = 3,
-						Text = not (v38 ~= "Problem" and v38 ~= "Both") and v40.selectOnePrompt or "",
-						textStyle = v27.Color.System.Alert
+						Text = not (v37 ~= "Problem" and v37 ~= "Both") and v39.selectOnePrompt or "",
+						textStyle = v26.Color.System.Alert
 					})
 				}),
-				ProblemSurface = if not v47 then React.createElement(View, {
+				ProblemSurface = if not v46 then React.createElement(View, {
 					tag = "size-full-0 auto-y col gap-small",
 					LayoutOrder = 2
 				}, {
 					SurfaceHeading = React.createElement(InputLabel, {
 						LayoutOrder = 1,
-						Text = v40.surfaceHeading,
+						Text = v39.surfaceHeading,
 						size = InputSize.Small
 					}),
 					SurfaceDropdownButton = React.createElement(SideModalDropdownButton, {
 						layoutOrder = 2,
-						text = v34 and v34.label or v40.chooseOne,
-						onActivated = v43,
-						isDropdownError = v38 == "Surface" or v38 == "Both"
+						text = v33 and v33.label or v39.chooseOne,
+						onActivated = v42,
+						isDropdownError = v37 == "Surface" or v37 == "Both"
 					}),
 					SurfaceSubtext = React.createElement(FoundationText, {
 						RichText = true,
 						tag = "auto-xy text-wrap text-align-x-left text-body-small",
 						LayoutOrder = 3,
-						Text = not (v38 ~= "Surface" and v38 ~= "Both") and v40.selectOnePrompt or "",
-						textStyle = v27.Color.System.Alert
+						Text = not (v37 ~= "Surface" and v37 ~= "Both") and v39.selectOnePrompt or "",
+						textStyle = v26.Color.System.Alert
 					})
 				}) else nil,
-				TextArea = if not v47 then React.createElement(TextArea, {
+				TextArea = if not v46 then React.createElement(TextArea, {
 					isRequired = false,
 					LayoutOrder = 3,
-					label = v40.commentHeading,
-					text = v36,
-					placeholder = v40.textAreaPlaceholder,
-					onChanged = v41,
+					label = v39.commentHeading,
+					text = v35,
+					placeholder = v39.textAreaPlaceholder,
+					onChanged = v40,
 					width = UDim.new(1, 0)
 				}) else nil
 			}),
@@ -211,8 +210,8 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 				}, {
 					SubmitButton = React.createElement(Button, {
 						LayoutOrder = 0,
-						text = if not v47 then v40.submitButton else v40.continueButton,
-						onActivated = v48,
+						text = if not v46 then v39.submitButton else v39.continueButton,
+						onActivated = v47,
 						variant = ButtonVariant.Emphasis,
 						width = UDim.new(1, 0)
 					}),
@@ -221,8 +220,8 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 			})
 		}),
 		OptionSheet = React.createElement(Sheet.Root, {
-			isOpen = v30 ~= "None",
-			onClose = v45
+			isOpen = v29 ~= "None",
+			onClose = v44
 		}, {
 			Header = React.createElement(Sheet.Header, {
 				hasCloseAffordance = false
@@ -233,13 +232,13 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 					LayoutOrder = 1,
 					variant = ButtonVariant.Utility,
 					icon = IconName.ChevronLargeLeft,
-					onActivated = v45
+					onActivated = v44
 				}),
 				Title = React.createElement(FoundationText, {
 					RichText = true,
 					tag = "auto-xy text-align-x-left text-wrap text-heading-small text-align-x-left",
 					LayoutOrder = 2,
-					Text = v30 == "Problem" and v40.problemHeading or v40.surfaceHeading
+					Text = v29 == "Problem" and v39.problemHeading or v39.surfaceHeading
 				})
 			})),
 			Content = React.createElement(Sheet.Content, nil, {
@@ -249,9 +248,9 @@ local function DualDropdownReportV2(t1: {[any]: any}) -- line: 48
 				}),
 				OptionsList = React.createElement(OptionSelectorGroup.Root, {
 					LayoutOrder = 2,
-					value = if v30 ~= "Problem" or v32 == nil then (v30 ~= "Surface" or v34 == nil) and "" or v34.value else v32.value,
-					onValueChanged = v46
-				}, Dash.map(t1[v30 ~= "Problem" and "surfaces" or "problems"], function(t4: {[any]: any}) -- line: 283
+					value = if v29 ~= "Problem" or v31 == nil then (v29 ~= "Surface" or v33 == nil) and "" or v33.value else v31.value,
+					onValueChanged = v45
+				}, Dash.map(t1[v29 ~= "Problem" and "surfaces" or "problems"], function(t4: {[any]: any}) -- line: 279
 					-- upvalues: React (copy), OptionSelectorGroup (copy), InputSize (copy)
 					return React.createElement(OptionSelectorGroup.Item, {
 						key = t4.value,

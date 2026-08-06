@@ -280,5 +280,6 @@ return {
 	ItemType = t1,
 	ItemTextKey = t3,
 	ItemInfo = t4,
-	EventNameMappings = t2
+	EventNameMappings = t2,
+	MomentsExperienceUri = v11
 }

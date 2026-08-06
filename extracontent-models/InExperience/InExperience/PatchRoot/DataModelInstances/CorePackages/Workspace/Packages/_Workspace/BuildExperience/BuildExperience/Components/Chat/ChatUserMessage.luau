@@ -9,7 +9,7 @@ local FoundationText = Foundation.Text
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 
-local function ChatUserMessage(t1: {[any]: any}) -- line: 21
+local function ChatUserMessage(t1: {[any]: any}) -- line: 19
 	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationText (copy)
 	local v10 = useTokens()
 	local message = t1.message

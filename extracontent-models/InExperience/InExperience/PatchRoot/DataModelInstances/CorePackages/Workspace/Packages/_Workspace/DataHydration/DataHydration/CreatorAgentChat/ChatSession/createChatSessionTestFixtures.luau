@@ -1,20 +1,20 @@
 local Parent = script:FindFirstAncestor("DataHydration").Parent
 local Signals = require(Parent.Signals)
 
-local function makeRequestHandle() -- line: 16
+local function makeRequestHandle() -- line: 14
 	-- upvalues: Signals (copy)
 	local v5, v6 = Signals.createSignal({
 		status = "pending"
 	})
 
-	local function succeed(p1) -- line: 18
+	local function succeed(p1) -- line: 16
 		-- upvalues: v6 (copy)
 		v6({
 			status = "succeeded",
 			result = p1
 		})
 	end
-	local function fail(s1: string) -- line: 21
+	local function fail(s1: string) -- line: 19
 		-- upvalues: v6 (copy)
 		v6({
 			status = "failed",
@@ -24,11 +24,11 @@ local function makeRequestHandle() -- line: 16
 
 	return {
 		state = v5,
-		dispose = function() -- line: 26
+		dispose = function() -- line: 24
 		end
 	}, succeed, fail
 end
-local function makeTurnHandle(s2: string) -- line: 53
+local function makeTurnHandle(s2: string) -- line: 51
 	-- upvalues: Signals (copy)
 	local t1 = {
 		requestId = nil,
@@ -60,7 +60,7 @@ local function makeTurnHandle(s2: string) -- line: 53
 	local n2 = 0
 	local t4 = {
 		state = v20,
-		onNotification = function(p2) -- line: 104
+		onNotification = function(p2) -- line: 102
 			-- upvalues: n1 (ref), t2 (copy)
 			n1 += 1
 
@@ -68,20 +68,20 @@ local function makeTurnHandle(s2: string) -- line: 53
 
 			t2[v51] = p2
 
-			return function() -- line: 108
+			return function() -- line: 106
 				-- upvalues: t2 (copy), v51 (copy)
 				t2[v51] = nil
 			end
 		end,
-		getLatestProcessedSequenceNumber = function() -- line: 112
+		getLatestProcessedSequenceNumber = function() -- line: 110
 			-- upvalues: u26 (ref)
 			return u26
 		end,
-		hasSequenceGap = function() -- line: 115
+		hasSequenceGap = function() -- line: 113
 			-- upvalues: n2 (ref)
 			return n2 > 0
 		end,
-		noteProcessedSequenceNumber = function(n3: number) -- line: 83
+		noteProcessedSequenceNumber = function(n3: number) -- line: 81
 			-- upvalues: t3 (copy), u26 (ref), u27 (ref), n2 (ref)
 			if t3[n3] == true then
 				return
@@ -112,7 +112,7 @@ local function makeTurnHandle(s2: string) -- line: 53
 
 			n2 -= 1
 		end,
-		cancel = function() -- line: 119
+		cancel = function() -- line: 117
 			-- upvalues: u22 (ref), v20 (copy), v21 (copy)
 			u22 = true
 
@@ -124,7 +124,7 @@ local function makeTurnHandle(s2: string) -- line: 53
 		end
 	}
 
-	local function finish(p3) -- line: 128
+	local function finish(p3) -- line: 126
 		-- upvalues: v20 (copy), v21 (copy)
 		if p3 ~= nil then
 		else
@@ -136,11 +136,11 @@ local function makeTurnHandle(s2: string) -- line: 53
 		v21(p3)
 	end
 
-	function t4.wasCancelled() -- line: 140
+	function t4.wasCancelled() -- line: 138
 		-- upvalues: u22 (ref)
 		return u22
 	end
-	function t4.setLatestProcessedSequenceNumber(n4: number) -- line: 143
+	function t4.setLatestProcessedSequenceNumber(n4: number) -- line: 141
 		-- upvalues: t3 (copy), u26 (ref), u27 (ref), n2 (ref)
 		if t3[n4] == true then
 			return
@@ -171,7 +171,7 @@ local function makeTurnHandle(s2: string) -- line: 53
 
 		n2 -= 1
 	end
-	function t4.emitNotification() -- line: 146
+	function t4.emitNotification() -- line: 144
 		-- upvalues: t2 (copy)
 		for _, v56 in t2 do
 			v56()
@@ -184,7 +184,7 @@ end
 return {
 	Types = require(script.Parent.Parent.types),
 	makeRequestHandle = makeRequestHandle,
-	makeImmediateSuccess = function(p4) -- line: 31
+	makeImmediateSuccess = function(p4) -- line: 29
 		-- upvalues: makeRequestHandle (copy)
 		local v10, v11 = makeRequestHandle()
 
@@ -192,7 +192,7 @@ return {
 
 		return v10
 	end,
-	makeImmediateFailure = function(s3: string) -- line: 37
+	makeImmediateFailure = function(s3: string) -- line: 35
 		-- upvalues: makeRequestHandle (copy)
 		local v13, _, v15 = makeRequestHandle()
 
@@ -200,7 +200,7 @@ return {
 
 		return v13
 	end,
-	makeImmediateFailureWithCode = function(s4: string, n5: number) -- line: 43
+	makeImmediateFailureWithCode = function(s4: string, n5: number) -- line: 41
 		-- upvalues: Signals (copy)
 		return {
 			state = Signals.createSignal({
@@ -208,12 +208,12 @@ return {
 				error = s4,
 				errorCode = n5
 			}),
-			dispose = function() -- line: 48
+			dispose = function() -- line: 46
 			end
 		}
 	end,
 	makeTurnHandle = makeTurnHandle,
-	defaultDeps = function() -- line: 154
+	defaultDeps = function() -- line: 152
 		-- upvalues: makeRequestHandle (copy), makeTurnHandle (copy)
 		local t5 = {}
 		local t6 = {}
@@ -229,7 +229,7 @@ return {
 		return {
 			deps = {
 				rpcTimeoutSeconds = 5,
-				initialize = function(_) -- line: 180
+				initialize = function(_) -- line: 178
 					-- upvalues: t5 (copy), makeRequestHandle (copy)
 					table.insert(t5, #t5 + 1)
 
@@ -242,7 +242,7 @@ return {
 
 					return v59
 				end,
-				sessionNew = function(p6) -- line: 184
+				sessionNew = function(p6) -- line: 182
 					-- upvalues: t6 (copy), makeRequestHandle (copy)
 					table.insert(t6, p6)
 
@@ -255,7 +255,7 @@ return {
 
 					return v63
 				end,
-				sessionLoad = function(p7, p8) -- line: 188
+				sessionLoad = function(p7, p8) -- line: 186
 					-- upvalues: t7 (copy), t8 (copy), makeRequestHandle (copy)
 					table.insert(t7, {
 						sessionId = p7,
@@ -281,7 +281,7 @@ return {
 
 					return v71
 				end,
-				sessionPrompt = function(p9) -- line: 196
+				sessionPrompt = function(p9) -- line: 194
 					-- upvalues: t9 (copy), makeTurnHandle (copy), t13 (copy), t14 (copy)
 					table.insert(t9, p9)
 
@@ -292,7 +292,7 @@ return {
 
 					return v74
 				end,
-				ingestSessionHistory = function(p10, p11, p12) -- line: 203
+				ingestSessionHistory = function(p10, p11, p12) -- line: 201
 					-- upvalues: t10 (copy), t11 (copy), t12 (copy), t13 (copy)
 					table.insert(t10, {
 						sessionId = p10,
@@ -327,7 +327,7 @@ return {
 
 					return t18
 				end,
-				submitToolResult = function(_) -- line: 229
+				submitToolResult = function(_) -- line: 227
 					-- upvalues: makeRequestHandle (copy)
 					local v86, v87 = makeRequestHandle()
 
@@ -335,11 +335,11 @@ return {
 
 					return v86
 				end,
-				getActiveTurnHandle = function(_) -- line: 232
+				getActiveTurnHandle = function(_) -- line: 230
 					-- upvalues: t13 (copy)
 					return t13[#t13]
 				end,
-				onCasSessionIdChanged = function(_) -- line: 235
+				onCasSessionIdChanged = function(_) -- line: 233
 				end
 			},
 			initializeCalls = t5,
@@ -350,7 +350,7 @@ return {
 			ingestSessionHistoryCalls = t10,
 			ingestSessionHistoryResults = t11,
 			turnHandles = t13,
-			finishLastTurn = function(p16) -- line: 249
+			finishLastTurn = function(p16) -- line: 247
 				-- upvalues: t14 (copy)
 				local v91 = t14[#t14]
 
@@ -360,14 +360,14 @@ return {
 			end
 		}
 	end,
-	awaitTurnHandle = function(p17, n6: number?) -- line: 258
+	awaitTurnHandle = function(p17, n6: number?) -- line: 256
 		local v43 = os.clock() + (n6 or 3)
 
 		while p17.getTurnHandle(false) == nil and p17.getSetupError(false) == nil and not (v43 < os.clock()) do
 			task.wait()
 		end
 	end,
-	waitFor = function(p18: ((...any) -> ...any), n7: number?) -- line: 268
+	waitFor = function(p18: ((...any) -> ...any), n7: number?) -- line: 266
 		local v46 = os.clock() + (n7 or 3)
 
 		while not p18() and not (v46 < os.clock()) do

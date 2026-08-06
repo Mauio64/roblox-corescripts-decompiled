@@ -1,6 +1,7 @@
 local scriptParent = script.Parent
 local UIBlox = require(scriptParent.UIBlox)
 local StyleProviderWithDefaultTheme = require(script.StyleProviderWithDefaultTheme)
+local FFlagAppNavBarPerItemThemeOverride = require(scriptParent.SharedFlags).FFlagAppNavBarPerItemThemeOverride
 local DesignTokens = require(script.DesignTokens)
 local UiModeStyleProvider = require(script.UiModeStyleProvider)
 
@@ -20,6 +21,7 @@ return {
 	StyleProviderWithDefaultTheme = StyleProviderWithDefaultTheme,
 	AppFonts = require(script.AppFonts),
 	ThemeContext = require(script.ThemeContext),
+	UiModeTokenOverridesContext = if not FFlagAppNavBarPerItemThemeOverride then nil else require(script.UiModeTokenOverridesContext),
 	getSceneOverridesStore = require(script.getSceneOverridesStore),
 	["jest.config"] = script["jest.config"]
 }

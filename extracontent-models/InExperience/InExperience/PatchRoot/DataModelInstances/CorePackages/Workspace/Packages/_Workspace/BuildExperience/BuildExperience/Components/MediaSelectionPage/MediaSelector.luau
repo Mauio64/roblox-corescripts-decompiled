@@ -22,10 +22,10 @@ local MediaPreview = require(script.Parent.MediaPreview)
 
 require(script.Parent.types)
 
-local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
+local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 47
 	-- upvalues: getGameMediaForUniverse (copy), React (copy), UniverseConfiguration (copy), SignalsReact (copy), useTokens (copy), createGalleryCaptureSource (copy), useMediaUpdater (copy), LocalizationStrings (copy), getGameMediaStore (copy), uploadCaptureAsync (copy), getThumbnailUrlAsync (copy), Promise (copy), createImageAssetAsync (copy), CaptureSelectionView (copy), FilmstripSlot (copy), View (copy), MediaPreview (copy), ScrollView (copy), Foundation (copy)
 	local v24 = getGameMediaForUniverse(t1.universeId)
-	local v25 = React.useMemo(function() -- line: 50
+	local v25 = React.useMemo(function() -- line: 49
 		-- upvalues: UniverseConfiguration (copy), t1 (copy)
 		return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchSummary(t1.universeId)
 	end, { t1.universeId })
@@ -58,20 +58,20 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 
 	local v50 = useMediaUpdater()
 
-	React.useEffect(function() -- line: 81
+	React.useEffect(function() -- line: 80
 		-- upvalues: v45 (copy), v32 (copy), v24 (copy)
 		if v45.current == 0 then
 			v32(v24.thumbnails)
 		end
 	end, { v24.thumbnails })
-	React.useEffect(function() -- line: 87
+	React.useEffect(function() -- line: 86
 		-- upvalues: v45 (copy), v30 (copy), v24 (copy)
 		if v45.current == 0 then
 			v30(v24.icon)
 		end
 	end, { v24.icon })
 
-	local v51 = React.useMemo(function() -- line: 93
+	local v51 = React.useMemo(function() -- line: 92
 		-- upvalues: v31 (copy)
 		local t2 = {}
 
@@ -83,9 +83,9 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 	end, { v31 })
 	local v52 = v27 ~= nil
 	local v53 = #v51 < 10 and v52
-	local v54 = React.useCallback(function(s1: string, b1: boolean) -- line: 104
+	local v54 = React.useCallback(function(s1: string, b1: boolean) -- line: 103
 		-- upvalues: v44 (copy)
-		v44(function(p1) -- line: 105
+		v44(function(p1) -- line: 104
 			-- upvalues: s1 (copy), b1 (copy)
 			local v115 = table.clone(p1)
 
@@ -94,17 +94,17 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			return v115
 		end)
 	end, {})
-	local v55 = React.useCallback(function() -- line: 112
+	local v55 = React.useCallback(function() -- line: 111
 		-- upvalues: v45 (copy)
 		local v89 = v45
 
 		v89.current = v89.current + 1
 	end, {})
-	local v56 = React.useCallback(function() -- line: 116
+	local v56 = React.useCallback(function() -- line: 115
 		-- upvalues: v45 (copy)
 		v45.current = math.max(0, v45.current - 1)
 	end, {})
-	local v57 = React.useCallback(function(s2: string) -- line: 120
+	local v57 = React.useCallback(function(s2: string) -- line: 119
 		-- upvalues: v52 (copy), LocalizationStrings (copy)
 		local t3 = {}
 
@@ -128,7 +128,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			items = t3
 		}}
 	end, { v52 })
-	local v58 = React.useCallback(function(s3: string) -- line: 141
+	local v58 = React.useCallback(function(s3: string) -- line: 140
 		-- upvalues: v43 (copy), v46 (copy), v38 (copy), v36 (copy)
 		if v43[s3] or v46.current and s3 ~= "icon" and s3 ~= "empty" then
 			return
@@ -137,7 +137,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 		v38(s3)
 		v36(true)
 	end, { v43 })
-	local v59 = React.useCallback(function(s4: string) -- line: 150
+	local v59 = React.useCallback(function(s4: string) -- line: 149
 		-- upvalues: v36 (copy), v46 (copy), v37 (copy), v52 (copy), v42 (copy), v40 (copy), v27 (copy), v43 (copy), v31 (copy), v55 (copy), v54 (copy), v32 (copy), v33 (copy), v34 (copy), v50 (copy), getGameMediaStore (copy), t1 (copy), v56 (copy)
 		v36(false)
 
@@ -186,7 +186,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			v46.current = true
 			v55()
 			v54(v94, true)
-			v32(function(p2) -- line: 186
+			v32(function(p2) -- line: 185
 				-- upvalues: v94 (copy)
 				local t4 = {}
 
@@ -205,12 +205,12 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 				})
 			end
 
-			v50.removePreview(v27, assetResourceName):andThen(function() -- line: 201
+			v50.removePreview(v27, assetResourceName):andThen(function() -- line: 200
 				-- upvalues: getGameMediaStore (copy), t1 (copy)
 				getGameMediaStore().fetchGameMedia((tostring(t1.universeId)))
-			end):catch(function() -- line: 204
+			end):catch(function() -- line: 203
 				-- upvalues: v32 (copy), v94 (copy), u95 (ref), v99 (copy)
-				v32(function(p3) -- line: 205
+				v32(function(p3) -- line: 204
 					-- upvalues: v94 (copy), u95 (ref), v99 (copy)
 					for _, v135 in p3 do
 						if v135.id == v94 then
@@ -224,7 +224,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 
 					return v136
 				end)
-			end):finally(function() -- line: 216
+			end):finally(function() -- line: 215
 				-- upvalues: v46 (copy), v54 (copy), v94 (copy), v56 (copy)
 				v46.current = false
 				v54(v94, false)
@@ -243,36 +243,36 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 		v56,
 		v54
 	})
-	local v60 = React.useCallback(function() -- line: 237
+	local v60 = React.useCallback(function() -- line: 236
 		-- upvalues: v36 (copy)
 		v36(false)
 	end, {})
-	local v61 = React.useCallback(function() -- line: 241
+	local v61 = React.useCallback(function() -- line: 240
 		-- upvalues: v34 (copy)
 		v34({
 			kind = "icon"
 		})
 	end, {})
-	local v62 = React.useCallback(function(s5: string) -- line: 245
+	local v62 = React.useCallback(function(s5: string) -- line: 244
 		-- upvalues: v34 (copy)
 		v34({
 			kind = "thumbnail",
 			id = s5
 		})
 	end, {})
-	local v63 = React.useCallback(function() -- line: 249
+	local v63 = React.useCallback(function() -- line: 248
 		-- upvalues: v58 (copy)
 		v58("icon")
 	end, { v58 })
-	local v64 = React.useCallback(function() -- line: 253
+	local v64 = React.useCallback(function() -- line: 252
 		-- upvalues: v58 (copy)
 		v58("empty")
 	end, { v58 })
-	local v65 = React.useCallback(function(p4) -- line: 257
+	local v65 = React.useCallback(function(p4) -- line: 256
 		-- upvalues: v58 (copy)
 		v58(p4)
 	end, { v58 })
-	local v66 = React.useCallback(function(p5) -- line: 262
+	local v66 = React.useCallback(function(p5) -- line: 261
 		-- upvalues: v41 (copy), v27 (copy), v43 (copy), v40 (copy), v42 (copy), v49 (copy), v47 (copy), v55 (copy), v54 (copy), v34 (copy), v32 (copy), uploadCaptureAsync (copy), getThumbnailUrlAsync (copy), Promise (copy), v26 (copy), createImageAssetAsync (copy), v50 (copy), v30 (copy), getGameMediaStore (copy), t1 (copy), v56 (copy)
 		local v104 = v41
 
@@ -325,7 +325,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 				kind = "icon"
 			})
 		elseif v104 == "empty" then
-			v32(function(p6) -- line: 303
+			v32(function(p6) -- line: 302
 				-- upvalues: u109 (ref)
 				local v121 = table.clone(p6)
 
@@ -342,7 +342,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 				id = u109
 			})
 		else
-			v32(function(p7) -- line: 314
+			v32(function(p7) -- line: 313
 				-- upvalues: v104 (copy)
 				local v123 = table.clone(p7)
 
@@ -362,10 +362,10 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			end)
 		end
 
-		local v111 = uploadCaptureAsync(p5):andThen(function(p8) -- line: 331
+		local v111 = uploadCaptureAsync(p5):andThen(function(p8) -- line: 330
 			-- upvalues: getThumbnailUrlAsync (copy)
 			return getThumbnailUrlAsync(p8.assetId)
-		end):andThen(function(p9) -- line: 334
+		end):andThen(function(p9) -- line: 333
 			-- upvalues: Promise (copy), v26 (copy), createImageAssetAsync (copy), v104 (copy)
 			if typeof(p9) == "table" and p9.status == "in_review" then
 				return Promise.reject({
@@ -380,7 +380,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 				creatorTargetId = v26.creatorTargetId
 			}
 
-			return createImageAssetAsync(imageUrl, nil, v104 == "icon", v129):andThen(function(p10) -- line: 348
+			return createImageAssetAsync(imageUrl, nil, v104 == "icon", v129):andThen(function(p10) -- line: 347
 				-- upvalues: imageUrl (copy)
 				return {
 					imageAssetId = tostring(p10.assetId),
@@ -388,19 +388,19 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 				}
 			end)
 		end)
-		local v112 = v111:andThen(function(p11) -- line: 356
+		local v112 = v111:andThen(function(p11) -- line: 355
 			return p11.imageAssetId
 		end);
 
-		((if v104 ~= "icon" then (if v104 ~= "empty" then v50.replacePreview(v27, v112, u106.assetResourceName) else v50.addPreview(v27, v112)) else v50.setIcon(v27, v112))):andThen(function() -- line: 374
+		((if v104 ~= "icon" then (if v104 ~= "empty" then v50.replacePreview(v27, v112, u106.assetResourceName) else v50.addPreview(v27, v112)) else v50.setIcon(v27, v112))):andThen(function() -- line: 373
 			-- upvalues: v111 (copy)
 			return v111
-		end):andThen(function(t5: {[any]: any}) -- line: 377
+		end):andThen(function(t5: {[any]: any}) -- line: 376
 			-- upvalues: v104 (copy), v30 (copy), v32 (copy), u109 (ref), getGameMediaStore (copy), t1 (copy)
 			if v104 == "icon" then
 				v30(t5.displayUrl)
 			else
-				v32(function(p12) -- line: 381
+				v32(function(p12) -- line: 380
 					-- upvalues: u109 (ref), t5 (copy)
 					local v139 = table.clone(p12)
 
@@ -422,14 +422,14 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			end
 
 			getGameMediaStore().fetchGameMedia((tostring(t1.universeId)))
-		end):catch(function() -- line: 399
+		end):catch(function() -- line: 398
 			-- upvalues: v104 (copy), v32 (copy), u109 (ref), v34 (copy), u106 (ref)
 			if v104 == "icon" then
 				return
 			end
 
 			if v104 == "empty" then
-				v32(function(p13) -- line: 403
+				v32(function(p13) -- line: 402
 					-- upvalues: u109 (ref)
 					local t6 = {}
 
@@ -441,7 +441,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 
 					return t6
 				end)
-				v34(function(p14) -- line: 412
+				v34(function(p14) -- line: 411
 					-- upvalues: u109 (ref)
 					if p14.kind == "thumbnail" and p14.id == u109 then
 						return {
@@ -457,7 +457,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 
 			local v132 = u106
 
-			v32(function(p15) -- line: 419
+			v32(function(p15) -- line: 418
 				-- upvalues: u109 (ref), v132 (copy)
 				local v148 = table.clone(p15)
 
@@ -471,7 +471,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 
 				return v148
 			end)
-		end):finally(function() -- line: 431
+		end):finally(function() -- line: 430
 			-- upvalues: v54 (copy), u109 (ref), v56 (copy)
 			v54(u109, false)
 			v56()
@@ -486,13 +486,13 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 		v56,
 		v54
 	})
-	local v67 = React.useCallback(function() -- line: 448
+	local v67 = React.useCallback(function() -- line: 447
 		-- upvalues: v40 (copy), v42 (copy)
 		v40("editor")
 		v42(nil)
 	end, {})
 
-	React.useEffect(function() -- line: 453
+	React.useEffect(function() -- line: 452
 		-- upvalues: t1 (copy), v39 (copy), v67 (copy)
 		local backHandlerRef = t1.backHandlerRef
 
@@ -500,7 +500,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			backHandlerRef.current = if v39 ~= "captureSelection" then nil else v67
 		end
 
-		return function() -- line: 458
+		return function() -- line: 457
 			-- upvalues: backHandlerRef (copy)
 			if backHandlerRef then
 				backHandlerRef.current = nil
@@ -511,7 +511,7 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 		v67
 	})
 
-	local v68 = React.useMemo(function() -- line: 465
+	local v68 = React.useMemo(function() -- line: 464
 		-- upvalues: v37 (copy), v57 (copy)
 		if not v37 then
 			return {{
@@ -589,11 +589,11 @@ local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 48
 			menuItems = if not v81 then nil else v68,
 			onMenuActivated = v59,
 			onMenuClose = v60,
-			onSelect = function() -- line: 535
+			onSelect = function() -- line: 534
 				-- upvalues: v62 (copy), id (copy)
 				v62(id)
 			end,
-			onEditPressed = if not v52 and id == "thumbnail_1" then nil else function() -- line: 539
+			onEditPressed = if not v52 and id == "thumbnail_1" then nil else function() -- line: 538
 				-- upvalues: v65 (copy), id (copy)
 				v65(id)
 			end,

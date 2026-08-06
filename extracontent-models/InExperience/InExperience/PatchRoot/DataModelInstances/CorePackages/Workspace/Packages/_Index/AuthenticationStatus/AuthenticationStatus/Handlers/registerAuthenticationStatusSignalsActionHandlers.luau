@@ -8,7 +8,7 @@ local function handleSetAuthenticationStatus(t1: {[any]: any}) -- line: 8
 	-- upvalues: GetAuthenticationStatusStore (copy)
 	GetAuthenticationStatusStore(false).setAuthenticationStatus(t1.status)
 
-	return false
+	return true
 end
 
 return function(p1) -- line: 13

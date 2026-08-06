@@ -260,5 +260,112 @@ return {
 			notificationId = Dash.identity,
 			clientTimestamp = Dash.identity
 		}
+	},
+	[EventNames.LuckyRecommendationRowImpression] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationRowImpression,
+		formatRulesForAdditionalInfo = {
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationInvoked] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationInvoked,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			squadMemberCount = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationRevealShown] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationRevealShown,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			pickRequestId = Dash.identity,
+			universeId = Dash.identity,
+			revealType = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationRerolled] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationRerolled,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			pickRequestId = Dash.identity,
+			revealType = Dash.identity,
+			phaseAtReroll = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationJoinTapped] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationJoinTapped,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			pickRequestId = Dash.identity,
+			revealType = Dash.identity,
+			rootPlaceId = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationErrorShown] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationErrorShown,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			errorType = Dash.identity,
+			pickRequestId = Dash.identity,
+			revealType = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationDismissed] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationDismissed,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			pickRequestId = Dash.identity,
+			revealType = Dash.identity,
+			phaseAtDismiss = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	},
+	[EventNames.LuckyRecommendationExperienceInviteCreated] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.LuckyRecommendationExperienceInviteCreated,
+		formatRulesForAdditionalInfo = {
+			luckyRecommendationSessionId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			localUserId = Dash.identity,
+			pickRequestId = Dash.identity,
+			revealType = Dash.identity,
+			rootPlaceId = Dash.identity,
+			experienceInviteId = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
 	}
 }

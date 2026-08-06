@@ -6,20 +6,20 @@ local withCsrfRetry = require(DataHydration.withCsrfRetry)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function playtestersUrl(s1: string, n1: number) -- line: 30
+local function playtestersUrl(s1: string, n1: number) -- line: 29
 	return ("%s/v1/universes/%d/configuration/playtesters"):format(s1, n1)
 end
-local function resolveBase(t1: {[any]: any}?) -- line: 34
+local function resolveBase(t1: {[any]: any}?) -- line: 33
 	-- upvalues: UrlBase (copy)
 	local v15 = t1 or {}
 
 	return v15.network, v15.baseUrl or UrlBase.new("develop")
 end
-local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 40
+local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 39
 	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
 	return (t2 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 end
-local function decodePlaytesterIds(p1) -- line: 47
+local function decodePlaytesterIds(p1) -- line: 46
 	local t3 = {}
 	local v19 = if type(p1) ~= "table" then nil else p1.playtesters
 
@@ -41,7 +41,7 @@ local function decodePlaytesterIds(p1) -- line: 47
 end
 
 return {
-	fetchPlaytesters = function(n2: number, t4: {[any]: any}?) -- line: 67
+	fetchPlaytesters = function(n2: number, t4: {[any]: any}?) -- line: 66
 		-- upvalues: UrlBase (copy), fetch (copy), decodePlaytesterIds (copy), asPromise (copy)
 		local v25 = t4 or {}
 		local network = v25.network
@@ -57,7 +57,7 @@ return {
 
 		return asPromise(v28)
 	end,
-	addPlaytester = function(n3: number, t5: {[any]: any}, t6: {[any]: any}?) -- line: 80
+	addPlaytester = function(n3: number, t5: {[any]: any}, t6: {[any]: any}?) -- line: 79
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), decodePlaytesterIds (copy), asPromise (copy)
 		local v32 = t6 or {}
 		local _ = v32.network
@@ -76,7 +76,7 @@ return {
 
 		return asPromise(v35)
 	end,
-	removePlaytester = function(n4: number, n5: number, t7: {[any]: any}?) -- line: 98
+	removePlaytester = function(n4: number, n5: number, t7: {[any]: any}?) -- line: 97
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), decodePlaytesterIds (copy), asPromise (copy)
 		local v39 = t7 or {}
 		local _ = v39.network

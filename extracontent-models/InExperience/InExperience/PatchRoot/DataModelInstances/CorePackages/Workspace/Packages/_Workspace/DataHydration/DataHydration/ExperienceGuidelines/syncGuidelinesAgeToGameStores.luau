@@ -8,7 +8,7 @@ local FFlagSduiExperienceDetailsSupport = require(DataHydrationParent.SharedFlag
 require(script.Parent.ExperienceGuidelinesStoreTypes)
 
 return {
-	syncGuidelinesAgeToGameStores = function(n1: number, p1) -- line: 13
+	syncGuidelinesAgeToGameStores = function(n1: number, p1) -- line: 12
 		-- upvalues: FFlagLuaAppDataHydrationUpdateItem (copy), getGameInfoStore (copy), FFlagSduiExperienceDetailsSupport (copy), getAgeRecommendationStore (copy)
 		local ageRecommendationDetails = p1.ageRecommendationDetails
 		local v10 = ageRecommendationDetails and ageRecommendationDetails.ageRecommendationSummary

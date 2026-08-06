@@ -6,7 +6,7 @@ local Dash = require(FoundationParent.Dash)
 require(Foundation.Components.Types)
 
 local ButtonVariant = require(Foundation.Enums.ButtonVariant)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 
 require(Foundation.Enums.StateLayerMode)
 require(Foundation.Utility.composeStyleVariant)
@@ -21,10 +21,10 @@ local function toStroke(p1) -- line: 40
 	}
 end
 local function createButtonVariantStyles(p2, p3, b1: boolean?) -- line: 48
-	-- upvalues: ColorMode (copy), Dash (copy), Constants (copy)
+	-- upvalues: ColorNamespace (copy), Dash (copy), Constants (copy)
 	local t1 = {}
 
-	for v18 in ColorMode do
+	for v18 in ColorNamespace do
 		local v19 = p2[v18]
 		local v20 = if type(p3) ~= "table" then v19[p3] else {
 			Foreground = Dash.get(v19, p3)
@@ -48,7 +48,7 @@ local function createButtonVariantStyles(p2, p3, b1: boolean?) -- line: 48
 
 		t3.stroke = t4
 		t3.stateLayer = {
-			mode = Constants.COLOR_MODE_TO_STATE_LAYER_MODE[b1 or false][v18]
+			mode = Constants.COLOR_NAMESPACE_TO_STATE_LAYER_MODE[b1 or false][v18]
 		}
 		t2.container = t3
 		t2.content = {

@@ -31,47 +31,59 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 	local v27 = t1.textTransparency or React.createBinding(0)
 	local getDisplayId = t1.getDisplayId
 	local getDisplayFromId = t1.getDisplayFromId
-	local v30 = React.useMemo(function() -- line: 125
-		-- upvalues: Signals (copy), getDisplayFromId (copy), getDisplayId (copy)
-		return Signals.createComputed(function(p2) -- line: 126
-			-- upvalues: getDisplayFromId (copy), getDisplayId (copy)
-			return getDisplayFromId(getDisplayId(p2), p2)
+	local localize = t1.localize
+	local v31 = React.useMemo(function() -- line: 126
+		-- upvalues: v22 (copy), localize (copy)
+		return {
+			systemTextSize = v22,
+			localize = localize
+		}
+	end, {
+		v22,
+		localize
+	})
+	local v32 = React.useMemo(function() -- line: 129
+		-- upvalues: Signals (copy), getDisplayFromId (copy), getDisplayId (copy), v31 (copy)
+		return Signals.createComputed(function(p2) -- line: 130
+			-- upvalues: getDisplayFromId (copy), getDisplayId (copy), v31 (copy)
+			return getDisplayFromId(getDisplayId(p2), p2, v31)
 		end)
 	end, {
 		getDisplayId,
-		getDisplayFromId
+		getDisplayFromId,
+		v31
 	})
-	local v31 = SignalsReact.useSignalBinding(v30)
-	local v32 = SignalsReact.useSignalBinding(t1.getLayoutOrder)
-	local v33 = React.useCallback(function() -- line: 140
+	local v33 = SignalsReact.useSignalBinding(v32)
+	local v34 = SignalsReact.useSignalBinding(t1.getLayoutOrder)
+	local v35 = React.useCallback(function() -- line: 144
 		-- upvalues: getDisplayId (copy)
 		return getDisplayId(false)
 	end, { getDisplayId })
-	local v34 = useFinishChatWindowMessageRenderIntervals(v33)
-	local v35 = React.useCallback(function(p3) -- line: 144
-		-- upvalues: v34 (copy)
+	local v36 = useFinishChatWindowMessageRenderIntervals(v35)
+	local v37 = React.useCallback(function(p3) -- line: 148
+		-- upvalues: v36 (copy)
 		if p3 and (p3.Text and p3.Text ~= "") then
-			v34()
+			v36()
 		end
-	end, { v34 })
-	local v36 = React.useMemo(function() -- line: 156
-		-- upvalues: v21 (copy)
-		local v51 = math.floor(v21 * 3 / 2)
-
-		return UDim2.fromOffset(v51, v21)
-	end, { v21 })
-	local v37, v38 = React.useBinding(v36)
-
-	React.useEffect(function() -- line: 163
-		-- upvalues: v38 (copy), v36 (copy)
-		v38(v36)
 	end, { v36 })
-	React.useEffect(function() -- line: 167
-		-- upvalues: v19 (copy), v21 (copy), TextService (copy), v38 (copy)
-		local u52 = false
+	local v38 = React.useMemo(function() -- line: 160
+		-- upvalues: v21 (copy)
+		local v53 = math.floor(v21 * 3 / 2)
 
-		task.spawn(function() -- line: 169
-			-- upvalues: v19 (copy), v21 (copy), TextService (copy), u52 (ref), v38 (copy)
+		return UDim2.fromOffset(v53, v21)
+	end, { v21 })
+	local v39, v40 = React.useBinding(v38)
+
+	React.useEffect(function() -- line: 167
+		-- upvalues: v40 (copy), v38 (copy)
+		v40(v38)
+	end, { v38 })
+	React.useEffect(function() -- line: 171
+		-- upvalues: v19 (copy), v21 (copy), TextService (copy), v40 (copy)
+		local u54 = false
+
+		task.spawn(function() -- line: 173
+			-- upvalues: v19 (copy), v21 (copy), TextService (copy), u54 (ref), v40 (copy)
 			local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
 
 			GetTextBoundsParams.Text = "          "
@@ -79,28 +91,28 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 			GetTextBoundsParams.Size = v21
 			GetTextBoundsParams.Width = 1e999
 
-			local ok, result = pcall(function() -- line: 175
+			local ok, result = pcall(function() -- line: 179
 				-- upvalues: TextService (copy), GetTextBoundsParams (copy)
 				return TextService:GetTextBoundsAsync(GetTextBoundsParams)
 			end)
 
-			if u52 or (not ok or result == nil) then
+			if u54 or (not ok or result == nil) then
 				return
 			end
 
-			v38(UDim2.fromOffset(result.X, result.Y))
+			v40(UDim2.fromOffset(result.X, result.Y))
 		end)
 
-		return function() -- line: 183
-			-- upvalues: u52 (ref)
-			u52 = true
+		return function() -- line: 187
+			-- upvalues: u54 (ref)
+			u54 = true
 		end
 	end, {
 		v19,
 		v21
 	})
 
-	local v39 = v31:map(function(p4) -- line: 188
+	local v41 = v33:map(function(p4) -- line: 192
 		if p4 == nil then
 			return ""
 		end
@@ -112,18 +124,16 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 		return p4.content
 	end)
 	local t2 = {
-		hasStroke = true,
 		font = v19,
 		textSize = v21,
 		textColor = v23
 	}
 	local t3 = {
-		hasStroke = false,
 		font = font,
 		textSize = v22,
 		textColor = MutedColor3
 	}
-	local v42 = v31:map(function(p5) -- line: 216
+	local v44 = v33:map(function(p5) -- line: 218
 		-- upvalues: t3 (copy), t2 (copy)
 		if p5 ~= nil and p5.displayStyle == "system" then
 			return t3
@@ -131,32 +141,25 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 
 		return t2
 	end)
-	local v43 = v42:map(function(t4: {[any]: any}) -- line: 220
+	local v45 = v44:map(function(t4: {[any]: any}) -- line: 222
 		return t4.font
 	end)
-	local v44 = v42:map(function(t5: {[any]: any}) -- line: 224
+	local v46 = v44:map(function(t5: {[any]: any}) -- line: 226
 		return t5.textSize
 	end)
-	local v45 = v42:map(function(t6: {[any]: any}) -- line: 228
+	local v47 = v44:map(function(t6: {[any]: any}) -- line: 230
 		return t6.textColor
 	end)
-	local v46 = React.joinBindings({
-		style = v42,
-		textTransparency = v27
-	}):map(function(p6) -- line: 235
+	local v48 = v27:map(function(p6) -- line: 234
 		-- upvalues: v26 (copy)
-		if not p6.style.hasStroke then
-			return 1
-		end
+		local v61 = v26
 
-		local v59 = v26
-
-		return v59 + p6.textTransparency * (1 - v59)
+		return v61 + p6 * (1 - v61)
 	end)
-	local v47 = React.joinBindings({
-		display = v31,
+	local v49 = React.joinBindings({
+		display = v33,
 		textTransparency = v27
-	}):map(function(p7) -- line: 248
+	}):map(function(p7) -- line: 244
 		if p7.textTransparency >= 0.9 then
 			return false
 		end
@@ -169,10 +172,10 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 
 		return display.skeletonWidth == "prefix" or display.skeletonWidth == "full"
 	end)
-	local v48 = React.joinBindings({
-		display = v31,
-		placeholder = v37
-	}):map(function(p8) -- line: 262
+	local v50 = React.joinBindings({
+		display = v33,
+		placeholder = v39
+	}):map(function(p8) -- line: 258
 		local display = p8.display
 
 		if display ~= nil and display.skeletonWidth == "full" then
@@ -181,7 +184,7 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 
 		return p8.placeholder
 	end)
-	local v49 = v31:map(function(p9) -- line: 270
+	local v51 = v33:map(function(p9) -- line: 266
 		return p9 ~= nil
 	end)
 
@@ -189,31 +192,37 @@ local function FriendsChatTextMessage(t1: {[any]: any}) -- line: 88
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(1, 0, 0, 0),
-		LayoutOrder = v32,
-		Visible = v49
+		LayoutOrder = v34,
+		Visible = v51
 	}, {
 		body = React.createElement("TextLabel", {
 			BackgroundTransparency = 1,
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Size = UDim2.new(1, 0, 0, 0),
-			FontFace = v43,
-			TextSize = v44,
-			TextColor3 = v45,
+			FontFace = v45,
+			TextSize = v46,
+			TextColor3 = v47,
 			TextStrokeColor3 = v25,
-			TextStrokeTransparency = v46,
+			TextStrokeTransparency = v48,
 			TextTransparency = v27,
 			TextWrapped = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			RichText = true,
-			Text = v39,
-			[React.Change.Text] = v35
+			Text = v41,
+			[React.Change.Text] = v37
+		}, {
+			stroke = React.createElement("UIStroke", {
+				Color = v25 or Color3.fromRGB(0, 0, 0),
+				Thickness = v16.Stroke.Thin,
+				Transparency = v48
+			})
 		}),
 		skeleton = React.createElement(Foundation.Skeleton, {
-			Size = v48,
+			Size = v50,
 			Position = UDim2.fromOffset(0, 0),
 			AnchorPoint = Vector2.new(0, 0),
-			Visible = v47
+			Visible = v49
 		})
 	})
 end

@@ -20,9 +20,11 @@ local initiateAvatarCreationFeePurchase = require(_script.Thunks.initiateAvatarC
 local UnifiedPurchasePrompt = require(_script.Components.UnifiedPurchasePrompt)
 local dispatchPurchaseForProductPayload = require(_script.Utils.dispatchPurchaseForProductPayload)
 local SetProductPayload = require(_script.Actions.SetProductPayload)
+local SetPurchaseAnalyticsMetadata = require(_script.Actions.SetPurchaseAnalyticsMetadata)
 local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = require(_script.Parent.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
 local FFlagPurchasePromptCartPricingEnabled = require(_script.Flags.FFlagPurchasePromptCartPricingEnabled)
 local FFlagEnablePurchasePayloadInExperienceShop = SharedFlags.FFlagEnablePurchasePayloadInExperienceShop
+local FFlagPassShopPurchaseSurfaceToBuyModal = SharedFlags.FFlagPassShopPurchaseSurfaceToBuyModal
 local FFlagSkipBuyDelayForExperienceShop = require(_script.Flags.FFlagSkipBuyDelayForExperienceShop)
 
 require(_script.types)
@@ -31,41 +33,41 @@ local FFlagEnableUnifiedProductPurchaseFlow = require(_script.Parent.SharedFlags
 local FFlagPurchasePromptSubtitleForTimedOptions = require(_script.Parent.SharedFlags).FFlagPurchasePromptSubtitleForTimedOptions
 local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
 local FFlagEnableRobuxInExperienceShop = SharedFlags.FFlagEnableRobuxInExperienceShop
-local v31 = game:DefineFastFlag("PurchasePromptElevateDisplayOrder", false)
+local v33 = game:DefineFastFlag("PurchasePromptElevateDisplayOrder", false)
 local WindowState = require(_script.Enums.WindowState)
 local PromptState = require(_script.Enums.PromptState)
 local PublishAssetAnalytics = require(_script.Utils.PublishAssetAnalytics)
-local u35 = nil
-local u36 = nil
 local u37 = nil
+local u38 = nil
+local u39 = nil
 local BindableEvent = Instance.new("BindableEvent")
 local BindableEvent2 = Instance.new("BindableEvent")
 
-local function createStore() -- line: 59
-	-- upvalues: ABTest (copy), Network (copy), FFlagPurchasePromptCartPricingEnabled (copy), u37 (ref), Analytics (copy), PlatformInterface (copy), ExternalSettings (copy), PublicBindables (copy), BindableEvent (copy), u36 (ref), Rodux (copy), Reducer (copy), Thunk (copy), WindowState (copy), PromptState (copy), BindableEvent2 (copy), PurchasePromptLite (copy)
-	local v42 = ABTest.new()
-	local v43 = Network.new()
+local function createStore() -- line: 61
+	-- upvalues: ABTest (copy), Network (copy), FFlagPurchasePromptCartPricingEnabled (copy), u39 (ref), Analytics (copy), PlatformInterface (copy), ExternalSettings (copy), PublicBindables (copy), BindableEvent (copy), u38 (ref), Rodux (copy), Reducer (copy), Thunk (copy), WindowState (copy), PromptState (copy), BindableEvent2 (copy), PurchasePromptLite (copy)
+	local v44 = ABTest.new()
+	local v45 = Network.new()
 
 	if FFlagPurchasePromptCartPricingEnabled then
-		u37 = v43
+		u39 = v45
 	end
 
-	local v44 = Analytics.new()
-	local v45 = PlatformInterface.new()
-	local v46 = ExternalSettings.new()
-	local v47 = PublicBindables.new({
+	local v46 = Analytics.new()
+	local v47 = PlatformInterface.new()
+	local v48 = ExternalSettings.new()
+	local v49 = PublicBindables.new({
 		windowStateChangedBindable = BindableEvent
 	})
 
-	u36 = Rodux.Store.new(Reducer, {}, { Thunk.middleware({
-		[ABTest] = v42,
-		[Network] = if not FFlagPurchasePromptCartPricingEnabled then v43 else u37,
-		[Analytics] = v44,
-		[PlatformInterface] = v45,
-		[ExternalSettings] = v46,
-		[PublicBindables] = v47
+	u38 = Rodux.Store.new(Reducer, {}, { Thunk.middleware({
+		[ABTest] = v44,
+		[Network] = if not FFlagPurchasePromptCartPricingEnabled then v45 else u39,
+		[Analytics] = v46,
+		[PlatformInterface] = v47,
+		[ExternalSettings] = v48,
+		[PublicBindables] = v49
 	}) })
-	u36.changed:connect(function(p1, p2) -- line: 85
+	u38.changed:connect(function(p1, p2) -- line: 87
 		-- upvalues: BindableEvent (copy), WindowState (copy), PromptState (copy), BindableEvent2 (copy), FFlagPurchasePromptCartPricingEnabled (copy), PurchasePromptLite (copy)
 		if p2.windowState ~= p1.windowState then
 			BindableEvent:Fire({
@@ -83,13 +85,13 @@ local function createStore() -- line: 59
 		end
 	end)
 end
-local function UnifiedPurchasePromptContainer(t1: {[any]: any}) -- line: 209
-	-- upvalues: createStore (copy), Roact (copy), UnifiedPurchasePrompt (copy), u36 (ref), FFlagPurchasePromptCartPricingEnabled (copy), u37 (ref), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), FFlagPurchasePromptSubtitleForTimedOptions (copy)
+local function UnifiedPurchasePromptContainer(t1: {[any]: any}) -- line: 221
+	-- upvalues: createStore (copy), Roact (copy), UnifiedPurchasePrompt (copy), u38 (ref), FFlagPurchasePromptCartPricingEnabled (copy), u39 (ref), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), FFlagPurchasePromptSubtitleForTimedOptions (copy)
 	createStore()
 
 	return Roact.createElement(UnifiedPurchasePrompt, {
-		store = u36,
-		network = if not FFlagPurchasePromptCartPricingEnabled then nil else u37,
+		store = u38,
+		network = if not FFlagPurchasePromptCartPricingEnabled then nil else u39,
 		productPayload = t1.productPayload,
 		purchaseCallbacks = t1.purchaseCallbacks,
 		postPurchaseActions = t1.postPurchaseActions,
@@ -100,9 +102,9 @@ local function UnifiedPurchasePromptContainer(t1: {[any]: any}) -- line: 209
 end
 
 return {
-	mountPurchasePrompt = function() -- line: 115
-		-- upvalues: RunService (copy), u35 (ref), createStore (copy), v31 (copy), Roact (copy), PurchasePromptApp (copy), u36 (ref), FFlagPurchasePromptCartPricingEnabled (copy), u37 (ref), CoreGui (copy)
-		if RunService:IsStudio() and RunService:IsEdit() or u35 then
+	mountPurchasePrompt = function() -- line: 117
+		-- upvalues: RunService (copy), u37 (ref), createStore (copy), v33 (copy), Roact (copy), PurchasePromptApp (copy), u38 (ref), FFlagPurchasePromptCartPricingEnabled (copy), u39 (ref), CoreGui (copy)
+		if RunService:IsStudio() and RunService:IsEdit() or u37 then
 			return nil
 		end
 
@@ -113,42 +115,49 @@ return {
 			IgnoreGuiInset = true
 		}
 
-		if v31 then
+		if v33 then
 			t2.DisplayOrder = 10
 		end
 
-		local v49 = Roact.createElement("ScreenGui", t2, { Roact.createElement(PurchasePromptApp, {
-			store = u36,
-			network = if not FFlagPurchasePromptCartPricingEnabled then nil else u37
+		local v51 = Roact.createElement("ScreenGui", t2, { Roact.createElement(PurchasePromptApp, {
+			store = u38,
+			network = if not FFlagPurchasePromptCartPricingEnabled then nil else u39
 		}) })
 
-		u35 = Roact.mount(v49, CoreGui, "PurchasePromptApp")
+		u37 = Roact.mount(v51, CoreGui, "PurchasePromptApp")
 
-		return u35
+		return u37
 	end,
-	initiateAvatarCreationFeePurchase = function(p3, p4, p5, p6) -- line: 149
-		-- upvalues: u36 (ref), initiateAvatarCreationFeePurchase (copy)
-		if not u36 then
+	initiateAvatarCreationFeePurchase = function(p3, p4, p5, p6) -- line: 151
+		-- upvalues: u38 (ref), initiateAvatarCreationFeePurchase (copy)
+		if not u38 then
 			error("initiateAvatarCreationFeePurchase cannot be called when the PurchasePrompt has not been mounted")
 		end
 
-		u36:dispatch(initiateAvatarCreationFeePurchase(p3, p4, p5, p6))
+		u38:dispatch(initiateAvatarCreationFeePurchase(p3, p4, p5, p6))
 	end,
-	initiatePurchaseForProductPayload = function(p7) -- line: 176
-		-- upvalues: u36 (ref), FFlagEnablePurchasePayloadInExperienceShop (copy), FFlagSkipBuyDelayForExperienceShop (copy), SetProductPayload (copy), dispatchPurchaseForProductPayload (copy)
-		if not u36 then
+	initiatePurchaseForProductPayload = function(p7, p8) -- line: 178
+		-- upvalues: u38 (ref), FFlagEnablePurchasePayloadInExperienceShop (copy), FFlagSkipBuyDelayForExperienceShop (copy), SetProductPayload (copy), FFlagPassShopPurchaseSurfaceToBuyModal (copy), SetPurchaseAnalyticsMetadata (copy), dispatchPurchaseForProductPayload (copy)
+		if not u38 then
 			warn("initiatePurchaseForProductPayload called before mountPurchasePrompt; ignoring.")
 
 			return
 		end
 
 		if FFlagEnablePurchasePayloadInExperienceShop or FFlagSkipBuyDelayForExperienceShop then
-			u36:dispatch(SetProductPayload(p7))
+			u38:dispatch(SetProductPayload(p7))
 		end
 
-		dispatchPurchaseForProductPayload(function(p8) -- line: 192
-			-- upvalues: u36 (ref)
-			u36:dispatch(p8)
+		if FFlagPassShopPurchaseSurfaceToBuyModal and p8 then
+			u38:dispatch(SetPurchaseAnalyticsMetadata({
+				surface = p8.surface,
+				productUniverseId = p8.productUniverseId
+			}))
+		end
+
+		dispatchPurchaseForProductPayload(function(p9) -- line: 204
+			-- upvalues: u38 (ref)
+			u38:dispatch(p9)
 		end, p7, nil, false)
 	end,
 	windowStateChangedEvent = BindableEvent.Event,

@@ -4,6 +4,8 @@ local LabelAbuseTypeMapping = require(script.Parent.LabelAbuseTypeMapping)
 require(script.Parent.Types.CategoryTypes.CategoryTypes)
 
 local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local OutfitTypes = require(script.Parent.Enums.OutfitTypes)
+local InventoryOutfitType = require(script.Parent.Enums.InventoryOutfitType)
 local FFlagAXCatalogBodySuits = AvatarExperienceFlags.FFlagAXCatalogBodySuits
 local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
 local FFlagAXInventoryDurablesSupport = AvatarExperienceFlags.FFlagAXInventoryDurablesSupport
@@ -11,9 +13,9 @@ local t1 = {}
 local t2 = {}
 local EnumItems = Enum.BundleType:GetEnumItems()
 
-for _, v11 in EnumItems do
-	t1[v11.Name] = tostring(v11.Value)
-	t2[tostring(v11.Value)] = v11.Name
+for _, v13 in EnumItems do
+	t1[v13.Name] = tostring(v13.Value)
+	t2[tostring(v13.Value)] = v13.Name
 end
 
 if FFlagAXInventoryDurablesSupport then
@@ -32,9 +34,9 @@ local t3 = {
 local t4 = {}
 local t5 = {}
 
-for _, v17 in (Enum.AvatarAssetType:GetEnumItems()) do
-	t4[v17.Name] = tostring(v17.Value)
-	t5[tostring(v17.Value)] = v17.Name
+for _, v19 in (Enum.AvatarAssetType:GetEnumItems()) do
+	t4[v19.Name] = tostring(v19.Value)
+	t5[tostring(v19.Value)] = v19.Name
 end
 
 local t6 = {
@@ -60,8 +62,8 @@ local t6 = {
 }
 local t7 = {}
 
-for v20, v21 in t6 do
-	t7[v21] = v20
+for v22, v23 in t6 do
+	t7[v23] = v22
 end
 
 local t8 = {
@@ -113,13 +115,13 @@ local t11 = {
 	IS_LEFT = "IS_LEFT",
 	IS_RIGHT = "IS_RIGHT"
 }
-local v26 = game:DefineFastInt("AXMakeupZoomRadius", 7)
-local v27 = game:DefineFastInt("AXMakeupLooksZoomRadius", 7)
-local v28 = game:DefineFastInt("AXEyelashesZoomRadius", 7)
-local v29 = game:DefineFastInt("AXEyebrowsZoomRadius", 7)
-local v30 = game:DefineFastInt("AXFaceMakeupZoomRadius", 7)
-local v31 = game:DefineFastInt("AXLipMakeupZoomRadius", 7)
-local v32 = game:DefineFastInt("AXEyeMakeupZoomRadius", 7)
+local v28 = game:DefineFastInt("AXMakeupZoomRadius", 7)
+local v29 = game:DefineFastInt("AXMakeupLooksZoomRadius", 7)
+local v30 = game:DefineFastInt("AXEyelashesZoomRadius", 7)
+local v31 = game:DefineFastInt("AXEyebrowsZoomRadius", 7)
+local v32 = game:DefineFastInt("AXFaceMakeupZoomRadius", 7)
+local v33 = game:DefineFastInt("AXLipMakeupZoomRadius", 7)
+local v34 = game:DefineFastInt("AXEyeMakeupZoomRadius", 7)
 local t12 = {
 	BodyCategories = {
 		Heads = 8.5,
@@ -180,13 +182,13 @@ local t12 = {
 		Bodysuits = if not FFlagAXCatalogBodySuits then nil else 12
 	},
 	Makeup = {
-		Makeup = v26,
-		MakeupLooks = v27,
-		Eyelashes = v28,
-		Eyebrows = v29,
-		FaceMakeup = v30,
-		LipMakeup = v31,
-		EyeMakeup = v32
+		Makeup = v28,
+		MakeupLooks = v29,
+		Eyelashes = v30,
+		Eyebrows = v31,
+		FaceMakeup = v32,
+		LipMakeup = v33,
+		EyeMakeup = v34
 	},
 	Special = {
 		HeadRefinement = 7
@@ -261,9 +263,40 @@ local t21 = {
 	[t4.EyeMakeup] = 2
 }
 local t22 = {
+	Head = Enum.BodyPart.Head,
+	LeftArm = Enum.BodyPart.LeftArm,
+	LeftLeg = Enum.BodyPart.LeftLeg,
+	RightArm = Enum.BodyPart.RightArm,
+	RightLeg = Enum.BodyPart.RightLeg,
+	Torso = Enum.BodyPart.Torso
+}
+local t23 = {
 	AttributeKey = "IXP_LAYER",
 	TagName = "WIDGET"
 }
+local t24 = {
+	[InventoryOutfitType.Body] = OutfitTypes.Avatar,
+	[InventoryOutfitType.Avatar] = OutfitTypes.Avatar,
+	[InventoryOutfitType.DynamicHead] = OutfitTypes.DynamicHead,
+	[InventoryOutfitType.Shoes] = OutfitTypes.Shoes,
+	[InventoryOutfitType.Animations] = OutfitTypes.Animations,
+	[InventoryOutfitType.PurchasedMakeup] = OutfitTypes.Makeup,
+	[InventoryOutfitType.CreatedMakeup] = OutfitTypes.Makeup
+}
+local t25 = {
+	["1"] = InventoryOutfitType.Body,
+	["2"] = InventoryOutfitType.DynamicHead,
+	["3"] = InventoryOutfitType.Avatar,
+	["4"] = InventoryOutfitType.Shoes,
+	["5"] = InventoryOutfitType.Animations,
+	["6"] = InventoryOutfitType.PurchasedMakeup,
+	["7"] = InventoryOutfitType.CreatedMakeup
+}
+local t26 = {}
+
+for v50, v51 in t25 do
+	t26[v51] = tonumber(v50)
+end
 
 return {
 	BODY_BUNDLE_TYPE_ID = "1",
@@ -298,5 +331,11 @@ return {
 	LOOK_TYPE = t18,
 	MIN_MAKEUP_ITEMS_FOR_LAYERING_BUTTON = 2,
 	LabelAbuseTypeMapping = LabelAbuseTypeMapping,
-	IXP_WIDGET_LAYER_EXPOSURE = t22
+	BODY_PART_NAME_TO_ENUM = t22,
+	STATIC_FACIAL_ANIMATION = "StaticFacialAnimation",
+	NON_EDITABLE_MAKEUP_GRANT_KEY = "NonEditableMakeup",
+	INVENTORY_OUTFIT_TYPE_TO_OUTFIT_TYPE = t24,
+	INVENTORY_TYPE_ID_TO_INVENTORY_OUTFIT_TYPE = t25,
+	INVENTORY_OUTFIT_TYPE_TO_INVENTORY_TYPE_ID = t26,
+	IXP_WIDGET_LAYER_EXPOSURE = t23
 }

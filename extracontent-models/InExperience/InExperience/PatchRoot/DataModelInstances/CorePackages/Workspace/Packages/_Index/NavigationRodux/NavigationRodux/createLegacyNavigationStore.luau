@@ -15,13 +15,15 @@ local Constants = require(NavigationRodux.Constants)
 
 require(NavigationRodux.types)
 
-local getLegacyPageFromRoactNavigationRoute = require(script.Parent.Utils).getLegacyPageFromRoactNavigationRoute
+local Utils = require(script.Parent.Utils)
+local getLegacyPageFromRoactNavigationRoute = Utils.getLegacyPageFromRoactNavigationRoute
+local getLegacyRouteFromRoactNavigationState = Utils.getLegacyRouteFromRoactNavigationState
 
-local function legacyPageEqual(p1, p2) -- line: 34
+local function legacyPageEqual(p1, p2) -- line: 36
 	-- upvalues: tutils (copy)
 	return tutils.shallowEqual(p1, p2)
 end
-local function legacyRouteEqual(p3, p4) -- line: 38
+local function legacyRouteEqual(p3, p4) -- line: 40
 	-- upvalues: tutils (copy)
 	if p3 == p4 then
 		return true
@@ -32,17 +34,17 @@ local function legacyRouteEqual(p3, p4) -- line: 38
 	end
 
 	for i = 1, #p3 do
-		local v26 = p3[i]
-		local v27 = p4[i]
+		local v28 = p3[i]
+		local v29 = p4[i]
 
-		if not tutils.shallowEqual(v26, v27) then
+		if not tutils.shallowEqual(v28, v29) then
 			return false
 		end
 	end
 
 	return true
 end
-local function legacyHistoryEqual(p5, p6) -- line: 53
+local function legacyHistoryEqual(p5, p6) -- line: 55
 	-- upvalues: legacyRouteEqual (copy)
 	if p5 == p6 then
 		return true
@@ -60,7 +62,7 @@ local function legacyHistoryEqual(p5, p6) -- line: 53
 
 	return true
 end
-local function routeStateEqual(p7, p8) -- line: 68
+local function routeStateEqual(p7, p8) -- line: 70
 	-- upvalues: tutils (copy)
 	if p7 == p8 then
 		return true
@@ -72,127 +74,132 @@ local function routeStateEqual(p7, p8) -- line: 68
 
 	return p7.routeName == p8.routeName and (p7.key == p8.key and tutils.shallowEqual(p7.params or {}, p8.params or {}))
 end
-local function createLegacyNavigationStore(p9) -- line: 98
-	-- upvalues: Signals (copy), Constants (copy), FFlagAppIaHomeSubTab (copy), getLegacyPageFromRoactNavigationRoute (copy), Cryo (copy), FFlagSignalsNavP3Final (copy), legacyHistoryEqual (copy), FFlagSignalsNavProjected (copy), getCurrentNavigationState (copy), getCurrentRouteState (copy), routeStateEqual (copy), legacyRouteEqual (copy), legacyPageEqual (copy), FFlagSignalsNavP2NavigationPrimitives (copy)
-	local v34 = Signals.createComputed(function(p10) -- line: 99
+local function createLegacyNavigationStore(p9) -- line: 100
+	-- upvalues: Signals (copy), Constants (copy), FFlagAppIaHomeSubTab (copy), getLegacyPageFromRoactNavigationRoute (copy), Cryo (copy), FFlagSignalsNavP3Final (copy), legacyHistoryEqual (copy), getLegacyRouteFromRoactNavigationState (copy), legacyRouteEqual (copy), FFlagSignalsNavProjected (copy), getCurrentNavigationState (copy), getCurrentRouteState (copy), routeStateEqual (copy), legacyPageEqual (copy), FFlagSignalsNavP2NavigationPrimitives (copy)
+	local v36 = Signals.createComputed(function(p10) -- line: 106
 		-- upvalues: p9 (copy), Constants (copy), FFlagAppIaHomeSubTab (copy), getLegacyPageFromRoactNavigationRoute (copy), Cryo (copy)
 		local t1 = {}
-		local v47 = p9.getState(p10)
+		local v50 = p9.getState(p10)
 
-		for i = 1, v47.index do
-			local v49 = v47.routes[i]
+		for i = 1, v50.index do
+			local v52 = v50.routes[i]
 
-			if v49.routes and v49.routeName == Constants.TempRnSwitchNavigatorName then
-				v49 = v49.routes[v49.index]
+			if v52.routes and v52.routeName == Constants.TempRnSwitchNavigatorName then
+				v52 = v52.routes[v52.index]
 			end
 
-			if FFlagAppIaHomeSubTab and v49.routes and v49.routeName == Constants.HomeContainerName then
-				v49 = v49.routes[v49.index]
+			if FFlagAppIaHomeSubTab and v52.routes and v52.routeName == Constants.HomeContainerName then
+				v52 = v52.routes[v52.index]
 			end
 
-			local v50 = getLegacyPageFromRoactNavigationRoute(v49)
+			local v53 = getLegacyPageFromRoactNavigationRoute(v52)
 
-			table.insert(t1, Cryo.List.join(t1[i - 1] or {}, { v50 }))
+			table.insert(t1, Cryo.List.join(t1[i - 1] or {}, { v53 }))
 		end
 
 		return t1
 	end, if not FFlagSignalsNavP3Final then nil else legacyHistoryEqual)
-	local v35 = Signals.createComputed(function(p11) -- line: 121
+	local v37 = Signals.createComputed(function(p11) -- line: 132
+		-- upvalues: p9 (copy), getLegacyRouteFromRoactNavigationState (copy)
+		local v55 = p9.getState(p11)
+
+		return getLegacyRouteFromRoactNavigationState(v55)
+	end, if not FFlagSignalsNavP3Final then nil else legacyRouteEqual)
+	local v38 = Signals.createComputed(function(p12) -- line: 137
 		-- upvalues: FFlagSignalsNavProjected (copy), p9 (copy), getCurrentNavigationState (copy), getCurrentRouteState (copy)
 		if FFlagSignalsNavProjected then
-			local v52 = p9.getState(p11)
+			local v57 = p9.getState(p12)
 
-			return (getCurrentNavigationState(v52))
+			return (getCurrentNavigationState(v57))
 		end
 
-		local v53 = p9.getNavigation(p11)
+		local v58 = p9.getNavigation(p12)
 
-		return (getCurrentRouteState(v53))
+		return (getCurrentRouteState(v58))
 	end, if not FFlagSignalsNavP3Final then nil else routeStateEqual)
-	local v36 = Signals.createComputed(function(p12) -- line: 135
-		-- upvalues: v34 (copy)
-		local v55 = v34(p12)
+	local v39 = Signals.createComputed(function(p13) -- line: 151
+		-- upvalues: v36 (copy)
+		local v60 = v36(p13)
 
-		return v55[#v55]
+		return v60[#v60]
 	end, if not FFlagSignalsNavP3Final then nil else legacyRouteEqual)
-	local v37 = Signals.createComputed(function(p13) -- line: 140
-		-- upvalues: v34 (copy)
-		local v57 = v34(p13)
-		local v58 = v57[#v57]
+	local v40 = Signals.createComputed(function(p14) -- line: 156
+		-- upvalues: v36 (copy)
+		local v62 = v36(p14)
+		local v63 = v62[#v62]
 
-		return v58[#v58]
+		return v63[#v63]
 	end, if not FFlagSignalsNavP3Final then nil else legacyPageEqual)
-	local v38 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p14) -- line: 147
-		-- upvalues: v34 (copy)
-		local v60 = v34(p14)
-		local v61 = v60[#v60]
+	local v41 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p15) -- line: 163
+		-- upvalues: v36 (copy)
+		local v65 = v36(p15)
+		local v66 = v65[#v65]
 
-		return v61[#v61].name
+		return v66[#v66].name
 	end)
 	local t2 = {}
 	local t3 = {}
-	local v41 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p15) -- line: 195
-		-- upvalues: v34 (copy)
-		local v69 = v34(p15)
+	local v44 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p16) -- line: 213
+		-- upvalues: v36 (copy)
+		local v74 = v36(p16)
 
-		return v69[#v69][1].name
+		return v74[#v74][1].name
 	end)
-	local v42 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p16) -- line: 203
-		-- upvalues: v34 (copy)
-		local v71 = v34(p16)
+	local v45 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p17) -- line: 221
+		-- upvalues: v36 (copy)
+		local v76 = v36(p17)
 
-		return #v71[#v71] > 1
+		return #v76[#v76] > 1
 	end)
-	local v43 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p17) -- line: 211
-		-- upvalues: v34 (copy)
-		local v73 = v34(p17)
+	local v46 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p18) -- line: 229
+		-- upvalues: v36 (copy)
+		local v78 = v36(p18)
 
-		return #v73[#v73]
+		return #v78[#v78]
 	end)
-	local v44 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p18) -- line: 219
-		-- upvalues: v35 (copy)
-		return v35(p18).key or ""
+	local v47 = if not FFlagSignalsNavP2NavigationPrimitives then nil else Signals.createComputed(function(p19) -- line: 237
+		-- upvalues: v38 (copy)
+		return v38(p19).key or ""
 	end)
 
 	return {
-		getHistory = v34,
-		getCurrentRoute = v35,
-		getCurrentLegacyRoute = v36,
-		getCurrentPage = v37,
-		getCurrentPageName = v38,
-		getIsCurrentPageSignal = function(s1: string) -- line: 158
-			-- upvalues: t2 (copy), Signals (copy), v38 (copy)
-			local v63 = t2[s1]
+		getHistory = v36,
+		getCurrentRoute = v38,
+		getCurrentLegacyRoute = v39,
+		getCurrentPage = v40,
+		getCurrentPageName = v41,
+		getIsCurrentPageSignal = function(s1: string) -- line: 174
+			-- upvalues: t2 (copy), Signals (copy), v41 (copy)
+			local v68 = t2[s1]
 
-			if v63 then
-				return v63
+			if v68 then
+				return v68
 			end
 
-			local v64 = Signals.createComputed(function(p19) -- line: 163
-				-- upvalues: v38 (copy), s1 (copy)
-				return v38(p19) == s1
+			local v69 = Signals.createComputed(function(p20) -- line: 179
+				-- upvalues: v41 (copy), s1 (copy)
+				return v41(p20) == s1
 			end)
 
-			t2[s1] = v64
+			t2[s1] = v69
 
-			return v64
+			return v69
 		end,
-		getRouteContainsPageSignal = function(s2: string) -- line: 173
-			-- upvalues: t3 (copy), Signals (copy), v34 (copy)
-			local v66 = t3[s2]
+		getRouteContainsPageSignal = function(s2: string) -- line: 192
+			-- upvalues: t3 (copy), Signals (copy), v37 (copy)
+			local v71 = t3[s2]
 
-			if v66 then
-				return v66
+			if v71 then
+				return v71
 			end
 
-			local v67 = Signals.createComputed(function(p20) -- line: 178
-				-- upvalues: v34 (copy), s2 (copy)
-				local v77 = v34(p20)
-				local v78 = v77[#v77]
+			local v72 = Signals.createComputed(function(p21) -- line: 197
+				-- upvalues: v37 (copy), s2 (copy)
+				local v82 = v37(p21)
 
-				if v78 then
-					for _, v80 in v78 do
-						if v80.name == s2 then
+				if v82 then
+					for _, v84 in v82 do
+						if v84.name == s2 then
 							return true
 						end
 					end
@@ -201,14 +208,14 @@ local function createLegacyNavigationStore(p9) -- line: 98
 				return false
 			end)
 
-			t3[s2] = v67
+			t3[s2] = v72
 
-			return v67
+			return v72
 		end,
-		getCurrentTabName = v41,
-		getCanGoBack = v42,
-		getRouteDepth = v43,
-		getCurrentRouteKey = v44
+		getCurrentTabName = v44,
+		getCanGoBack = v45,
+		getRouteDepth = v46,
+		getCurrentRouteKey = v47
 	}
 end
 

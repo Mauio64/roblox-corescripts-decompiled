@@ -9,19 +9,19 @@ require(script.Parent.ServerManagementStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function resolveBase(t1: {[any]: any}?) -- line: 21
+local function resolveBase(t1: {[any]: any}?) -- line: 20
 	-- upvalues: UrlBase (copy)
 	local v11 = t1 or {}
 
 	return v11.network, v11.baseUrl or UrlBase.APIS
 end
-local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 26
+local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 25
 	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
 	return (t2 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 end
 
 return {
-	fetchListRestartStatuses = function(n1: number, t3: {[any]: any}?) -- line: 33
+	fetchListRestartStatuses = function(n1: number, t3: {[any]: any}?) -- line: 32
 		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
 		local v15 = t3 or {}
 		local network = v15.network
@@ -31,14 +31,14 @@ return {
 			analyticsKey = "server-management.list-restart-statuses",
 			network = network,
 			url = ("%s%s/universes/%d/restarts"):format(v17, "/server-management/v1", n1),
-			decode = function(p1) -- line: 43
+			decode = function(p1) -- line: 42
 				return p1
 			end
 		})
 
 		return asPromise(v18)
 	end,
-	fetchForecastRestart = function(n2: number, t4: {[any]: any}?) -- line: 50
+	fetchForecastRestart = function(n2: number, t4: {[any]: any}?) -- line: 49
 		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
 		local v21 = t4 or {}
 		local network = v21.network
@@ -48,14 +48,14 @@ return {
 			analyticsKey = "server-management.forecast-restart",
 			network = network,
 			url = ("%s%s/universes/%d/restarts:forecast"):format(v23, "/server-management/v1", n2),
-			decode = function(p2) -- line: 60
+			decode = function(p2) -- line: 59
 				return p2
 			end
 		})
 
 		return asPromise(v24)
 	end,
-	launchRestart = function(n3: number, p3, t5: {[any]: any}?) -- line: 67
+	launchRestart = function(n3: number, p3, t5: {[any]: any}?) -- line: 66
 		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), asPromise (copy)
 		local v28 = t5 or {}
 		local _ = v28.network
@@ -66,7 +66,7 @@ return {
 			network = (t5 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
 			url = ("%s%s/universes/%d/restarts"):format(v30, "/server-management/v1", n3),
 			body = p3 or {},
-			decode = function(p4) -- line: 79
+			decode = function(p4) -- line: 78
 				return p4
 			end
 		})

@@ -14,17 +14,17 @@ local fetchUniverseSearch = require(script.Parent.fetchUniverseSearch)
 
 require(script.Parent.UniverseSearchStoreTypes)
 
-local function paramsKey(p1) -- line: 30
+local function paramsKey(p1) -- line: 29
 	-- upvalues: HttpService (copy)
 	return HttpService:JSONEncode(p1)
 end
-local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
+local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 33
 	-- upvalues: Cryo (copy), createDataCache (copy), createDataResolver (copy), fetchUniverseSearch (copy), HttpService (copy)
 	local v12 = t1 or {}
 	local t2 = {}
 	local t3 = {}
 
-	local function applyItemPatches(p2) -- line: 40
+	local function applyItemPatches(p2) -- line: 39
 		-- upvalues: t3 (ref), Cryo (copy)
 		local data = p2.data
 
@@ -59,7 +59,7 @@ local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
 	local v17 = createDataResolver({
 		supportsMultiGet = false,
 		cache = v16,
-		fetchFn = function(s1: string, _) -- line: 71
+		fetchFn = function(s1: string, _) -- line: 70
 			-- upvalues: t2 (ref), fetchUniverseSearch (copy), v12 (copy), applyItemPatches (copy)
 			local v27 = t2[s1]
 
@@ -71,7 +71,7 @@ local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
 	})
 
 	return {
-		getSearch = function(p4) -- line: 80
+		getSearch = function(p4) -- line: 79
 			-- upvalues: HttpService (copy), t2 (ref), v17 (copy)
 			local json = HttpService:JSONEncode(p4)
 
@@ -79,7 +79,7 @@ local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
 
 			return v17.getCachedItem(json)
 		end,
-		fetchSearch = function(p5) -- line: 86
+		fetchSearch = function(p5) -- line: 85
 			-- upvalues: HttpService (copy), t2 (ref), v17 (copy)
 			local json = HttpService:JSONEncode(p5)
 
@@ -87,7 +87,7 @@ local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
 
 			return v17.fetchItem(json)
 		end,
-		getAndFetchSearch = function(p6) -- line: 92
+		getAndFetchSearch = function(p6) -- line: 91
 			-- upvalues: HttpService (copy), t2 (ref), v17 (copy)
 			local json = HttpService:JSONEncode(p6)
 
@@ -95,7 +95,7 @@ local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
 
 			return v17.getAndFetchItem(json)
 		end,
-		updateSearchItem = function(n1: number, t5: {[any]: any}) -- line: 100
+		updateSearchItem = function(n1: number, t5: {[any]: any}) -- line: 99
 			-- upvalues: t3 (ref), Cryo (copy), t2 (ref), v17 (copy), applyItemPatches (copy), v16 (copy)
 			t3[n1] = Cryo.Dictionary.join(t3[n1] or {}, t5)
 
@@ -111,12 +111,12 @@ local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 34
 				end
 			end
 		end,
-		invalidateAll = function() -- line: 117
+		invalidateAll = function() -- line: 116
 			-- upvalues: t2 (ref), v17 (copy)
 			t2 = {}
 			v17.clear()
 		end,
-		dispose = function() -- line: 122
+		dispose = function() -- line: 121
 			-- upvalues: t2 (ref), t3 (ref), v17 (copy)
 			t2 = {}
 			t3 = {}

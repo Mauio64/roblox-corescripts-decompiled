@@ -7,10 +7,12 @@ require(SduiCoreSystem.SduiComponentType)
 
 local ConditionalPropsInterface = require(SduiCoreSystem.ConditionalProps.SduiConditionalPropTypes).ConditionalPropsInterface
 local FFlagSduiActionTelemetryHandler = require(SduiCoreSystemParent.SharedFlags).FFlagSduiActionTelemetryHandler
+local FFlagSduiActionSkipUnifiedLogging = require(SduiCoreSystemParent.SharedFlags).FFlagSduiActionSkipUnifiedLogging
 local t1 = {
 	actionType = t.string,
 	actionParams = t.optional(t.table),
-	telemetryHandler = if not FFlagSduiActionTelemetryHandler then nil else t.optional(t.string)
+	telemetryHandler = if not FFlagSduiActionTelemetryHandler then nil else t.optional(t.string),
+	skipUnifiedLogging = if not FFlagSduiActionSkipUnifiedLogging then nil else t.optional(t.boolean)
 }
 local t2 = {
 	componentType = t.string,
@@ -24,12 +26,12 @@ local t2 = {
 	__isClientBinding = t.optional(t.boolean),
 	__usageRecorded = t.optional(t.boolean)
 }
-local v9 = Cryo.Dictionary.join(t2, {
+local v10 = Cryo.Dictionary.join(t2, {
 	componentType = t.optional(t.string)
 })
 
 return {
 	ActionInterface = t1,
 	UiComponentInterface = t2,
-	SduiTemplateInterface = v9
+	SduiTemplateInterface = v10
 }

@@ -7,11 +7,12 @@ require(UserList.Common.Types)
 
 local UserRow = require(script.Parent.UserRow)
 local ContactRow = require(script.Parent.ContactRow)
+local FFlagUserListCtaIntegrationEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaIntegrationEnabled
 
-local function EntityRow(t1: {[any]: any}) -- line: 37
-	-- upvalues: React (copy), Enums (copy), ContactRow (copy), UserRow (copy)
+local function EntityRow(t1: {[any]: any}) -- line: 41
+	-- upvalues: React (copy), Enums (copy), ContactRow (copy), UserRow (copy), FFlagUserListCtaIntegrationEnabled (copy)
 	local entity = t1.entity
-	local v10 = React.useCallback(function() -- line: 40
+	local v11 = React.useCallback(function() -- line: 44
 		-- upvalues: t1 (copy), entity (copy)
 		if t1.onActivated then
 			t1.onActivated(entity.id, entity.type)
@@ -21,13 +22,13 @@ local function EntityRow(t1: {[any]: any}) -- line: 37
 		entity.id,
 		entity.type
 	})
-	local v11 = if t1.layoutMode ~= Enums.LayoutMode.Horizontal then Enums.RowLayoutMode.Wide else Enums.RowLayoutMode.Compact
+	local v12 = if t1.layoutMode ~= Enums.LayoutMode.Horizontal then Enums.RowLayoutMode.Wide else Enums.RowLayoutMode.Compact
 
 	if entity.type == Enums.EntityType.Contact then
 		return React.createElement(ContactRow, {
 			entityId = entity.id,
-			layoutMode = v11,
-			onActivated = v10,
+			layoutMode = v12,
+			onActivated = v11,
 			layoutOrder = t1.layoutOrder,
 			primaryCta = t1.primaryCta,
 			secondaryCta = t1.secondaryCta,
@@ -40,10 +41,11 @@ local function EntityRow(t1: {[any]: any}) -- line: 37
 
 	return React.createElement(UserRow, {
 		entityId = entity.id,
-		layoutMode = v11,
-		onActivated = v10,
+		layoutMode = v12,
+		onActivated = v11,
 		primaryCta = t1.primaryCta,
 		secondaryCta = t1.secondaryCta,
+		ctaLoading = if not FFlagUserListCtaIntegrationEnabled then nil else t1.ctaLoading,
 		contextualInfo = t1.contextualInfo,
 		layoutOrder = t1.layoutOrder,
 		loadingState = t1.loadingState,

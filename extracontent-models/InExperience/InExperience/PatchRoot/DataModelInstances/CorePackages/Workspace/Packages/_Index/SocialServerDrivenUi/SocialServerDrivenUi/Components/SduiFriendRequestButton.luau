@@ -1,52 +1,65 @@
-local Parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
-local React = require(Parent.React)
-local RoactUtils = require(Parent.RoactUtils)
-local Foundation = require(Parent.Foundation)
-local SignalsReact = require(Parent.SignalsReact)
+local SocialServerDrivenUi = script:FindFirstAncestor("SocialServerDrivenUi")
+local SocialServerDrivenUiParent = SocialServerDrivenUi.Parent
+local React = require(SocialServerDrivenUiParent.React)
+local RoactUtils = require(SocialServerDrivenUiParent.RoactUtils)
+local Foundation = require(SocialServerDrivenUiParent.Foundation)
+
+require(SocialServerDrivenUiParent.SduiCoreSystem)
+
+local SignalsReact = require(SocialServerDrivenUiParent.SignalsReact)
+local SharedFlags = require(SocialServerDrivenUiParent.SharedFlags)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local FriendsStore = require(Parent.DataHydration).Friends.FriendsStore
-local SetCurrentToastMessage = require(Parent.ToastRodux).Actions.SetCurrentToastMessage
-local Enums = require(Parent.FriendsNetworking).Enums
+local firePlayerFriendAddTelemetry = require(SocialServerDrivenUi.Analytics.firePlayerFriendAddTelemetry)
+local FriendsStore = require(SocialServerDrivenUiParent.DataHydration).Friends.FriendsStore
+local SetCurrentToastMessage = require(SocialServerDrivenUiParent.ToastRodux).Actions.SetCurrentToastMessage
+local Enums = require(SocialServerDrivenUiParent.FriendsNetworking).Enums
 local IconButton = Foundation.IconButton
 local Enums2 = Foundation.Enums
+local FFlagSduiSearchPeoplePlayerTileTelemetry = SharedFlags.FFlagSduiSearchPeoplePlayerTileTelemetry
 local Small = Enums2.InputSize.Small
-local v13 = Enums.FriendshipOriginSourceType.PlayerSearch.rawValue()
+local v17 = Enums.FriendshipOriginSourceType.PlayerSearch.rawValue()
 
-local function SduiFriendRequestButton(t1: {[any]: any}) -- line: 46
-	-- upvalues: useDispatch (copy), SignalsReact (copy), FriendsStore (copy), React (copy), v13 (copy), SetCurrentToastMessage (copy), IconButton (copy), Enums2 (copy), Small (copy)
+local function SduiFriendRequestButton(t1: {[any]: any}) -- line: 56
+	-- upvalues: useDispatch (copy), SignalsReact (copy), FriendsStore (copy), React (copy), v17 (copy), SetCurrentToastMessage (copy), FFlagSduiSearchPeoplePlayerTileTelemetry (copy), firePlayerFriendAddTelemetry (copy), IconButton (copy), Enums2 (copy), Small (copy)
 	local userId = t1.userId
-	local v17 = useDispatch()
-	local v18 = SignalsReact.useSignalState(FriendsStore.get().GetFriendshipStatus(userId or "").data)
-	local v19 = v18 == Enum.FriendStatus.FriendRequestSent or v18 == Enum.FriendStatus.FriendRequestReceived
-	local v20 = React.useCallback(function() -- line: 60
-		-- upvalues: v19 (copy), userId (copy), t1 (copy), v13 (copy), FriendsStore (copy), v17 (copy), SetCurrentToastMessage (copy)
-		if v19 or userId == nil then
+	local v21 = useDispatch()
+	local v22 = SignalsReact.useSignalState(FriendsStore.get().GetFriendshipStatus(userId or "").data)
+	local v23 = v22 == Enum.FriendStatus.FriendRequestSent or v22 == Enum.FriendStatus.FriendRequestReceived
+	local v24 = React.useCallback(function() -- line: 71
+		-- upvalues: v23 (copy), userId (copy), t1 (copy), v17 (copy), FriendsStore (copy), v21 (copy), SetCurrentToastMessage (copy), FFlagSduiSearchPeoplePlayerTileTelemetry (copy), firePlayerFriendAddTelemetry (copy)
+		if v23 or userId == nil then
 			return
 		end
 
-		local v21 = if typeof(t1.source) ~= "string" or t1.source == "" then v13 else t1.source
+		local v25 = if typeof(t1.source) ~= "string" or t1.source == "" then v17 else t1.source
 
-		FriendsStore.get().RequestFriendship(userId, v21):andThen(function() -- line: 71
-			-- upvalues: v17 (copy), SetCurrentToastMessage (copy)
-			v17(SetCurrentToastMessage({
+		FriendsStore.get().RequestFriendship(userId, v25):andThen(function() -- line: 82
+			-- upvalues: v21 (copy), SetCurrentToastMessage (copy)
+			v21(SetCurrentToastMessage({
 				toastMessage = "Feature.Friends.Action.FriendRequestSent",
 				isLocalized = false
 			}))
-		end):catch(function(_) -- line: 77
-			-- upvalues: v17 (copy), SetCurrentToastMessage (copy)
-			v17(SetCurrentToastMessage({
+		end):catch(function(_) -- line: 88
+			-- upvalues: v21 (copy), SetCurrentToastMessage (copy)
+			v21(SetCurrentToastMessage({
 				toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong",
 				isLocalized = false
 			}))
 		end)
+
+		if FFlagSduiSearchPeoplePlayerTileTelemetry then
+			firePlayerFriendAddTelemetry(userId, t1.analyticsContext, t1.sduiContext)
+		end
 	end, {
-		v19,
+		v23,
 		userId,
 		t1.source,
-		v17
+		v21,
+		if not FFlagSduiSearchPeoplePlayerTileTelemetry then nil else t1.analyticsContext,
+		if not FFlagSduiSearchPeoplePlayerTileTelemetry then nil else t1.sduiContext
 	})
 
-	if v18 == nil or v18 == Enum.FriendStatus.Friend then
+	if v22 == nil or v22 == Enum.FriendStatus.Friend then
 		return nil
 	end
 
@@ -60,10 +73,10 @@ local function SduiFriendRequestButton(t1: {[any]: any}) -- line: 46
 		Button = React.createElement(IconButton, {
 			icon = "icons/common/plus_small",
 			isCircular = true,
-			variant = if not v19 then Enums2.ButtonVariant.OverMedia else Enums2.ButtonVariant.SubEmphasis,
-			isDisabled = v19,
+			variant = Enums2.ButtonVariant.OverMedia,
+			isDisabled = v23,
 			size = t1.size or Small,
-			onActivated = v20
+			onActivated = v24
 		})
 	})
 end

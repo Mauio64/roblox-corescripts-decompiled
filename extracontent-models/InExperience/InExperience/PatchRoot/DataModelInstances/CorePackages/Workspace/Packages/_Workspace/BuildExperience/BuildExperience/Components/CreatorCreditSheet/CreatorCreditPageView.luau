@@ -18,9 +18,9 @@ local InputSize = Foundation.Enums.InputSize
 local ProgressShape = Foundation.Enums.ProgressShape
 local ProgressSize = Foundation.Enums.ProgressSize
 
-local function noop() -- line: 28
+local function noop() -- line: 26
 end
-local function clampPct(n1: number) -- line: 48
+local function clampPct(n1: number) -- line: 46
 	if n1 < 0 then
 		return 0
 	end
@@ -31,11 +31,11 @@ local function clampPct(n1: number) -- line: 48
 
 	return n1
 end
-local function formatNumber(n2: number) -- line: 57
+local function formatNumber(n2: number) -- line: 55
 	-- upvalues: NumberLocalization (copy), LocalizationService (copy)
 	return NumberLocalization.localize(string.format("%.0f", (math.floor(n2))), LocalizationService.RobloxLocaleId)
 end
-local function FreeUsageCard(t1: {[any]: any}) -- line: 61
+local function FreeUsageCard(t1: {[any]: any}) -- line: 59
 	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy)
 	local pctUsed = t1.pctUsed
 	local v31 = if not (pctUsed < 0) then if not (pctUsed > 100) then pctUsed else 100 else 0
@@ -74,7 +74,7 @@ local function FreeUsageCard(t1: {[any]: any}) -- line: 61
 		})
 	})
 end
-local function RobuxLine(t2: {[any]: any}) -- line: 105
+local function RobuxLine(t2: {[any]: any}) -- line: 103
 	-- upvalues: LocalizationStrings (copy), NumberLocalization (copy), LocalizationService (copy), formatNumber (copy), React (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy)
 	local v36
 
@@ -119,7 +119,7 @@ local function RobuxLine(t2: {[any]: any}) -- line: 105
 		})
 	})
 end
-local function AdditionalUsageCard(t3: {[any]: any}) -- line: 152
+local function AdditionalUsageCard(t3: {[any]: any}) -- line: 150
 	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), Toggle (copy), InputSize (copy), RobuxLine (copy), Button (copy), ButtonVariant (copy), noop (copy)
 	local v39 = t3.additionalEnabled and t3.dailyLimit ~= nil
 	local v40 = v39 or t3.additionalEnabled and t3.hasLimitConfigured == true
@@ -147,7 +147,7 @@ local function AdditionalUsageCard(t3: {[any]: any}) -- line: 152
 				size = InputSize.Medium,
 				isChecked = t3.additionalEnabled,
 				isDisabled = t3.settingsDisabled == true,
-				onActivated = function(b1: boolean) -- line: 195
+				onActivated = function(b1: boolean) -- line: 193
 					-- upvalues: t3 (copy)
 					if not t3.settingsDisabled then
 						t3.onToggleAdditional(b1)
@@ -236,7 +236,7 @@ local function AdditionalUsageCard(t3: {[any]: any}) -- line: 152
 		}
 	}, t4)
 end
-local function CreatorCreditPageView(t5: {[any]: any}) -- line: 290
+local function CreatorCreditPageView(t5: {[any]: any}) -- line: 288
 	-- upvalues: React (copy), View (copy), FreeUsageCard (copy), AdditionalUsageCard (copy)
 	return React.createElement(View, {
 		tag = "col gap-medium size-full-0 auto-y padding-y-xlarge",

@@ -8,7 +8,7 @@ local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
 return {
-	fetchDetailedGuidelines = function(n1: number, t1: {[any]: any}?) -- line: 22
+	fetchDetailedGuidelines = function(n1: number, t1: {[any]: any}?) -- line: 21
 		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
 		local v8 = t1 or {}
 		local v9 = v8.baseUrl or UrlBase.APIS
@@ -20,7 +20,7 @@ return {
 			body = {
 				universeId = n1
 			},
-			decode = function(p1) -- line: 34
+			decode = function(p1) -- line: 33
 				return p1
 			end
 		})

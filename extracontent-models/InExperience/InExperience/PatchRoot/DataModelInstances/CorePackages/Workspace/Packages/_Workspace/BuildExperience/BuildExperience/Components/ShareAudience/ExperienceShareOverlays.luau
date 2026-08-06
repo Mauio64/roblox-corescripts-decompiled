@@ -7,7 +7,7 @@ local PlaytestersOnlyShareDialog = require(BuildExperience.Components.ShareAudie
 
 require(BuildExperience.utils.useExperienceShareFlow)
 
-local function ExperienceShareOverlays(t1: {[any]: any}) -- line: 27
+local function ExperienceShareOverlays(t1: {[any]: any}) -- line: 26
 	-- upvalues: React (copy), FriendsOnlyShareDialog (copy), PlaytestersOnlyShareDialog (copy), LocalizationStrings (copy)
 	return React.createElement(React.Fragment, nil, {
 		FriendsOnlyShareDialog = if t1.activeDialog ~= "friends" then nil else React.createElement(FriendsOnlyShareDialog, {

@@ -3,7 +3,7 @@ local React = require(Parent.React)
 local BuildChatPageView = require(script.Parent.BuildChatPageView)
 local useBuildChatPageViewModel = require(script.Parent.useBuildChatPageViewModel)
 
-local function BuildChatPage(p1) -- line: 13
+local function BuildChatPage(p1) -- line: 11
 	-- upvalues: useBuildChatPageViewModel (copy), React (copy), BuildChatPageView (copy)
 	local v7 = useBuildChatPageViewModel(p1)
 

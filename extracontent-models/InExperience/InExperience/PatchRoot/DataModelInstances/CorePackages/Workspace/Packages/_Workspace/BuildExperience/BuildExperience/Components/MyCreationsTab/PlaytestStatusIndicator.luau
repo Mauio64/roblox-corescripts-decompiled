@@ -14,7 +14,7 @@ local ProgressShape = Foundation.Enums.ProgressShape
 local ProgressSize = Foundation.Enums.ProgressSize
 local useTokens = Foundation.Hooks.useTokens
 
-local function PlaytestStatusIndicator(t1: {[any]: any}) -- line: 28
+local function PlaytestStatusIndicator(t1: {[any]: any}) -- line: 26
 	-- upvalues: useTokens (copy), React (copy), View (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), Icon (copy), IconName (copy), IconVariant (copy)
 	local Size_400 = useTokens().Size.Size_400
 

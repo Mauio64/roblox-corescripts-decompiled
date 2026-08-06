@@ -1,5 +1,7 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local CreatorAgentChat = require(Parent.DataHydration.CreatorAgentChat)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local BuildExperienceParent = BuildExperience.Parent
+local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
+local FFlagBuildExperienceToolResultFailureRecovery = require(BuildExperience.Flags.FFlagBuildExperienceToolResultFailureRecovery)
 
 require(script.Parent.chatTypes)
 
@@ -13,7 +15,7 @@ local debug = CreatorAgentChat.debug
 local awaitRequestState = toolControllerUtils.awaitRequestState
 local getToolCallOrder = toolControllerUtils.getToolCallOrder
 
-local function buildOptimisticPlanTool(t1: {[any]: any}) -- line: 42
+local function buildOptimisticPlanTool(t1: {[any]: any}) -- line: 44
 	return {
 		toolCallId = t1.toolCallId,
 		callOrder = t1.proposal.callOrder or 0,
@@ -21,24 +23,24 @@ local function buildOptimisticPlanTool(t1: {[any]: any}) -- line: 42
 		feedbackText = t1.proposal.feedbackText
 	}
 end
-local function createPlanProposalSync(p1: ((...any) -> ...any), p2: ((...any) -> ...any), p3: ((...any) -> ...any)) -- line: 51
+local function createPlanProposalSync(p1: ((...any) -> ...any), p2: ((...any) -> ...any), p3: ((...any) -> ...any)) -- line: 53
 	-- upvalues: StudioProposePlanTool (copy), debug (copy), getToolCallOrder (copy)
-	local u16 = nil
-	local u17 = nil
-	local u18 = false
+	local u18 = nil
+	local u19 = nil
+	local u20 = false
 
-	return function(p4) -- line: 60
-		-- upvalues: StudioProposePlanTool (copy), p3 (copy), u18 (ref), debug (copy), u16 (ref), u17 (ref), p1 (copy), p2 (copy), getToolCallOrder (copy)
-		local v35, v36, v37, v38, v39 = StudioProposePlanTool.findPlanInTurnState(p4, p3())
+	return function(p4) -- line: 62
+		-- upvalues: StudioProposePlanTool (copy), p3 (copy), u20 (ref), debug (copy), u18 (ref), u19 (ref), p1 (copy), p2 (copy), getToolCallOrder (copy)
+		local v39, v40, v41, v42, v43 = StudioProposePlanTool.findPlanInTurnState(p4, p3())
 
-		if v35 == nil or v36 == nil then
-			if u18 then
+		if v39 == nil or v40 == nil then
+			if u20 then
 				debug.log("info", "present_plan proposal cleared", {
 					turn = debug.formatTurnState(p4)
 				})
-				u18 = false
-				u16 = nil
-				u17 = nil
+				u20 = false
+				u18 = nil
+				u19 = nil
 				p1(nil)
 				p2(nil)
 			end
@@ -46,34 +48,34 @@ local function createPlanProposalSync(p1: ((...any) -> ...any), p2: ((...any) ->
 			return false
 		end
 
-		u18 = true
+		u20 = true
 
-		if v36 ~= u16 or v37 ~= u17 then
-			u16 = v36
-			u17 = v37
+		if v40 ~= u18 or v41 ~= u19 then
+			u18 = v40
+			u19 = v41
 
 			local t2 = {
 				submitted = false,
 				sessionId = p4.sessionId,
-				toolCallId = v36,
-				turnId = v38,
-				referenceId = v39,
+				toolCallId = v40,
+				turnId = v42,
+				referenceId = v43,
 				proposal = {
 					isAccepted = false,
-					title = v35.title,
-					textContent = v35.textContent,
-					summary = v35.summary,
-					toolCallId = v36,
-					callOrder = getToolCallOrder(p4, v36)
+					title = v39.title,
+					textContent = v39.textContent,
+					summary = v39.summary,
+					toolCallId = v40,
+					callOrder = getToolCallOrder(p4, v40)
 				}
 			}
 
 			p2(t2)
 			p1(t2.proposal)
 			debug.log("info", "present_plan proposal displayed", {
-				toolCallId = v36,
-				turnId = v38,
-				referenceId = v39,
+				toolCallId = v40,
+				turnId = v42,
+				referenceId = v43,
 				turn = debug.formatTurnState(p4)
 			})
 		end
@@ -81,153 +83,190 @@ local function createPlanProposalSync(p1: ((...any) -> ...any), p2: ((...any) ->
 		return true
 	end
 end
-local function createProposePlanController(p5, t3: {[any]: any}, p6) -- line: 109
-	-- upvalues: debug (copy), awaitRequestState (copy), chatConstants (copy), StudioProposePlanTool (copy), getToolCallOrder (copy)
-	local u22 = nil
-	local u23 = nil
+local function createProposePlanController(p5, t3: {[any]: any}, p6, p7) -- line: 111
+	-- upvalues: debug (copy), FFlagBuildExperienceToolResultFailureRecovery (copy), awaitRequestState (copy), chatConstants (copy), StudioProposePlanTool (copy), getToolCallOrder (copy)
+	local u25 = nil
+	local u26 = nil
 
-	local function setPlanFlow(t4: {[any]: any}?) -- line: 117
-		-- upvalues: u22 (ref)
-		u22 = t4
+	local function setPlanFlow(t4: {[any]: any}?) -- line: 120
+		-- upvalues: u25 (ref)
+		u25 = t4
 	end
-	local function submitPlanResult(t5: {[any]: any}, t6: {[any]: any}, s1: string) -- line: 121
-		-- upvalues: debug (copy), p5 (copy), awaitRequestState (copy), chatConstants (copy), t3 (copy), p6 (copy), u22 (ref)
-		debug.log("info", "present_plan tool_result submitting", {
-			sessionId = t5.sessionId,
+	local function recoverFailedSubmission(t5: {[any]: any}, s1: string?, n1: number?) -- line: 124
+		-- upvalues: p7 (copy), p6 (copy)
+		t5.submitted = false
+
+		if p7 == nil then
+			return
+		end
+
+		t5.proposal = {
+			isAccepted = false,
+			feedbackText = nil,
+			title = t5.proposal.title,
+			textContent = t5.proposal.textContent,
+			summary = t5.proposal.summary,
+			toolCallId = t5.proposal.toolCallId,
+			callOrder = t5.proposal.callOrder
+		}
+		p6.setPlanTool({
 			toolCallId = t5.toolCallId,
-			turnId = t5.turnId,
-			referenceId = t5.referenceId,
-			resultKind = s1
+			callOrder = t5.proposal.callOrder or 0,
+			isAccepted = t5.proposal.isAccepted,
+			feedbackText = t5.proposal.feedbackText
+		})
+		p7(s1, n1)
+	end
+	local function submitPlanResult(t6: {[any]: any}, t7: {[any]: any}, s2: string, s3: string?) -- line: 143
+		-- upvalues: debug (copy), p5 (copy), FFlagBuildExperienceToolResultFailureRecovery (copy), recoverFailedSubmission (copy), awaitRequestState (copy), chatConstants (copy), t3 (copy), p6 (copy), u25 (ref)
+		debug.log("info", "present_plan tool_result submitting", {
+			sessionId = t6.sessionId,
+			toolCallId = t6.toolCallId,
+			turnId = t6.turnId,
+			referenceId = t6.referenceId,
+			resultKind = s2
 		})
 
 		local elapsed = os.clock()
-		local v46 = p5.submitActiveToolResult(t6, false, t5.turnId, t5.referenceId)
+		local v54 = p5.submitActiveToolResult(t7, false, t6.turnId, t6.referenceId)
 
-		if v46 == nil then
+		if v54 == nil then
 			debug.log("warn", "present_plan tool_result submit aborted (no active session)", {
-				toolCallId = t5.toolCallId,
-				resultKind = s1
+				toolCallId = t6.toolCallId,
+				resultKind = s2
 			})
-			t5.submitted = false
+
+			if FFlagBuildExperienceToolResultFailureRecovery then
+				recoverFailedSubmission(t6, s3, nil)
+
+				return
+			end
+
+			t6.submitted = false
 
 			return
 		end
 
-		local v47 = awaitRequestState(v46.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
-		local v48 = math.floor((os.clock() - elapsed) * 1000 + 0.5)
+		local v55 = awaitRequestState(v54.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
+		local v56 = math.floor((os.clock() - elapsed) * 1000 + 0.5)
 
-		if v47.status ~= "succeeded" then
-			t5.submitted = false
+		if v55.status ~= "succeeded" then
+			if FFlagBuildExperienceToolResultFailureRecovery then
+				recoverFailedSubmission(t6, s3, v55.errorCode)
+			else
+				t6.submitted = false
+			end
+
 			debug.log("warn", "present_plan tool_result submit failed", {
-				sessionId = t5.sessionId,
-				toolCallId = t5.toolCallId,
-				turnId = t5.turnId,
-				referenceId = t5.referenceId,
-				durationMs = v48,
-				state = debug.formatRequestState(v47),
-				resultKind = s1
+				sessionId = t6.sessionId,
+				toolCallId = t6.toolCallId,
+				turnId = t6.turnId,
+				referenceId = t6.referenceId,
+				durationMs = v56,
+				state = debug.formatRequestState(v55),
+				resultKind = s2
 			})
 
 			return
 		end
 
 		debug.log("info", "present_plan tool_result submitted", {
-			sessionId = t5.sessionId,
-			toolCallId = t5.toolCallId,
-			turnId = t5.turnId,
-			referenceId = t5.referenceId,
-			durationMs = v48,
-			resultKind = s1
+			sessionId = t6.sessionId,
+			toolCallId = t6.toolCallId,
+			turnId = t6.turnId,
+			referenceId = t6.referenceId,
+			durationMs = v56,
+			resultKind = s2
 		})
-		t3[t5.toolCallId] = true
-		p6.markSubmitted(t5.toolCallId)
-		p6.removePlanAction(t5.toolCallId)
-		u22 = nil
+		t3[t6.toolCallId] = true
+		p6.markSubmitted(t6.toolCallId)
+		p6.removePlanAction(t6.toolCallId)
+		u25 = nil
 	end
-	local function submitPlanAccepted(t7: {[any]: any}) -- line: 170
+	local function submitPlanAccepted(t8: {[any]: any}) -- line: 205
 		-- upvalues: submitPlanResult (copy), StudioProposePlanTool (copy)
-		submitPlanResult(t7, StudioProposePlanTool.formatAcceptedContent(), "accept")
+		submitPlanResult(t8, StudioProposePlanTool.formatAcceptedContent(), "accept", nil)
 	end
-	local function submitPlanFeedback(t8: {[any]: any}, s2: string) -- line: 174
-		-- upvalues: submitPlanResult (copy), StudioProposePlanTool (copy)
-		submitPlanResult(t8, StudioProposePlanTool.formatFeedbackContent(s2), "feedback")
+	local function submitPlanFeedback(t9: {[any]: any}, s4: string) -- line: 209
+		-- upvalues: submitPlanResult (copy), StudioProposePlanTool (copy), FFlagBuildExperienceToolResultFailureRecovery (copy)
+		submitPlanResult(t9, StudioProposePlanTool.formatFeedbackContent(s4), "feedback", if not FFlagBuildExperienceToolResultFailureRecovery then nil else s4)
 	end
-	local function setCurrentPlanProposal(p7) -- line: 178
-		-- upvalues: u22 (ref), p6 (copy), u23 (ref)
-		if p7 ~= nil then
-			local v53 = u22
+	local function setCurrentPlanProposal(p8) -- line: 218
+		-- upvalues: u25 (ref), p6 (copy), u26 (ref)
+		if p8 ~= nil then
+			local v61 = u25
 
-			if v53 ~= nil then
+			if v61 ~= nil then
 				p6.setPlanTool({
-					toolCallId = v53.toolCallId,
-					callOrder = v53.proposal.callOrder or 0,
-					isAccepted = v53.proposal.isAccepted,
-					feedbackText = v53.proposal.feedbackText
+					toolCallId = v61.toolCallId,
+					callOrder = v61.proposal.callOrder or 0,
+					isAccepted = v61.proposal.isAccepted,
+					feedbackText = v61.proposal.feedbackText
 				})
-				p6.setPlanAction(v53.toolCallId, u23)
+				p6.setPlanAction(v61.toolCallId, u26)
 			end
 
 			return
 		end
 
-		local v54 = u22
+		local v62 = u25
 
-		if v54 ~= nil then
-			p6.removePlanTool(v54.toolCallId)
-			p6.removePlanAction(v54.toolCallId)
+		if v62 ~= nil then
+			p6.removePlanTool(v62.toolCallId)
+			p6.removePlanAction(v62.toolCallId)
 		end
 	end
-	local function getSubmittedToolCallIds() -- line: 195
+	local function getSubmittedToolCallIds() -- line: 235
 		-- upvalues: t3 (copy)
 		return t3
 	end
 
-	local u30 = nil
-	local u31 = nil
-	local u32 = false
+	local u34 = nil
+	local u35 = nil
+	local u36 = false
 
-	local function onPlanAcceptedImpl() -- line: 200
-		-- upvalues: u22 (ref), setCurrentPlanProposal (copy), submitPlanResult (copy), StudioProposePlanTool (copy)
-		local v62 = u22
+	local function onPlanAcceptedImpl() -- line: 240
+		-- upvalues: u25 (ref), setCurrentPlanProposal (copy), submitPlanResult (copy), StudioProposePlanTool (copy)
+		local v70 = u25
 
-		if v62 == nil or v62.submitted then
+		if v70 == nil or v70.submitted then
 			return
 		end
 
-		v62.submitted = true
-		v62.proposal = {
+		v70.submitted = true
+		v70.proposal = {
 			isAccepted = true,
 			feedbackText = nil,
-			title = v62.proposal.title,
-			textContent = v62.proposal.textContent,
-			summary = v62.proposal.summary,
-			toolCallId = v62.proposal.toolCallId,
-			callOrder = v62.proposal.callOrder
+			title = v70.proposal.title,
+			textContent = v70.proposal.textContent,
+			summary = v70.proposal.summary,
+			toolCallId = v70.proposal.toolCallId,
+			callOrder = v70.proposal.callOrder
 		}
-		setCurrentPlanProposal(v62.proposal)
-		task.spawn(function() -- line: 217
-			-- upvalues: v62 (copy), submitPlanResult (copy), StudioProposePlanTool (copy)
-			local v66 = v62
+		setCurrentPlanProposal(v70.proposal)
+		task.spawn(function() -- line: 257
+			-- upvalues: v70 (copy), submitPlanResult (copy), StudioProposePlanTool (copy)
+			local v74 = v70
 
-			submitPlanResult(v66, StudioProposePlanTool.formatAcceptedContent(), "accept")
+			submitPlanResult(v74, StudioProposePlanTool.formatAcceptedContent(), "accept", nil)
 		end)
 	end
 
-	u23 = onPlanAcceptedImpl
+	u26 = onPlanAcceptedImpl
 
 	return {
-		syncPlanProposal = function(p8) -- line: 60
-			-- upvalues: StudioProposePlanTool (copy), getSubmittedToolCallIds (copy), u32 (ref), debug (copy), u30 (ref), u31 (ref), setCurrentPlanProposal (copy), setPlanFlow (copy), getToolCallOrder (copy)
-			local v56, v57, v58, v59, v60 = StudioProposePlanTool.findPlanInTurnState(p8, getSubmittedToolCallIds())
+		syncPlanProposal = function(p9) -- line: 62
+			-- upvalues: StudioProposePlanTool (copy), getSubmittedToolCallIds (copy), u36 (ref), debug (copy), u34 (ref), u35 (ref), setCurrentPlanProposal (copy), setPlanFlow (copy), getToolCallOrder (copy)
+			local v64, v65, v66, v67, v68 = StudioProposePlanTool.findPlanInTurnState(p9, getSubmittedToolCallIds())
 
-			if v56 == nil or v57 == nil then
-				if u32 then
+			if v64 == nil or v65 == nil then
+				if u36 then
 					debug.log("info", "present_plan proposal cleared", {
-						turn = debug.formatTurnState(p8)
+						turn = debug.formatTurnState(p9)
 					})
-					u32 = false
-					u30 = nil
-					u31 = nil
+					u36 = false
+					u34 = nil
+					u35 = nil
 					setCurrentPlanProposal(nil)
 					setPlanFlow(nil)
 				end
@@ -235,80 +274,80 @@ local function createProposePlanController(p5, t3: {[any]: any}, p6) -- line: 10
 				return false
 			end
 
-			u32 = true
+			u36 = true
 
-			if v57 ~= u30 or v58 ~= u31 then
-				u30 = v57
-				u31 = v58
+			if v65 ~= u34 or v66 ~= u35 then
+				u34 = v65
+				u35 = v66
 
-				local t9 = {
+				local t10 = {
 					submitted = false,
-					sessionId = p8.sessionId,
-					toolCallId = v57,
-					turnId = v59,
-					referenceId = v60,
+					sessionId = p9.sessionId,
+					toolCallId = v65,
+					turnId = v67,
+					referenceId = v68,
 					proposal = {
 						isAccepted = false,
-						title = v56.title,
-						textContent = v56.textContent,
-						summary = v56.summary,
-						toolCallId = v57,
-						callOrder = getToolCallOrder(p8, v57)
+						title = v64.title,
+						textContent = v64.textContent,
+						summary = v64.summary,
+						toolCallId = v65,
+						callOrder = getToolCallOrder(p9, v65)
 					}
 				}
 
-				setPlanFlow(t9)
-				setCurrentPlanProposal(t9.proposal)
+				setPlanFlow(t10)
+				setCurrentPlanProposal(t10.proposal)
 				debug.log("info", "present_plan proposal displayed", {
-					toolCallId = v57,
-					turnId = v59,
-					referenceId = v60,
-					turn = debug.formatTurnState(p8)
+					toolCallId = v65,
+					turnId = v67,
+					referenceId = v68,
+					turn = debug.formatTurnState(p9)
 				})
 			end
 
 			return true
 		end,
-		stopPendingPlan = function() -- line: 247
-			-- upvalues: u22 (ref), p6 (copy)
-			local v65 = u22
+		stopPendingPlan = function() -- line: 287
+			-- upvalues: u25 (ref), p6 (copy)
+			local v73 = u25
 
-			if v65 == nil or v65.submitted then
+			if v73 == nil or v73.submitted then
 				return false
 			end
 
-			v65.submitted = true
-			u22 = nil
-			p6.removePlanTool(v65.toolCallId)
-			p6.removePlanAction(v65.toolCallId)
+			v73.submitted = true
+			u25 = nil
+			p6.removePlanTool(v73.toolCallId)
+			p6.removePlanAction(v73.toolCallId)
 
 			return true
 		end,
-		trySubmitComposerText = function(s3: string) -- line: 223
-			-- upvalues: u22 (ref), setCurrentPlanProposal (copy), submitPlanResult (copy), StudioProposePlanTool (copy)
-			local v64 = u22
+		trySubmitComposerText = function(s5: string) -- line: 263
+			-- upvalues: u25 (ref), setCurrentPlanProposal (copy), submitPlanResult (copy), StudioProposePlanTool (copy), FFlagBuildExperienceToolResultFailureRecovery (copy)
+			local v72 = u25
 
-			if v64 == nil or v64.submitted then
+			if v72 == nil or v72.submitted then
 				return false
 			end
 
-			v64.submitted = true
-			v64.proposal = {
+			v72.submitted = true
+			v72.proposal = {
 				isAccepted = false,
-				title = v64.proposal.title,
-				textContent = v64.proposal.textContent,
-				summary = v64.proposal.summary,
-				toolCallId = v64.proposal.toolCallId,
-				callOrder = v64.proposal.callOrder,
-				feedbackText = s3
+				title = v72.proposal.title,
+				textContent = v72.proposal.textContent,
+				summary = v72.proposal.summary,
+				toolCallId = v72.proposal.toolCallId,
+				callOrder = v72.proposal.callOrder,
+				feedbackText = s5
 			}
-			setCurrentPlanProposal(v64.proposal)
-			task.spawn(function() -- line: 241
-				-- upvalues: v64 (copy), s3 (copy), submitPlanResult (copy), StudioProposePlanTool (copy)
-				local v67 = v64
-				local v68 = s3
+			setCurrentPlanProposal(v72.proposal)
+			task.spawn(function() -- line: 281
+				-- upvalues: v72 (copy), s5 (copy), submitPlanResult (copy), StudioProposePlanTool (copy), FFlagBuildExperienceToolResultFailureRecovery (copy)
+				local v75 = v72
+				local v76 = s5
 
-				submitPlanResult(v67, StudioProposePlanTool.formatFeedbackContent(v68), "feedback")
+				submitPlanResult(v75, StudioProposePlanTool.formatFeedbackContent(v76), "feedback", if not FFlagBuildExperienceToolResultFailureRecovery then nil else v76)
 			end)
 
 			return true

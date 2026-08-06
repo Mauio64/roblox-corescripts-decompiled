@@ -12,19 +12,20 @@ local Constants = UserLib.Utils.Constants
 
 require(ProfilePlatform.Common.Types)
 
+local FFlagRenameDeprecatedUIBloxTokens = require(ProfilePlatformParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
 local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
 
-local function useRenderSquareExperienceTile(s1: string?, p1: ((...any) -> ...any)?, _: {[any]: any}?) -- line: 27
-	-- upvalues: useDispatch (copy), useNavigation (copy), useStyle (copy), React (copy), OpenGameDetails (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), ExperienceTileV3 (copy)
-	local v17 = useDispatch()
-	local v18 = useNavigation()
-	local v19 = useStyle()
-	local u20 = s1 or "ProfileExperienceTile_"
+local function useRenderSquareExperienceTile(s1: string?, p1: ((...any) -> ...any)?, _: {[any]: any}?) -- line: 29
+	-- upvalues: useDispatch (copy), useNavigation (copy), useStyle (copy), React (copy), OpenGameDetails (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), ExperienceTileV3 (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
+	local v18 = useDispatch()
+	local v19 = useNavigation()
+	local v20 = useStyle()
+	local u21 = s1 or "ProfileExperienceTile_"
 
-	return (React.useCallback(function(p2, n1: number, _, n2: number?) -- line: 44
-		-- upvalues: p1 (copy), v17 (copy), OpenGameDetails (copy), v18 (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), React (copy), ExperienceTileV3 (copy), v19 (copy), u20 (ref)
+	return (React.useCallback(function(p2, n1: number, _, n2: number?) -- line: 46
+		-- upvalues: p1 (copy), v18 (copy), OpenGameDetails (copy), v19 (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), React (copy), ExperienceTileV3 (copy), v20 (copy), u21 (ref)
 		local GameIcon = Constants.RbxthumbTypes.GameIcon
-		local v26 = getRbxthumbWithTypeSizeAndOptions(p2.experienceId, GameIcon, 150)
+		local v27 = getRbxthumbWithTypeSizeAndOptions(p2.experienceId, GameIcon, 150)
 
 		return React.createElement("Frame", {
 			BackgroundTransparency = 1,
@@ -37,14 +38,14 @@ local function useRenderSquareExperienceTile(s1: string?, p1: ((...any) -> ...an
 				isHoverEnabled = false,
 				hasOutline = false,
 				experienceName = p2.name,
-				thumbnail = v26,
-				onActivated = function() -- line: 45
-					-- upvalues: p1 (copy), p2 (copy), n1 (copy), n2 (copy), v17 (copy), OpenGameDetails (copy), v18 (copy)
+				thumbnail = v27,
+				onActivated = function() -- line: 47
+					-- upvalues: p1 (copy), p2 (copy), n1 (copy), n2 (copy), v18 (copy), OpenGameDetails (copy), v19 (copy)
 					if p1 then
 						p1(p2, n1, n2)
 					end
 
-					v17(OpenGameDetails(p2.experienceId, v18, {
+					v18(OpenGameDetails(p2.experienceId, v19, {
 						mountAsFullView = false,
 						showBackButton = true
 					}))
@@ -53,18 +54,18 @@ local function useRenderSquareExperienceTile(s1: string?, p1: ((...any) -> ...an
 					bottomContentPadding = {
 						Left = 0,
 						Right = 0,
-						Top = v19.Tokens.Padding.Small,
-						Bottom = v19.Tokens.Padding.Small
+						Top = v20.Tokens.Padding.Small,
+						Bottom = v20.Tokens.Padding.Small
 					}
 				}
 			})
-		}), `{ u20 }{ p2.experienceId }_`
+		}), `{ u21 }{ p2.experienceId }_`
 	end, {
-		v17,
 		v18,
-		v19.Tokens.Component.VerticalTile.Base.ContentBottom.Spacing,
+		v19,
+		if not FFlagRenameDeprecatedUIBloxTokens then v20.Tokens.Component.VerticalTile.Base.ContentBottom.Spacing else v20.Tokens.Padding.Small,
 		p1,
-		u20
+		u21
 	}))
 end
 

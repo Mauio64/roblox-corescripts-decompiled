@@ -13,9 +13,9 @@ local FFlagBuildExperiencePrivateInvites = require(BuildExperience.Flags.FFlagBu
 local PrivacyType = UniverseConfiguration.PrivacyType
 local v14 = Signals.createSignal(nil)
 
-local function useExperienceShareFlow(n1: number?, n2: number?) -- line: 59
+local function useExperienceShareFlow(n1: number?, n2: number?) -- line: 58
 	-- upvalues: React (copy), UniverseConfiguration (copy), SignalsReact (copy), v14 (copy), sharePublishedExperience (copy), GameConfigurationLabels (copy), PrivacyType (copy), FFlagBuildExperiencePrivateInvites (copy), sendBuildExperienceEvent (copy), sharePrivateExperience (copy), Logger (copy)
-	local v18 = React.useMemo(function() -- line: 60
+	local v18 = React.useMemo(function() -- line: 59
 		-- upvalues: n1 (copy), UniverseConfiguration (copy)
 		if n1 ~= nil then
 			return (UniverseConfiguration.getUniverseConfigurationStore().getAndFetchConfiguration(n1))
@@ -26,22 +26,22 @@ local function useExperienceShareFlow(n1: number?, n2: number?) -- line: 59
 	local v19 = SignalsReact.useSignalState(if v18 == nil then v14 else v18.data)
 	local v20, v21 = React.useState("none")
 	local v22, v23 = React.useState(false)
-	local v24 = React.useCallback(function() -- line: 75
+	local v24 = React.useCallback(function() -- line: 74
 		-- upvalues: v23 (copy), v21 (copy)
 		v23(false)
 		v21("none")
 	end, {})
-	local v25 = React.useCallback(function() -- line: 80
+	local v25 = React.useCallback(function() -- line: 79
 		-- upvalues: n2 (copy), sharePublishedExperience (copy)
 		if n2 ~= nil then
 			sharePublishedExperience(n2)
 		end
 	end, { n2 })
-	local v26 = React.useMemo(function() -- line: 89
+	local v26 = React.useMemo(function() -- line: 88
 		-- upvalues: GameConfigurationLabels (copy), v19 (copy)
 		return GameConfigurationLabels.getAudience(v19)
 	end, { v19 })
-	local v27 = React.useCallback(function() -- line: 95
+	local v27 = React.useCallback(function() -- line: 94
 		-- upvalues: v26 (copy), PrivacyType (copy), FFlagBuildExperiencePrivateInvites (copy), v21 (copy), n1 (copy), sendBuildExperienceEvent (copy), v25 (copy)
 		if v26 == PrivacyType.Private then
 			if FFlagBuildExperiencePrivateInvites then
@@ -71,12 +71,12 @@ local function useExperienceShareFlow(n1: number?, n2: number?) -- line: 59
 		v25,
 		n1
 	})
-	local v28 = React.useCallback(function() -- line: 115
+	local v28 = React.useCallback(function() -- line: 114
 		-- upvalues: v21 (copy), v25 (copy)
 		v21("none")
 		v25()
 	end, { v25 })
-	local v29 = React.useCallback(function() -- line: 120
+	local v29 = React.useCallback(function() -- line: 119
 		-- upvalues: n1 (copy), sendBuildExperienceEvent (copy), v23 (copy), sharePrivateExperience (copy), v21 (copy), Logger (copy)
 		if n1 == nil then
 			return
@@ -88,10 +88,10 @@ local function useExperienceShareFlow(n1: number?, n2: number?) -- line: 59
 			source = "playtesters_dialog"
 		})
 		v23(false)
-		sharePrivateExperience(n1):andThen(function() -- line: 132
+		sharePrivateExperience(n1):andThen(function() -- line: 131
 			-- upvalues: v21 (copy)
 			v21("none")
-		end):catch(function(p1) -- line: 135
+		end):catch(function(p1) -- line: 134
 			-- upvalues: Logger (copy), n1 (copy), v23 (copy)
 			Logger:warning("useExperienceShareFlow: private share failed for universe {}: {}", n1, p1)
 			v23(true)

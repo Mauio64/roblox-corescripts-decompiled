@@ -6,9 +6,9 @@ local historyPageUtils = require(script.Parent.historyPageUtils)
 require(script.Parent.sessionDeps)
 
 return {
-	createHistoryPolling = function(t1: {[any]: any}) -- line: 24
+	createHistoryPolling = function(t1: {[any]: any}) -- line: 23
 		-- upvalues: historyPageUtils (copy), constants (copy)
-		local function pollSessionHistory(s1: string, n1: number?, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)) -- line: 25
+		local function pollSessionHistory(s1: string, n1: number?, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)) -- line: 24
 			-- upvalues: t1 (copy), historyPageUtils (copy)
 			if p2() then
 				return false
@@ -53,7 +53,7 @@ return {
 
 			return #v13 > 0
 		end
-		local function startPollingTurnFromHistory(s2: string, p3, p4) -- line: 67
+		local function startPollingTurnFromHistory(s2: string, p3, p4) -- line: 66
 			-- upvalues: historyPageUtils (copy), constants (copy), t1 (copy), pollSessionHistory (copy)
 			local v19 = p4 or {}
 			local v20 = historyPageUtils.resolveNonNegativeNumber(v19.rtnIdleFallbackSeconds, constants.getRtnIdleFallbackSeconds())
@@ -84,14 +84,14 @@ return {
 			local n3 = 0
 			local n4 = 0
 
-			local function shouldStopPolling() -- line: 111
+			local function shouldStopPolling() -- line: 110
 				-- upvalues: u26 (ref), p3 (copy), t1 (copy), s2 (copy)
 				return u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2)
 			end
 
 			local u38 = nil
 
-			local function stopPolling() -- line: 117
+			local function stopPolling() -- line: 116
 				-- upvalues: u27 (ref), u31 (ref), v22 (copy), n4 (ref)
 				if not u27 then
 					return
@@ -101,7 +101,7 @@ return {
 				u31 = v22
 				n4 += 1
 			end
-			local function startPolling() -- line: 126
+			local function startPolling() -- line: 125
 				-- upvalues: u27 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u31 (ref), v22 (copy), u38 (ref)
 				if u27 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2)) then
 					return
@@ -111,7 +111,7 @@ return {
 				u31 = v22
 				u38(0)
 			end
-			local function updatePollingState() -- line: 135
+			local function updatePollingState() -- line: 134
 				-- upvalues: u26 (ref), p3 (copy), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u30 (ref), u38 (ref)
 				if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
 					if not u27 then
@@ -147,7 +147,7 @@ return {
 					n4 += 1
 				end
 			end
-			local function refreshSequenceGapState() -- line: 145
+			local function refreshSequenceGapState() -- line: 144
 				-- upvalues: p3 (copy), u29 (ref), u30 (ref), n3 (ref), v21 (copy), u26 (ref), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u38 (ref)
 				local hasSequenceGap = p3.hasSequenceGap
 				local v50 = hasSequenceGap ~= nil and hasSequenceGap()
@@ -163,7 +163,7 @@ return {
 				local v51 = n3
 
 				if v50 then
-					task.delay(v21, function() -- line: 157
+					task.delay(v21, function() -- line: 156
 						-- upvalues: v51 (copy), n3 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u29 (ref), u30 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u38 (ref)
 						if v51 ~= n3 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) or not u29) then
 							return
@@ -241,7 +241,7 @@ return {
 					n4 += 1
 				end
 			end
-			local function u43(n5: number) -- line: 169
+			local function u43(n5: number) -- line: 168
 				-- upvalues: u33 (ref), n2 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), v20 (copy), elapsed (ref), u43 (ref), u28 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref)
 				if u33 then
 					return
@@ -251,7 +251,7 @@ return {
 
 				local v53 = n2
 
-				task.delay(n5, function() -- line: 175
+				task.delay(n5, function() -- line: 174
 					-- upvalues: u33 (ref), v53 (copy), n2 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), v20 (copy), elapsed (ref), u43 (ref), u28 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref)
 					u33 = false
 
@@ -304,7 +304,7 @@ return {
 					end
 				end)
 			end
-			local function noteRtnActivity() -- line: 191
+			local function noteRtnActivity() -- line: 190
 				-- upvalues: elapsed (ref), u28 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref), u43 (ref), v20 (copy)
 				elapsed = os.clock()
 				u28 = false
@@ -330,13 +330,13 @@ return {
 				u43(v20)
 			end
 
-			function u38(n6: number) -- line: 198
+			function u38(n6: number) -- line: 197
 				-- upvalues: n4 (ref), u27 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), pollSessionHistory (copy), afterSequenceId (copy), v19 (copy), shouldStopPolling (copy), u31 (ref), v22 (copy), refreshSequenceGapState (copy), u28 (ref), u30 (ref), u38 (ref), u23 (ref), constants (copy)
 				n4 += 1
 
 				local v55 = n4
 
-				task.delay(n6, function() -- line: 201
+				task.delay(n6, function() -- line: 200
 					-- upvalues: v55 (copy), n4 (ref), u27 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), pollSessionHistory (copy), afterSequenceId (copy), v19 (copy), shouldStopPolling (copy), u31 (ref), v22 (copy), refreshSequenceGapState (copy), u28 (ref), u30 (ref), u38 (ref), u23 (ref), constants (copy)
 					if v55 ~= n4 or (not u27 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2))) then
 						return
@@ -390,7 +390,7 @@ return {
 				end)
 			end
 
-			local v45 = p3.onNotification(function() -- line: 233
+			local v45 = p3.onNotification(function() -- line: 232
 				-- upvalues: elapsed (ref), u28 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref), u43 (ref), v20 (copy), refreshSequenceGapState (copy)
 				elapsed = os.clock()
 				u28 = false
@@ -441,7 +441,7 @@ return {
 
 			u43(v20)
 
-			return function() -- line: 241
+			return function() -- line: 240
 				-- upvalues: u26 (ref), n2 (ref), n3 (ref), n4 (ref), v45 (copy)
 				u26 = true
 				n2 += 1
@@ -453,12 +453,12 @@ return {
 
 		return {
 			startPollingTurnFromHistory = startPollingTurnFromHistory,
-			startPollingActiveTurn = function(s3: string, p5) -- line: 250
+			startPollingActiveTurn = function(s3: string, p5) -- line: 249
 				-- upvalues: t1 (copy), startPollingTurnFromHistory (copy)
 				local v48 = t1.deps.getActiveTurnHandle(s3)
 
 				if v48 == nil then
-					return function() -- line: 253
+					return function() -- line: 252
 					end
 				end
 

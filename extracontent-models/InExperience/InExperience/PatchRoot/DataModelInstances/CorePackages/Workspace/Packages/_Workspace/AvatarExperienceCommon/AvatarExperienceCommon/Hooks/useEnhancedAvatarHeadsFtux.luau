@@ -12,69 +12,68 @@ local useIsSpatial = require(AvatarExperienceCommonParent.Responsive).useIsSpati
 local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
 local FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage = AvatarExperienceFlags.FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage
 local FIntAXEnhancedAvatarHeadsFtuxDelay = AvatarExperienceFlags.FIntAXEnhancedAvatarHeadsFtuxDelay
-local FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss = AvatarExperienceFlags.FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss
 
-local function v16(p1) -- line: 26
+local function v15(p1) -- line: 25
 	return p1.ScreenSize
 end
-local function useEnhancedAvatarHeadsFtux() -- line: 30
-	-- upvalues: useNavigation (copy), useAvatarRoute (copy), useSelector (copy), v16 (copy), React (copy), SafeAppStorageService (copy), FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage (copy), FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss (copy), useIsSpatial (copy), AvatarScreen (copy), FIntAXEnhancedAvatarHeadsFtuxDelay (copy)
-	local v19 = useNavigation()
-	local v20 = useAvatarRoute()
-	local v21 = useSelector(v16)
-	local v22 = React.useMemo(function() -- line: 35
-		-- upvalues: v20 (copy)
-		return v20 and (v20.opaque and v20.opaque.name)
-	end, { v20 })
-	local v23 = React.useCallback(function() -- line: 39
+local function useEnhancedAvatarHeadsFtux() -- line: 29
+	-- upvalues: useNavigation (copy), useAvatarRoute (copy), useSelector (copy), v15 (copy), React (copy), SafeAppStorageService (copy), FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage (copy), useIsSpatial (copy), AvatarScreen (copy), FIntAXEnhancedAvatarHeadsFtuxDelay (copy)
+	local v18 = useNavigation()
+	local v19 = useAvatarRoute()
+	local v20 = useSelector(v15)
+	local v21 = React.useMemo(function() -- line: 34
+		-- upvalues: v19 (copy)
+		return v19 and (v19.opaque and v19.opaque.name)
+	end, { v19 })
+	local v22 = React.useCallback(function() -- line: 38
 		-- upvalues: SafeAppStorageService (copy), FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage (copy)
 		return SafeAppStorageService.getItem("AXEnhancedAvatarHeadsFtux", FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage)
 	end, {})
-	local v24 = React.useCallback(function() -- line: 43
+	local v23 = React.useCallback(function() -- line: 42
 		-- upvalues: SafeAppStorageService (copy), FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage (copy)
 		SafeAppStorageService.setItem("AXEnhancedAvatarHeadsFtux", "true", FFlagAXEnhancedAvatarHeadsFtuxUseMemStorage)
 		SafeAppStorageService.flush()
 	end, {})
-	local v25 = not not FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss and useIsSpatial()
+	local v24 = useIsSpatial()
 
-	React.useEffect(function() -- line: 51
-		-- upvalues: FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss (copy), v25 (copy), v23 (copy), v22 (copy), AvatarScreen (copy), FIntAXEnhancedAvatarHeadsFtuxDelay (copy), v19 (copy), v21 (copy), v24 (copy)
-		if FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss and v25 then
+	React.useEffect(function() -- line: 50
+		-- upvalues: v24 (copy), v22 (copy), v21 (copy), AvatarScreen (copy), FIntAXEnhancedAvatarHeadsFtuxDelay (copy), v18 (copy), v20 (copy), v23 (copy)
+		if v24 then
 			return
 		end
 
-		if v23() == "true" then
+		if v22() == "true" then
 			return
 		end
 
-		if v22 ~= AvatarScreen.AvatarEditor then
+		if v21 ~= AvatarScreen.AvatarEditor then
 			return
 		end
 
-		local thread = task.delay(FIntAXEnhancedAvatarHeadsFtuxDelay / 1000, function() -- line: 66
-			-- upvalues: v19 (copy), AvatarScreen (copy), v21 (copy), v24 (copy)
-			v19.navigate(AvatarScreen.EnhancedAvatarHeadsFtuxPrompt, {
-				screenSize = v21,
-				onConfirm = function() -- line: 69
-					-- upvalues: v24 (copy)
-					v24()
+		local thread = task.delay(FIntAXEnhancedAvatarHeadsFtuxDelay / 1000, function() -- line: 65
+			-- upvalues: v18 (copy), AvatarScreen (copy), v20 (copy), v23 (copy)
+			v18.navigate(AvatarScreen.EnhancedAvatarHeadsFtuxPrompt, {
+				screenSize = v20,
+				onConfirm = function() -- line: 68
+					-- upvalues: v23 (copy)
+					v23()
 				end
 			})
 		end)
 
-		return function() -- line: 75
+		return function() -- line: 74
 			-- upvalues: thread (copy)
 			if thread then
 				task.cancel(thread)
 			end
 		end
 	end, {
-		v23,
-		v24,
 		v22,
+		v23,
 		v21,
-		v19,
-		if not FFlagAXEnhancedAvatarHeadsFtuxConsoleDismiss then nil else v25
+		v20,
+		v18,
+		v24
 	})
 end
 

@@ -38,7 +38,7 @@ local t4 = {
 return {
 	ProtocolVersion = 2,
 	CapRtnNamespace = "AssistantPlugin",
-	acpUrl = function() -- line: 13
+	acpUrl = function() -- line: 12
 		-- upvalues: UrlBase (copy), v3 (copy)
 		return UrlBase.APIS .. v3
 	end,
@@ -47,7 +47,7 @@ return {
 	Notifications = t3,
 	ErrorCodes = t4,
 	AskTool = t2,
-	extractSessionNewProject = function(p1) -- line: 53
+	extractSessionNewProject = function(p1) -- line: 52
 		if typeof(p1) ~= "table" then
 			return nil
 		end
@@ -60,7 +60,7 @@ return {
 
 		return nil
 	end,
-	buildSessionNewWireParams = function(t5: {[any]: any}) -- line: 64
+	buildSessionNewWireParams = function(t5: {[any]: any}) -- line: 63
 		local t6 = {
 			universeId = t5.project.universeId,
 			placeId = t5.project.placeId

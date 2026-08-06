@@ -55,7 +55,7 @@ local function IconButton(p1, p2) -- line: 79
 		v33, n1 = getIconScale(v31, v28.size)
 	end
 
-	local v35 = useIconButtonVariants(v29, v28.size, v28.variant, if not v30 then nil else v30.colorMode)
+	local v35 = useIconButtonVariants(v29, v28.size, v28.variant, if not v30 then nil else v30.colorNamespace)
 	local size = v35.container.size
 	local v37 = if not v28.isCircular then UDim.new(0, v35.container.radius or v29.Radius.Large) else UDim.new(0, v29.Radius.Circle)
 	local v38 = useIconSize(v28.size, isBuilderIcon(v31), true)

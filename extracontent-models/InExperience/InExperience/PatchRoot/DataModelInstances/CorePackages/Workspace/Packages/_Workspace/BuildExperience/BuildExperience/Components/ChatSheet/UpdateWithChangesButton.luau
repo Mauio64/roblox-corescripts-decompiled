@@ -7,7 +7,7 @@ local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 
-local function UpdateWithChangesButton(t1: {[any]: any}) -- line: 19
+local function UpdateWithChangesButton(t1: {[any]: any}) -- line: 18
 	-- upvalues: React (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy)
 	return React.createElement(Button, {
 		text = LocalizationStrings.CHAT_UPDATE_WITH_CHANGES,

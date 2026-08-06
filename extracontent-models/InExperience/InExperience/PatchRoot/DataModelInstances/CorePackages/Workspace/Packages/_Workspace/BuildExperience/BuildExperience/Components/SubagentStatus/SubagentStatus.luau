@@ -5,7 +5,7 @@ local FoundationText = Foundation.Text
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 
-local function hasChildren(p1) -- line: 26
+local function hasChildren(p1) -- line: 24
 	if p1 == nil then
 		return false
 	end
@@ -22,7 +22,7 @@ local function hasChildren(p1) -- line: 26
 
 	return false
 end
-local function SubagentStatus(t1: {[any]: any}) -- line: 41
+local function SubagentStatus(t1: {[any]: any}) -- line: 39
 	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationText (copy)
 	local v13 = useTokens()
 	local v14 = t1.testId or "subagent-status"

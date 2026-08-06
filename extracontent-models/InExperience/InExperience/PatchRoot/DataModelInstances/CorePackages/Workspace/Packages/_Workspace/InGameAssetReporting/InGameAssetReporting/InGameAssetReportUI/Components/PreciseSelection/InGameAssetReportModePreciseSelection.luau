@@ -25,161 +25,160 @@ local InGameAssetReportAnalytics = require(InGameAssetReporting.InGameAssetRepor
 local getHighlightModeVariant = require(InGameAssetReporting.Utility.getHighlightModeVariant)
 local v26 = game:DefineFastFlag("PreciseSelectionBugfixesEnabled", false)
 local FFlagPrefillPreciseSelectionChoices = require(InGameAssetReportingParent.SharedFlags).FFlagPrefillPreciseSelectionChoices
-local FFlagReportIPInfringement = require(InGameAssetReportingParent.SharedFlags).FFlagReportIPInfringement
-local v29 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
-local v30 = string.gsub(string.gsub(v29, "http:", "https:"), "https://www", "https://apis") .. "rights-management-api/rights/v1/snapshots"
+local v28 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
+local v29 = string.gsub(string.gsub(v28, "http:", "https:"), "https://www", "https://apis") .. "rights-management-api/rights/v1/snapshots"
 
-return function(t1: {[any]: any}) -- line: 57
-	-- upvalues: React (copy), AnalyticsReducer (copy), Constants (copy), setTimeout (copy), clearTimeout (copy), v26 (copy), ScreenshotManager (copy), SceneAnalysis (copy), InGameAssetReportAnalytics (copy), ExperienceStateCaptureService (copy), UserInputService (copy), FFlagReportIPInfringement (copy), HttpService (copy), v30 (copy), getHighlightModeVariant (copy), buildReport (copy), Players (copy), withLocalization (copy), ReportPreciseSelectionPortraitHeaderFooter (copy), ReportPreciseSelectionLandscapeHeader (copy), InGameAssetReportSubmitDialog (copy), FFlagPrefillPreciseSelectionChoices (copy), InGameAssetReportCompleteModal (copy), InGameAssetReportIPInfringementModal (copy), InGameAssetIPInfringementErrorModal (copy)
-	local v32, v33 = React.useState(false)
-	local v34, v35 = React.useState(false)
-	local v36, v37 = React.useState(false)
-	local v38, v39 = React.useState("")
-	local v40, v41 = React.useState(nil)
-	local v42, v43 = React.useState(true)
-	local v44, v45 = React.useReducer(AnalyticsReducer, Constants.AnalyticsInitialState)
-	local v46, v47 = React.useState(nil)
-	local v48, v49 = React.useState(nil)
-	local v50, v51 = React.useState(nil)
-	local v52, v53 = React.useState(false)
-	local v54, v55 = React.useState(nil)
-	local v56, v57 = React.useState("")
-	local v58, v59 = React.useState(nil)
-	local v60, v61 = React.useState(false)
+return function(t1: {[any]: any}) -- line: 56
+	-- upvalues: React (copy), AnalyticsReducer (copy), Constants (copy), setTimeout (copy), clearTimeout (copy), v26 (copy), ScreenshotManager (copy), SceneAnalysis (copy), InGameAssetReportAnalytics (copy), ExperienceStateCaptureService (copy), UserInputService (copy), HttpService (copy), v29 (copy), getHighlightModeVariant (copy), buildReport (copy), Players (copy), withLocalization (copy), ReportPreciseSelectionPortraitHeaderFooter (copy), ReportPreciseSelectionLandscapeHeader (copy), InGameAssetReportSubmitDialog (copy), FFlagPrefillPreciseSelectionChoices (copy), InGameAssetReportCompleteModal (copy), InGameAssetReportIPInfringementModal (copy), InGameAssetIPInfringementErrorModal (copy)
+	local v31, v32 = React.useState(false)
+	local v33, v34 = React.useState(false)
+	local v35, v36 = React.useState(false)
+	local v37, v38 = React.useState("")
+	local v39, v40 = React.useState(nil)
+	local v41, v42 = React.useState(true)
+	local v43, v44 = React.useReducer(AnalyticsReducer, Constants.AnalyticsInitialState)
+	local v45, v46 = React.useState(nil)
+	local v47, v48 = React.useState(nil)
+	local v49, v50 = React.useState(nil)
+	local v51, v52 = React.useState(false)
+	local v53, v54 = React.useState(nil)
+	local v55, v56 = React.useState("")
+	local v57, v58 = React.useState(nil)
+	local v59, v60 = React.useState(false)
 	local ViewportSize = game.Workspace.CurrentCamera.ViewportSize
-	local v63 = t1.getIsSmallPortraitMode(ViewportSize)
+	local v62 = t1.getIsSmallPortraitMode(ViewportSize)
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: v45 (copy), Constants (copy), v55 (copy), setTimeout (copy), v53 (copy)
-		v45({
+	React.useEffect(function() -- line: 78
+		-- upvalues: v44 (copy), Constants (copy), v54 (copy), setTimeout (copy), v52 (copy)
+		v44({
 			type = Constants.AnalyticsActions.AccumulateForTimeSpent,
 			accumulated_time_ms = workspace:GetServerTimeNow() * 1000
 		})
-		v45({
+		v44({
 			type = Constants.AnalyticsActions.SetPlaceId,
 			place_id = game.PlaceId
 		})
-		v55(setTimeout(function() -- line: 88
-			-- upvalues: v53 (copy)
-			v53(true)
+		v54(setTimeout(function() -- line: 87
+			-- upvalues: v52 (copy)
+			v52(true)
 		end, 10000))
 	end, {
-		v53,
-		v55
-	})
-
-	local v64 = React.useCallback(function() -- line: 93
-		-- upvalues: v53 (copy), v54 (copy), clearTimeout (copy)
-		v53(false)
-
-		if v54 then
-			clearTimeout(v54)
-		end
-	end, {
-		v53,
+		v52,
 		v54
 	})
-	local v65 = React.useCallback(function() -- line: 101
-		-- upvalues: v26 (copy), v38 (copy), ScreenshotManager (copy), v39 (copy), v64 (copy), v33 (copy), v45 (copy), Constants (copy), ViewportSize (copy), v63 (copy)
+
+	local v63 = React.useCallback(function() -- line: 92
+		-- upvalues: v52 (copy), v53 (copy), clearTimeout (copy)
+		v52(false)
+
+		if v53 then
+			clearTimeout(v53)
+		end
+	end, {
+		v52,
+		v53
+	})
+	local v64 = React.useCallback(function() -- line: 100
+		-- upvalues: v26 (copy), v37 (copy), ScreenshotManager (copy), v38 (copy), v63 (copy), v32 (copy), v44 (copy), Constants (copy), ViewportSize (copy), v62 (copy)
 		if v26 then
-			if v38 == "" then
-				ScreenshotManager:TakeScreenshotWithCallback(v39, nil)
+			if v37 == "" then
+				ScreenshotManager:TakeScreenshotWithCallback(v38, nil)
 			end
-		elseif not v38 then
-			ScreenshotManager:TakeScreenshotWithCallback(v39, nil)
+		elseif not v37 then
+			ScreenshotManager:TakeScreenshotWithCallback(v38, nil)
 		end
 
-		v64()
-		v33(true)
-		v45({
+		v63()
+		v32(true)
+		v44({
 			type = Constants.AnalyticsActions.SetViewportInformation,
 			viewport_size_x = ViewportSize.X,
 			viewport_size_y = ViewportSize.Y,
-			is_portrait_mode = v63
+			is_portrait_mode = v62
 		})
-		v45({
+		v44({
 			type = Constants.AnalyticsActions.IncrementNextCount
 		})
 	end, {
-		v33,
-		v39,
+		v32,
 		v38,
+		v37,
 		ViewportSize,
-		v63,
-		v45,
-		v64
+		v62,
+		v44,
+		v63
 	})
-	local v66 = React.useCallback(function() -- line: 141
-		-- upvalues: v41 (copy), SceneAnalysis (copy), v50 (copy), v65 (copy)
-		v41(SceneAnalysis.interpretAndExtractItemsFromInstanceForPreciseSelection(v50))
-		v65()
+	local v65 = React.useCallback(function() -- line: 140
+		-- upvalues: v40 (copy), SceneAnalysis (copy), v49 (copy), v64 (copy)
+		v40(SceneAnalysis.interpretAndExtractItemsFromInstanceForPreciseSelection(v49))
+		v64()
 	end, {
-		v65,
-		v41,
-		v50
+		v64,
+		v40,
+		v49
 	})
-	local v67 = React.useCallback(function() -- line: 147
-		-- upvalues: InGameAssetReportAnalytics (copy), v44 (copy), t1 (copy)
-		InGameAssetReportAnalytics(v44, 2)
+	local v66 = React.useCallback(function() -- line: 146
+		-- upvalues: InGameAssetReportAnalytics (copy), v43 (copy), t1 (copy)
+		InGameAssetReportAnalytics(v43, 2)
 		t1.backAction()
 	end, {
 		t1.backAction,
-		v44
+		v43
 	})
 
-	React.useEffect(function() -- line: 155
-		-- upvalues: v48 (copy), ExperienceStateCaptureService (copy), v51 (copy), v45 (copy), Constants (copy), v26 (copy), v64 (copy), UserInputService (copy), v41 (copy), SceneAnalysis (copy), v65 (copy), v49 (copy)
-		if v48 then
-			v48:Disconnect()
+	React.useEffect(function() -- line: 154
+		-- upvalues: v47 (copy), ExperienceStateCaptureService (copy), v50 (copy), v44 (copy), Constants (copy), v26 (copy), v63 (copy), UserInputService (copy), v40 (copy), SceneAnalysis (copy), v64 (copy), v48 (copy)
+		if v47 then
+			v47:Disconnect()
 		end
 
-		local connection = ExperienceStateCaptureService.ItemSelectedInCaptureMode:Connect(function(p1) -- line: 159
-			-- upvalues: v51 (copy), v45 (copy), Constants (copy), v26 (copy), v64 (copy), UserInputService (copy), v41 (copy), SceneAnalysis (copy), v65 (copy)
-			v51(p1)
+		local connection = ExperienceStateCaptureService.ItemSelectedInCaptureMode:Connect(function(p1) -- line: 158
+			-- upvalues: v50 (copy), v44 (copy), Constants (copy), v26 (copy), v63 (copy), UserInputService (copy), v40 (copy), SceneAnalysis (copy), v64 (copy)
+			v50(p1)
 
 			if p1 then
-				v45({
+				v44({
 					type = Constants.AnalyticsActions.IncremementAnnotationCount
 				})
 
 				if v26 then
-					v64()
+					v63()
 				end
 			end
 
 			if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then
-				v41(SceneAnalysis.interpretAndExtractItemsFromInstanceForPreciseSelection(p1))
-				v65()
+				v40(SceneAnalysis.interpretAndExtractItemsFromInstanceForPreciseSelection(p1))
+				v64()
 			end
 		end)
 
-		v49(connection)
+		v48(connection)
 	end, {
-		v51,
-		v49,
-		v65,
-		v41,
-		v45,
-		v64
+		v50,
+		v48,
+		v64,
+		v40,
+		v44,
+		v63
 	})
 
-	local v68 = React.useCallback(function(s1: string, s2: string, p2) -- line: 192
-		-- upvalues: FFlagReportIPInfringement (copy), v40 (copy), v59 (copy), Constants (copy), v38 (copy), HttpService (copy), v30 (copy), v57 (copy), v37 (copy), v33 (copy), v35 (copy), v45 (copy), getHighlightModeVariant (copy), buildReport (copy), Players (copy)
-		if FFlagReportIPInfringement and s1 == "ip infringement" then
-			if not v40 or not v40.extractedAssets then
-				v59(Constants.IpErrorCodes.ClientNoAssetsExtracted)
+	local v67 = React.useCallback(function(s1: string, s2: string, p2) -- line: 191
+		-- upvalues: v39 (copy), v58 (copy), Constants (copy), v37 (copy), HttpService (copy), v29 (copy), v56 (copy), v36 (copy), v32 (copy), v34 (copy), v44 (copy), getHighlightModeVariant (copy), buildReport (copy), Players (copy)
+		if s1 == "ip infringement" then
+			if not v39 or not v39.extractedAssets then
+				v58(Constants.IpErrorCodes.ClientNoAssetsExtracted)
 
 				return
 			end
 
 			local t2 = {}
 
-			for k, v in pairs(v40.extractedAssets) do
+			for k, v in pairs(v39.extractedAssets) do
 				for _, v2 in ipairs(v) do
-					local v83 = if k ~= "Package" then v2 else v2.id
+					local v82 = if k ~= "Package" then v2 else v2.id
 
-					if v83 then
-						local match = string.match(v83, "%d+")
+					if v82 then
+						local match = string.match(v82, "%d+")
 
 						if match and match ~= "" then
 							table.insert(t2, {
@@ -193,7 +192,7 @@ return function(t1: {[any]: any}) -- line: 57
 
 			if #t2 > 0 then
 				local t3 = {
-					screenshot_id = v38,
+					screenshot_id = v37,
 					universe_id = game.GameId,
 					contents = t2
 				}
@@ -201,25 +200,25 @@ return function(t1: {[any]: any}) -- line: 57
 
 				HttpService:RequestInternal({
 					Method = "POST",
-					Url = v30,
+					Url = v29,
 					Headers = {
 						["Content-Type"] = "application/json",
 						Accept = "application/json"
 					},
 					Body = json
-				}):Start(function(_, p4) -- line: 235
-					-- upvalues: HttpService (copy), v57 (copy), v37 (copy), v59 (copy), Constants (copy)
+				}):Start(function(_, p4) -- line: 234
+					-- upvalues: HttpService (copy), v56 (copy), v36 (copy), v58 (copy), Constants (copy)
 					if p4.StatusCode == 200 then
 						local ok, result = pcall(HttpService.JSONDecode, HttpService, p4.Body)
 
 						if ok and result and result.code then
-							v57(result.code)
-							v37(true)
+							v56(result.code)
+							v36(true)
 
 							return
 						end
 
-						v59(Constants.IpErrorCodes.Unknown)
+						v58(Constants.IpErrorCodes.Unknown)
 
 						return
 					end
@@ -231,162 +230,162 @@ return function(t1: {[any]: any}) -- line: 57
 						Unknown = result.app_error_code
 					end
 
-					v59(Unknown)
+					v58(Unknown)
 				end)
 
 				return
 			end
 
-			v59(Constants.IpErrorCodes.ClientNoAssetsExtracted)
+			v58(Constants.IpErrorCodes.ClientNoAssetsExtracted)
 
 			return
 		end
 
-		v33(false)
-		v35(true)
-		v45({
+		v32(false)
+		v34(true)
+		v44({
 			final_annotation_count = 0,
 			type = Constants.AnalyticsActions.SetExtractionResults,
-			results = v40
+			results = v39
 		})
-		v45({
+		v44({
 			type = Constants.AnalyticsActions.SetReasonSelection,
 			reason_selection = s1
 		})
-		v45({
+		v44({
 			type = Constants.AnalyticsActions.SetSurfaceSelection,
 			surface_selection = s2
 		})
-		v45({
+		v44({
 			type = Constants.AnalyticsActions.SetCommentAdded,
 			comment_added = #p2 > 0
 		})
 
-		local v87 = getHighlightModeVariant()
+		local v86 = getHighlightModeVariant()
 
-		v45({
+		v44({
 			type = Constants.AnalyticsActions.SetVariant,
-			variant = v87
+			variant = v86
 		})
 
-		local v88 = buildReport(Players.LocalPlayer.UserId, v38, v40, s1, s2, p2, {}, nil, v87)
+		local v87 = buildReport(Players.LocalPlayer.UserId, v37, v39, s1, s2, p2, {}, nil, v86)
 
-		if v88 then
-			Players:ReportAbuseV3(Players.LocalPlayer, v88)
+		if v87 then
+			Players:ReportAbuseV3(Players.LocalPlayer, v87)
 		end
 	end, {
-		v40,
-		v33,
-		v35,
-		v38,
-		v59,
+		v39,
+		v32,
+		v34,
 		v37,
-		v57,
-		v45
+		v58,
+		v36,
+		v56,
+		v44
 	})
-	local v69 = React.useCallback(function() -- line: 321
-		-- upvalues: v41 (copy), v33 (copy), ExperienceStateCaptureService (copy)
-		v41(nil)
-		v33(false)
+	local v68 = React.useCallback(function() -- line: 320
+		-- upvalues: v40 (copy), v32 (copy), ExperienceStateCaptureService (copy)
+		v40(nil)
+		v32(false)
 		ExperienceStateCaptureService:ResetHighlight()
 	end, {
-		v33,
-		v41
+		v32,
+		v40
 	})
-	local v70 = React.useCallback(function() -- line: 328
-		-- upvalues: v35 (copy), InGameAssetReportAnalytics (copy), v44 (copy), t1 (copy)
-		v35(false)
-		InGameAssetReportAnalytics(v44, 1)
+	local v69 = React.useCallback(function() -- line: 327
+		-- upvalues: v34 (copy), InGameAssetReportAnalytics (copy), v43 (copy), t1 (copy)
+		v34(false)
+		InGameAssetReportAnalytics(v43, 1)
 		t1.onReportComplete()
 	end, {
 		t1.onReportComplete,
-		v35,
-		v44
+		v34,
+		v43
 	})
-	local v71 = React.useCallback(function() -- line: 334
-		-- upvalues: v42 (copy), v43 (copy), v45 (copy), Constants (copy)
-		if v42 then
-			v43(false)
+	local v70 = React.useCallback(function() -- line: 333
+		-- upvalues: v41 (copy), v42 (copy), v44 (copy), Constants (copy)
+		if v41 then
+			v42(false)
 
 			return
 		end
 
-		v45({
+		v44({
 			did_user_resize = true,
 			type = Constants.AnalyticsActions.SetDidUserResize
 		})
 	end, {
-		v42,
-		v32,
-		v45,
-		v43
+		v41,
+		v31,
+		v44,
+		v42
 	})
 
-	React.useEffect(function() -- line: 347
-		-- upvalues: v46 (copy), UserInputService (copy), v67 (copy), v47 (copy)
-		if v46 then
-			v46:Disconnect()
+	React.useEffect(function() -- line: 346
+		-- upvalues: v45 (copy), UserInputService (copy), v66 (copy), v46 (copy)
+		if v45 then
+			v45:Disconnect()
 		end
 
-		local connection = UserInputService.InputEnded:Connect(function(input) -- line: 352
-			-- upvalues: v67 (copy)
+		local connection = UserInputService.InputEnded:Connect(function(input) -- line: 351
+			-- upvalues: v66 (copy)
 			if input.KeyCode == Enum.KeyCode.Escape then
-				v67()
+				v66()
 			end
 		end)
 
-		v47(connection)
+		v46(connection)
 	end, {
-		v67,
-		v47
+		v66,
+		v46
 	})
 
-	local v72 = React.useCallback(function() -- line: 361
-		-- upvalues: v59 (copy)
-		v59(nil)
+	local v71 = React.useCallback(function() -- line: 360
+		-- upvalues: v58 (copy)
+		v58(nil)
 	end, {})
-	local v73 = React.useCallback(function() -- line: 368
-		-- upvalues: v61 (copy), HttpService (copy), v38 (copy), v30 (copy), v57 (copy), v59 (copy), v37 (copy), Constants (copy)
-		v61(true)
+	local v72 = React.useCallback(function() -- line: 367
+		-- upvalues: v60 (copy), HttpService (copy), v37 (copy), v29 (copy), v56 (copy), v58 (copy), v36 (copy), Constants (copy)
+		v60(true)
 
 		local json = HttpService:JSONEncode({
-			screenshot_id = v38,
+			screenshot_id = v37,
 			universe_id = game.GameId,
 			contents = {}
 		})
 
 		HttpService:RequestInternal({
 			Method = "POST",
-			Url = v30,
+			Url = v29,
 			Headers = {
 				["Content-Type"] = "application/json",
 				Accept = "application/json"
 			},
 			Body = json
-		}):Start(function(_, p6) -- line: 387
-			-- upvalues: v61 (copy), HttpService (copy), v57 (copy), v59 (copy), v37 (copy), Constants (copy)
-			v61(false)
+		}):Start(function(_, p6) -- line: 386
+			-- upvalues: v60 (copy), HttpService (copy), v56 (copy), v58 (copy), v36 (copy), Constants (copy)
+			v60(false)
 
 			if p6.StatusCode == 200 then
 				local ok, result = pcall(HttpService.JSONDecode, HttpService, p6.Body)
 
 				if ok and result and result.code then
-					v57(result.code)
-					v59(nil)
-					v37(true)
+					v56(result.code)
+					v58(nil)
+					v36(true)
 
 					return
 				end
 			end
 
-			v59(Constants.IpErrorCodes.Unknown)
+			v58(Constants.IpErrorCodes.Unknown)
 		end)
 	end, {
-		v38,
-		v57,
-		v59,
 		v37,
-		v61
+		v56,
+		v58,
+		v36,
+		v60
 	})
 
 	return withLocalization({
@@ -394,12 +393,12 @@ return function(t1: {[any]: any}) -- line: 57
 		next = "Feature.ReportAbuse.Action.Next",
 		coachmarkTitle = "Feature.ReportAbuse.Label.CantSelectTitle",
 		coachmarkText = "Feature.ReportAbuse.Label.CantSelectSubtitle"
-	})(function(p7) -- line: 415
-		-- upvalues: React (copy), v71 (copy), v63 (copy), ReportPreciseSelectionPortraitHeaderFooter (copy), v67 (copy), ReportPreciseSelectionLandscapeHeader (copy), v66 (copy), v52 (copy), v64 (copy), v32 (copy), InGameAssetReportSubmitDialog (copy), ViewportSize (copy), v68 (copy), v69 (copy), v45 (copy), FFlagPrefillPreciseSelectionChoices (copy), v40 (copy), v34 (copy), InGameAssetReportCompleteModal (copy), v70 (copy), FFlagReportIPInfringement (copy), v36 (copy), InGameAssetReportIPInfringementModal (copy), v56 (copy), v58 (copy), InGameAssetIPInfringementErrorModal (copy), v72 (copy), v73 (copy), v60 (copy)
+	})(function(p7) -- line: 414
+		-- upvalues: React (copy), v70 (copy), v62 (copy), ReportPreciseSelectionPortraitHeaderFooter (copy), v66 (copy), ReportPreciseSelectionLandscapeHeader (copy), v65 (copy), v51 (copy), v63 (copy), v31 (copy), InGameAssetReportSubmitDialog (copy), ViewportSize (copy), v67 (copy), v68 (copy), v44 (copy), FFlagPrefillPreciseSelectionChoices (copy), v39 (copy), v33 (copy), InGameAssetReportCompleteModal (copy), v69 (copy), v35 (copy), InGameAssetReportIPInfringementModal (copy), v55 (copy), v57 (copy), InGameAssetIPInfringementErrorModal (copy), v71 (copy), v72 (copy), v59 (copy)
 		return React.createElement("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
-			[React.Change.AbsoluteSize] = v71
+			[React.Change.AbsoluteSize] = v70
 		}, {
 			Header = React.createElement("TextButton", {
 				BackgroundTransparency = 1,
@@ -412,22 +411,22 @@ return function(t1: {[any]: any}) -- line: 57
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					SortOrder = Enum.SortOrder.LayoutOrder
 				}),
-				InGameAssetReportModeHeader = if not v63 then React.createElement(ReportPreciseSelectionLandscapeHeader, {
+				InGameAssetReportModeHeader = if not v62 then React.createElement(ReportPreciseSelectionLandscapeHeader, {
 					titleText = p7.mainTitle,
 					nextText = p7.next,
-					nextAction = v66,
-					backAction = v67,
+					nextAction = v65,
+					backAction = v66,
 					coachmarkTitle = p7.coachmarkTitle,
 					coachmarkText = p7.coachmarkText,
-					isCoachmarkOpen = v52,
-					onCoachmarkClose = v64
+					isCoachmarkOpen = v51,
+					onCoachmarkClose = v63
 				}) else React.createElement(ReportPreciseSelectionPortraitHeaderFooter.PortraitModeHeader, {
 					titleText = p7.mainTitle,
 					nextText = p7.next,
-					backAction = v67
+					backAction = v66
 				})
 			}),
-			Footer = if not v63 then nil else React.createElement("TextButton", {
+			Footer = if not v62 then nil else React.createElement("TextButton", {
 				ZIndex = 2,
 				BackgroundTransparency = 1,
 				AutoButtonColor = false,
@@ -435,36 +434,36 @@ return function(t1: {[any]: any}) -- line: 57
 				Position = UDim2.new(0, 0, 1, -60)
 			}, {
 				InGameAssetReportModeFooter = React.createElement(ReportPreciseSelectionPortraitHeaderFooter.PortraitModeFooter, {
-					nextAction = v66,
+					nextAction = v65,
 					nextText = p7.next,
-					isCoachmarkOpen = v52,
-					onCoachmarkClose = v64,
+					isCoachmarkOpen = v51,
+					onCoachmarkClose = v63,
 					coachmarkTitle = p7.coachmarkTitle,
 					coachmarkText = p7.coachmarkText
 				})
 			}),
-			SubmitDialog = if not v32 then nil else React.createElement(InGameAssetReportSubmitDialog, {
+			SubmitDialog = if not v31 then nil else React.createElement(InGameAssetReportSubmitDialog, {
 				screenSize = ViewportSize,
-				onSubmit = v68,
-				onBack = v69,
-				analyticsDispatch = v45,
-				extractionResult = if not FFlagPrefillPreciseSelectionChoices then nil else v40
+				onSubmit = v67,
+				onBack = v68,
+				analyticsDispatch = v44,
+				extractionResult = if not FFlagPrefillPreciseSelectionChoices then nil else v39
 			}),
-			ReportCompleteModal = if not v34 then nil else React.createElement(InGameAssetReportCompleteModal, {
+			ReportCompleteModal = if not v33 then nil else React.createElement(InGameAssetReportCompleteModal, {
 				screenSize = ViewportSize,
-				onClose = v70
+				onClose = v69
 			}),
-			IPInfringementModal = if not FFlagReportIPInfringement or not v36 then nil else React.createElement(InGameAssetReportIPInfringementModal, {
+			IPInfringementModal = if not v35 then nil else React.createElement(InGameAssetReportIPInfringementModal, {
 				screenSize = ViewportSize,
-				reportCode = v56,
-				onClose = v70
+				reportCode = v55,
+				onClose = v69
 			}),
-			ErrorModal = if not FFlagReportIPInfringement or v58 == nil then nil else React.createElement(InGameAssetIPInfringementErrorModal, {
+			ErrorModal = if v57 == nil then nil else React.createElement(InGameAssetIPInfringementErrorModal, {
 				screenSize = ViewportSize,
-				onBack = v72,
-				errorCode = v58,
-				onReportExperience = v73,
-				isReportExperienceLoading = v60
+				onBack = v71,
+				errorCode = v57,
+				onReportExperience = v72,
+				isReportExperienceLoading = v59
 			})
 		})
 	end)

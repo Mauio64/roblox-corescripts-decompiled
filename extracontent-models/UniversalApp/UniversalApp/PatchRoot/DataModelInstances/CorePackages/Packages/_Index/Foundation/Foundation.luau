@@ -24,6 +24,7 @@ local ButtonVariant = require(script.Enums.ButtonVariant)
 local ChipGroupVariant = require(script.Enums.ChipGroupVariant)
 local ChipSize = require(script.Enums.ChipSize)
 local ChipVariant = require(script.Enums.ChipVariant)
+local ColorMode = require(script.Enums.ColorMode)
 local ControlState = require(script.Enums.ControlState)
 local CursorType = require(script.Enums.CursorType)
 local DateTimePickerVariant = require(script.Enums.DateTimePickerVariant)
@@ -45,6 +46,8 @@ local NumberInputControlsVariant = require(script.Enums.NumberInputControlsVaria
 local OnChangeCallbackReason = require(script.Enums.OnChangeCallbackReason)
 local OnCloseCallbackReason = require(script.Enums.OnCloseCallbackReason)
 local Orientation = require(script.Enums.Orientation)
+local PaginationSize = require(script.Enums.PaginationSize)
+local PaginationVariant = require(script.Enums.PaginationVariant)
 local PopoverAlign = require(script.Enums.PopoverAlign)
 local PopoverSide = require(script.Enums.PopoverSide)
 local ProgressShape = require(script.Enums.ProgressShape)
@@ -56,6 +59,9 @@ local SearchInputShape = require(script.Enums.SearchInputShape)
 local SliderVariant = require(script.Enums.SliderVariant)
 local StateLayerAffordance = require(script.Enums.StateLayerAffordance)
 local StateLayerMode = require(script.Enums.StateLayerMode)
+local StatusBadgeShape = require(script.Enums.StatusBadgeShape)
+local StatusBadgeSize = require(script.Enums.StatusBadgeSize)
+local StatusBadgeVariant = require(script.Enums.StatusBadgeVariant)
 local StatusIndicatorShape = require(script.Enums.StatusIndicatorShape)
 local StatusIndicatorSize = require(script.Enums.StatusIndicatorSize)
 local StatusIndicatorVariant = require(script.Enums.StatusIndicatorVariant)
@@ -98,6 +104,7 @@ local Loading = require(script.Components.Loading)
 local Menu = require(script.Components.Menu)
 local NumberInput = require(script.Components.NumberInput)
 local OptionSelectorGroup = require(script.Components.OptionSelectorGroup)
+local Pagination = require(script.Components.Pagination)
 local Popover = require(script.Components.Popover)
 local Progress = require(script.Components.Progress)
 local RadioGroup = require(script.Components.RadioGroup)
@@ -109,6 +116,7 @@ local Sheet = require(script.Components.Sheet)
 local Skeleton = require(script.Components.Skeleton)
 local Slider = require(script.Components.Slider)
 local Snackbar = require(script.Components.Snackbar)
+local StatusBadge = require(script.Components.StatusBadge)
 local StatusIndicator = require(script.Components.StatusIndicator)
 
 require(script.Components.AlertActions)
@@ -122,7 +130,7 @@ local Toggle = require(script.Components.Toggle)
 local Tooltip = require(script.Components.Tooltip)
 local Toast = require(script.Components.Toast)
 local View = require(script.Components.View)
-local v116 = strict({
+local v124 = strict({
 	Accordion = Accordion,
 	Avatar = Avatar,
 	AvatarGroup = AvatarGroup,
@@ -156,6 +164,7 @@ local v116 = strict({
 	Menu = Menu,
 	NumberInput = NumberInput,
 	OptionSelectorGroup = OptionSelectorGroup,
+	Pagination = Pagination,
 	Pill = Chip,
 	Popover = Popover,
 	Progress = Progress,
@@ -168,6 +177,7 @@ local v116 = strict({
 	Skeleton = Skeleton,
 	Slider = Slider,
 	Snackbar = Snackbar,
+	StatusBadge = StatusBadge,
 	StatusIndicator = StatusIndicator,
 	SystemBanner = SystemBanner,
 	Tabs = Tabs,
@@ -203,7 +213,8 @@ local v116 = strict({
 		useStyleTags = require(script.Providers.Style.useStyleTags),
 		useTextSizeOffset = require(script.Providers.Style.useTextSizeOffset),
 		useTokens = require(script.Providers.Style.useTokens),
-		withCursor = require(script.Providers.Cursor.withCursor)
+		withCursor = require(script.Providers.Cursor.withCursor),
+		withTokens_DEPRECATED = require(script.Providers.Style.withTokens_DEPRECATED)
 	},
 	Enums = {
 		AccessoryType = AccessoryType,
@@ -223,6 +234,7 @@ local v116 = strict({
 		ChipGroupVariant = ChipGroupVariant,
 		ChipSize = ChipSize,
 		ChipVariant = ChipVariant,
+		ColorMode = ColorMode,
 		CursorType = CursorType,
 		DateTimePickerVariant = DateTimePickerVariant,
 		Device = Device,
@@ -245,6 +257,8 @@ local v116 = strict({
 		OnChangeCallbackReason = OnChangeCallbackReason,
 		OnCloseCallbackReason = OnCloseCallbackReason,
 		Orientation = Orientation,
+		PaginationSize = PaginationSize,
+		PaginationVariant = PaginationVariant,
 		PopoverAlign = PopoverAlign,
 		PopoverSide = PopoverSide,
 		ProgressShape = ProgressShape,
@@ -256,6 +270,9 @@ local v116 = strict({
 		SliderVariant = SliderVariant,
 		StateLayerAffordance = StateLayerAffordance,
 		StateLayerMode = StateLayerMode,
+		StatusBadgeShape = StatusBadgeShape,
+		StatusBadgeSize = StatusBadgeSize,
+		StatusBadgeVariant = StatusBadgeVariant,
 		StatusIndicatorShape = StatusIndicatorShape,
 		StatusIndicatorSize = StatusIndicatorSize,
 		StatusIndicatorVariant = StatusIndicatorVariant,
@@ -297,11 +314,11 @@ local v116 = strict({
 if _G.__FOUNDATION_TRACK_USAGE__ then
 	local UsageTracker = require(script.Parent.UsageTracker)
 
-	v116 = UsageTracker.trackMemberAccess("Foundation", v116, UsageTracker.isReactComponent)
+	v124 = UsageTracker.trackMemberAccess("Foundation", v124, UsageTracker.isReactComponent)
 end
 
 if _G.__FOUNDATION_TRACE_LOG__ then
 	require(script.Utility.Logger):enableTraceLog()
 end
 
-return v116
+return v124

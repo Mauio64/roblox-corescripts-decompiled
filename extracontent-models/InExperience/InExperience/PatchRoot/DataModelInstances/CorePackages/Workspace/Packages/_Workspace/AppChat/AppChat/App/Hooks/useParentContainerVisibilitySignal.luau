@@ -5,23 +5,27 @@ local RoactUtils = require(AppChatParent.RoactUtils)
 local EnteredChatFromEntryPoint = require(AppChat.Actions.EnteredChatFromEntryPoint)
 local setAppChatVisible = require(AppChat.App.AppChatVisible).setAppChatVisible
 local ParentContainerContext = require(AppChat.Contexts.ParentContainer.ParentContainerContext)
+local FFlagExpChatEnableFriendsTab = require(AppChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 
-return function() -- line: 13
-	-- upvalues: React (copy), ParentContainerContext (copy), useDispatch (copy), setAppChatVisible (copy), EnteredChatFromEntryPoint (copy)
-	local v9 = React.useContext(ParentContainerContext)
-	local visibilitySignal = v9.visibilitySignal
-	local getShouldSetAppChatVisible = v9.getShouldSetAppChatVisible
-	local entryPoint = v9.entryPoint
-	local v13 = useDispatch()
+return function() -- line: 16
+	-- upvalues: React (copy), ParentContainerContext (copy), useDispatch (copy), setAppChatVisible (copy), FFlagExpChatEnableFriendsTab (copy), EnteredChatFromEntryPoint (copy)
+	local v10 = React.useContext(ParentContainerContext)
+	local visibilitySignal = v10.visibilitySignal
+	local getShouldSetAppChatVisible = v10.getShouldSetAppChatVisible
+	local entryPoint = v10.entryPoint
+	local v14 = useDispatch()
 
-	React.useEffect(function() -- line: 20
-		-- upvalues: visibilitySignal (copy), getShouldSetAppChatVisible (copy), setAppChatVisible (copy), v13 (copy), EnteredChatFromEntryPoint (copy), entryPoint (copy)
-		local u14 = visibilitySignal:connect(function(...) -- line: 23
-			-- upvalues: getShouldSetAppChatVisible (copy), setAppChatVisible (copy), v13 (copy), EnteredChatFromEntryPoint (copy), entryPoint (copy)
-			if getShouldSetAppChatVisible(...) then
+	React.useEffect(function() -- line: 23
+		-- upvalues: visibilitySignal (copy), getShouldSetAppChatVisible (copy), setAppChatVisible (copy), FFlagExpChatEnableFriendsTab (copy), entryPoint (copy), v14 (copy), EnteredChatFromEntryPoint (copy)
+		local u15 = visibilitySignal:connect(function(p1, p2) -- line: 26
+			-- upvalues: getShouldSetAppChatVisible (copy), setAppChatVisible (copy), FFlagExpChatEnableFriendsTab (copy), entryPoint (copy), v14 (copy), EnteredChatFromEntryPoint (copy)
+			if getShouldSetAppChatVisible(p1) then
 				setAppChatVisible(true)
-				v13(EnteredChatFromEntryPoint(entryPoint))
+
+				local v18 = if not FFlagExpChatEnableFriendsTab then entryPoint else p2 or entryPoint
+
+				v14(EnteredChatFromEntryPoint(v18))
 
 				return
 			end
@@ -29,15 +33,15 @@ return function() -- line: 13
 			setAppChatVisible(false)
 		end)
 
-		return function() -- line: 32
-			-- upvalues: u14 (ref)
-			if u14 then
-				u14:disconnect()
+		return function() -- line: 38
+			-- upvalues: u15 (ref)
+			if u15 then
+				u15:disconnect()
 			end
 		end
 	end, {
 		setAppChatVisible,
-		v13,
+		v14,
 		visibilitySignal,
 		getShouldSetAppChatVisible,
 		entryPoint

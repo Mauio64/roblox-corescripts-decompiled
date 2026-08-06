@@ -7,7 +7,7 @@ require(BuildExperience.Chat.chatTypes)
 local ChatTurnBlock = require(script.Parent.ChatTurnBlock)
 local ChatUserMessage = require(script.Parent.ChatUserMessage)
 
-local function ChatMessageItem(t1: {[any]: any}) -- line: 22
+local function ChatMessageItem(t1: {[any]: any}) -- line: 20
 	-- upvalues: React (copy), ChatUserMessage (copy), ChatTurnBlock (copy)
 	local message = t1.message
 
@@ -27,7 +27,7 @@ local function ChatMessageItem(t1: {[any]: any}) -- line: 22
 		isPlaytestLoading = t1.isPlaytestLoading
 	})
 end
-local function arePropsEqual(t2: {[any]: any}, t3: {[any]: any}) -- line: 45
+local function arePropsEqual(t2: {[any]: any}, t3: {[any]: any}) -- line: 43
 	local message = t2.message
 	local message2 = t3.message
 

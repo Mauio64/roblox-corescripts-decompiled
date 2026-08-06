@@ -13,9 +13,9 @@ local getCurrentExperienceProject = require(BuildExperience.utils.getCurrentExpe
 
 require(script.Parent.ChatSheetView)
 
-local function noop() -- line: 31
+local function noop() -- line: 29
 end
-local function useChatSheetViewModel(t1: {[any]: any}) -- line: 33
+local function useChatSheetViewModel(t1: {[any]: any}) -- line: 31
 	-- upvalues: noop (copy), GetAssistantBuildStore (copy), SignalsReact (copy), GetCreatorAgentResumeStore (copy), getCurrentExperienceProject (copy), useChatSessionCore (copy), useChatPlaytestFooter (copy), React (copy)
 	local v13 = t1.onClose or noop
 	local v14 = t1.isOpen == nil or t1.isOpen
@@ -34,7 +34,7 @@ local function useChatSheetViewModel(t1: {[any]: any}) -- line: 33
 	})
 	local v22 = useChatPlaytestFooter(v21, "ChatSheetPlaytestCta")
 
-	React.useEffect(function() -- line: 52
+	React.useEffect(function() -- line: 50
 		-- upvalues: v14 (copy), v16 (copy), v13 (copy)
 		if v14 and v16 then
 			v13()
@@ -44,7 +44,7 @@ local function useChatSheetViewModel(t1: {[any]: any}) -- line: 33
 		v16,
 		v13
 	})
-	React.useEffect(function() -- line: 58
+	React.useEffect(function() -- line: 56
 		-- upvalues: v14 (copy), v17 (copy), v19 (copy), t1 (copy)
 		if not v14 then
 			v17.setActiveTarget(nil)
@@ -57,7 +57,7 @@ local function useChatSheetViewModel(t1: {[any]: any}) -- line: 33
 			sessionId = t1.sessionId
 		})
 
-		return function() -- line: 67
+		return function() -- line: 65
 			-- upvalues: v17 (copy)
 			v17.setActiveTarget(nil)
 		end

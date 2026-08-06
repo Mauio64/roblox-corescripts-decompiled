@@ -8,7 +8,7 @@ require(script.Parent.UniverseSearchStoreTypes)
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function fetchUniverseSearch(p1, t1: {[any]: any}?) -- line: 19
+local function fetchUniverseSearch(p1, t1: {[any]: any}?) -- line: 18
 	-- upvalues: UrlBase (copy), fetch (copy), UrlBuilder (copy), asPromise (copy)
 	local v10 = t1 or {}
 	local v11 = v10.baseUrl or UrlBase.APIS
@@ -71,7 +71,7 @@ local function fetchUniverseSearch(p1, t1: {[any]: any}?) -- line: 19
 		analyticsKey = "universes-search.search",
 		network = v10.network,
 		url = UrlBuilder.UrlBuilder.addQueryString(v11 .. "/universes/v1/search", t2),
-		decode = function(p2) -- line: 73
+		decode = function(p2) -- line: 72
 			return p2
 		end
 	})

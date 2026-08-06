@@ -1,9 +1,12 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
 local Constants = require(AvatarExperienceCommon.Constants)
 
-local function createHumanoidDescriptionAccessoryInfo(s1: string, s2: string, t1: {[any]: any}) -- line: 22
+require(AvatarExperienceCommon.Types.CategoryTypes.CategoryTypes)
+require(AvatarExperienceCommon.Types.CommonTypes)
+
+local function createHumanoidDescriptionAccessoryInfo(p1, p2, t1: {[any]: any}) -- line: 27
 	-- upvalues: Constants (copy)
-	local num = tonumber(s2)
+	local num = tonumber(p2)
 
 	assert(num ~= nil, "assetIdAsNumber is not nil. Silence type checker.")
 
@@ -12,7 +15,7 @@ local function createHumanoidDescriptionAccessoryInfo(s1: string, s2: string, t1
 	return {
 		AssetId = num,
 		Order = v8.order,
-		AccessoryType = v8.type or Constants.ASSET_TYPE_TO_ACCESSORY_TYPE[s1],
+		AccessoryType = v8.type or Constants.ASSET_TYPE_TO_ACCESSORY_TYPE[p1],
 		IsLayered = v8.isLayered,
 		Position = v8.position,
 		Rotation = v8.rotation,

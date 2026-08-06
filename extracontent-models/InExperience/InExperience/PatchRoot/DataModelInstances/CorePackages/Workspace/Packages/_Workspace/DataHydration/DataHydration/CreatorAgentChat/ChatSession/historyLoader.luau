@@ -7,23 +7,23 @@ local historyPageUtils = require(script.Parent.historyPageUtils)
 require(script.Parent.sessionDeps)
 
 return {
-	createHistoryLoader = function(t1: {[any]: any}) -- line: 39
+	createHistoryLoader = function(t1: {[any]: any}) -- line: 38
 		-- upvalues: historyPageUtils (copy), sessionHistoryMerge (copy), constants (copy)
 		local n1 = 0
 		local u6 = nil
 
-		local function isRefreshGenerationStale(n2: number) -- line: 43
+		local function isRefreshGenerationStale(n2: number) -- line: 42
 			-- upvalues: t1 (copy)
 			return n2 ~= t1.getRefreshGeneration()
 		end
-		local function clearHistoryLoadInFlightIfOwned(s1: string) -- line: 47
+		local function clearHistoryLoadInFlightIfOwned(s1: string) -- line: 46
 			-- upvalues: u6 (ref), t1 (copy)
 			if s1 == u6 then
 				t1.setHistoryLoadInFlight(false)
 				u6 = nil
 			end
 		end
-		local function tryAcquireHistoryLoad(s2: string) -- line: 54
+		local function tryAcquireHistoryLoad(s2: string) -- line: 53
 			-- upvalues: t1 (copy), u6 (ref)
 			if t1.getHistoryLoadInFlight() then
 				if s2 == u6 then
@@ -39,7 +39,7 @@ return {
 
 			return true
 		end
-		local function loadHistoryPage(s3: string, s4: string?, p1: ((...any) -> ...any)) -- line: 67
+		local function loadHistoryPage(s3: string, s4: string?, p1: ((...any) -> ...any)) -- line: 66
 			-- upvalues: t1 (copy), historyPageUtils (copy)
 			local v22 = t1.deps.sessionLoad(s3, {
 				historyPageToken = s4
@@ -52,15 +52,15 @@ return {
 
 			return true, historyPageUtils.getSessionLoadHistory(v23.result), historyPageUtils.getNextHistoryPageToken(v23.result)
 		end
-		local function isSessionLoadStale(s5: string, n3: number, p2: ((...any) -> ...any)) -- line: 85
+		local function isSessionLoadStale(s5: string, n3: number, p2: ((...any) -> ...any)) -- line: 84
 			-- upvalues: t1 (copy)
 			return p2() or (s5 ~= t1.getCasSessionId() or n3 ~= t1.getRefreshGeneration())
 		end
-		local function isPrefetchStale(s6: string, n4: number, n5: number, p3: ((...any) -> ...any)) -- line: 93
+		local function isPrefetchStale(s6: string, n4: number, n5: number, p3: ((...any) -> ...any)) -- line: 92
 			-- upvalues: t1 (copy), n1 (ref)
 			return p3() or (s6 ~= t1.getCasSessionId() or n5 ~= t1.getRefreshGeneration()) or n4 ~= n1
 		end
-		local function commitRefreshedHistory(s7: string, n6: number, t2: {[any]: any}, s8: string?, p4: ((...any) -> ...any)) -- line: 103
+		local function commitRefreshedHistory(s7: string, n6: number, t2: {[any]: any}, s8: string?, p4: ((...any) -> ...any)) -- line: 102
 			-- upvalues: t1 (copy), sessionHistoryMerge (copy)
 			if p4() or (s7 ~= t1.getCasSessionId() or n6 ~= t1.getRefreshGeneration()) then
 				return false
@@ -86,9 +86,9 @@ return {
 
 			return true
 		end
-		local function prefetchOlderHistoryPagesInBackground(s9: string, s10: string?, p5: ((...any) -> ...any), n7: number, n8: number) -- line: 133
+		local function prefetchOlderHistoryPagesInBackground(s9: string, s10: string?, p5: ((...any) -> ...any), n7: number, n8: number) -- line: 132
 			-- upvalues: constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
-			task.spawn(function() -- line: 140
+			task.spawn(function() -- line: 139
 				-- upvalues: s10 (copy), constants (copy), s9 (copy), n7 (copy), n8 (copy), p5 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
 				local v72 = s10
 				local v73 = constants.getPrefetchHistoryPagesOnRefresh()
@@ -123,7 +123,7 @@ return {
 				end
 			end)
 		end
-		local function beginPrefetchGeneration() -- line: 158
+		local function beginPrefetchGeneration() -- line: 157
 			-- upvalues: n1 (ref)
 			n1 += 1
 
@@ -131,7 +131,7 @@ return {
 		end
 
 		return {
-			refreshSession = function(p6: ((...any) -> ...any)) -- line: 163
+			refreshSession = function(p6: ((...any) -> ...any)) -- line: 162
 				-- upvalues: t1 (copy), u6 (ref), historyPageUtils (copy), loadHistoryPage (copy), constants (copy), commitRefreshedHistory (copy), n1 (ref)
 				local v46 = t1.getCasSessionId()
 
@@ -214,7 +214,7 @@ return {
 
 								local v61 = n1
 
-								task.defer(function() -- line: 224
+								task.defer(function() -- line: 223
 									-- upvalues: v46 (copy), u56 (ref), p6 (copy), v61 (copy), v47 (copy), constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
 									local v82 = v46
 									local v83 = u56
@@ -222,7 +222,7 @@ return {
 									local v85 = v61
 									local v86 = v47
 
-									task.spawn(function() -- line: 140
+									task.spawn(function() -- line: 139
 										-- upvalues: v83 (copy), constants (copy), v82 (copy), v85 (copy), v86 (copy), v84 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
 										local v92 = v83
 										local v93 = constants.getPrefetchHistoryPagesOnRefresh()
@@ -272,7 +272,7 @@ return {
 					g48 = true
 				until not g48
 			end,
-			loadOlderHistory = function(p7: ((...any) -> ...any)) -- line: 238
+			loadOlderHistory = function(p7: ((...any) -> ...any)) -- line: 237
 				-- upvalues: t1 (copy), u6 (ref), loadHistoryPage (copy), n1 (ref), constants (copy)
 				local v63 = t1.getCasSessionId()
 				local v64 = t1.getNextHistoryPageToken()
@@ -325,7 +325,7 @@ return {
 
 								local v71 = n1
 
-								task.defer(function() -- line: 264
+								task.defer(function() -- line: 263
 									-- upvalues: v63 (copy), v70 (copy), p7 (copy), v71 (copy), v65 (copy), constants (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
 									local v87 = v63
 									local v88 = v70
@@ -333,7 +333,7 @@ return {
 									local v90 = v71
 									local v91 = v65
 
-									task.spawn(function() -- line: 140
+									task.spawn(function() -- line: 139
 										-- upvalues: v88 (copy), constants (copy), v87 (copy), v90 (copy), v91 (copy), v89 (copy), t1 (copy), n1 (ref), loadHistoryPage (copy)
 										local v102 = v88
 										local v103 = constants.getPrefetchHistoryPagesOnRefresh()

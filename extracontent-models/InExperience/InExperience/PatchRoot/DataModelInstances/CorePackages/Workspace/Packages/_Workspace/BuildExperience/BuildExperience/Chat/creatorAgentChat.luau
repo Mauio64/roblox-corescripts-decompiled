@@ -34,7 +34,7 @@ local t2 = {
 	[ErrorCodes.OutOfCredits] = LocalizationStrings.CHAT_ERROR_OUT_OF_CREDITS
 }
 
-local function getOutOfCreditsReason(s1: string?) -- line: 94
+local function getOutOfCreditsReason(s1: string?) -- line: 103
 	-- upvalues: t1 (copy)
 	if s1 == nil then
 		return nil
@@ -42,7 +42,7 @@ local function getOutOfCreditsReason(s1: string?) -- line: 94
 
 	return t1[s1]
 end
-local function resolvePromptFailure(p1, p2) -- line: 103
+local function resolvePromptFailure(p1, p2) -- line: 112
 	-- upvalues: ErrorCodes (copy), t1 (copy), Forbidden (copy)
 	if p1 == nil then
 		if p2 == nil then
@@ -64,22 +64,22 @@ local function resolvePromptFailure(p1, p2) -- line: 103
 	local t3 = {
 		errorCode = p1.errorCode
 	}
-	local v31
+	local v34
 
 	if p1.errorCode == ErrorCodes.OutOfCredits then
 		local error = p1.error
 
-		v31 = if error ~= nil then t1[error] else nil
+		v34 = if error ~= nil then t1[error] else nil
 	else
-		v31 = nil
+		v34 = nil
 	end
 
-	t3.outOfCreditsReason = v31
+	t3.outOfCreditsReason = v34
 	t3.isContentPolicy = p1.errorCode == Forbidden
 
 	return t3
 end
-local function getPromptFailureTelemetryParameters(t4: {[any]: any}) -- line: 127
+local function getPromptFailureTelemetryParameters(t4: {[any]: any}) -- line: 136
 	local t5 = {
 		isContentPolicy = tostring(t4.isContentPolicy)
 	}
@@ -98,7 +98,7 @@ local function getPromptFailureTelemetryParameters(t4: {[any]: any}) -- line: 12
 
 	return t5
 end
-local function formatSetupErrorMessage(p3) -- line: 143
+local function formatSetupErrorMessage(p3) -- line: 152
 	-- upvalues: LocalizationStrings (copy), t2 (copy)
 	local t6 = {
 		isContentPolicy = false,
@@ -115,50 +115,50 @@ local function formatSetupErrorMessage(p3) -- line: 143
 	end
 
 	if t6.errorCode ~= nil then
-		local v36 = t2[t6.errorCode]
+		local v39 = t2[t6.errorCode]
 
-		if v36 ~= nil then
-			return v36
+		if v39 ~= nil then
+			return v39
 		end
 	end
 
 	return LocalizationStrings.CHAT_DEFAULT_FAILURE
 end
-local function createLocalToolControllers(p4) -- line: 154
+local function createLocalToolControllers(p4, p5) -- line: 163
 	-- upvalues: localToolOverlay (copy), askUserController (copy), proposePlanController (copy), clientLogsController (copy)
 	local t7 = {}
-	local v39 = localToolOverlay()
-	local v40 = askUserController(p4, t7, v39)
-	local v41 = proposePlanController(p4, t7, v39)
-	local v42 = clientLogsController(p4, t7)
+	local v43 = localToolOverlay()
+	local v44 = askUserController(p4, t7, v43, p5)
+	local v45 = proposePlanController(p4, t7, v43, p5)
+	local v46 = clientLogsController(p4, t7)
 
 	return {
-		getOptimisticLocalTools = v39.getOptimisticLocalTools,
-		getLocalToolActions = v39.getLocalToolActions,
-		hasDisplayedAnswerStack = v40.hasDisplayedAnswerStack,
-		syncFromTurnState = function(p5) -- line: 165
-			-- upvalues: v40 (copy), v41 (copy), v42 (copy)
-			v40.syncAnswerStack(p5)
-			v41.syncPlanProposal(p5)
-			v42.syncClientLogsRequest(p5)
+		getOptimisticLocalTools = v43.getOptimisticLocalTools,
+		getLocalToolActions = v43.getLocalToolActions,
+		hasDisplayedAnswerStack = v44.hasDisplayedAnswerStack,
+		syncFromTurnState = function(p6) -- line: 178
+			-- upvalues: v44 (copy), v45 (copy), v46 (copy)
+			v44.syncAnswerStack(p6)
+			v45.syncPlanProposal(p6)
+			v46.syncClientLogsRequest(p6)
 		end,
-		trySubmitComposerText = function(s2: string) -- line: 170
-			-- upvalues: v40 (copy), v41 (copy)
-			return v40.trySubmitComposerText(s2) or v41.trySubmitComposerText(s2)
+		trySubmitComposerText = function(s2: string) -- line: 183
+			-- upvalues: v44 (copy), v45 (copy)
+			return v44.trySubmitComposerText(s2) or v45.trySubmitComposerText(s2)
 		end,
-		stopPending = function() -- line: 173
-			-- upvalues: v40 (copy), v41 (copy)
-			v40.stopPendingAnswer()
-			v41.stopPendingPlan()
+		stopPending = function() -- line: 186
+			-- upvalues: v44 (copy), v45 (copy)
+			v44.stopPendingAnswer()
+			v45.stopPendingPlan()
 		end
 	}
 end
 
 return {
-	createLiveAssistantTurn = function(p6, s3: string, p7: ((...any) -> ...any)) -- line: 182
+	createLiveAssistantTurn = function(p7, s3: string, p8: ((...any) -> ...any), p9) -- line: 195
 		-- upvalues: createLocalToolControllers (copy), StudioAskUserTool (copy), StudioProposePlanTool (copy), StudioClientLogsTool (copy), sendBuildExperienceEvent (copy), resolvePromptFailure (copy), debug (copy), getPromptFailureTelemetryParameters (copy), LocalizationStrings (copy), t2 (copy)
-		local v46 = createLocalToolControllers(p6)
-		local universeId = p6.universeId
+		local v51 = createLocalToolControllers(p7, p9)
+		local universeId = p7.universeId
 		local t8 = {
 			_roblox = {
 				localTools = {
@@ -171,62 +171,62 @@ return {
 				}
 			}
 		}
-		local u49 = nil
+		local u54 = nil
 
-		u49 = p6.sendPrompt({
+		u54 = p7.sendPrompt({
 			prompt = s3,
 			promptMeta = t8,
-			onDroppedChatMessage = function(n1: number) -- line: 205
-				-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), p6 (copy)
+			onDroppedChatMessage = function(n1: number) -- line: 219
+				-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), p7 (copy)
 				sendBuildExperienceEvent("DROPPED_CHAT_MESSAGE", {
 					universeId = universeId,
-					placeId = p6.placeId,
-					conversationId = p6.getCasSessionId(),
+					placeId = p7.placeId,
+					conversationId = p7.getCasSessionId(),
 					messageId = n1
 				})
 			end,
-			onCompleted = function(p8) -- line: 219
-				-- upvalues: resolvePromptFailure (copy), u49 (ref), debug (copy), universeId (copy), p6 (copy), sendBuildExperienceEvent (copy), getPromptFailureTelemetryParameters (copy), p7 (copy)
-				local v66 = resolvePromptFailure(p8, u49.getSetupError(false))
+			onCompleted = function(p10) -- line: 233
+				-- upvalues: resolvePromptFailure (copy), u54 (ref), debug (copy), universeId (copy), p7 (copy), sendBuildExperienceEvent (copy), getPromptFailureTelemetryParameters (copy), p8 (copy)
+				local v72 = resolvePromptFailure(p10, u54.getSetupError(false))
 
-				if v66 ~= nil then
+				if v72 ~= nil then
 					debug.log("info", "prompt send failed", {
-						errorCode = v66.errorCode,
-						isContentPolicy = v66.isContentPolicy,
-						setupStage = v66.setupStage,
+						errorCode = v72.errorCode,
+						isContentPolicy = v72.isContentPolicy,
+						setupStage = v72.setupStage,
 						universeId = universeId,
-						placeId = p6.placeId
+						placeId = p7.placeId
 					})
 					sendBuildExperienceEvent("SEND_PROMPT_FAILED", {
 						universeId = universeId,
-						placeId = p6.placeId,
-						conversationId = p6.getCasSessionId()
-					}, (getPromptFailureTelemetryParameters(v66)))
+						placeId = p7.placeId,
+						conversationId = p7.getCasSessionId()
+					}, (getPromptFailureTelemetryParameters(v72)))
 				end
 
-				p7(v66)
+				p8(v72)
 			end
 		})
 		debug.log("info", "creator agent local tools registered for prompt", {
 			universeId = universeId,
-			placeId = p6.placeId,
+			placeId = p7.placeId,
 			toolName = StudioAskUserTool.TOOL_NAME,
 			planToolName = StudioProposePlanTool.TOOL_NAME,
 			logsToolName = StudioClientLogsTool.TOOL_NAME
 		})
 
 		return {
-			getOptimisticLocalTools = v46.getOptimisticLocalTools,
-			getLocalToolActions = v46.getLocalToolActions,
-			getSetupErrorText = function(p9) -- line: 242
-				-- upvalues: u49 (ref), LocalizationStrings (copy), t2 (copy)
-				local v68 = u49.getSetupError(p9)
+			getOptimisticLocalTools = v51.getOptimisticLocalTools,
+			getLocalToolActions = v51.getLocalToolActions,
+			getSetupErrorText = function(p11) -- line: 256
+				-- upvalues: u54 (ref), LocalizationStrings (copy), t2 (copy)
+				local v74 = u54.getSetupError(p11)
 
-				if v68 ~= nil then
+				if v74 ~= nil then
 					local t9 = {
 						isContentPolicy = false,
-						errorCode = v68.errorCode,
-						setupStage = v68.stage
+						errorCode = v74.errorCode,
+						setupStage = v74.stage
 					}
 
 					if t9.isContentPolicy then
@@ -238,10 +238,10 @@ return {
 					end
 
 					if t9.errorCode ~= nil then
-						local v70 = t2[t9.errorCode]
+						local v76 = t2[t9.errorCode]
 
-						if v70 ~= nil then
-							return v70
+						if v76 ~= nil then
+							return v76
 						end
 					end
 
@@ -250,81 +250,81 @@ return {
 
 				return nil
 			end,
-			start = function() -- line: 255
-				-- upvalues: u49 (ref)
-				u49.start()
+			start = function() -- line: 269
+				-- upvalues: u54 (ref)
+				u54.start()
 			end,
-			stop = function() -- line: 261
-				-- upvalues: v46 (copy), u49 (ref)
-				v46.stopPending()
-				u49.stop()
+			stop = function() -- line: 275
+				-- upvalues: v51 (copy), u54 (ref)
+				v51.stopPending()
+				u54.stop()
 			end,
-			detach = v46.stopPending,
-			syncFromTurnState = v46.syncFromTurnState,
-			trySubmitComposerText = v46.trySubmitComposerText
+			detach = v51.stopPending,
+			syncFromTurnState = v51.syncFromTurnState,
+			trySubmitComposerText = v51.trySubmitComposerText
 		}
 	end,
-	createResumedAssistantTurn = function(p10, p11, p12: ((...any) -> ...any), n2: number?) -- line: 278
+	createResumedAssistantTurn = function(p12, p13, p14: ((...any) -> ...any), n2: number?, p15) -- line: 292
 		-- upvalues: createLocalToolControllers (copy), Signals (copy), sendBuildExperienceEvent (copy)
-		local v54 = createLocalToolControllers(p10)
-		local v55 = Signals.createSignal(nil)
-		local u56 = false
-		local u57 = false
-		local u58 = nil
-		local u59 = nil
+		local v60 = createLocalToolControllers(p12, p15)
+		local v61 = Signals.createSignal(nil)
+		local u62 = false
+		local u63 = false
+		local u64 = nil
+		local u65 = nil
 
-		local function cleanupObservers() -- line: 298
-			-- upvalues: u59 (ref), u58 (ref)
-			if u59 ~= nil then
-				u59()
-				u59 = nil
+		local function cleanupObservers() -- line: 313
+			-- upvalues: u65 (ref), u64 (ref)
+			if u65 ~= nil then
+				u65()
+				u65 = nil
 			end
 
-			if u58 ~= nil then
-				u58()
-				u58 = nil
+			if u64 ~= nil then
+				u64()
+				u64 = nil
 			end
 		end
-		local function finish() -- line: 309
-			-- upvalues: u57 (ref), u59 (ref), u58 (ref), p12 (copy)
-			if u57 then
+		local function finish() -- line: 324
+			-- upvalues: u63 (ref), u65 (ref), u64 (ref), p14 (copy)
+			if u63 then
 				return
 			end
 
-			u57 = true
+			u63 = true
 
-			if u59 ~= nil then
-				u59()
-				u59 = nil
+			if u65 ~= nil then
+				u65()
+				u65 = nil
 			end
 
-			if u58 ~= nil then
-				u58()
-				u58 = nil
+			if u64 ~= nil then
+				u64()
+				u64 = nil
 			end
 
-			p12(nil)
+			p14(nil)
 		end
 
 		return {
-			getOptimisticLocalTools = v54.getOptimisticLocalTools,
-			getLocalToolActions = v54.getLocalToolActions,
-			getSetupErrorText = v55,
-			start = function() -- line: 320
-				-- upvalues: u56 (ref), sendBuildExperienceEvent (copy), p10 (copy), n2 (copy), u58 (ref), u59 (ref), Signals (copy), p11 (copy), u57 (ref), p12 (copy)
-				if u56 then
+			getOptimisticLocalTools = v60.getOptimisticLocalTools,
+			getLocalToolActions = v60.getLocalToolActions,
+			getSetupErrorText = v61,
+			start = function() -- line: 335
+				-- upvalues: u62 (ref), sendBuildExperienceEvent (copy), p12 (copy), n2 (copy), u64 (ref), u65 (ref), Signals (copy), p13 (copy), u63 (ref), p14 (copy)
+				if u62 then
 					return
 				end
 
-				u56 = true
+				u62 = true
 
 				local t10 = {
-					onDroppedChatMessage = function(n3: number) -- line: 326
-						-- upvalues: sendBuildExperienceEvent (copy), p10 (copy)
+					onDroppedChatMessage = function(n3: number) -- line: 341
+						-- upvalues: sendBuildExperienceEvent (copy), p12 (copy)
 						sendBuildExperienceEvent("DROPPED_CHAT_MESSAGE", {
-							universeId = p10.universeId,
-							placeId = p10.placeId,
-							conversationId = p10.getCasSessionId(),
+							universeId = p12.universeId,
+							placeId = p12.placeId,
+							conversationId = p12.getCasSessionId(),
 							messageId = n3
 						})
 					end
@@ -334,65 +334,65 @@ return {
 					t10.afterSequenceId = n2
 				end
 
-				u58 = p10.startPollingActiveTurn(t10)
-				u59 = Signals.createEffect(function(p13) -- line: 340
-					-- upvalues: p11 (copy), u57 (ref), u59 (ref), u58 (ref), p12 (copy)
-					if p11.state(p13).isDone then
-						if u57 then
+				u64 = p12.startPollingActiveTurn(t10)
+				u65 = Signals.createEffect(function(p16) -- line: 355
+					-- upvalues: p13 (copy), u63 (ref), u65 (ref), u64 (ref), p14 (copy)
+					if p13.state(p16).isDone then
+						if u63 then
 							return
 						end
 
-						u57 = true
+						u63 = true
 
-						if u59 ~= nil then
-							u59()
-							u59 = nil
+						if u65 ~= nil then
+							u65()
+							u65 = nil
 						end
 
-						if u58 ~= nil then
-							u58()
-							u58 = nil
+						if u64 ~= nil then
+							u64()
+							u64 = nil
 						end
 
-						p12(nil)
+						p14(nil)
 					end
 				end)
 			end,
-			stop = function() -- line: 352
-				-- upvalues: u57 (ref), u59 (ref), u58 (ref), v54 (copy), p11 (copy)
-				u57 = true
+			stop = function() -- line: 367
+				-- upvalues: u63 (ref), u65 (ref), u64 (ref), v60 (copy), p13 (copy)
+				u63 = true
 
-				if u59 ~= nil then
-					u59()
-					u59 = nil
+				if u65 ~= nil then
+					u65()
+					u65 = nil
 				end
 
-				if u58 ~= nil then
-					u58()
-					u58 = nil
+				if u64 ~= nil then
+					u64()
+					u64 = nil
 				end
 
-				v54.stopPending()
-				p11.cancel()
+				v60.stopPending()
+				p13.cancel()
 			end,
-			detach = function() -- line: 358
-				-- upvalues: u57 (ref), u59 (ref), u58 (ref), v54 (copy)
-				u57 = true
+			detach = function() -- line: 373
+				-- upvalues: u63 (ref), u65 (ref), u64 (ref), v60 (copy)
+				u63 = true
 
-				if u59 ~= nil then
-					u59()
-					u59 = nil
+				if u65 ~= nil then
+					u65()
+					u65 = nil
 				end
 
-				if u58 ~= nil then
-					u58()
-					u58 = nil
+				if u64 ~= nil then
+					u64()
+					u64 = nil
 				end
 
-				v54.stopPending()
+				v60.stopPending()
 			end,
-			syncFromTurnState = v54.syncFromTurnState,
-			trySubmitComposerText = v54.trySubmitComposerText
+			syncFromTurnState = v60.syncFromTurnState,
+			trySubmitComposerText = v60.trySubmitComposerText
 		}
 	end,
 	getPromptFailureComposerError = function(t11: {[any]: any}) -- line: 78
@@ -410,6 +410,33 @@ return {
 
 			if v25 ~= nil then
 				return v25
+			end
+		end
+
+		return LocalizationStrings.CHAT_DEFAULT_FAILURE
+	end,
+	getToolResultFailureComposerError = function(n4: number?) -- line: 94
+		-- upvalues: Forbidden (copy), LocalizationStrings (copy), t2 (copy)
+		local t12 = {
+			outOfCreditsReason = nil,
+			setupStage = nil,
+			errorCode = n4,
+			isContentPolicy = n4 == Forbidden
+		}
+
+		if t12.isContentPolicy then
+			return LocalizationStrings.CHAT_POLICY_REJECTION
+		end
+
+		if t12.setupStage == "missing_project" then
+			return LocalizationStrings.CHAT_MISSING_PROJECT
+		end
+
+		if t12.errorCode ~= nil then
+			local v28 = t2[t12.errorCode]
+
+			if v28 ~= nil then
+				return v28
 			end
 		end
 

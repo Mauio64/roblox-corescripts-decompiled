@@ -7,9 +7,13 @@ local getDeepValue = dependencies.SocialLibraries.Dictionary.getDeepValue
 local getRbxthumbWithTypeSizeAndOptions = dependencies.getRbxthumbWithTypeSizeAndOptions
 local UserLibConstants = dependencies.UserLibConstants
 
-return function(p1) -- line: 11
+if require(FriendsLanding.Flags.FFlagFriendsLandingDeprecateUnusedMapToUsers) then
+	return nil
+end
+
+return function(p1) -- line: 17
 	-- upvalues: t (copy), getDeepValue (copy), llama (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), RoduxPresence (copy)
-	return function(p2) -- line: 12
+	return function(p2) -- line: 18
 		-- upvalues: t (copy), getDeepValue (copy), p1 (copy), llama (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), RoduxPresence (copy)
 		assert(t.string(p2))
 
@@ -17,7 +21,7 @@ return function(p1) -- line: 11
 		local v12 = p1.FriendsLanding.DeletedUsers or nil
 		local VerifiedUsers = p1.FriendsLanding.VerifiedUsers
 
-		return llama.Dictionary.map(v11, function(p3) -- line: 18
+		return llama.Dictionary.map(v11, function(p3) -- line: 24
 			-- upvalues: p1 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), llama (copy), getDeepValue (copy), RoduxPresence (copy), v12 (copy), VerifiedUsers (copy)
 			local v15 = if not p1.isTest then getRbxthumbWithTypeSizeAndOptions(p3, UserLibConstants.RbxthumbTypes.Avatar, 352) else ""
 

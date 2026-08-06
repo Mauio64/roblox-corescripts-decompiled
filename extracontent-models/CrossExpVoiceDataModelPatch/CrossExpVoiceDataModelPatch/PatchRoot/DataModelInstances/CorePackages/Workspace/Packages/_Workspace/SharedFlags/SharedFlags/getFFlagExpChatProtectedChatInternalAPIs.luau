@@ -1,7 +1,5 @@
-local TextChatService = game:GetService("TextChatService")
-local v2 = game:DefineFastFlag("ExpChatUseInternalTextChatAPIs", false) and (game:GetEngineFeature("TextChatServiceInternalAPIs2") and (game:GetEngineFeature("TextChatServiceProtectedChatEnabled") and TextChatService:IsProtectedChatEnabled()))
+game:DefineFastFlag("ExpChatUseInternalTextChatAPIs2", false)
 
-return function() -- line: 16
-	-- upvalues: v2 (copy)
-	return v2
+return function() -- line: 12
+	return game:GetFastFlag("ExpChatUseInternalTextChatAPIs2") and (game:GetEngineFeature("TextChatServiceInternalAPIs2") and (game:GetEngineFeature("TextChatServiceProtectedChatEnabled") and game:GetService("TextChatService"):IsProtectedChatEnabled()))
 end

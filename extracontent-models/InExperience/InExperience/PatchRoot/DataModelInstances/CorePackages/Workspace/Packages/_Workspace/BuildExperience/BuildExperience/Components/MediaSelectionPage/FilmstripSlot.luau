@@ -22,7 +22,7 @@ local useTokens = Foundation.Hooks.useTokens
 
 require(script.Parent.types)
 
-local function FilmstripSlot(t1: {[any]: any}) -- line: 48
+local function FilmstripSlot(t1: {[any]: any}) -- line: 47
 	-- upvalues: useTokens (copy), React (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), InputSize (copy), FoundationImage (copy), IconButton (copy), Badge (copy), IconPosition (copy), LocalizationStrings (copy), BadgeVariant (copy), BadgeShape (copy), BadgeSize (copy)
 	local v24 = useTokens()
 	local v25 = if not t1.isSelected then v24.Color.Stroke.Default.Color3 else v24.Color.Content.Emphasis.Color3
@@ -61,7 +61,7 @@ local function FilmstripSlot(t1: {[any]: any}) -- line: 48
 				BackgroundTransparency = 1,
 				Text = "",
 				ZIndex = 1,
-				[React.Event.Activated] = t1.onEmptySlotPressed or function() -- line: 89
+				[React.Event.Activated] = t1.onEmptySlotPressed or function() -- line: 88
 				end
 			}),
 			PlusIcon = React.createElement(View, {

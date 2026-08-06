@@ -3,7 +3,7 @@ local HttpService = game:GetService("HttpService")
 
 require(Parent.HttpClient)
 
-local function tryJsonDecode(p1) -- line: 11
+local function tryJsonDecode(p1) -- line: 10
 	-- upvalues: HttpService (copy)
 	if p1 == nil or p1 == "" then
 		return nil
@@ -18,9 +18,9 @@ local function tryJsonDecode(p1) -- line: 11
 
 	return nil
 end
-local function rpcDecoder() -- line: 20
+local function rpcDecoder() -- line: 19
 	-- upvalues: HttpService (copy)
-	return function(p2) -- line: 21
+	return function(p2) -- line: 20
 		-- upvalues: HttpService (copy)
 		local responseBody = p2.responseBody
 		local v11

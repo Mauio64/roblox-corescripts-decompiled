@@ -31,6 +31,7 @@ local function FoundationProvider(p1) -- line: 34
 		React.createElement(ElevationProvider, nil),
 		React.createElement(PreferencesProvider, v18),
 		React.createElement(StyleProvider, {
+			colorMode = p1.colorMode,
 			theme = p1.theme,
 			device = p1.device,
 			derives = p1.derives,

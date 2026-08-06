@@ -1,6 +1,6 @@
 local t1 = {}
 
-local function coerceToString(p1) -- line: 32
+local function coerceToString(p1) -- line: 33
 	if p1 == nil then
 		return ""
 	end
@@ -8,10 +8,10 @@ local function coerceToString(p1) -- line: 32
 	return (tostring(p1))
 end
 
-function t1.sanitizeSegment(p2) -- line: 39
+function t1.sanitizeSegment(p2) -- line: 40
 	return (((if p2 ~= nil then tostring(p2) else "")):gsub("%s+", "_"):gsub("[^%w_]", ""))
 end
-function t1.build(t2: {[any]: any}) -- line: 50
+function t1.build(t2: {[any]: any}) -- line: 51
 	-- upvalues: t1 (copy)
 	local t3 = {}
 
@@ -25,7 +25,7 @@ function t1.build(t2: {[any]: any}) -- line: 50
 
 	return table.concat(t3, "-")
 end
-function t1.chatLandingTopBarIconButton(s1: string) -- line: 61
+function t1.chatLandingTopBarIconButton(s1: string) -- line: 62
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -35,7 +35,16 @@ function t1.chatLandingTopBarIconButton(s1: string) -- line: 61
 		s1
 	})
 end
-function t1.chatLandingConversationListHeader(s2: string) -- line: 71
+function t1.appChatLoadingOverlayBackButton() -- line: 72
+	-- upvalues: t1 (copy)
+	return t1.build({
+		"chat",
+		"loadingOverlay",
+		"button",
+		"back"
+	})
+end
+function t1.chatLandingConversationListHeader(s2: string) -- line: 81
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -45,7 +54,7 @@ function t1.chatLandingConversationListHeader(s2: string) -- line: 71
 		s2
 	})
 end
-function t1.chatLandingConversationEntry(s3: string) -- line: 81
+function t1.chatLandingConversationEntry(s3: string) -- line: 91
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -55,7 +64,7 @@ function t1.chatLandingConversationEntry(s3: string) -- line: 81
 		s3
 	})
 end
-function t1.chatLandingConversationEntrySquadButton(s4: string) -- line: 91
+function t1.chatLandingConversationEntrySquadButton(s4: string) -- line: 101
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -66,7 +75,7 @@ function t1.chatLandingConversationEntrySquadButton(s4: string) -- line: 91
 		`squad_{ s4 }`
 	})
 end
-function t1.chatDetailsTopBarActionButton(s5: string) -- line: 102
+function t1.chatDetailsTopBarActionButton(s5: string) -- line: 112
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -76,7 +85,7 @@ function t1.chatDetailsTopBarActionButton(s5: string) -- line: 102
 		s5
 	})
 end
-function t1.chatDetailsListActionButton(s6: string) -- line: 112
+function t1.chatDetailsListActionButton(s6: string) -- line: 122
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -86,7 +95,7 @@ function t1.chatDetailsListActionButton(s6: string) -- line: 112
 		s6
 	})
 end
-function t1.chatDetailsParticipantMoreButton(s7: string) -- line: 122
+function t1.chatDetailsParticipantMoreButton(s7: string) -- line: 132
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -98,7 +107,7 @@ function t1.chatDetailsParticipantMoreButton(s7: string) -- line: 122
 		`{ s7 }_moreDetails`
 	})
 end
-function t1.chatConversationTopBarButton(s8: string) -- line: 134
+function t1.chatConversationTopBarButton(s8: string) -- line: 144
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -108,7 +117,7 @@ function t1.chatConversationTopBarButton(s8: string) -- line: 134
 		s8
 	})
 end
-function t1.chatConversationSystemMessageCard(p3) -- line: 144
+function t1.chatConversationSystemMessageCard(p3) -- line: 154
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -118,7 +127,7 @@ function t1.chatConversationSystemMessageCard(p3) -- line: 144
 		if type(p3) ~= "table" then p3 else table.concat(p3, "_")
 	})
 end
-function t1.chatConversationSystemMessage(s9: string) -- line: 154
+function t1.chatConversationSystemMessage(s9: string) -- line: 164
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -128,7 +137,7 @@ function t1.chatConversationSystemMessage(s9: string) -- line: 154
 		s9
 	})
 end
-function t1.selectChatMembersUserCellWithCheckbox(s10: string, b1: boolean) -- line: 164
+function t1.selectChatMembersUserCellWithCheckbox(s10: string, b1: boolean) -- line: 174
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -139,7 +148,7 @@ function t1.selectChatMembersUserCellWithCheckbox(s10: string, b1: boolean) -- l
 		`{ s10 }_{ not b1 and "unchecked" or "checked" }`
 	})
 end
-function t1.selectChatMembersSearchInput(s11: string?) -- line: 175
+function t1.selectChatMembersSearchInput(s11: string?) -- line: 185
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",
@@ -149,7 +158,7 @@ function t1.selectChatMembersSearchInput(s11: string?) -- line: 175
 		s11
 	})
 end
-function t1.selectChatMembersTopBarActionButton(s12: string) -- line: 185
+function t1.selectChatMembersTopBarActionButton(s12: string) -- line: 195
 	-- upvalues: t1 (copy)
 	return t1.build({
 		"chat",

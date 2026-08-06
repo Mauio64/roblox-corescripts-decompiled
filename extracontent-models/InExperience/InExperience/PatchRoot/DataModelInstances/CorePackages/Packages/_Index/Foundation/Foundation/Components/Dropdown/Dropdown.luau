@@ -27,7 +27,7 @@ local t2 = {
 	position = PopoverSide.Bottom
 }
 
-local function Dropdown(p1, p2) -- line: 80
+local function Dropdown(p1, p2) -- line: 83
 	-- upvalues: withDefaults (copy), t1 (copy), Flags (copy), InputVariant (copy), React (copy), markSelectedItem (copy), Popover (copy), DropdownControl (copy), withCommonProps (copy), PopoverAlign (copy), t2 (copy), Radius (copy), BaseMenu (copy)
 	local v21 = withDefaults(p1, t1)
 
@@ -38,14 +38,14 @@ local function Dropdown(p1, p2) -- line: 80
 	local v22, v23 = React.useState(false)
 	local v24 = React.useRef(nil)
 	local v25, v26 = React.useState(nil)
-	local v27 = React.useCallback(function(p3) -- line: 89
+	local v27 = React.useCallback(function(p3) -- line: 92
 		-- upvalues: v24 (copy), v26 (copy)
 		v24.current = p3
 		v26(p3)
 	end, {})
 
 	if Flags.FoundationDropdownSelectionProps then
-		React.useImperativeHandle(p2, function() -- line: 95
+		React.useImperativeHandle(p2, function() -- line: 98
 			-- upvalues: v25 (copy)
 			return v25
 		end, { v25 })
@@ -53,23 +53,23 @@ local function Dropdown(p1, p2) -- line: 80
 
 	local v28, v29 = React.useBinding(v21.width)
 	local v30, v31 = markSelectedItem(v21.items, v21.value)
-	local v32 = React.useCallback(function() -- line: 105
+	local v32 = React.useCallback(function() -- line: 108
 		-- upvalues: v23 (copy)
-		v23(function(p4) -- line: 106
+		v23(function(p4) -- line: 109
 			return not p4
 		end)
 	end, {})
-	local v33 = React.useCallback(function() -- line: 111
+	local v33 = React.useCallback(function() -- line: 114
 		-- upvalues: v23 (copy)
 		v23(false)
 	end, {})
-	local v34 = React.useCallback(function(p5) -- line: 115
+	local v34 = React.useCallback(function(p5) -- line: 118
 		-- upvalues: v23 (copy), v21 (copy)
 		v23(false)
 		v21.onItemChanged(p5)
 	end, { v21.onItemChanged })
 
-	v21.onAbsoluteSizeChanged = React.useCallback(function(p6) -- line: 120
+	v21.onAbsoluteSizeChanged = React.useCallback(function(p6) -- line: 123
 		-- upvalues: p1 (copy), v29 (copy)
 		if p1.onAbsoluteSizeChanged then
 			p1.onAbsoluteSizeChanged(p6)
@@ -123,6 +123,7 @@ local function Dropdown(p1, p2) -- line: 80
 			maxHeight = v21.maxHeight,
 			onActivated = v34,
 			radius = Radius.Medium,
+			scrollingFrameRef = v21.scrollingFrameRef,
 			testId = `{ v21.testId }--menu`
 		}))
 	})

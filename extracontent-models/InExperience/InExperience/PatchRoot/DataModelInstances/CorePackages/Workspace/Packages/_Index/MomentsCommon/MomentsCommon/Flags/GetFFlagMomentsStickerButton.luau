@@ -1,5 +1,5 @@
-game:DefineFastFlag("MomentsStickerButton", false)
+game:DefineFastFlag("MomentsStickerButton2", false)
 
 return function() -- line: 3
-	return game:GetFastFlag("MomentsStickerButton") and game:GetEngineFeature("MomentsStickerOverlay")
+	return game:GetFastFlag("MomentsStickerButton2") and game:GetEngineFeature("MomentsStickerOverlay")
 end

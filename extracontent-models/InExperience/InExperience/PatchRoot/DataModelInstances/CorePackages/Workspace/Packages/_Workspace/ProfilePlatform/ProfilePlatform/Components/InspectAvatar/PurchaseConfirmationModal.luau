@@ -10,6 +10,10 @@ local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
 local NumberLocalization = require(ProfilePlatformParent.Localization).NumberLocalization
 local AvatarSaveContext = require(ProfilePlatformParent.AvatarExperienceSave).Context.AvatarSaveContext
+local getIsInsufficientRobuxError = require(ProfilePlatformParent.AvatarExperienceCommon).Utils.getIsInsufficientRobuxError
+local SetCurrentToastMessage = require(ProfilePlatformParent.ToastRodux).Actions.SetCurrentToastMessage
+local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
+local Enums = require(ProfilePlatform.Common.Enums)
 local PurchaseBulkItems = require(ProfilePlatform.Networking.PurchaseBulkItems)
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local useProfileAnalyticsContext = require(ProfilePlatform.Contexts.useProfileAnalyticsContext)
@@ -33,124 +37,154 @@ local EnumsOrientation = Foundation.Enums.Orientation
 local IconName = Foundation.Enums.IconName
 local getIconRichText = Foundation.Utility.getIconRichText
 
-local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 50
-	-- upvalues: useNavigation (copy), useProfileAnalyticsContext (copy), useDispatch (copy), useProfileWrapperContext (copy), React (copy), AvatarSaveContext (copy), useLocalization (copy), FFlagSocialEnableProfileInspectAndBuyAnalytics (copy), EventNames (copy), PurchaseBulkItems (copy), HandlePurchaseItemsSuccess (copy), NumberLocalization (copy), LocalizationService (copy), getIconRichText (copy), IconName (copy), View (copy), FoundationText (copy), FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav (copy), InputHandlers (copy), Dialog (copy), DialogSize (copy), Checkbox (copy), InputSize (copy), EnumsOrientation (copy), ButtonVariant (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy)
-	local v37 = useNavigation()
-	local v38 = useProfileAnalyticsContext()
-	local v39 = useDispatch()
-	local v40 = useProfileWrapperContext()
-	local v41 = React.useContext(AvatarSaveContext)
-	local v42 = t1.navigation.state.params or {}
-	local v43 = v42.totalPrice or 0
-	local v44 = v42.purchasableLineItems or {}
-	local v45 = v42.userId or ""
-	local v46 = v42.purchasedWearIds or {}
-	local v47 = v42.ownedAssetIds or {}
-	local v48 = v42.wearTypeMap or {}
-	local v49 = useLocalization({
+local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 56
+	-- upvalues: useNavigation (copy), useProfileAnalyticsContext (copy), useDispatch (copy), useProfileWrapperContext (copy), React (copy), AvatarSaveContext (copy), RobloxAppHooks (copy), Enums (copy), useLocalization (copy), FFlagSocialEnableProfileInspectAndBuyAnalytics (copy), EventNames (copy), PurchaseBulkItems (copy), HandlePurchaseItemsSuccess (copy), getIsInsufficientRobuxError (copy), SetCurrentToastMessage (copy), NumberLocalization (copy), LocalizationService (copy), getIconRichText (copy), IconName (copy), View (copy), FoundationText (copy), FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav (copy), InputHandlers (copy), Dialog (copy), DialogSize (copy), Checkbox (copy), InputSize (copy), EnumsOrientation (copy), ButtonVariant (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy)
+	local v41 = useNavigation()
+	local v42 = useProfileAnalyticsContext()
+	local v43 = useDispatch()
+	local v44 = useProfileWrapperContext()
+	local v45 = React.useContext(AvatarSaveContext)
+	local v46 = t1.navigation.state.params or {}
+	local v47 = v46.totalPrice or 0
+	local v48 = v46.purchasableLineItems or {}
+	local v49 = v46.userId or ""
+	local v50 = v46.purchasedWearIds or {}
+	local v51 = v46.ownedAssetIds or {}
+	local v52 = v46.wearTypeMap or {}
+	local v53 = RobloxAppHooks.useLocalRobuxBalance()
+	local v54 = if v53 == nil then v46.robuxBalance or 0 else v53
+	local v55 = React.useCallback(function() -- line: 73
+		-- upvalues: v41 (copy), Enums (copy), v47 (copy), v54 (copy)
+		v41.navigate(Enums.Screens.InsufficientRobuxDialog, {
+			totalPrice = v47,
+			robuxBalance = v54
+		})
+	end, {
+		v41,
+		v47,
+		v54
+	})
+	local v56 = useLocalization({
 		buyTitle = "IAPExperience.PurchasePrompt.Header.BuyAvatar",
 		buyAction = "IAPExperience.PurchasePrompt.Action.Buy",
 		totalPrice = "IAPExperience.PurchasePrompt.Label.TotalPriceV2",
 		wearAfterPurchase = "Feature.Catalog.Label.WearAvatarAfterPurchase",
 		purchasePartialFailure = "Feature.Avatar.Heading.LooksPurchasePartialSuccess",
+		purchaseFailed = "CoreScripts.PurchasePrompt.PurchaseFailed.UnknownFailureNoItemName",
 		purchaseSuccessSingular = {
 			"Feature.Avatar.Message.LooksPurchaseSuccessSingular",
 			numItems = 1
 		},
 		purchaseSuccessPlural = {
 			"Feature.Avatar.Message.LooksPurchaseSuccessPlural",
-			numItems = #v44
+			numItems = #v48
 		}
 	})
-	local v50 = React.useMemo(function() -- line: 78
-		-- upvalues: v49 (copy)
+	local v57 = React.useMemo(function() -- line: 94
+		-- upvalues: v56 (copy)
 		return {
-			purchaseSuccessSingular = v49.purchaseSuccessSingular,
-			purchaseSuccessPlural = v49.purchaseSuccessPlural,
-			purchasePartialFailure = v49.purchasePartialFailure
+			purchaseSuccessSingular = v56.purchaseSuccessSingular,
+			purchaseSuccessPlural = v56.purchaseSuccessPlural,
+			purchasePartialFailure = v56.purchasePartialFailure
 		}
 	end, {
-		v49.purchaseSuccessSingular,
-		v49.purchaseSuccessPlural,
-		v49.purchasePartialFailure
+		v56.purchaseSuccessSingular,
+		v56.purchaseSuccessPlural,
+		v56.purchasePartialFailure
 	})
-	local v51, v52 = React.useState(false)
-	local v53, v54 = React.useState(true)
-	local v55 = React.useCallback(function() -- line: 93
-		-- upvalues: v51 (copy), v37 (copy)
-		if v51 then
+	local v58, v59 = React.useState(false)
+	local v60, v61 = React.useState(true)
+	local v62 = React.useCallback(function() -- line: 109
+		-- upvalues: v58 (copy), v41 (copy)
+		if v58 then
 			return
 		end
 
-		v37.goBack()
+		v41.goBack()
 	end, {
-		v51,
-		v37
+		v58,
+		v41
 	})
-	local v56 = React.useCallback(function() -- line: 101
-		-- upvalues: v51 (copy), v44 (copy), v52 (copy), FFlagSocialEnableProfileInspectAndBuyAnalytics (copy), v38 (copy), EventNames (copy), v40 (copy), PurchaseBulkItems (copy), v45 (copy), HandlePurchaseItemsSuccess (copy), v53 (copy), v46 (copy), v47 (copy), v48 (copy), v41 (copy), v39 (copy), v50 (copy), v37 (copy)
-		if v51 or #v44 == 0 then
+	local v63 = React.useCallback(function() -- line: 117
+		-- upvalues: v58 (copy), v48 (copy), v59 (copy), FFlagSocialEnableProfileInspectAndBuyAnalytics (copy), v42 (copy), EventNames (copy), v44 (copy), PurchaseBulkItems (copy), v49 (copy), HandlePurchaseItemsSuccess (copy), v60 (copy), v50 (copy), v51 (copy), v52 (copy), v45 (copy), v43 (copy), v57 (copy), v41 (copy), getIsInsufficientRobuxError (copy), v55 (copy), SetCurrentToastMessage (copy), v56 (copy)
+		if v58 or #v48 == 0 then
 			return
 		end
 
-		v52(true)
+		v59(true)
 
 		if FFlagSocialEnableProfileInspectAndBuyAnalytics then
-			v38.fireAnalyticsEvent(EventNames.InspectAvatarPurchaseConfirmed, {
-				profileSessionId = v40.profileSessionId
+			v42.fireAnalyticsEvent(EventNames.InspectAvatarPurchaseConfirmed, {
+				profileSessionId = v44.profileSessionId
 			})
 		else
-			v38.fireAnalyticsEvent(EventNames.CatalogItemOpened, {
+			v42.fireAnalyticsEvent(EventNames.CatalogItemOpened, {
 				btnContext = "InspectAvatarBuyAll"
 			})
 		end
 
 		PurchaseBulkItems({
-			userId = v45,
-			lineItems = v44
-		}):andThen(function(p1) -- line: 120
-			-- upvalues: HandlePurchaseItemsSuccess (copy), v53 (copy), v46 (copy), v47 (copy), v48 (copy), v40 (copy), v41 (copy), v39 (copy), v50 (copy)
+			userId = v49,
+			lineItems = v48
+		}):andThen(function(p1) -- line: 138
+			-- upvalues: HandlePurchaseItemsSuccess (copy), v60 (copy), v50 (copy), v51 (copy), v52 (copy), v44 (copy), v45 (copy), v43 (copy), v57 (copy), v41 (copy)
 			HandlePurchaseItemsSuccess({
 				result = p1,
-				isWearAfterPurchaseChecked = v53,
-				purchasedWearIds = v46,
-				ownedAssetIds = v47,
-				wearTypeMap = v48,
-				profileWrapperContext = v40,
-				avatarSaveContext = v41,
-				dispatch = v39,
-				localized = v50
+				isWearAfterPurchaseChecked = v60,
+				purchasedWearIds = v50,
+				ownedAssetIds = v51,
+				wearTypeMap = v52,
+				profileWrapperContext = v44,
+				avatarSaveContext = v45,
+				dispatch = v43,
+				localized = v57
 			})
-		end):finally(function() -- line: 132
-			-- upvalues: v52 (copy), v37 (copy)
-			v52(false)
-			v37.goBack()
+			v41.goBack()
+		end):catch(function(p2) -- line: 152
+			-- upvalues: getIsInsufficientRobuxError (copy), v55 (copy), v43 (copy), SetCurrentToastMessage (copy), v56 (copy), v41 (copy)
+			if getIsInsufficientRobuxError(p2) then
+				v55()
+
+				return
+			end
+
+			v43(SetCurrentToastMessage({
+				isLocalized = true,
+				toastType = "PurchaseMessage",
+				toastMessage = v56.purchaseFailed
+			}))
+			v41.goBack()
+		end):finally(function() -- line: 164
+			-- upvalues: v59 (copy)
+			v59(false)
 		end)
 	end, {
+		v58,
+		v48,
+		v49,
+		v50,
 		v51,
+		v52,
+		v60,
+		v42,
+		v41,
+		v43,
+		v57,
 		v44,
 		v45,
-		v46,
-		v47,
-		v48,
-		v53,
-		v38,
-		v37,
-		v39,
-		v50,
-		v40,
-		v41
+		v55,
+		v56.purchaseFailed
 	})
-	local v57 = React.useMemo(function() -- line: 154
-		-- upvalues: NumberLocalization (copy), v43 (copy), LocalizationService (copy), getIconRichText (copy), IconName (copy)
-		local v61 = NumberLocalization.localize(v43, LocalizationService.RobloxLocaleId)
+	local v64 = React.useMemo(function() -- line: 187
+		-- upvalues: NumberLocalization (copy), v47 (copy), LocalizationService (copy), getIconRichText (copy), IconName (copy)
+		local v68 = NumberLocalization.localize(v47, LocalizationService.RobloxLocaleId)
 
-		return `{ getIconRichText(IconName.Robux) } { v61 }`
+		return `{ getIconRichText(IconName.Robux) } { v68 }`
 	end, {
-		v43,
+		v47,
 		LocalizationService.RobloxLocaleId
 	})
-	local v58 = React.createElement(View, {
+	local v65 = React.createElement(View, {
 		LayoutOrder = 1,
 		tag = "size-full-1300 padding-left-xxsmall padding-right-xxsmall padding-top-small padding-bottom-large"
 	}, {
@@ -165,7 +199,7 @@ local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 50
 				Label = React.createElement(FoundationText, {
 					LayoutOrder = 1,
 					tag = "auto-xy text-title-medium content-default text-align-x-left padding-y-xsmall",
-					Text = v49.totalPrice
+					Text = v56.totalPrice
 				})
 			}),
 			RightSide = React.createElement(View, {
@@ -177,27 +211,27 @@ local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 50
 					LayoutOrder = 1,
 					tag = "auto-xy text-title-medium content-emphasis text-align-x-right padding-y-xsmall",
 					RichText = true,
-					Text = v57
+					Text = v64
 				})
 			})
 		})
 	})
-	local v59 = if not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav then nil else React.useMemo(function() -- line: 193
-		-- upvalues: InputHandlers (copy), v55 (copy)
-		return InputHandlers.onRelease(function(p2) -- line: 194
-			-- upvalues: v55 (copy)
-			p2:cancel()
-			v55()
+	local v66 = if not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav then nil else React.useMemo(function() -- line: 226
+		-- upvalues: InputHandlers (copy), v62 (copy)
+		return InputHandlers.onRelease(function(p3) -- line: 227
+			-- upvalues: v62 (copy)
+			p3:cancel()
+			v62()
 		end)
-	end, { v55 })
-	local v60 = React.createElement(Dialog.Root, {
+	end, { v62 })
+	local v67 = React.createElement(Dialog.Root, {
 		size = DialogSize.Small,
-		onClose = v55,
+		onClose = v62,
 		hasBackdrop = not not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav or nil
 	}, {
 		DialogTitle = React.createElement(Dialog.Title, {
 			LayoutOrder = 1,
-			text = v49.buyTitle
+			text = v56.buyTitle
 		}),
 		DialogContent = React.createElement(Dialog.Content, {
 			LayoutOrder = 2
@@ -205,17 +239,17 @@ local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 50
 			Body = React.createElement(View, {
 				tag = "col gap-medium auto-y size-full-0 align-x-left"
 			}, {
-				PriceTotal = v58,
+				PriceTotal = v65,
 				WearCheckbox = React.createElement(Checkbox, {
 					LayoutOrder = 2,
-					label = v49.wearAfterPurchase,
+					label = v56.wearAfterPurchase,
 					size = InputSize.XSmall,
-					isChecked = v53,
-					onActivated = function() -- line: 222
-						-- upvalues: v54 (copy), v53 (copy)
-						v54(not v53)
+					isChecked = v60,
+					onActivated = function() -- line: 255
+						-- upvalues: v61 (copy), v60 (copy)
+						v61(not v60)
 					end,
-					isDisabled = v51
+					isDisabled = v58
 				})
 			})
 		}),
@@ -223,9 +257,9 @@ local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 50
 			LayoutOrder = 3,
 			orientation = EnumsOrientation.Horizontal,
 			actions = {{
-				text = v49.buyAction,
+				text = v56.buyAction,
 				variant = ButtonVariant.Emphasis,
-				onActivated = v56
+				onActivated = v63
 			}}
 		})
 	})
@@ -237,15 +271,15 @@ local function PurchaseConfirmationModal(t1: {[any]: any}) -- line: 50
 			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
 			customEventHandlers = {
 				[FocusNavigationEventNameEnum.NavigateBack] = {
-					handler = v59
+					handler = v66
 				}
 			}
 		}, {
-			Dialog = v60
+			Dialog = v67
 		})
 	end
 
-	return v60
+	return v67
 end
 
 return PurchaseConfirmationModal

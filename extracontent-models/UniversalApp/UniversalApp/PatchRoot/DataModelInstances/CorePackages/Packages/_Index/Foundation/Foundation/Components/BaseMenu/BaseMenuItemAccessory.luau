@@ -14,12 +14,12 @@ local PresentationContext = require(Foundation.Providers.Style.PresentationConte
 require(Foundation.Providers.Style.Tokens)
 
 local AccessoryType = require(Foundation.Enums.AccessoryType)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 
 require(Foundation.Enums.InputSize)
 
 local function Accessory(t1: {[any]: any}) -- line: 46
-	-- upvalues: AccessoryType (copy), React (copy), View (copy), PresentationContext (copy), ColorMode (copy), Avatar (copy), Text (copy), Badge (copy), Icon (copy)
+	-- upvalues: AccessoryType (copy), React (copy), View (copy), PresentationContext (copy), ColorNamespace (copy), Avatar (copy), Text (copy), Badge (copy), Icon (copy)
 	local accessory = t1.accessory
 
 	if accessory == nil then
@@ -37,7 +37,7 @@ local function Accessory(t1: {[any]: any}) -- line: 46
 			Avatar = React.createElement(PresentationContext.Provider, {
 				value = {
 					isIconSize = true,
-					colorMode = ColorMode.Color
+					colorNamespace = ColorNamespace.Color
 				}
 			}, {
 				Avatar = React.createElement(Avatar, {

@@ -32,7 +32,7 @@ local t1 = {
 	groups = {}
 }
 
-local function getKeyboardTop() -- line: 71
+local function getKeyboardTop() -- line: 69
 	-- upvalues: UserInputService (copy), GuiService (copy)
 	if not UserInputService.OnScreenKeyboardVisible then
 		return 0
@@ -42,12 +42,12 @@ local function getKeyboardTop() -- line: 71
 
 	return (math.max(0, UserInputService.OnScreenKeyboardPosition.Y - GuiInset.Y))
 end
-local function useUniverseSummary(n1: number?) -- line: 79
+local function useUniverseSummary(n1: number?) -- line: 77
 	-- upvalues: UniverseConfiguration (copy), React (copy), Signals (copy), SignalsReact (copy)
 	local v31 = UniverseConfiguration.getUniverseConfigurationStore()
-	local v32 = React.useMemo(function() -- line: 81
+	local v32 = React.useMemo(function() -- line: 79
 		-- upvalues: Signals (copy), n1 (copy), v31 (copy)
-		return Signals.createComputed(function(p1) -- line: 82
+		return Signals.createComputed(function(p1) -- line: 80
 			-- upvalues: n1 (copy), v31 (copy)
 			if n1 == nil or n1 == 0 then
 				return nil
@@ -62,7 +62,7 @@ local function useUniverseSummary(n1: number?) -- line: 79
 
 	return SignalsReact.useSignalState(v32)
 end
-local function getHydratedExperienceName(s1: string, p2) -- line: 93
+local function getHydratedExperienceName(s1: string, p2) -- line: 91
 	local v35 = if p2 == nil then nil else p2.name
 
 	if typeof(v35) == "string" and v35 ~= "" then
@@ -71,7 +71,7 @@ local function getHydratedExperienceName(s1: string, p2) -- line: 93
 
 	return s1
 end
-local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
+local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 99
 	-- upvalues: useTokens (copy), useUniverseSummary (copy), GetBuildOverflowMenuStore (copy), GetCreatorAgentResumeStore (copy), React (copy), EngineFeature (copy), v19 (copy), UserInputService (copy), GuiService (copy), PermissionsProtocol (copy), MessageBusService (copy), MessageId (copy), default (copy), CreatorAgentChat (copy), useChatSessionCore (copy), useChatPlaytestFooter (copy), UniverseConfiguration (copy), useCreatorCreditChatUpsellViewModel (copy), sendBuildExperienceEvent (copy), t1 (copy)
 	local v37 = useTokens()
 	local v38 = useUniverseSummary(t2.target.universeId)
@@ -83,7 +83,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 	local v47, v48 = React.useState(false)
 	local v49, v50 = React.useState(false)
 	local v51, v52 = React.useState(false)
-	local v53, v54 = React.useState(function() -- line: 114
+	local v53, v54 = React.useState(function() -- line: 112
 		-- upvalues: EngineFeature (copy), v19 (copy)
 		return EngineFeature and v19.wasPushNotificationsUpsellShownToday()
 	end)
@@ -102,9 +102,9 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 
 	local v61, v62 = useState(n2)
 	local v63, v64 = React.useState(0)
-	local v65 = React.useCallback(function() -- line: 124
+	local v65 = React.useCallback(function() -- line: 122
 		-- upvalues: PermissionsProtocol (copy), v57 (copy), v46 (copy), v52 (copy)
-		return PermissionsProtocol.default:hasPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p3) -- line: 129
+		return PermissionsProtocol.default:hasPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p3) -- line: 127
 			-- upvalues: v57 (copy), v46 (copy), PermissionsProtocol (copy), v52 (copy)
 			if v57.current then
 				v46(p3.status)
@@ -113,32 +113,32 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 					v52(false)
 				end
 			end
-		end, function() -- line: 136
+		end, function() -- line: 134
 		end)
 	end, {})
 
-	React.useEffect(function() -- line: 141
+	React.useEffect(function() -- line: 139
 		-- upvalues: v57 (copy), v65 (copy), MessageBusService (copy), MessageId (copy)
 		v57.current = true
 		v65()
 
 		local v98 = MessageBusService:Subscribe(MessageId, v65, false, true)
 
-		return function() -- line: 146
+		return function() -- line: 144
 			-- upvalues: v57 (copy), v98 (copy)
 			v57.current = false
 			v98:Disconnect()
 		end
 	end, { v65 })
 
-	local v66 = React.useCallback(function() -- line: 152
+	local v66 = React.useCallback(function() -- line: 150
 		-- upvalues: v49 (copy), v50 (copy), PermissionsProtocol (copy), v57 (copy), v46 (copy), v52 (copy)
 		if v49 then
 			return
 		end
 
 		v50(true)
-		PermissionsProtocol.default:requestPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p4) -- line: 162
+		PermissionsProtocol.default:requestPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function(p4) -- line: 160
 			-- upvalues: v57 (copy), v46 (copy), PermissionsProtocol (copy), v52 (copy), v50 (copy)
 			if not v57.current then
 				return
@@ -151,23 +151,23 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 			end
 
 			v50(false)
-		end, function() -- line: 171
+		end, function() -- line: 169
 			-- upvalues: v57 (copy), v50 (copy)
 			if v57.current then
 				v50(false)
 			end
 		end)
 	end, { v49 })
-	local v67 = React.useCallback(function() -- line: 178
+	local v67 = React.useCallback(function() -- line: 176
 		-- upvalues: default (copy)
-		default:switchToSettingsApp():catch(function() -- line: 179
+		default:switchToSettingsApp():catch(function() -- line: 177
 		end)
 	end, {})
-	local v68 = React.useCallback(function() -- line: 182
+	local v68 = React.useCallback(function() -- line: 180
 		-- upvalues: v48 (copy)
 		v48(true)
 	end, {})
-	local v69 = React.useCallback(function() -- line: 186
+	local v69 = React.useCallback(function() -- line: 184
 		-- upvalues: v62 (copy), UserInputService (copy), GuiService (copy)
 		local v99 = v62
 		local n3
@@ -183,7 +183,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		v99(n3)
 	end, {})
 
-	React.useEffect(function() -- line: 190
+	React.useEffect(function() -- line: 188
 		-- upvalues: v69 (copy), UserInputService (copy)
 		v69()
 
@@ -191,7 +191,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		local connection2 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(v69)
 		local connection3 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(v69)
 
-		return function() -- line: 198
+		return function() -- line: 196
 			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()
@@ -199,11 +199,11 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		end
 	end, { v69 })
 
-	local v70 = React.useCallback(function(p5) -- line: 205
+	local v70 = React.useCallback(function(p5) -- line: 203
 		-- upvalues: v64 (copy)
 		v64(p5.AbsolutePosition.Y + p5.AbsoluteSize.Y)
 	end, {})
-	local v71 = React.useCallback(function(p6) -- line: 209
+	local v71 = React.useCallback(function(p6) -- line: 207
 		-- upvalues: v44 (copy)
 		local AbsoluteWindowSizeY = p6.AbsoluteWindowSize.Y
 
@@ -211,7 +211,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 	end, {})
 	local v72 = if not (v61 <= 0) and not (v63 <= 0) then math.max(0, v63 - v61) else 0
 	local v73 = t2.target.isNewGameTarget == true
-	local v74 = React.useMemo(function() -- line: 217
+	local v74 = React.useMemo(function() -- line: 215
 		-- upvalues: t2 (copy), v38 (copy)
 		local t3 = {
 			universeId = t2.target.universeId,
@@ -238,7 +238,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		t2.target.gameIcon,
 		v38
 	})
-	local v75 = React.useCallback(function(t4: {[any]: any}) -- line: 240
+	local v75 = React.useCallback(function(t4: {[any]: any}) -- line: 238
 		-- upvalues: t2 (copy), v74 (copy)
 		if t2.onNavigateToResolvedTarget ~= nil then
 			t2.onNavigateToResolvedTarget({
@@ -262,10 +262,10 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		count = 0,
 		reason = nil
 	})
-	local v78 = React.useCallback(function(n4: number?, p7) -- line: 266
+	local v78 = React.useCallback(function(n4: number?, p7) -- line: 264
 		-- upvalues: CreatorAgentChat (copy), v77 (copy)
 		if n4 == CreatorAgentChat.ErrorCodes.OutOfCredits then
-			v77(function(p8) -- line: 268
+			v77(function(p8) -- line: 266
 				-- upvalues: p7 (copy)
 				return {
 					count = p8.count + 1,
@@ -300,10 +300,10 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 	local v87 = v45 == PermissionsProtocol.Status.DENIED and (not v47 and (not v53 or v55))
 	local v88 = React.useRef(false)
 
-	React.useEffect(function() -- line: 304
+	React.useEffect(function() -- line: 302
 		-- upvalues: EngineFeature (copy), v87 (copy), u84 (ref), v79 (copy), v55 (copy), v56 (copy), v54 (copy), v19 (copy)
 		if not EngineFeature then
-			return function() -- line: 306
+			return function() -- line: 304
 			end
 		end
 
@@ -317,7 +317,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 			v56(false)
 		end
 
-		return function() -- line: 320
+		return function() -- line: 318
 		end
 	end, {
 		v87,
@@ -326,7 +326,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		v53,
 		v55
 	})
-	React.useEffect(function() -- line: 331
+	React.useEffect(function() -- line: 329
 		-- upvalues: t2 (copy), v88 (copy), v79 (copy), UniverseConfiguration (copy)
 		local universeId = t2.target.universeId
 		local v117 = v88.current and not v79.isAssistantResponding
@@ -334,7 +334,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		v88.current = v79.isAssistantResponding
 
 		if not v117 or (universeId == nil or universeId == 0) then
-			return function() -- line: 337
+			return function() -- line: 335
 			end
 		end
 
@@ -344,20 +344,20 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 			v118.fetchSummary(universeId)
 		end
 
-		return function() -- line: 344
+		return function() -- line: 342
 		end
 	end, {
 		t2.target.universeId,
 		v79.isAssistantResponding
 	})
-	React.useEffect(function() -- line: 347
+	React.useEffect(function() -- line: 345
 		-- upvalues: v40 (copy), t2 (copy)
 		v40.setActiveTarget({
 			universeId = t2.target.universeId,
 			sessionId = t2.target.sessionId
 		})
 
-		return function() -- line: 352
+		return function() -- line: 350
 			-- upvalues: v40 (copy)
 			v40.setActiveTarget(nil)
 		end
@@ -367,13 +367,13 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		t2.target.sessionId
 	})
 
-	local v89 = React.useCallback(function() -- line: 357
+	local v89 = React.useCallback(function() -- line: 355
 		-- upvalues: v79 (copy)
 		if v79.textBoxRef.current then
 			v79.textBoxRef.current.releaseFocus()
 		end
 	end, { v79.textBoxRef })
-	local v90 = React.useCallback(function() -- line: 363
+	local v90 = React.useCallback(function() -- line: 361
 		-- upvalues: v89 (copy), t2 (copy)
 		v89()
 
@@ -391,7 +391,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		outOfCreditsPromptFailureReason = v76.reason,
 		isAssistantResponding = v79.isAssistantResponding
 	})
-	local v93 = React.useCallback(function() -- line: 378
+	local v93 = React.useCallback(function() -- line: 376
 		-- upvalues: v89 (copy), t2 (copy)
 		v89()
 		t2.onClose()
@@ -399,7 +399,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		v89,
 		t2.onClose
 	})
-	local v94 = React.useCallback(function(p9) -- line: 383
+	local v94 = React.useCallback(function(p9) -- line: 381
 		-- upvalues: v89 (copy), t2 (copy)
 		if p9.type == "openPage" then
 			v89()
@@ -421,7 +421,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		t2.onOpenConfigurationPage,
 		t2.onOpenInvitePicker
 	})
-	local v95 = React.useCallback(function() -- line: 397
+	local v95 = React.useCallback(function() -- line: 395
 		-- upvalues: sendBuildExperienceEvent (copy), t2 (copy), v79 (copy)
 		sendBuildExperienceEvent("PLAY_CLICK", {
 			universeId = t2.target.universeId,
@@ -436,7 +436,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		v79.playtestPlaceId,
 		t2.target.universeId
 	})
-	local v96 = React.useCallback(function() -- line: 407
+	local v96 = React.useCallback(function() -- line: 405
 		-- upvalues: v89 (copy), t2 (copy), subagentTaskState (copy), t1 (copy)
 		v89()
 		t2.onOpenAgentsPage(subagentTaskState or t1)
@@ -445,7 +445,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		t2.onOpenAgentsPage,
 		subagentTaskState
 	})
-	local v97 = React.useCallback(function(s2: string) -- line: 412
+	local v97 = React.useCallback(function(s2: string) -- line: 410
 		-- upvalues: v89 (copy), v42 (copy)
 		v89()
 		v42(s2)
@@ -457,7 +457,7 @@ local function useBuildChatPageViewModel(t2: {[any]: any}) -- line: 101
 		onPageMetricsChanged = v70,
 		selectedChipGroupName = v41,
 		onChipActivated = v97,
-		onChipBottomSheetClose = function() -- line: 423
+		onChipBottomSheetClose = function() -- line: 421
 			-- upvalues: v42 (copy)
 			v42(nil)
 		end,

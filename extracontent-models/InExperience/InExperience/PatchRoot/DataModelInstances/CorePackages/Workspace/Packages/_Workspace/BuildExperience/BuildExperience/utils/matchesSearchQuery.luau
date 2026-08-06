@@ -1,4 +1,4 @@
-local function matchesSearchQuery(s1: string?, s2: string) -- line: 12
+local function matchesSearchQuery(s1: string?, s2: string) -- line: 11
 	if s2 == "" then
 		return true
 	end

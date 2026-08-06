@@ -11,6 +11,7 @@ local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableS
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local InputHandlers = require(ProfilePlatformParent.InputHandlers)
 local FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav
+local FFlagProfileInspectAvatarBuyAll = require(ProfilePlatform.Flags.FFlagProfileInspectAvatarBuyAll)
 local View = Foundation.View
 local FoundationText = Foundation.Text
 local IconButton = Foundation.IconButton
@@ -29,11 +30,11 @@ local CatalogItemRowCardContainer = require(script.Parent.CatalogItemRowCardCont
 local isItemPurchasable = InspectAvatarUtils.isItemPurchasable
 
 local function InspectAvatarSheet(t1: {[any]: any}) -- line: 69
-	-- upvalues: useLocalization (copy), ItemDisplayHelpers (copy), React (copy), Dash (copy), CatalogItemRowCardContainer (copy), isItemPurchasable (copy), FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav (copy), InputHandlers (copy), View (copy), DisplayBackground (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy), Skeleton (copy), Divider (copy), BuyActionBar (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy)
-	local v29 = useLocalization({
+	-- upvalues: useLocalization (copy), ItemDisplayHelpers (copy), React (copy), Dash (copy), CatalogItemRowCardContainer (copy), isItemPurchasable (copy), FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav (copy), InputHandlers (copy), View (copy), DisplayBackground (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy), Skeleton (copy), Divider (copy), BuyActionBar (copy), FFlagProfileInspectAvatarBuyAll (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy)
+	local v30 = useLocalization({
 		buyItems = "Feature.Catalog.Label.BuyItems",
+		buyWholeLook = "Feature.Profile.Header.BuyWholeLook",
 		bundle = "Feature.Catalog.Label.Bundle",
-		insufficientRobux = "Feature.Profile.Heading.InsufficientFunds",
 		title = {
 			"Feature.Profile.Header.InspectAndBuy",
 			username = t1.username
@@ -44,40 +45,40 @@ local function InspectAvatarSheet(t1: {[any]: any}) -- line: 69
 			totalNumberOfItems = #t1.displayItems
 		}
 	})
-	local v30 = useLocalization(ItemDisplayHelpers.PRICE_STATUS_LOCALIZATION_KEYS)
-	local v31 = useLocalization(ItemDisplayHelpers.ASSET_TYPE_LOCALIZATION_KEYS)
-	local v32 = useLocalization(ItemDisplayHelpers.BUNDLE_TYPE_LOCALIZATION_KEYS)
-	local v33 = React.useMemo(function() -- line: 87
-		-- upvalues: v29 (copy), Dash (copy), v31 (copy), v32 (copy)
+	local v31 = useLocalization(ItemDisplayHelpers.PRICE_STATUS_LOCALIZATION_KEYS)
+	local v32 = useLocalization(ItemDisplayHelpers.ASSET_TYPE_LOCALIZATION_KEYS)
+	local v33 = useLocalization(ItemDisplayHelpers.BUNDLE_TYPE_LOCALIZATION_KEYS)
+	local v34 = React.useMemo(function() -- line: 87
+		-- upvalues: v30 (copy), Dash (copy), v32 (copy), v33 (copy)
 		return {
 			bundleParts = nil,
-			bundle = v29.bundle,
-			assetTypeNames = Dash.join(v31, v32)
+			bundle = v30.bundle,
+			assetTypeNames = Dash.join(v32, v33)
 		}
 	end, {
-		v29.bundle,
-		v31,
-		v32
+		v30.bundle,
+		v32,
+		v33
 	})
 	local t2 = {}
 
-	for v35, v36 in t1.displayItems do
-		local id = v36.id
+	for v36, v37 in t1.displayItems do
+		local id = v37.id
 
 		t2[`item_{ id }`] = React.createElement(CatalogItemRowCardContainer, {
 			rowHeight = 72,
-			asset = v36,
-			index = v35,
+			asset = v37,
+			index = v36,
 			isChecked = t1.selectedItems[id] == true,
-			isPurchasable = isItemPurchasable(v36),
-			localizedStrings = v33,
-			priceStatusLocalized = v30,
+			isPurchasable = isItemPurchasable(v37),
+			localizedStrings = v34,
+			priceStatusLocalized = v31,
 			onToggleItem = t1.onToggleItem,
 			openItemDetails = t1.openItemDetails
 		})
 	end
 
-	local v38 = if not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav then nil else React.useMemo(function() -- line: 114
+	local v39 = if not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav then nil else React.useMemo(function() -- line: 114
 		-- upvalues: InputHandlers (copy), t1 (copy)
 		return InputHandlers.onRelease(function(p1) -- line: 115
 			-- upvalues: t1 (copy)
@@ -129,7 +130,7 @@ local function InspectAvatarSheet(t1: {[any]: any}) -- line: 69
 			Title = React.createElement(FoundationText, {
 				tag = "size-full-0 auto-y padding-y-small text-heading-small text-align-x-left",
 				LayoutOrder = 2,
-				Text = v29.title
+				Text = v30.title
 			}),
 			ScrollWrapper = React.createElement(View, {
 				tag = "fill size-full-0",
@@ -173,13 +174,13 @@ local function InspectAvatarSheet(t1: {[any]: any}) -- line: 69
 			}, {
 				ActionBar = React.createElement(BuyActionBar, {
 					priceLabel = {
-						leftLabel = v29.buyHeader,
+						leftLabel = v30.buyHeader,
 						priceInRobux = tostring(t1.purchaseSummary.totalPrice)
 					},
 					purchaseButtonProps = {
-						purchaseButtonText = if not t1.hasInsufficientFunds then v29.buyItems else v29.insufficientRobux,
+						purchaseButtonText = if not FFlagProfileInspectAvatarBuyAll then v30.buyItems else v30.buyWholeLook,
 						onPurchase = t1.onBuyAll,
-						isDisabled = t1.isLoading or (t1.purchaseSummary.count == 0 or t1.hasInsufficientFunds == true),
+						isDisabled = t1.isLoading or t1.purchaseSummary.count == 0,
 						variant = ButtonVariant.Emphasis
 					}
 				})
@@ -194,7 +195,7 @@ local function InspectAvatarSheet(t1: {[any]: any}) -- line: 69
 			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
 			customEventHandlers = {
 				[FocusNavigationEventNameEnum.NavigateBack] = {
-					handler = v38
+					handler = v39
 				}
 			}
 		}, t4)

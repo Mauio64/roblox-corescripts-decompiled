@@ -25,11 +25,11 @@ local t2 = {
 	}
 }
 
-local function valueLooksLikeToolName(p1) -- line: 36
+local function valueLooksLikeToolName(p1) -- line: 34
 	-- upvalues: t1 (copy)
 	return typeof(p1) == "string" and t1[string.lower(p1)] == true
 end
-local function getRawInputContent(p2) -- line: 40
+local function getRawInputContent(p2) -- line: 38
 	if typeof(p2) == "string" then
 		return p2, nil, nil
 	end
@@ -52,7 +52,7 @@ local function getRawInputContent(p2) -- line: 40
 
 	return content, v14, nil
 end
-local function toolCallLooksLikeProposePlan(p3) -- line: 59
+local function toolCallLooksLikeProposePlan(p3) -- line: 57
 	-- upvalues: t1 (copy)
 	local kind = p3.kind
 
@@ -81,7 +81,7 @@ local function toolCallLooksLikeProposePlan(p3) -- line: 59
 
 	return true
 end
-local function decodePersistedToolResultText(s1: string) -- line: 93
+local function decodePersistedToolResultText(s1: string) -- line: 91
 	-- upvalues: HttpService (copy)
 	local ok, result = pcall(HttpService.JSONDecode, HttpService, s1)
 
@@ -95,7 +95,7 @@ local function decodePersistedToolResultText(s1: string) -- line: 93
 
 	return nil
 end
-local function getPersistedToolResultText(p4) -- line: 103
+local function getPersistedToolResultText(p4) -- line: 101
 	-- upvalues: HttpService (copy)
 	if p4.content == nil then
 		return nil
@@ -125,7 +125,7 @@ local function getPersistedToolResultText(p4) -- line: 103
 
 	return nil
 end
-local function getToolCallOrder(p5, s2: string) -- line: 153
+local function getToolCallOrder(p5, s2: string) -- line: 151
 	if p5.activityItems ~= nil then
 		for v65, v66 in p5.activityItems do
 			if v66.kind == "tool_call" and s2 == v66.toolCallId then
@@ -150,7 +150,7 @@ local function getToolCallOrder(p5, s2: string) -- line: 153
 
 	return 0
 end
-local function decodePlanResult(s3: string) -- line: 176
+local function decodePlanResult(s3: string) -- line: 174
 	-- upvalues: HttpService (copy)
 	local ok, result = pcall(HttpService.JSONDecode, HttpService, s3)
 
@@ -172,7 +172,7 @@ end
 return {
 	TOOL_NAME = "present_plan",
 	LOCAL_TOOL_DEFINITION = t2,
-	extractPlanFromToolCall = function(p6) -- line: 72
+	extractPlanFromToolCall = function(p6) -- line: 70
 		-- upvalues: t1 (copy), getRawInputContent (copy)
 		local kind = p6.kind
 		local g24 = nil
@@ -228,7 +228,7 @@ return {
 			g24 = true
 		until not g24
 	end,
-	findPlanInTurnState = function(p7, t5: {[any]: any}?) -- line: 126
+	findPlanInTurnState = function(p7, t5: {[any]: any}?) -- line: 124
 		-- upvalues: getPersistedToolResultText (copy), t1 (copy), getRawInputContent (copy)
 		local t6 = {}
 		local g53 = nil
@@ -305,7 +305,7 @@ return {
 
 		return nil, nil, nil, nil, nil
 	end,
-	getCompletedPlansFromTurnState = function(p8) -- line: 192
+	getCompletedPlansFromTurnState = function(p8) -- line: 190
 		-- upvalues: t1 (copy), getRawInputContent (copy), getPersistedToolResultText (copy), HttpService (copy), getToolCallOrder (copy)
 		local t7 = {}
 		local t8 = {}
@@ -393,7 +393,7 @@ return {
 
 		return t7
 	end,
-	formatAcceptedContent = function() -- line: 221
+	formatAcceptedContent = function() -- line: 219
 		-- upvalues: HttpService (copy)
 		return {
 			text = HttpService:JSONEncode({
@@ -401,7 +401,7 @@ return {
 			})
 		}
 	end,
-	formatFeedbackContent = function(s4: string) -- line: 229
+	formatFeedbackContent = function(s4: string) -- line: 227
 		-- upvalues: HttpService (copy)
 		return {
 			text = HttpService:JSONEncode({

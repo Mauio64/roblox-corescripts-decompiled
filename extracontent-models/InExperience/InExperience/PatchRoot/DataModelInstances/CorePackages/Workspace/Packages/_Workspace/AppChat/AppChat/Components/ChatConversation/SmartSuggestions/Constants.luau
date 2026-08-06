@@ -1,7 +1,8 @@
 local SuggestionType = require(script.Parent.Types).SuggestionType
 local t1 = {
 	SuggestionType.Message,
-	SuggestionType.GameCard
+	SuggestionType.GameCard,
+	SuggestionType.StartParty
 }
 
 return {

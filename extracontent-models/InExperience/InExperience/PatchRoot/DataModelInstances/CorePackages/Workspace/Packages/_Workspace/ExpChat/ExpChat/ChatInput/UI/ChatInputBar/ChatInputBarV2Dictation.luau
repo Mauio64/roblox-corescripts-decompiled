@@ -9,6 +9,7 @@ local FFlagExpChatFixBackspaceNilTargetChannel = ExpChatShared.Flags.FFlagExpCha
 local FFlagExpChatDictationFTUX = require(ExpChat.Flags.FFlagExpChatDictationFTUX)
 local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
 local v11 = game:DefineFastFlag("ExpChatFocusablePlaceholderText", false)
+local FFlagExpChatInputBarV2CornerAndTruncationFix = require(ExpChat.Flags.FFlagExpChatInputBarV2CornerAndTruncationFix)
 local SharedFlags = require(ExpChatParent.SharedFlags)
 local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
@@ -20,21 +21,21 @@ local useDictationInputBar = require(script.Parent.Dictation.useDictationInputBa
 local useDictationTextArea = require(script.Parent.Dictation.useDictationTextArea)
 local DictationAffordances = require(script.Parent.Dictation.DictationAffordances)
 
-local function lerp(n1: number, n2: number, n3: number) -- line: 44
+local function lerp(n1: number, n2: number, n3: number) -- line: 46
 	return n1 + (n2 - n1) * n3
 end
-local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
-	-- upvalues: Foundation (copy), useDictationInputBar (copy), DictationAffordances (copy), React (copy), useDictationTextArea (copy), StopCountdown (copy), FFlagEnableConsoleExpControls (copy), FFlagExpChatEnableFocusNavigation (copy), ChannelChip (copy), FFlagExpChatFixBackspaceNilTargetChannel (copy), FFlagExpChatUseMessagesStore (copy), Config (copy), v11 (copy), FFlagExpChatPresetChatEnabled (copy), DictationWaveform (copy), FFlagExpChatDictationFTUX (copy), DictationFTUX (copy)
-	local v28 = Foundation.Hooks.useTokens()
+local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 91
+	-- upvalues: Foundation (copy), useDictationInputBar (copy), DictationAffordances (copy), React (copy), useDictationTextArea (copy), FFlagExpChatInputBarV2CornerAndTruncationFix (copy), StopCountdown (copy), FFlagEnableConsoleExpControls (copy), FFlagExpChatEnableFocusNavigation (copy), ChannelChip (copy), FFlagExpChatFixBackspaceNilTargetChannel (copy), FFlagExpChatUseMessagesStore (copy), Config (copy), v11 (copy), FFlagExpChatPresetChatEnabled (copy), DictationWaveform (copy), FFlagExpChatDictationFTUX (copy), DictationFTUX (copy)
+	local v29 = Foundation.Hooks.useTokens()
 	local setTransparency = t1.setTransparency
 	local chatInputBarSettings = t1.chatInputBarSettings
 	local isSpatialUIEnabled = t1.isSpatialUIEnabled
 	local canLocalUserChatDerived = t1.canLocalUserChatDerived
 	local targetChannelWidth = t1.targetChannelWidth
 	local showPlaceholderText = t1.showPlaceholderText
-	local v35 = t1.hasEmptyInputText == true
+	local v36 = t1.hasEmptyInputText == true
 	local cursor = t1.cursor
-	local v37 = useDictationInputBar({
+	local v38 = useDictationInputBar({
 		inputText = t1.inputText,
 		setInputText = t1.setInputText,
 		chatInputBarSettings = chatInputBarSettings,
@@ -47,27 +48,27 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 		onSendRecordingTap = t1.onSendRecordingTap,
 		onTranscriptionStaged = t1.onTranscriptionStaged
 	})
-	local v38 = DictationAffordances.deriveMicSendButton(v37, {
-		hasEmptyInputText = v35,
+	local v39 = DictationAffordances.deriveMicSendButton(v38, {
+		hasEmptyInputText = v36,
 		idleSendIcon = Foundation.Enums.IconName.ArrowMediumUp,
-		idleSendVariant = if not v35 then Foundation.Enums.ButtonVariant.Emphasis else Foundation.Enums.ButtonVariant.Standard,
+		idleSendVariant = if not v36 then Foundation.Enums.ButtonVariant.Emphasis else Foundation.Enums.ButtonVariant.Standard,
 		idleSendActivated = t1.onSendActivated,
-		idleSendDisabled = v35
+		idleSendDisabled = v36
 	})
-	local v39 = DictationAffordances.deriveBackgroundColors(v37, {
+	local v40 = DictationAffordances.deriveBackgroundColors(v38, {
 		defaultColor3 = chatInputBarSettings.BackgroundColor3,
 		defaultTransparency = t1.chatInputBarBackgroundTransparency,
-		listeningColor3 = v28.Color.Shift.Shift_200.Color3,
-		listeningTransparency = v28.Color.Shift.Shift_200.Transparency
+		listeningColor3 = v29.Color.Shift.Shift_200.Color3,
+		listeningTransparency = v29.Color.Shift.Shift_200.Transparency
 	})
-	local v40 = React.useMemo(function() -- line: 132
-		-- upvalues: t1 (copy), v39 (copy)
-		return t1.transparencyValue:map(function(n4: number) -- line: 133
-			-- upvalues: v39 (copy)
+	local v41 = React.useMemo(function() -- line: 134
+		-- upvalues: t1 (copy), v40 (copy)
+		return t1.transparencyValue:map(function(n4: number) -- line: 135
+			-- upvalues: v40 (copy)
 			local t2 = {
-				Color3 = v39.color3
+				Color3 = v40.color3
 			}
-			local baseTransparency = v39.baseTransparency
+			local baseTransparency = v40.baseTransparency
 
 			t2.Transparency = baseTransparency + (1 - baseTransparency) * n4
 
@@ -75,29 +76,29 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 		end)
 	end, {
 		t1.transparencyValue,
-		v39.color3,
-		v39.baseTransparency
+		v40.color3,
+		v40.baseTransparency
 	})
-	local v41 = DictationAffordances.shouldPreventFade(v37)
-	local v42 = React.useMemo(function() -- line: 142
-		-- upvalues: v41 (copy), t1 (copy)
-		if v41 then
-			return t1.transparencyValue:map(function(_: number) -- line: 144
+	local v42 = DictationAffordances.shouldPreventFade(v38)
+	local v43 = React.useMemo(function() -- line: 144
+		-- upvalues: v42 (copy), t1 (copy)
+		if v42 then
+			return t1.transparencyValue:map(function(_: number) -- line: 146
 				return 0
 			end)
 		end
 
 		return t1.transparencyValue
 	end, {
-		v41,
+		v42,
 		t1.transparencyValue
 	})
-	local v43 = useDictationTextArea(v37, {
+	local v44 = useDictationTextArea(v38, {
 		transparencyValue = t1.transparencyValue,
 		showPlaceholderText = showPlaceholderText
 	})
-	local useLongPressOverlay = v38.useLongPressOverlay
-	local micGestureHandlers = v37.micGestureHandlers
+	local useLongPressOverlay = v39.useLongPressOverlay
+	local micGestureHandlers = v38.micGestureHandlers
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
@@ -110,21 +111,25 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 			Size = UDim2.fromScale(1, 0)
 		}, {
 			InputGroup = React.createElement(Foundation.View, {
-				tag = "row align-y-center auto-y padding-x-xxsmall radius-circle",
 				LayoutOrder = 1,
-				backgroundStyle = v40,
+				tag = {
+					["row align-y-center auto-y padding-x-xxsmall"] = true,
+					["radius-circle"] = not FFlagExpChatInputBarV2CornerAndTruncationFix
+				},
+				cornerRadius = if not FFlagExpChatInputBarV2CornerAndTruncationFix then nil else UDim.new(0, 20),
+				backgroundStyle = v41,
 				stroke = {
-					Color = v28.Color.Stroke.Default.Color3,
-					Transparency = setTransparency(v28.Color.Stroke.Default.Transparency, t1.transparencyValue)
+					Color = v29.Color.Stroke.Default.Color3,
+					Transparency = setTransparency(v29.Color.Stroke.Default.Transparency, t1.transparencyValue)
 				},
 				Position = UDim2.fromScale(0, 0),
 				Size = UDim2.fromScale(1, 0)
 			}, {
 				StopCountdown = React.createElement(StopCountdown, {
 					LayoutOrder = 1,
-					countdownProgress = v37.dictation.bindings.countdownProgress,
-					onActivated = v37.dictation.stopDictation,
-					Visible = v37.dictation.bindings.isRecording
+					countdownProgress = v38.dictation.bindings.countdownProgress,
+					onActivated = v38.dictation.stopDictation,
+					Visible = v38.dictation.bindings.isRecording
 				}),
 				TextContainer = React.createElement("Frame", {
 					BackgroundTransparency = 1,
@@ -140,7 +145,7 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 					TargetChannelChip = React.createElement(ChannelChip, {
 						transparency = setTransparency(0, t1.transparencyValue),
 						onAbsoluteSizeChanged = t1.onAbsoluteSizeChanged,
-						onChannelChipActivated = if not FFlagExpChatFixBackspaceNilTargetChannel then t1.resetTargetChannel else function() -- line: 217
+						onChannelChipActivated = if not FFlagExpChatFixBackspaceNilTargetChannel then t1.resetTargetChannel else function() -- line: 223
 							-- upvalues: t1 (copy)
 							t1.resetTargetChannel(t1.isGlobalChatTabActive)
 						end,
@@ -155,7 +160,7 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 						Font = Config.ChatInputBarFont,
 						Text = t1.disabledChatPlaceholderText,
 						Position = UDim2.fromScale(1, 0),
-						Size = targetChannelWidth:map(function(n6: number) -- line: 234
+						Size = targetChannelWidth:map(function(n6: number) -- line: 240
 							return UDim2.new(1, -(n6 + 8), 0, 0)
 						end),
 						TextColor3 = showPlaceholderText and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3,
@@ -163,8 +168,8 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 						TextTransparency = setTransparency(not showPlaceholderText and 0 or 0.5, t1.transparencyValue),
 						Selectable = not not v11 or nil,
 						SelectionImageObject = if not v11 then nil else cursor,
-						TextWrapped = not (FFlagExpChatPresetChatEnabled and (showPlaceholderText and t1.shouldTruncatePlaceholder)),
-						TextTruncate = if not FFlagExpChatPresetChatEnabled or not showPlaceholderText then nil else Enum.TextTruncate.AtEnd,
+						TextWrapped = if not FFlagExpChatInputBarV2CornerAndTruncationFix then not (FFlagExpChatPresetChatEnabled and (showPlaceholderText and t1.shouldTruncatePlaceholder)) else not showPlaceholderText,
+						TextTruncate = if not FFlagExpChatInputBarV2CornerAndTruncationFix or not showPlaceholderText then if not FFlagExpChatPresetChatEnabled or not showPlaceholderText then nil else Enum.TextTruncate.AtEnd else Enum.TextTruncate.AtEnd,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						TextYAlignment = Enum.TextYAlignment.Top,
 						ref = if not v11 then nil else t1.placeholderRef
@@ -174,7 +179,7 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 						AnchorPoint = Vector2.new(1, 0),
 						AutomaticSize = Enum.AutomaticSize.Y,
 						Position = UDim2.fromScale(1, 0),
-						Size = targetChannelWidth:map(function(n7: number) -- line: 268
+						Size = targetChannelWidth:map(function(n7: number) -- line: 277
 							return UDim2.new(1, -(n7 + 8), 0, 0)
 						end)
 					}, {
@@ -192,10 +197,11 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 							PlaceholderColor3 = chatInputBarSettings.PlaceholderColor3,
 							TextColor3 = chatInputBarSettings.TextColor3,
 							TextSize = if not isSpatialUIEnabled then chatInputBarSettings.TextSize else chatInputBarSettings.SpatialPanelTextSize,
-							TextTransparency = v43.textTransparency,
-							TextStrokeTransparency = v43.textStrokeTransparency,
+							TextTransparency = v44.textTransparency,
+							TextStrokeTransparency = v44.textStrokeTransparency,
 							TextStrokeColor3 = chatInputBarSettings.TextStrokeColor3,
-							TextWrapped = true,
+							TextWrapped = not FFlagExpChatInputBarV2CornerAndTruncationFix or not showPlaceholderText,
+							TextTruncate = if not FFlagExpChatInputBarV2CornerAndTruncationFix or not showPlaceholderText then nil else Enum.TextTruncate.AtEnd,
 							TextXAlignment = Enum.TextXAlignment.Left,
 							TextYAlignment = Enum.TextYAlignment.Top,
 							ZIndex = 2,
@@ -213,13 +219,13 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 						AnchorPoint = Vector2.new(0, 0.5),
 						Position = UDim2.fromScale(0, 0.5),
 						Size = UDim2.new(1, 0, 0, if not isSpatialUIEnabled then chatInputBarSettings.TextSize else chatInputBarSettings.SpatialPanelTextSize),
-						Visible = v37.dictation.bindings.isAudioActive
+						Visible = v38.dictation.bindings.isAudioActive
 					}, {
 						List = React.createElement(DictationWaveform, {
-							isActive = v37.isRecording or v37.isListening,
-							audioDeviceInput = v37.dictation.audioDeviceInput,
-							transcribedSamplesBinding = v37.transcribedSamplesBinding,
-							onSample = v37.onWaveformSample
+							isActive = v38.isRecording or v38.isListening,
+							audioDeviceInput = v38.dictation.audioDeviceInput,
+							transcribedSamplesBinding = v38.transcribedSamplesBinding,
+							onSample = v38.onWaveformSample
 						})
 					}),
 					UIFlexItem = React.createElement("UIFlexItem", {
@@ -227,25 +233,25 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 					}),
 					UIPadding = React.createElement("UIPadding", {
 						PaddingBottom = UDim.new(0, 10),
-						PaddingLeft = UDim.new(0, v28.Padding.Medium),
-						PaddingRight = UDim.new(0, v28.Padding.Medium),
+						PaddingLeft = UDim.new(0, v29.Padding.Medium),
+						PaddingRight = UDim.new(0, v29.Padding.Medium),
 						PaddingTop = UDim.new(0, 10)
 					})
 				}),
 				SendButtonContainer = React.createElement(Foundation.View, {
 					tag = "auto-xy padding-xxsmall",
 					LayoutOrder = 3,
-					ref = v37.micButtonSlotRef,
-					GroupTransparency = v42
+					ref = v38.micButtonSlotRef,
+					GroupTransparency = v43
 				}, {
 					SendButton = React.createElement(Foundation.IconButton, {
 						isCircular = true,
-						icon = v38.icon,
-						variant = v38.variant,
+						icon = v39.icon,
+						variant = v39.variant,
 						size = Foundation.Enums.InputSize.Small,
-						isDisabled = v38.isDisabled,
+						isDisabled = v39.isDisabled,
 						Selectable = not useLongPressOverlay and nil,
-						onActivated = if not useLongPressOverlay then v38.onActivated else function() -- line: 364
+						onActivated = if not useLongPressOverlay then v39.onActivated else function() -- line: 379
 						end
 					}),
 					InputTarget = if not useLongPressOverlay or micGestureHandlers == nil then nil else React.createElement("TextButton", {
@@ -255,15 +261,15 @@ local function ChatInputBarV2Dictation(t1: {[any]: any}) -- line: 89
 						Text = "",
 						ZIndex = 2,
 						Selectable = true,
-						SelectionImageObject = v37.micCursor,
+						SelectionImageObject = v38.micCursor,
 						[React.Event.Activated] = micGestureHandlers[React.Event.Activated],
 						[React.Event.InputBegan] = micGestureHandlers[React.Event.InputBegan],
 						[React.Event.InputEnded] = micGestureHandlers[React.Event.InputEnded]
 					})
 				}),
-				FTUX = if not FFlagExpChatDictationFTUX or (not v37.ftux or not v37.ftux.shouldShow) then nil else React.createElement(DictationFTUX, {
-					anchorRef = v37.micButtonSlotRef,
-					onDismiss = if not FFlagExpChatDictationFTUX then nil else v37.ftux.dismiss
+				FTUX = if not FFlagExpChatDictationFTUX or (not v38.ftux or not v38.ftux.shouldShow) then nil else React.createElement(DictationFTUX, {
+					anchorRef = v38.micButtonSlotRef,
+					onDismiss = if not FFlagExpChatDictationFTUX then nil else v38.ftux.dismiss
 				})
 			})
 		})

@@ -1,64 +1,67 @@
-local Parent = script:FindFirstAncestor("SduiSharedUtilities").Parent
-local Cryo = require(Parent.Cryo)
+local SduiSharedUtilities = script:FindFirstAncestor("SduiSharedUtilities")
+local SduiSharedUtilitiesParent = SduiSharedUtilities.Parent
+local Cryo = require(SduiSharedUtilitiesParent.Cryo)
 
-local function createSduiTemplateStore() -- line: 38
+require(SduiSharedUtilities.SduiIntegrationTypes)
+
+local function createSduiTemplateStore() -- line: 24
 	-- upvalues: Cryo (copy)
 	local t1 = {}
 	local t2 = {}
 
 	return {
-		getTemplate = function(s1: string) -- line: 49
+		getTemplate = function(s1: string) -- line: 35
 			-- upvalues: t1 (ref)
 			return t1[s1]
 		end,
-		addTemplates = function(t3: {[any]: any}) -- line: 55
+		addTemplates = function(t3: {[any]: any}) -- line: 41
 			-- upvalues: t1 (ref), Cryo (copy)
 			t1 = Cryo.Dictionary.join(t1, t3)
 		end,
-		recordSurfaceTemplates = function(s2: string, t4: {[any]: any}) -- line: 62
+		recordSurfaceTemplates = function(s2: string, t4: {[any]: any}) -- line: 48
 			-- upvalues: t2 (ref)
 			if t4 == nil then
 				return
 			end
 
-			local v12 = t2[s2]
+			local v13 = t2[s2]
 
-			if v12 == nil then
-				v12 = {}
-				t2[s2] = v12
+			if v13 == nil then
+				v13 = {}
+				t2[s2] = v13
 			end
 
-			for v13, v14 in t4 do
-				v12[v13] = v14
+			for v14, v15 in t4 do
+				v13[v14] = v15
 			end
 		end,
-		getCachedRobloxComponentToTemplateId = function(s3: string) -- line: 80
+		getCachedRobloxComponentToTemplateId = function(s3: string) -- line: 66
 			-- upvalues: t2 (ref)
-			local v16 = t2[s3]
+			local v17 = t2[s3]
 
-			if v16 == nil then
+			if v17 == nil then
 				return {}
 			end
 
-			return v16
+			return v17
 		end,
-		getTemplateForRobloxComponent = function(s4: string, s5: string) -- line: 90
+		getTemplateForRobloxComponent = function(s4: string, s5: string) -- line: 76
 			-- upvalues: t2 (ref), t1 (ref)
-			local v19 = t2[s4]
-
-			if v19 == nil then
-				return nil
-			end
-
-			local v20 = v19[s5]
+			local v20 = t2[s4]
 
 			if v20 == nil then
 				return nil
 			end
 
-			return t1[v20]
+			local v21 = v20[s5]
+
+			if v21 == nil then
+				return nil
+			end
+
+			return t1[v21]
 		end,
-		clear = function() -- line: 102
+		clear = function() -- line: 88
 			-- upvalues: t1 (ref), t2 (ref)
 			t1 = {}
 			t2 = {}
@@ -66,15 +69,15 @@ local function createSduiTemplateStore() -- line: 38
 	}
 end
 
-local u4 = nil
+local u5 = nil
 
-local function getSduiTemplateStore() -- line: 122
-	-- upvalues: u4 (ref), createSduiTemplateStore (copy)
-	if u4 == nil then
-		u4 = createSduiTemplateStore()
+local function getSduiTemplateStore() -- line: 108
+	-- upvalues: u5 (ref), createSduiTemplateStore (copy)
+	if u5 == nil then
+		u5 = createSduiTemplateStore()
 	end
 
-	return u4
+	return u5
 end
 
 return getSduiTemplateStore

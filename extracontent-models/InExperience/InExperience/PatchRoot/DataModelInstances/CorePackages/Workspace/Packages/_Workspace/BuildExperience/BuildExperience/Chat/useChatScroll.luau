@@ -2,7 +2,7 @@ local Parent = script:FindFirstAncestor("BuildExperience").Parent
 local React = require(Parent.React)
 local chatScroll = require(script.Parent.chatScroll)
 
-local function useChatScroll() -- line: 29
+local function useChatScroll() -- line: 27
 	-- upvalues: React (copy), chatScroll (copy)
 	local v5 = React.useRef(nil)
 	local v6 = React.useRef(nil)
@@ -10,13 +10,13 @@ local function useChatScroll() -- line: 29
 	local v8 = React.useRef(true)
 	local v9 = React.useRef(0)
 	local v10 = React.useRef(nil)
-	local v11 = React.useCallback(function() -- line: 37
+	local v11 = React.useCallback(function() -- line: 35
 		-- upvalues: v8 (copy), v10 (copy)
 		if v8.current and v10.current ~= nil then
 			v10.current()
 		end
 	end, {})
-	local v12 = React.useCallback(function() -- line: 43
+	local v12 = React.useCallback(function() -- line: 41
 		-- upvalues: v6 (copy)
 		local current = v6.current
 
@@ -27,7 +27,7 @@ local function useChatScroll() -- line: 29
 			v6.current = nil
 		end
 	end, {})
-	local v13 = React.useCallback(function() -- line: 53
+	local v13 = React.useCallback(function() -- line: 51
 		-- upvalues: v5 (copy), v9 (copy), chatScroll (copy), v7 (copy), v8 (copy)
 		local current = v5.current
 
@@ -37,7 +37,7 @@ local function useChatScroll() -- line: 29
 			v8.current = chatScroll.isScrolledToTop(current)
 		end
 	end, {})
-	local v14 = React.useCallback(function() -- line: 62
+	local v14 = React.useCallback(function() -- line: 60
 		-- upvalues: v13 (copy), v11 (copy)
 		v13()
 		v11()
@@ -45,13 +45,13 @@ local function useChatScroll() -- line: 29
 		v11,
 		v13
 	})
-	local v15 = React.useCallback(function() -- line: 67
+	local v15 = React.useCallback(function() -- line: 65
 		-- upvalues: v5 (copy)
 		local current = v5.current
 
 		return current ~= nil and current.AbsoluteCanvasSize.Y <= current.AbsoluteWindowSize.Y
 	end, {})
-	local v16 = React.useCallback(function() -- line: 72
+	local v16 = React.useCallback(function() -- line: 70
 		-- upvalues: v5 (copy), chatScroll (copy), v9 (copy), v13 (copy)
 		local current = v5.current
 
@@ -60,17 +60,17 @@ local function useChatScroll() -- line: 29
 			v13()
 		end
 	end, { v13 })
-	local v17 = React.useCallback(function() -- line: 80
+	local v17 = React.useCallback(function() -- line: 78
 		-- upvalues: v7 (copy), v16 (copy)
 		if v7.current then
 			v16()
 		end
 	end, { v16 })
-	local v18 = React.useCallback(function() -- line: 86
+	local v18 = React.useCallback(function() -- line: 84
 		-- upvalues: v13 (copy)
 		v13()
 	end, { v13 })
-	local v19 = React.useCallback(function(p1) -- line: 91
+	local v19 = React.useCallback(function(p1) -- line: 89
 		-- upvalues: v5 (copy), v12 (copy), v13 (copy), v16 (copy), v6 (copy), v14 (copy)
 		if p1 == v5.current then
 			return
@@ -87,7 +87,7 @@ local function useChatScroll() -- line: 29
 		v16()
 		task.defer(v16)
 
-		local function onScrollViewportChanged() -- line: 107
+		local function onScrollViewportChanged() -- line: 105
 			-- upvalues: v16 (copy)
 			v16()
 			task.defer(v16)
@@ -104,36 +104,36 @@ local function useChatScroll() -- line: 29
 		v13,
 		v14
 	})
-	local v20 = React.useCallback(function() -- line: 132
+	local v20 = React.useCallback(function() -- line: 130
 		-- upvalues: v13 (copy)
 		v13()
 	end, { v13 })
-	local v21 = React.useCallback(function() -- line: 136
+	local v21 = React.useCallback(function() -- line: 134
 		-- upvalues: v7 (copy), v9 (copy), v16 (copy)
 		if v7.current then
 			v9.current = 0
 			v16()
 		end
 	end, { v16 })
-	local v22 = React.useCallback(function() -- line: 143
+	local v22 = React.useCallback(function() -- line: 141
 		-- upvalues: v9 (copy), v7 (copy), v16 (copy)
 		v9.current = 0
 		v7.current = true
 		v16()
 		task.defer(v16)
 	end, { v16 })
-	local v23 = React.useCallback(function(p2: ((...any) -> ...any)?) -- line: 150
+	local v23 = React.useCallback(function(p2: ((...any) -> ...any)?) -- line: 148
 		-- upvalues: v10 (copy), v11 (copy)
 		v10.current = p2
 		task.defer(v11)
 	end, { v11 })
 
-	React.useEffect(function() -- line: 155
+	React.useEffect(function() -- line: 153
 		-- upvalues: v12 (copy)
 		return v12
 	end, { v12 })
 
-	return React.useMemo(function() -- line: 160
+	return React.useMemo(function() -- line: 158
 		-- upvalues: v19 (copy), v17 (copy), v18 (copy), v20 (copy), v21 (copy), v22 (copy), v15 (copy), v7 (copy), v8 (copy), v23 (copy)
 		return {
 			setScrollingFrame = v19,

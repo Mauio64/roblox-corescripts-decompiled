@@ -22,5 +22,6 @@ return {
 	Utils = {
 		shouldShowLeftHeader = require(script.Utils.shouldShowLeftHeader)
 	},
-	FlyoutScrollAwayControl = require(script.FlyoutScrollAwayControl)
+	FlyoutScrollAwayControl = require(script.FlyoutScrollAwayControl),
+	["jest.config"] = script["jest.config"]
 }

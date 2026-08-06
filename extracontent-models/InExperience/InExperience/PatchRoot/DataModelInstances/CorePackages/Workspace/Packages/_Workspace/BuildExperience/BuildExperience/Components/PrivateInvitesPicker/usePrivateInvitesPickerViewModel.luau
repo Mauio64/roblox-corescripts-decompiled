@@ -14,13 +14,13 @@ local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExpe
 
 require(script.Parent.PrivateInvitesPickerView)
 
-local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
+local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 37
 	-- upvalues: React (copy), sendBuildExperienceEvent (copy), getPrivatePlaytestersStore (copy), SignalsReact (copy), FriendsStore (copy), searchFriendsAsync (copy), useUserPicker (copy), LocalizationStrings (copy)
 	local universeId = t1.universeId
 	local onInvitesSent = t1.onInvitesSent
 	local v15 = React.useRef(false)
 
-	React.useEffect(function() -- line: 44
+	React.useEffect(function() -- line: 43
 		-- upvalues: v15 (copy), sendBuildExperienceEvent (copy), universeId (copy)
 		if v15.current then
 			return
@@ -33,7 +33,7 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 	end, { universeId })
 
 	local v16 = getPrivatePlaytestersStore(false)
-	local v17 = React.useMemo(function() -- line: 53
+	local v17 = React.useMemo(function() -- line: 52
 		-- upvalues: v16 (copy), universeId (copy)
 		return v16.getAndFetchInvitedPlayers(universeId)
 	end, {
@@ -42,7 +42,7 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 	})
 	local v18 = SignalsReact.useSignalState(v17.players)
 	local v19 = SignalsReact.useSignalState(v17.status) ~= "Ready" and 0 or math.max(0, v16.MAX_INVITES - #v18)
-	local v20 = React.useMemo(function() -- line: 66
+	local v20 = React.useMemo(function() -- line: 65
 		-- upvalues: v18 (copy)
 		local t2 = {}
 
@@ -52,21 +52,21 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 
 		return t2
 	end, { v18 })
-	local v21 = React.useMemo(function() -- line: 76
+	local v21 = React.useMemo(function() -- line: 75
 		-- upvalues: FriendsStore (copy)
 		return FriendsStore.get()
 	end, {})
-	local v22 = React.useMemo(function() -- line: 79
+	local v22 = React.useMemo(function() -- line: 78
 		-- upvalues: v21 (copy)
 		return v21.GetAllFriends()
 	end, { v21 })
-	local v23 = React.useMemo(function() -- line: 82
+	local v23 = React.useMemo(function() -- line: 81
 		-- upvalues: v21 (copy)
 		return v21.GetAllFriendsStatus()
 	end, { v21 })
 	local v24 = SignalsReact.useSignalState(v22)
 	local v25 = SignalsReact.useSignalState(v23)
-	local v26 = React.useMemo(function() -- line: 88
+	local v26 = React.useMemo(function() -- line: 87
 		-- upvalues: v24 (copy)
 		local t3 = {}
 
@@ -83,17 +83,17 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 		return t3
 	end, { v24 })
 	local v27 = v25 == "NotReady"
-	local v28 = React.useCallback(function() -- line: 102
+	local v28 = React.useCallback(function() -- line: 101
 		-- upvalues: v21 (copy)
 		v21.FetchMoreFriends()
 	end, { v21 })
-	local v29 = React.useCallback(function(s1: string, s2: string?) -- line: 108
+	local v29 = React.useCallback(function(s1: string, s2: string?) -- line: 107
 		-- upvalues: searchFriendsAsync (copy)
 		return searchFriendsAsync(s1, s2, 20)
 	end, {})
-	local v30 = React.useCallback(function(t4: {[any]: any}, s3: string?) -- line: 112
+	local v30 = React.useCallback(function(t4: {[any]: any}, s3: string?) -- line: 111
 		-- upvalues: v16 (copy), universeId (copy), sendBuildExperienceEvent (copy), onInvitesSent (copy)
-		return v16.sendInvites(universeId, t4, s3):andThen(function() -- line: 115
+		return v16.sendInvites(universeId, t4, s3):andThen(function() -- line: 114
 			-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), t4 (copy), onInvitesSent (copy)
 			sendBuildExperienceEvent("PLAYTESTERS_ADDED", {
 				universeId = universeId
@@ -101,7 +101,7 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 				count = tostring(#t4)
 			})
 			onInvitesSent()
-		end):catch(function(p1) -- line: 121
+		end):catch(function(p1) -- line: 120
 			-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), t4 (copy)
 			sendBuildExperienceEvent("PLAYTESTERS_ADD_FAILED", {
 				universeId = universeId
@@ -115,7 +115,7 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 		universeId,
 		onInvitesSent
 	})
-	local v31 = React.useMemo(function() -- line: 132
+	local v31 = React.useMemo(function() -- line: 131
 		-- upvalues: v26 (copy), v27 (copy), v28 (copy), v29 (copy), v30 (copy), v19 (copy), v20 (copy)
 		return {
 			browseIds = v26,
@@ -137,18 +137,18 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 	})
 	local v32 = useUserPicker(v31)
 	local v33, v34 = React.useState(true)
-	local v35 = React.useCallback(function() -- line: 159
+	local v35 = React.useCallback(function() -- line: 158
 		-- upvalues: v34 (copy)
 		v34(false)
 	end, {})
 	local v36, v37 = React.useState(nil)
-	local v38 = React.useCallback(function(p2) -- line: 168
+	local v38 = React.useCallback(function(p2) -- line: 167
 		-- upvalues: v37 (copy)
 		v37(p2)
 	end, {})
 	local loadMore = v32.loadMore
 
-	React.useEffect(function() -- line: 172
+	React.useEffect(function() -- line: 171
 		-- upvalues: v36 (copy), loadMore (copy)
 		if v36 == nil then
 			return
@@ -156,7 +156,7 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 
 		local v52 = v36
 
-		local function maybeLoadMore() -- line: 177
+		local function maybeLoadMore() -- line: 176
 			-- upvalues: v52 (copy), loadMore (copy)
 			local v59 = v52.AbsoluteCanvasSize.Y - (v52.CanvasPosition.Y + v52.AbsoluteWindowSize.Y)
 
@@ -174,7 +174,7 @@ local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 38
 			loadMore()
 		end
 
-		return function() -- line: 188
+		return function() -- line: 187
 			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()

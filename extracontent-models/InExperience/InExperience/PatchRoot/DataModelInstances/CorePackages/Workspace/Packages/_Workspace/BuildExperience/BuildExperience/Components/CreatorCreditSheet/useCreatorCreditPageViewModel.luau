@@ -14,14 +14,14 @@ local useOpenBuyRobuxWebView = require(script.Parent.useOpenBuyRobuxWebView)
 local useRefreshCreatorCreditOnUnhide = require(script.Parent.useRefreshCreatorCreditOnUnhide)
 local DataStatus = DataHydration.DataStatus
 
-local function useCreatorCreditPageViewModel() -- line: 25
+local function useCreatorCreditPageViewModel() -- line: 23
 	-- upvalues: CreatorCredit (copy), React (copy), SignalsReact (copy), DataStatus (copy), useOpenBuyRobuxWebView (copy), useRefreshCreatorCreditOnUnhide (copy), getHoursUntilReset (copy), CreatorCreditConfig (copy)
 	local v13 = CreatorCredit.getCreatorCreditStore(false)
-	local v14 = React.useMemo(function() -- line: 28
+	local v14 = React.useMemo(function() -- line: 26
 		-- upvalues: v13 (copy)
 		return v13.getQuotaSummary()
 	end, { v13 })
-	local v15 = React.useMemo(function() -- line: 31
+	local v15 = React.useMemo(function() -- line: 29
 		-- upvalues: v13 (copy)
 		return v13.getDailyLimit()
 	end, { v13 })
@@ -39,7 +39,7 @@ local function useCreatorCreditPageViewModel() -- line: 25
 	local v28, v29 = React.useState(false)
 	local v30, v31 = React.useState(false)
 	local v32 = React.useRef(0)
-	local v33 = React.useCallback(function() -- line: 50
+	local v33 = React.useCallback(function() -- line: 48
 		-- upvalues: v32 (copy), v29 (copy), v31 (copy)
 		local v41 = v32
 
@@ -49,7 +49,7 @@ local function useCreatorCreditPageViewModel() -- line: 25
 
 		return v32.current
 	end, {})
-	local v34 = React.useCallback(function(n1: number, b1: boolean) -- line: 56
+	local v34 = React.useCallback(function(n1: number, b1: boolean) -- line: 54
 		-- upvalues: v32 (copy), v29 (copy), v31 (copy)
 		if n1 ~= v32.current then
 			return
@@ -58,7 +58,7 @@ local function useCreatorCreditPageViewModel() -- line: 25
 		v29(false)
 		v31(b1)
 	end, {})
-	local v35 = React.useCallback(function(b2: boolean) -- line: 64
+	local v35 = React.useCallback(function(b2: boolean) -- line: 62
 		-- upvalues: v25 (copy), v28 (copy), v19 (copy), v33 (copy), v13 (copy), v34 (copy)
 		if not v25 or (v28 or v19 == nil) then
 			return
@@ -70,10 +70,10 @@ local function useCreatorCreditPageViewModel() -- line: 25
 			additionalUsageEnabled = b2,
 			dailyLimitSet = v19.dailyLimitSet,
 			dailyLimit = v19.dailyLimit
-		}):andThen(function() -- line: 75
+		}):andThen(function() -- line: 73
 			-- upvalues: v34 (copy), v45 (copy)
 			v34(v45, false)
-		end):catch(function() -- line: 78
+		end):catch(function() -- line: 76
 			-- upvalues: v34 (copy), v45 (copy)
 			v34(v45, true)
 		end)
@@ -85,7 +85,7 @@ local function useCreatorCreditPageViewModel() -- line: 25
 		v19,
 		v25
 	})
-	local v36 = React.useCallback(function() -- line: 82
+	local v36 = React.useCallback(function() -- line: 80
 		-- upvalues: v25 (copy), v28 (copy), v31 (copy), v27 (copy)
 		if v25 and not v28 then
 			v31(false)
@@ -95,7 +95,7 @@ local function useCreatorCreditPageViewModel() -- line: 25
 		v28,
 		v25
 	})
-	local v37 = React.useCallback(function(n2: number?) -- line: 88
+	local v37 = React.useCallback(function(n2: number?) -- line: 86
 		-- upvalues: v25 (copy), v28 (copy), v19 (copy), v33 (copy), v13 (copy), v32 (copy), v34 (copy), v27 (copy)
 		if not v25 or (v28 or v19 == nil) then
 			return
@@ -107,13 +107,13 @@ local function useCreatorCreditPageViewModel() -- line: 25
 			additionalUsageEnabled = v19.additionalUsageEnabled,
 			dailyLimitSet = n2 ~= nil,
 			dailyLimit = n2 or 0
-		}):andThen(function() -- line: 99
+		}):andThen(function() -- line: 97
 			-- upvalues: v32 (copy), v47 (copy), v34 (copy), v27 (copy)
 			if v32.current == v47 then
 				v34(v47, false)
 				v27(false)
 			end
-		end):catch(function() -- line: 105
+		end):catch(function() -- line: 103
 			-- upvalues: v34 (copy), v47 (copy)
 			v34(v47, true)
 		end)
@@ -125,13 +125,13 @@ local function useCreatorCreditPageViewModel() -- line: 25
 		v19,
 		v25
 	})
-	local v38 = React.useCallback(function() -- line: 109
+	local v38 = React.useCallback(function() -- line: 107
 		-- upvalues: v27 (copy)
 		v27(false)
 	end, {})
-	local v39 = React.useCallback(function() -- line: 112
+	local v39 = React.useCallback(function() -- line: 110
 		-- upvalues: v13 (copy)
-		v13.refreshQuotaSummary():catch(function() -- line: 113
+		v13.refreshQuotaSummary():catch(function() -- line: 111
 		end)
 	end, { v13 })
 	local v40 = useOpenBuyRobuxWebView(v39)

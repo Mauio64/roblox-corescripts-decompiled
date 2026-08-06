@@ -1,62 +1,48 @@
-local FriendsChat = script:FindFirstAncestor("FriendsChat")
-local FriendsChatParent = FriendsChat.Parent
-local createSignal = require(FriendsChatParent.Signals).createSignal
-local FFlagFriendsChatTabUnreadBadgeFix = require(FriendsChat.Flags.FFlagFriendsChatTabUnreadBadgeFix)
+local Parent = script:FindFirstAncestor("FriendsChat").Parent
+local createSignal = require(Parent.Signals).createSignal
 
-return function() -- line: 23
-	-- upvalues: createSignal (copy), FFlagFriendsChatTabUnreadBadgeFix (copy)
-	local v5, v6 = createSignal(false)
-	local v7, v8 = createSignal(nil)
-	local v9, v10 = createSignal(false)
-	local v11, v12 = createSignal({})
+return function() -- line: 19
+	-- upvalues: createSignal (copy)
+	local v3, v4 = createSignal(false)
+	local v5, v6 = createSignal(nil)
+	local v7, v8 = createSignal({})
 
 	return {
-		getHasEnteredFriendsTab = v5,
-		getActiveConversationId = v7,
-		getHasLocalUnread = v9,
-		getLocalUnreadConversationIds = v11,
-		markFriendsTabEntered = function() -- line: 36
+		getHasEnteredFriendsTab = v3,
+		getActiveConversationId = v5,
+		getLocalUnreadConversationIds = v7,
+		markFriendsTabEntered = function() -- line: 31
+			-- upvalues: v4 (copy)
+			v4(true)
+		end,
+		setActiveConversationId = function(s1: string?) -- line: 35
 			-- upvalues: v6 (copy)
-			v6(true)
+			v6(s1)
 		end,
-		setActiveConversationId = function(s1: string?) -- line: 40
+		addLocalUnread = function(s2: string) -- line: 39
 			-- upvalues: v8 (copy)
-			v8(s1)
+			v8(function(p1) -- line: 40
+				-- upvalues: s2 (copy)
+				if p1[s2] then
+					return p1
+				end
+
+				local v12 = table.clone(p1)
+
+				v12[s2] = true
+
+				return v12
+			end)
 		end,
-		setHasLocalUnread = function(b1: boolean) -- line: 44
-			-- upvalues: FFlagFriendsChatTabUnreadBadgeFix (copy), v10 (copy)
-			if not FFlagFriendsChatTabUnreadBadgeFix then
-				v10(b1)
-			end
-		end,
-		addLocalUnread = function(s2: string) -- line: 50
-			-- upvalues: FFlagFriendsChatTabUnreadBadgeFix (copy), v12 (copy)
-			if FFlagFriendsChatTabUnreadBadgeFix then
-				v12(function(p1) -- line: 52
-					-- upvalues: s2 (copy)
-					if p1[s2] then
-						return p1
-					end
+		clearLocalUnread = function() -- line: 50
+			-- upvalues: v8 (copy)
+			v8(function(p2) -- line: 51
+				if next(p2) == nil then
+					return p2
+				end
 
-					local v17 = table.clone(p1)
-
-					v17[s2] = true
-
-					return v17
-				end)
-			end
-		end,
-		clearLocalUnread = function() -- line: 63
-			-- upvalues: FFlagFriendsChatTabUnreadBadgeFix (copy), v12 (copy)
-			if FFlagFriendsChatTabUnreadBadgeFix then
-				v12(function(p2) -- line: 65
-					if next(p2) == nil then
-						return p2
-					end
-
-					return {}
-				end)
-			end
+				return {}
+			end)
 		end
 	}
 end

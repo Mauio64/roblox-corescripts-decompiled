@@ -4,7 +4,7 @@ local getGameInfoStore = require(DataHydration.Game.GameInfo.getGameInfoStore)
 local FFlagLuaAppDataHydrationUpdateItem = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationUpdateItem
 
 return {
-	syncExperienceGenreToGameInfo = function(n1: number, s1: string?, s2: string?) -- line: 9
+	syncExperienceGenreToGameInfo = function(n1: number, s1: string?, s2: string?) -- line: 8
 		-- upvalues: FFlagLuaAppDataHydrationUpdateItem (copy), getGameInfoStore (copy)
 		if not FFlagLuaAppDataHydrationUpdateItem then
 			return

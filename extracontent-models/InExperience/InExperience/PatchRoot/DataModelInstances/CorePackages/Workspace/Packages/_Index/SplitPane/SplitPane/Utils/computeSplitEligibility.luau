@@ -41,13 +41,18 @@ local function computeSplitEligibility(t2: {[any]: any}) -- line: 34
 			continue
 		end
 
-		local splitPaneEligibility = resolveOptions(v23).splitPaneEligibility
+		local v24 = resolveOptions(v23)
+		local splitPaneEligibility = v24.splitPaneEligibility
 
-		if splitPaneEligibility == SplitPaneSlot.Content then
-			return true
-		end
+		if splitPaneEligibility ~= nil or not v24.transparent and not v24.overlayEnabled then
+			if splitPaneEligibility == SplitPaneSlot.Content then
+				return true
+			end
 
-		if splitPaneEligibility == nil then
+			if splitPaneEligibility ~= nil then
+				continue
+			end
+
 			return false
 		end
 	end

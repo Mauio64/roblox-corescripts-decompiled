@@ -19,16 +19,16 @@ require(InExperienceShop.Types)
 
 local Constants = require(InExperienceShop.Constants)
 
-local function ShopItemTile(t1: {[any]: any}) -- line: 47
+local function ShopItemTile(t1: {[any]: any}) -- line: 48
 	-- upvalues: SignalsReact (copy), getInExperienceShopStore (copy), React (copy), FFlagEnableInExperienceShopUnifiedLogging (copy), InExperienceShopParent (copy), InExperienceShop (copy), SessionService (copy), View (copy), FoundationImage (copy), FFlagFixThumbnailBackgroundInExperienceShop (copy), SHOP_ITEM_MEDIA_HEIGHT_SCALE (copy), FoundationText (copy), Icon (copy), Constants (copy), IconSize (copy), ShopItemFooter (copy)
 	local v20 = SignalsReact.useSignalState(getInExperienceShopStore)
 	local v21 = React.useRef(nil)
-	local v22 = SignalsReact.useSignalState(function(p1) -- line: 54
+	local v22 = SignalsReact.useSignalState(function(p1) -- line: 55
 		-- upvalues: v20 (copy), t1 (copy)
 		return v20.getOwnership(p1)[t1.itemId]
 	end)
 
-	React.useEffect(function() -- line: 62
+	React.useEffect(function() -- line: 63
 		-- upvalues: t1 (copy), v20 (copy)
 		if t1.itemType == "GamePass" then
 			v20.fetchGamePassOwnership(t1.itemId)
@@ -38,13 +38,13 @@ local function ShopItemTile(t1: {[any]: any}) -- line: 47
 		t1.itemType,
 		v20.fetchGamePassOwnership
 	})
-	React.useEffect(function() -- line: 69
+	React.useEffect(function() -- line: 70
 		-- upvalues: FFlagEnableInExperienceShopUnifiedLogging (copy), InExperienceShopParent (copy), InExperienceShop (copy), t1 (copy), v21 (copy), SessionService (copy)
 		if not FFlagEnableInExperienceShopUnifiedLogging then
 			return
 		end
 
-		task.defer(function() -- line: 74
+		task.defer(function() -- line: 75
 			-- upvalues: InExperienceShopParent (copy), InExperienceShop (copy), t1 (copy), v21 (copy), SessionService (copy)
 			local addUnifiedEventLogging = require(InExperienceShopParent.AvatarExperienceAnalytics).addUnifiedEventLogging
 			local v28 = require(InExperienceShop.Utils.mapShopItemTypeToUnifiedItemType)(t1.itemType)
@@ -77,7 +77,7 @@ local function ShopItemTile(t1: {[any]: any}) -- line: 47
 
 	local onItemActivated = t1.onItemActivated
 	local itemType = t1.itemType
-	local v25 = React.useCallback(function() -- line: 111
+	local v25 = React.useCallback(function() -- line: 112
 		-- upvalues: onItemActivated (copy), t1 (copy), itemType (copy)
 		if onItemActivated then
 			onItemActivated(t1.itemId, itemType)
@@ -139,7 +139,8 @@ local function ShopItemTile(t1: {[any]: any}) -- line: 47
 				itemId = t1.itemId,
 				itemType = t1.itemType,
 				isOwned = v22,
-				price = t1.price
+				price = t1.price,
+				shopPageType = t1.shopPageType
 			})
 		})
 	})

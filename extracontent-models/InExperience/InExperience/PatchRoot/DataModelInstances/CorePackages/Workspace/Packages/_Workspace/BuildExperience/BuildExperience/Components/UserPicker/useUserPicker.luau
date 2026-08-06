@@ -5,10 +5,10 @@ require(script.Parent.UserPickerTypes)
 
 local v3 = game:DefineFastInt("BuildExperienceUserPickerSearchDebounceMs", 250)
 
-local function trim(s1: string) -- line: 24
+local function trim(s1: string) -- line: 23
 	return (string.gsub(s1, "^%s*(.-)%s*$", "%1"))
 end
-local function countKeys(t1: {[any]: any}) -- line: 28
+local function countKeys(t1: {[any]: any}) -- line: 27
 	local n1 = 0
 
 	for _, v12 in t1 do
@@ -19,7 +19,7 @@ local function countKeys(t1: {[any]: any}) -- line: 28
 
 	return n1
 end
-local function appendUniqueIds(t2: {[any]: any}, t3: {[any]: any}) -- line: 40
+local function appendUniqueIds(t2: {[any]: any}, t3: {[any]: any}) -- line: 39
 	local t4 = {}
 
 	for _, v17 in t2 do
@@ -36,7 +36,7 @@ local function appendUniqueIds(t2: {[any]: any}, t3: {[any]: any}) -- line: 40
 
 	return v18
 end
-local function useUserPicker(p1) -- line: 54
+local function useUserPicker(p1) -- line: 53
 	-- upvalues: React (copy), v3 (copy), appendUniqueIds (copy)
 	local browseIds = p1.browseIds
 	local browseIsLoading = p1.browseIsLoading
@@ -58,7 +58,7 @@ local function useUserPicker(p1) -- line: 54
 	local v46 = React.useRef(false)
 	local v47 = string.gsub(v30, "^%s*(.-)%s*$", "%1") ~= ""
 
-	React.useEffect(function() -- line: 80
+	React.useEffect(function() -- line: 79
 		-- upvalues: v30 (copy), v33 (copy), v35 (copy), v37 (copy), v45 (copy), v3 (copy), onSearch (copy)
 		local v57 = v30
 		local v58 = string.gsub(v57, "^%s*(.-)%s*$", "%1")
@@ -81,16 +81,16 @@ local function useUserPicker(p1) -- line: 54
 		v35(nil)
 		v37(true)
 
-		local thread = task.delay(v3 / 1000, function() -- line: 97
+		local thread = task.delay(v3 / 1000, function() -- line: 96
 			-- upvalues: onSearch (copy), v58 (copy), v45 (copy), current (copy), v33 (copy), v35 (copy), v37 (copy)
-			onSearch(v58):andThen(function(p2) -- line: 100
+			onSearch(v58):andThen(function(p2) -- line: 99
 				-- upvalues: v45 (copy), current (copy), v33 (copy), v35 (copy), v37 (copy)
 				if v45.current == current then
 					v33(p2.ids)
 					v35(p2.nextCursor)
 					v37(false)
 				end
-			end):catch(function() -- line: 107
+			end):catch(function() -- line: 106
 				-- upvalues: v45 (copy), current (copy), v33 (copy), v35 (copy), v37 (copy)
 				if v45.current == current then
 					v33({})
@@ -100,7 +100,7 @@ local function useUserPicker(p1) -- line: 54
 			end)
 		end)
 
-		return function() -- line: 118
+		return function() -- line: 117
 			-- upvalues: thread (copy)
 			pcall(task.cancel, thread)
 		end
@@ -109,7 +109,7 @@ local function useUserPicker(p1) -- line: 54
 		onSearch
 	})
 
-	local v48 = React.useCallback(function() -- line: 123
+	local v48 = React.useCallback(function() -- line: 122
 		-- upvalues: v47 (copy), v44 (copy), v34 (copy), v45 (copy), onSearch (copy), v30 (copy), v33 (copy), appendUniqueIds (copy), v35 (copy), loadMoreBrowse (copy)
 		if v47 then
 			if v44.current or v34 == nil then
@@ -122,18 +122,18 @@ local function useUserPicker(p1) -- line: 54
 			local v63 = onSearch
 			local v64 = v30
 
-			v63(string.gsub(v64, "^%s*(.-)%s*$", "%1"), v34):andThen(function(p3) -- line: 133
+			v63(string.gsub(v64, "^%s*(.-)%s*$", "%1"), v34):andThen(function(p3) -- line: 132
 				-- upvalues: v45 (copy), current (copy), v33 (copy), appendUniqueIds (copy), v35 (copy)
 				if v45.current ~= current then
 					return
 				end
 
-				v33(function(p4) -- line: 138
+				v33(function(p4) -- line: 137
 					-- upvalues: appendUniqueIds (copy), p3 (copy)
 					return (appendUniqueIds(p4, p3.ids))
 				end)
 				v35(p3.nextCursor)
-			end):finally(function() -- line: 143
+			end):finally(function() -- line: 142
 				-- upvalues: v44 (copy)
 				v44.current = false
 			end)
@@ -149,7 +149,7 @@ local function useUserPicker(p1) -- line: 54
 		onSearch,
 		loadMoreBrowse
 	})
-	local v49 = React.useMemo(function() -- line: 155
+	local v49 = React.useMemo(function() -- line: 154
 		-- upvalues: v47 (copy), v32 (copy), browseIds (copy), excludeUserIds (copy)
 		local v65 = if not v47 then browseIds else v32
 
@@ -180,7 +180,7 @@ local function useUserPicker(p1) -- line: 54
 		end
 	end
 
-	React.useEffect(function() -- line: 174
+	React.useEffect(function() -- line: 173
 		-- upvalues: selectionLimit (copy), v39 (copy)
 		if selectionLimit == nil then
 			return
@@ -188,7 +188,7 @@ local function useUserPicker(p1) -- line: 54
 
 		local v69 = selectionLimit
 
-		v39(function(p5) -- line: 179
+		v39(function(p5) -- line: 178
 			-- upvalues: v69 (copy)
 			local n3 = 0
 
@@ -215,7 +215,7 @@ local function useUserPicker(p1) -- line: 54
 			return t6
 		end)
 	end, { selectionLimit })
-	React.useEffect(function() -- line: 195
+	React.useEffect(function() -- line: 194
 		-- upvalues: v46 (copy), onSelectionChanged (copy), v38 (copy)
 		if not v46.current then
 			v46.current = true
@@ -239,11 +239,11 @@ local function useUserPicker(p1) -- line: 54
 		onSelectionChanged
 	})
 
-	local v53 = React.useCallback(function(n5: number) -- line: 211
+	local v53 = React.useCallback(function(n5: number) -- line: 210
 		-- upvalues: v38 (copy)
 		return v38[n5] == true
 	end, { v38 })
-	local v54 = React.useCallback(function(n6: number) -- line: 215
+	local v54 = React.useCallback(function(n6: number) -- line: 214
 		-- upvalues: v38 (copy), selectionLimit (copy)
 		if v38[n6] == true then
 			return true
@@ -268,9 +268,9 @@ local function useUserPicker(p1) -- line: 54
 		v38,
 		selectionLimit
 	})
-	local v55 = React.useCallback(function(n8: number) -- line: 222
+	local v55 = React.useCallback(function(n8: number) -- line: 221
 		-- upvalues: v39 (copy), selectionLimit (copy)
-		v39(function(p6) -- line: 223
+		v39(function(p6) -- line: 222
 			-- upvalues: n8 (copy), selectionLimit (copy)
 			local v95 = table.clone(p6)
 
@@ -299,7 +299,7 @@ local function useUserPicker(p1) -- line: 54
 			return v95
 		end)
 	end, { selectionLimit })
-	local v56 = React.useCallback(function() -- line: 236
+	local v56 = React.useCallback(function() -- line: 235
 		-- upvalues: v42 (copy), v38 (copy), v43 (copy), onSubmit (copy), v40 (copy)
 		if v42 then
 			return
@@ -322,7 +322,7 @@ local function useUserPicker(p1) -- line: 54
 		local v83 = onSubmit
 		local v84 = v40
 
-		v83(t8, (if string.gsub(v84, "^%s*(.-)%s*$", "%1") == "" then nil else v40)):finally(function() -- line: 250
+		v83(t8, (if string.gsub(v84, "^%s*(.-)%s*$", "%1") == "" then nil else v40)):finally(function() -- line: 249
 			-- upvalues: v43 (copy)
 			v43(false)
 		end)

@@ -1,6 +1,7 @@
 local CorePackages = game:GetService("CorePackages")
 local ParentParent = script.Parent.Parent
 local Images = require(CorePackages.Packages.InGameMenuDependencies).UIBlox.App.ImageSet.Images
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
 local Constants = require(ParentParent.Resources.Constants)
 local t1 = {
 	{
@@ -19,7 +20,7 @@ local t1 = {
 		key = "Players",
 		title = "CoreScripts.InGameMenu.PageTitle.Players",
 		navigationDepth = 2,
-		icon = Images["icons/controls/players"],
+		icon = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/controls/players"] else "icons/controls/players",
 		component = script.PlayersPage,
 		parentPage = Constants.MainPagePageKey
 	},
@@ -27,7 +28,7 @@ local t1 = {
 		key = "InviteFriends",
 		title = "CoreScripts.InGameMenu.PageTitle.InviteFriends",
 		navigationDepth = 2,
-		icon = Images["icons/actions/friends/friendInvite"],
+		icon = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/actions/friends/friendInvite"] else "icons/actions/friends/friendInvite",
 		component = script.Parent.InviteFriendsPage,
 		parentPage = Constants.MainPagePageKey
 	},
@@ -35,7 +36,7 @@ local t1 = {
 		key = "GameSettings",
 		title = "CoreScripts.InGameMenu.PageTitle.GameSettings",
 		navigationDepth = 2,
-		icon = Images["icons/common/settings"],
+		icon = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/common/settings"] else "icons/common/settings",
 		component = script.Parent.GameSettingsPage.BasicPage,
 		parentPage = Constants.MainPagePageKey
 	},
@@ -43,7 +44,7 @@ local t1 = {
 		key = "Report",
 		title = "CoreScripts.InGameMenu.PageTitle.Report",
 		navigationDepth = 2,
-		icon = Images["icons/actions/feedback"],
+		icon = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/actions/feedback"] else "icons/actions/feedback",
 		component = script.Parent.ReportPage,
 		parentPage = Constants.MainPagePageKey
 	},
@@ -52,7 +53,7 @@ local t1 = {
 		title = "CoreScripts.InGameMenu.PageTitle.Controls",
 		isModal = true,
 		navigationDepth = 2,
-		icon = Images["icons/controls/controls"],
+		icon = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/controls/controls"] else "icons/controls/controls",
 		component = script.Parent.ControlsPage,
 		parentPage = Constants.MainPagePageKey
 	},

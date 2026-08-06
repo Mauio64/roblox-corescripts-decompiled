@@ -37,7 +37,7 @@ return function(p1, p2) -- line: 33
 
 	ScreenGui.Parent = Folder
 	ScreenGui.Name = "UserRelationshipModalOverlay"
-	ScreenGui.DisplayOrder = 1
+	ScreenGui.DisplayOrder = -1
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.Enabled = true
 	ScreenGui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets

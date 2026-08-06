@@ -8,7 +8,7 @@ local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
 
-local function BuyMoreRobuxCard(t1: {[any]: any}) -- line: 28
+local function BuyMoreRobuxCard(t1: {[any]: any}) -- line: 27
 	-- upvalues: React (copy), View (copy), FoundationText (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy)
 	return React.createElement(View, {
 		tag = "col gap-medium size-full-0 auto-y padding-large stroke-standard stroke-default radius-large",

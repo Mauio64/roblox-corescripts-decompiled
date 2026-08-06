@@ -21,12 +21,12 @@ local t3 = {
 	studio_save_and_publish = true
 }
 
-local function normalizeToolIdentifier(s1: string) -- line: 40
+local function normalizeToolIdentifier(s1: string) -- line: 39
 	local v18 = string.gsub(s1, "[_%-%s]", "")
 
 	return string.lower(v18)
 end
-local function identifierMatchesPublish(s2: string) -- line: 45
+local function identifierMatchesPublish(s2: string) -- line: 44
 	-- upvalues: t2 (copy)
 	local v20 = string.gsub(s2, "[_%-%s]", "")
 	local v21 = string.lower(v20)
@@ -37,7 +37,7 @@ local function identifierMatchesPublish(s2: string) -- line: 45
 
 	return string.find(v21, "publishplace", 1, true) ~= nil
 end
-local function valueLooksLikePublishTool(p1) -- line: 53
+local function valueLooksLikePublishTool(p1) -- line: 52
 	-- upvalues: t2 (copy)
 	local v23 = false
 
@@ -58,7 +58,7 @@ local function valueLooksLikePublishTool(p1) -- line: 53
 
 	return v23
 end
-local function isSaveAndPublishValue(p2) -- line: 57
+local function isSaveAndPublishValue(p2) -- line: 56
 	-- upvalues: t3 (copy)
 	if typeof(p2) ~= "string" then
 		return false
@@ -66,7 +66,7 @@ local function isSaveAndPublishValue(p2) -- line: 57
 
 	return t3[string.lower(p2)] == true
 end
-local function toolCallMatchesPublishPlace(p3) -- line: 64
+local function toolCallMatchesPublishPlace(p3) -- line: 63
 	-- upvalues: t2 (copy)
 	local kind = p3.kind
 	local v29 = false
@@ -136,7 +136,7 @@ local function toolCallMatchesPublishPlace(p3) -- line: 64
 
 	return true
 end
-local function isSaveAndPublishToolCall(p4) -- line: 83
+local function isSaveAndPublishToolCall(p4) -- line: 82
 	-- upvalues: t3 (copy)
 	local title = p4.title
 
@@ -170,7 +170,7 @@ local function isSaveAndPublishToolCall(p4) -- line: 83
 
 	return true
 end
-local function parsePublishedVersionNumber(s3: string) -- line: 112
+local function parsePublishedVersionNumber(s3: string) -- line: 111
 	local match = string.match(s3, "^%s*Saved as version%s+(%d+)%s*%.?%s*$")
 
 	if match == nil then
@@ -179,7 +179,7 @@ local function parsePublishedVersionNumber(s3: string) -- line: 112
 
 	return (tonumber(match))
 end
-local function parseTextResult(s4: string) -- line: 120
+local function parseTextResult(s4: string) -- line: 119
 	-- upvalues: HttpService (copy)
 	local ok, result = pcall(HttpService.JSONDecode, HttpService, s4)
 
@@ -193,7 +193,7 @@ local function parseTextResult(s4: string) -- line: 120
 
 	return result
 end
-local function getToolCallPublishedVersionNumber(p5) -- line: 131
+local function getToolCallPublishedVersionNumber(p5) -- line: 130
 	-- upvalues: HttpService (copy)
 	local content = p5.content
 
@@ -229,7 +229,7 @@ end
 
 return {
 	PUBLISH_PLACE_TOOL_IDENTIFIERS = t1,
-	includesPublishPlaceTool = function(p6) -- line: 100
+	includesPublishPlaceTool = function(p6) -- line: 99
 		-- upvalues: toolCallMatchesPublishPlace (copy)
 		for _, v52 in p6.toolCalls do
 			if v52.status ~= "failed" and toolCallMatchesPublishPlace(v52) then
@@ -240,7 +240,7 @@ return {
 		return false
 	end,
 	toolCallMatchesPublishPlace = toolCallMatchesPublishPlace,
-	getLatestSuccessfulResult = function(p7) -- line: 159
+	getLatestSuccessfulResult = function(p7) -- line: 158
 		-- upvalues: isSaveAndPublishToolCall (copy), getToolCallPublishedVersionNumber (copy)
 		if p7 == nil then
 			return nil

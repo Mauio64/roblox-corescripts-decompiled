@@ -11,7 +11,6 @@ require(Components.Types)
 
 local View = require(Components.View)
 local Constants = require(Foundation.Constants)
-local Flags = require(Foundation.Utility.Flags)
 local blendTransparencies = require(Foundation.Utility.blendTransparencies)
 local getBindableValue = require(Foundation.Utility.getBindableValue)
 local getDisabledStyle = require(Foundation.Utility.getDisabledStyle)
@@ -43,10 +42,10 @@ local t1 = {
 	size = InputSize.Large,
 	variant = InputVariant.Standard
 }
-local v37 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 143
+local v36 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 142
 	-- upvalues: React (copy), isPluginSecurity (copy), Padding (copy)
 	local isBoundsChecker = t2.isBoundsChecker
-	local v42 = t2.isMultiLine or isBoundsChecker
+	local v41 = t2.isMultiLine or isBoundsChecker
 
 	return React.createElement("TextBox", {
 		ClearTextOnFocus = false,
@@ -58,9 +57,9 @@ local v37 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 
 		LineHeight = t2.fontStyle.LineHeight,
 		TextColor3 = if not t2.textStyle then nil else t2.textStyle.Color3,
 		TextTransparency = if not t2.textStyle then nil else t2.textStyle.Transparency,
-		MultiLine = v42,
-		TextWrapped = v42,
-		TextYAlignment = if not v42 then Enum.TextYAlignment.Center else Enum.TextYAlignment.Top,
+		MultiLine = v41,
+		TextWrapped = v41,
+		TextYAlignment = if not v41 then Enum.TextYAlignment.Center else Enum.TextYAlignment.Top,
 		TextEditable = not isBoundsChecker and not t2.isDisabled,
 		PlaceholderText = t2.placeholder,
 		TextInputType = if not isPluginSecurity() then nil else t2.textInputType,
@@ -85,364 +84,364 @@ local v37 = React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 
 	}, t2.children)
 end))
 
-local function InternalTextInput(p2, p3) -- line: 192
-	-- upvalues: Flags (copy), withDefaults (copy), t1 (copy), useTokens (copy), React (copy), getBindableValue (copy), useTextInputVariants (copy), useStyleTags (copy), usePreferredInput (copy), useComposerFocusLock (copy), getDisabledStyle (copy), getMultiLineTextHeight (copy), chatTextAreaDebug (copy), measureTextLineCount (copy), InputFocusBehavior (copy), useComposerKeyboardConnections (copy), ControlState (copy), Radius (copy), truncateTextToCursor (copy), useBindable (copy), ReactUtils (copy), View (copy), withCommonProps (copy), blendTransparencies (copy), Constants (copy), StateLayerAffordance (copy), ScrollView (copy), v37 (copy), mapBindable (copy), Icon (copy)
-	if Flags.FoundationInputSelectionProps and p2.Selectable == nil then
+local function InternalTextInput(p2, p3) -- line: 191
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), getBindableValue (copy), useTextInputVariants (copy), useStyleTags (copy), usePreferredInput (copy), useComposerFocusLock (copy), getDisabledStyle (copy), getMultiLineTextHeight (copy), chatTextAreaDebug (copy), measureTextLineCount (copy), InputFocusBehavior (copy), useComposerKeyboardConnections (copy), ControlState (copy), Radius (copy), truncateTextToCursor (copy), useBindable (copy), ReactUtils (copy), View (copy), withCommonProps (copy), blendTransparencies (copy), Constants (copy), StateLayerAffordance (copy), ScrollView (copy), v36 (copy), mapBindable (copy), Icon (copy)
+	if p2.Selectable == nil then
 		p2 = table.clone(p2)
 		p2.Selectable = true
 	end
 
-	local v45 = withDefaults(p2, t1)
-	local v46 = useTokens()
+	local v44 = withDefaults(p2, t1)
+	local v45 = useTokens()
+	local v46 = React.useRef(nil)
 	local v47 = React.useRef(nil)
 	local v48 = React.useRef(nil)
 	local v49 = React.useRef(nil)
-	local v50 = React.useRef(nil)
-	local v51 = React.useRef("")
-	local v52 = React.useRef(getBindableValue(v45.text))
-	local v53 = React.useRef(nil)
-	local v54 = React.useRef(Vector2.zero)
-	local v55 = React.useRef(false)
-	local v56 = React.useRef(0)
-	local v57, v58 = React.useState(false)
-	local v59, v60 = React.useState(false)
-	local v61 = useTextInputVariants(v46, v45.size, v45.variant, v45.radius, v59, v45.hasError)
-	local container = v61.container
-	local v63 = if not v45.trailingElement or typeof(container.tag) ~= "string" then container.tag else string.gsub(container.tag, "gap%-large", "gap-xsmall")
-	local v64 = useStyleTags(v61.textBox.tag)
-	local isDisabled = v45.isDisabled
-	local v66 = v45.isDisabled and v45.trailingElement == nil
-	local v67 = usePreferredInput()
-	local v68, v69 = React.useState(false)
-	local v70 = v67 == Enum.PreferredInput.Touch
-	local Standard = v46.Stroke.Standard
-	local v72 = math.ceil(Standard) * 2
-	local v73 = math.ceil(v46.Stroke.Thick) * 2
+	local v50 = React.useRef("")
+	local v51 = React.useRef(getBindableValue(v44.text))
+	local v52 = React.useRef(nil)
+	local v53 = React.useRef(Vector2.zero)
+	local v54 = React.useRef(false)
+	local v55 = React.useRef(0)
+	local v56, v57 = React.useState(false)
+	local v58, v59 = React.useState(false)
+	local v60 = useTextInputVariants(v45, v44.size, v44.variant, v44.radius, v58, v44.hasError)
+	local container = v60.container
+	local v62 = if not v44.trailingElement or typeof(container.tag) ~= "string" then container.tag else string.gsub(container.tag, "gap%-large", "gap-xsmall")
+	local v63 = useStyleTags(v60.textBox.tag)
+	local isDisabled = v44.isDisabled
+	local v65 = v44.isDisabled and v44.trailingElement == nil
+	local v66 = usePreferredInput()
+	local v67, v68 = React.useState(false)
+	local v69 = v66 == Enum.PreferredInput.Touch
+	local Standard = v45.Stroke.Standard
+	local v71 = math.ceil(Standard) * 2
+	local v72 = math.ceil(v45.Stroke.Thick) * 2
 
 	useComposerFocusLock(isDisabled == true, {
-		v47,
-		v48
+		v46,
+		v47
 	})
 
-	local v74 = getDisabledStyle(v46.Color.Content.Emphasis, isDisabled)
-	local fontStyle = v61.textBox.fontStyle
+	local v73 = getDisabledStyle(v45.Color.Content.Emphasis, isDisabled)
+	local fontStyle = v60.textBox.fontStyle
 	local FontSize = fontStyle.FontSize
 	local LineHeight = fontStyle.LineHeight
-	local v78 = getMultiLineTextHeight(FontSize, 1, LineHeight)
-	local v79, v80 = React.useState(1)
-	local v81, v82 = React.useState(v78)
-	local v83 = v45.maxLines ~= nil
-	local v84, v85 = React.useState(function() -- line: 248
-		-- upvalues: getBindableValue (copy), v45 (copy)
-		return getBindableValue(v45.text)
+	local v77 = getMultiLineTextHeight(FontSize, 1, LineHeight)
+	local v78, v79 = React.useState(1)
+	local v80, v81 = React.useState(v77)
+	local v82 = v44.maxLines ~= nil
+	local v83, v84 = React.useState(function() -- line: 246
+		-- upvalues: getBindableValue (copy), v44 (copy)
+		return getBindableValue(v44.text)
 	end)
 
-	React.useEffect(function() -- line: 252
-		-- upvalues: chatTextAreaDebug (copy), v45 (copy)
-		chatTextAreaDebug.setEnabled(v45.composerDebug == true)
+	React.useEffect(function() -- line: 250
+		-- upvalues: chatTextAreaDebug (copy), v44 (copy)
+		chatTextAreaDebug.setEnabled(v44.composerDebug == true)
 
-		return function() -- line: 254
+		return function() -- line: 252
 		end
-	end, { v45.composerDebug })
+	end, { v44.composerDebug })
 
-	local v86 = React.useCallback(function() -- line: 257
-		-- upvalues: v47 (copy), v48 (copy)
-		local v146 = v47.current or v48.current
+	local v85 = React.useCallback(function() -- line: 255
+		-- upvalues: v46 (copy), v47 (copy)
+		local v145 = v46.current or v47.current
 
-		if v146 and v146.AbsoluteSize.X > 0 then
-			return v146.AbsoluteSize.X
+		if v145 and v145.AbsoluteSize.X > 0 then
+			return v145.AbsoluteSize.X
 		end
 
 		return 0
 	end, {})
-	local v87 = React.useCallback(function(s1: string) -- line: 266
-		-- upvalues: measureTextLineCount (copy), v45 (copy), v78 (copy), v86 (copy), fontStyle (copy), FontSize (copy), v82 (copy)
-		local v148 = measureTextLineCount({
+	local v86 = React.useCallback(function(s1: string) -- line: 264
+		-- upvalues: measureTextLineCount (copy), v44 (copy), v77 (copy), v85 (copy), fontStyle (copy), FontSize (copy), v81 (copy)
+		local v147 = measureTextLineCount({
 			text = s1,
-			maxLines = v45.maxLines,
-			singleLineHeight = v78,
-			layoutWidth = v86(),
+			maxLines = v44.maxLines,
+			singleLineHeight = v77,
+			layoutWidth = v85(),
 			font = fontStyle.Font,
 			fontSize = FontSize
 		})
-		local v149 = if not v148.boundsY or not (v148.boundsY > 0) then v78 else math.ceil(v148.boundsY)
+		local v148 = if not v147.boundsY or not (v147.boundsY > 0) then v77 else math.ceil(v147.boundsY)
 
-		v82((math.max(v149, v148.lineCount * v78)))
+		v81((math.max(v148, v147.lineCount * v77)))
 
-		return v148.lineCount
+		return v147.lineCount
 	end, {
 		FontSize,
 		LineHeight,
 		fontStyle.Font,
-		v45.maxLines,
-		v86,
-		v78
+		v44.maxLines,
+		v85,
+		v77
 	})
-	local v88 = if not v83 then getBindableValue(v45.text) else v45.text
-	local v89 = if not v45.maxLines then math.max(1, v45.numLines) else v79
-	local v90 = not not v45.alwaysMultiLine or v89 > 1
+	local v87 = if not v82 then getBindableValue(v44.text) else v44.text
+	local v88 = if not v44.maxLines then math.max(1, v44.numLines) else v78
+	local v89 = not not v44.alwaysMultiLine or v88 > 1
 
-	React.useEffect(function() -- line: 297
-		-- upvalues: v83 (copy), getBindableValue (copy), v45 (copy), v52 (copy), chatTextAreaDebug (copy), v85 (copy), v80 (copy), v87 (copy)
-		if not v83 then
-			return function() -- line: 299
+	React.useEffect(function() -- line: 295
+		-- upvalues: v82 (copy), getBindableValue (copy), v44 (copy), v51 (copy), chatTextAreaDebug (copy), v84 (copy), v79 (copy), v86 (copy)
+		if not v82 then
+			return function() -- line: 297
 			end
 		end
 
-		local v150 = getBindableValue(v45.text)
+		local v149 = getBindableValue(v44.text)
 
-		if v150 ~= v52.current then
-			chatTextAreaDebug.log("syncFromParent", `len={ utf8.len(v150) or #v150 }`)
-			v52.current = v150
-			v85(v150)
-			v80(v87(v150))
-			task.defer(function() -- line: 307
-				-- upvalues: v80 (copy), v87 (copy), v150 (copy)
-				v80(v87(v150))
+		if v149 ~= v51.current then
+			chatTextAreaDebug.log("syncFromParent", `len={ utf8.len(v149) or #v149 }`)
+			v51.current = v149
+			v84(v149)
+			v79(v86(v149))
+			task.defer(function() -- line: 305
+				-- upvalues: v79 (copy), v86 (copy), v149 (copy)
+				v79(v86(v149))
 			end)
 		end
 
-		return function() -- line: 311
+		return function() -- line: 309
 		end
 	end, {
-		v45.text,
-		v87,
-		v83
+		v44.text,
+		v86,
+		v82
 	})
 
-	local v91 = React.useCallback(function(p4) -- line: 314
-		-- upvalues: v47 (copy), v48 (copy)
+	local v90 = React.useCallback(function(p4) -- line: 312
+		-- upvalues: v46 (copy), v47 (copy)
+		if v46.current then
+			v46.current.SelectionStart = p4
+		end
+
 		if v47.current then
 			v47.current.SelectionStart = p4
 		end
-
-		if v48.current then
-			v48.current.SelectionStart = p4
-		end
 	end, {})
-	local v92 = React.useCallback(function(p5) -- line: 323
-		-- upvalues: v47 (copy), v48 (copy)
+	local v91 = React.useCallback(function(p5) -- line: 321
+		-- upvalues: v46 (copy), v47 (copy)
+		if v46.current then
+			v46.current.CursorPosition = p5
+		end
+
 		if v47.current then
 			v47.current.CursorPosition = p5
 		end
-
-		if v48.current then
-			v48.current.CursorPosition = p5
-		end
 	end, {})
-	local v93 = React.useCallback(function() -- line: 332
-		-- upvalues: v47 (copy), v48 (copy), v91 (copy), v92 (copy)
-		local v153 = v47.current or v48.current
+	local v92 = React.useCallback(function() -- line: 330
+		-- upvalues: v46 (copy), v47 (copy), v90 (copy), v91 (copy)
+		local v152 = v46.current or v47.current
 
-		if v153 == nil or v153.Parent == nil then
+		if v152 == nil or v152.Parent == nil then
 			return
 		end
 
-		local v154 = utf8.len(v153.Text)
+		local v153 = utf8.len(v152.Text)
 
-		if v154 then
-			v91(0)
-			v92(v154 + 1)
+		if v153 then
+			v90(0)
+			v91(v153 + 1)
 		end
 	end, {
-		v91,
-		v92
+		v90,
+		v91
 	})
-	local v94 = React.useCallback(function() -- line: 346
-		-- upvalues: v47 (copy), v45 (copy), InputFocusBehavior (copy), v93 (copy)
-		if v47.current == nil then
+	local v93 = React.useCallback(function() -- line: 344
+		-- upvalues: v46 (copy), v44 (copy), InputFocusBehavior (copy), v92 (copy)
+		if v46.current == nil then
 			return
 		end
 
-		v47.current:CaptureFocus()
+		v46.current:CaptureFocus()
 
-		if v45.focusBehavior == InputFocusBehavior.Highlight then
-			task.spawn(v93)
+		if v44.focusBehavior == InputFocusBehavior.Highlight then
+			task.spawn(v92)
 		end
 	end, {
-		v93,
-		v45.focusBehavior
+		v92,
+		v44.focusBehavior
 	})
-	local v95 = React.useCallback(function() -- line: 363
-		-- upvalues: v47 (copy), v48 (copy), v69 (copy), v60 (copy)
+	local v94 = React.useCallback(function() -- line: 361
+		-- upvalues: v46 (copy), v47 (copy), v68 (copy), v59 (copy)
+		if v46.current then
+			v46.current:ReleaseFocus()
+		end
+
 		if v47.current then
 			v47.current:ReleaseFocus()
 		end
 
-		if v48.current then
-			v48.current:ReleaseFocus()
-		end
-
-		v69(false)
-		v60(false)
+		v68(false)
+		v59(false)
 	end, {})
-	local v96 = React.useCallback(function() -- line: 374
-		-- upvalues: v47 (copy)
-		if v47.current then
-			return (v47.current:IsFocused())
+	local v95 = React.useCallback(function() -- line: 372
+		-- upvalues: v46 (copy)
+		if v46.current then
+			return (v46.current:IsFocused())
 		end
 
 		return nil
 	end, {})
-	local v97 = React.useCallback(function() -- line: 381
-		-- upvalues: v47 (copy)
-		if v47.current then
-			return v47.current.SelectionStart
+	local v96 = React.useCallback(function() -- line: 379
+		-- upvalues: v46 (copy)
+		if v46.current then
+			return v46.current.SelectionStart
 		end
 
 		return nil
 	end, {})
-	local v98 = React.useCallback(function() -- line: 388
-		-- upvalues: v47 (copy)
-		if v47.current then
-			return v47.current.CursorPosition
+	local v97 = React.useCallback(function() -- line: 386
+		-- upvalues: v46 (copy)
+		if v46.current then
+			return v46.current.CursorPosition
 		end
 
 		return nil
 	end, {})
-	local v99 = React.useCallback(function() -- line: 395
-		-- upvalues: v47 (copy)
-		if v47.current then
-			v47.current.Text = ""
+	local v98 = React.useCallback(function() -- line: 393
+		-- upvalues: v46 (copy)
+		if v46.current then
+			v46.current.Text = ""
 		end
 	end, {})
 
-	React.useImperativeHandle(p3, function() -- line: 403
-		-- upvalues: v96 (copy), v94 (copy), v95 (copy), v58 (copy), v97 (copy), v98 (copy), v92 (copy), v91 (copy)
+	React.useImperativeHandle(p3, function() -- line: 401
+		-- upvalues: v95 (copy), v93 (copy), v94 (copy), v57 (copy), v96 (copy), v97 (copy), v91 (copy), v90 (copy)
 		return {
-			getIsFocused = v96,
-			focus = v94,
-			releaseFocus = v95,
-			setHover = v58,
-			getSelectionStart = v97,
-			getCursorPosition = v98,
-			setCursorPosition = v92,
-			setSelectionStart = v91
+			getIsFocused = v95,
+			focus = v93,
+			releaseFocus = v94,
+			setHover = v57,
+			getSelectionStart = v96,
+			getCursorPosition = v97,
+			setCursorPosition = v91,
+			setSelectionStart = v90
 		}
 	end, {
-		v98,
-		v96,
 		v97,
-		v94,
 		v95,
-		v92,
-		v91
+		v96,
+		v93,
+		v94,
+		v91,
+		v90
 	})
 
-	local v100 = React.useCallback(function(p6) -- line: 427
-		-- upvalues: v51 (copy), v55 (copy), v52 (copy), v90 (copy), v49 (copy), v83 (copy), v85 (copy), v45 (copy), v80 (copy), v87 (copy)
-		if p6 == nil or (p6.Parent == nil or v51.current ~= "") then
+	local v99 = React.useCallback(function(p6) -- line: 425
+		-- upvalues: v50 (copy), v54 (copy), v51 (copy), v89 (copy), v48 (copy), v82 (copy), v84 (copy), v44 (copy), v79 (copy), v86 (copy)
+		if p6 == nil or (p6.Parent == nil or v50.current ~= "") then
 			return
 		end
 
 		local p6Text = p6.Text
 
-		if v55.current and p6Text ~= "" then
+		if v54.current and p6Text ~= "" then
 			return
 		end
 
-		if p6Text == v52.current then
+		if p6Text == v51.current then
 			return
 		end
 
-		v52.current = p6Text
+		v51.current = p6Text
 
-		if v90 and v49.current then
-			v49.current.Text = p6Text
+		if v89 and v48.current then
+			v48.current.Text = p6Text
 		end
 
-		if v83 then
-			v85(p6Text)
+		if v82 then
+			v84(p6Text)
 		end
 
-		if v45.maxLines then
-			v80(v87(p6Text))
-			task.defer(function() -- line: 453
-				-- upvalues: v80 (copy), v87 (copy), p6Text (copy)
-				v80(v87(p6Text))
+		if v44.maxLines then
+			v79(v86(p6Text))
+			task.defer(function() -- line: 451
+				-- upvalues: v79 (copy), v86 (copy), p6Text (copy)
+				v79(v86(p6Text))
 			end)
 		end
 
-		v45.onChanged(p6Text)
+		v44.onChanged(p6Text)
 	end, {
-		v45.onChanged,
-		v90,
-		v68,
-		v45.maxLines,
-		v87,
-		v83
+		v44.onChanged,
+		v89,
+		v67,
+		v44.maxLines,
+		v86,
+		v82
 	})
-	local v101 = React.useRef(false)
-	local v102 = React.useCallback(function(_, p8) -- line: 465
-		-- upvalues: v101 (copy)
+	local v100 = React.useRef(false)
+	local v101 = React.useCallback(function(_, p8) -- line: 463
+		-- upvalues: v100 (copy)
 		if p8.UserInputType == Enum.UserInputType.MouseMovement then
-			v101.current = false
+			v100.current = false
 		end
 	end, {})
-	local v103 = React.useCallback(function(_, p10) -- line: 472
-		-- upvalues: v101 (copy), v93 (copy)
-		if not v101.current then
+	local v102 = React.useCallback(function(_, p10) -- line: 470
+		-- upvalues: v100 (copy), v92 (copy)
+		if not v100.current then
 			return
 		end
 
-		v101.current = false
+		v100.current = false
 
 		if p10.UserInputType ~= Enum.UserInputType.MouseButton1 then
 			return
 		end
 
-		v93()
+		v92()
 	end, {
+		v90,
 		v91,
-		v92,
-		v93
+		v92
 	})
-	local v104 = React.useCallback(function(s2: string) -- line: 491
-		-- upvalues: v52 (copy), v83 (copy), v85 (copy), v45 (copy), v80 (copy), v87 (copy)
-		v52.current = s2
+	local v103 = React.useCallback(function(s2: string) -- line: 489
+		-- upvalues: v51 (copy), v82 (copy), v84 (copy), v44 (copy), v79 (copy), v86 (copy)
+		v51.current = s2
 
-		if v83 then
-			v85(s2)
+		if v82 then
+			v84(s2)
 		end
 
-		if v45.maxLines then
-			v80(v87(s2))
+		if v44.maxLines then
+			v79(v86(s2))
 		end
 
-		v45.onChanged(s2)
+		v44.onChanged(s2)
 	end, {
-		v45.maxLines,
-		v87,
-		v45.onChanged,
-		v83
+		v44.maxLines,
+		v86,
+		v44.onChanged,
+		v82
 	})
-	local v105 = v45.onReturnPressed ~= nil and not v70
-	local v106 = React.useCallback(function(_, s3: string) -- line: 504
-		-- upvalues: v45 (copy), v56 (copy), chatTextAreaDebug (copy), v55 (copy)
-		if v45.onReturnPressed == nil then
+	local v104 = v44.onReturnPressed ~= nil and not v69
+	local v105 = React.useCallback(function(_, s3: string) -- line: 502
+		-- upvalues: v44 (copy), v55 (copy), chatTextAreaDebug (copy), v54 (copy)
+		if v44.onReturnPressed == nil then
 			return
 		end
 
 		local elapsed = os.clock()
 
-		if elapsed - v56.current < 0.15 then
+		if elapsed - v55.current < 0.15 then
 			chatTextAreaDebug.log("returnSubmit", `source={ s3 } skipped=debounced`)
 
 			return
 		end
 
 		chatTextAreaDebug.log("returnSubmit", `source={ s3 }`)
-		v56.current = elapsed
-		v55.current = true
-		v45.onReturnPressed()
-		task.delay(0.15, function() -- line: 520
-			-- upvalues: v55 (copy)
-			v55.current = false
+		v55.current = elapsed
+		v54.current = true
+		v44.onReturnPressed()
+		task.delay(0.15, function() -- line: 518
+			-- upvalues: v54 (copy)
+			v54.current = false
 		end)
-	end, { v45.onReturnPressed })
-	local v107 = React.useCallback(function(_: boolean, b2: boolean) -- line: 525
-		-- upvalues: v47 (copy), chatTextAreaDebug (copy), v104 (copy), v106 (copy)
-		local current = v47.current
+	end, { v44.onReturnPressed })
+	local v106 = React.useCallback(function(_: boolean, b2: boolean) -- line: 523
+		-- upvalues: v46 (copy), chatTextAreaDebug (copy), v103 (copy), v105 (copy)
+		local current = v46.current
 
 		if current == nil or current:IsFocused() ~= true then
 			return
@@ -451,8 +450,8 @@ local function InternalTextInput(p2, p3) -- line: 192
 		if b2 then
 			local currentText = current.Text
 
-			task.defer(function() -- line: 533
-				-- upvalues: current (copy), currentText (copy), chatTextAreaDebug (copy), v104 (copy)
+			task.defer(function() -- line: 531
+				-- upvalues: current (copy), currentText (copy), chatTextAreaDebug (copy), v103 (copy)
 				if current.Parent == nil then
 					return
 				end
@@ -461,265 +460,265 @@ local function InternalTextInput(p2, p3) -- line: 192
 
 				if currentText2 ~= currentText then
 					chatTextAreaDebug.log("returnNewline", "source=UserInputService.InputBegan-shift engineInserted=true")
-					v104(currentText2)
+					v103(currentText2)
 				end
 			end)
 
 			return
 		end
 
-		v106(current, "UserInputService.InputBegan")
+		v105(current, "UserInputService.InputBegan")
 	end, {
-		v106,
-		v104
+		v105,
+		v103
 	})
-	local v108 = useComposerKeyboardConnections({
-		enabled = v105 == true,
-		onReturnPressed = v107
+	local v107 = useComposerKeyboardConnections({
+		enabled = v104 == true,
+		onReturnPressed = v106
 	})
-	local connect = v108.connect
-	local disconnect = v108.disconnect
-	local v111 = React.useCallback(function() -- line: 562
-		-- upvalues: isDisabled (copy), v90 (copy), v70 (copy), v47 (copy), v51 (copy), v69 (copy), v60 (copy), v45 (copy), v105 (copy), connect (copy), InputFocusBehavior (copy), v48 (copy), v101 (copy)
+	local connect = v107.connect
+	local disconnect = v107.disconnect
+	local v110 = React.useCallback(function() -- line: 560
+		-- upvalues: isDisabled (copy), v89 (copy), v69 (copy), v46 (copy), v50 (copy), v68 (copy), v59 (copy), v44 (copy), v104 (copy), connect (copy), InputFocusBehavior (copy), v47 (copy), v100 (copy)
 		if isDisabled then
 			return
 		end
 
-		if v90 and v70 then
-			if v47.current and v47.current.Parent then
-				v51.current = v47.current.Text
+		if v89 and v69 then
+			if v46.current and v46.current.Parent then
+				v50.current = v46.current.Text
 			end
 
-			v69(true)
+			v68(true)
 		end
 
-		v60(true)
+		v59(true)
 
-		if v45.onFocus then
-			v45.onFocus()
+		if v44.onFocus then
+			v44.onFocus()
 		end
 
-		if v105 then
+		if v104 then
 			connect()
 		end
 
-		local focusBehavior = v45.focusBehavior
+		local focusBehavior = v44.focusBehavior
 
 		if focusBehavior == InputFocusBehavior.Clear then
-			v51.current = ""
+			v50.current = ""
+
+			if v46.current then
+				v46.current.Text = ""
+			end
 
 			if v47.current then
 				v47.current.Text = ""
-			end
-
-			if v48.current then
-				v48.current.Text = ""
 
 				return
 			end
 		elseif focusBehavior == InputFocusBehavior.Highlight then
-			v101.current = true
+			v100.current = true
 		end
 	end, {
-		v45.onFocus,
+		v44.onFocus,
 		isDisabled,
-		v70,
-		v90,
-		v45.focusBehavior,
-		v105,
+		v69,
+		v89,
+		v44.focusBehavior,
+		v104,
 		connect
 	})
-	local v112 = React.useCallback(function(p12, p13) -- line: 610
-		-- upvalues: v103 (copy)
-		v103(p12, p13)
-	end, { v103 })
-	local v113 = React.useCallback(function(p14, b3: boolean, p15) -- line: 615
-		-- upvalues: chatTextAreaDebug (copy), v105 (copy), disconnect (copy), v60 (copy), v101 (copy), v90 (copy), v69 (copy), v45 (copy), v106 (copy)
+	local v111 = React.useCallback(function(p12, p13) -- line: 608
+		-- upvalues: v102 (copy)
+		v102(p12, p13)
+	end, { v102 })
+	local v112 = React.useCallback(function(p14, b3: boolean, p15) -- line: 613
+		-- upvalues: chatTextAreaDebug (copy), v104 (copy), disconnect (copy), v59 (copy), v100 (copy), v89 (copy), v68 (copy), v44 (copy), v105 (copy)
 		chatTextAreaDebug.log("textBox.FocusLost", `enterPressed={ b3 }`)
 
-		if v105 then
+		if v104 then
 			disconnect()
 		end
 
-		v60(false)
-		v101.current = false
+		v59(false)
+		v100.current = false
 
-		if v90 then
-			v69(false)
+		if v89 then
+			v68(false)
 		end
 
-		if v45.onFocusLost then
-			v45.onFocusLost(p15)
+		if v44.onFocusLost then
+			v44.onFocusLost(p15)
 		end
 
-		if b3 and v105 then
-			v106(p14, "TextBox.FocusLost")
+		if b3 and v104 then
+			v105(p14, "TextBox.FocusLost")
 		end
 	end, {
-		v90,
-		v45.onFocusLost,
+		v89,
+		v44.onFocusLost,
+		v104,
 		v105,
-		v106,
 		disconnect
 	})
-	local v114 = React.useCallback(function(p16) -- line: 646
-		-- upvalues: v58 (copy), ControlState (copy)
-		v58(p16 == ControlState.Hover)
+	local v113 = React.useCallback(function(p16) -- line: 644
+		-- upvalues: v57 (copy), ControlState (copy)
+		v57(p16 == ControlState.Hover)
 	end, {})
-	local v115 = React.useCallback(function(p17, vector2: Vector2) -- line: 650
-		-- upvalues: v53 (copy), v45 (copy)
-		v53.current = vector2
+	local v114 = React.useCallback(function(p17, vector2: Vector2) -- line: 648
+		-- upvalues: v52 (copy), v44 (copy)
+		v52.current = vector2
 
-		if v45.onDragStarted then
-			v45.onDragStarted(p17, vector2)
+		if v44.onDragStarted then
+			v44.onDragStarted(p17, vector2)
 		end
-	end, { v45.onDragStarted })
-	local v116 = React.useCallback(function(p18, vector2: Vector2) -- line: 657
-		-- upvalues: v45 (copy)
-		if v45.onDrag then
-			v45.onDrag(p18, vector2)
+	end, { v44.onDragStarted })
+	local v115 = React.useCallback(function(p18, vector2: Vector2) -- line: 655
+		-- upvalues: v44 (copy)
+		if v44.onDrag then
+			v44.onDrag(p18, vector2)
 		end
-	end, { v45.onDrag })
-	local v117 = React.useCallback(function(p19, vector2: Vector2) -- line: 663
-		-- upvalues: v53 (copy), v94 (copy), v95 (copy), v60 (copy), v45 (copy)
-		if vector2 == v53.current then
-			v94()
+	end, { v44.onDrag })
+	local v116 = React.useCallback(function(p19, vector2: Vector2) -- line: 661
+		-- upvalues: v52 (copy), v93 (copy), v94 (copy), v59 (copy), v44 (copy)
+		if vector2 == v52.current then
+			v93()
 		else
-			v95()
-			v60(false)
+			v94()
+			v59(false)
 		end
 
-		v53.current = nil
+		v52.current = nil
 
-		if v45.onDragEnded then
-			v45.onDragEnded(p19, vector2)
+		if v44.onDragEnded then
+			v44.onDragEnded(p19, vector2)
 		end
 	end, {
-		v45.onDragEnded,
-		v94,
-		v95
+		v44.onDragEnded,
+		v93,
+		v94
 	})
-	local v118 = if not v45.maxLines then nil else getMultiLineTextHeight(FontSize, v45.maxLines, LineHeight)
-	local v119 = React.useMemo(function() -- line: 680
-		-- upvalues: v45 (copy), v78 (copy), v81 (copy), v118 (copy), getMultiLineTextHeight (copy), FontSize (copy), v89 (copy), LineHeight (copy)
-		if v45.maxLines then
-			return (math.clamp(math.max(v78, v81), v78, v118))
+	local v117 = if not v44.maxLines then nil else getMultiLineTextHeight(FontSize, v44.maxLines, LineHeight)
+	local v118 = React.useMemo(function() -- line: 678
+		-- upvalues: v44 (copy), v77 (copy), v80 (copy), v117 (copy), getMultiLineTextHeight (copy), FontSize (copy), v88 (copy), LineHeight (copy)
+		if v44.maxLines then
+			return (math.clamp(math.max(v77, v80), v77, v117))
 		end
 
-		return getMultiLineTextHeight(FontSize, v89, LineHeight)
+		return getMultiLineTextHeight(FontSize, v88, LineHeight)
 	end, {
-		v45.maxLines,
-		v78,
-		v81,
-		v118,
+		v44.maxLines,
+		v77,
+		v80,
+		v117,
 		FontSize,
-		v89,
+		v88,
 		LineHeight
 	})
-	local v120 = React.useMemo(function() -- line: 702
-		-- upvalues: getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), container (copy), v72 (copy)
-		local v182 = getMultiLineTextHeight(FontSize, 1, LineHeight)
-		local v183 = v182 + math.round(math.round((container.minHeight - v72 - v182) * 2) / 2) + v72
+	local v119 = React.useMemo(function() -- line: 700
+		-- upvalues: getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), container (copy), v71 (copy)
+		local v181 = getMultiLineTextHeight(FontSize, 1, LineHeight)
+		local v182 = v181 + math.round(math.round((container.minHeight - v71 - v181) * 2) / 2) + v71
 
-		return UDim.new(0, (math.ceil(v183 / 2)))
+		return UDim.new(0, (math.ceil(v182 / 2)))
 	end, {
 		container.minHeight,
-		v72,
+		v71,
 		FontSize,
 		LineHeight
 	})
-	local v121 = React.useMemo(function() -- line: 711
-		-- upvalues: v45 (copy), v120 (copy), Radius (copy), container (copy)
-		if v45.maxLines then
-			return v120
+	local v120 = React.useMemo(function() -- line: 709
+		-- upvalues: v44 (copy), v119 (copy), Radius (copy), container (copy)
+		if v44.maxLines then
+			return v119
 		end
 
-		if v45.radius == Radius.Circle then
+		if v44.radius == Radius.Circle then
 			return UDim.new(0, (math.ceil(container.minHeight / 2)))
 		end
 
 		return nil
 	end, {
-		v45.maxLines,
-		v120,
+		v44.maxLines,
+		v119,
 		container.minHeight,
-		v45.radius
+		v44.radius
 	})
-	local v122 = React.useMemo(function() -- line: 721
-		-- upvalues: v121 (copy), container (copy), v46 (copy)
+	local v121 = React.useMemo(function() -- line: 719
+		-- upvalues: v120 (copy), container (copy), v45 (copy)
 		return {
-			radius = if not v121 then UDim.new(0, container.radius) else v121,
-			offset = v46.Stroke.Thick,
-			borderWidth = v46.Stroke.Thick
+			radius = if not v120 then UDim.new(0, container.radius) else v120,
+			offset = v45.Stroke.Thick,
+			borderWidth = v45.Stroke.Thick
 		}
 	end, {
-		v46,
+		v45,
 		container.radius,
-		v121
+		v120
 	})
-	local v123, v124 = React.useMemo(function() -- line: 730
-		-- upvalues: container (copy), v72 (copy), getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), v119 (copy)
-		local v184 = math.round((container.minHeight - v72 - getMultiLineTextHeight(FontSize, 1, LineHeight)) * 2) / 2
-		local uDim = UDim.new(0, (math.floor(v184 / 2)))
-		local uDim2 = UDim.new(0, (math.ceil(v184 / 2)))
-		local v187 = v119 + math.round(v184) + v72
+	local v122, v123 = React.useMemo(function() -- line: 728
+		-- upvalues: container (copy), v71 (copy), getMultiLineTextHeight (copy), FontSize (copy), LineHeight (copy), v118 (copy)
+		local v183 = math.round((container.minHeight - v71 - getMultiLineTextHeight(FontSize, 1, LineHeight)) * 2) / 2
+		local uDim = UDim.new(0, (math.floor(v183 / 2)))
+		local uDim2 = UDim.new(0, (math.ceil(v183 / 2)))
+		local v186 = v118 + math.round(v183) + v71
 
 		return {
 			top = uDim,
 			bottom = uDim2,
 			left = UDim.new(0, 0),
 			right = UDim.new(0, 0)
-		}, v187
+		}, v186
 	end, {
 		container.minHeight,
+		v71,
 		v72,
-		v73,
 		FontSize,
-		v119,
+		v118,
 		LineHeight
 	})
-	local v125 = v123.bottom.Offset + v123.top.Offset
-	local v126 = v45.textPaddingOnParent == true
-	local v127 = if not v126 then v123 else nil
-	local v128 = if not v126 then v119 + v125 else v119
-	local v129 = v90 and (v45.maxLines ~= nil and not v68)
-	local v130 = if not v126 then v81 + v125 else v81
-	local v131 = if not v129 then v128 else math.max(v128, v130)
-	local v132 = if not v126 then v131 else v131 + v125
-	local uDim2 = UDim2.new(1, 0, 0, v131)
-	local uDim2_2 = UDim2.new(1, 0, 0, v128)
+	local v124 = v122.bottom.Offset + v122.top.Offset
+	local v125 = v44.textPaddingOnParent == true
+	local v126 = if not v125 then v122 else nil
+	local v127 = if not v125 then v118 + v124 else v118
+	local v128 = v89 and (v44.maxLines ~= nil and not v67)
+	local v129 = if not v125 then v80 + v124 else v80
+	local v130 = if not v128 then v127 else math.max(v127, v129)
+	local v131 = if not v125 then v130 else v130 + v124
+	local uDim2 = UDim2.new(1, 0, 0, v130)
+	local uDim2_2 = UDim2.new(1, 0, 0, v127)
 
-	React.useEffect(function() -- line: 778
-		-- upvalues: v45 (copy), chatTextAreaDebug (copy), v89 (copy), v124 (copy)
-		if v45.maxLines then
-			chatTextAreaDebug.log("layout", `lineCount={ v89 } borderFrameHeight={ v124 }`)
+	React.useEffect(function() -- line: 776
+		-- upvalues: v44 (copy), chatTextAreaDebug (copy), v88 (copy), v123 (copy)
+		if v44.maxLines then
+			chatTextAreaDebug.log("layout", `lineCount={ v88 } borderFrameHeight={ v123 }`)
 		end
 
-		return function() -- line: 782
+		return function() -- line: 780
 		end
 	end, {
-		v89,
-		v124,
-		v45.maxLines
+		v88,
+		v123,
+		v44.maxLines
 	})
 
-	local v135 = React.useMemo(function() -- line: 785
-		-- upvalues: v90 (copy), v45 (copy)
-		if v90 then
+	local v134 = React.useMemo(function() -- line: 783
+		-- upvalues: v89 (copy), v44 (copy)
+		if v89 then
 			return {
 				FillDirection = Enum.FillDirection.Vertical,
-				ItemLineAlignment = if v45.maxLines == nil then Enum.ItemLineAlignment.Center else Enum.ItemLineAlignment.Start
+				ItemLineAlignment = if v44.maxLines == nil then Enum.ItemLineAlignment.Center else Enum.ItemLineAlignment.Start
 			}
 		end
 
 		return nil
 	end, {
-		v90,
-		v45.maxLines
+		v89,
+		v44.maxLines
 	})
-	local v136 = React.useMemo(function() -- line: 796
-		-- upvalues: v90 (copy)
-		if v90 then
+	local v135 = React.useMemo(function() -- line: 794
+		-- upvalues: v89 (copy)
+		if v89 then
 			return {
 				AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				CanvasSize = UDim2.fromOffset(0, 0),
@@ -729,275 +728,268 @@ local function InternalTextInput(p2, p3) -- line: 192
 		end
 
 		return nil
-	end, { v90 })
-	local v137 = React.useCallback(function(p20) -- line: 807
-		-- upvalues: v50 (copy), v49 (copy), truncateTextToCursor (copy), v123 (copy)
-		local current = v50.current
-		local current2 = v49.current
+	end, { v89 })
+	local v136 = React.useCallback(function(p20) -- line: 805
+		-- upvalues: v49 (copy), v48 (copy), truncateTextToCursor (copy), v122 (copy)
+		local current = v49.current
+		local current2 = v48.current
 
 		if current == nil or current2 == nil then
 			return
 		end
 
-		local v191 = p20.TextSize * p20.LineHeight
+		local v190 = p20.TextSize * p20.LineHeight
 		local CanvasPositionY = current.CanvasPosition.Y
 
 		current2.Text = truncateTextToCursor(p20)
 
 		local TextBoundsY = current2.TextBounds.Y
-		local v194 = CanvasPositionY - v123.top.Offset + v123.bottom.Offset
-		local v195 = CanvasPositionY + current.AbsoluteSize.Y - v123.top.Offset - v123.bottom.Offset
+		local v193 = CanvasPositionY - v122.top.Offset + v122.bottom.Offset
+		local v194 = CanvasPositionY + current.AbsoluteSize.Y - v122.top.Offset - v122.bottom.Offset
 
-		if v194 > TextBoundsY - v191 then
-			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v191 - v194)
+		if v193 > TextBoundsY - v190 then
+			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v190 - v193)
 		end
 
-		if v195 < TextBoundsY then
-			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v195)
+		if v194 < TextBoundsY then
+			current.CanvasPosition = current.CanvasPosition + Vector2.new(0, TextBoundsY - v194)
 		end
-	end, { v123 })
-	local v138 = React.useCallback(function(p21) -- line: 840
-		-- upvalues: v50 (copy), v54 (copy)
+	end, { v122 })
+	local v137 = React.useCallback(function(p21) -- line: 838
+		-- upvalues: v49 (copy), v53 (copy)
 		if p21 == nil then
 			return
 		end
 
-		v50.current = p21
+		v49.current = p21
 		p21.ClipsDescendants = true
-		p21.CanvasPosition = v54.current
+		p21.CanvasPosition = v53.current
 	end, {})
-	local v139 = React.useCallback(function(p22) -- line: 850
-		-- upvalues: v51 (copy), Flags (copy)
+	local v138 = React.useCallback(function(p22) -- line: 848
+		-- upvalues: v50 (copy)
 		if p22 then
-			p22.Text = v51.current
-			v51.current = ""
-
-			if Flags.FoundationTextAreaDelayMobileFocus then
-				task.delay(0, function() -- line: 855
-					-- upvalues: p22 (copy)
-					if p22.Parent ~= nil then
-						p22:CaptureFocus()
-					end
-				end)
-
-				return
-			end
-
-			p22:CaptureFocus()
+			p22.Text = v50.current
+			v50.current = ""
+			task.delay(0, function() -- line: 852
+				-- upvalues: p22 (copy)
+				if p22.Parent ~= nil then
+					p22:CaptureFocus()
+				end
+			end)
 		end
 	end, {})
-	local v140 = React.useCallback(function(p23) -- line: 866
-		-- upvalues: v54 (copy)
-		v54.current = p23.CanvasPosition
+	local v139 = React.useCallback(function(p23) -- line: 860
+		-- upvalues: v53 (copy)
+		v53.current = p23.CanvasPosition
 	end, {})
-	local v141 = React.useMemo(function() -- line: 871
-		-- upvalues: v45 (copy), React (copy), v115 (copy), v116 (copy), v117 (copy), v59 (copy), isDisabled (copy)
-		if not v45.onDragStarted and (not v45.onDrag and not v45.onDragEnded) then
+	local v140 = React.useMemo(function() -- line: 865
+		-- upvalues: v44 (copy), React (copy), v114 (copy), v115 (copy), v116 (copy), v58 (copy), isDisabled (copy)
+		if not v44.onDragStarted and (not v44.onDrag and not v44.onDragEnded) then
 			return nil
 		end
 
 		return React.createElement("UIDragDetector", {
 			DragStyle = Enum.UIDragDetectorDragStyle.Scriptable,
-			[React.Event.DragStart] = v115,
-			[React.Event.DragContinue] = v116,
-			[React.Event.DragEnd] = v117,
-			Enabled = not v59 and not isDisabled
+			[React.Event.DragStart] = v114,
+			[React.Event.DragContinue] = v115,
+			[React.Event.DragEnd] = v116,
+			Enabled = not v58 and not isDisabled
 		})
 	end, {
+		v114,
 		v115,
 		v116,
-		v117,
-		v59,
+		v58,
 		isDisabled,
-		v45.onDragStarted,
-		v45.onDrag,
-		v45.onDragEnded
+		v44.onDragStarted,
+		v44.onDrag,
+		v44.onDragEnded
 	})
-	local v142 = useBindable(if not v45.horizontalPadding then UDim.new(0, 0) else v45.horizontalPadding.left or UDim.new(0, 0))
-	local v143 = useBindable(if not v45.horizontalPadding then UDim.new(0, 0) else v45.horizontalPadding.right or UDim.new(0, 0))
-	local v144 = React.useMemo(function() -- line: 902
-		-- upvalues: v45 (copy), container (copy), v46 (copy)
-		if v45.hasClearButton then
-			return (UDim2.fromOffset(0, (container.minHeight - v46.Stroke.Standard) / 2))
+	local v141 = useBindable(if not v44.horizontalPadding then UDim.new(0, 0) else v44.horizontalPadding.left or UDim.new(0, 0))
+	local v142 = useBindable(if not v44.horizontalPadding then UDim.new(0, 0) else v44.horizontalPadding.right or UDim.new(0, 0))
+	local v143 = React.useMemo(function() -- line: 896
+		-- upvalues: v44 (copy), container (copy), v45 (copy)
+		if v44.hasClearButton then
+			return (UDim2.fromOffset(0, (container.minHeight - v45.Stroke.Standard) / 2))
 		end
 
 		return nil
 	end, {
-		v45.hasClearButton,
+		v44.hasClearButton,
 		container.minHeight,
-		v46.Stroke.Standard
+		v45.Stroke.Standard
 	})
-	local v145 = ReactUtils.useComposedRef(v48, v139)
+	local v144 = ReactUtils.useComposedRef(v47, v138)
 
-	return React.createElement(View, withCommonProps(v45, {
-		Size = UDim2.new(1, 0, 0, v124),
+	return React.createElement(View, withCommonProps(v44, {
+		Size = UDim2.new(1, 0, 0, v123),
 		selection = {
-			Selectable = if not Flags.FoundationInputSelectionProps then not isDisabled else v45.Selectable and not isDisabled,
-			NextSelectionUp = if not Flags.FoundationInputSelectionProps then nil else v45.NextSelectionUp,
-			NextSelectionDown = if not Flags.FoundationInputSelectionProps then nil else v45.NextSelectionDown,
-			NextSelectionLeft = if not Flags.FoundationInputSelectionProps then nil else v45.NextSelectionLeft,
-			NextSelectionRight = if not Flags.FoundationInputSelectionProps then nil else v45.NextSelectionRight
+			Selectable = v44.Selectable and not isDisabled,
+			NextSelectionUp = v44.NextSelectionUp,
+			NextSelectionDown = v44.NextSelectionDown,
+			NextSelectionLeft = v44.NextSelectionLeft,
+			NextSelectionRight = v44.NextSelectionRight
 		},
-		cursor = v122,
+		cursor = v121,
 		stroke = if not container.strokeStyle or not container.strokeThickness then nil else {
 			Color = container.strokeStyle.Color3,
 			Transparency = if not isDisabled then container.strokeStyle.Transparency else blendTransparencies(container.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY),
 			Thickness = container.strokeThickness,
-			BorderStrokePosition = if not v59 and not v57 then Enum.BorderStrokePosition.Inner else Enum.BorderStrokePosition.Center
+			BorderStrokePosition = if not v58 and not v56 then Enum.BorderStrokePosition.Inner else Enum.BorderStrokePosition.Center
 		},
-		cornerRadius = v121,
+		cornerRadius = v120,
 		padding = {
-			left = v142:map(function(p24) -- line: 944
+			left = v141:map(function(p24) -- line: 936
 				-- upvalues: Standard (copy)
 				return UDim.new(0, Standard) + p24
 			end),
-			right = if v45.trailingElement ~= nil or not v45.hasClearButton then v143:map(function(p25) -- line: 950
+			right = if v44.trailingElement ~= nil or not v44.hasClearButton then v142:map(function(p25) -- line: 942
 				-- upvalues: Standard (copy)
 				return UDim.new(0, Standard) + p25
 			end) else UDim.new(0, Standard),
 			top = UDim.new(0, Standard),
 			bottom = UDim.new(0, Standard)
 		},
-		onActivated = if isDisabled then nil else v94,
-		onStateChanged = v114,
-		isDisabled = v66,
+		onActivated = if isDisabled then nil else v93,
+		onStateChanged = v113,
+		isDisabled = v65,
 		backgroundStyle = if not container.bgStyle then nil else getDisabledStyle({
 			Color3 = container.bgStyle.Color3,
-			Transparency = if not v45.backgroundGradient then container.bgStyle.Transparency else 0
-		}, v66),
+			Transparency = if not v44.backgroundGradient then container.bgStyle.Transparency else 0
+		}, v65),
 		stateLayer = {
 			affordance = StateLayerAffordance.None
 		},
-		tag = v63,
-		testId = `{ v45.testId }--outer-container`
+		tag = v62,
+		testId = `{ v44.testId }--outer-container`
 	}), {
-		DragDetector = v141,
-		Background = v45.backgroundGradient,
-		Leading = if not v45.leadingElement then nil else React.createElement(View, {
+		DragDetector = v140,
+		Background = v44.backgroundGradient,
+		Leading = if not v44.leadingElement then nil else React.createElement(View, {
 			LayoutOrder = 1,
 			tag = "size-0-full auto-x",
-			GroupTransparency = if not v66 then nil else Constants.DISABLED_TRANSPARENCY,
-			testId = `{ v45.testId }--leading`
-		}, v45.leadingElement),
-		TextBoxWrapper = React.createElement(if not v90 then View else ScrollView, {
+			GroupTransparency = if not v65 then nil else Constants.DISABLED_TRANSPARENCY,
+			testId = `{ v44.testId }--leading`
+		}, v44.leadingElement),
+		TextBoxWrapper = React.createElement(if not v89 then View else ScrollView, {
 			LayoutOrder = 2,
 			tag = "fill size-full clip",
 			selection = {
 				Selectable = false
 			},
-			scroll = v136,
-			layout = v135,
-			onCanvasPositionChanged = if not v90 then nil else v140,
-			scrollingFrameRef = if not v90 then nil else v138
+			scroll = v135,
+			layout = v134,
+			onCanvasPositionChanged = if not v89 then nil else v139,
+			scrollingFrameRef = if not v89 then nil else v137
 		}, {
 			TextContent = React.createElement(View, {
-				Size = if not v129 then nil else UDim2.new(1, 0, 0, v132),
+				Size = if not v128 then nil else UDim2.new(1, 0, 0, v131),
 				tag = {
-					["fill size-full"] = not v129
+					["fill size-full"] = not v128
 				},
-				padding = if not v126 then nil else v123,
+				padding = if not v125 then nil else v122,
 				selection = {
 					Selectable = false
 				},
-				onActivated = if isDisabled then nil else v94,
+				onActivated = if isDisabled then nil else v93,
 				stateLayer = {
 					affordance = StateLayerAffordance.None
 				}
 			}, {
-				TextBox = if v68 then nil else React.createElement(v37, {
+				TextBox = if v67 then nil else React.createElement(v36, {
 					overlayNativeInput = nil,
-					text = v88,
-					placeholder = v45.placeholder,
-					textInputType = v45.textInputType,
+					text = v87,
+					placeholder = v44.placeholder,
+					textInputType = v44.textInputType,
 					fontStyle = fontStyle,
-					textStyle = v74,
-					isMultiLine = v90,
+					textStyle = v73,
+					isMultiLine = v89,
 					isDisabled = isDisabled,
-					ref = v47,
-					tag = `{ v64 or "" } data-testid={ v45.testId }--textbox`,
-					Size = if not v90 then nil else uDim2,
-					automaticSize = if not v45.maxLines then if not v83 then mapBindable(v45.text, function(p26) -- line: 1020
-						-- upvalues: v90 (copy), v68 (copy)
-						if v90 and (not v68 and p26 ~= "") then
+					ref = v46,
+					tag = `{ v63 or "" } data-testid={ v44.testId }--textbox`,
+					Size = if not v89 then nil else uDim2,
+					automaticSize = if not v44.maxLines then if not v82 then mapBindable(v44.text, function(p26) -- line: 1012
+						-- upvalues: v89 (copy), v67 (copy)
+						if v89 and (not v67 and p26 ~= "") then
 							return Enum.AutomaticSize.Y
 						end
 
 						return nil
-					end) else if not v90 or (v68 or v84 == "") then nil else Enum.AutomaticSize.Y else nil,
-					padding = v127,
-					onFocusGained = v111,
-					onFocusLost = if not v90 or not v70 then v113 else nil,
-					onTextChanged = v100,
-					onCursorPositionChanged = if not v90 then nil else v137,
-					onInputChanged = v102,
-					onInputEnded = v112,
-					manualFocusRelease = if not v70 then nil else v45.manualFocusRelease,
-					shouldEmitReturnEvents = v70 and (v45.manualFocusRelease == true and v45.alwaysMultiLine == true) or nil
+					end) else if not v89 or (v67 or v83 == "") then nil else Enum.AutomaticSize.Y else nil,
+					padding = v126,
+					onFocusGained = v110,
+					onFocusLost = if not v89 or not v69 then v112 else nil,
+					onTextChanged = v99,
+					onCursorPositionChanged = if not v89 then nil else v136,
+					onInputChanged = v101,
+					onInputEnded = v111,
+					manualFocusRelease = if not v69 then nil else v44.manualFocusRelease,
+					shouldEmitReturnEvents = v69 and (v44.manualFocusRelease == true and v44.alwaysMultiLine == true) or nil
 				}, {
-					DragDetector = v141,
-					BoundsChecker = if not v90 then nil else React.createElement(v37, {
+					DragDetector = v140,
+					BoundsChecker = if not v89 then nil else React.createElement(v36, {
 						isBoundsChecker = true,
 						fontStyle = fontStyle,
-						textStyle = v74,
-						Size = if not v126 then UDim2.new(1, 0, 1, v125) else UDim2.fromScale(1, 1),
-						ref = v49
+						textStyle = v73,
+						Size = if not v125 then UDim2.new(1, 0, 1, v124) else UDim2.fromScale(1, 1),
+						ref = v48
 					})
 				}),
-				MobileTextBox = if not v90 or not v68 then nil else React.createElement(v37, {
+				MobileTextBox = if not v89 or not v67 then nil else React.createElement(v36, {
 					overlayNativeInput = nil,
-					text = v88,
-					placeholder = v45.placeholder,
-					textInputType = v45.textInputType,
+					text = v87,
+					placeholder = v44.placeholder,
+					textInputType = v44.textInputType,
 					fontStyle = fontStyle,
-					textStyle = v74,
-					isMultiLine = v90,
+					textStyle = v73,
+					isMultiLine = v89,
 					isDisabled = isDisabled,
-					padding = v127,
-					ref = v145,
-					tag = `{ v64 or "" } data-testid={ v45.testId }--mobile-textbox`,
+					padding = v126,
+					ref = v144,
+					tag = `{ v63 or "" } data-testid={ v44.testId }--mobile-textbox`,
 					Size = uDim2_2,
-					onFocusLost = if not v90 or not v70 then nil else v113,
-					onTextChanged = v100,
-					onCursorPositionChanged = if not v90 then nil else v137,
-					onInputEnded = v112,
-					manualFocusRelease = if not v70 then nil else v45.manualFocusRelease,
-					shouldEmitReturnEvents = v70 and (v45.manualFocusRelease == true and v45.alwaysMultiLine == true) or nil
+					onFocusLost = if not v89 or not v69 then nil else v112,
+					onTextChanged = v99,
+					onCursorPositionChanged = if not v89 then nil else v136,
+					onInputEnded = v111,
+					manualFocusRelease = if not v69 then nil else v44.manualFocusRelease,
+					shouldEmitReturnEvents = v69 and (v44.manualFocusRelease == true and v44.alwaysMultiLine == true) or nil
 				})
 			})
 		}),
-		Clear = if not v45.hasClearButton then nil else React.createElement(View, {
+		Clear = if not v44.hasClearButton then nil else React.createElement(View, {
 			LayoutOrder = 3,
 			isDisabled = isDisabled,
 			GroupTransparency = if not isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-			Visible = mapBindable(v45.text, function(p27) -- line: 1093
+			Visible = mapBindable(v44.text, function(p27) -- line: 1085
 				return p27 ~= ""
 			end),
-			tag = v61.clearButton.tag
+			tag = v60.clearButton.tag
 		}, {
 			ClearButton = React.createElement(View, {
 				tag = "anchor-center-left auto-xy",
-				onActivated = v99,
-				padding = UDim.new(0, v61.clearButton.padding),
-				Position = v144,
+				onActivated = v98,
+				padding = UDim.new(0, v60.clearButton.padding),
+				Position = v143,
 				stateLayer = {
 					affordance = StateLayerAffordance.None
 				},
-				testId = `{ v45.testId }--clear-button`
+				testId = `{ v44.testId }--clear-button`
 			}, {
 				Icon = React.createElement(Icon, {
-					name = v61.clearButton.icon
+					name = v60.clearButton.icon
 				})
 			})
 		}),
-		Trailing = if not v45.trailingElement then nil else React.createElement(View, {
+		Trailing = if not v44.trailingElement then nil else React.createElement(View, {
 			LayoutOrder = 4,
-			GroupTransparency = if not v66 then nil else Constants.DISABLED_TRANSPARENCY,
+			GroupTransparency = if not v65 then nil else Constants.DISABLED_TRANSPARENCY,
 			tag = {
-				["col align-y-bottom self-stretch size-0-full auto-x"] = v45.trailingAlignBottom == true,
-				["row align-y-center size-0-full auto-x"] = v45.trailingAlignBottom ~= true
+				["col align-y-bottom self-stretch size-0-full auto-x"] = v44.trailingAlignBottom == true,
+				["row align-y-center size-0-full auto-x"] = v44.trailingAlignBottom ~= true
 			},
-			testId = `{ v45.testId }--trailing`
-		}, v45.trailingElement)
+			testId = `{ v44.testId }--trailing`
+		}, v44.trailingElement)
 	})
 end
 

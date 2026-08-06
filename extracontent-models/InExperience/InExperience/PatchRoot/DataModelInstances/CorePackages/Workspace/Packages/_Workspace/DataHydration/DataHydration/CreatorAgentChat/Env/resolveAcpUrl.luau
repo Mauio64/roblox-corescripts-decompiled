@@ -2,7 +2,7 @@ local ContentProvider = game:GetService("ContentProvider")
 local AcpProtocol = require(script.Parent.Parent.Acp.AcpProtocol)
 local v3 = game:DefineFastString("MyStatsExperienceStatsBaseUrl", "")
 
-local function resolveCreatorAgentAcp() -- line: 34
+local function resolveCreatorAgentAcp() -- line: 33
 	-- upvalues: v3 (copy), ContentProvider (copy), AcpProtocol (copy)
 	local v8 = v3
 
@@ -18,7 +18,7 @@ local function resolveCreatorAgentAcp() -- line: 34
 		return t1
 	end
 
-	local ok, result = pcall(function() -- line: 44
+	local ok, result = pcall(function() -- line: 43
 		-- upvalues: ContentProvider (copy)
 		return ContentProvider.BaseUrl
 	end)
@@ -45,11 +45,11 @@ end
 
 return {
 	resolveCreatorAgentAcp = resolveCreatorAgentAcp,
-	resolveCreatorAgentAcpUrl = function() -- line: 65
+	resolveCreatorAgentAcpUrl = function() -- line: 64
 		-- upvalues: resolveCreatorAgentAcp (copy)
 		return resolveCreatorAgentAcp().url
 	end,
-	parseSitetestRobloxlabsNumber = function(s1: string) -- line: 26
+	parseSitetestRobloxlabsNumber = function(s1: string) -- line: 25
 		local match = string.match(s1, "sitetest(%d+)%.robloxlabs%.com")
 
 		if match == nil then
@@ -58,7 +58,7 @@ return {
 
 		return (tonumber(match))
 	end,
-	buildRobloxlabsAcpUrl = function(n1: number) -- line: 22
+	buildRobloxlabsAcpUrl = function(n1: number) -- line: 21
 		-- upvalues: AcpProtocol (copy)
 		return `https://apis.sitetest{ n1 }.robloxlabs.com{ AcpProtocol.ACP_PATH }`
 	end

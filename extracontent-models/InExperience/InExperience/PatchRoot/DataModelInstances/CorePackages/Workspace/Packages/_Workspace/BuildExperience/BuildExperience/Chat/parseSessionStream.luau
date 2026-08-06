@@ -7,14 +7,14 @@ local PublishToolUtils = CreatorAgentChat.PublishToolUtils
 local TurnStateReducer = CreatorAgentChat.TurnStateReducer
 local SubagentTasks = CreatorAgentChat.SubagentTasks
 
-local function contentBlockToText(p1) -- line: 77
+local function contentBlockToText(p1) -- line: 76
 	if p1 ~= nil and (p1.type == "text" and typeof(p1.text) == "string") then
 		return p1.text
 	end
 
 	return ""
 end
-local function contentBlocksToText(t1: {[any]: any}?) -- line: 84
+local function contentBlocksToText(t1: {[any]: any}?) -- line: 83
 	if typeof(t1) ~= "table" then
 		return ""
 	end
@@ -31,7 +31,7 @@ local function contentBlocksToText(t1: {[any]: any}?) -- line: 84
 
 	return table.concat(t2)
 end
-local function getSequenceId(p2) -- line: 98
+local function getSequenceId(p2) -- line: 97
 	local sequenceId = p2.sequenceId
 
 	if typeof(sequenceId) == "number" and sequenceId >= 0 then
@@ -40,7 +40,7 @@ local function getSequenceId(p2) -- line: 98
 
 	return nil
 end
-local function asOptimisticallyCancelled(p3) -- line: 106
+local function asOptimisticallyCancelled(p3) -- line: 105
 	-- upvalues: TurnStateReducer (copy)
 	return TurnStateReducer.applySessionUpdate(p3, {
 		sessionUpdate = "state_change",
@@ -48,7 +48,7 @@ local function asOptimisticallyCancelled(p3) -- line: 106
 		stop_reason = "cancelled"
 	}, nil)
 end
-local function getMessageId(p4) -- line: 114
+local function getMessageId(p4) -- line: 113
 	local messageId = p4.messageId
 
 	if typeof(messageId) == "string" and messageId ~= "" then
@@ -57,19 +57,19 @@ local function getMessageId(p4) -- line: 114
 
 	return nil
 end
-local function isAssistantTurnUpdate(p5) -- line: 119
+local function isAssistantTurnUpdate(p5) -- line: 118
 	return p5 == "agent_message" or (p5 == "agent_message_chunk" or (p5 == "tool_call_update" or (p5 == "tool_call_content_chunk" or p5 == "state_change")))
 end
-local function hasAssistantTurnContent(p6) -- line: 127
+local function hasAssistantTurnContent(p6) -- line: 126
 	return p6.assistantText ~= "" or (#p6.activityItems > 0 or p6.toolCallCount > 0)
 end
-local function shouldEmitAssistantTurn(p7) -- line: 135
+local function shouldEmitAssistantTurn(p7) -- line: 134
 	return p7.assistantText ~= "" or (#p7.activityItems > 0 or p7.toolCallCount > 0) or (#p7.pendingAgentMessageContent > 0 or (p7.status == "cancelled" or (p7.stopReason == "cancelled" or p7.stopReason == "error")))
 end
-local function orderedBySequenceId(t3: {[any]: any}) -- line: 143
+local function orderedBySequenceId(t3: {[any]: any}) -- line: 142
 	local v36 = table.clone(t3)
 
-	table.sort(v36, function(p8, p9) -- line: 145
+	table.sort(v36, function(p8, p9) -- line: 144
 		local sequenceId = p8.sequenceId
 		local v109 = ((if typeof(sequenceId) ~= "number" or not (sequenceId >= 0) then nil else sequenceId)) or -1
 		local sequenceId2 = p9.sequenceId
@@ -79,7 +79,7 @@ local function orderedBySequenceId(t3: {[any]: any}) -- line: 143
 
 	return v36
 end
-local function parseChatItems(t4: {[any]: any}, s1: string) -- line: 155
+local function parseChatItems(t4: {[any]: any}, s1: string) -- line: 154
 	-- upvalues: contentBlocksToText (copy), TurnStateReducer (copy)
 	local t5 = {}
 	local u40 = nil
@@ -88,7 +88,7 @@ local function parseChatItems(t4: {[any]: any}, s1: string) -- line: 155
 	local t6 = {}
 	local u44 = false
 
-	local function flushActiveTurn() -- line: 163
+	local function flushActiveTurn() -- line: 162
 		-- upvalues: u40 (ref), u44 (ref), t5 (copy), u41 (ref), u42 (ref), t6 (ref)
 		if u40 ~= nil and u44 then
 			local v111 = u40
@@ -110,7 +110,7 @@ local function parseChatItems(t4: {[any]: any}, s1: string) -- line: 155
 		t6 = {}
 		u44 = false
 	end
-	local function appendUserMessage(s2: string?, n1: number?, s3: string) -- line: 180
+	local function appendUserMessage(s2: string?, n1: number?, s3: string) -- line: 179
 		-- upvalues: t5 (copy)
 		if s3 == "" then
 			return
@@ -194,7 +194,7 @@ local function parseChatItems(t4: {[any]: any}, s1: string) -- line: 155
 
 	return t5
 end
-local function buildUserMessageItem(t7: {[any]: any}, s4: string?) -- line: 237
+local function buildUserMessageItem(t7: {[any]: any}, s4: string?) -- line: 236
 	local v58 = if s4 == nil or t7.sequenceId == nil then t7.messageId else `{ s4 }:{ t7.sequenceId }:user`
 
 	return {
@@ -203,14 +203,14 @@ local function buildUserMessageItem(t7: {[any]: any}, s4: string?) -- line: 237
 		text = t7.text
 	}
 end
-local function getEventMeta(p10, n2: number?) -- line: 248
+local function getEventMeta(p10, n2: number?) -- line: 247
 	if n2 == nil or p10.eventMetaBySequenceId == nil then
 		return nil
 	end
 
 	return p10.eventMetaBySequenceId[n2]
 end
-local function resolveTurnId(p11, t8: {[any]: any}) -- line: 255
+local function resolveTurnId(p11, t8: {[any]: any}) -- line: 254
 	local endSequenceId = t8.endSequenceId
 	local v64 = if endSequenceId ~= nil and p11.eventMetaBySequenceId ~= nil then p11.eventMetaBySequenceId[endSequenceId] else nil
 
@@ -228,7 +228,7 @@ local function resolveTurnId(p11, t8: {[any]: any}) -- line: 255
 
 	return nil
 end
-local function buildTurnFeedbackIds(t9: {[any]: any}, t10: {[any]: any}) -- line: 269
+local function buildTurnFeedbackIds(t9: {[any]: any}, t10: {[any]: any}) -- line: 268
 	-- upvalues: PublishToolUtils (copy), resolveTurnId (copy)
 	local v70 = PublishToolUtils.getLatestSuccessfulResult(t9.turnState)
 
@@ -242,13 +242,13 @@ local function buildTurnFeedbackIds(t9: {[any]: any}, t10: {[any]: any}) -- line
 		rollbackTargetVersionNumber = if v70 == nil then nil else v70.rollbackTargetVersionNumber
 	}
 end
-local function parseSessionStream(t11: {[any]: any}, t12: {[any]: any}) -- line: 282
+local function parseSessionStream(t11: {[any]: any}, t12: {[any]: any}) -- line: 281
 	-- upvalues: parseChatItems (copy), TurnStateReducer (copy), PublishToolUtils (copy), SubagentTasks (copy), buildTurnFeedbackIds (copy)
 	local sessionId = t12.sessionId
 	local v74 = parseChatItems
 	local v75 = table.clone(t11)
 
-	table.sort(v75, function(p12, p13) -- line: 145
+	table.sort(v75, function(p12, p13) -- line: 144
 		local sequenceId = p12.sequenceId
 		local v119 = ((if typeof(sequenceId) ~= "number" or not (sequenceId >= 0) then nil else sequenceId)) or -1
 		local sequenceId3 = p13.sequenceId

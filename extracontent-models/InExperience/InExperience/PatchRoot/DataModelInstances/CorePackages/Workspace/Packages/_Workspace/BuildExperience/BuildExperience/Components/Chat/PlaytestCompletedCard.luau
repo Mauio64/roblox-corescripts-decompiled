@@ -10,7 +10,7 @@ local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 
-local function PlaytestCompletedCard(t1: {[any]: any}) -- line: 27
+local function PlaytestCompletedCard(t1: {[any]: any}) -- line: 25
 	-- upvalues: React (copy), View (copy), FoundationText (copy), LocalizationStrings (copy), Button (copy), IconName (copy), InputSize (copy), ButtonVariant (copy)
 	local v14 = t1.isLoading == true
 

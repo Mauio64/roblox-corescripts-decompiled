@@ -13,7 +13,7 @@ local t1 = {
 	}
 }
 
-local function shouldSample(n1: number) -- line: 15
+local function shouldSample(n1: number) -- line: 14
 	if n1 <= 0 then
 		return false
 	end
@@ -26,7 +26,7 @@ local function shouldSample(n1: number) -- line: 15
 end
 
 return {
-	log = function(n2: number, b1: boolean, n3: number?) -- line: 25
+	log = function(n2: number, b1: boolean, n3: number?) -- line: 24
 		-- upvalues: TelemetryService (copy), t1 (copy)
 		local FastInt = game:GetFastInt("BuildExperienceTurnActivityGapMsThrottleHundredthsPercent")
 

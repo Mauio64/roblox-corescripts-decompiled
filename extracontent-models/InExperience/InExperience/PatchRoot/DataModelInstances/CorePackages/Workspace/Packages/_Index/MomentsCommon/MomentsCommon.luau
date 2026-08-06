@@ -27,7 +27,7 @@ local t1 = {
 	useDeviceInsets = require(script.Hooks.useDeviceInsets),
 	useFormFactor = require(script.Hooks.useFormFactor),
 	useImageLoadingState = require(script.Hooks.useImageLoadingState),
-	useMomentsGating = function(...) -- line: 74
+	useMomentsGating = function(...) -- line: 87
 		return require(script.Hooks.useMomentsGating)(...)
 	end,
 	useScreenSize = require(script.Hooks.useScreenSize),
@@ -37,6 +37,9 @@ local t1 = {
 
 return {
 	Analytics = Analytics,
+	canRenderNativeMoments = function(t2: {[any]: any}) -- line: 83
+		return t2.isTabEnabled or t2.isFlyoutEntryEnabled and t2.platformIntegrationEnabled
+	end,
 	Flags = {
 		ArgusExperiment = ArgusExperiment,
 		GetFFlagMomentsAnalyticsProducerPrereqs = GetFFlagMomentsAnalyticsProducerPrereqs,

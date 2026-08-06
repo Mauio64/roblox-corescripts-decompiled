@@ -2,6 +2,9 @@ local scriptParent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local React = require(FoundationParent.React)
+
+require(Foundation.Enums.ColorMode)
+
 local Device = require(Foundation.Enums.Device)
 local StyleSheetContext = require(scriptParent.StyleSheetContext)
 local TagsContext = require(scriptParent.TagsContext)
@@ -21,15 +24,15 @@ local t1 = {
 	device = Device.Desktop
 }
 
-local function StyleProvider(t2: {[any]: any}) -- line: 49
+local function StyleProvider(t2: {[any]: any}) -- line: 55
 	-- upvalues: withDefaults (copy), t1 (copy), VariantsContext (copy), React (copy), getTokens (copy), usePreferences (copy), getTextSizeOffset (copy), useRegistryStyleSheet (copy), TokensContext (copy), TextSizeOffsetContext (copy), TagsContext (copy), StyleSheetContext (copy)
 	local v21 = withDefaults({
-		theme = t2.theme,
+		theme = t2.colorMode or t2.theme,
 		device = t2.device,
 		scale = t2.scale
 	}, t1)
 	local v22 = VariantsContext.useVariantsState()
-	local v23 = React.useMemo(function() -- line: 58
+	local v23 = React.useMemo(function() -- line: 64
 		-- upvalues: getTokens (copy), v21 (copy), t2 (copy)
 		return getTokens(v21.theme, v21.device, v21.scale, t2.tokenOverrides)
 	end, {
@@ -39,7 +42,7 @@ local function StyleProvider(t2: {[any]: any}) -- line: 49
 		t2.tokenOverrides
 	})
 	local preferredTextSize = usePreferences().preferredTextSize
-	local v25 = React.useMemo(function() -- line: 65
+	local v25 = React.useMemo(function() -- line: 71
 		-- upvalues: getTextSizeOffset (copy)
 		return getTextSizeOffset() or 0
 	end, { preferredTextSize })

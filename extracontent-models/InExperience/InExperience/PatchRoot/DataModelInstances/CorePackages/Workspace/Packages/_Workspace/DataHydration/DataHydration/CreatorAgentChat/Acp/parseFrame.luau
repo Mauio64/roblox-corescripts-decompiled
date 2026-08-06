@@ -2,10 +2,10 @@ local HttpService = game:GetService("HttpService")
 
 require(script.Parent.Parent.types)
 
-local function trim(s1: string) -- line: 11
+local function trim(s1: string) -- line: 10
 	return (s1:gsub("^%s+", ""):gsub("%s+$", ""))
 end
-local function stripFrame(s2: string) -- line: 15
+local function stripFrame(s2: string) -- line: 14
 	local v7 = s2:gsub("^%s+", ""):gsub("%s+$", "")
 
 	if v7 == "" then
@@ -26,7 +26,7 @@ local function stripFrame(s2: string) -- line: 15
 
 	return v7
 end
-local function parseFrame(s3: string) -- line: 32
+local function parseFrame(s3: string) -- line: 31
 	-- upvalues: stripFrame (copy), HttpService (copy)
 	local v9 = stripFrame(s3)
 

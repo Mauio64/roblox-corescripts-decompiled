@@ -22,28 +22,31 @@ local useCallback = React.useCallback
 local useEffect = React.useEffect
 local FFlagLuaAppEventsListImpressionToEventError = require(VirtualEvents.Parent.SharedFlags).FFlagLuaAppEventsListImpressionToEventError
 local FFlagLuaAppSduiEventDetailsEnabled = require(VirtualEvents.Parent.SharedFlags).FFlagLuaAppSduiEventDetailsEnabled
+local FFlagLuaAppGameViewTileBackgroundColorOverride = require(VirtualEvents.Parent.SharedFlags).FFlagLuaAppGameViewTileBackgroundColorOverride
 
-return function(t1: {[any]: any}) -- line: 52
-	-- upvalues: useTextSizeOffset (copy), useDesignTokens (copy), Responsive (copy), React (copy), HttpService (copy), useCallback (copy), EventTile (copy), FFlagLuaAppSduiEventDetailsEnabled (copy), useGetGameTileHeight (copy), useLocalization (copy), sortEventsByStartDate (copy), FFlagLuaAppEventsListImpressionToEventError (copy), DiscoveryEventErrorLogger (copy), flaggedMutedError (copy), useCollectionImpressionsSignal (copy), useEffect (copy), CollectionCarousel (copy), FrameBoundsImpressionsTracker (copy)
-	local v23 = useTextSizeOffset()
-	local v24 = useDesignTokens()
-	local v25 = Responsive.usePreferredInput() == Responsive.Input.Directional
-	local v26 = React.useMemo(function() -- line: 57
+return function(t1: {[any]: any}) -- line: 54
+	-- upvalues: useTextSizeOffset (copy), useDesignTokens (copy), Responsive (copy), React (copy), HttpService (copy), FFlagLuaAppGameViewTileBackgroundColorOverride (copy), useCallback (copy), EventTile (copy), FFlagLuaAppSduiEventDetailsEnabled (copy), useGetGameTileHeight (copy), useLocalization (copy), sortEventsByStartDate (copy), FFlagLuaAppEventsListImpressionToEventError (copy), DiscoveryEventErrorLogger (copy), flaggedMutedError (copy), useCollectionImpressionsSignal (copy), useEffect (copy), CollectionCarousel (copy), FrameBoundsImpressionsTracker (copy)
+	local v24 = useTextSizeOffset()
+	local v25 = useDesignTokens()
+	local v26 = Responsive.usePreferredInput() == Responsive.Input.Directional
+	local v27 = React.useMemo(function() -- line: 59
 		-- upvalues: t1 (copy), HttpService (copy)
 		return `EventsListCarousel_{ t1.universeId }{ HttpService:GenerateGUID() }`
 	end, { t1.universeId })
-	local v27 = useCallback(function(p1, n1: number, uDim2: UDim2, _: number?) -- line: 62
-		-- upvalues: React (copy), EventTile (copy), t1 (copy), v26 (copy), v25 (copy), FFlagLuaAppSduiEventDetailsEnabled (copy)
+	local v28 = if not FFlagLuaAppGameViewTileBackgroundColorOverride or not t1.peekViewFormat then nil else v25.Color.Surface.Surface_200
+	local v29 = useCallback(function(p1, n1: number, uDim2: UDim2, _: number?) -- line: 71
+		-- upvalues: React (copy), EventTile (copy), t1 (copy), v28 (copy), v27 (copy), v26 (copy), FFlagLuaAppSduiEventDetailsEnabled (copy)
 		return React.createElement(EventTile, {
 			Event = p1,
 			DefaultThumbnail = t1.defaultThumbnail,
+			backgroundStyle = v28,
 			onJoinEvent = t1.onJoinEvent,
 			onRsvpChanged = t1.onRsvpChanged,
 			onTileActivated = t1.onTileActivated,
-			impressionsTag = v26,
+			impressionsTag = v27,
 			layoutOrder = n1,
 			size = uDim2,
-			disableButtons = v25,
+			disableButtons = v26,
 			suppressRsvpReminderToastBecauseEventDetailsFocused = if not FFlagLuaAppSduiEventDetailsEnabled then nil else t1.suppressRsvpReminderToastBecauseEventDetailsFocused
 		}), p1.id
 	end, {
@@ -52,46 +55,47 @@ return function(t1: {[any]: any}) -- line: 52
 		t1.onRsvpChanged,
 		t1.onTileActivated,
 		if not FFlagLuaAppSduiEventDetailsEnabled then nil else t1.suppressRsvpReminderToastBecauseEventDetailsFocused,
+		v27,
 		v26,
-		v25
+		if not FFlagLuaAppGameViewTileBackgroundColorOverride then nil else v28
 	})
-	local v28 = useGetGameTileHeight(false, "Event", true, false, false, v23, v25 and 0 or v24.Size.Size_700 + v24.Size.Size_200)
-	local v29 = useLocalization({
+	local v30 = useGetGameTileHeight(false, "Event", true, false, false, v24, v26 and 0 or v25.Size.Size_700 + v25.Size.Size_200)
+	local v31 = useLocalization({
 		title = "Feature.VirtualEvents.EventsListTitle"
 	})
-	local v30 = sortEventsByStartDate(t1.virtualEvents)
-	local v31 = React.useRef({})
-	local v32 = useCallback(function(p2) -- line: 109
-		-- upvalues: v30 (copy), v31 (copy), t1 (copy), FFlagLuaAppEventsListImpressionToEventError (copy), DiscoveryEventErrorLogger (copy), flaggedMutedError (copy)
-		for _, v44 in p2 do
-			local v45 = v30[v44]
+	local v32 = sortEventsByStartDate(t1.virtualEvents)
+	local v33 = React.useRef({})
+	local v34 = useCallback(function(p2) -- line: 120
+		-- upvalues: v32 (copy), v33 (copy), t1 (copy), FFlagLuaAppEventsListImpressionToEventError (copy), DiscoveryEventErrorLogger (copy), flaggedMutedError (copy)
+		for _, v46 in p2 do
+			local v47 = v32[v46]
 
-			if v45 ~= nil then
-				if not v31.current[v45.id] then
-					v31.current[v45.id] = true
-					t1.onEventImpression(v45)
+			if v47 ~= nil then
+				if not v33.current[v47.id] then
+					v33.current[v47.id] = true
+					t1.onEventImpression(v47)
 				end
 			elseif FFlagLuaAppEventsListImpressionToEventError then
-				DiscoveryEventErrorLogger.reportError("EventsListCarouselNilViewedEvent", `Viewed event at index { v44 } was nil when sending Event Tile impressions with referral source { t1.referralSource }`, {
-					index = v44,
+				DiscoveryEventErrorLogger.reportError("EventsListCarouselNilViewedEvent", `Viewed event at index { v46 } was nil when sending Event Tile impressions with referral source { t1.referralSource }`, {
+					index = v46,
 					referralSource = t1.referralSource
 				})
 			else
-				flaggedMutedError("EventsListCarouselNilViewedEvent", `Viewed event at index ${ v44 } was nil when sending Event Tile impressions with referral source ${ t1.referralSource }`)
+				flaggedMutedError("EventsListCarouselNilViewedEvent", `Viewed event at index ${ v46 } was nil when sending Event Tile impressions with referral source ${ t1.referralSource }`)
 			end
 		end
 	end, {
 		t1.onEventImpression,
-		v30,
+		v32,
 		t1.referralSource
 	})
-	local v33 = React.useRef(nil)
-	local v34, v35 = useCollectionImpressionsSignal()
-	local v36, v37 = React.useState(os.clock())
+	local v35 = React.useRef(nil)
+	local v36, v37 = useCollectionImpressionsSignal()
+	local v38, v39 = React.useState(os.clock())
 
-	useEffect(function() -- line: 147
-		-- upvalues: v37 (copy)
-		v37(os.clock())
+	useEffect(function() -- line: 158
+		-- upvalues: v39 (copy)
+		v39(os.clock())
 	end, { t1.virtualEvents })
 
 	if #t1.virtualEvents == 0 then
@@ -109,23 +113,23 @@ return function(t1: {[any]: any}) -- line: 52
 			hideHeaderButton = true,
 			fractionalItemAmount = 0.33,
 			sideMargin = 0,
-			scrollingFrameRef = v33,
-			title = v29.title,
-			items = v30,
-			renderItem = v27,
-			getItemHeight = v28,
-			onViewableItemsChanged = v35,
-			onChangeCanvasPosition = v35,
+			scrollingFrameRef = v35,
+			title = v31.title,
+			items = v32,
+			renderItem = v29,
+			getItemHeight = v30,
+			onViewableItemsChanged = v37,
+			onChangeCanvasPosition = v37,
 			numColumns = not t1.peekViewFormat and 2 or 1,
-			columnGap = v24.Size.Size_300
+			columnGap = v25.Size.Size_300
 		}),
 		FrameBoundsImpressionsTracker = React.createElement(FrameBoundsImpressionsTracker, {
 			pageContext = t1.referralSource,
-			parentRef = v33,
-			impressionsTag = v26,
-			scrollViewPositionChangedSignal = v34,
-			sendImpressions = v32,
-			dataUpdatedTimestamp = v36
+			parentRef = v35,
+			impressionsTag = v27,
+			scrollViewPositionChangedSignal = v36,
+			sendImpressions = v34,
+			dataUpdatedTimestamp = v38
 		})
 	})
 end

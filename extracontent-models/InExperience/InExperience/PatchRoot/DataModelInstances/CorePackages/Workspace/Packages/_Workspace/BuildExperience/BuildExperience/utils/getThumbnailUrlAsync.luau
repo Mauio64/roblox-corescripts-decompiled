@@ -5,7 +5,7 @@ local debug = require(Parent.DataHydration.CreatorAgentChat).debug
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 27
+local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 26
 	-- upvalues: debug (copy), Promise (copy), fetch (copy), asPromise (copy)
 	local v10 = s1 or "420x420"
 
@@ -13,11 +13,11 @@ local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 27
 		assetId = n1
 	})
 
-	return Promise.new(function(resolve, reject) -- line: 32
+	return Promise.new(function(resolve, reject) -- line: 31
 		-- upvalues: fetch (copy), n1 (copy), v10 (copy), asPromise (copy), debug (copy)
 		local n2 = 0
 
-		local function poll(n3: number) -- line: 35
+		local function poll(n3: number) -- line: 34
 			-- upvalues: fetch (copy), n1 (copy), v10 (copy), asPromise (copy), reject (copy), debug (copy), resolve (copy), n2 (ref), poll (copy)
 			local v16 = fetch({
 				method = "POST",
@@ -29,12 +29,12 @@ local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 27
 					targetId = n1,
 					size = v10
 				}},
-				decode = function(p1) -- line: 48
+				decode = function(p1) -- line: 47
 					return p1
 				end
 			})
 
-			asPromise(v16):andThen(function(p2) -- line: 54
+			asPromise(v16):andThen(function(p2) -- line: 53
 				-- upvalues: reject (copy), debug (copy), n1 (copy), resolve (copy), n2 (ref), poll (copy), n3 (copy)
 				local v19 = p2 and p2.data
 
@@ -73,7 +73,7 @@ local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 27
 						return
 					end
 
-					task.delay(2, function() -- line: 71
+					task.delay(2, function() -- line: 70
 						-- upvalues: poll (copy), n3 (copy)
 						poll(n3 + 1)
 					end)
@@ -91,7 +91,7 @@ local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 27
 						return
 					end
 
-					task.delay(2, function() -- line: 80
+					task.delay(2, function() -- line: 79
 						-- upvalues: poll (copy), n3 (copy)
 						poll(n3 + 1)
 					end)
@@ -100,7 +100,7 @@ local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 27
 				end
 
 				reject(`Thumbnail failed: { v20.state }`)
-			end):catch(function(p3) -- line: 88
+			end):catch(function(p3) -- line: 87
 				-- upvalues: reject (copy)
 				reject(p3)
 			end)

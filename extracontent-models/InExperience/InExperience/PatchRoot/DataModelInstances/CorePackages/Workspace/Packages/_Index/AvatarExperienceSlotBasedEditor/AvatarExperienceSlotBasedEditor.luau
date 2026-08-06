@@ -9,10 +9,10 @@ local NavigationParams = require(script.Enums.NavigationParams)
 
 require(script.Hooks.useSlotItemCardBreakpoints)
 
-local InventoryItemType = require(script.Enums.InventoryItemType)
 local InventorySorts = require(script.Enums.InventorySorts)
 local InventoryFilters = require(script.Enums.InventoryFilters)
 local InventoryItemAvailability = require(script.Enums.InventoryItemAvailability)
+local InventoryItemType = require(script.Enums.InventoryItemType)
 local SlotType = require(script.Enums.SlotType)
 local createCategoryInventoryStore = require(script.Stores.createCategoryInventoryStore)
 local createSortAndFiltersStore = require(script.Stores.createSortAndFiltersStore)
@@ -61,10 +61,10 @@ return {
 		Categories = Categories,
 		ItemView = ItemView,
 		NavigationParams = NavigationParams,
-		InventoryItemType = InventoryItemType,
 		InventorySorts = InventorySorts,
 		InventoryFilters = InventoryFilters,
 		InventoryItemAvailability = InventoryItemAvailability,
+		InventoryItemType = InventoryItemType,
 		SlotType = SlotType
 	},
 	Constants = require(script.Constants),

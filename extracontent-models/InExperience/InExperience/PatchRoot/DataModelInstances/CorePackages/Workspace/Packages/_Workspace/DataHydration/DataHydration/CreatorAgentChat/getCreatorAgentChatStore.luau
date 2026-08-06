@@ -10,7 +10,7 @@ require(script.Parent.types)
 
 local wireCapDelivery = require(script.Parent.Acp.wireCapDelivery)
 
-local function createDefaultStore() -- line: 20
+local function createDefaultStore() -- line: 19
 	-- upvalues: resolveAcpUrl (copy), debug (copy), AcpProtocol (copy), createCreatorAgentChatStore (copy), getDefaultAuthHeaders (copy), wireCapDelivery (copy)
 	local v10 = resolveAcpUrl.resolveCreatorAgentAcp()
 

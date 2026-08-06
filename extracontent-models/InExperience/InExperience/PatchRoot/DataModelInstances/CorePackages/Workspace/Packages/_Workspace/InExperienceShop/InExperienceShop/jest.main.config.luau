@@ -14,6 +14,7 @@ return {
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.ErrorLogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,
-		JestConfigs.setupFiles.createPromiseRejectionHandler()
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes
 	}
 }

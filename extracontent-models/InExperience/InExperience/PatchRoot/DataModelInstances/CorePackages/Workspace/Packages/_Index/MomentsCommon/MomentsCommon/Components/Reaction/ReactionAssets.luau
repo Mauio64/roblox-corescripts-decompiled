@@ -49,5 +49,15 @@ return {
 		end
 
 		return `rbxasset://textures/ui/Moments/Reactions/{ v12 }-{ v13 }.png`
+	end,
+	getStickerImageUri = function(p6) -- line: 62
+		-- upvalues: t1 (copy)
+		local v16 = t1[p6]
+
+		if v16 == nil then
+			return nil
+		end
+
+		return `rbxasset://textures/ui/Moments/Reactions/{ v16 }-large@3x.png`
 	end
 }

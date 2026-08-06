@@ -7,9 +7,9 @@ local createPrivateShareLink = require(BuildExperience.utils.createPrivateShareL
 local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
 local isSubjectToDesktopPolicies = SharedFlags.isSubjectToDesktopPolicies
 
-local function sharePrivateExperience(n1: number) -- line: 34
+local function sharePrivateExperience(n1: number) -- line: 33
 	-- upvalues: createPrivateShareLink (copy), FFlagEnableShareSheet (copy), UniversalShareSheet (copy), isSubjectToDesktopPolicies (copy), default (copy)
-	return createPrivateShareLink(n1):andThen(function(s1: string?) -- line: 35
+	return createPrivateShareLink(n1):andThen(function(s1: string?) -- line: 34
 		-- upvalues: FFlagEnableShareSheet (copy), UniversalShareSheet (copy), isSubjectToDesktopPolicies (copy), default (copy)
 		if s1 == nil then
 			error("sharePrivateExperience: no share link returned")

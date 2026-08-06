@@ -8,13 +8,13 @@ require(BuildExperience.Stores.GetPlaytestLoadingStore.createPlaytestLoadingStor
 
 local PlaytestStatusIndicator = require(script.Parent.PlaytestStatusIndicator)
 
-local function getStatusForPlaceId(p1, n1: number, p2) -- line: 22
+local function getStatusForPlaceId(p1, n1: number, p2) -- line: 20
 	-- upvalues: GetPlaytestLoadingStore (copy)
 	return (p2 or GetPlaytestLoadingStore(p1)).getStatusForPlaceId(n1)(p1)
 end
-local function PlaytestStatusIndicatorForPlace(t1: {[any]: any}) -- line: 31
+local function PlaytestStatusIndicatorForPlace(t1: {[any]: any}) -- line: 29
 	-- upvalues: React (copy), getStatusForPlaceId (copy), SignalsReact (copy), PlaytestStatusIndicator (copy)
-	local v13 = React.useCallback(function(p3) -- line: 32
+	local v13 = React.useCallback(function(p3) -- line: 30
 		-- upvalues: getStatusForPlaceId (copy), t1 (copy)
 		return getStatusForPlaceId(p3, t1.placeId, t1.playtestLoadingStore)
 	end, {

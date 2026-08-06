@@ -2,7 +2,7 @@ local TextService = game:GetService("TextService")
 local getVisibleLineCount = require(script.Parent.getVisibleLineCount)
 local chatTextAreaDebug = require(script.Parent.chatTextAreaDebug)
 
-local function measureTextLineCount(t1: {[any]: any}) -- line: 25
+local function measureTextLineCount(t1: {[any]: any}) -- line: 23
 	-- upvalues: getVisibleLineCount (copy), chatTextAreaDebug (copy), TextService (copy)
 	local v6 = getVisibleLineCount(t1.text, t1.maxLines)
 	local n1 = 1

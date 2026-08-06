@@ -12,11 +12,14 @@ local FFlagEnableBlackbirdOnFlyoutMenu = SharedFlags.FFlagEnableBlackbirdOnFlyou
 local FFlagEnableRMOnMorePageGUAC = SharedFlags.FFlagEnableRMOnMorePageGUAC
 local FFlagEnableRMOnMorePageForAll = SharedFlags.FFlagEnableRMOnMorePageForAll
 local FFlagLuaAppFixNotificationBadgeCountsSync = SharedFlags.FFlagLuaAppFixNotificationBadgeCountsSync
-local v15 = game:DefineFastFlag("FlyoutGateMomentsTile", false)
-local useMomentsGating = require(Parent.MomentsCommon).Hooks.useMomentsGating
+local FFlagFixMomentsExperienceFallback = SharedFlags.FFlagFixMomentsExperienceFallback
+local v16 = game:DefineFastFlag("FlyoutGateMomentsTile", false)
+local MomentsCommon = require(Parent.MomentsCommon)
+local useMomentsGating = MomentsCommon.Hooks.useMomentsGating
+local canRenderNativeMoments = MomentsCommon.canRenderNativeMoments
 local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
 
-local function updateNotifications(p1, p2, p3, p4) -- line: 22
+local function updateNotifications(p1, p2, p3, p4) -- line: 25
 	-- upvalues: FlyoutContentSettings (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy)
 	local n1 = 0
 
@@ -32,24 +35,24 @@ local function updateNotifications(p1, p2, p3, p4) -- line: 22
 		p1.notificationCount = n1
 	end
 end
-local function useFlyoutNavigationItems() -- line: 42
-	-- upvalues: Constants (copy), useSelector (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy), React (copy), useAppPolicy (copy), v15 (copy), useMomentsGating (copy), FFlagEnableRMOnMorePageGUAC (copy), FlyoutContentSettings (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), updateNotifications (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), FFlagEnableRMOnMorePageForAll (copy), AppPage (copy)
+local function useFlyoutNavigationItems() -- line: 45
+	-- upvalues: Constants (copy), useSelector (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy), React (copy), useAppPolicy (copy), v16 (copy), FFlagFixMomentsExperienceFallback (copy), useMomentsGating (copy), FFlagEnableRMOnMorePageGUAC (copy), FlyoutContentSettings (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), updateNotifications (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), FFlagEnableRMOnMorePageForAll (copy), canRenderNativeMoments (copy), AppPage (copy)
 	local FLYOUT_DEFAULT_POLICY = Constants.FLYOUT_DEFAULT_POLICY
-	local v26 = useSelector(function(p5) -- line: 46
+	local v29 = useSelector(function(p5) -- line: 49
 		return p5.NotificationBadgeCounts
 	end)
-	local v27 = useSelector(function(p6) -- line: 50
+	local v30 = useSelector(function(p6) -- line: 53
 		-- upvalues: FFlagLuaAppFixNotificationBadgeCountsSync (copy)
 		if not FFlagLuaAppFixNotificationBadgeCountsSync then
 			return 0
 		end
 
 		local FriendsCarousel = p6.FriendsCarousel
-		local v44 = FriendsCarousel and (FriendsCarousel.Friends and FriendsCarousel.Friends.requests)
+		local v47 = FriendsCarousel and (FriendsCarousel.Friends and FriendsCarousel.Friends.requests)
 
-		return v44 and v44.receivedCount or 0
+		return v47 and v47.receivedCount or 0
 	end)
-	local v28 = useSelector(function(p7) -- line: 59
+	local v31 = useSelector(function(p7) -- line: 62
 		-- upvalues: FFlagLuaAppFixNotificationBadgeCountsSync (copy)
 		if not FFlagLuaAppFixNotificationBadgeCountsSync then
 			return 0
@@ -57,84 +60,92 @@ local function useFlyoutNavigationItems() -- line: 42
 
 		return p7.SocialTab and p7.SocialTab.UnreadConversationCount or 0
 	end)
-	local v29 = useSelector(function(p8) -- line: 66
+	local v32 = useSelector(function(p8) -- line: 69
 		return p8.OmniRecommendations and p8.OmniRecommendations.Home
 	end)
-	local v30 = v29 and v29.sorts or {}
-	local v31, v32 = React.useMemo(function() -- line: 70
-		-- upvalues: v30 (copy), Constants (copy)
-		local v47 = nil
-		local v48 = nil
+	local v33 = v32 and v32.sorts or {}
+	local v34, v35 = React.useMemo(function() -- line: 73
+		-- upvalues: v33 (copy), Constants (copy)
+		local v50 = nil
+		local v51 = nil
 
-		for _, v in pairs(v30) do
+		for _, v in pairs(v33) do
 			if v.topicId == Constants.SORT_ID_CONTINUE_PLAYING then
-				v47 = true
+				v50 = true
 			elseif v.topicId == Constants.SORT_ID_FAVORITES then
-				v48 = true
+				v51 = true
 			end
 		end
 
-		return v47, v48
-	end, { v30 })
-	local v33 = useAppPolicy(function(p9) -- line: 82
+		return v50, v51
+	end, { v33 })
+	local v36 = useAppPolicy(function(p9) -- line: 85
 		return p9.getDisablePremiumEntrypoint() or false
 	end)
-	local v34 = useAppPolicy(function(p10) -- line: 85
+	local v37 = useAppPolicy(function(p10) -- line: 88
 		return p10.getDisableBlackbirdEntrypoints() or false
 	end)
-	local v35 = useAppPolicy(function(p11) -- line: 88
+	local v38 = useAppPolicy(function(p11) -- line: 91
 		return p11.getGiftCardSourceRefOverride()
 	end)
-	local v36 = useAppPolicy(function(p12) -- line: 91
+	local v39 = useAppPolicy(function(p12) -- line: 94
 		return p12.getRedeemTileEnabled()
 	end)
-	local v37 = if not v15 then nil else useMomentsGating()
-	local v38 = not not v15 and useAppPolicy(function(p13) -- line: 96
+	local v40 = if not v16 and not FFlagFixMomentsExperienceFallback then nil else useMomentsGating()
+	local v41 = not not v16 and useAppPolicy(function(p13) -- line: 101
 		return p13.getDisplayMomentsMoreTabTile()
 	end)
-	local v39 = not v15 or (not FFlagEnableRMOnMorePageGUAC or v38)
-	local v40 = not v35 or v35 == ""
+	local v42 = not v16 or (not FFlagEnableRMOnMorePageGUAC or v41)
+	local v43 = not v38 or v38 == ""
 
-	return React.useMemo(function() -- line: 106
-		-- upvalues: FLYOUT_DEFAULT_POLICY (copy), FlyoutContentSettings (copy), v32 (copy), v31 (copy), v33 (copy), v40 (copy), v36 (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), v34 (copy), updateNotifications (copy), v26 (copy), v27 (copy), v28 (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), v15 (copy), v37 (copy), FFlagEnableRMOnMorePageForAll (copy), v39 (copy), AppPage (copy)
+	return React.useMemo(function() -- line: 111
+		-- upvalues: FLYOUT_DEFAULT_POLICY (copy), FlyoutContentSettings (copy), v35 (copy), v34 (copy), v36 (copy), v43 (copy), v39 (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), v37 (copy), updateNotifications (copy), v29 (copy), v30 (copy), v31 (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), v16 (copy), v40 (copy), FFlagEnableRMOnMorePageForAll (copy), v42 (copy), FFlagFixMomentsExperienceFallback (copy), canRenderNativeMoments (copy), AppPage (copy)
 		local t1 = {}
 		local t2 = {}
 
-		for _, v59 in FLYOUT_DEFAULT_POLICY.MyLibrary do
-			local v60 = FlyoutContentSettings.ItemInfo[v59]
+		for _, v62 in FLYOUT_DEFAULT_POLICY.MyLibrary do
+			local v63 = FlyoutContentSettings.ItemInfo[v62]
 
-			if v60 ~= nil and (v59 ~= FlyoutContentSettings.ItemType.Favorites or v32) and (v59 ~= FlyoutContentSettings.ItemType.ContinuePlaying or v31) and (v59 ~= FlyoutContentSettings.ItemType.Premium or not v33) and (v59 ~= FlyoutContentSettings.ItemType.GiftCards or not v40) and (v59 ~= FlyoutContentSettings.ItemType.Redeem or v36) and (not FFlagEnableBlackbird or not FFlagEnableBlackbirdOnFlyoutMenu or v59 ~= FlyoutContentSettings.ItemType.Premium and (v59 ~= FlyoutContentSettings.ItemType.Blackbird or not v34)) then
-				local v61 = table.clone(v60)
+			if v63 ~= nil and (v62 ~= FlyoutContentSettings.ItemType.Favorites or v35) and (v62 ~= FlyoutContentSettings.ItemType.ContinuePlaying or v34) and (v62 ~= FlyoutContentSettings.ItemType.Premium or not v36) and (v62 ~= FlyoutContentSettings.ItemType.GiftCards or not v43) and (v62 ~= FlyoutContentSettings.ItemType.Redeem or v39) and (not FFlagEnableBlackbird or not FFlagEnableBlackbirdOnFlyoutMenu or v62 ~= FlyoutContentSettings.ItemType.Premium and (v62 ~= FlyoutContentSettings.ItemType.Blackbird or not v37)) then
+				local v64 = table.clone(v63)
 
-				updateNotifications(v61, v26, v27, v28)
-				table.insert(t1, v61)
+				updateNotifications(v64, v29, v30, v31)
+				table.insert(t1, v64)
 			end
 		end
 
-		for _, v63 in FLYOUT_DEFAULT_POLICY.AdditionalNavigation do
-			local v64 = FlyoutContentSettings.ItemInfo[v63]
+		for _, v66 in FLYOUT_DEFAULT_POLICY.AdditionalNavigation do
+			local v67 = FlyoutContentSettings.ItemInfo[v66]
 
-			if v64 == nil then
+			if v67 == nil then
 				continue
 			end
 
-			if v63 == FlyoutContentSettings.ItemType.Events then
+			if v66 == FlyoutContentSettings.ItemType.Events then
 				if not GetFFlagPlatformEventEnabled() or GetFStringPlatformEventUrl() == "" then
 					continue
 				end
-			elseif v63 == FlyoutContentSettings.ItemType.Moments and v15 and ((v37 == nil or not v37.isFlyoutEntryEnabled) and (not FFlagEnableRMOnMorePageForAll and not v39)) then
+			elseif v66 == FlyoutContentSettings.ItemType.Moments and v16 and ((v40 == nil or not v40.isFlyoutEntryEnabled) and (not FFlagEnableRMOnMorePageForAll and not v42)) then
 				continue
 			end
 
-			local v65 = table.clone(v64)
+			local v68 = table.clone(v67)
 
-			if v63 == FlyoutContentSettings.ItemType.Moments and v37 ~= nil and v37.isFlyoutEntryEnabled and v37.platformIntegrationEnabled then
-				v65.context = {
-					appPage = AppPage.Moments
-				}
+			if v66 == FlyoutContentSettings.ItemType.Moments and v40 ~= nil then
+				if FFlagFixMomentsExperienceFallback then
+					v68.context = if not canRenderNativeMoments(v40) then {
+						appUri = FlyoutContentSettings.MomentsExperienceUri
+					} else {
+						appPage = AppPage.Moments
+					}
+				elseif v40.isFlyoutEntryEnabled and v40.platformIntegrationEnabled then
+					v68.context = {
+						appPage = AppPage.Moments
+					}
+				end
 			end
 
-			table.insert(t2, v65)
+			table.insert(t2, v68)
 		end
 
 		return {
@@ -142,17 +153,17 @@ local function useFlyoutNavigationItems() -- line: 42
 			additionalNavigationItems = t2
 		}
 	end, {
-		v32,
-		v31,
-		FLYOUT_DEFAULT_POLICY,
-		v26,
-		v33,
+		v35,
 		v34,
-		v40,
-		if not v15 then nil else v39,
+		FLYOUT_DEFAULT_POLICY,
+		v29,
+		v36,
 		v37,
-		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v27,
-		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v28
+		v43,
+		if not v16 then nil else v42,
+		v40,
+		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v30,
+		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v31
 	})
 end
 

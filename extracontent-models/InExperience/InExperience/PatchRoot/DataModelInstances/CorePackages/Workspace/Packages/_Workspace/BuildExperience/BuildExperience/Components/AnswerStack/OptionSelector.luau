@@ -8,7 +8,7 @@ local t1 = {
 	affordance = Foundation.Enums.StateLayerAffordance.None
 }
 
-local function OptionSelector(t2: {[any]: any}) -- line: 25
+local function OptionSelector(t2: {[any]: any}) -- line: 24
 	-- upvalues: useTokens (copy), React (copy), View (copy), t1 (copy), FoundationText (copy)
 	local v10 = useTokens()
 	local v11 = t2.isSelected == true

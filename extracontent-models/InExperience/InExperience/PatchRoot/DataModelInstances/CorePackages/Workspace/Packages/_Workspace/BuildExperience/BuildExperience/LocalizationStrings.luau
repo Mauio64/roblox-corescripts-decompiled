@@ -124,20 +124,20 @@ return {
 	BUILD_MENU_PUBLISH = "Publish",
 	BUILD_MENU_PUBLISH_LATEST = "Publish latest",
 	CREATOR_CREDIT_BUY = "Buy",
-	CREATOR_CREDIT_DAILY_CAPTION = "AI Credits reset daily",
-	CREATOR_CREDIT_DAILY_LABEL = "Daily AI Credits",
-	CREATOR_CREDIT_EXTRA_DESCRIPTION = "Additional AI usage starts after your free daily credits run out.",
-	CREATOR_CREDIT_EXTRA_LABEL = "Extra AI Credits",
-	CREATOR_CREDIT_INSUFFICIENT_FUNDS = "You need more AI Credits to continue.",
-	CREATOR_CREDIT_LOADING = "Loading AI usage…",
+	CREATOR_CREDIT_DAILY_CAPTION = "Build usage resets daily",
+	CREATOR_CREDIT_DAILY_LABEL = "Daily Build usage",
+	CREATOR_CREDIT_EXTRA_DESCRIPTION = "Additional Build usage starts after your free daily usage runs out.",
+	CREATOR_CREDIT_EXTRA_LABEL = "Additional Build usage",
+	CREATOR_CREDIT_INSUFFICIENT_FUNDS = "You need more Build usage to continue.",
+	CREATOR_CREDIT_LOADING = "Loading Build usage…",
 	CREATOR_CREDIT_MENU_ITEM = "Usage",
-	CREATOR_CREDIT_PAGE_TITLE = "AI usage",
-	CREATOR_CREDIT_FREE_USAGE_LABEL = "Free AI usage",
+	CREATOR_CREDIT_PAGE_TITLE = "Build usage",
+	CREATOR_CREDIT_FREE_USAGE_LABEL = "Free Build usage",
 	CREATOR_CREDIT_FREE_USAGE_CAPTION = "Resets daily",
-	CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL = "Get more AI usage",
-	CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL = "Additional AI usage",
+	CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL = "Get more Build usage",
+	CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL = "Additional Build usage",
 	CREATOR_CREDIT_AVAILABLE_SUFFIX = "available",
-	CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION = "Use your Robux to automatically buy additional AI usage as you create. You can set a daily spend limit anytime.",
+	CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION = "Use your Robux to automatically buy additional Build usage as you create. You can set a daily spend limit anytime.",
 	CREATOR_CREDIT_SET_DAILY_LIMIT = "Set a daily limit",
 	CREATOR_CREDIT_MANAGE_LIMIT = "Manage limit",
 	CREATOR_CREDIT_SETTINGS_SAVE_ERROR = "Couldn't save changes. Try again.",
@@ -145,10 +145,10 @@ return {
 	CREATOR_CREDIT_LIMIT_SHEET_CONFIRM = "Set limit",
 	CREATOR_CREDIT_LIMIT_SHEET_NO_LIMIT = "No limit",
 	CREATOR_CREDIT_BUY_ROBUX_BUTTON = "Buy Robux",
-	CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = "No Robux left for AI usage",
-	CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = "Buy more Robux to keep creating, or wait for your free AI usage to reset tomorrow.",
-	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE = "Free AI usage limit reached",
-	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION = "Buy more AI usage with Robux, or wait for your daily limit to reset.",
+	CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = "No Robux left for Build usage",
+	CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = "Buy more Robux to keep creating, or wait for your free Build usage to reset tomorrow.",
+	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE = "Free Build usage limit reached",
+	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION = "Buy more Build usage with Robux, or wait for your daily limit to reset.",
 	CREATOR_CREDIT_DAILY_LIMIT_REACHED_TITLE = "Daily Robux limit reached",
 	CREATOR_CREDIT_DAILY_LIMIT_REACHED_DESCRIPTION = "Increase your daily Robux limit to keep creating, or wait for it to reset tomorrow.",
 	CREATOR_CREDIT_ADJUST_LIMIT_BUTTON = "Manage limit",
@@ -177,7 +177,7 @@ return {
 	CHAT_ERROR_INTERNAL = "Build ran into a problem. Try again.",
 	CHAT_ERROR_INVALID_PARAMS = "Something went wrong with your message. Edit it and try again.",
 	CHAT_ERROR_NOT_FOUND = "This conversation couldn't be found. Start a new one.",
-	CHAT_ERROR_OUT_OF_CREDITS = "You're out of AI usage. View your options to continue.",
+	CHAT_ERROR_OUT_OF_CREDITS = "You're out of Build usage. View your options to use Robux to keep creating.",
 	CHAT_ERROR_UNAUTHORIZED = "You're signed out. Sign in and try again.",
 	CHAT_ERROR_UPSTREAM_UNAVAILABLE = "Build is temporarily unavailable. Try again in a minute.",
 	CHAT_MISSING_PROJECT = "Create a new game to start using Build.",
@@ -225,6 +225,7 @@ return {
 	GAME_CONFIGURATION_LOADING = "Loading...",
 	GAME_CONFIGURATION_PREVIEW = "Preview",
 	GAME_CONFIGURATION_PUBLISH = "Publish",
+	GAME_CONFIGURATION_PUBLISH_AUDIENCE_ERROR = "Your game was published, but couldn't be made public. Try again.",
 	GAME_CONFIGURATION_PUBLISH_ERROR = "Your game couldn't be published. Try again.",
 	GAME_CONFIGURATION_PUBLISH_SUCCESS = "Your game is ready to play on Roblox!",
 	GAME_CONFIGURATION_SHARE = "Share",
@@ -347,6 +348,7 @@ return {
 	MY_CREATIONS_NEW_GAME = "New game",
 	MY_CREATIONS_PRIVATE = "Private",
 	MY_CREATIONS_PUBLIC = "Public",
+	MY_CREATIONS_PUBLICLY_UNAVAILABLE = "Publicly unavailable",
 	MY_CREATIONS_READY = "Ready",
 	MY_CREATIONS_RESTRICTED = "Limited",
 	PLAYTEST_DISABLED_TOOLTIP = "You can start playtesting after you create your first game.",
@@ -414,50 +416,50 @@ return {
 	VERSION_HISTORY_RESTORE = "Restore",
 	VERSION_HISTORY_RESTORE_FAILED = "Couldn't restore this version. Try again.",
 	VERSION_HISTORY_TITLE = "Version history",
-	formatBuildGreeting = function(s1: string) -- line: 109
+	formatBuildGreeting = function(s1: string) -- line: 107
 		if s1 ~= "" then
 			return `Hi, { s1 }`
 		end
 
 		return "Hi"
 	end,
-	formatGameSharedWithTarget = function(s2: string) -- line: 117
+	formatGameSharedWithTarget = function(s2: string) -- line: 115
 		if s2 == "" then
 			return "Game shared"
 		end
 
 		return `Game shared with { s2 }`
 	end,
-	formatShareExperience = function(s3: string) -- line: 113
+	formatShareExperience = function(s3: string) -- line: 111
 		return `Share { s3 }`
 	end,
-	formatChatFailedTool = function(s4: string) -- line: 159
+	formatChatFailedTool = function(s4: string) -- line: 157
 		return `Failed { s4 }`
 	end,
-	formatChatFinishedTool = function(s5: string) -- line: 155
+	formatChatFinishedTool = function(s5: string) -- line: 153
 		return `Finished { s5 }`
 	end,
-	formatChatRunningTool = function(s6: string) -- line: 163
+	formatChatRunningTool = function(s6: string) -- line: 161
 		return `Running { s6 }`
 	end,
-	formatChatTaskCount = function(n1: number) -- line: 136
+	formatChatTaskCount = function(n1: number) -- line: 134
 		if n1 == 1 then
 			return "1 task completed"
 		end
 
 		return `{ n1 } tasks completed`
 	end,
-	formatChatThinkingDuration = function(n2: number) -- line: 150
+	formatChatThinkingDuration = function(n2: number) -- line: 148
 		return `Thinking for { math.max(0, (math.floor(n2))) }s`
 	end,
-	formatChatTurnFailureMessage = function(s7: string, n3: number?) -- line: 132
+	formatChatTurnFailureMessage = function(s7: string, n3: number?) -- line: 130
 		if n3 ~= nil then
 			return `({ n3 }) { s7 }`
 		end
 
 		return s7
 	end,
-	formatChatWorkedDuration = function(n4: number) -- line: 140
+	formatChatWorkedDuration = function(n4: number) -- line: 138
 		local v13 = math.max(0, (math.floor(n4 + 0.5)))
 
 		if v13 < 60 then
@@ -466,7 +468,7 @@ return {
 
 		return `Worked for { math.floor(v13 / 60) }m{ v13 % 60 }s`
 	end,
-	getChatToolActivityLabel = function(s8: string, s9: string?) -- line: 167
+	getChatToolActivityLabel = function(s8: string, s9: string?) -- line: 165
 		-- upvalues: t1 (copy)
 		local v20 = t1[s8]
 
@@ -484,53 +486,53 @@ return {
 
 		return v20.running
 	end,
-	formatMyCreationsUniverseName = function(n5: number) -- line: 124
+	formatMyCreationsUniverseName = function(n5: number) -- line: 122
 		return `Universe { n5 }`
 	end,
-	formatPrivateInvitesCount = function(n6: number, n7: number) -- line: 212
+	formatPrivateInvitesCount = function(n6: number, n7: number) -- line: 210
 		return `{ n6 }/{ n7 }`
 	end,
-	formatPrivateInvitesSent = function(n8: number, n9: number) -- line: 208
+	formatPrivateInvitesSent = function(n8: number, n9: number) -- line: 206
 		return `{ n8 } of { n9 } playtesters added`
 	end,
-	formatPrivateInvitesSubtitle = function(n10: number) -- line: 204
+	formatPrivateInvitesSubtitle = function(n10: number) -- line: 202
 		return `Choose up to { n10 } friends, then share the link to the game.`
 	end,
-	formatSubagentStatusCompletedTasks = function(n11: number) -- line: 128
+	formatSubagentStatusCompletedTasks = function(n11: number) -- line: 126
 		return `{ n11 } completed tasks`
 	end,
-	formatUserPickerUsername = function(s10: string) -- line: 216
+	formatUserPickerUsername = function(s10: string) -- line: 214
 		return `@{ s10 }`
 	end,
-	formatVersionHistoryCreatedDate = function(s11: string, n12: number, s12: string) -- line: 192
+	formatVersionHistoryCreatedDate = function(s11: string, n12: number, s12: string) -- line: 190
 		return `{ s11 } { n12 }, { s12 }`
 	end,
-	formatVersionHistoryRestoredBadge = function(n13: number) -- line: 188
+	formatVersionHistoryRestoredBadge = function(n13: number) -- line: 186
 		return `Restored { (if not (n13 < 10) then `v{ n13 }` else `v0{ n13 }`) }`
 	end,
-	formatVersionHistoryVersionLabel = function(n14: number, s13: string) -- line: 200
+	formatVersionHistoryVersionLabel = function(n14: number, s13: string) -- line: 198
 		return `{ (if not (n14 < 10) then `v{ n14 }` else `v0{ n14 }`) } · { s13 }`
 	end,
-	formatVersionHistoryVersionNumber = function(n15: number) -- line: 181
+	formatVersionHistoryVersionNumber = function(n15: number) -- line: 179
 		if n15 < 10 then
 			return `v0{ n15 }`
 		end
 
 		return `v{ n15 }`
 	end,
-	formatVersionHistoryVersionTitle = function(n16: number) -- line: 196
+	formatVersionHistoryVersionTitle = function(n16: number) -- line: 194
 		return `Version { n16 }`
 	end,
-	formatCreatorCreditAdditionalUsed = function(s14: string, s15: string) -- line: 242
+	formatCreatorCreditAdditionalUsed = function(s14: string, s15: string) -- line: 248
 		return `{ s14 } of { s15 } used`
 	end,
-	formatCreatorCreditAdditionalUsedNoLimit = function(s16: string) -- line: 246
+	formatCreatorCreditAdditionalUsedNoLimit = function(s16: string) -- line: 252
 		return `{ s16 } used • No limit`
 	end,
-	formatCreatorCreditLimitBelowSpend = function(s17: string) -- line: 250
+	formatCreatorCreditLimitBelowSpend = function(s17: string) -- line: 256
 		return `Limit can't be below the { s17 } Robux already spent today.`
 	end,
-	formatCreatorCreditPercentUsed = function(n17: number) -- line: 224
+	formatCreatorCreditPercentUsed = function(n17: number) -- line: 222
 		local v38 = math.floor(n17 + 0.5)
 
 		if v38 < 0 then
@@ -543,14 +545,20 @@ return {
 
 		return `{ v38 }% used`
 	end,
-	formatCreatorCreditResetHours = function(n18: number) -- line: 235
+	formatCreatorCreditRobuxUsage = function(s18: string, s19: string) -- line: 233
+		return `{ s18 }/{ s19 }`
+	end,
+	formatCreatorCreditRobuxUsageUnlimited = function(s20: string) -- line: 237
+		return `{ s20 } used`
+	end,
+	formatCreatorCreditResetHours = function(n18: number) -- line: 241
 		if n18 == 1 then
 			return "Resets in 1 hour"
 		end
 
 		return `Resets in { n18 } hours`
 	end,
-	formatCreatorCreditUsageTrailing = function(s18: string, s19: string) -- line: 220
-		return `{ s18 } of { s19 }`
+	formatCreatorCreditUsageTrailing = function(s21: string, s22: string) -- line: 218
+		return `{ s21 } of { s22 }`
 	end
 }

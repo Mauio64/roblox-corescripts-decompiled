@@ -6,17 +6,17 @@ local React = require(BuildExperienceParent.React)
 local useOpenWebView = require(BuildExperienceParent.WebViewUtils).useOpenWebView
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
-local function getPurchaseRobuxUrl() -- line: 18
+local function getPurchaseRobuxUrl() -- line: 16
 	-- upvalues: ContentProvider (copy)
 	local v10 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
 
 	return string.gsub(v10, "http:", "https:") .. "upgrades/robux?ctx=navpopover"
 end
-local function useOpenBuyRobuxWebView(p1: ((...any) -> ...any)?, t1: {[any]: any}?) -- line: 24
+local function useOpenBuyRobuxWebView(p1: ((...any) -> ...any)?, t1: {[any]: any}?) -- line: 22
 	-- upvalues: useOpenWebView (copy), React (copy), AppLifecycleObserverService (copy), ContentProvider (copy), LocalizationStrings (copy)
 	local v13 = useOpenWebView()
 	local v14 = React.useRef(false)
-	local v15 = React.useCallback(function() -- line: 30
+	local v15 = React.useCallback(function() -- line: 28
 		-- upvalues: v14 (copy), p1 (copy)
 		if not v14.current then
 			return
@@ -29,16 +29,16 @@ local function useOpenBuyRobuxWebView(p1: ((...any) -> ...any)?, t1: {[any]: any
 		end
 	end, { p1 })
 
-	React.useEffect(function() -- line: 40
+	React.useEffect(function() -- line: 38
 		-- upvalues: p1 (copy), t1 (copy), AppLifecycleObserverService (copy), v15 (copy), v14 (copy)
 		if p1 == nil then
-			return function() -- line: 42
+			return function() -- line: 40
 			end
 		end
 
 		local connection = (t1 or AppLifecycleObserverService).OnUnhide:Connect(v15)
 
-		return function() -- line: 46
+		return function() -- line: 44
 			-- upvalues: v14 (copy), connection (copy)
 			v14.current = false
 			connection:Disconnect()
@@ -49,7 +49,7 @@ local function useOpenBuyRobuxWebView(p1: ((...any) -> ...any)?, t1: {[any]: any
 		p1
 	})
 
-	return React.useCallback(function() -- line: 52
+	return React.useCallback(function() -- line: 50
 		-- upvalues: v14 (copy), p1 (copy), v13 (copy), ContentProvider (copy), LocalizationStrings (copy), v15 (copy)
 		v14.current = p1 ~= nil
 

@@ -1,4 +1,5 @@
 return {
+	TweenDuration = 0.35,
 	Breakpoint = {
 		HeightSmall = 600
 	},

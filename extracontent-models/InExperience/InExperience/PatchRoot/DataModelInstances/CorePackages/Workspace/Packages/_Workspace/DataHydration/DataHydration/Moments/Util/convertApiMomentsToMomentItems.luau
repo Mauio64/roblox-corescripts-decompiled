@@ -123,7 +123,7 @@ local function normalizeStickerOverlayEdit(p7) -- line: 135
 		return nil
 	end
 
-	if type(p7.sticker) ~= "string" or p7.sticker == "" then
+	if type(p7.stickerURI) ~= "string" or p7.stickerURI == "" then
 		return nil
 	end
 
@@ -132,7 +132,7 @@ local function normalizeStickerOverlayEdit(p7) -- line: 135
 		rotation = type(p7.rotation) ~= "number" and 0 or p7.rotation,
 		scale = type(p7.scale) ~= "number" and 1 or p7.scale,
 		stickerSize = type(p7.stickerSize) ~= "number" and 1 or p7.stickerSize,
-		stickerURI = type(p7.sticker) ~= "string" and "" or p7.sticker,
+		stickerURI = type(p7.stickerURI) ~= "string" and "" or p7.stickerURI,
 		zIndex = type(p7.zIndex) ~= "number" and 1 or p7.zIndex
 	}
 end

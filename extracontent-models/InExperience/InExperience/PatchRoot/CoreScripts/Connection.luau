@@ -25,7 +25,6 @@ local v21 = game:DefineFastFlag("DebugEnableErrorStringTesting", false)
 local v22 = game:DefineFastFlag("ShouldMuteUnlocalizedError", false)
 local v23 = game:DefineFastFlag("UpdateConnectionErrorLoc", false)
 local v24 = game:DefineFastFlag("ShowScreentimeLockoutKickMessage", false)
-local v25 = game:DefineFastFlag("AddConnectionErrorLocalizationKeys", false)
 local t1 = {
 	eventName = "ConnectionEvent",
 	description = "Counter to track connection events.",
@@ -37,83 +36,83 @@ local t1 = {
 		31
 	}
 }
-local v27 = game:DefineFastInt("PotentialClientTimeoutSeconds", 7200)
-local v28 = game:DefineFastInt("MaxKickMessageLength", 200)
-local v29 = game:DefineFastFlag("RefactorReconnectUnblockTeleport", false)
-local v30 = game:DefineFastFlag("ConnectionEnableAutoReconnect", false)
-local v31 = game:DefineFastInt("ConnectionAutoReconnectFirstDelayMs", 2000)
-local v32 = game:DefineFastInt("ConnectionAutoReconnectBaseDelayMs", 5000)
-local v33 = game:DefineFastInt("ConnectionAutoReconnectMaxDelayMs", 20000)
-local v34 = game:DefineFastInt("ConnectionAutoReconnectJitterMs", 2000)
-local v35 = game:DefineFastInt("ConnectionAutoReconnectMaxDurationSeconds", 300)
+local v26 = game:DefineFastInt("PotentialClientTimeoutSeconds", 7200)
+local v27 = game:DefineFastInt("MaxKickMessageLength", 200)
+local v28 = game:DefineFastFlag("RefactorReconnectUnblockTeleport", false)
+local v29 = game:DefineFastFlag("ConnectionEnableAutoReconnect", false)
+local v30 = game:DefineFastInt("ConnectionAutoReconnectFirstDelayMs", 2000)
+local v31 = game:DefineFastInt("ConnectionAutoReconnectBaseDelayMs", 5000)
+local v32 = game:DefineFastInt("ConnectionAutoReconnectMaxDelayMs", 20000)
+local v33 = game:DefineFastInt("ConnectionAutoReconnectJitterMs", 2000)
+local v34 = game:DefineFastInt("ConnectionAutoReconnectMaxDurationSeconds", 300)
 local random = nil
 
-if v30 then
+if v29 then
 	random = Random.new()
 end
 
 local EngineFeature = game:GetEngineFeature("CoreGuiOverflowDetection")
 local FFlagCoreScriptShowTeleportPrompt = require(RobloxGui.Modules.Flags.FFlagCoreScriptShowTeleportPrompt)
 local FFlagAllowDisconnectGuiForOkUnknown = require(RobloxGui.Modules.Flags.FFlagAllowDisconnectGuiForOkUnknown)
-local v40 = game:DefineFastFlag("EnableExperienceGenericChallengeRenderingConnection2", false)
+local v39 = game:DefineFastFlag("EnableExperienceGenericChallengeRenderingConnection2", false)
 local GetFFlagDisplayChannelNameOnErrorPrompt = require(RobloxGui.Modules.Flags.GetFFlagDisplayChannelNameOnErrorPrompt)
 
-local function safeGetFInt(p1, p2) -- line: 76
-	local ok, result = pcall(function() -- line: 77
+local function safeGetFInt(p1, p2) -- line: 75
+	local ok, result = pcall(function() -- line: 76
 		-- upvalues: p1 (copy)
 		return (tonumber(settings():GetFVariable(p1)))
 	end)
 
 	return ok and result or p2
 end
-local function safeGetFString(p3, p4) -- line: 83
-	local ok, result = pcall(function() -- line: 84
+local function safeGetFString(p3, p4) -- line: 82
+	local ok, result = pcall(function() -- line: 83
 		-- upvalues: p3 (copy)
 		return settings():GetFVariable(p3)
 	end)
 
 	return ok and result or p4
 end
-local function computeAutoReconnectDelaySeconds(p5) -- line: 93
-	-- upvalues: v31 (copy), v32 (copy), v33 (copy), v34 (copy), random (ref)
-	local v134 = if not (p5 <= 1) then if p5 ~= 2 then math.min(v32 * 2 ^ (p5 - 2), v33) else v32 else v31
+local function computeAutoReconnectDelaySeconds(p5) -- line: 92
+	-- upvalues: v30 (copy), v31 (copy), v32 (copy), v33 (copy), random (ref)
+	local v133 = if not (p5 <= 1) then if p5 ~= 2 then math.min(v31 * 2 ^ (p5 - 2), v32) else v31 else v30
 
-	if v34 > 0 then
-		v134 += random:NextInteger(0, v34)
+	if v33 > 0 then
+		v133 += random:NextInteger(0, v33)
 	end
 
-	return v134 / 1000
+	return v133 / 1000
 end
 
 local s1 = "DefaultTimeoutTimeMs"
-local ok, result = pcall(function() -- line: 77
+local ok, result = pcall(function() -- line: 76
 	-- upvalues: s1 (copy)
 	return (tonumber(settings():GetFVariable(s1)))
 end)
-local v48 = (ok and result or 10000) / 1000
+local v47 = (ok and result or 10000) / 1000
 local FFlag = settings():GetFFlag("ReconnectDisabled")
 local s2 = "ReconnectDisabledReason"
-local ok2, result2 = pcall(function() -- line: 84
+local ok2, result2 = pcall(function() -- line: 83
 	-- upvalues: s2 (copy)
 	return settings():GetFVariable(s2)
 end)
-local v53 = ok2 and result2 or "We're sorry, Roblox is temporarily unavailable.  Please try again later."
+local v52 = ok2 and result2 or "We're sorry, Roblox is temporarily unavailable.  Please try again later."
 local timestamp = tick()
-local v55 = game:DefineFastFlag("UpdateConnectionLocWarning", false)
-local v56 = game:DefineFastFlag("AddPlacelaunchDeviceBlock2", false)
-local v57 = game:DefineFastFlag("AddContextualPlayabilityConnectionErrors", false)
-local v58 = game:DefineFastFlag("AddVipOwnerNotPresentConnectionError", false)
-local v59 = game:DefineFastFlag("VipOwnerNotPresentEnableReconnect", false)
-local v60 = game:DefineFastFlag("RAKickLogic2", false)
-local v61 = game:DefineFastInt("RAMinEngineVersion", 725)
-local v62 = false
+local v54 = game:DefineFastFlag("UpdateConnectionLocWarning", false)
+local v55 = game:DefineFastFlag("AddPlacelaunchDeviceBlock2", false)
+local v56 = game:DefineFastFlag("AddContextualPlayabilityConnectionErrors", false)
+local v57 = game:DefineFastFlag("AddVipOwnerNotPresentConnectionError", false)
+local v58 = game:DefineFastFlag("VipOwnerNotPresentEnableReconnect", false)
+local v59 = game:DefineFastFlag("RAKickLogic2", false)
+local v60 = game:DefineFastInt("RAMinEngineVersion", 725)
+local v61 = false
 
-if v60 then
+if v59 then
 	local RobloxVersion = RunService:GetRobloxVersion()
 	local num = tonumber(string.match(RobloxVersion, "%.(%d+)%."))
 
-	if num and v61 <= num then
-		v62 = true
+	if num and v60 <= num then
+		v61 = true
 	end
 end
 
@@ -121,9 +120,9 @@ local FFlagConnectionAmpUpsellOnLeave = require(CorePackages.Workspace.Packages.
 local FFlagConnectionAmpParentalApprovalUpsell = require(CorePackages.Workspace.Packages.SharedFlags).FFlagConnectionAmpParentalApprovalUpsell
 local FFlagConnectionUpsellAnalytics = require(CorePackages.Workspace.Packages.SharedFlags).FFlagConnectionUpsellAnalytics
 local FFlagUniversalFeatureRestrictionReceivers = require(CorePackages.Workspace.Packages.SharedFlags).FFlagUniversalFeatureRestrictionReceivers
-local v69 = game:DefineFastFlag("AddCollaborationCoreGatedConnectionError2", false)
+local v68 = game:DefineFastFlag("AddCollaborationCoreGatedConnectionError2", false)
 local EngineFeature2 = game:GetEngineFeature("PlacelaunchCollaborationCoreGatedConnectionError")
-local v71 = game:DefineFastFlag("RobloxExperienceKickOverride", false)
+local v70 = game:DefineFastFlag("RobloxExperienceKickOverride", false)
 local ConnectionAmpUpsellOnLeave = nil
 
 if FFlagConnectionAmpUpsellOnLeave then
@@ -133,10 +132,10 @@ end
 local buildRobloxExperienceKickContent = require(CorePackages.Workspace.Packages.InterventionShared.buildRobloxExperienceKickContent)
 local showFeatureRestrictionDirect = require(CorePackages.Workspace.Packages.UniversalFeatureRestrictions.showFeatureRestrictionDirect)
 
-local function fetchUniverseIdFromPlaceId(p6) -- line: 168
+local function fetchUniverseIdFromPlaceId(p6) -- line: 167
 	-- upvalues: Url (copy), HttpRbxApiService (copy), HttpService (copy)
-	local v136 = string.format("%suniverses/v1/places/%d/universe", Url.APIS_URL, p6)
-	local ok3, result3 = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v136)
+	local v135 = string.format("%suniverses/v1/places/%d/universe", Url.APIS_URL, p6)
+	local ok3, result3 = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v135)
 
 	if not ok3 or type(result3) ~= "string" then
 		return nil
@@ -156,23 +155,23 @@ local function fetchUniverseIdFromPlaceId(p6) -- line: 168
 
 	return universeId
 end
-local function translateString(s3: string, t2: {[any]: any}?) -- line: 188
-	-- upvalues: LocalizationService (copy), Localization (copy), v55 (copy), Logging (copy)
+local function translateString(s3: string, t2: {[any]: any}?) -- line: 187
+	-- upvalues: LocalizationService (copy), Localization (copy), v54 (copy), Logging (copy)
 	local RobloxLocaleId = LocalizationService.RobloxLocaleId
-	local v145 = Localization.new(RobloxLocaleId)
+	local v144 = Localization.new(RobloxLocaleId)
 
-	v145:SetLocale(RobloxLocaleId)
+	v144:SetLocale(RobloxLocaleId)
 
-	local ok5, result5 = pcall(function() -- line: 193
-		-- upvalues: v145 (copy), s3 (copy), t2 (copy)
-		return v145:Format(s3, t2)
+	local ok5, result5 = pcall(function() -- line: 192
+		-- upvalues: v144 (copy), s3 (copy), t2 (copy)
+		return v144:Format(s3, t2)
 	end)
 
 	if ok5 then
 		return result5
 	end
 
-	if v55 then
+	if v54 then
 		Logging.warn("Failed to translate string with key: " .. s3 .. ", LocaleId: " .. RobloxLocaleId)
 	else
 		Logging.warn("Failed to translate string with key: " .. s3)
@@ -181,7 +180,7 @@ local function translateString(s3: string, t2: {[any]: any}?) -- line: 188
 	return ""
 end
 
-local u77 = nil
+local u76 = nil
 local n1 = -1
 local AbsoluteSizeX = RobloxGui.AbsoluteSize.X
 local AbsoluteSizeY = RobloxGui.AbsoluteSize.Y
@@ -202,7 +201,7 @@ local t3 = {
 	RECONNECT_COLLABORATION_CORE_GATED = 14
 }
 
-if v30 then
+if v29 then
 	t3.AUTO_RECONNECTING = 15
 end
 
@@ -225,11 +224,11 @@ if FFlagConnectionAmpUpsellOnLeave then
 	t4[t3.RECONNECT_PARENT_APPROVAL_REQUIRED] = "Join Error"
 end
 
-if v69 then
+if v68 then
 	t4[t3.RECONNECT_COLLABORATION_CORE_GATED] = "Join Error"
 end
 
-if v30 then
+if v29 then
 	t4[t3.AUTO_RECONNECTING] = "Disconnected"
 end
 
@@ -250,41 +249,41 @@ if FFlagConnectionAmpUpsellOnLeave then
 	t5[t3.RECONNECT_PARENT_APPROVAL_REQUIRED] = "InGame.ConnectionError.Title.JoinError"
 end
 
-if v69 then
+if v68 then
 	t5[t3.RECONNECT_COLLABORATION_CORE_GATED] = "InGame.ConnectionError.Title.JoinError"
 end
 
-if v30 then
+if v29 then
 	t5[t3.AUTO_RECONNECTING] = "InGame.ConnectionError.Title.Disconnected"
 end
 
-local v86 = Create("ScreenGui")({
+local v85 = Create("ScreenGui")({
 	Name = "RobloxPromptGui",
 	OnTopOfCoreBlur = true,
 	DisplayOrder = 9,
 	AutoLocalize = false,
 	Parent = CoreGui
 })
-local v87 = Create("Frame")({
+local v86 = Create("Frame")({
 	Name = "promptOverlay",
 	BackgroundTransparency = 1,
 	Active = false,
 	BackgroundColor3 = Color3.new(0, 0, 0),
 	Size = UDim2.new(1, 0, 1, 36),
 	Position = UDim2.new(0, 0, 0, -36),
-	Parent = v86
+	Parent = v85
 })
 
-coroutine.wrap(function() -- line: 316
-	-- upvalues: RobloxGui (copy), v87 (copy)
+coroutine.wrap(function() -- line: 315
+	-- upvalues: RobloxGui (copy), v86 (copy)
 	local Constants = require(RobloxGui.Modules.TopBar.Constants)
-	local v149 = Constants.ApplyDisplayScale(Constants.TopBarHeight)
+	local v148 = Constants.ApplyDisplayScale(Constants.TopBarHeight)
 
-	v87.Size = UDim2.new(1, 0, 1, v149)
-	v87.Position = UDim2.new(0, 0, 0, -v149)
+	v86.Size = UDim2.new(1, 0, 1, v148)
+	v86.Position = UDim2.new(0, 0, 0, -v148)
 end)()
 
-local function openCollaboratorsPageForUniverseId(p7) -- line: 325
+local function openCollaboratorsPageForUniverseId(p7) -- line: 324
 	-- upvalues: TelemetryService (copy), t1 (copy), Url (copy), LinkingProtocol (copy)
 	TelemetryService:LogCounter(t1, {
 		customFields = {
@@ -292,12 +291,12 @@ local function openCollaboratorsPageForUniverseId(p7) -- line: 325
 		}
 	}, 1)
 
-	local v151 = string.format("%sdashboard/creations/experiences/%s/safety/collaborators", Url.CREATE_URL, (tostring(p7)))
+	local v150 = string.format("%sdashboard/creations/experiences/%s/safety/collaborators", Url.CREATE_URL, (tostring(p7)))
 
-	LinkingProtocol.default:openURL(v151)
+	LinkingProtocol.default:openURL(v150)
 end
-local function v89() -- line: 361
-	-- upvalues: NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), RbxAnalyticsService (copy), u77 (ref), TeleportService (copy), FFlagCoreScriptShowTeleportPrompt (copy), v29 (copy), GuiService (copy)
+local function v88() -- line: 360
+	-- upvalues: NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), RbxAnalyticsService (copy), u76 (ref), TeleportService (copy), FFlagCoreScriptShowTeleportPrompt (copy), v28 (copy), GuiService (copy)
 	tick()
 
 	if NONE == t3.IS_RECONNECTING then
@@ -317,7 +316,7 @@ local function v89() -- line: 361
 	}, 1)
 	RbxAnalyticsService:ReportCounter("ReconnectPrompt-ReconnectActivated")
 	NONE = t3.IS_RECONNECTING
-	u77:primaryShimmerPlay()
+	u76:primaryShimmerPlay()
 	TelemetryService:LogCounter(t1, {
 		customFields = {
 			selectedItem = "ReconnectSameServer"
@@ -326,7 +325,7 @@ local function v89() -- line: 361
 	TeleportService:TeleportReconnect()
 
 	if FFlagCoreScriptShowTeleportPrompt then
-		if v29 then
+		if v28 then
 			TeleportService:UnblockAsync()
 
 			return
@@ -335,8 +334,8 @@ local function v89() -- line: 361
 		GuiService:SetMenuIsOpen(false, "ErrorPrompt")
 	end
 end
-local function v90() -- line: 393
-	-- upvalues: NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), u77 (ref), GuiService (copy), TeleportService (copy)
+local function v89() -- line: 392
+	-- upvalues: NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), u76 (ref), GuiService (copy), TeleportService (copy)
 	if NONE == t3.IS_RECONNECTING then
 		TelemetryService:LogCounter(t1, {
 			customFields = {
@@ -365,11 +364,11 @@ local function v90() -- line: 393
 		}
 	}, 1)
 	NONE = t3.IS_RECONNECTING
-	u77:primaryShimmerPlay()
+	u76:primaryShimmerPlay()
 	GuiService:ClearError()
 	TeleportService:Teleport(PlaceId)
 end
-local function v91() -- line: 413
+local function v90() -- line: 412
 	-- upvalues: TelemetryService (copy), t1 (copy), GuiService (copy), RunService (copy)
 	TelemetryService:LogCounter(t1, {
 		customFields = {
@@ -381,7 +380,7 @@ local function v91() -- line: 413
 	RunService.RenderStepped:wait()
 	game:Shutdown()
 end
-local function v92() -- line: 422
+local function v91() -- line: 421
 	-- upvalues: GuiService (copy)
 	GuiService:ClearError()
 end
@@ -398,23 +397,23 @@ local t6 = {
 	lastRemaining = nil
 }
 
-local function pushErrorToPrompt(p8, p9) -- line: 439
-	-- upvalues: u77 (ref), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
-	if not u77 then
+local function pushErrorToPrompt(p8, p9) -- line: 438
+	-- upvalues: u76 (ref), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
+	if not u76 then
 		return
 	end
 
 	if GetFFlagDisplayChannelNameOnErrorPrompt() then
-		u77:onErrorChanged(p8, p9, true)
+		u76:onErrorChanged(p8, p9, true)
 
 		return
 	end
 
-	u77:onErrorChanged(p8, p9)
+	u76:onErrorChanged(p8, p9)
 end
-local function renderAutoReconnectPrompt() -- line: 448
-	-- upvalues: u77 (ref), NONE (ref), t3 (copy), t6 (copy), translateString (copy), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
-	if not u77 then
+local function renderAutoReconnectPrompt() -- line: 447
+	-- upvalues: u76 (ref), NONE (ref), t3 (copy), t6 (copy), translateString (copy), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
+	if not u76 then
 		return
 	end
 
@@ -422,52 +421,52 @@ local function renderAutoReconnectPrompt() -- line: 448
 		return
 	end
 
-	local v157 = if NONE ~= t3.IS_RECONNECTING then math.max(0, (math.ceil(t6.nextAttemptAt - tick()))) else -1
+	local v156 = if NONE ~= t3.IS_RECONNECTING then math.max(0, (math.ceil(t6.nextAttemptAt - tick()))) else -1
 
-	if v157 == t6.lastRemaining then
+	if v156 == t6.lastRemaining then
 		return
 	end
 
-	t6.lastRemaining = v157
+	t6.lastRemaining = v156
 
 	local attempt = t6.attempt
-	local v159 = if not (v157 <= 0) then if v157 ~= 1 then translateString("InGame.ConnectionError.ReconnectingAttemptInSeconds", {
+	local v158 = if not (v156 <= 0) then if v156 ~= 1 then translateString("InGame.ConnectionError.ReconnectingAttemptInSeconds", {
 		RBX_ATTEMPT = attempt,
-		RBX_SECONDS = v157
+		RBX_SECONDS = v156
 	}) else translateString("InGame.ConnectionError.ReconnectingAttemptInSecond", {
 		RBX_ATTEMPT = attempt
 	}) else translateString("InGame.ConnectionError.ReconnectingAttempt", {
 		RBX_ATTEMPT = attempt
 	})
-	local v160 = if not t6.baseMessage or t6.baseMessage == "" then v159 else t6.baseMessage .. "\n" .. v159
+	local v159 = if not t6.baseMessage or t6.baseMessage == "" then v158 else t6.baseMessage .. "\n" .. v158
 
-	if v160 == t6.lastRenderedText then
+	if v159 == t6.lastRenderedText then
 		return
 	end
 
-	t6.lastRenderedText = v160
+	t6.lastRenderedText = v159
 
 	local errorCode = t6.errorCode
 
-	if not u77 then
+	if not u76 then
 		return
 	end
 
 	if GetFFlagDisplayChannelNameOnErrorPrompt() then
-		u77:onErrorChanged(v160, errorCode, true)
+		u76:onErrorChanged(v159, errorCode, true)
 
 		return
 	end
 
-	u77:onErrorChanged(v160, errorCode)
+	u76:onErrorChanged(v159, errorCode)
 end
-local function ensureAutoReconnectTicker() -- line: 494
+local function ensureAutoReconnectTicker() -- line: 493
 	-- upvalues: t6 (copy), renderAutoReconnectPrompt (copy)
 	if t6.tickerThread then
 		return
 	end
 
-	t6.tickerThread = task.spawn(function() -- line: 498
+	t6.tickerThread = task.spawn(function() -- line: 497
 		-- upvalues: t6 (copy), renderAutoReconnectPrompt (copy)
 		while t6.active do
 			task.wait(0.25)
@@ -477,7 +476,7 @@ local function ensureAutoReconnectTicker() -- line: 494
 		t6.tickerThread = nil
 	end)
 end
-local function cancelAutoReconnect() -- line: 507
+local function cancelAutoReconnect() -- line: 506
 	-- upvalues: t6 (copy)
 	t6.active = false
 	t6.attempt = 0
@@ -497,7 +496,7 @@ local function cancelAutoReconnect() -- line: 507
 		t6.tickerThread = nil
 	end
 end
-local function autoReconnectAttemptBucket(p10) -- line: 526
+local function autoReconnectAttemptBucket(p10) -- line: 525
 	if p10 <= 5 then
 		return (tostring(p10))
 	end
@@ -508,16 +507,16 @@ local function autoReconnectAttemptBucket(p10) -- line: 526
 
 	return "9+"
 end
-local function fireAutoReconnect() -- line: 536
-	-- upvalues: t6 (copy), NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), renderAutoReconnectPrompt (copy), u77 (ref), TeleportService (copy), FFlagCoreScriptShowTeleportPrompt (copy), v29 (copy), GuiService (copy)
+local function fireAutoReconnect() -- line: 535
+	-- upvalues: t6 (copy), NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), renderAutoReconnectPrompt (copy), u76 (ref), TeleportService (copy), FFlagCoreScriptShowTeleportPrompt (copy), v28 (copy), GuiService (copy)
 	t6.pendingThread = nil
 
 	if NONE == t3.IS_RECONNECTING then
 		return
 	end
 
-	local v163 = TelemetryService
-	local v164 = t1
+	local v162 = TelemetryService
+	local v163 = t1
 	local t7 = {}
 	local t8 = {
 		selectedItem = "AutoReconnectAttempt"
@@ -526,18 +525,18 @@ local function fireAutoReconnect() -- line: 536
 
 	t8.attemptBucket = if not (attempt <= 5) then not (attempt <= 8) and "9+" or "6-8" else tostring(attempt)
 	t7.customFields = t8
-	v163:LogCounter(v164, t7, 1)
+	v162:LogCounter(v163, t7, 1)
 	NONE = t3.IS_RECONNECTING
 	renderAutoReconnectPrompt()
 
-	if u77 then
-		u77:primaryShimmerPlay()
+	if u76 then
+		u76:primaryShimmerPlay()
 	end
 
 	TeleportService:TeleportReconnect()
 
 	if FFlagCoreScriptShowTeleportPrompt then
-		if v29 then
+		if v28 then
 			TeleportService:UnblockAsync()
 
 			return
@@ -546,8 +545,8 @@ local function fireAutoReconnect() -- line: 536
 		GuiService:SetMenuIsOpen(false, "ErrorPrompt")
 	end
 end
-local function scheduleAutoReconnect() -- line: 562
-	-- upvalues: t6 (copy), v31 (copy), v32 (copy), v33 (copy), v34 (copy), random (ref), TelemetryService (copy), t1 (copy), renderAutoReconnectPrompt (copy), fireAutoReconnect (copy)
+local function scheduleAutoReconnect() -- line: 561
+	-- upvalues: t6 (copy), v30 (copy), v31 (copy), v32 (copy), v33 (copy), random (ref), TelemetryService (copy), t1 (copy), renderAutoReconnectPrompt (copy), fireAutoReconnect (copy)
 	t6.active = true
 
 	if t6.pendingThread then
@@ -558,15 +557,15 @@ local function scheduleAutoReconnect() -- line: 562
 	t6.attempt = t6.attempt + 1
 
 	local attempt = t6.attempt
-	local v169 = if not (attempt <= 1) then if attempt ~= 2 then math.min(v32 * 2 ^ (attempt - 2), v33) else v32 else v31
+	local v168 = if not (attempt <= 1) then if attempt ~= 2 then math.min(v31 * 2 ^ (attempt - 2), v32) else v31 else v30
 
-	if v34 > 0 then
-		v169 += random:NextInteger(0, v34)
+	if v33 > 0 then
+		v168 += random:NextInteger(0, v33)
 	end
 
-	local v170 = v169 / 1000
+	local v169 = v168 / 1000
 
-	t6.nextAttemptAt = tick() + v170
+	t6.nextAttemptAt = tick() + v169
 	t6.lastRenderedText = nil
 	t6.lastRemaining = nil
 	TelemetryService:LogCounter(t1, {
@@ -576,7 +575,7 @@ local function scheduleAutoReconnect() -- line: 562
 	}, 1)
 
 	if not t6.tickerThread then
-		t6.tickerThread = task.spawn(function() -- line: 498
+		t6.tickerThread = task.spawn(function() -- line: 497
 			-- upvalues: t6 (copy), renderAutoReconnectPrompt (copy)
 			while t6.active do
 				task.wait(0.25)
@@ -587,9 +586,9 @@ local function scheduleAutoReconnect() -- line: 562
 		end)
 	end
 
-	t6.pendingThread = task.delay(v170, fireAutoReconnect)
+	t6.pendingThread = task.delay(v169, fireAutoReconnect)
 end
-local function autoReconnectNowFunction() -- line: 579
+local function autoReconnectNowFunction() -- line: 578
 	-- upvalues: NONE (ref), t3 (copy), TelemetryService (copy), t1 (copy), t6 (copy), fireAutoReconnect (copy)
 	if NONE == t3.IS_RECONNECTING then
 		TelemetryService:LogCounter(t1, {
@@ -632,7 +631,11 @@ local t9 = {
 	[Enum.ConnectionError.DisconnectDuplicatePlayer] = true,
 	[Enum.ConnectionError.DisconnectCloudEditKick] = true,
 	[Enum.ConnectionError.DisconnectOnRemoteSysStats] = true,
+	[Enum.ConnectionError.DisconnectBySecurityPolicy] = true,
+	[Enum.ConnectionError.DisconnectBlockedIP] = true,
 	[Enum.ConnectionError.DisconnectPrivateServerKickout] = true,
+	[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = true,
+	[Enum.ConnectionError.DisconnectCollaboratorUnderage] = true,
 	[Enum.ConnectionError.PlacelaunchFlooded] = true,
 	[Enum.ConnectionError.PlacelaunchHashException] = true,
 	[Enum.ConnectionError.PlacelaunchHashExpired] = true,
@@ -654,34 +657,27 @@ if v24 then
 	t9[Enum.ConnectionError.ScreentimeLockoutKick] = true
 end
 
-if v25 then
-	t9[Enum.ConnectionError.DisconnectBySecurityPolicy] = true
-	t9[Enum.ConnectionError.DisconnectBlockedIP] = true
-	t9[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = true
-	t9[Enum.ConnectionError.DisconnectCollaboratorUnderage] = true
-end
-
-if v56 then
+if v55 then
 	t9[Enum.ConnectionError.PlacelaunchDeviceBlock] = true
 end
 
-if v57 then
+if v56 then
 	t9[Enum.ConnectionError.PlacelaunchAgeVerificationRequired] = true
 	t9[Enum.ConnectionError.PlacelaunchParentalApprovalRequired] = true
 	t9[Enum.ConnectionError.PlacelaunchCoreGated] = true
 end
 
-if v58 and not v59 then
+if v57 and not v58 then
 	t9[Enum.ConnectionError.PlacelaunchVipOwnerNotPresent] = true
 end
 
-local v103 = if not v69 or not EngineFeature2 then nil else Enum.ConnectionError.PlacelaunchCollaborationCoreGated
+local v102 = if not v68 or not EngineFeature2 then nil else Enum.ConnectionError.PlacelaunchCollaborationCoreGated
 
-if v69 and v103 then
-	t9[v103] = true
+if v68 and v102 then
+	t9[v102] = true
 end
 
-if v60 and v62 then
+if v59 and v61 then
 	t9[Enum.ConnectionError.DisconnectRemoteAttestationUnsupported] = true
 	t9[Enum.ConnectionError.DisconnectRemoteAttestationGeneralFailure] = true
 	t9[Enum.ConnectionError.DisconnectRemoteAttestationOSOutOfDate] = true
@@ -690,7 +686,7 @@ end
 
 local t10 = {}
 
-if v30 then
+if v29 then
 	t10 = {
 		[Enum.ConnectionError.DisconnectConnectionLost] = true,
 		[Enum.ConnectionError.DisconnectTimeout] = true,
@@ -713,13 +709,13 @@ local t11 = {
 			LocalizationKey = "InGame.CommonUI.Button.Retry",
 			LayoutOrder = 2,
 			Primary = true,
-			Callback = v89
+			Callback = v88
 		},
 		{
 			Text = "Cancel",
 			LocalizationKey = "Feature.SettingsHub.Action.CancelSearch",
 			LayoutOrder = 1,
-			Callback = v91
+			Callback = v90
 		}
 	},
 	[t3.RECONNECT_DISCONNECT] = {
@@ -728,13 +724,13 @@ local t11 = {
 			LocalizationKey = "InGame.ConnectionError.Button.Reconnect",
 			LayoutOrder = 2,
 			Primary = true,
-			Callback = v89
+			Callback = v88
 		},
 		{
 			Text = "Leave",
 			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 			LayoutOrder = 1,
-			Callback = v91
+			Callback = v90
 		}
 	},
 	[t3.TELEPORT_FAILED] = {{
@@ -742,42 +738,42 @@ local t11 = {
 		LocalizationKey = "InGame.CommonUI.Button.Ok",
 		LayoutOrder = 1,
 		Primary = true,
-		Callback = v92
+		Callback = v91
 	}},
 	[t3.RECONNECT_DISABLED_DISCONNECT] = {{
 		Text = "Leave",
 		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 		LayoutOrder = 1,
 		Primary = true,
-		Callback = v91
+		Callback = v90
 	}},
 	[t3.RECONNECT_DISABLED_PLACELAUNCH] = {{
 		Text = "Leave",
 		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 		LayoutOrder = 1,
 		Primary = true,
-		Callback = v91
+		Callback = v90
 	}},
 	[t3.RECONNECT_DISABLED] = {{
 		Text = "Leave",
 		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 		LayoutOrder = 1,
 		Primary = true,
-		Callback = v91
+		Callback = v90
 	}},
 	[t3.OUT_OF_MEMORY_KEEPPLAYING_LEAVE] = {
 		{
 			Text = "Keep Playing",
 			LocalizationKey = "InGame.CommonUI.Button.KeepPlaying",
 			LayoutOrder = 1,
-			Callback = v92
+			Callback = v91
 		},
 		{
 			Text = "Leave",
 			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 			LayoutOrder = 2,
 			Primary = true,
-			Callback = v91
+			Callback = v90
 		}
 	},
 	[t3.RECONNECT_CONNECT_FAILURE] = {
@@ -786,13 +782,13 @@ local t11 = {
 			LocalizationKey = "InGame.CommonUI.Button.Retry",
 			LayoutOrder = 2,
 			Primary = true,
-			Callback = v89
+			Callback = v88
 		},
 		{
 			Text = "Cancel",
 			LocalizationKey = "Feature.SettingsHub.Action.CancelSearch",
 			LayoutOrder = 1,
-			Callback = v91
+			Callback = v90
 		}
 	},
 	[t3.RECONNECT_DISABLED_CONNECT_FAILURE] = {{
@@ -800,19 +796,39 @@ local t11 = {
 		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 		LayoutOrder = 1,
 		Primary = true,
-		Callback = v91
+		Callback = v90
 	}}
 }
 
 if FFlagConnectionAmpUpsellOnLeave then
-	local v106 = ConnectionAmpUpsellOnLeave.createAgeCheckCallback(t1, v90, 9)
+	local v105 = ConnectionAmpUpsellOnLeave.createAgeCheckCallback(t1, v89, 9)
 
 	t11[t3.RECONNECT_AGE_CHECK_REQUIRED] = {
 		{
 			Text = "Leave",
 			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 			LayoutOrder = 1,
-			Callback = v91
+			Callback = v90
+		},
+		{
+			LayoutOrder = 2,
+			Primary = true,
+			Text = ConnectionAmpUpsellOnLeave.PrimaryButtonText,
+			LocalizationKey = ConnectionAmpUpsellOnLeave.PrimaryButtonLocalizationKey,
+			Callback = v105
+		}
+	}
+end
+
+if FFlagConnectionAmpParentalApprovalUpsell then
+	local v106 = ConnectionAmpUpsellOnLeave.createParentalApprovalCallback(t1, v89, 9)
+
+	t11[t3.RECONNECT_PARENT_APPROVAL_REQUIRED] = {
+		{
+			Text = "Leave",
+			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+			LayoutOrder = 1,
+			Callback = v90
 		},
 		{
 			LayoutOrder = 2,
@@ -824,40 +840,20 @@ if FFlagConnectionAmpUpsellOnLeave then
 	}
 end
 
-if FFlagConnectionAmpParentalApprovalUpsell then
-	local v107 = ConnectionAmpUpsellOnLeave.createParentalApprovalCallback(t1, v90, 9)
-
-	t11[t3.RECONNECT_PARENT_APPROVAL_REQUIRED] = {
-		{
-			Text = "Leave",
-			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
-			LayoutOrder = 1,
-			Callback = v91
-		},
-		{
-			LayoutOrder = 2,
-			Primary = true,
-			Text = ConnectionAmpUpsellOnLeave.PrimaryButtonText,
-			LocalizationKey = ConnectionAmpUpsellOnLeave.PrimaryButtonLocalizationKey,
-			Callback = v107
-		}
-	}
-end
-
-if v69 then
+if v68 then
 	t11[t3.RECONNECT_COLLABORATION_CORE_GATED] = {
 		{
 			Text = "Ok",
 			LocalizationKey = "InGame.ConnectionError.Action.Ok",
 			LayoutOrder = 1,
-			Callback = v91
+			Callback = v90
 		},
 		{
 			Text = "View collaborators",
 			LocalizationKey = "InGame.ConnectionError.Action.ViewCollaborators",
 			LayoutOrder = 2,
 			Primary = true,
-			Callback = function() -- line: 336
+			Callback = function() -- line: 335
 				-- upvalues: TelemetryService (copy), t1 (copy), openCollaboratorsPageForUniverseId (copy), fetchUniverseIdFromPlaceId (copy)
 				TelemetryService:LogCounter(t1, {
 					customFields = {
@@ -885,11 +881,11 @@ if v69 then
 					return
 				end
 
-				coroutine.wrap(function() -- line: 351
+				coroutine.wrap(function() -- line: 350
 					-- upvalues: fetchUniverseIdFromPlaceId (copy), PlaceId (copy), TelemetryService (copy), t1 (copy), openCollaboratorsPageForUniverseId (copy)
-					local v214 = fetchUniverseIdFromPlaceId(PlaceId)
+					local v213 = fetchUniverseIdFromPlaceId(PlaceId)
 
-					if not v214 then
+					if not v213 then
 						TelemetryService:LogCounter(t1, {
 							customFields = {
 								selectedItem = "ViewCollaboratorsUniverseIdLookupFailed"
@@ -899,14 +895,14 @@ if v69 then
 						return
 					end
 
-					openCollaboratorsPageForUniverseId(v214)
+					openCollaboratorsPageForUniverseId(v213)
 				end)()
 			end
 		}
 	}
 end
 
-if v30 then
+if v29 then
 	t11[t3.AUTO_RECONNECTING] = {
 		{
 			Text = "Reconnect Now",
@@ -919,8 +915,8 @@ if v30 then
 			Text = "Leave",
 			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
 			LayoutOrder = 1,
-			Callback = function() -- line: 592
-				-- upvalues: TelemetryService (copy), t1 (copy), t6 (copy), v91 (copy)
+			Callback = function() -- line: 591
+				-- upvalues: TelemetryService (copy), t1 (copy), t6 (copy), v90 (copy)
 				TelemetryService:LogCounter(t1, {
 					customFields = {
 						selectedItem = "AutoReconnectLeave"
@@ -944,135 +940,135 @@ if v30 then
 					t6.tickerThread = nil
 				end
 
-				v91()
+				v90()
 			end
 		}
 	}
 end
 
 local t12 = {
-	[t3.NONE] = function() -- line: 887
-		-- upvalues: RunService (copy), v87 (copy)
+	[t3.NONE] = function() -- line: 883
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = false
-		v87.Transparency = 1
+		v86.Active = false
+		v86.Transparency = 1
 	end,
-	[t3.RECONNECT_DISCONNECT] = function() -- line: 892
-		-- upvalues: VRService (copy), RunService (copy), v87 (copy)
+	[t3.RECONNECT_DISCONNECT] = function() -- line: 888
+		-- upvalues: VRService (copy), RunService (copy), v86 (copy)
 		if VRService.VREnabled then
 			RunService:SetRobloxGuiFocused(false)
 		else
 			RunService:SetRobloxGuiFocused(true)
 		end
 
-		v87.Active = true
-		v87.Transparency = 1
+		v86.Active = true
+		v86.Transparency = 1
 	end,
-	[t3.RECONNECT_PLACELAUNCH] = function() -- line: 901
-		-- upvalues: RunService (copy), v87 (copy)
+	[t3.RECONNECT_PLACELAUNCH] = function() -- line: 897
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = true
-		v87.Transparency = 0.3
+		v86.Active = true
+		v86.Transparency = 0.3
 	end,
-	[t3.TELEPORT_FAILED] = function() -- line: 906
-		-- upvalues: RunService (copy), v87 (copy)
+	[t3.TELEPORT_FAILED] = function() -- line: 902
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = true
-		v87.Transparency = 0.3
+		v86.Active = true
+		v86.Transparency = 0.3
 	end,
-	[t3.RECONNECT_DISABLED_DISCONNECT] = function() -- line: 911
-		-- upvalues: VRService (copy), RunService (copy), v87 (copy)
+	[t3.RECONNECT_DISABLED_DISCONNECT] = function() -- line: 907
+		-- upvalues: VRService (copy), RunService (copy), v86 (copy)
 		if VRService.VREnabled then
 			RunService:SetRobloxGuiFocused(false)
 		else
 			RunService:SetRobloxGuiFocused(true)
 		end
 
-		v87.Active = true
-		v87.Transparency = 1
+		v86.Active = true
+		v86.Transparency = 1
 	end,
-	[t3.RECONNECT_DISABLED_PLACELAUNCH] = function() -- line: 920
-		-- upvalues: RunService (copy), v87 (copy)
+	[t3.RECONNECT_DISABLED_PLACELAUNCH] = function() -- line: 916
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = true
-		v87.Transparency = 0.3
+		v86.Active = true
+		v86.Transparency = 0.3
 	end,
-	[t3.RECONNECT_DISABLED] = function() -- line: 925
-		-- upvalues: VRService (copy), RunService (copy), v87 (copy)
+	[t3.RECONNECT_DISABLED] = function() -- line: 921
+		-- upvalues: VRService (copy), RunService (copy), v86 (copy)
 		if VRService.VREnabled then
 			RunService:SetRobloxGuiFocused(false)
 		else
 			RunService:SetRobloxGuiFocused(true)
 		end
 
-		v87.Active = true
-		v87.Transparency = 1
+		v86.Active = true
+		v86.Transparency = 1
 	end,
-	[t3.RECONNECT_CONNECT_FAILURE] = function() -- line: 934
-		-- upvalues: RunService (copy), v87 (copy)
+	[t3.RECONNECT_CONNECT_FAILURE] = function() -- line: 930
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = true
-		v87.Transparency = 0.3
+		v86.Active = true
+		v86.Transparency = 0.3
 	end,
-	[t3.RECONNECT_DISABLED_CONNECT_FAILURE] = function() -- line: 939
-		-- upvalues: RunService (copy), v87 (copy)
+	[t3.RECONNECT_DISABLED_CONNECT_FAILURE] = function() -- line: 935
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = true
-		v87.Transparency = 0.3
+		v86.Active = true
+		v86.Transparency = 0.3
 	end
 }
 
 if FFlagConnectionAmpUpsellOnLeave then
-	local v109 = t12[t3.RECONNECT_PLACELAUNCH]
+	local v108 = t12[t3.RECONNECT_PLACELAUNCH]
 
-	t12[t3.RECONNECT_AGE_CHECK_REQUIRED] = v109
+	t12[t3.RECONNECT_AGE_CHECK_REQUIRED] = v108
 
 	if FFlagConnectionAmpParentalApprovalUpsell then
-		t12[t3.RECONNECT_PARENT_APPROVAL_REQUIRED] = v109
+		t12[t3.RECONNECT_PARENT_APPROVAL_REQUIRED] = v108
 	end
 end
 
-if v69 then
-	t12[t3.RECONNECT_COLLABORATION_CORE_GATED] = function() -- line: 959
-		-- upvalues: RunService (copy), v87 (copy)
+if v68 then
+	t12[t3.RECONNECT_COLLABORATION_CORE_GATED] = function() -- line: 955
+		-- upvalues: RunService (copy), v86 (copy)
 		RunService:SetRobloxGuiFocused(false)
-		v87.Active = true
-		v87.Transparency = 0.3
+		v86.Active = true
+		v86.Transparency = 0.3
 	end
 end
 
-if v30 then
+if v29 then
 	t12[t3.AUTO_RECONNECTING] = t12[t3.RECONNECT_DISCONNECT]
 end
 
-local function onEnter(p11) -- line: 973
-	-- upvalues: u77 (ref), v21 (copy), ErrorPrompt (copy), v87 (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref), t12 (copy), t4 (copy), t5 (copy), t11 (copy)
-	if not u77 then
+local function onEnter(p11) -- line: 969
+	-- upvalues: u76 (ref), v21 (copy), ErrorPrompt (copy), v86 (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref), t12 (copy), t4 (copy), t5 (copy), t11 (copy)
+	if not u76 then
 		local t13 = {
 			MenuIsOpenKey = "ConnectionErrorPrompt",
 			PlayAnimation = not v21
 		}
 
-		u77 = ErrorPrompt.new("Default", t13)
-		u77:setParent(v87)
-		u77:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+		u76 = ErrorPrompt.new("Default", t13)
+		u76:setParent(v86)
+		u76:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
 	end
 
 	if t12[p11] then
 		t12[p11]()
 	end
 
-	u77:setErrorTitle(t4[p11], t5[p11])
-	u77:updateButtons(t11[p11])
+	u76:setErrorTitle(t4[p11], t5[p11])
+	u76:updateButtons(t11[p11])
 end
-local function onExit(p12) -- line: 990
-	-- upvalues: t3 (copy), u77 (ref)
+local function onExit(p12) -- line: 986
+	-- upvalues: t3 (copy), u76 (ref)
 	if p12 == t3.IS_RECONNECTING then
-		u77:primaryShimmerStop()
+		u76:primaryShimmerStop()
 	end
 end
-local function stateTransit(p13, p14, p15) -- line: 997
-	-- upvalues: FFlagAllowDisconnectGuiForOkUnknown (copy), t3 (copy), FFlag (copy), timestamp (ref), n1 (ref), v48 (copy), OK (ref), t9 (copy), TelemetryService (copy), t1 (copy), RbxAnalyticsService (copy), v30 (copy), t10 (ref), FFlagConnectionAmpUpsellOnLeave (copy), ConnectionAmpUpsellOnLeave (ref), FFlagConnectionUpsellAnalytics (copy), FFlagConnectionAmpParentalApprovalUpsell (copy), v69 (copy), v103 (copy), v27 (copy), t6 (copy), v35 (copy)
+local function stateTransit(p13, p14, p15) -- line: 993
+	-- upvalues: FFlagAllowDisconnectGuiForOkUnknown (copy), t3 (copy), FFlag (copy), timestamp (ref), n1 (ref), v47 (copy), OK (ref), t9 (copy), TelemetryService (copy), t1 (copy), RbxAnalyticsService (copy), v29 (copy), t10 (ref), FFlagConnectionAmpUpsellOnLeave (copy), ConnectionAmpUpsellOnLeave (ref), FFlagConnectionUpsellAnalytics (copy), FFlagConnectionAmpParentalApprovalUpsell (copy), v68 (copy), v102 (copy), v26 (copy), t6 (copy), v34 (copy)
 	if FFlagAllowDisconnectGuiForOkUnknown then
 		if p14 == Enum.ConnectionError.OK then
 			return t3.NONE
@@ -1097,7 +1093,7 @@ local function stateTransit(p13, p14, p15) -- line: 997
 		end
 
 		if p13 == Enum.ConnectionError.ConnectErrors then
-			n1 = tick() + v48
+			n1 = tick() + v47
 			OK = Enum.ConnectionError.ConnectErrors
 
 			if t9[p14] then
@@ -1119,7 +1115,7 @@ local function stateTransit(p13, p14, p15) -- line: 997
 		end
 
 		if p13 == Enum.ConnectionError.DisconnectErrors then
-			n1 = tick() + v48
+			n1 = tick() + v47
 			OK = Enum.ConnectionError.DisconnectErrors
 
 			if p14 == Enum.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave then
@@ -1137,7 +1133,7 @@ local function stateTransit(p13, p14, p15) -- line: 997
 			}, 1)
 			RbxAnalyticsService:ReportCounter("ReconnectPrompt-Disconnect")
 
-			if v30 and t10[p14] then
+			if v29 and t10[p14] then
 				return t3.AUTO_RECONNECTING
 			end
 
@@ -1183,7 +1179,7 @@ local function stateTransit(p13, p14, p15) -- line: 997
 				end
 			end
 
-			if v69 and v103 and p14 == v103 then
+			if v68 and v102 and p14 == v102 then
 				TelemetryService:LogCounter(t1, {
 					customFields = {
 						selectedItem = "PlaceLaunchCollaborationCoreGated"
@@ -1228,7 +1224,7 @@ local function stateTransit(p13, p14, p15) -- line: 997
 		RbxAnalyticsService:ReportCounter("ReconnectPrompt-ReconnectFailed")
 
 		if p13 == Enum.ConnectionError.TeleportErrors then
-			if tick() > timestamp + v27 then
+			if tick() > timestamp + v26 then
 				TelemetryService:LogCounter(t1, {
 					customFields = {
 						selectedItem = "ReconnectTimedOut"
@@ -1259,10 +1255,10 @@ local function stateTransit(p13, p14, p15) -- line: 997
 					}
 				}, 1)
 
-				if v30 and t6.active then
-					local v179 = v35
+				if v29 and t6.active then
+					local v178 = v34
 
-					if v179 <= 0 or tick() <= timestamp + v179 then
+					if v178 <= 0 or tick() <= timestamp + v178 then
 						return t3.AUTO_RECONNECTING
 					end
 
@@ -1288,7 +1284,7 @@ local function stateTransit(p13, p14, p15) -- line: 997
 		end
 	end
 
-	if v30 and p15 == t3.AUTO_RECONNECTING then
+	if v29 and p15 == t3.AUTO_RECONNECTING then
 		if FFlag then
 			return t3.RECONNECT_DISABLED
 		end
@@ -1302,71 +1298,71 @@ local function stateTransit(p13, p14, p15) -- line: 997
 
 	return p15
 end
-local function getCreatorBanString(s4: string) -- line: 1144
+local function getCreatorBanString(s4: string) -- line: 1140
 	-- upvalues: GuiService (copy), translateString (copy)
 	local ErrorDetails = GuiService:GetErrorDetails()
 
 	if ErrorDetails then
-		local v188
+		local v187
 
 		if ErrorDetails.time then
 			local minutes = ErrorDetails.minutes
 			local hours = ErrorDetails.hours
 			local days = ErrorDetails.days
-			local v185 = if minutes ~= 1 then translateString("InGame.ConnectionError.CreatorBanMinutesPlural", {
+			local v184 = if minutes ~= 1 then translateString("InGame.ConnectionError.CreatorBanMinutesPlural", {
 				RBX_TIME_MINUTES = minutes
 			}) else translateString("InGame.ConnectionError.CreatorBanMinutesSingular")
-			local v186 = if hours ~= 1 then translateString("InGame.ConnectionError.CreatorBanHoursPlural", {
+			local v185 = if hours ~= 1 then translateString("InGame.ConnectionError.CreatorBanHoursPlural", {
 				RBX_TIME_HOURS = hours
 			}) else translateString("InGame.ConnectionError.CreatorBanHoursSingular")
-			local v187 = if days ~= 1 then translateString("InGame.ConnectionError.CreatorBanDaysPlural", {
+			local v186 = if days ~= 1 then translateString("InGame.ConnectionError.CreatorBanDaysPlural", {
 				RBX_TIME_DAYS = days
 			}) else translateString("InGame.ConnectionError.CreatorBanDaysSingular")
 
-			if v185 == "" or v186 == "" or v187 == "" then
+			if v184 == "" or v185 == "" or v186 == "" then
 				return s4
 			end
 
 			if hours > 0 then
-				v185 = v186 .. ", " .. v185
+				v184 = v185 .. ", " .. v184
 			end
 
 			if days > 0 then
-				v185 = v187 .. ", " .. v185
+				v184 = v186 .. ", " .. v184
 			end
 
-			v188 = translateString("InGame.ConnectionError.CreatorBanWithTime", {
-				RBX_TIME_REMAINING = v185
+			v187 = translateString("InGame.ConnectionError.CreatorBanWithTime", {
+				RBX_TIME_REMAINING = v184
 			})
 		else
-			v188 = translateString("InGame.ConnectionError.CreatorBanNoTime")
+			v187 = translateString("InGame.ConnectionError.CreatorBanNoTime")
 		end
 
-		if v188 == "" then
+		if v187 == "" then
 			return s4
 		end
 
 		local displayReason = ErrorDetails.displayReason
 
 		if displayReason and displayReason ~= "" then
-			local v190 = translateString("InGame.ConnectionError.CreatorBanMessage", {
+			local v189 = translateString("InGame.ConnectionError.CreatorBanMessage", {
 				RBX_STR = displayReason
 			})
 
-			if v190 ~= "" then
-				return v188 .. " " .. v190
+			if v189 ~= "" then
+				return v187 .. " " .. v189
 			end
 
 			return s4
 		end
 
-		return v188
+		return v187
 	end
 
 	return s4
 end
 
-local v114 = game:DefineFastFlag("RemoveRefToMissingLocInConnection", false)
+local v113 = game:DefineFastFlag("RemoveRefToMissingLocInConnection", false)
 local t14 = {
 	[Enum.ConnectionError.ConnectErrors] = "InGame.ConnectionError.ConnectErrors",
 	[Enum.ConnectionError.AlreadyConnected] = "InGame.ConnectionError.ConnectionFailedWaitAndTry",
@@ -1401,27 +1397,27 @@ local t14 = {
 	[Enum.ConnectionError.DisconnectIdle] = "InGame.ConnectionError.DisconnectIdle",
 	[Enum.ConnectionError.DisconnectRaknetErrors] = "InGame.ConnectionError.DisconnectRaknetErrors",
 	[Enum.ConnectionError.DisconnectWrongVersion] = "InGame.ConnectionError.DisconnectWrongVersion",
-	[Enum.ConnectionError.DisconnectBySecurityPolicy] = not v114 and "InGame.ConnectionError.DisconnectBySecurityPolicy" or nil,
-	[Enum.ConnectionError.DisconnectBlockedIP] = not v114 and "InGame.ConnectionError.DisconnectBlockedIP" or nil,
-	[Enum.ConnectionError.DisconnectClientFailure] = not v114 and "InGame.ConnectionError.DisconnectClientFailure" or nil,
-	[Enum.ConnectionError.DisconnectClientRequest] = not v114 and "InGame.ConnectionError.DisconnectClientRequest" or nil,
+	[Enum.ConnectionError.DisconnectBySecurityPolicy] = "InGame.ConnectionError.DisconnectBlockedConnection",
+	[Enum.ConnectionError.DisconnectBlockedIP] = "InGame.ConnectionError.DisconnectBlockedConnection",
+	[Enum.ConnectionError.DisconnectClientFailure] = "InGame.ConnectionError.DisconnectClientFailure",
+	[Enum.ConnectionError.DisconnectClientRequest] = "InGame.ConnectionError.DisconnectClientRequest",
 	[Enum.ConnectionError.DisconnectPrivateServerKickout] = "InGame.ConnectionError.DisconnectPrivateServerKickout",
-	[Enum.ConnectionError.DisconnectModeratedGame] = not v114 and "InGame.ConnectionError.DisconnectModeratedGame" or nil,
-	[Enum.ConnectionError.ServerShutdown] = not v114 and "InGame.ConnectionError.ServerShutdown" or nil,
-	[Enum.ConnectionError.ReplicatorTimeout] = not v114 and "InGame.ConnectionError.ReplicatorTimeout" or nil,
-	[Enum.ConnectionError.PlayerRemoved] = not v114 and "InGame.ConnectionError.PlayerRemoved" or nil,
+	[Enum.ConnectionError.DisconnectModeratedGame] = "InGame.ConnectionError.ServerShutdown",
+	[Enum.ConnectionError.ServerShutdown] = "InGame.ConnectionError.ServerShutdown",
+	[Enum.ConnectionError.ReplicatorTimeout] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.PlayerRemoved] = "InGame.ConnectionError.DisconnectTryAgain",
 	[Enum.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave] = "InGame.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave",
-	[Enum.ConnectionError.DisconnectRomarkEndOfTest] = not v114 and "InGame.ConnectionError.DisconnectRomarkEndOfTest" or nil,
-	[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = not v114 and "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked" or nil,
-	[Enum.ConnectionError.DisconnectCollaboratorUnderage] = not v114 and "InGame.ConnectionError.DisconnectCollaboratorUnderage" or nil,
-	[Enum.ConnectionError.NetworkInternal] = not v114 and "InGame.ConnectionError.NetworkInternal" or nil,
-	[Enum.ConnectionError.NetworkSend] = not v114 and "InGame.ConnectionError.NetworkSend" or nil,
-	[Enum.ConnectionError.NetworkTimeout] = not v114 and "InGame.ConnectionError.NetworkTimeout" or nil,
-	[Enum.ConnectionError.NetworkMisbehavior] = not v114 and "InGame.ConnectionError.NetworkMisbehavior" or nil,
-	[Enum.ConnectionError.NetworkSecurity] = not v114 and "InGame.ConnectionError.NetworkSecurity" or nil,
-	[Enum.ConnectionError.ReplacementReady] = not v114 and "InGame.ConnectionError.ReplacementReady" or nil,
-	[Enum.ConnectionError.ServerEmpty] = not v114 and "InGame.ConnectionError.ServerEmpty" or nil,
-	[Enum.ConnectionError.PhantomFreeze] = not v114 and "InGame.ConnectionError.PhantomFreeze" or nil,
+	[Enum.ConnectionError.DisconnectRomarkEndOfTest] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked",
+	[Enum.ConnectionError.DisconnectCollaboratorUnderage] = "InGame.ConnectionError.DisconnectCollaboratorUnderage",
+	[Enum.ConnectionError.NetworkInternal] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.NetworkSend] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.NetworkTimeout] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.NetworkMisbehavior] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.NetworkSecurity] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.ReplacementReady] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.ServerEmpty] = "InGame.ConnectionError.DisconnectTryAgain",
+	[Enum.ConnectionError.PhantomFreeze] = "InGame.ConnectionError.DisconnectTryAgain",
 	[Enum.ConnectionError.AndroidAnticheatKick] = "InGame.ConnectionError.AndroidAnticheatKick",
 	[Enum.ConnectionError.AndroidEmulatorKick] = "InGame.ConnectionError.AndroidEmulatorKick",
 	[Enum.ConnectionError.PlacelaunchErrors] = "InGame.ConnectionError.PlacelaunchErrors",
@@ -1438,8 +1434,8 @@ local t14 = {
 	[Enum.ConnectionError.PlacelaunchPartyCannotFit] = "InGame.ConnectionError.PlacelaunchPartyCannotFit",
 	[Enum.ConnectionError.PlacelaunchHttpError] = "InGame.ConnectionError.PlacelaunchHttpError",
 	[Enum.ConnectionError.PlacelaunchUserPrivacyUnauthorized] = "InGame.ConnectionError.PlacelaunchUserPrivacyUnauthorized",
-	[Enum.ConnectionError.PlacelaunchCreatorBan] = not v114 and "InGame.ConnectionError.PlacelaunchCreatorBan" or nil,
-	[Enum.ConnectionError.PlacelaunchCustomMessage] = not v114 and "InGame.ConnectionError.PlacelaunchCustomMessage" or nil,
+	[Enum.ConnectionError.PlacelaunchCreatorBan] = "InGame.ConnectionError.CreatorBanNoTime",
+	[Enum.ConnectionError.PlacelaunchCustomMessage] = not v113 and "InGame.ConnectionError.PlacelaunchCustomMessage" or nil,
 	[Enum.ConnectionError.PlacelaunchOtherError] = "InGame.ConnectionError.PlacelaunchOtherError",
 	[Enum.ConnectionError.TeleportErrors] = "InGame.ConnectionError.TeleportErrors",
 	[Enum.ConnectionError.TeleportFailure] = "InGame.ConnectionError.TeleportFailure",
@@ -1448,7 +1444,7 @@ local t14 = {
 	[Enum.ConnectionError.TeleportGameFull] = "InGame.ConnectionError.TeleportGameFull",
 	[Enum.ConnectionError.TeleportUnauthorized] = "InGame.ConnectionError.TeleportUnauthorized",
 	[Enum.ConnectionError.TeleportFlooded] = "InGame.ConnectionError.TeleportFlooded",
-	[Enum.ConnectionError.TeleportIsTeleporting] = not v114 and "InGame.ConnectionError.TeleportIsTeleporting" or nil,
+	[Enum.ConnectionError.TeleportIsTeleporting] = not v113 and "InGame.ConnectionError.TeleportIsTeleporting" or nil,
 	[Enum.ConnectionError.DisconnectVerboselyModeratedGame] = "InGame.ConnectionError.DisconnectVerboselyModeratedGame"
 }
 
@@ -1456,48 +1452,25 @@ if v24 then
 	t14[Enum.ConnectionError.ScreentimeLockoutKick] = "Feature.Screentime.Content.ScreentimeLimitDialog"
 end
 
-if v25 then
-	t14[Enum.ConnectionError.DisconnectBySecurityPolicy] = "InGame.ConnectionError.DisconnectBlockedConnection"
-	t14[Enum.ConnectionError.DisconnectBlockedIP] = "InGame.ConnectionError.DisconnectBlockedConnection"
-	t14[Enum.ConnectionError.DisconnectClientFailure] = "InGame.ConnectionError.DisconnectClientFailure"
-	t14[Enum.ConnectionError.DisconnectClientRequest] = "InGame.ConnectionError.DisconnectClientRequest"
-	t14[Enum.ConnectionError.DisconnectModeratedGame] = "InGame.ConnectionError.ServerShutdown"
-	t14[Enum.ConnectionError.ServerShutdown] = "InGame.ConnectionError.ServerShutdown"
-	t14[Enum.ConnectionError.ReplicatorTimeout] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.PlayerRemoved] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.DisconnectRomarkEndOfTest] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked"
-	t14[Enum.ConnectionError.DisconnectCollaboratorUnderage] = "InGame.ConnectionError.DisconnectCollaboratorUnderage"
-	t14[Enum.ConnectionError.NetworkInternal] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.NetworkSend] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.NetworkTimeout] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.NetworkMisbehavior] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.NetworkSecurity] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.ReplacementReady] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.ServerEmpty] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.PhantomFreeze] = "InGame.ConnectionError.DisconnectTryAgain"
-	t14[Enum.ConnectionError.PlacelaunchCreatorBan] = "InGame.ConnectionError.CreatorBanNoTime"
-end
-
-if v56 then
+if v55 then
 	t14[Enum.ConnectionError.PlacelaunchDeviceBlock] = "InGame.ConnectionError.PlacelaunchDeviceBlock"
 end
 
-if v57 then
+if v56 then
 	t14[Enum.ConnectionError.PlacelaunchAgeVerificationRequired] = "InGame.ConnectionError.Description.AgeCheckRequired"
 	t14[Enum.ConnectionError.PlacelaunchParentalApprovalRequired] = "InGame.ConnectionError.Description.ParentalApprovalRequired"
 	t14[Enum.ConnectionError.PlacelaunchCoreGated] = "InGame.ConnectionError.Description.LockedByAge"
 end
 
-if v58 then
+if v57 then
 	t14[Enum.ConnectionError.PlacelaunchVipOwnerNotPresent] = "InGame.ConnectionError.Description.VipOwnerNotPresent"
 end
 
-if v69 and v103 then
-	t14[v103] = "InGame.ConnectionError.Description.CollaborationRequiresTrustedFriends"
+if v68 and v102 then
+	t14[v102] = "InGame.ConnectionError.Description.CollaborationRequiresTrustedFriends"
 end
 
-if v60 and v62 then
+if v59 and v61 then
 	t14[Enum.ConnectionError.DisconnectRemoteAttestationTimeout] = "InGame.ConnectionError.RemoteAttestationTimeout"
 	t14[Enum.ConnectionError.DisconnectRemoteAttestationUnsupported] = "InGame.ConnectionError.RemoteAttestationUnsupported"
 	t14[Enum.ConnectionError.DisconnectRemoteAttestationGeneralFailure] = "InGame.ConnectionError.RemoteAttestationGeneralFailure"
@@ -1505,54 +1478,54 @@ if v60 and v62 then
 	t14[Enum.ConnectionError.DisconnectRemoteAttestationBootValidationFailure] = "InGame.ConnectionError.RemoteAttestationBootValidationFailure"
 end
 
-local function getErrorString(s5: string, p16, p17) -- line: 1355
-	-- upvalues: translateString (copy), v28 (copy), v23 (copy), t14 (copy), mutedError (copy), v22 (copy)
+local function getErrorString(s5: string, p16, p17) -- line: 1328
+	-- upvalues: translateString (copy), v27 (copy), v23 (copy), t14 (copy), mutedError (copy), v22 (copy)
 	if p16 == Enum.ConnectionError.OK then
 		return ""
 	end
 
 	if p17 then
-		local v194 = translateString("InGame.ConnectionError.ReconnectFailed")
+		local v193 = translateString("InGame.ConnectionError.ReconnectFailed")
 
-		if v194 ~= "" then
-			return v194
+		if v193 ~= "" then
+			return v193
 		end
 
 		return "Reconnect was unsuccessful. Please try again."
 	end
 
 	if p16 == Enum.ConnectionError.DisconnectLuaKick and s5 ~= "" then
-		local v195 = s5:sub(1, v28)
-		local v196 = translateString("InGame.ConnectionError.DisconnectLuaKickWithMessage", {
-			RBX_STR = v195
+		local v194 = s5:sub(1, v27)
+		local v195 = translateString("InGame.ConnectionError.DisconnectLuaKickWithMessage", {
+			RBX_STR = v194
 		})
 
-		if v196 ~= "" then
-			return v196
+		if v195 ~= "" then
+			return v195
 		end
 
-		return v195
+		return v194
 	end
 
-	local v197
+	local v196
 
 	if v23 then
-		v197 = t14[p16]
+		v196 = t14[p16]
 
-		if not v197 then
+		if not v196 then
 			mutedError("Cannot find localization key for " .. tostring(p16))
-			v197 = "InGame.ConnectionError.UnknownError"
+			v196 = "InGame.ConnectionError.UnknownError"
 		end
 	else
-		v197 = string.gsub(tostring(p16), "Enum", "InGame")
+		v196 = string.gsub(tostring(p16), "Enum", "InGame")
 	end
 
-	local v198 = if p16 ~= Enum.ConnectionError.DisconnectIdle then translateString(v197) else translateString(v197, {
+	local v197 = if p16 ~= Enum.ConnectionError.DisconnectIdle then translateString(v196) else translateString(v196, {
 		RBX_NUM = tostring(20)
 	})
 
-	if v198 ~= "" then
-		return v198
+	if v197 ~= "" then
+		return v197
 	end
 
 	if v22 then
@@ -1561,18 +1534,18 @@ local function getErrorString(s5: string, p16, p17) -- line: 1355
 
 	return s5
 end
-local function updateErrorPrompt(p18, p19, p20) -- line: 1409
-	-- upvalues: v71 (copy), FFlagUniversalFeatureRestrictionReceivers (copy), GuiService (copy), buildRobloxExperienceKickContent (copy), translateString (copy), showFeatureRestrictionDirect (copy), v91 (copy), TelemetryService (copy), t1 (copy), stateTransit (copy), NONE (ref), t3 (copy), u77 (ref), onEnter (copy), v30 (copy), scheduleAutoReconnect (copy), t6 (copy), getCreatorBanString (copy), getErrorString (copy), v53 (copy), renderAutoReconnectPrompt (copy), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
-	if v71 and (FFlagUniversalFeatureRestrictionReceivers and p19 == Enum.ConnectionError.DisconnectLuaKick) then
+local function updateErrorPrompt(p18, p19, p20) -- line: 1382
+	-- upvalues: v70 (copy), FFlagUniversalFeatureRestrictionReceivers (copy), GuiService (copy), buildRobloxExperienceKickContent (copy), translateString (copy), showFeatureRestrictionDirect (copy), v90 (copy), TelemetryService (copy), t1 (copy), stateTransit (copy), NONE (ref), t3 (copy), u76 (ref), onEnter (copy), v29 (copy), scheduleAutoReconnect (copy), t6 (copy), getCreatorBanString (copy), getErrorString (copy), v52 (copy), renderAutoReconnectPrompt (copy), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
+	if v70 and (FFlagUniversalFeatureRestrictionReceivers and p19 == Enum.ConnectionError.DisconnectLuaKick) then
 		local ErrorDetails = GuiService:GetErrorDetails()
 
 		if ErrorDetails and ErrorDetails.moderatorType == "roblox" then
-			local v203 = buildRobloxExperienceKickContent(p18, ErrorDetails, translateString)
+			local v202 = buildRobloxExperienceKickContent(p18, ErrorDetails, translateString)
 
-			showFeatureRestrictionDirect(v203.abuseVector, v203.moderationDetail, {
-				onDismiss = v91,
-				titleOverride = v203.options.titleOverride,
-				bodyOverride = v203.options.bodyOverride
+			showFeatureRestrictionDirect(v202.abuseVector, v202.moderationDetail, {
+				onDismiss = v90,
+				titleOverride = v202.options.titleOverride,
+				bodyOverride = v202.options.bodyOverride
 			})
 			TelemetryService:LogCounter(t1, {
 				customFields = {
@@ -1584,18 +1557,18 @@ local function updateErrorPrompt(p18, p19, p20) -- line: 1409
 		end
 	end
 
-	local v204 = stateTransit(p20, p19, NONE)
+	local v203 = stateTransit(p20, p19, NONE)
 
-	if v204 ~= NONE then
+	if v203 ~= NONE then
 		if NONE == t3.IS_RECONNECTING then
-			u77:primaryShimmerStop()
+			u76:primaryShimmerStop()
 		end
 
-		NONE = v204
-		onEnter(v204)
+		NONE = v203
+		onEnter(v203)
 
-		if v30 then
-			if v204 == t3.AUTO_RECONNECTING then
+		if v29 then
+			if v203 == t3.AUTO_RECONNECTING then
 				scheduleAutoReconnect()
 			else
 				t6.active = false
@@ -1619,29 +1592,29 @@ local function updateErrorPrompt(p18, p19, p20) -- line: 1409
 		end
 	end
 
-	local v205
+	local v204
 
 	if p19 == Enum.ConnectionError.PlacelaunchCreatorBan then
-		v205 = getCreatorBanString(p18)
+		v204 = getCreatorBanString(p18)
 	elseif p20 == Enum.ConnectionError.TeleportErrors and NONE ~= t3.TELEPORT_FAILED then
 		if p19 == Enum.ConnectionError.OK then
-			v205 = ""
+			v204 = ""
 		else
-			local v206 = translateString("InGame.ConnectionError.ReconnectFailed")
+			local v205 = translateString("InGame.ConnectionError.ReconnectFailed")
 
-			v205 = v206 == "" and "Reconnect was unsuccessful. Please try again." or v206
+			v204 = v205 == "" and "Reconnect was unsuccessful. Please try again." or v205
 		end
 	else
-		v205 = getErrorString(p18, p19)
+		v204 = getErrorString(p18, p19)
 	end
 
 	if NONE == t3.RECONNECT_DISABLED then
-		v205 = v53
+		v204 = v52
 	end
 
-	if v30 and NONE == t3.AUTO_RECONNECTING then
+	if v29 and NONE == t3.AUTO_RECONNECTING then
 		if t6.baseMessage == nil then
-			t6.baseMessage = v205
+			t6.baseMessage = v204
 			t6.errorCode = p19
 		end
 
@@ -1650,17 +1623,17 @@ local function updateErrorPrompt(p18, p19, p20) -- line: 1409
 		return
 	end
 
-	if u77 then
+	if u76 then
 		if GetFFlagDisplayChannelNameOnErrorPrompt() then
-			u77:onErrorChanged(v205, p19, true)
+			u76:onErrorChanged(v204, p19, true)
 
 			return
 		end
 
-		u77:onErrorChanged(v205, p19)
+		u76:onErrorChanged(v204, p19)
 	end
 end
-local function onErrorMessageChanged() -- line: 1484
+local function onErrorMessageChanged() -- line: 1457
 	-- upvalues: GuiService (copy), updateErrorPrompt (copy)
 	local ErrorMessage = GuiService:GetErrorMessage()
 	local ErrorCode = GuiService:GetErrorCode()
@@ -1668,9 +1641,9 @@ local function onErrorMessageChanged() -- line: 1484
 
 	updateErrorPrompt(ErrorMessage, ErrorCode, ErrorType)
 end
-local function onScreenSizeChanged() -- line: 1491
-	-- upvalues: u77 (ref), RobloxGui (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref)
-	if not u77 then
+local function onScreenSizeChanged() -- line: 1464
+	-- upvalues: u76 (ref), RobloxGui (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref)
+	if not u76 then
 		return
 	end
 
@@ -1680,7 +1653,7 @@ local function onScreenSizeChanged() -- line: 1491
 	if AbsoluteSizeX2 ~= AbsoluteSizeX or AbsoluteSizeY2 ~= AbsoluteSizeY then
 		AbsoluteSizeX = AbsoluteSizeX2
 		AbsoluteSizeY = AbsoluteSizeY2
-		u77:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+		u76:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
 	end
 end
 
@@ -1696,7 +1669,7 @@ if v21 then
 			updateErrorPrompt("Should show localized strings, please file a jira ticket for missing translation.", v2, k)
 			wait(2)
 
-			if v30 then
+			if v29 then
 				t6.active = false
 				t6.attempt = 0
 				t6.nextAttemptAt = 0
@@ -1722,7 +1695,7 @@ if v21 then
 end
 
 if EngineFeature then
-	GuiService.CoreGuiRenderOverflowed:Connect(function() -- line: 1530
+	GuiService.CoreGuiRenderOverflowed:Connect(function() -- line: 1503
 		-- upvalues: CoreGui (copy)
 		for _, child in pairs(CoreGui:GetChildren()) do
 			if child:IsA("ScreenGui") and child.Name ~= "RobloxPromptGui" then
@@ -1732,8 +1705,8 @@ if EngineFeature then
 	end)
 end
 
-if v40 then
-	coroutine.wrap(function() -- line: 1547
+if v39 then
+	coroutine.wrap(function() -- line: 1520
 		-- upvalues: CorePackages (copy)
 		require(CorePackages.Workspace.Packages.GenericChallenges).Middleware.InitExperienceChallengeInterceptor()
 	end)()

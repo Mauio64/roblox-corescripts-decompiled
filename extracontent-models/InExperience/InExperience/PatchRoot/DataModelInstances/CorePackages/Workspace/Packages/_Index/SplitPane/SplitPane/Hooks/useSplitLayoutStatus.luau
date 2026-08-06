@@ -26,8 +26,11 @@ local function useSplitLayoutStatus(t1: {[any]: any}, n1: number) -- line: 26
 
 	if v20 then
 		for i = #t1, 1, -1 do
-			if t1[i].descriptor.options.splitPaneEligibility ~= SplitPaneSlot.Support then
-				if not (#t2 > 0) then
+			local options = t1[i].descriptor.options
+			local splitPaneEligibility = options.splitPaneEligibility
+
+			if splitPaneEligibility ~= SplitPaneSlot.Support then
+				if (options.transparent or options.overlayEnabled) and splitPaneEligibility == nil or not (#t2 > 0) then
 					continue
 				end
 
@@ -39,8 +42,8 @@ local function useSplitLayoutStatus(t1: {[any]: any}, n1: number) -- line: 26
 			table.insert(t2, 1, i)
 		end
 	elseif not v18 then
-		for _, v28 in t1 do
-			if v28.descriptor.options.splitPaneEligibility == SplitPaneSlot.Support and v28.viewState ~= ViewState.Closing then
+		for _, v30 in t1 do
+			if v30.descriptor.options.splitPaneEligibility == SplitPaneSlot.Support and v30.viewState ~= ViewState.Closing then
 				v25 = true
 
 				break
@@ -48,22 +51,22 @@ local function useSplitLayoutStatus(t1: {[any]: any}, n1: number) -- line: 26
 		end
 	end
 
-	local v29 = #t2
-	local v30 = v24 ~= nil and v29 > 0
-	local v31 = n1 >= 1
-	local v32 = v25 or (v30 or v20 and (v21 and v31))
+	local v31 = #t2
+	local v32 = v24 ~= nil and v31 > 0
+	local v33 = n1 >= 1
+	local v34 = v25 or (v32 or v20 and (v21 and v33))
 
-	React.useEffect(function() -- line: 72
+	React.useEffect(function() -- line: 76
 		-- upvalues: v22 (copy), v17 (copy), v19 (copy), t1 (copy), SplitPaneSlot (copy), RoactNavigation (copy)
 		if not v22 then
 			return
 		end
 
-		local v33 = v17.getIsSplitEligible(false)
+		local v35 = v17.getIsSplitEligible(false)
 
 		v17.setIsSplitEligible(v19)
 
-		if not v33 or v19 then
+		if not v35 or v19 then
 			return
 		end
 
@@ -82,13 +85,13 @@ local function useSplitLayoutStatus(t1: {[any]: any}, n1: number) -- line: 26
 				local splitPaneEligibility = descriptor2.options.splitPaneEligibility
 
 				if splitPaneEligibility ~= nil and splitPaneEligibility ~= SplitPaneSlot.Content then
-					local v39 = descriptor2.state ~= nil and descriptor2.state.key or nil
+					local v41 = descriptor2.state ~= nil and descriptor2.state.key or nil
 
-					if v39 ~= nil then
+					if v41 ~= nil then
 						navigation.dispatch(RoactNavigation.StackActions.pop({
 							prune = false,
 							immediate = true,
-							key = v39
+							key = v41
 						}))
 					end
 				end
@@ -100,9 +103,9 @@ local function useSplitLayoutStatus(t1: {[any]: any}, n1: number) -- line: 26
 		t1,
 		v17
 	})
-	React.useEffect(function() -- line: 109
-		-- upvalues: v32 (copy), v22 (copy), v17 (copy), SupportPaneMode (copy), t1 (copy), ViewState (copy), SplitPaneSlot (copy)
-		if v32 then
+	React.useEffect(function() -- line: 113
+		-- upvalues: v34 (copy), v22 (copy), v17 (copy), SupportPaneMode (copy), t1 (copy), ViewState (copy), SplitPaneSlot (copy)
+		if v34 then
 			return
 		end
 
@@ -110,21 +113,21 @@ local function useSplitLayoutStatus(t1: {[any]: any}, n1: number) -- line: 26
 			v17.setSupportPaneMode(SupportPaneMode.Normal)
 		end
 
-		for _, v41 in t1 do
-			if v41.viewState == ViewState.Closing and v41.descriptor.options.splitPaneEligibility == SplitPaneSlot.Support then
-				v41.setClosed()
+		for _, v43 in t1 do
+			if v43.viewState == ViewState.Closing and v43.descriptor.options.splitPaneEligibility == SplitPaneSlot.Support then
+				v43.setClosed()
 			end
 		end
 	end, {
 		v22,
-		v32,
+		v34,
 		t1,
 		v17
 	})
 
 	return {
-		isSplitLayoutEnabled = v32,
-		isRouteActiveOnPane = v30,
+		isSplitLayoutEnabled = v34,
+		isRouteActiveOnPane = v32,
 		paneIndices = t2
 	}
 end

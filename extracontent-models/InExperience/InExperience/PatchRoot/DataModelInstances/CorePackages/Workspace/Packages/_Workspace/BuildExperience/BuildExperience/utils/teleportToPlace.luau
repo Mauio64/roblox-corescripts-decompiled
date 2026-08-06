@@ -2,7 +2,7 @@ local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local playtestTeleportRemote = require(script.Parent.playtestTeleportRemote)
 local u3 = nil
 
-local function getRemote() -- line: 11
+local function getRemote() -- line: 10
 	-- upvalues: u3 (ref), RobloxReplicatedStorage (copy), playtestTeleportRemote (copy)
 	if u3 ~= nil then
 		return u3
@@ -14,7 +14,7 @@ local function getRemote() -- line: 11
 
 	return playtestTeleportRemoteREMOTE_NAME
 end
-local function teleportToPlace(n1: number) -- line: 21
+local function teleportToPlace(n1: number) -- line: 20
 	-- upvalues: u3 (ref), RobloxReplicatedStorage (copy), playtestTeleportRemote (copy)
 	local v8
 

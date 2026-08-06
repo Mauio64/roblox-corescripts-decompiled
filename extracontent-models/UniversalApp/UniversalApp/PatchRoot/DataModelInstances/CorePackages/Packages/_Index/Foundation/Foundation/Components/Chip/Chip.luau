@@ -14,7 +14,7 @@ local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local Accessory = require(script.Parent.Accessory)
 local IconPosition = require(Foundation.Enums.IconPosition)
-local ColorMode = require(Foundation.Enums.ColorMode)
+local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local StateLayerMode = require(Foundation.Enums.StateLayerMode)
 
 require(Foundation.Enums.CursorType)
@@ -32,7 +32,7 @@ local t1 = {
 }
 
 local function Chip(p1, p2) -- line: 71
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), IconPosition (copy), IconVariant (copy), useChipVariants (copy), View (copy), withCommonProps (copy), StateLayerMode (copy), Constants (copy), PresentationContext (copy), ColorMode (copy), Accessory (copy), Text (copy)
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), IconPosition (copy), IconVariant (copy), useChipVariants (copy), View (copy), withCommonProps (copy), StateLayerMode (copy), Constants (copy), PresentationContext (copy), ColorNamespace (copy), Accessory (copy), Text (copy)
 	local v23 = withDefaults(p1, t1)
 	local v24 = useTokens()
 	local v25, v26 = React.useMemo(function() -- line: 75
@@ -101,7 +101,7 @@ local function Chip(p1, p2) -- line: 71
 	}), React.createElement(PresentationContext.Provider, {
 		value = {
 			isIconSize = true,
-			colorMode = if not v23.isChecked then ColorMode.Color else ColorMode.Inverse
+			colorNamespace = if not v23.isChecked then ColorNamespace.Color else ColorNamespace.Inverse
 		}
 	}, {
 		Leading = if not v25 then nil else React.createElement(Accessory, {

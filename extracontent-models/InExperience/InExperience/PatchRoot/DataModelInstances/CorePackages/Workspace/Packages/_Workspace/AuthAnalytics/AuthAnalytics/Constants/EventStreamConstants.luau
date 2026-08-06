@@ -257,6 +257,7 @@ return {
 		SwitchAccountsShown = "shown",
 		SwitchAccountsU13Hidden = "u13Hidden",
 		SwitchAccountsIxpHidden = "ixpHidden",
+		SwitchAccountsAmpHidden = "ampHidden",
 		SwitchAccountsExclusionsHidden = "exclusionsHidden",
 		SwitchAccountsBlobEmpty = "blobEmpty",
 		SignupLayerExposure = "signupLayerExposure",

@@ -11,7 +11,8 @@ return {
 	},
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.UIBloxInitializer,
-		JestConfigs.setupFiles.createPromiseRejectionHandler()
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes
 	},
 	coveragePathIgnorePatterns = { "Localization/Locales/.*%.lua$" }
 }

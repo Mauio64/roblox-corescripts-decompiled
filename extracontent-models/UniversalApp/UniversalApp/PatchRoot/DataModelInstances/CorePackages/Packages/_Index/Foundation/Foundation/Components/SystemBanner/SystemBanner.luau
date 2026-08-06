@@ -77,7 +77,7 @@ local function SystemBanner(p1, p2) -- line: 57
 		ref = v35
 	}), React.createElement(PresentationContext.Provider, {
 		value = {
-			colorMode = v32.container.colorMode
+			colorNamespace = v32.container.colorNamespace
 		}
 	}, {
 		Icon = React.createElement(Icon, {

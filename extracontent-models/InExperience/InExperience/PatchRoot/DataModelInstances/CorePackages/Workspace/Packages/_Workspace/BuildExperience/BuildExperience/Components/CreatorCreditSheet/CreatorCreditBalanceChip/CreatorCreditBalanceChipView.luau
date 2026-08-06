@@ -6,7 +6,7 @@ local ChipSize = Foundation.Enums.ChipSize
 local ChipVariant = Foundation.Enums.ChipVariant
 local IconName = Foundation.Enums.IconName
 
-local function CreatorCreditBalanceChipView(t1: {[any]: any}) -- line: 20
+local function CreatorCreditBalanceChipView(t1: {[any]: any}) -- line: 18
 	-- upvalues: React (copy), Chip (copy), IconName (copy), ChipVariant (copy), ChipSize (copy)
 	if t1.balanceText == nil then
 		return nil

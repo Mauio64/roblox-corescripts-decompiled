@@ -19,6 +19,7 @@ local EditProfileBackgroundContainer = require(ProfilePlatform.Components.EditPr
 local CommunityVerificationModal = require(ProfilePlatform.Components.CommunityVerificationModal)
 local InspectAvatarSheetContainer = require(ProfilePlatform.Components.InspectAvatar.InspectAvatarSheetContainer)
 local PurchaseConfirmationModal = require(ProfilePlatform.Components.InspectAvatar.PurchaseConfirmationModal)
+local InsufficientRobuxDialog = require(ProfilePlatform.Components.InspectAvatar.InsufficientRobuxDialog)
 local MomentsGridPage = require(ProfilePlatform.Components.Moments.MomentsGridPage)
 local MomentsFeedPage = require(ProfilePlatform.Components.Moments.MomentsFeedPage)
 local FFlagSocialEnableProfileInspectAndBuy = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
@@ -40,9 +41,9 @@ local t2 = {
 	renderUnderlyingPage = true
 }
 
-local function makeFullBleedNavigationOptions(t3: {[any]: any}) -- line: 55
+local function makeFullBleedNavigationOptions(t3: {[any]: any}) -- line: 56
 	-- upvalues: t2 (copy)
-	return function(p1) -- line: 56
+	return function(p1) -- line: 57
 		-- upvalues: t2 (copy), t3 (copy)
 		if p1.navigation.getParam("fullBleed") then
 			return t2
@@ -59,7 +60,7 @@ local t4 = {
 	{
 		[Enums.Screens.EditProfilePage] = {
 			screen = if not FFlagEditProfileMigration then EditProfilePage else EditProfileLanding,
-			navigationOptions = if not FFlagAXEnableProfileTab then t1 else function(p2) -- line: 56
+			navigationOptions = if not FFlagAXEnableProfileTab then t1 else function(p2) -- line: 57
 				-- upvalues: t2 (copy), t1 (copy)
 				if p2.navigation.getParam("fullBleed") then
 					return t2
@@ -157,7 +158,7 @@ if FFlagEditProfileMigration then
 			absorbInput = false
 		}
 
-		function t8(p3) -- line: 56
+		function t8(p3) -- line: 57
 			-- upvalues: t2 (copy), t7 (copy)
 			if p3.navigation.getParam("fullBleed") then
 				return t2
@@ -202,6 +203,12 @@ if FFlagSocialEnableProfileInspectAndBuy then
 	table.insert(t4, {
 		[Enums.Screens.PurchaseConfirmationModal] = {
 			screen = PurchaseConfirmationModal,
+			navigationOptions = t1
+		}
+	})
+	table.insert(t4, {
+		[Enums.Screens.InsufficientRobuxDialog] = {
+			screen = InsufficientRobuxDialog,
 			navigationOptions = t1
 		}
 	})

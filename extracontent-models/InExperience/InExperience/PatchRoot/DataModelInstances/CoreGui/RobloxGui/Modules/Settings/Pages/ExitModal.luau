@@ -152,7 +152,7 @@ local function Initialize() -- line: 79
 			confirmText = t1.actionHome,
 			doNotShowText = t1.optionDontShow,
 			titleBackgroundImageProps = {
-				image = "rbxasset://textures/ui/LuaApp/graphic/Auth/GridBackground.jpg",
+				image = "rbxasset://textures/ui/LuaApp/graphic/Auth/GridBackground_05202026.jpg",
 				imageHeight = 200,
 				text = "<font face=\"GothamBlack\" size=\"42\">" .. t1.title .. "</font><font size=\"4\"><br /></font><br />" .. t1.subtitle
 			},

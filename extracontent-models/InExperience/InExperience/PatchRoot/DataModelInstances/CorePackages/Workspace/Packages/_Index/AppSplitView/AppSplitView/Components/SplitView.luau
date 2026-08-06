@@ -55,46 +55,48 @@ local function SplitView(t2: {[any]: any}) -- line: 75
 	local v37 = t2.supportPaneMode or Enums.SupportPaneMode.Normal
 	local v38 = v37 == Enums.SupportPaneMode.Expanded
 	local v39 = v37 == Enums.SupportPaneMode.Collapsed
-	local v40 = v38 or v37 == Enums.SupportPaneMode.Expanding
-	local v41 = not v38
-	local v42 = t2.supportPane ~= nil and (t2.supportPane.resizable == Enums.PaneResizable.Horizontal and (t2.onSupportPaneWidthChanged ~= nil and (not v40 and not v39)))
-	local v43 = t2.supportPane ~= nil and t2.supportPane.width ~= nil
+	local v40 = v37 == Enums.SupportPaneMode.Collapsing
+	local v41 = v38 or v37 == Enums.SupportPaneMode.Expanding
+	local v42 = not v38
+	local v43 = t2.supportPane ~= nil and (not v41 and (not v39 and not v40))
+	local v44 = v43 and (t2.supportPane ~= nil and (t2.supportPane.resizable == Enums.PaneResizable.Horizontal and t2.onSupportPaneWidthChanged ~= nil))
+	local v45 = t2.supportPane ~= nil and t2.supportPane.width ~= nil
 	local t3 = {
 		navWidth = v35,
 		supportWidth = v36,
 		variant = v34,
-		hasWidthOverride = v43,
+		hasWidthOverride = v45,
 		onSupportPaneWidthChanged = t2.onSupportPaneWidthChanged
 	}
-	local v45 = useSplitViewResize(t3)
-	local v46 = React.useCallback(function(p4) -- line: 113
-		-- upvalues: v40 (copy), v45 (copy), t2 (copy)
-		if not v40 then
-			v45.onSupportAbsoluteSizeChanged(p4)
+	local v47 = useSplitViewResize(t3)
+	local v48 = React.useCallback(function(p4) -- line: 114
+		-- upvalues: v41 (copy), v47 (copy), t2 (copy)
+		if not v41 then
+			v47.onSupportAbsoluteSizeChanged(p4)
 		end
 
 		if t2.onSupportRegionRectChanged then
 			t2.onSupportRegionRectChanged(p4)
 		end
 	end, {
-		v40,
-		v45.onSupportAbsoluteSizeChanged,
+		v41,
+		v47.onSupportAbsoluteSizeChanged,
 		t2.onSupportRegionRectChanged
 	})
-	local v47 = if not v38 then if not v39 then CompositionTags.SupportRegion.Root else CompositionTags.SupportRegion.Collapsed or CompositionTags.SupportRegion.Root else CompositionTags.ContentRegion.Root
+	local v49 = if not v38 then if not v39 then CompositionTags.SupportRegion.Root else CompositionTags.SupportRegion.Collapsed or CompositionTags.SupportRegion.Root else CompositionTags.ContentRegion.Root
 	local uDim2, uDim2_2
 
 	if v38 then
 		uDim2 = UDim2.fromScale(0, 0)
 		uDim2_2 = UDim2.fromScale(1, 1)
 	else
-		uDim2 = v45.supportPosition
-		uDim2_2 = v45.supportSize
+		uDim2 = v47.supportPosition
+		uDim2_2 = v47.supportSize
 	end
 
-	local v50 = not v38 and 1 or 4
-	local contentPosition = v45.contentPosition
-	local contentSize = v45.contentSize
+	local v52 = if not v38 then (not v43 or v44) and 1 or 3 else 4
+	local contentPosition = v47.contentPosition
+	local contentSize = v47.contentSize
 
 	return React.createElement(React.Fragment, nil, {
 		CompositionStyleSheet = React.createElement(CompositionStyleSheet),
@@ -102,7 +104,7 @@ local function SplitView(t2: {[any]: any}) -- line: 75
 			ZIndex = 1,
 			tag = CompositionTags.NavigationRegion.Root,
 			Size = UDim2.new(0, v35, 1, 0),
-			Interactable = v41,
+			Interactable = v42,
 			backgroundStyle = t1
 		}, {
 			Slot = t2.navigationPane.element
@@ -112,28 +114,30 @@ local function SplitView(t2: {[any]: any}) -- line: 75
 			tag = CompositionTags.ContentRegion.Root,
 			Position = contentPosition,
 			Size = contentSize,
-			Interactable = v41,
+			Interactable = v42,
 			backgroundStyle = t1,
 			onAbsoluteSizeChanged = t2.onContentRegionRectChanged,
 			onAbsolutePositionChanged = t2.onContentRegionRectChanged
 		}, t2.children),
 		SupportPane = if not t2.supportPane then nil else React.createElement(View, {
-			tag = v47,
+			tag = v49,
 			Position = uDim2,
 			Size = uDim2_2,
-			ZIndex = v50,
+			ZIndex = v52,
 			backgroundStyle = t1,
-			onAbsoluteSizeChanged = v46,
+			onAbsoluteSizeChanged = v48,
 			onAbsolutePositionChanged = t2.onSupportRegionRectChanged
 		}, {
 			Slot = t2.supportPane.element
 		}),
-		SupportResizer = if not v42 then nil else React.createElement(PaneResizer, {
-			ZIndex = 3,
-			position = v45.resizerPosition,
-			hitWidth = v45.resizerHitWidth,
-			onDrag = v45.onResizerDrag,
-			onDragEnd = v45.onResizerDragEnd
+		SupportResizer = if not v43 then nil else React.createElement(PaneResizer, {
+			Name = "SupportResizer",
+			interactive = v44,
+			position = v47.resizerPosition,
+			hitWidth = v47.resizerHitWidth,
+			ZIndex = not v44 and 2 or 3,
+			onDrag = if not v44 then nil else v47.onResizerDrag,
+			onDragEnd = if not v44 then nil else v47.onResizerDragEnd
 		})
 	})
 end

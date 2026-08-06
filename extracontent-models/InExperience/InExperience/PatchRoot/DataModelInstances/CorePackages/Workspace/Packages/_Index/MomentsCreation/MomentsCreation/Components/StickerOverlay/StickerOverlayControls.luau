@@ -10,117 +10,136 @@ local Button = Foundation.Button
 local Knob = Foundation.Knob
 local Slider = Foundation.Slider
 local View = Foundation.View
-local FoundationImage = Foundation.Image
 local useCallback = React.useCallback
 local useMemo = React.useMemo
 local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
 local useTokens = Foundation.Hooks.useTokens
 local useSignalState = SignalsReact.useSignalState
 local ReactionType = MomentsCommon.Enums.ReactionType
-local ReactionSize = MomentsCommon.Enums.ReactionSize
 local ReactionAssets = MomentsCommon.Components.ReactionAssets
+local EventNames = MomentsCommon.Analytics.EventNames
+local SessionManager = MomentsCommon.Analytics.SessionManager
+local FunnelEventNames = MomentsCommon.Analytics.FunnelEventNames
 local Constants = require(MomentsCreation.Constants)
+local StickerPickerItem = require(MomentsCreation.Components.StickerOverlay.StickerPickerItem)
+local fireAnalyticsEvent = require(MomentsCreation.Analytics.fireAnalyticsEvent)
+local makeCreationEventFields = require(MomentsCreation.Analytics.makeCreationEventFields)
 local makeDefaultStickerOverlayEdit = require(MomentsCreation.Utils.makeDefaultStickerOverlayEdit)
 local useCreationFlowStrings = require(MomentsCreation.Hooks.useCreationFlowStrings)
 
 require(MomentsCreation.Types.CreationFlowTypes)
 require(MomentsCreationParent.MomentsTypes)
 
-local function StickerOverlayControls(t1: {[any]: any}) -- line: 49
-	-- upvalues: useDeviceInsets (copy), useTokens (copy), useCreationFlowStrings (copy), useMemo (copy), Signals (copy), Constants (copy), useSignalState (copy), useCallback (copy), Dash (copy), ReactionType (copy), ReactionAssets (copy), ReactionSize (copy), React (copy), FoundationImage (copy), makeDefaultStickerOverlayEdit (copy), View (copy), Slider (copy), Knob (copy), Foundation (copy), Button (copy)
+local function StickerOverlayControls(t1: {[any]: any}) -- line: 54
+	-- upvalues: useDeviceInsets (copy), useTokens (copy), useCreationFlowStrings (copy), useMemo (copy), Signals (copy), Constants (copy), useSignalState (copy), useCallback (copy), Dash (copy), makeDefaultStickerOverlayEdit (copy), makeCreationEventFields (copy), SessionManager (copy), FunnelEventNames (copy), fireAnalyticsEvent (copy), EventNames (copy), ReactionType (copy), ReactionAssets (copy), React (copy), StickerPickerItem (copy), View (copy), Slider (copy), Knob (copy), Foundation (copy), Button (copy)
 	local controller = t1.controller
-	local v28 = useDeviceInsets()
-	local v29 = useTokens()
-	local v30 = useCreationFlowStrings()
-	local v31 = useMemo(function() -- line: 56
+	local v32 = useDeviceInsets()
+	local v33 = useTokens()
+	local v34 = useCreationFlowStrings()
+	local v35 = useMemo(function() -- line: 61
 		-- upvalues: Signals (copy), controller (copy), Constants (copy)
-		return Signals.createComputed(function(p1) -- line: 57
+		return Signals.createComputed(function(p1) -- line: 62
 			-- upvalues: controller (copy), Constants (copy)
-			local v47 = controller.getActiveSession(p1)
-			local v48 = if v47 == nil then nil else v47.getDraft(p1)
-			local v49 = v48 and v48[1]
+			local v62 = controller.getActiveSession(p1)
+			local v63 = if v62 == nil then nil else v62.getDraft(p1)
+			local v64 = v63 and v63[1]
 
-			if v49 ~= nil then
-				return v49.stickerSize
+			if v64 ~= nil then
+				return v64.stickerSize
 			end
 
 			return Constants.StickerOverlay.DefaultStickerSize
 		end)
 	end, { controller })
-	local v32 = useSignalState(v31)
-	local v33 = useCallback(function(n1: number) -- line: 66
+	local v36 = useSignalState(v35)
+	local v37 = useCallback(function(n1: number) -- line: 71
 		-- upvalues: controller (copy), Dash (copy)
-		local v38 = controller.getActiveSession(false)
+		local v43 = controller.getActiveSession(false)
 
-		if v38 == nil then
+		if v43 == nil then
 			return
 		end
 
-		local v39 = v38.getDraft(false)
-		local v40 = v39 and v39[1]
+		local v44 = v43.getDraft(false)
+		local v45 = v44 and v44[1]
 
-		if v40 == nil then
+		if v45 == nil then
 			return
 		end
 
-		v38.update({ Dash.joinDeep(v40, {
+		v43.update({ Dash.joinDeep(v45, {
 			stickerSize = n1
 		}) })
 	end, { controller })
-	local v34 = useCallback(function() -- line: 79
+	local v38 = useCallback(function() -- line: 84
 		-- upvalues: controller (copy)
 		controller.discardActiveTool()
 	end, { controller })
-	local v35 = useCallback(function() -- line: 83
+	local v39 = useCallback(function() -- line: 88
 		-- upvalues: controller (copy)
 		controller.commitActiveTool()
 	end, { controller })
-	local v36 = useMemo(function() -- line: 88
-		-- upvalues: ReactionType (copy), ReactionAssets (copy), ReactionSize (copy), React (copy), FoundationImage (copy), controller (copy), makeDefaultStickerOverlayEdit (copy), Dash (copy)
-		local t2 = {}
-		local n2 = 0
+	local v40 = useCallback(function(s1: string) -- line: 92
+		-- upvalues: controller (copy), makeDefaultStickerOverlayEdit (copy), Dash (copy), makeCreationEventFields (copy), SessionManager (copy), FunnelEventNames (copy), fireAnalyticsEvent (copy), EventNames (copy)
+		local v47 = controller.getActiveSession(false)
 
-		for _, v44 in ReactionType do
-			n2 += 1
-
-			local v45 = ReactionAssets.getStaticImageUri(v44, ReactionSize.Large)
-
-			table.insert(t2, React.createElement(FoundationImage, {
-				BackgroundTransparency = 1,
-				tag = "size-1000-1000 radius-medium",
-				key = v44,
-				LayoutOrder = n2,
-				onActivated = function() -- line: 99
-					-- upvalues: controller (copy), makeDefaultStickerOverlayEdit (copy), Dash (copy), v45 (copy)
-					local v50 = controller.getActiveSession(false)
-
-					if v50 == nil then
-						return
-					end
-
-					local v51 = v50.getDraft(false)
-					local v52 = v51 and v51[1] or makeDefaultStickerOverlayEdit()
-
-					v50.update({ Dash.join(v52, {
-						stickerURI = v45
-					}) })
-				end,
-				Image = v45,
-				ScaleType = Enum.ScaleType.Fit
-			}))
+		if v47 == nil then
+			return
 		end
 
-		return t2
+		local v48 = v47.getDraft(false)
+		local v49 = v48 and v48[1] or makeDefaultStickerOverlayEdit()
+
+		v47.update({ Dash.join(v49, {
+			stickerURI = s1
+		}) })
+
+		local t2 = {
+			stickerURI = s1
+		}
+
+		for v51, v52 in makeCreationEventFields.makeToolFieldFromKind("sticker") do
+			t2[v51] = v52
+		end
+
+		local v53 = SessionManager.getSessionId(FunnelEventNames.FunnelTypes.CreationFlow)
+
+		for v54, v55 in makeCreationEventFields.makeCreationBaseFields(v53) do
+			t2[v54] = v55
+		end
+
+		fireAnalyticsEvent(EventNames.EditingFlowStickerSelected, t2)
 	end, { controller })
+	local v41 = useMemo(function() -- line: 119
+		-- upvalues: ReactionType (copy), ReactionAssets (copy), React (copy), StickerPickerItem (copy), v40 (copy)
+		local t3 = {}
+		local n2 = 0
+
+		for _, v59 in ReactionType do
+			local v60 = ReactionAssets.getStickerImageUri(v59)
+
+			if v60 ~= nil then
+				n2 += 1
+				table.insert(t3, React.createElement(StickerPickerItem, {
+					key = v59,
+					layoutOrder = n2,
+					stickerURI = v60,
+					onStickerSelected = v40
+				}))
+			end
+		end
+
+		return t3
+	end, { v40 })
 
 	return React.createElement(View, {
 		tag = "col align-x-center align-y-bottom gap-large position-bottom-center anchor-bottom-center size-full-0 auto-y",
 		LayoutOrder = t1.layoutOrder,
 		padding = {
-			top = UDim.new(0, v29.Padding.Small),
-			bottom = UDim.new(0, (math.max(v28.bottom, v29.Padding.Small))),
-			left = UDim.new(0, (math.max(v28.left, v29.Padding.XLarge))),
-			right = UDim.new(0, (math.max(v28.right, v29.Padding.XLarge)))
+			top = UDim.new(0, v33.Padding.Small),
+			bottom = UDim.new(0, (math.max(v32.bottom, v33.Padding.Small))),
+			left = UDim.new(0, (math.max(v32.left, v33.Padding.XLarge))),
+			right = UDim.new(0, (math.max(v32.right, v33.Padding.XLarge)))
 		}
 	}, {
 		StickerSizeSlider = React.createElement(Slider, {
@@ -129,10 +148,10 @@ local function StickerOverlayControls(t1: {[any]: any}) -- line: 49
 				size = Foundation.Enums.InputSize.Large
 			}),
 			knobVisibility = Foundation.Enums.Visibility.Always,
-			onValueChanged = v33,
+			onValueChanged = v37,
 			size = Foundation.Enums.InputSize.XSmall,
 			range = NumberRange.new(Constants.StickerOverlay.MinStickerSize, Constants.StickerOverlay.MaxStickerSize),
-			value = math.clamp(v32 or Constants.StickerOverlay.DefaultStickerSize, Constants.StickerOverlay.MinStickerSize, Constants.StickerOverlay.MaxStickerSize),
+			value = math.clamp(v36 or Constants.StickerOverlay.DefaultStickerSize, Constants.StickerOverlay.MinStickerSize, Constants.StickerOverlay.MaxStickerSize),
 			variant = Foundation.Enums.SliderVariant.Standard
 		}),
 		Nav = React.createElement(View, {
@@ -142,21 +161,21 @@ local function StickerOverlayControls(t1: {[any]: any}) -- line: 49
 			BackButton = React.createElement(Button, {
 				LayoutOrder = 1,
 				fillBehavior = Foundation.Enums.FillBehavior.Fit,
-				text = v30.GeneralCtaBack,
+				text = v34.GeneralCtaBack,
 				variant = Foundation.Enums.ButtonVariant.Text,
-				onActivated = v34,
+				onActivated = v38,
 				size = Foundation.Enums.InputSize.Medium
 			}),
 			StickerRow = React.createElement(View, {
 				LayoutOrder = 2,
 				tag = "row flex-x-between align-x-center align-y-center gap-small auto-xy"
-			}, v36),
+			}, v41),
 			DoneButton = React.createElement(Button, {
 				LayoutOrder = 3,
 				fillBehavior = Foundation.Enums.FillBehavior.Fit,
-				text = v30.GeneralCtaDone,
+				text = v34.GeneralCtaDone,
 				variant = Foundation.Enums.ButtonVariant.Text,
-				onActivated = v35,
+				onActivated = v39,
 				size = Foundation.Enums.InputSize.Medium
 			})
 		})

@@ -2,6 +2,7 @@ local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local Dash = require(FoundationParent.Dash)
 local React = require(FoundationParent.React)
+local Flags = require(Foundation.Utility.Flags)
 
 require(Foundation.Components.Types)
 
@@ -25,43 +26,43 @@ local t1 = {
 }
 local color3 = Color3.fromRGB(163, 162, 165)
 
-local function Interactable(p1, p2) -- line: 48
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), useTokens (copy), useCursor (copy), ControlState (copy), color3 (copy), getOriginalBackgroundStyle (copy), StateLayerAffordance (copy), getStateLayerStyle (copy), blendColors (copy), joinBindables (copy), useGuiControlState (copy), mapBindable (copy), Dash (copy)
-	local v21 = withDefaults(p1, t1)
-	local v22 = React.useRef(nil)
-	local v23 = useTokens()
-	local v24 = useCursor(v21.cursor)
-	local v25, v26 = React.useBinding(ControlState.Initialize)
-	local v27 = React.useRef(nil)
-	local v28 = React.useCallback(function(p3) -- line: 56
-		-- upvalues: v25 (copy), ControlState (copy), v22 (copy), color3 (copy), v27 (copy), v26 (copy), v21 (copy)
-		if v25:getValue() == ControlState.Default and v22.current ~= nil then
-			local Styled = v22.current:GetStyled("BackgroundColor3")
-			local Styled2 = v22.current:GetStyled("BackgroundTransparency")
+local function Interactable(p1, p2) -- line: 49
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), useTokens (copy), useCursor (copy), ControlState (copy), color3 (copy), getOriginalBackgroundStyle (copy), StateLayerAffordance (copy), getStateLayerStyle (copy), blendColors (copy), joinBindables (copy), useGuiControlState (copy), mapBindable (copy), Flags (copy), Dash (copy)
+	local v22 = withDefaults(p1, t1)
+	local v23 = React.useRef(nil)
+	local v24 = useTokens()
+	local v25 = useCursor(v22.cursor)
+	local v26, v27 = React.useBinding(ControlState.Initialize)
+	local v28 = React.useRef(nil)
+	local v29 = React.useCallback(function(p3) -- line: 57
+		-- upvalues: v26 (copy), ControlState (copy), v23 (copy), color3 (copy), v28 (copy), v27 (copy), v22 (copy)
+		if v26:getValue() == ControlState.Default and v23.current ~= nil then
+			local Styled = v23.current:GetStyled("BackgroundColor3")
+			local Styled2 = v23.current:GetStyled("BackgroundTransparency")
 
 			if Styled ~= color3 or Styled2 ~= 0 then
-				v27.current = {
+				v28.current = {
 					Color3 = Styled,
 					Transparency = Styled2
 				}
 			end
 		end
 
-		v26(p3)
+		v27(p3)
 
-		if v21.onStateChanged ~= nil then
-			v21.onStateChanged(p3)
+		if v22.onStateChanged ~= nil then
+			v22.onStateChanged(p3)
 		end
-	end, { v21.onStateChanged })
-	local v29 = React.useMemo(function() -- line: 73
-		-- upvalues: getOriginalBackgroundStyle (copy), v21 (copy)
-		return getOriginalBackgroundStyle(v21.BackgroundColor3, v21.BackgroundTransparency)
+	end, { v22.onStateChanged })
+	local v30 = React.useMemo(function() -- line: 74
+		-- upvalues: getOriginalBackgroundStyle (copy), v22 (copy)
+		return getOriginalBackgroundStyle(v22.BackgroundColor3, v22.BackgroundTransparency)
 	end, {
-		v21.BackgroundColor3,
-		v21.BackgroundTransparency
+		v22.BackgroundColor3,
+		v22.BackgroundTransparency
 	})
-	local v30 = React.useCallback(function(p4, p5, p6, p7) -- line: 78
-		-- upvalues: ControlState (copy), StateLayerAffordance (copy), v27 (copy), getStateLayerStyle (copy), v23 (copy), blendColors (copy)
+	local v31 = React.useCallback(function(p4, p5, p6, p7) -- line: 79
+		-- upvalues: ControlState (copy), StateLayerAffordance (copy), v28 (copy), getStateLayerStyle (copy), v24 (copy), blendColors (copy)
 		if p4 == ControlState.Initialize or (p4 == ControlState.Default or p4 == ControlState.Disabled or p7 == StateLayerAffordance.None) then
 			return p5
 		end
@@ -72,71 +73,72 @@ local function Interactable(p1, p2) -- line: 48
 		}
 
 		if p5.Color3 == nil then
-			t2.Color3 = if not v27.current then nil else v27.current.Color3
+			t2.Color3 = if not v28.current then nil else v28.current.Color3
 		end
 
 		if p5.Transparency == nil then
-			t2.Transparency = if not v27.current then nil else v27.current.Transparency
+			t2.Transparency = if not v28.current then nil else v28.current.Transparency
 		end
 
-		local v43 = getStateLayerStyle(v23, p6, p4)
+		local v44 = getStateLayerStyle(v24, p6, p4)
 
-		return blendColors(t2, v43)
+		return blendColors(t2, v44)
 	end, {
-		v23,
-		v21.BackgroundColor3,
-		v21.BackgroundTransparency
+		v24,
+		v22.BackgroundColor3,
+		v22.BackgroundTransparency
 	})
-	local v31 = React.useMemo(function() -- line: 121
-		-- upvalues: joinBindables (copy), v25 (copy), v29 (copy), v21 (copy), v30 (copy)
+	local v32 = React.useMemo(function() -- line: 122
+		-- upvalues: joinBindables (copy), v26 (copy), v30 (copy), v22 (copy), v31 (copy)
 		return joinBindables({
-			controlState = v25,
-			backgroundStyle = v29,
-			mode = if not v21.stateLayer then nil else v21.stateLayer.mode,
-			affordance = if not v21.stateLayer then nil else v21.stateLayer.affordance
-		}, function(p8) -- line: 127
-			-- upvalues: v30 (copy)
-			return v30(p8.controlState, p8.backgroundStyle, p8.mode, p8.affordance)
+			controlState = v26,
+			backgroundStyle = v30,
+			mode = if not v22.stateLayer then nil else v22.stateLayer.mode,
+			affordance = if not v22.stateLayer then nil else v22.stateLayer.affordance
+		}, function(p8) -- line: 128
+			-- upvalues: v31 (copy)
+			return v31(p8.controlState, p8.backgroundStyle, p8.mode, p8.affordance)
 		end)
 	end, {
-		v29,
-		v25,
 		v30,
-		if not v21.stateLayer then nil else v21.stateLayer.mode,
-		if not v21.stateLayer then nil else v21.stateLayer.affordance
+		v26,
+		v31,
+		if not v22.stateLayer then nil else v22.stateLayer.mode,
+		if not v22.stateLayer then nil else v22.stateLayer.affordance
 	})
-	local v32 = useGuiControlState(v22, v28)
+	local v33 = useGuiControlState(v23, v29)
 
-	React.useImperativeHandle(p2, function() -- line: 142
-		-- upvalues: v22 (copy)
-		return v22.current
+	React.useImperativeHandle(p2, function() -- line: 143
+		-- upvalues: v23 (copy)
+		return v23.current
 	end, {})
 
 	local t3 = {
-		BackgroundColor3 = mapBindable(v31, function(p9) -- line: 147
+		BackgroundColor3 = mapBindable(v32, function(p9) -- line: 148
 			return p9.Color3
 		end),
-		BackgroundTransparency = mapBindable(v31, function(p10) -- line: 150
+		BackgroundTransparency = mapBindable(v32, function(p10) -- line: 151
 			return p10.Transparency
 		end),
-		Active = not v21.isDisabled,
-		Interactable = not v21.isDisabled,
-		[React.Event.Activated] = if v21.isDisabled then nil else v21.onActivated,
-		[React.Event.MouseButton2Click] = if v21.isDisabled then nil else v21.onSecondaryActivated,
-		ref = v32,
-		SelectionImageObject = v21.SelectionImageObject or v24
+		Active = not v22.isDisabled,
+		Interactable = not v22.isDisabled,
+		[React.Event.Activated] = if v22.isDisabled then nil else v22.onActivated,
+		[React.Event.SecondaryActivated] = if not Flags.FoundationInteractableSecondaryActivated or v22.isDisabled then nil else v22.onSecondaryActivated,
+		[React.Event.MouseButton2Click] = if Flags.FoundationInteractableSecondaryActivated or v22.isDisabled then nil else v22.onSecondaryActivated,
+		ref = v33,
+		SelectionImageObject = v22.SelectionImageObject or v25
 	}
-	local v34 = Dash.union(v21, t3)
+	local v35 = Dash.union(v22, t3)
 
-	v34.component = nil
-	v34.isDisabled = nil
-	v34.onActivated = nil
-	v34.onSecondaryActivated = nil
-	v34.onStateChanged = nil
-	v34.stateLayer = nil
-	v34.cursor = nil
+	v35.component = nil
+	v35.isDisabled = nil
+	v35.onActivated = nil
+	v35.onSecondaryActivated = nil
+	v35.onStateChanged = nil
+	v35.stateLayer = nil
+	v35.cursor = nil
 
-	return React.createElement(v21.component, v34)
+	return React.createElement(v22.component, v35)
 end
 
 return React.memo(React.forwardRef(Interactable))

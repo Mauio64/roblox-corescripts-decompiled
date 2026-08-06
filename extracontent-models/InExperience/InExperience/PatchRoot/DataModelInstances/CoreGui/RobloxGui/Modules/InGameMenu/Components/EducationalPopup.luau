@@ -62,7 +62,7 @@ function v17.render(p2) -- line: 46
 			cancelText = p3.actionExit,
 			confirmText = p3.actionHome,
 			titleBackgroundImageProps = {
-				image = "rbxasset://textures/ui/LuaApp/graphic/Auth/GridBackground.jpg",
+				image = "rbxasset://textures/ui/LuaApp/graphic/Auth/GridBackground_05202026.jpg",
 				imageHeight = 200,
 				text = "<font face=\"GothamBlack\" size=\"42\">" .. p3.title .. "</font><font size=\"4\"><br /></font><br />" .. p3.subtitle
 			},

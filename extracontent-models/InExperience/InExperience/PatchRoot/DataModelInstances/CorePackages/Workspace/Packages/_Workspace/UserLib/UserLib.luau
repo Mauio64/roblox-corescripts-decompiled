@@ -5,7 +5,6 @@ local Actions = require(script.Actions)
 local Utils = require(script.Utils)
 local Thunks = require(script.Thunks)
 local Requests = require(script.Requests)
-local Stores = require(script.Stores)
 local Handlers = require(script.Handlers)
 
 return {
@@ -16,6 +15,5 @@ return {
 	Utils = Utils,
 	Thunks = Thunks,
 	Requests = Requests,
-	Stores = Stores,
 	Handlers = Handlers
 }

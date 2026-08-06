@@ -6,11 +6,13 @@ local useSmartSuggestions = require(script.Parent.useSmartSuggestions)
 local Chip = Foundation.Chip
 local ChipSize = Foundation.Enums.ChipSize
 local useTokens = Foundation.Hooks.useTokens
+local SuggestionType = Types.SuggestionType
 local t1 = {
-	[Types.SuggestionType.GameCard] = Foundation.Enums.IconName.Controller
+	[SuggestionType.GameCard] = Foundation.Enums.IconName.Controller,
+	[SuggestionType.StartParty] = Foundation.Enums.IconName.ThreePeople
 }
 
-local function attachGrowFlexItem(p1) -- line: 45
+local function attachGrowFlexItem(p1) -- line: 43
 	if p1 ~= nil and p1:FindFirstChildOfClass("UIFlexItem") == nil then
 		local UIFlexItem = Instance.new("UIFlexItem")
 
@@ -18,35 +20,35 @@ local function attachGrowFlexItem(p1) -- line: 45
 		UIFlexItem.Parent = p1
 	end
 end
-local function SmartSuggestionsChipRow(t2: {[any]: any}) -- line: 53
+local function SmartSuggestionsChipRow(t2: {[any]: any}) -- line: 51
 	-- upvalues: useTokens (copy), useSmartSuggestions (copy), React (copy), Chip (copy), t1 (copy), ChipSize (copy), attachGrowFlexItem (copy), Foundation (copy)
-	local v15 = useTokens()
-	local v16 = useSmartSuggestions(t2.conversationId, t2.sendMessage, t2.sendGameLinkChatMessage)
-	local v17 = t2.suggestions or v16.suggestions
-	local hiddenSuggestions = v16.hiddenSuggestions
-	local onActivated = v16.onActivated
+	local v16 = useTokens()
+	local v17 = useSmartSuggestions(t2.conversationId, t2.sendMessage, t2.sendGameLinkChatMessage)
+	local v18 = t2.suggestions or v17.suggestions
+	local hiddenSuggestions = v17.hiddenSuggestions
+	local onActivated = v17.onActivated
 	local t3 = {}
-	local v21 = false
+	local v22 = false
 
-	for v22, v23 in v17 do
-		local v24 = hiddenSuggestions[v23] == true
+	for v23, v24 in v18 do
+		local v25 = hiddenSuggestions[v24] == true
 
-		v21 = v21 or not v24
-		t3[`chip_{ v22 }`] = React.createElement(Chip, {
-			text = v23.display_text,
-			leading = t1[v23.type],
+		v22 = v22 or not v25
+		t3[`chip_{ v23 }`] = React.createElement(Chip, {
+			text = v24.display_text,
+			leading = t1[v24.type],
 			size = ChipSize.Large,
-			LayoutOrder = v22,
-			Visible = not v24,
+			LayoutOrder = v23,
+			Visible = not v25,
 			ref = attachGrowFlexItem,
-			onActivated = function() -- line: 72
-				-- upvalues: onActivated (copy), v23 (copy)
-				onActivated(v23)
+			onActivated = function() -- line: 70
+				-- upvalues: onActivated (copy), v24 (copy)
+				onActivated(v24)
 			end
 		})
 	end
 
-	if not v21 then
+	if not v22 then
 		return nil
 	end
 
@@ -56,7 +58,7 @@ local function SmartSuggestionsChipRow(t2: {[any]: any}) -- line: 53
 		layout = {
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v15.Gap.Small),
+			Padding = UDim.new(0, v16.Gap.Small),
 			SortOrder = Enum.SortOrder.LayoutOrder
 		},
 		scroll = {

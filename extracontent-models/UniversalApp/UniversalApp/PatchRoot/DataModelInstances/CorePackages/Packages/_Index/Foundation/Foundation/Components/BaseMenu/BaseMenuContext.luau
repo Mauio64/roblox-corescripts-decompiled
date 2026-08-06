@@ -15,6 +15,7 @@ return (React.createContext({
 	hoverCloseAtDepth = nil,
 	hoverReset = nil,
 	depth = 1,
+	maxHeight = nil,
 	size = InputSize.Medium,
 	hoverOpenPath = {}
 }))

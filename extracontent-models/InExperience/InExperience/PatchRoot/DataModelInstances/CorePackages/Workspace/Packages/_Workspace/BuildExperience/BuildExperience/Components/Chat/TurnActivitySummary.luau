@@ -17,12 +17,12 @@ local IconSize = Foundation.Enums.IconSize
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local t1 = {}
 
-local function constantSource() -- line: 43
+local function constantSource() -- line: 41
 	return 0
 end
-local function useReactiveValue(p1) -- line: 47
+local function useReactiveValue(p1) -- line: 45
 	-- upvalues: React (copy), constantSource (copy), SignalsReact (copy)
-	local v25 = React.useCallback(function(p2) -- line: 48
+	local v25 = React.useCallback(function(p2) -- line: 46
 		-- upvalues: p1 (copy), constantSource (copy)
 		if typeof(p1) == "function" then
 			return (p1(p2))
@@ -37,7 +37,7 @@ local function useReactiveValue(p1) -- line: 47
 
 	return (SignalsReact.useSignalState(v25))
 end
-local function createThinkingGradient(p3, b1: boolean) -- line: 61
+local function createThinkingGradient(p3, b1: boolean) -- line: 59
 	-- upvalues: React (copy), chatConstants (copy)
 	return React.createElement("UIGradient", {
 		Enabled = b1,
@@ -46,13 +46,13 @@ local function createThinkingGradient(p3, b1: boolean) -- line: 61
 			NumberSequenceKeypoint.new(0.5, 0),
 			NumberSequenceKeypoint.new(1, 0.55)
 		}),
-		Offset = p3:map(function(n1: number) -- line: 69
+		Offset = p3:map(function(n1: number) -- line: 67
 			-- upvalues: chatConstants (copy)
 			return Vector2.new(n1 * chatConstants.THINKING_GRADIENT_ANIMATION_SPEED % chatConstants.THINKING_GRADIENT_OFFSET - chatConstants.THINKING_GRADIENT_OFFSET / 2, 0)
 		end)
 	})
 end
-local function createActivityText(s1: string, n2: number) -- line: 79
+local function createActivityText(s1: string, n2: number) -- line: 77
 	-- upvalues: React (copy), FoundationText (copy)
 	return React.createElement(FoundationText, {
 		tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-muted",
@@ -60,7 +60,7 @@ local function createActivityText(s1: string, n2: number) -- line: 79
 		Text = s1
 	})
 end
-local function createActivityItem(p4, n3: number) -- line: 87
+local function createActivityItem(p4, n3: number) -- line: 85
 	-- upvalues: createActivityText (copy), turnDisplay (copy)
 	if p4.kind == "tool_call" then
 		return createActivityText(turnDisplay.getToolActivityLabel(p4), n3)
@@ -68,7 +68,7 @@ local function createActivityItem(p4, n3: number) -- line: 87
 
 	return nil
 end
-local function createActivitySummaryActionText(p5, n4: number, p6, b2: boolean) -- line: 95
+local function createActivitySummaryActionText(p5, n4: number, p6, b2: boolean) -- line: 93
 	-- upvalues: React (copy), FoundationText (copy), createThinkingGradient (copy)
 	return React.createElement(FoundationText, {
 		tag = "size-full-0 auto-y text-body-medium text-no-wrap text-align-x-left text-truncate-end content-muted",
@@ -79,13 +79,13 @@ local function createActivitySummaryActionText(p5, n4: number, p6, b2: boolean) 
 		ThinkingGradient = createThinkingGradient(p6, b2)
 	})
 end
-local function getActivitySummaryActionText(s2: string, p7, t2: {[any]: any}) -- line: 111
+local function getActivitySummaryActionText(s2: string, p7, t2: {[any]: any}) -- line: 109
 	-- upvalues: chatConstants (copy)
 	if s2 ~= chatConstants.ASSISTANT_LOADING_TEXT then
 		return s2
 	end
 
-	return p7:map(function(n5: number) -- line: 120
+	return p7:map(function(n5: number) -- line: 118
 		-- upvalues: t2 (copy), chatConstants (copy)
 		if not t2.isThinking then
 			return chatConstants.ASSISTANT_LOADING_TEXT
@@ -106,7 +106,7 @@ local function getActivitySummaryActionText(s2: string, p7, t2: {[any]: any}) --
 		return chatConstants.ASSISTANT_STILL_WORKING_TEXT
 	end)
 end
-local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
+local function TurnActivitySummary(t3: {[any]: any}) -- line: 136
 	-- upvalues: useReactiveValue (copy), t1 (copy), React (copy), Foundation (copy), chatConstants (copy), turnDisplay (copy), FoundationText (copy), View (copy), createActivitySummaryActionText (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), ScrollView (copy)
 	local segment = t3.segment
 	local v41 = useReactiveValue(segment.label)
@@ -128,19 +128,19 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 		current.startedAt = nil
 	end
 
-	local v53 = React.useCallback(function() -- line: 159
+	local v53 = React.useCallback(function() -- line: 157
 		-- upvalues: v45 (copy)
-		v45(function(b3: boolean) -- line: 160
+		v45(function(b3: boolean) -- line: 158
 			return not b3
 		end)
 	end, {})
-	local v54 = React.useCallback(function(p8) -- line: 165
+	local v54 = React.useCallback(function(p8) -- line: 163
 		-- upvalues: v48 (copy)
 		if p8 == nil then
 			return
 		end
 
-		task.defer(function() -- line: 170
+		task.defer(function() -- line: 168
 			-- upvalues: v48 (copy), p8 (copy)
 			if v48.current ~= p8 then
 				return
@@ -151,7 +151,7 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 			p8.CanvasPosition = Vector2.new(0, v89)
 		end)
 	end, {})
-	local v55 = React.useCallback(function(p9) -- line: 181
+	local v55 = React.useCallback(function(p9) -- line: 179
 		-- upvalues: v48 (copy), v54 (copy)
 		v48.current = p9
 
@@ -159,7 +159,7 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 			v54(p9)
 		end
 	end, { v54 })
-	local v56 = React.useCallback(function(p10) -- line: 188
+	local v56 = React.useCallback(function(p10) -- line: 186
 		-- upvalues: v47 (copy), v54 (copy)
 		v47(p10.AbsoluteCanvasSize.Y)
 		v54(p10)
@@ -167,16 +167,16 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 		v47,
 		v54
 	})
-	local v57 = React.useCallback(function(p11) -- line: 193
+	local v57 = React.useCallback(function(p11) -- line: 191
 		-- upvalues: v54 (copy)
 		v54(p11)
 	end, { v54 })
 
-	React.useEffect(function() -- line: 197
+	React.useEffect(function() -- line: 195
 		-- upvalues: v54 (copy), v48 (copy)
 		v54(v48.current)
 
-		return function() -- line: 199
+		return function() -- line: 197
 		end
 	end, {
 		v54,
@@ -222,7 +222,7 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 		local v70 = createActivitySummaryActionText
 		local clockBinding = t3.clockBinding
 
-		t6.CurrentAction = v70(if v41 == chatConstants.ASSISTANT_LOADING_TEXT then clockBinding:map(function(n7: number) -- line: 120
+		t6.CurrentAction = v70(if v41 == chatConstants.ASSISTANT_LOADING_TEXT then clockBinding:map(function(n7: number) -- line: 118
 			-- upvalues: current (copy), chatConstants (copy)
 			if not current.isThinking then
 				return chatConstants.ASSISTANT_LOADING_TEXT
@@ -278,7 +278,7 @@ local function TurnActivitySummary(t3: {[any]: any}) -- line: 138
 			LayoutOrder = 2,
 			tag = "size-full-0 clip",
 			testId = "TurnActivitySummary.ActivityHistory",
-			Size = v46:map(function(n8: number) -- line: 260
+			Size = v46:map(function(n8: number) -- line: 258
 				return UDim2.new(1, 0, 0, (math.clamp(n8, 24, 220)))
 			end),
 			scrollingFrameRef = v55,

@@ -28,7 +28,7 @@ local t1 = {
 	userPresence = UserPresence.None
 }
 
-local function Avatar(p1, p2) -- line: 49
+local function Avatar(p1, p2) -- line: 52
 	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useAvatarVariants (copy), getAvatarSize (copy), React (copy), View (copy), withCommonProps (copy), Image (copy), Flags (copy), mapBindable (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), Dash (copy), StatusIndicator (copy), Indicator (copy)
 	local v26 = withDefaults(p1, t1)
 	local v27 = useTokens()
@@ -44,9 +44,13 @@ local function Avatar(p1, p2) -- line: 49
 		Size = UDim2.fromOffset(v30, v30)
 	}), {
 		Image = React.createElement(Image, {
-			Image = if not Flags.FoundationAvatarBindableUserId then getRbxThumb(ThumbnailType.AvatarHeadShot, v26.userId, ThumbnailSize.Medium) else mapBindable(v26.userId, function(p3) -- line: 70
-				-- upvalues: getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy)
-				return getRbxThumb(ThumbnailType.AvatarHeadShot, p3, ThumbnailSize.Medium)
+			Image = if not Flags.FoundationAvatarBindableUserId then getRbxThumb(ThumbnailType.AvatarHeadShot, v26.userId, ThumbnailSize.Medium, if not Flags.FoundationAvatarIncludeProfileFrame then nil else {
+				includeProfileFrame = v26.includeProfileFrame
+			}) else mapBindable(v26.userId, function(p3) -- line: 73
+				-- upvalues: getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), Flags (copy), v26 (copy)
+				return getRbxThumb(ThumbnailType.AvatarHeadShot, p3, ThumbnailSize.Medium, if not Flags.FoundationAvatarIncludeProfileFrame then nil else {
+					includeProfileFrame = v26.includeProfileFrame
+				})
 			end),
 			tag = v29.avatar.tag,
 			backgroundStyle = v26.backgroundStyle,

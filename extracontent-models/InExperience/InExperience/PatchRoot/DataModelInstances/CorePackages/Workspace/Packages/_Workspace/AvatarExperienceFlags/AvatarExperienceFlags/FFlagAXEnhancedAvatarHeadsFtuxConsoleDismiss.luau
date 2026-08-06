@@ -1,3 +1,0 @@
-local FFlagAXEnableEnhancedAvatarHeadsFtux = require(script.Parent.FFlagAXEnableEnhancedAvatarHeadsFtux)
-
-return game:DefineFastFlag("AXEnhancedAvatarHeadsFtuxConsoleDismiss", false) and FFlagAXEnableEnhancedAvatarHeadsFtux

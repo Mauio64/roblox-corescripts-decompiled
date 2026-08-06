@@ -11,15 +11,15 @@ local CaptureGridItem = require(script.Parent.CaptureGridItem)
 local useCaptureSelectionViewModel = require(script.Parent.useCaptureSelectionViewModel)
 local ScrollingGridView = MomentsCommon.ScrollingGridView
 
-local function renderEmptyState() -- line: 27
+local function renderEmptyState() -- line: 26
 	-- upvalues: React (copy), View (copy)
 	return React.createElement(View, {
 		tag = "align-x-center align-y-center size-full"
 	})
 end
-local function CaptureSelectionView(p1) -- line: 38
+local function CaptureSelectionView(p1) -- line: 37
 	-- upvalues: React (copy), CaptureGridItem (copy), View (copy), MediaPreview (copy), ScrollingGridView (copy), renderEmptyState (copy), Button (copy), Foundation (copy), InputSize (copy), ButtonVariant (copy)
-	local v17 = React.useCallback(function(p2, _: number) -- line: 39
+	local v17 = React.useCallback(function(p2, _: number) -- line: 38
 		-- upvalues: React (copy), CaptureGridItem (copy), p1 (copy)
 		return React.createElement(CaptureGridItem, {
 			capture = p2,
@@ -81,7 +81,7 @@ local function CaptureSelectionView(p1) -- line: 38
 		})
 	})
 end
-local function CaptureSelectionContainer(t1: {[any]: any}) -- line: 100
+local function CaptureSelectionContainer(t1: {[any]: any}) -- line: 99
 	-- upvalues: useCaptureSelectionViewModel (copy), React (copy), CaptureSelectionView (copy)
 	local v19 = useCaptureSelectionViewModel({
 		captureSource = t1.captureSource,

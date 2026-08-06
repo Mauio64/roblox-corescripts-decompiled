@@ -14,15 +14,16 @@ require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
 local AbuseVector = require(GenericAbuseReporting.Enums.AbuseVector)
 local DynamicReport = require(GenericAbuseReporting.UXFlow.DynamicReport.DynamicReport)
 local DynamicReportV2Container = require(GenericAbuseReporting.UXFlow.DynamicReportV2.DynamicReportV2Container)
-local FFlagAddThumbnailSelectorReport = require(GenericAbuseReportingParent.SharedFlags).FFlagAddThumbnailSelectorReport
-local v15 = game:DefineFastFlag("EnableDynamicReportV2ForUserProfileReports3", false)
-local v16 = game:DefineFastFlag("FixKidsBlueOnReportDropdown", false)
+local SharedFlags = require(GenericAbuseReportingParent.SharedFlags)
+local FFlagAddThumbnailSelectorReport = SharedFlags.FFlagAddThumbnailSelectorReport
+local FFlagEnableReportingFlowForMomentsFeed = SharedFlags.FFlagEnableReportingFlowForMomentsFeed
+local v17 = game:DefineFastFlag("FixKidsBlueOnReportDropdown", false)
 
-local function DynamicReportContainer(t1: {[any]: any}) -- line: 38
-	-- upvalues: React (copy), ThemeContext (copy), v15 (copy), AbuseVector (copy), DynamicReportV2Container (copy), v16 (copy), LayerCollectorProvider (copy), AbuseReportBeduiProvider (copy), AbuseReportFormDataProvider (copy), FFlagAddThumbnailSelectorReport (copy), AbuseReportAnalyticsProvider (copy), DynamicReport (copy), FoundationProvider (copy), Foundation (copy)
-	local v19 = React.useContext(ThemeContext)
+local function DynamicReportContainer(t1: {[any]: any}) -- line: 37
+	-- upvalues: React (copy), ThemeContext (copy), AbuseVector (copy), FFlagEnableReportingFlowForMomentsFeed (copy), DynamicReportV2Container (copy), v17 (copy), LayerCollectorProvider (copy), AbuseReportBeduiProvider (copy), AbuseReportFormDataProvider (copy), FFlagAddThumbnailSelectorReport (copy), AbuseReportAnalyticsProvider (copy), DynamicReport (copy), FoundationProvider (copy), Foundation (copy)
+	local v20 = React.useContext(ThemeContext)
 
-	if v15 and t1.abuseVector == AbuseVector.UserProfile then
+	if t1.abuseVector == AbuseVector.UserProfile or FFlagEnableReportingFlowForMomentsFeed and t1.abuseVector == AbuseVector.MomentsFeed then
 		local t2 = {
 			abuseVector = t1.abuseVector,
 			targetId = t1.targetId,
@@ -34,7 +35,7 @@ local function DynamicReportContainer(t1: {[any]: any}) -- line: 38
 		return React.createElement(DynamicReportV2Container, t2)
 	end
 
-	if v16 then
+	if v17 then
 		return React.createElement(LayerCollectorProvider, {}, {
 			AbuseReportBeduiProvider = React.createElement(AbuseReportBeduiProvider, {
 				abuseVector = t1.abuseVector
@@ -54,7 +55,7 @@ local function DynamicReportContainer(t1: {[any]: any}) -- line: 38
 
 	return React.createElement(LayerCollectorProvider, {}, {
 		FoundationProvider = React.createElement(FoundationProvider, {
-			theme = if v19.theme ~= "light" then Foundation.Enums.Theme.Dark else Foundation.Enums.Theme.Light
+			theme = if v20.theme ~= "light" then Foundation.Enums.Theme.Dark else Foundation.Enums.Theme.Light
 		}, {
 			AbuseReportBeduiProvider = React.createElement(AbuseReportBeduiProvider, {
 				abuseVector = t1.abuseVector

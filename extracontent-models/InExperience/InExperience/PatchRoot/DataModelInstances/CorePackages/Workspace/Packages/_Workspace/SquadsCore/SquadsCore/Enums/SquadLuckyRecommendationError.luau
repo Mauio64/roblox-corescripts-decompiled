@@ -1,4 +1,5 @@
 return {
 	NoRecommendations = "NoRecommendations",
-	Failed = "Failed"
+	Failed = "Failed",
+	Timeout = "Timeout"
 }

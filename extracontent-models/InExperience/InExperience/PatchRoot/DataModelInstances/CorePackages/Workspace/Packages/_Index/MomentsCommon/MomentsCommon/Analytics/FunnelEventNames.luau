@@ -33,6 +33,7 @@ local t6 = {
 }
 local t7 = {
 	StickerOverlayButtonPressed = "StickerOverlayButtonPressed",
+	StickerOverlaySelected = "StickerOverlaySelected",
 	StickerOverlayCompleted = "StickerOverlayCompleted"
 }
 local t8 = {
@@ -119,8 +120,12 @@ local t9 = {
 			stepNumber = 1,
 			stepName = "Sticker Overlay Button Pressed"
 		},
-		[t7.StickerOverlayCompleted] = {
+		[t7.StickerOverlaySelected] = {
 			stepNumber = 2,
+			stepName = "Sticker Overlay Selected"
+		},
+		[t7.StickerOverlayCompleted] = {
+			stepNumber = 3,
 			stepName = "Sticker Overlay Completed"
 		}
 	}

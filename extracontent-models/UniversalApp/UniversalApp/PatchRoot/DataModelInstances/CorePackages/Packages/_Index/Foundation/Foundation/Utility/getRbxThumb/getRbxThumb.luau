@@ -56,15 +56,21 @@ local t1 = {
 	}
 }
 
-return function(p1, p2, p3) -- line: 188
-	-- upvalues: t1 (copy), ThumbnailSize (copy), getAssetIdAsNumeric (copy)
-	local v9 = t1[p1][p3 or ThumbnailSize.Medium]
-	local v10 = getAssetIdAsNumeric(p2)
+return function(p1, p2, p3, t2: {[any]: any}?) -- line: 197
+	-- upvalues: t1 (copy), ThumbnailSize (copy), getAssetIdAsNumeric (copy), ThumbnailType (copy)
+	local v10 = t1[p1][p3 or ThumbnailSize.Medium]
+	local v11 = getAssetIdAsNumeric(p2)
 
-	if not v9 then
+	if not v10 then
 		warn(`Unsupported size { p3 } for media type: { p1 }, defaulting to { ThumbnailSize.Medium }`)
-		v9 = t1[p1][ThumbnailSize.Medium]
+		v10 = t1[p1][ThumbnailSize.Medium]
 	end
 
-	return `rbxthumb://type={ p1 }&id={ v10 }&w={ v9.X }&h={ v9.Y }`
+	local v12 = `rbxthumb://type={ p1 }&id={ v11 }&w={ v10.X }&h={ v10.Y }`
+
+	if p1 == ThumbnailType.AvatarHeadShot and t2 and t2.includeProfileFrame then
+		v12 ..= "&includeprofileframe=true"
+	end
+
+	return v12
 end

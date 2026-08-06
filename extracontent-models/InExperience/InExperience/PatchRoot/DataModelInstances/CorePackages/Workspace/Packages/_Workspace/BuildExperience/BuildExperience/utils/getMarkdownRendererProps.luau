@@ -4,10 +4,10 @@ require(Parent.Foundation)
 
 local font = Font.new("rbxasset://fonts/families/BuilderMono.json", Enum.FontWeight.Regular)
 
-local function colorToHex(p1) -- line: 46
+local function colorToHex(p1) -- line: 44
 	return `#{ p1.Color3:ToHex() }`
 end
-local function typographyToTextStyles(p2, p3) -- line: 51
+local function typographyToTextStyles(p2, p3) -- line: 49
 	local p2Font = p2.Font
 	local t1 = {
 		textSize = p2.FontSize,
@@ -33,22 +33,22 @@ local function typographyToTextStyles(p2, p3) -- line: 51
 
 	return t1
 end
-local function getTextSize(p4) -- line: 70
+local function getTextSize(p4) -- line: 68
 	return p4.FontSize
 end
-local function getLineHeight(p5) -- line: 74
+local function getLineHeight(p5) -- line: 72
 	return p5.LineHeight
 end
-local function getColor3(p6) -- line: 78
+local function getColor3(p6) -- line: 76
 	return p6.Color3
 end
-local function getTransparency(p7) -- line: 82
+local function getTransparency(p7) -- line: 80
 	return p7.Transparency
 end
-local function getSize(n1: number) -- line: 86
+local function getSize(n1: number) -- line: 84
 	return n1
 end
-local function getMarkdownRendererProps(p8, p9) -- line: 90
+local function getMarkdownRendererProps(p8, p9) -- line: 88
 	-- upvalues: typographyToTextStyles (copy), font (copy)
 	local Typography = p8.Typography
 	local Content = p8.Color.Content

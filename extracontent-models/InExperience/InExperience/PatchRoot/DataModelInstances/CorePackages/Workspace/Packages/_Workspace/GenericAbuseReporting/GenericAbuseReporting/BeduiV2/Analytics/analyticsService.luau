@@ -1,8 +1,11 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
 local LocalPlayer = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
 local TelemetryService = game:GetService("TelemetryService")
-local Dash = require(Parent.Dash)
-local FFlagFixAnalyticsForDynamicReportV2 = require(Parent.SharedFlags).FFlagFixAnalyticsForDynamicReportV2
+local Dash = require(GenericAbuseReportingParent.Dash)
+local FFlagAbuseReportClientVersion = require(GenericAbuseReporting.Flags.FFlagAbuseReportClientVersion)
+local FFlagFixAnalyticsForDynamicReportV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagFixAnalyticsForDynamicReportV2
 local t1 = {
 	ReportStarted = "OpenDialog",
 	ReportAbandoned = "EarlyClose",
@@ -32,49 +35,53 @@ local t2 = {
 	Footer = "footer",
 	NextAction = "next_action"
 }
+local t3 = {
+	Flow = "flow",
+	SceneSelection = "sceneSelection"
+}
 
-local function isArray(t3: {[any]: any}) -- line: 92
+local function isArray(t4: {[any]: any}) -- line: 107
 	local n1 = 0
 
-	for _ in t3 do
+	for _ in t4 do
 		n1 += 1
 	end
 
-	return n1 == #t3 and n1 > 0
+	return n1 == #t4 and n1 > 0
 end
-local function flattenForTelemetry(t4: {[any]: any}) -- line: 105
-	local t5 = {}
+local function flattenForTelemetry(t5: {[any]: any}) -- line: 120
+	local t6 = {}
 
-	for v16, v17 in t4 do
-		if type(v17) == "table" then
+	for v25, v26 in t5 do
+		if type(v26) == "table" then
 			local n2 = 0
 
-			for _ in v17 do
+			for _ in v26 do
 				n2 += 1
 			end
 
-			if n2 == #v17 and n2 > 0 then
-				local t6 = {}
+			if n2 == #v26 and n2 > 0 then
+				local t7 = {}
 
-				for _, v22 in v17 do
-					table.insert(t6, (tostring(v22)))
+				for _, v31 in v26 do
+					table.insert(t7, (tostring(v31)))
 				end
 
-				t5[v16] = "[" .. table.concat(t6, ", ") .. "]"
+				t6[v25] = "[" .. table.concat(t7, ", ") .. "]"
 			else
-				for v23, v24 in v17 do
-					t5[tostring(v23)] = tostring(v24)
+				for v32, v33 in v26 do
+					t6[tostring(v32)] = tostring(v33)
 				end
 			end
 		else
-			t5[v16] = tostring(v17)
+			t6[v25] = tostring(v26)
 		end
 	end
 
-	return t5
+	return t6
 end
 
-local t7 = {
+local t8 = {
 	eventName = "DynamicAbuseReportEventV2",
 	description = "Event to track dynamic abuse report v2",
 	links = "https://github.rbx.com/Roblox/proto-schemas/pull/8782",
@@ -90,30 +97,72 @@ local t7 = {
 	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportV2ThrottleHundredthsPercent", 0)
 }
 
-return {
-	sendAnalyticsEvent = function(t8: {[any]: any}, t9: {[any]: any}) -- line: 141
-		-- upvalues: FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), LocalPlayer (copy), TelemetryService (copy), t7 (copy), flattenForTelemetry (copy)
-		if FFlagFixAnalyticsForDynamicReportV2 then
-			local v27 = Dash.join(t8, t9, {
-				user_id = LocalPlayer and LocalPlayer.UserId or nil
-			})
+local function getCoreScriptVersion() -- line: 162
+	-- upvalues: RunService (copy)
+	if not game:GetEngineFeature("CoreScriptVersionEnabled") then
+		return nil
+	end
 
-			TelemetryService:LogEvent(t7, {
-				customFields = flattenForTelemetry(v27),
-				eventContext = t8.abuse_vector
+	local ok, result = pcall(function() -- line: 167
+		-- upvalues: RunService (copy)
+		return RunService:GetCoreScriptVersion()
+	end)
+
+	if ok then
+		return result
+	end
+
+	return nil
+end
+
+local v16
+
+if FFlagAbuseReportClientVersion then
+	if not game:GetEngineFeature("CoreScriptVersionEnabled") then
+		v16 = nil
+	else
+		local ok, result = pcall(function() -- line: 167
+			-- upvalues: RunService (copy)
+			return RunService:GetCoreScriptVersion()
+		end)
+
+		v16 = if not ok then nil else result
+	end
+else
+	v16 = nil
+end
+
+local v19 = v16
+
+return {
+	sendAnalyticsEvent = function(t9: {[any]: any}, t10: {[any]: any}) -- line: 176
+		-- upvalues: LocalPlayer (copy), FFlagAbuseReportClientVersion (copy), v19 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), TelemetryService (copy), t8 (copy), flattenForTelemetry (copy)
+		local t11 = {
+			user_id = LocalPlayer and LocalPlayer.UserId or nil
+		}
+
+		if FFlagAbuseReportClientVersion then
+			t11.client_version = v19
+		end
+
+		if FFlagFixAnalyticsForDynamicReportV2 then
+			local v39 = Dash.join(t9, t10, t11)
+
+			TelemetryService:LogEvent(t8, {
+				customFields = flattenForTelemetry(v39),
+				eventContext = t9.abuse_vector
 			})
 
 			return
 		end
 
-		TelemetryService:LogEvent(Dash.join(t7, {
-			eventContext = t8.abuse_vector
+		TelemetryService:LogEvent(Dash.join(t8, {
+			eventContext = t9.abuse_vector
 		}), {
-			customFields = Dash.join(t8, t9, {
-				user_id = LocalPlayer and LocalPlayer.UserId or nil
-			})
+			customFields = Dash.join(t9, t10, t11)
 		})
 	end,
 	TelemetryEventType = t1,
-	LinkOpenedSource = t2
+	LinkOpenedSource = t2,
+	SubmitSource = t3
 }

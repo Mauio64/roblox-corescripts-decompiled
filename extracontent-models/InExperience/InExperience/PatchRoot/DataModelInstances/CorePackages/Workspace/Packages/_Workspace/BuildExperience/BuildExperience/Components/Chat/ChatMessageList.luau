@@ -8,7 +8,7 @@ require(BuildExperience.Chat.chatTypes)
 local View = Foundation.View
 local ChatMessageItem = require(script.Parent.ChatMessageItem)
 
-local function ChatMessageList(t1: {[any]: any}) -- line: 24
+local function ChatMessageList(t1: {[any]: any}) -- line: 22
 	-- upvalues: React (copy), View (copy), ChatMessageItem (copy)
 	local t2 = {}
 

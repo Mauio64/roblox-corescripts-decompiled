@@ -5,15 +5,15 @@ local DataHydration = require(AppChatParent.DataHydration)
 
 require(AppChatParent.Signals)
 
-local UserLib = require(AppChatParent.UserLib)
+local LocalUserIdStore = require(AppChatParent.LocalUserIdStore).LocalUserIdStore
 local v6 = require(AppChat.Logger):new(script.Name)
 
 local function resolveLocalUserId(p1) -- line: 24
-	-- upvalues: UserLib (copy)
-	return UserLib.Stores.LocalUserIdStore.getCurrentUserId(p1)
+	-- upvalues: LocalUserIdStore (copy)
+	return LocalUserIdStore.getCurrentUserId(p1)
 end
 local function createFriendsChatMetadataStore() -- line: 28
-	-- upvalues: DataHydration (copy), AppChatNetworking (copy), v6 (copy), resolveLocalUserId (copy), UserLib (copy)
+	-- upvalues: DataHydration (copy), AppChatNetworking (copy), v6 (copy), resolveLocalUserId (copy), LocalUserIdStore (copy)
 	local v10 = DataHydration.createDataCache()
 	local v11 = DataHydration.createDataResolver({
 		supportsMultiGet = false,
@@ -44,8 +44,8 @@ local function createFriendsChatMetadataStore() -- line: 28
 			return v11.fetchItem(resolveLocalUserId(false))
 		end,
 		updateFriendsChatMetadata = function(p6) -- line: 55
-			-- upvalues: v10 (copy), UserLib (copy)
-			v10.replaceItem(UserLib.Stores.LocalUserIdStore.getCurrentUserId(false), p6)
+			-- upvalues: v10 (copy), LocalUserIdStore (copy)
+			v10.replaceItem(LocalUserIdStore.getCurrentUserId(false), p6)
 		end,
 		clear = v11.clear,
 		dispose = v11.dispose

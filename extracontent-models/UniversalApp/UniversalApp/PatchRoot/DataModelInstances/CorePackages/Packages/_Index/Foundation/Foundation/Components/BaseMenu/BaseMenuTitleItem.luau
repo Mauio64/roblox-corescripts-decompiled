@@ -18,7 +18,7 @@ local useBaseMenuItemVariants = require(script.Parent.useBaseMenuItemVariants)
 local function BaseMenuTitleItem(p1, p2) -- line: 32
 	-- upvalues: useTokens (copy), useBaseMenuItemVariants (copy), Flags (copy), React (copy), View (copy), withCommonProps (copy), Text (copy)
 	local v13 = useTokens()
-	local v14 = useBaseMenuItemVariants(v13, p1.size, false)
+	local v14 = useBaseMenuItemVariants(v13, p1.size, false, false)
 
 	if Flags.FoundationBaseMenuBeta then
 		local v15 = if p1.menuHasCheck ~= true then v14.container.paddingLeftWithoutCheck or 0 else (v14.container.paddingLeftWithCheck or 0) + (v14.title.checkColumnWidth or 0)

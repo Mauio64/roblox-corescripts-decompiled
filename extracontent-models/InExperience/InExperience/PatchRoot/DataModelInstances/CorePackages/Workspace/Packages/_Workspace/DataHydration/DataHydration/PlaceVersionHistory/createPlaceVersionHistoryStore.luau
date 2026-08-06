@@ -8,7 +8,7 @@ local fetchPlaceVersionHistory = require(script.Parent.fetchPlaceVersionHistory)
 
 require(script.Parent.PlaceVersionHistoryStoreTypes)
 
-local function createPlaceVersionHistoryStore(t1: {[any]: any}?) -- line: 21
+local function createPlaceVersionHistoryStore(t1: {[any]: any}?) -- line: 20
 	-- upvalues: createSingleEntityResolver (copy), fetchPlaceVersionHistory (copy)
 	local v7 = t1 or {}
 	local t2 = {
@@ -16,7 +16,7 @@ local function createPlaceVersionHistoryStore(t1: {[any]: any}?) -- line: 21
 		baseUrl = v7.baseUrl,
 		developBaseUrl = v7.developBaseUrl
 	}
-	local v9 = createSingleEntityResolver(function(n1: number) -- line: 29
+	local v9 = createSingleEntityResolver(function(n1: number) -- line: 28
 		-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy)
 		return fetchPlaceVersionHistory.fetchHistory(n1, t2)
 	end)
@@ -26,18 +26,18 @@ local function createPlaceVersionHistoryStore(t1: {[any]: any}?) -- line: 21
 		fetchHistory = v9.fetch,
 		getAndFetchHistory = v9.getAndFetch,
 		updateHistory = v9.update,
-		fetchPageHistory = function(n2: number, p1) -- line: 33
+		fetchPageHistory = function(n2: number, p1) -- line: 32
 			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.fetchHistory(n2, t2, p1):andThen(function(p2) -- line: 39
+			return fetchPlaceVersionHistory.fetchHistory(n2, t2, p1):andThen(function(p2) -- line: 38
 				-- upvalues: v9 (copy), n2 (copy)
 				v9.update(n2, p2)
 
 				return p2
 			end)
 		end,
-		revertVersion = function(n3: number, n4: number, n5: number) -- line: 45
+		revertVersion = function(n3: number, n4: number, n5: number) -- line: 44
 			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.revertVersion(n4, n5, t2):andThen(function(_) -- line: 52
+			return fetchPlaceVersionHistory.revertVersion(n4, n5, t2):andThen(function(_) -- line: 51
 				-- upvalues: n4 (copy), n5 (copy), v9 (copy), n3 (copy)
 				local t3 = {
 					assetId = n4,
@@ -47,24 +47,24 @@ local function createPlaceVersionHistoryStore(t1: {[any]: any}?) -- line: 21
 				v9.fetch(n3)
 
 				return t3
-			end):catch(function(p4) -- line: 61
+			end):catch(function(p4) -- line: 60
 				error(p4)
 			end)
 		end,
-		rollbackPlace = function(n6: number, n7: number, s1: string?, b1: boolean?) -- line: 66
+		rollbackPlace = function(n6: number, n7: number, s1: string?, b1: boolean?) -- line: 65
 			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.rollbackPlace(n6, n7, s1, b1, t2):andThen(function(p5) -- line: 74
+			return fetchPlaceVersionHistory.rollbackPlace(n6, n7, s1, b1, t2):andThen(function(p5) -- line: 73
 				-- upvalues: v9 (copy), n6 (copy)
 				v9.fetch(n6)
 
 				return p5
-			end):catch(function(p6) -- line: 78
+			end):catch(function(p6) -- line: 77
 				error(p6)
 			end)
 		end,
-		addVersionNote = function(n8: number, s2: string, p7) -- line: 83
+		addVersionNote = function(n8: number, s2: string, p7) -- line: 82
 			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.addVersionNote(n8, s2, p7, t2):andThen(function(p8) -- line: 90
+			return fetchPlaceVersionHistory.addVersionNote(n8, s2, p7, t2):andThen(function(p8) -- line: 89
 				-- upvalues: v9 (copy), n8 (copy), s2 (copy), p7 (copy)
 				local v30 = v9.get(n8).data(false)
 

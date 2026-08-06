@@ -8,11 +8,11 @@ local debug = require(Parent.DataHydration.CreatorAgentChat).debug
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function cropToSquareAsync(s1: string) -- line: 20
+local function cropToSquareAsync(s1: string) -- line: 19
 	-- upvalues: Promise (copy), AssetService (copy)
-	return Promise.new(function(resolve, reject) -- line: 21
+	return Promise.new(function(resolve, reject) -- line: 20
 		-- upvalues: AssetService (copy), s1 (copy)
-		local ok, result = pcall(function() -- line: 22
+		local ok, result = pcall(function() -- line: 21
 			-- upvalues: AssetService (copy), s1 (copy)
 			return AssetService:CreateEditableImageAsync(Content.fromUri(s1))
 		end)
@@ -71,7 +71,7 @@ local function cropToSquareAsync(s1: string) -- line: 20
 		resolve(buffer.tostring(buf))
 	end)
 end
-local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: {[any]: any}?) -- line: 88
+local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: {[any]: any}?) -- line: 87
 	-- upvalues: Players (copy), Promise (copy), cropToSquareAsync (copy), fetch (copy), asPromise (copy), debug (copy), getAssetUserAuthStore (copy)
 	local LocalPlayer = Players.LocalPlayer
 
@@ -79,7 +79,7 @@ local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: 
 		return Promise.reject("No local player")
 	end
 
-	local function getImageContent() -- line: 99
+	local function getImageContent() -- line: 98
 		-- upvalues: b1 (copy), cropToSquareAsync (copy), s2 (copy), fetch (copy), asPromise (copy)
 		if b1 then
 			return cropToSquareAsync(s2)
@@ -90,12 +90,12 @@ local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: 
 			analyticsKey = "build-experience.download-thumbnail",
 			responseEncoding = "protobuf",
 			url = s2,
-			decode = function(p1: buffer) -- line: 108
+			decode = function(p1: buffer) -- line: 107
 				return p1
 			end
 		})
 
-		return asPromise(v40):andThen(function(p2: buffer) -- line: 112
+		return asPromise(v40):andThen(function(p2: buffer) -- line: 111
 			return buffer.tostring(p2)
 		end)
 	end
@@ -104,7 +104,7 @@ local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: 
 		cropSquare = b1
 	})
 
-	return getImageContent():andThen(function(s4: string) -- line: 121
+	return getImageContent():andThen(function(s4: string) -- line: 120
 		-- upvalues: b1 (copy), getAssetUserAuthStore (copy), s3 (copy), t1 (copy), LocalPlayer (copy)
 		local v42 = not b1 and "image/png" or "image/bmp"
 		local v43 = getAssetUserAuthStore()
@@ -119,10 +119,10 @@ local function createImageAssetAsync(s2: string, s3: string?, b1: boolean?, t1: 
 		end
 
 		return v43.createImageAsset(s4, v42, t2)
-	end):andThen(function(p3) -- line: 134
+	end):andThen(function(p3) -- line: 133
 		-- upvalues: getAssetUserAuthStore (copy)
 		return getAssetUserAuthStore().pollUntilDone(p3)
-	end):andThen(function(p4) -- line: 138
+	end):andThen(function(p4) -- line: 137
 		-- upvalues: Promise (copy), debug (copy)
 		if typeof(p4) == "table" and p4.status == "timed_out" then
 			return Promise.reject("Operation did not complete in time")
