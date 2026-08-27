@@ -1,4 +1,0 @@
-local FFlagPPVEnabledOnConsole = require(script.Parent.FFlagPPVEnabledOnConsole)
-local FFlagAddFriendsTileRefactorWithContextualMenu = require(script.Parent.FFlagAddFriendsTileRefactorWithContextualMenu)
-
-return game:DefineFastFlag("AddFriendsRenderTileRefactor_v1", false) and (FFlagPPVEnabledOnConsole or FFlagAddFriendsTileRefactorWithContextualMenu)
